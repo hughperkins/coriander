@@ -31,8 +31,28 @@ static llvm::LLVMContext TheContext;
 static llvm::IRBuilder<> Builder(TheContext);
 static std::unique_ptr<llvm::Module> TheModule;
 static std::map<std::string, Value *> NamedValues;
+static std::map<string, bool> iskernel_by_name;
 
 map<Value *, string> nameByValue;
+
+std::string dumpType(Type *type);
+
+std::string dumpFunctionType(FunctionType *fn) {
+    cout << "function" << endl;
+    // cout << "name " << string(fn->getName()) << endl;
+    std::string params_str = "";
+    int i = 0;
+    for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
+        Type * paramType = *it;
+        if(i > 0) {
+            params_str += ", ";
+        }
+        params_str += dumpType(paramType);
+        i++;
+    }
+    cout << "params_str " << params_str << endl;
+    return params_str;
+}
 
 std::string dumpType(Type *type) {
     Type::TypeID typeID = type->getTypeID();
@@ -45,6 +65,8 @@ std::string dumpType(Type *type) {
             return "float";
         case Type::DoubleTyID:
             return "double";
+        case Type::FunctionTyID:
+            return dumpFunctionType((FunctionType *)type);
         case Type::PointerTyID:
             // cout << "point type" << endl;
             elementType = type->getPointerElementType();
@@ -102,6 +124,8 @@ string dumpConstant(Constant *constant) {
         PointerType *pointerType = global->getType();
         Type *elementType = pointerType->getPointerElementType();
         cout << "element type " << elementType << endl;
+        cout << dumpType(elementType) << endl;
+        cout << "constant has name " << constant->hasName() << " " << string(constant->getName()) << endl;
     } else {
         cout << "valueTy " << valueTy << endl;
         cout << GlobalValue::classof(constant) << endl;
@@ -250,6 +274,9 @@ void myDump(Function *F) {
     string fname = F->getName();
     // cout << "F has name " << F->hasName() << " " << fname << endl;
     string gencode = "";
+    if(iskernel_by_name[fname]) {
+        gencode += "kernel ";
+    }
     gencode += dumpType(retType) + " " + fname + "(";
     // gencode += fname + "(";
     int i = 0;
@@ -277,26 +304,43 @@ void myDump(Function *F) {
 void dumpModule(Module *M) {
     for(auto it=M->named_metadata_begin(); it != M->named_metadata_end(); it++) {
         NamedMDNode *namedMDNode = &*it;
-        cout << "namedmdnode " << namedMDNode << endl;
-        cout << "name " << string(namedMDNode->getName()) << endl;
+        // cout << "namedmdnode " << namedMDNode << endl;
+        // cout << "name " << string(namedMDNode->getName()) << endl;
         for(auto it2=namedMDNode->op_begin(); it2 != namedMDNode->op_end(); it2++) {
             MDNode *mdNode = *it2;
-            cout << "   got an mdnode " << endl;
+            // cout << "   got an mdnode " << endl;
+            bool isKernel = false;
+            string kernelName = "";
             for(auto it3=mdNode->op_begin(); it3 != mdNode->op_end(); it3++) {
                 const MDOperand *op = it3;
                 // cout << "      got an op" << endl;
                 Metadata *metadata = op->get();
                 // cout << "      got a metadata " << metadata << endl;
                 if(metadata != 0) {
-                    cout << "      metadata " << metadata->getMetadataID() << endl;
+                    // cout << "      metadata " << metadata->getMetadataID() << endl;
                     // cout << ConstantAsMetadata::classof(metadata) << endl;
                     if(MDString::classof(metadata)) {
-                        cout << string(((MDString *)metadata)->getString()) << endl;
+                        string meta_value = string(((MDString *)metadata)->getString());
+                        // cout << meta_value << endl;
+                        if(meta_value == "kernel") {
+                            isKernel = true;
+                        }
                     } else if(ConstantAsMetadata::classof(metadata)) {
                         Constant *constant = ((ConstantAsMetadata *)metadata)->getValue();
-                        cout << dumpConstant(constant) << endl;
+                        // cout << dumpConstant(constant) << endl;
+                        if(GlobalValue::classof(constant)) {
+                            GlobalValue *global = (GlobalValue *)constant;
+                            if(global->getType()->getPointerElementType()->getTypeID() == Type::FunctionTyID) {
+                                // cout << "found function constant" << endl;
+                                string functionName = string(constant->getName());
+                                kernelName = functionName;
+                            }
+                        }
                     }
                 }
+            }
+            if(isKernel) {
+                iskernel_by_name[kernelName] = true;
             }
         }
     }
