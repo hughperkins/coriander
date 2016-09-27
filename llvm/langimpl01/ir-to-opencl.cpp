@@ -113,6 +113,14 @@ int getIntConstant(Value *value) {
     return ((ConstantInt *)value)->getSExtValue();
 }
 
+double getFloatConstant(Value *value) {
+    unsigned int valueTy = value->getValueID();
+    if(valueTy != AShrOperator::ConstantFPVal) {
+        throw runtime_error("not a constant float");
+    }
+    return ((ConstantFP *)value)->getValueAPF().convertToFloat();
+}
+
 string dumpConstant(Constant *constant) {
     unsigned int valueTy = constant->getValueID();
     ostringstream oss;
@@ -141,6 +149,12 @@ string dumpOperand(Value *value) {
         int intvalue = getIntConstant(value);
         ostringstream oss;
         oss << intvalue;
+        return oss.str();
+    }
+    if(valueTy == AShrOperator::ConstantFPVal) {
+        double floatvalue = getFloatConstant(value);
+        ostringstream oss;
+        oss << floatvalue;
         return oss.str();
     }
     string name = nameByValue[value];
