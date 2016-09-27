@@ -97,6 +97,11 @@ string dumpConstant(Constant *constant) {
     if(valueTy == AShrOperator::ConstantIntVal) {
         // return ((ConstantInt *)value)->getSExtValue();
         oss << "int:" << ((ConstantInt *)constant)->getSExtValue();
+    } else if(GlobalValue::classof(constant)) {
+        GlobalValue *global = (GlobalValue *)constant;
+        PointerType *pointerType = global->getType();
+        Type *elementType = pointerType->getPointerElementType();
+        cout << "element type " << elementType << endl;
     } else {
         cout << "valueTy " << valueTy << endl;
         cout << GlobalValue::classof(constant) << endl;
