@@ -21,8 +21,26 @@ define float @_Z3barff(float %a, float %b) #1 {
 }
 
 ; Function Attrs: norecurse nounwind
+define void @_Z7incrvalPf(float* nocapture %a) #2 {
+  %1 = load float, float* %a, align 4, !tbaa !8
+  %2 = fadd float %1, 3.000000e+00
+  store float %2, float* %a, align 4, !tbaa !8
+  ret void
+}
+
+; Function Attrs: norecurse nounwind
+define void @_Z11somekernel1Pf(float* nocapture %a) #2 {
+  %1 = getelementptr inbounds float, float* %a, i64 1
+  %2 = bitcast float* %1 to i32*
+  %3 = load i32, i32* %2, align 4, !tbaa !8
+  %4 = bitcast float* %a to i32*
+  store i32 %3, i32* %4, align 4, !tbaa !8
+  ret void
+}
+
+; Function Attrs: norecurse nounwind
 define void @_Z3fooPf(float* nocapture %data) #2 {
-  store float 1.230000e+02, float* %data, align 4, !tbaa !7
+  store float 1.230000e+02, float* %data, align 4, !tbaa !8
   ret void
 }
 
@@ -31,19 +49,20 @@ attributes #1 = { norecurse nounwind readnone "disable-tail-calls"="false" "less
 attributes #2 = { norecurse nounwind "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="sm_20" "target-features"="+ptx42" "unsafe-fp-math"="false" "use-soft-float"="false" }
 attributes #3 = { nounwind readnone }
 
-!nvvm.annotations = !{!0, !1, !2, !1, !3, !3, !3, !3, !4, !4, !3}
-!llvm.ident = !{!5}
+!nvvm.annotations = !{!0, !1, !2, !3, !2, !4, !4, !4, !4, !5, !5, !4}
+!llvm.ident = !{!6}
 !nvvm.internalize.after.link = !{}
-!nvvmir.version = !{!6}
+!nvvmir.version = !{!7}
 
-!0 = !{void (float*)* @_Z3fooPf, !"kernel", i32 1}
-!1 = !{null, !"align", i32 8}
-!2 = !{null, !"align", i32 8, !"align", i32 65544, !"align", i32 131080}
-!3 = !{null, !"align", i32 16}
-!4 = !{null, !"align", i32 16, !"align", i32 65552, !"align", i32 131088}
-!5 = !{!"clang version 3.8.0-2ubuntu4 (tags/RELEASE_380/final)"}
-!6 = !{i32 1, i32 2}
-!7 = !{!8, !8, i64 0}
-!8 = !{!"float", !9, i64 0}
-!9 = !{!"omnipotent char", !10, i64 0}
-!10 = !{!"Simple C/C++ TBAA"}
+!0 = !{void (float*)* @_Z11somekernel1Pf, !"kernel", i32 1}
+!1 = !{void (float*)* @_Z3fooPf, !"kernel", i32 1}
+!2 = !{null, !"align", i32 8}
+!3 = !{null, !"align", i32 8, !"align", i32 65544, !"align", i32 131080}
+!4 = !{null, !"align", i32 16}
+!5 = !{null, !"align", i32 16, !"align", i32 65552, !"align", i32 131088}
+!6 = !{!"clang version 3.8.0-2ubuntu4 (tags/RELEASE_380/final)"}
+!7 = !{i32 1, i32 2}
+!8 = !{!9, !9, i64 0}
+!9 = !{!"float", !10, i64 0}
+!10 = !{!"omnipotent char", !11, i64 0}
+!11 = !{!"Simple C/C++ TBAA"}

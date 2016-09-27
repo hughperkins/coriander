@@ -68,3 +68,4 @@ llvm/test1/env2
 *.bc
 
 llvm/langimpl01/run
+llvm/langimpl01/ir-to-opencl

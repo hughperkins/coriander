@@ -9,8 +9,10 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Verifier.h"
 #include "llvm/IR/Type.h"
+#include "llvm/IR/ValueSymbolTable.h"
 // #include "llvm/IR/Core.h"
 #include "llvm/IR/Instructions.h"
+#include "llvm/IR/DebugInfoMetadata.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/SourceMgr.h"
 #include <iostream>
@@ -87,6 +89,21 @@ int getIntConstant(Value *value) {
         throw runtime_error("not a constant int");
     }
     return ((ConstantInt *)value)->getSExtValue();
+}
+
+string dumpConstant(Constant *constant) {
+    unsigned int valueTy = constant->getValueID();
+    ostringstream oss;
+    if(valueTy == AShrOperator::ConstantIntVal) {
+        // return ((ConstantInt *)value)->getSExtValue();
+        oss << "int:" << ((ConstantInt *)constant)->getSExtValue();
+    } else {
+        cout << "valueTy " << valueTy << endl;
+        cout << GlobalValue::classof(constant) << endl;
+        oss << "unknown";
+    }
+    // return "unknown";
+    return oss.str();
 }
 
 string dumpOperand(Value *value) {
@@ -185,6 +202,8 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             cout << "br" << endl;
         } else if(opcode == Instruction::SExt) {
             cout << "sext" << endl;
+        } else if(opcode == Instruction::BitCast) {
+            cout << "bitcast" << endl;
         } else if(opcode == Instruction::GetElementPtr) {
             cout << "getelementptr" << endl;
         } else if(opcode == Instruction::Ret) {
@@ -251,6 +270,50 @@ void myDump(Function *F) {
 }
 
 void dumpModule(Module *M) {
+    for(auto it=M->named_metadata_begin(); it != M->named_metadata_end(); it++) {
+        NamedMDNode *namedMDNode = &*it;
+        cout << "namedmdnode " << namedMDNode << endl;
+        cout << "name " << string(namedMDNode->getName()) << endl;
+        for(auto it2=namedMDNode->op_begin(); it2 != namedMDNode->op_end(); it2++) {
+            MDNode *mdNode = *it2;
+            cout << "   got an mdnode " << endl;
+            for(auto it3=mdNode->op_begin(); it3 != mdNode->op_end(); it3++) {
+                const MDOperand *op = it3;
+                // cout << "      got an op" << endl;
+                Metadata *metadata = op->get();
+                // cout << "      got a metadata " << metadata << endl;
+                if(metadata != 0) {
+                    cout << "      metadata " << metadata->getMetadataID() << endl;
+                    // cout << ConstantAsMetadata::classof(metadata) << endl;
+                    if(MDString::classof(metadata)) {
+                        cout << string(((MDString *)metadata)->getString()) << endl;
+                    } else if(ConstantAsMetadata::classof(metadata)) {
+                        Constant *constant = ((ConstantAsMetadata *)metadata)->getValue();
+                        cout << dumpConstant(constant) << endl;
+                    }
+                }
+            }
+        }
+    }
+    // cout << string(M->)
+
+    // for(auto it=M->global_begin(); it != M->global_end(); it++) {
+    //     GlobalVariable *global = &*it;
+    //     cout << "global " << global << endl;
+    //     cout << string(global->getName()) << endl;
+    // }
+
+    // for(auto it=M->alias_begin(); it != M->alias_end(); it++) {
+    //     GlobalAlias *alias = &*it;
+    //     cout << "alias " << alias << endl;
+    //     cout << string(alias->getName()) << endl;
+    // }
+
+    // SymbolTable 
+    // for(auto it=M->getValueSymbolTable().begin(); it != M->getValueSymbolTable().end(); it++) {
+    //     cout << "value symbol " << string(it->getName()) << endl;
+    // }
+
     for(auto it = M->begin(); it != M->end(); it++) {
         cout << "function " << string(it->getName()) << endl;
         string name = it->getName();
