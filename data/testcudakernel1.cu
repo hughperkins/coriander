@@ -14,10 +14,10 @@ __global__ void foo(float *data) {
         data[0] = 123.0f;
 }
 
-// __global__ void use_tid(float *data) {
-//     int tid = threadIdx.x;
-//     data[tid] = 123.0f;
-// }
+__global__ void use_tid(float *data) {
+    int tid = threadIdx.x;
+    data[tid] = 123.0f;
+}
 
 template< typename T >
 __device__ T addNumbers(T one, T two) {

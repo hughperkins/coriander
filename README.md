@@ -110,6 +110,7 @@ IR operations supported, at least partially:
 OpenCL/CUDA concepts supported, at least partially:
 - `global` assigned to incoming pointer arrays, and propagated to assigned variables appropriately
 - `kernel`s detected automatically
+- `get_global_id()` / `threadIx.`
 
 C++ things:
 - templating working ok (llvm cuda compiler handles this for us :-) )

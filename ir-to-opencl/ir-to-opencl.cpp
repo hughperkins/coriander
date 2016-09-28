@@ -33,6 +33,7 @@
 #include <cstdlib>
 #include <vector>
 #include <map>
+#include <set>
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
@@ -45,6 +46,7 @@ static llvm::IRBuilder<> Builder(TheContext);
 static std::unique_ptr<llvm::Module> TheModule;
 static std::map<std::string, Value *> NamedValues;
 static std::map<string, bool> iskernel_by_name;
+static std::set<string> ignoredFunctionNames;
 
 map<Value *, string> nameByValue;
 static int nextNameIdx;
@@ -284,7 +286,18 @@ std::string dumpCall(CallInst *instr) {
     string gencode = "";
     string typestr = dumpType(instr->getType());
     gencode += typestr + " " + dumpOperand(instr) + " = ";
-    gencode += string(instr->getCalledValue()->getName()) + "(";
+
+    string functionName = string(instr->getCalledValue()->getName());
+    if(functionName == "llvm.ptx.read.tid.x") {
+        return gencode + "get_global_id(0);\n";
+    }
+    if(functionName == "llvm.ptx.read.tid.y") {
+        return gencode + "get_global_id(1);\n";
+    }
+    if(functionName == "llvm.ptx.read.tid.z") {
+        return gencode + "get_global_id(2);\n";
+    }
+    gencode += functionName + "(";
     int i = 0;
     for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
         Value *op = &*it->get();
@@ -418,7 +431,7 @@ void dumpModule(Module *M) {
         nameByValue.clear();
         nextNameIdx = 0;
         string name = it->getName();
-        if(name != "_ZL21__nvvm_reflect_anchorv" && name != "__nvvm_reflect") {
+        if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end()) {
             Function *F = &*it;
             myDump(F);
         }
@@ -446,6 +459,9 @@ int main(int argc, char *argv[]) {
         Err.print(argv[0], errs());
         return 1;
     }
+    ignoredFunctionNames.insert("llvm.ptx.read.tid.x");
+    ignoredFunctionNames.insert("_ZL21__nvvm_reflect_anchorv");
+    ignoredFunctionNames.insert("__nvvm_reflect");
     dumpModule(TheModule.get());
     return 0;
 }
