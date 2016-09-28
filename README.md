@@ -79,7 +79,7 @@ You'll need:
 - Ubuntu 16.04
 - llvm 3.8
 - clang 3.8
-- CUDA toolkit (tested with CUDA 8.0rc1)
+- CUDA toolkit (tested with CUDA 7.5)
 - Have done `sudo apt-get install libc6-dev-i386`
 
 Then run:
