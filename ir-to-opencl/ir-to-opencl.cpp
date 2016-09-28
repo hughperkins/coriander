@@ -50,6 +50,8 @@ static std::map<string, bool> iskernel_by_name;
 map<Value *, string> nameByValue;
 static int nextNameIdx;
 
+static bool debug;
+
 std::string dumpType(Type *type);
 
 std::string dumpFunctionType(FunctionType *fn) {
@@ -104,6 +106,8 @@ std::string dumpType(Type *type) {
             switch(type->getPrimitiveSizeInBits()) {
                 case 32:
                     return "int";
+                case 64:
+                    return "long";
                 default:
                     cout << "integer size " << type->getPrimitiveSizeInBits() << endl;
                     throw runtime_error("unrecognized size");
@@ -299,7 +303,7 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
         string resultType = dumpType(instruction->getType());
         // cout << "resultType " << resultType << endl;
 
-        if(false) {
+        if(debug) {
             cout << resultType << " " << resultName << " =";
             cout << " " << string(instruction->getOpcodeName());
             for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
@@ -464,11 +468,21 @@ void dumpModule(Module *M) {
 
 int main(int argc, char *argv[]) {
     SMDiagnostic Err;
-    if(argc != 2) {
-        cout << "Usage: " << argv[0] << " target.ll" << endl;
+    if(argc < 2) {
+        cout << "Usage: " << argv[0] << " [--debug] target.ll" << endl;
         return 1;
     }
-    TheModule = parseIRFile(argv[1], Err, TheContext);
+    string target = argv[argc - 1];
+    debug = false;
+    if(argc == 3) {
+        if(string(argv[1]) != "--debug") {
+            cout << "Usage: " << argv[0] << " [--debug] target.ll" << endl;
+            return 1;
+        } else {
+            debug = true;
+        }
+    }
+    TheModule = parseIRFile(target, Err, TheContext);
     if(!TheModule) {
         Err.print(argv[0], errs());
         return 1;
