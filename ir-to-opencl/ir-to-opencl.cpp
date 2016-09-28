@@ -156,7 +156,6 @@ string dumpConstant(Constant *constant) {
         cout << GlobalValue::classof(constant) << endl;
         oss << "unknown";
     }
-    // return "unknown";
     return oss.str();
 }
 
@@ -243,7 +242,6 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
 
 std::string dumpFadd(BinaryOperator *instr) {
     string gencode = "";
-    // cout << "FAdd" << endl;
     string typestr = dumpType(instr->getType());
     gencode += typestr + " " + dumpOperand(instr) + " = ";
     Value *op1 = instr->getOperand(0);
@@ -273,7 +271,6 @@ std::string dumpBitcast(BitCastInst *instr) {
 std::string dumpBasicBlock(BasicBlock *basicBlock) {
     std::string gencode = "";
     for(BasicBlock::iterator it=basicBlock->begin(), e=basicBlock->end(); it != e; it++) {
-        // cout << "instruction" << endl;
         Instruction *instruction = &*it;
         auto opcode = instruction->getOpcode();
         storeValueName(instruction);
