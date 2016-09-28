@@ -102,10 +102,10 @@ IR operations supported, at least partially:
 - `getelementptr`
 - `store`
 - `load`
+-  `add`
 - `fadd`
 - `ret`
 - `bitcast`
-- `alloca`
 
 OpenCL/CUDA concepts supported, at least partially:
 - `global` assigned to incoming pointer arrays, and propagated to assigned variables appropriately

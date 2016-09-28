@@ -199,14 +199,14 @@ std::string dumpReturn(ReturnInst *retInst) {
     return gencode;
 }
 
-std::string dumpAlloca(Instruction *alloca) {
-    std::string gencode = "";
-    std::string typestring = dumpType(alloca->getType()->getPointerElementType());
-    // cout << "alloca typestring " << typestring << endl;
-    int count = getIntConstant(alloca->getOperand(0));
-    // cout << "count " << count << endl;
-    return gencode;
-}
+// std::string dumpAlloca(Instruction *alloca) {
+//     std::string gencode = "";
+//     std::string typestring = dumpType(alloca->getType()->getPointerElementType());
+//     // cout << "alloca typestring " << typestring << endl;
+//     // int count = getIntConstant(alloca->getOperand(0));
+//     // cout << "count " << count << endl;
+//     return gencode;
+// }
 
 void updateAddressSpace(Value *value, int newSpace) {
     Type *elementType = value->getType()->getPointerElementType();
@@ -247,6 +247,18 @@ std::string dumpFadd(BinaryOperator *instr) {
     Value *op1 = instr->getOperand(0);
     gencode += dumpValue(op1) + " ";
     gencode += "+ ";
+    Value *op2 = instr->getOperand(1);
+    gencode += dumpOperand(op2) + ";\n";
+    return gencode;
+}
+
+std::string dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    Value *op1 = instr->getOperand(0);
+    gencode += dumpValue(op1) + " ";
+    gencode += opstring + " ";
     Value *op2 = instr->getOperand(1);
     gencode += dumpOperand(op2) + ";\n";
     return gencode;
@@ -306,9 +318,10 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
         }
         if(opcode == Instruction::FAdd) {
             gencode += dumpFadd((BinaryOperator*)instruction);
-        } else if(opcode == Instruction::Alloca) {
-            // cout << "alloca" << endl;
-            gencode += dumpAlloca(instruction);
+        } else if(opcode == Instruction::Add) {
+            gencode += dumpBinaryOperator((BinaryOperator*)instruction, "+");
+        // } else if(opcode == Instruction::Alloca) {
+        //     gencode += dumpAlloca(instruction);
         } else if(opcode == Instruction::Store) {
             gencode += dumpStore((StoreInst*)instruction);
         } else if(opcode == Instruction::Call) {

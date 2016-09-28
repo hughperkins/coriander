@@ -20,7 +20,7 @@ __global__ void foo(float *data) {
 // }
 
 template< typename T >
-T addNumbers(T one, T two) {
+__device__ T addNumbers(T one, T two) {
     return one + two;
 }
 

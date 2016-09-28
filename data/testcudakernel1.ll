@@ -7,7 +7,7 @@ target triple = "nvptx64-nvidia-cuda"
 
 ; Function Attrs: nounwind readnone
 define internal i32 @_ZL21__nvvm_reflect_anchorv() #0 {
-  %1 = tail call i32 @__nvvm_reflect(i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str, i64 0, i64 0)) #4
+  %1 = tail call i32 @__nvvm_reflect(i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str, i64 0, i64 0)) #3
   ret i32 %1
 }
 
@@ -44,31 +44,27 @@ define void @_Z3fooPf(float* nocapture %data) #2 {
   ret void
 }
 
-define void @_Z13use_template1PfPi(float* nocapture %data, i32* nocapture %intdata) #3 {
+; Function Attrs: norecurse nounwind
+define void @_Z13use_template1PfPi(float* nocapture %data, i32* nocapture %intdata) #2 {
   %1 = getelementptr inbounds float, float* %data, i64 1
   %2 = load float, float* %1, align 4, !tbaa !9
   %3 = getelementptr inbounds float, float* %data, i64 2
   %4 = load float, float* %3, align 4, !tbaa !9
-  %5 = tail call float @_Z10addNumbersIfET_S0_S0_(float %2, float %4)
+  %5 = fadd float %2, %4
   store float %5, float* %data, align 4, !tbaa !9
   %6 = getelementptr inbounds i32, i32* %intdata, i64 1
   %7 = load i32, i32* %6, align 4, !tbaa !13
   %8 = getelementptr inbounds i32, i32* %intdata, i64 2
   %9 = load i32, i32* %8, align 4, !tbaa !13
-  %10 = tail call i32 @_Z10addNumbersIiET_S0_S0_(i32 %7, i32 %9)
+  %10 = add nsw i32 %9, %7
   store i32 %10, i32* %intdata, align 4, !tbaa !13
   ret void
 }
 
-declare float @_Z10addNumbersIfET_S0_S0_(float, float) #3
-
-declare i32 @_Z10addNumbersIiET_S0_S0_(i32, i32) #3
-
 attributes #0 = { nounwind readnone "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="sm_20" "target-features"="+ptx42" "unsafe-fp-math"="false" "use-soft-float"="false" }
 attributes #1 = { norecurse nounwind readnone "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="sm_20" "target-features"="+ptx42" "unsafe-fp-math"="false" "use-soft-float"="false" }
 attributes #2 = { norecurse nounwind "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="sm_20" "target-features"="+ptx42" "unsafe-fp-math"="false" "use-soft-float"="false" }
-attributes #3 = { "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="sm_20" "target-features"="+ptx42" "unsafe-fp-math"="false" "use-soft-float"="false" }
-attributes #4 = { nounwind readnone }
+attributes #3 = { nounwind readnone }
 
 !nvvm.annotations = !{!0, !1, !2, !3, !4, !3, !5, !5, !5, !5, !6, !6, !5}
 !llvm.ident = !{!7}
