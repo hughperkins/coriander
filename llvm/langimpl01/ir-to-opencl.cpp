@@ -240,6 +240,19 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
     return gencode;
 }
 
+std::string dumpFadd(BinaryOperator *instr) {
+    string gencode = "";
+    // cout << "FAdd" << endl;
+    string typestr = dumpType(instr->getType());
+    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    Value *op1 = instr->getOperand(0);
+    gencode += dumpValue(op1) + " ";
+    gencode += "+ ";
+    Value *op2 = instr->getOperand(1);
+    gencode += dumpOperand(op2) + ";\n";
+    return gencode;
+}
+
 std::string dumpBitcast(BitCastInst *instr) {
     string gencode = "";
     Value *op0 = instr->getOperand(0);
@@ -271,23 +284,20 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
         string resultName = nameByValue[instruction];
         string resultType = dumpType(instruction->getType());
         // cout << "resultType " << resultType << endl;
-        cout << resultType << " " << resultName << " =";
-        cout << " " << string(instruction->getOpcodeName());
-        for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
-            Value *op = &*it->get();
-            // User *user = &*it->getUser();
-            // cout << "   " << op << " " << dumpType(op->getType());
-            cout << " " << dumpOperand(op);
+
+        if(false) {
+            cout << resultType << " " << resultName << " =";
+            cout << " " << string(instruction->getOpcodeName());
+            for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
+                Value *op = &*it->get();
+                // User *user = &*it->getUser();
+                // cout << "   " << op << " " << dumpType(op->getType());
+                cout << " " << dumpOperand(op);
+            }
+            cout << endl;
         }
-        cout << endl;
         if(opcode == Instruction::FAdd) {
-            // cout << "FAdd" << endl;
-            gencode += resultType + " " + resultName + " = ";
-            Value *op1 = instruction->getOperand(0);
-            gencode += dumpValue(op1) + " ";
-            gencode += "+ ";
-            Value *op2 = instruction->getOperand(1);
-            gencode += dumpValue(op2) + ";\n";
+            gencode += dumpFadd((BinaryOperator*)instruction);
         } else if(opcode == Instruction::Alloca) {
             // cout << "alloca" << endl;
             gencode += dumpAlloca(instruction);
@@ -448,7 +458,7 @@ void dumpModule(Module *M) {
     for(auto it = M->begin(); it != M->end(); it++) {
         nameByValue.clear();
         nextNameIdx = 0;
-        cout << "function " << string(it->getName()) << endl;
+        // cout << "function " << string(it->getName()) << endl;
         string name = it->getName();
         if(name != "_ZL21__nvvm_reflect_anchorv" && name != "__nvvm_reflect") {
         // if(string(it->getName()) == "_Z3fooPfi") {
