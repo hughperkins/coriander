@@ -80,7 +80,7 @@ You'll need:
 - llvm 3.8
 - clang 3.8
 - CUDA toolkit (tested with CUDA 8.0rc1)
-- Have done `sudo apt-get install -y libc6 libc6-dev` (hmm, this isnt quite right; I cant remember how I fixed the issue with sys/cdefs.h not found :-P)
+- Have done `sudo apt-get install libc6-dev-i386`
 
 Then run:
 ```
