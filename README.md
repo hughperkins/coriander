@@ -76,9 +76,11 @@ Notice that:
 ## How to build ir-to-opencl
 
 You'll need:
+- Ubuntu 16.04
 - llvm 3.8
 - clang 3.8
 - CUDA toolkit (tested with CUDA 8.0rc1)
+- Have done `sudo apt-get install -y libc6 libc6-dev`
 
 Then run:
 ```
