@@ -7,7 +7,7 @@ TARGET=testcudakernel1
 #     exit 1
 # } fi
 
-clang++-3.8 -I/usr/local/cuda-7.5/include data/${TARGET}.cu --cuda-device-only -emit-llvm -O3 -S -o data/${TARGET}.ll || exit 1
+clang++-3.8 -include include/fake_funcs.h -I/usr/local/cuda-7.5/include data/${TARGET}.cu --cuda-device-only -emit-llvm -O3 -S -o data/${TARGET}.ll || exit 1
 # clang++ -I/usr/local/cuda-7.5/include -c data/${TARGET}.cu -save-temps -O3 -S || exit 1
 
 COMPILE_FLAGS="$(llvm-config-3.8 --cxxflags) -std=c++11"

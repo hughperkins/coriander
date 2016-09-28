@@ -53,6 +53,7 @@ map<Value *, string> nameByValue;
 static int nextNameIdx;
 
 static bool debug;
+static bool single_precision = true;
 
 std::string dumpType(Type *type);
 
@@ -93,7 +94,11 @@ std::string dumpType(Type *type) {
         case Type::FloatTyID:
             return "float";
         case Type::DoubleTyID:
-            return "double";
+            if(single_precision) {
+                return "float";
+            } else {
+                return "double";
+            }
         case Type::FunctionTyID:
             return dumpFunctionType((FunctionType *)type);
         case Type::PointerTyID:
