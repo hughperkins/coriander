@@ -60,3 +60,11 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+*.dat
+*.dll
+
+llvm/test1/env2
+*.bc
+
+llvm/langimpl01/run
