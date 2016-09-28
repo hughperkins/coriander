@@ -135,3 +135,9 @@ C++ things:
 - blas stuff (matrix mul, and convolutions):
    - lets use CLblast for blas stuff
    - use im2col for convolution for now (maybe libdnn?)
+
+## open questions
+
+- how to "package"/market this repo, in relation to tensorflow? ie should blas stuff be part of this, or should we have
+  a separate tensorflow-cl project, that uses clblast, ir-to-opencl etc as tools/libraries to achieve its aims?
+    - tentatively, I favor the latter approach, better reuse, better factorized
