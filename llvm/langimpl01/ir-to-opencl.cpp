@@ -231,8 +231,24 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
     string offset = dumpOperand(instr->getOperand(1));
     // ostringstream oss;
     // oss << offset;
-    gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + "[" + offset + "]";
-    gencode += "\n";
+    gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + "[" + offset + "];\n";
+    return gencode;
+}
+
+std::string dumpBitcast(BitCastInst *instr) {
+    string gencode = "";
+    Value *op0 = instr->getOperand(0);
+    Type *op0type = instr->getOperand(0)->getType();
+    if(op0type->getTypeID() == Type::PointerTyID) {
+        PointerType *inType = (PointerType *)op0type;
+        int addressspace = inType->getAddressSpace();
+        // cout << "address space " << addressspace << endl;
+        if(addressspace != 0) {
+            updateAddressSpace(instr, addressspace);
+        }
+    }
+    gencode += dumpType(instr->getType());
+    gencode += dumpOperand(instr) + " = (" + dumpType(instr->getType()) + ")" + dumpOperand(op0) + ";\n";
     return gencode;
 }
 
@@ -284,6 +300,7 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
         } else if(opcode == Instruction::SExt) {
             // cout << "sext" << endl;
         } else if(opcode == Instruction::BitCast) {
+            gencode += dumpBitcast((BitCastInst *)instruction);
             // cout << "bitcast" << endl;
         } else if(opcode == Instruction::GetElementPtr) {
             gencode += dumpGetElementPtr((GetElementPtrInst *)instruction);
