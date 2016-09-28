@@ -119,3 +119,19 @@ OpenCL/CUDA concepts supported, at least partially:
 
 C++ things:
 - templating working ok (llvm cuda compiler handles this for us :-) )
+
+## Things that would be cool to get working
+
+- single source:
+  - show we can compile host code as well :-)
+- kernel launch
+  - compile host-side kernel launch code, and launch a kernel :-)
+- be able to handle pointer arithmetic for host-side `float *`s representing opencl gpu memory :-P
+
+## Things we *need* to be working for tensorflow
+
+- tanh, exp, log (for sigmoid etc) (done)
+- basic per-element add, subtract, sqrt, etc; so we can create cost functions (done)
+- blas stuff (matrix mul, and convolutions):
+   - lets use CLblast for blas stuff
+   - use im2col for convolution for now (maybe libdnn?)
