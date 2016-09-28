@@ -54,10 +54,26 @@ std::string dumpFunctionType(FunctionType *fn) {
     return params_str;
 }
 
+std::string dumpPointerType(PointerType *ptr) {
+    // std::string elementTypeString = "";
+    string gencode = "";
+    // cout << "point type" << endl;
+    // cout << "pointer type addrspace " << ((PointerType *)type)->getAddressSpace() << endl;
+    // Type *elementType = 0;
+    Type *elementType = ptr->getPointerElementType();
+    string elementTypeString = dumpType(elementType);
+    // cout << "elementtypestring " << elementTypeString << endl;
+    int addressspace = ptr->getAddressSpace();
+    // string gencode = "";
+    if(addressspace == 1) {
+        gencode += "global ";
+    }
+    gencode += elementTypeString + "*";
+    return gencode;
+}
+
 std::string dumpType(Type *type) {
     Type::TypeID typeID = type->getTypeID();
-    Type *elementType = 0;
-    std::string elementTypeString = "";
     switch(typeID) {
         case Type::VoidTyID:
             return "void";
@@ -68,11 +84,7 @@ std::string dumpType(Type *type) {
         case Type::FunctionTyID:
             return dumpFunctionType((FunctionType *)type);
         case Type::PointerTyID:
-            // cout << "point type" << endl;
-            elementType = type->getPointerElementType();
-            elementTypeString = dumpType(elementType);
-            // cout << "elementtypestring " << elementTypeString << endl;
-            return elementTypeString + "*";
+            return dumpPointerType((PointerType *)type);
         case Type::IntegerTyID:
             switch(type->getPrimitiveSizeInBits()) {
                 case 32:
@@ -297,6 +309,12 @@ void myDump(Function *F) {
     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
         Argument *arg = &*it;
         storeValueName(arg);
+        Type *argType = arg->getType();
+        if(argType->getTypeID() == Type::PointerTyID) {
+            Type *elementType = argType->getPointerElementType();
+            Type *newtype = PointerType::get(elementType, 1);
+            arg->mutateType(newtype);
+        }
         string argname = dumpType(arg->getType()) + " " + string(arg->getName());
         if(i > 0) {
             gencode += ", ";
