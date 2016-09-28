@@ -502,6 +502,7 @@ int main(int argc, char *argv[]) {
 
     knownFunctionsMap["llvm.nvvm.sqrt.rn.d"] = "sqrt";
     knownFunctionsMap["_Z16our_pretend_tanhf"] = "tanh";
+    knownFunctionsMap["_Z15our_pretend_logf"] = "log";
 
     dumpModule(TheModule.get());
     return 0;

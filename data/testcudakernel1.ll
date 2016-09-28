@@ -81,18 +81,25 @@ define void @_Z13someops_floatPf(float* nocapture %data) #3 {
   %8 = fmul float %4, %2
   %9 = fadd float %7, %8
   store float %9, float* %data, align 4, !tbaa !12
-  %10 = tail call float @_Z16our_pretend_tanhf(float %2)
+  %10 = tail call float @_Z15our_pretend_logf(float %2)
   %11 = load float, float* %data, align 4, !tbaa !12
   %12 = fadd float %10, %11
+  store float %12, float* %data, align 4, !tbaa !12
   %13 = load float, float* %1, align 4, !tbaa !12
-  %14 = fpext float %13 to double
-  %15 = tail call double @llvm.nvvm.sqrt.rn.d(double %14) #5
-  %16 = fpext float %12 to double
-  %17 = fsub double %16, %15
-  %18 = fptrunc double %17 to float
-  store float %18, float* %data, align 4, !tbaa !12
+  %14 = tail call float @_Z16our_pretend_tanhf(float %13)
+  %15 = load float, float* %data, align 4, !tbaa !12
+  %16 = fadd float %14, %15
+  %17 = load float, float* %1, align 4, !tbaa !12
+  %18 = fpext float %17 to double
+  %19 = tail call double @llvm.nvvm.sqrt.rn.d(double %18) #5
+  %20 = fpext float %16 to double
+  %21 = fsub double %20, %19
+  %22 = fptrunc double %21 to float
+  store float %22, float* %data, align 4, !tbaa !12
   ret void
 }
+
+declare float @_Z15our_pretend_logf(float) #3
 
 declare float @_Z16our_pretend_tanhf(float) #3
 
