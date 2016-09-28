@@ -501,6 +501,7 @@ int main(int argc, char *argv[]) {
     ignoredFunctionNames.insert("__nvvm_reflect");
 
     knownFunctionsMap["llvm.nvvm.sqrt.rn.d"] = "sqrt";
+    knownFunctionsMap["_Z16our_pretend_tanhf"] = "tanh";
 
     dumpModule(TheModule.get());
     return 0;
