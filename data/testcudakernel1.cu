@@ -28,3 +28,13 @@ __global__ void use_template1(float *data, int *intdata) {
     data[0] = addNumbers(data[1], data[2]);
     intdata[0] = addNumbers(intdata[1], intdata[2]);
 }
+
+__global__ void someops_float(float *data) {
+    data[0] = data[1] - data[2];
+    data[0] += data[1] / data[2];
+    data[0] += data[1] * data[2];
+    // data[0] += log(data[1]);
+    // data[0] += exp(data[1]);
+    // data[0] += tanh(data[1]);
+    // data[0] -= sqrt(data[1]);
+}

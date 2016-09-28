@@ -331,6 +331,12 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
         }
         if(opcode == Instruction::FAdd) {
             gencode += dumpFadd((BinaryOperator*)instruction);
+        } else if(opcode == Instruction::FSub) {
+            gencode += dumpBinaryOperator((BinaryOperator*)instruction, "-");
+        } else if(opcode == Instruction::FDiv) {
+            gencode += dumpBinaryOperator((BinaryOperator*)instruction, "/");
+        } else if(opcode == Instruction::FMul) {
+            gencode += dumpBinaryOperator((BinaryOperator*)instruction, "*");
         } else if(opcode == Instruction::Add) {
             gencode += dumpBinaryOperator((BinaryOperator*)instruction, "+");
         // } else if(opcode == Instruction::Alloca) {
