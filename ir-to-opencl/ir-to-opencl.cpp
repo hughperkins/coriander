@@ -24,7 +24,6 @@
 #include "llvm/IR/Verifier.h"
 #include "llvm/IR/Type.h"
 #include "llvm/IR/ValueSymbolTable.h"
-// #include "llvm/IR/Core.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/DebugInfoMetadata.h"
 #include "llvm/Support/raw_ostream.h"
@@ -72,16 +71,10 @@ std::string dumpFunctionType(FunctionType *fn) {
 }
 
 std::string dumpPointerType(PointerType *ptr) {
-    // std::string elementTypeString = "";
     string gencode = "";
-    // cout << "point type" << endl;
-    // cout << "pointer type addrspace " << ((PointerType *)type)->getAddressSpace() << endl;
-    // Type *elementType = 0;
     Type *elementType = ptr->getPointerElementType();
     string elementTypeString = dumpType(elementType);
-    // cout << "elementtypestring " << elementTypeString << endl;
     int addressspace = ptr->getAddressSpace();
-    // string gencode = "";
     if(addressspace == 1) {
         gencode += "global ";
     }
@@ -120,13 +113,7 @@ std::string dumpType(Type *type) {
 
 std::string dumpValue(Value *value) {
     std::string gencode = "";
-    // std::string name = "unknown";
-    // if(value->hasName()) {
-    //     name = value->getName();
-    // }
-    // cout << "value name " << name << endl;
     unsigned int valueTy = value->getValueID();
-    // cout << "Valuety " << valueTy << endl;
     switch(valueTy) {
         case AShrOperator::ConstantIntVal:
             cout << "constant " << ((ConstantInt *)value)->getSExtValue() << endl;
@@ -156,7 +143,6 @@ string dumpConstant(Constant *constant) {
     unsigned int valueTy = constant->getValueID();
     ostringstream oss;
     if(valueTy == AShrOperator::ConstantIntVal) {
-        // return ((ConstantInt *)value)->getSExtValue();
         oss << "int:" << ((ConstantInt *)constant)->getSExtValue();
     } else if(GlobalValue::classof(constant)) {
         GlobalValue *global = (GlobalValue *)constant;
@@ -189,7 +175,6 @@ string dumpOperand(Value *value) {
         return oss.str();
     }
     string name = nameByValue[value];
-    // cout << "dumpoperand name " << name << endl;
     return name;
 }
 
@@ -197,7 +182,6 @@ void storeValueName(Value *value) {
     if(value->hasName()) {
         nameByValue[value] = string(value->getName());
     } else {
-        // int idx = nameByValue.size();
         int idx = nextNameIdx;
         nextNameIdx++;
         ostringstream oss;
@@ -240,7 +224,6 @@ string dumpLoad(LoadInst *instr) {
 
 string dumpStore(StoreInst *instr) {
     string gencode = "";
-    // string typestr = dumpType(instr->getType());
     gencode += dumpOperand(instr->getOperand(1)) + "[0] = " + dumpOperand(instr->getOperand(0)) + ";\n";
     return gencode;
 }
@@ -288,28 +271,20 @@ std::string dumpBitcast(BitCastInst *instr) {
 }
 
 std::string dumpBasicBlock(BasicBlock *basicBlock) {
-    // cout << "dumpBasicBlock" << endl;
     std::string gencode = "";
     for(BasicBlock::iterator it=basicBlock->begin(), e=basicBlock->end(); it != e; it++) {
         // cout << "instruction" << endl;
         Instruction *instruction = &*it;
-        // cout << instruction->getOpcodeName() << endl;
-        // string opcodeName = instruction->getOpcodeName();
         auto opcode = instruction->getOpcode();
-        // cout << "ops:" << endl;
         storeValueName(instruction);
-        // string resultName = dumpOperand(instruction);
         string resultName = nameByValue[instruction];
         string resultType = dumpType(instruction->getType());
-        // cout << "resultType " << resultType << endl;
 
         if(debug) {
             cout << resultType << " " << resultName << " =";
             cout << " " << string(instruction->getOpcodeName());
             for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
                 Value *op = &*it->get();
-                // User *user = &*it->getUser();
-                // cout << "   " << op << " " << dumpType(op->getType());
                 cout << " " << dumpOperand(op);
             }
             cout << endl;
@@ -321,26 +296,17 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             gencode += dumpAlloca(instruction);
         } else if(opcode == Instruction::Store) {
             gencode += dumpStore((StoreInst*)instruction);
-            // cout << "store" << endl;
         } else if(opcode == Instruction::Call) {
-            // cout << "call" << endl;
         } else if(opcode == Instruction::Load) {
             gencode += dumpLoad((LoadInst*)instruction);
-            // cout << "load" << endl;
         } else if(opcode == Instruction::ICmp) {
-            // cout << "icmp" << endl;
         } else if(opcode == Instruction::Br) {
-            // cout << "br" << endl;
         } else if(opcode == Instruction::SExt) {
-            // cout << "sext" << endl;
         } else if(opcode == Instruction::BitCast) {
             gencode += dumpBitcast((BitCastInst *)instruction);
-            // cout << "bitcast" << endl;
         } else if(opcode == Instruction::GetElementPtr) {
             gencode += dumpGetElementPtr((GetElementPtrInst *)instruction);
-            // cout << "getelementptr" << endl;
         } else if(opcode == Instruction::Ret) {
-            // cout << "Ret " << " num operands " << instruction->getNumOperands() << endl;
             gencode += dumpReturn((ReturnInst *)instruction);
         } else {
             cout << "opcode string " << instruction->getOpcodeName() << endl;
@@ -351,18 +317,14 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
 }
 
 void myDump(Function *F) {
-    // cout << "myDump" << endl;
     Type *retType = F->getReturnType();
     std::string retTypeString = dumpType(retType);
-    // cout << retType->isFloatingPointTy() << " " << retType->getPrimitiveSizeInBits() << endl;
     string fname = F->getName();
-    // cout << "F has name " << F->hasName() << " " << fname << endl;
     string gencode = "";
     if(iskernel_by_name[fname]) {
         gencode += "kernel ";
     }
     gencode += dumpType(retType) + " " + fname + "(";
-    // gencode += fname + "(";
     int i = 0;
     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
         Argument *arg = &*it;
@@ -378,8 +340,6 @@ void myDump(Function *F) {
             gencode += ", ";
         }
         gencode += argname;
-        // cout << "gencode to now " << gencode << endl;
-        // cout << arg.getName() << endl;
         i++;
     }
     gencode += ") {\n";
@@ -394,34 +354,24 @@ void myDump(Function *F) {
 void dumpModule(Module *M) {
     for(auto it=M->named_metadata_begin(); it != M->named_metadata_end(); it++) {
         NamedMDNode *namedMDNode = &*it;
-        // cout << "namedmdnode " << namedMDNode << endl;
-        // cout << "name " << string(namedMDNode->getName()) << endl;
         for(auto it2=namedMDNode->op_begin(); it2 != namedMDNode->op_end(); it2++) {
             MDNode *mdNode = *it2;
-            // cout << "   got an mdnode " << endl;
             bool isKernel = false;
             string kernelName = "";
             for(auto it3=mdNode->op_begin(); it3 != mdNode->op_end(); it3++) {
                 const MDOperand *op = it3;
-                // cout << "      got an op" << endl;
                 Metadata *metadata = op->get();
-                // cout << "      got a metadata " << metadata << endl;
                 if(metadata != 0) {
-                    // cout << "      metadata " << metadata->getMetadataID() << endl;
-                    // cout << ConstantAsMetadata::classof(metadata) << endl;
                     if(MDString::classof(metadata)) {
                         string meta_value = string(((MDString *)metadata)->getString());
-                        // cout << meta_value << endl;
                         if(meta_value == "kernel") {
                             isKernel = true;
                         }
                     } else if(ConstantAsMetadata::classof(metadata)) {
                         Constant *constant = ((ConstantAsMetadata *)metadata)->getValue();
-                        // cout << dumpConstant(constant) << endl;
                         if(GlobalValue::classof(constant)) {
                             GlobalValue *global = (GlobalValue *)constant;
                             if(global->getType()->getPointerElementType()->getTypeID() == Type::FunctionTyID) {
-                                // cout << "found function constant" << endl;
                                 string functionName = string(constant->getName());
                                 kernelName = functionName;
                             }
@@ -434,32 +384,12 @@ void dumpModule(Module *M) {
             }
         }
     }
-    // cout << string(M->)
-
-    // for(auto it=M->global_begin(); it != M->global_end(); it++) {
-    //     GlobalVariable *global = &*it;
-    //     cout << "global " << global << endl;
-    //     cout << string(global->getName()) << endl;
-    // }
-
-    // for(auto it=M->alias_begin(); it != M->alias_end(); it++) {
-    //     GlobalAlias *alias = &*it;
-    //     cout << "alias " << alias << endl;
-    //     cout << string(alias->getName()) << endl;
-    // }
-
-    // SymbolTable 
-    // for(auto it=M->getValueSymbolTable().begin(); it != M->getValueSymbolTable().end(); it++) {
-    //     cout << "value symbol " << string(it->getName()) << endl;
-    // }
 
     for(auto it = M->begin(); it != M->end(); it++) {
         nameByValue.clear();
         nextNameIdx = 0;
-        // cout << "function " << string(it->getName()) << endl;
         string name = it->getName();
         if(name != "_ZL21__nvvm_reflect_anchorv" && name != "__nvvm_reflect") {
-        // if(string(it->getName()) == "_Z3fooPfi") {
             Function *F = &*it;
             myDump(F);
         }
