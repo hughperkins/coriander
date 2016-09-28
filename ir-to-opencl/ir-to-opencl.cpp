@@ -287,6 +287,7 @@ std::string dumpCall(CallInst *instr) {
         return gencode + "get_global_id(2);\n";
     }
     if(knownFunctionsMap.find(functionName) != knownFunctionsMap.end()) {
+        // cout << "replace " << functionName << " with " << knownFunctionsMap[functionName] << endl;
         functionName = knownFunctionsMap[functionName];
     }
     gencode += functionName + "(";
@@ -330,6 +331,7 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
         string resultName = nameByValue[instruction];
         string resultType = dumpType(instruction->getType());
 
+        string instructioncode = "";
         if(debug) {
             cout << resultType << " " << resultName << " =";
             cout << " " << string(instruction->getOpcodeName());
@@ -340,45 +342,49 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             cout << endl;
         }
         if(opcode == Instruction::FAdd) {
-            gencode += dumpBinaryOperator((BinaryOperator*)instruction, "+");
+            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "+");
         } else if(opcode == Instruction::FSub) {
-            gencode += dumpBinaryOperator((BinaryOperator*)instruction, "-");
+            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "-");
         } else if(opcode == Instruction::FDiv) {
-            gencode += dumpBinaryOperator((BinaryOperator*)instruction, "/");
+            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "/");
         } else if(opcode == Instruction::FMul) {
-            gencode += dumpBinaryOperator((BinaryOperator*)instruction, "*");
+            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "*");
         } else if(opcode == Instruction::Add) {
-            gencode += dumpBinaryOperator((BinaryOperator*)instruction, "+");
+            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "+");
         } else if(opcode == Instruction::Mul) {
-            gencode += dumpBinaryOperator((BinaryOperator*)instruction, "*");
+            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "*");
         } else if(opcode == Instruction::SDiv) {
-            gencode += dumpBinaryOperator((BinaryOperator*)instruction, "/");
+            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "/");
         // } else if(opcode == Instruction::Alloca) {
         //     gencode += dumpAlloca(instruction);
         } else if(opcode == Instruction::Store) {
-            gencode += dumpStore((StoreInst*)instruction);
+            instructioncode = dumpStore((StoreInst*)instruction);
         } else if(opcode == Instruction::Call) {
-            gencode += dumpCall((CallInst *)instruction);
+            instructioncode = dumpCall((CallInst *)instruction);
         } else if(opcode == Instruction::Load) {
-            gencode += dumpLoad((LoadInst*)instruction);
+            instructioncode = dumpLoad((LoadInst*)instruction);
         // } else if(opcode == Instruction::ICmp) {
         // } else if(opcode == Instruction::Br) {
         } else if(opcode == Instruction::SExt) {
             cout << "note to self: this needs implementing :-P" << endl;
         } else if(opcode == Instruction::FPExt) {
-            gencode += dumpFPExt((CastInst *)instruction);
+            instructioncode = dumpFPExt((CastInst *)instruction);
         } else if(opcode == Instruction::FPTrunc) {
-            gencode += dumpFPTrunc((CastInst *)instruction);
+            instructioncode = dumpFPTrunc((CastInst *)instruction);
         } else if(opcode == Instruction::BitCast) {
-            gencode += dumpBitcast((BitCastInst *)instruction);
+            instructioncode = dumpBitcast((BitCastInst *)instruction);
         } else if(opcode == Instruction::GetElementPtr) {
-            gencode += dumpGetElementPtr((GetElementPtrInst *)instruction);
+            instructioncode = dumpGetElementPtr((GetElementPtrInst *)instruction);
         } else if(opcode == Instruction::Ret) {
-            gencode += dumpReturn((ReturnInst *)instruction);
+            instructioncode = dumpReturn((ReturnInst *)instruction);
         } else {
             cout << "opcode string " << instruction->getOpcodeName() << endl;
             throw runtime_error("unknown opcode");
         }
+        if(debug) {
+            cout << instructioncode << endl;
+        }
+        gencode += instructioncode;
     }
     return gencode;
 }
