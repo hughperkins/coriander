@@ -38,3 +38,10 @@ __global__ void someops_float(float *data) {
     // data[0] += tanh(data[1]);
     // data[0] -= sqrt(data[1]);
 }
+
+__global__ void someops_int(int *data) {
+    data[0] = data[1] - data[2];
+    data[0] += data[1] / data[2];
+    data[0] += data[1] + data[2];
+    data[0] += data[1] * data[2];
+}

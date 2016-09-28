@@ -339,6 +339,10 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             gencode += dumpBinaryOperator((BinaryOperator*)instruction, "*");
         } else if(opcode == Instruction::Add) {
             gencode += dumpBinaryOperator((BinaryOperator*)instruction, "+");
+        } else if(opcode == Instruction::Mul) {
+            gencode += dumpBinaryOperator((BinaryOperator*)instruction, "*");
+        } else if(opcode == Instruction::SDiv) {
+            gencode += dumpBinaryOperator((BinaryOperator*)instruction, "/");
         // } else if(opcode == Instruction::Alloca) {
         //     gencode += dumpAlloca(instruction);
         } else if(opcode == Instruction::Store) {
