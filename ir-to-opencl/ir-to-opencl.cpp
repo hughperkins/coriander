@@ -47,6 +47,7 @@ static std::unique_ptr<llvm::Module> TheModule;
 static std::map<std::string, Value *> NamedValues;
 static std::map<string, bool> iskernel_by_name;
 static std::set<string> ignoredFunctionNames;
+static std::map<string, string> knownFunctionsMap; // from cuda to opencl, eg tid.x => get_global_id
 
 map<Value *, string> nameByValue;
 static int nextNameIdx;
@@ -242,18 +243,6 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
     return gencode;
 }
 
-std::string dumpFadd(BinaryOperator *instr) {
-    string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += typestr + " " + dumpOperand(instr) + " = ";
-    Value *op1 = instr->getOperand(0);
-    gencode += dumpValue(op1) + " ";
-    gencode += "+ ";
-    Value *op2 = instr->getOperand(1);
-    gencode += dumpOperand(op2) + ";\n";
-    return gencode;
-}
-
 std::string dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
     string gencode = "";
     string typestr = dumpType(instr->getType());
@@ -297,6 +286,9 @@ std::string dumpCall(CallInst *instr) {
     if(functionName == "llvm.ptx.read.tid.z") {
         return gencode + "get_global_id(2);\n";
     }
+    if(knownFunctionsMap.find(functionName) != knownFunctionsMap.end()) {
+        functionName = knownFunctionsMap[functionName];
+    }
     gencode += functionName + "(";
     int i = 0;
     for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
@@ -308,6 +300,24 @@ std::string dumpCall(CallInst *instr) {
         i++;
     }
     gencode += ");\n";
+    return gencode;
+}
+
+std::string dumpFPExt(CastInst *instr) {
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    gencode += dumpValue(instr->getOperand(0)) + ";\n";
+    return gencode;
+}
+
+std::string dumpFPTrunc(CastInst *instr) {
+    // since this is float point trunc, lets just assume we're going from double to float
+    // fix any exceptiosn to this rule later
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    gencode += "(float)" + dumpValue(instr->getOperand(0)) + ";\n";
     return gencode;
 }
 
@@ -330,7 +340,7 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             cout << endl;
         }
         if(opcode == Instruction::FAdd) {
-            gencode += dumpFadd((BinaryOperator*)instruction);
+            gencode += dumpBinaryOperator((BinaryOperator*)instruction, "+");
         } else if(opcode == Instruction::FSub) {
             gencode += dumpBinaryOperator((BinaryOperator*)instruction, "-");
         } else if(opcode == Instruction::FDiv) {
@@ -351,9 +361,14 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             gencode += dumpCall((CallInst *)instruction);
         } else if(opcode == Instruction::Load) {
             gencode += dumpLoad((LoadInst*)instruction);
-        } else if(opcode == Instruction::ICmp) {
-        } else if(opcode == Instruction::Br) {
+        // } else if(opcode == Instruction::ICmp) {
+        // } else if(opcode == Instruction::Br) {
         } else if(opcode == Instruction::SExt) {
+            cout << "note to self: this needs implementing :-P" << endl;
+        } else if(opcode == Instruction::FPExt) {
+            gencode += dumpFPExt((CastInst *)instruction);
+        } else if(opcode == Instruction::FPTrunc) {
+            gencode += dumpFPTrunc((CastInst *)instruction);
         } else if(opcode == Instruction::BitCast) {
             gencode += dumpBitcast((BitCastInst *)instruction);
         } else if(opcode == Instruction::GetElementPtr) {
@@ -441,7 +456,8 @@ void dumpModule(Module *M) {
         nameByValue.clear();
         nextNameIdx = 0;
         string name = it->getName();
-        if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end()) {
+        if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
+                knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
             Function *F = &*it;
             myDump(F);
         }
@@ -472,6 +488,10 @@ int main(int argc, char *argv[]) {
     ignoredFunctionNames.insert("llvm.ptx.read.tid.x");
     ignoredFunctionNames.insert("_ZL21__nvvm_reflect_anchorv");
     ignoredFunctionNames.insert("__nvvm_reflect");
+
+    knownFunctionsMap["llvm.nvvm.sqrt.rn.d"] = "sqrt";
+
     dumpModule(TheModule.get());
     return 0;
 }
+

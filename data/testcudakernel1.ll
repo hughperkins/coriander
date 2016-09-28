@@ -81,7 +81,12 @@ define void @_Z13someops_floatPf(float* nocapture %data) #2 {
   %7 = fadd float %5, %6
   %8 = fmul float %4, %2
   %9 = fadd float %7, %8
-  store float %9, float* %data, align 4, !tbaa !12
+  %10 = fpext float %2 to double
+  %11 = tail call double @llvm.nvvm.sqrt.rn.d(double %10) #4
+  %12 = fpext float %9 to double
+  %13 = fsub double %12, %11
+  %14 = fptrunc double %13 to float
+  store float %14, float* %data, align 4, !tbaa !12
   ret void
 }
 
@@ -102,6 +107,9 @@ define void @_Z11someops_intPi(i32* nocapture %data) #2 {
 
 ; Function Attrs: nounwind readnone
 declare i32 @llvm.ptx.read.tid.x() #3
+
+; Function Attrs: nounwind readnone
+declare double @llvm.nvvm.sqrt.rn.d(double) #3
 
 attributes #0 = { nounwind readnone "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="sm_20" "target-features"="+ptx42" "unsafe-fp-math"="false" "use-soft-float"="false" }
 attributes #1 = { norecurse nounwind readnone "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="sm_20" "target-features"="+ptx42" "unsafe-fp-math"="false" "use-soft-float"="false" }

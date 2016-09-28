@@ -105,9 +105,12 @@ IR operations supported, at least partially:
 -  `add`
 - `fadd`
 - `ret`
+- `fpext`
+- `fptrunc`
 - `bitcast`
 - float maths operators: +, -, *, /
 - int maths operators: +, -, *, /
+- unary float maths: `sqrt`
 
 OpenCL/CUDA concepts supported, at least partially:
 - `global` assigned to incoming pointer arrays, and propagated to assigned variables appropriately
