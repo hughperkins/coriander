@@ -268,6 +268,24 @@ std::string dumpBitcast(BitCastInst *instr) {
     return gencode;
 }
 
+std::string dumpCall(CallInst *instr) {
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    gencode += string(instr->getCalledValue()->getName()) + "(";
+    int i = 0;
+    for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
+        Value *op = &*it->get();
+        if(i > 0) {
+            gencode += ", ";
+        }
+        gencode += dumpValue(op);
+        i++;
+    }
+    gencode += ");\n";
+    return gencode;
+}
+
 std::string dumpBasicBlock(BasicBlock *basicBlock) {
     std::string gencode = "";
     for(BasicBlock::iterator it=basicBlock->begin(), e=basicBlock->end(); it != e; it++) {
@@ -294,6 +312,7 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
         } else if(opcode == Instruction::Store) {
             gencode += dumpStore((StoreInst*)instruction);
         } else if(opcode == Instruction::Call) {
+            gencode += dumpCall((CallInst *)instruction);
         } else if(opcode == Instruction::Load) {
             gencode += dumpLoad((LoadInst*)instruction);
         } else if(opcode == Instruction::ICmp) {
