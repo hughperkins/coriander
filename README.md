@@ -68,6 +68,11 @@ data[0] = 123;
 }
 ```
 
+Notice that:
+- the `kernel` methods are correctly identified as being kernel methods (this comes from the metadata)
+- the float pointer parameters for the kernel methods are correctly marked as `global float *`
+- the `global`ness correctly propagates through to other variables
+
 ## How to build ir-to-opencl
 
 You'll need:
