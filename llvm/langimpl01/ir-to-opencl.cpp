@@ -220,6 +220,13 @@ string dumpLoad(LoadInst *instr) {
     return gencode;
 }
 
+string dumpStore(StoreInst *instr) {
+    string gencode = "";
+    // string typestr = dumpType(instr->getType());
+    gencode += dumpOperand(instr->getOperand(1)) + "[0] = " + dumpOperand(instr->getOperand(0)) + ";\n";
+    return gencode;
+}
+
 string dumpGetElementPtr(GetElementPtrInst *instr) {
     string gencode = "";
     PointerType *inType = (PointerType *)instr->getOperand(0)->getType();
@@ -285,6 +292,7 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             // cout << "alloca" << endl;
             gencode += dumpAlloca(instruction);
         } else if(opcode == Instruction::Store) {
+            gencode += dumpStore((StoreInst*)instruction);
             // cout << "store" << endl;
         } else if(opcode == Instruction::Call) {
             // cout << "call" << endl;
