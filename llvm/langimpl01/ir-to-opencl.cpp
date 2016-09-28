@@ -201,15 +201,9 @@ std::string dumpReturn(ReturnInst *retInst) {
 std::string dumpAlloca(Instruction *alloca) {
     std::string gencode = "";
     std::string typestring = dumpType(alloca->getType()->getPointerElementType());
-    cout << "alloca typestring " << typestring << endl;
-    // cout << dumpValue(alloca->getOperand(0));
+    // cout << "alloca typestring " << typestring << endl;
     int count = getIntConstant(alloca->getOperand(0));
-    cout << "count " << count << endl;
-    // cout << alloca << endl;
-    // cout << "hasname " << alloca->hasName() << endl;
-    // cout << "name " << string(alloca->getName()) << endl;
-    // gencode = typestring + 
-    // cout << "value name " << string(alloca->getValueName()) << endl;
+    // cout << "count " << count << endl;
     return gencode;
 }
 
@@ -219,18 +213,22 @@ void updateAddressSpace(Value *value, int newSpace) {
     value->mutateType(newType);
 }
 
+string dumpLoad(LoadInst *instr) {
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + "[0];\n";
+    return gencode;
+}
+
 string dumpGetElementPtr(GetElementPtrInst *instr) {
     string gencode = "";
     PointerType *inType = (PointerType *)instr->getOperand(0)->getType();
     int addressspace = inType->getAddressSpace();
-    // cout << "address space " << addressspace << endl;
     if(addressspace != 0) {
         updateAddressSpace(instr, addressspace);
     }
     string typestr = dumpType(instr->getType());
     string offset = dumpOperand(instr->getOperand(1));
-    // ostringstream oss;
-    // oss << offset;
     gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + "[" + offset + "];\n";
     return gencode;
 }
@@ -242,7 +240,6 @@ std::string dumpBitcast(BitCastInst *instr) {
     if(op0type->getTypeID() == Type::PointerTyID) {
         PointerType *inType = (PointerType *)op0type;
         int addressspace = inType->getAddressSpace();
-        // cout << "address space " << addressspace << endl;
         if(addressspace != 0) {
             updateAddressSpace(instr, addressspace);
         }
@@ -292,6 +289,7 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
         } else if(opcode == Instruction::Call) {
             // cout << "call" << endl;
         } else if(opcode == Instruction::Load) {
+            gencode += dumpLoad((LoadInst*)instruction);
             // cout << "load" << endl;
         } else if(opcode == Instruction::ICmp) {
             // cout << "icmp" << endl;
