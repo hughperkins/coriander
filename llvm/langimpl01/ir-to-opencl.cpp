@@ -213,6 +213,29 @@ std::string dumpAlloca(Instruction *alloca) {
     return gencode;
 }
 
+void updateAddressSpace(Value *value, int newSpace) {
+    Type *elementType = value->getType()->getPointerElementType();
+    Type *newType = PointerType::get(elementType, newSpace);
+    value->mutateType(newType);
+}
+
+string dumpGetElementPtr(GetElementPtrInst *instr) {
+    string gencode = "";
+    PointerType *inType = (PointerType *)instr->getOperand(0)->getType();
+    int addressspace = inType->getAddressSpace();
+    // cout << "address space " << addressspace << endl;
+    if(addressspace != 0) {
+        updateAddressSpace(instr, addressspace);
+    }
+    string typestr = dumpType(instr->getType());
+    string offset = dumpOperand(instr->getOperand(1));
+    // ostringstream oss;
+    // oss << offset;
+    gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + "[" + offset + "]";
+    gencode += "\n";
+    return gencode;
+}
+
 std::string dumpBasicBlock(BasicBlock *basicBlock) {
     // cout << "dumpBasicBlock" << endl;
     std::string gencode = "";
@@ -263,6 +286,7 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
         } else if(opcode == Instruction::BitCast) {
             // cout << "bitcast" << endl;
         } else if(opcode == Instruction::GetElementPtr) {
+            gencode += dumpGetElementPtr((GetElementPtrInst *)instruction);
             // cout << "getelementptr" << endl;
         } else if(opcode == Instruction::Ret) {
             // cout << "Ret " << " num operands " << instruction->getNumOperands() << endl;
