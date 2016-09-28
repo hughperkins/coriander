@@ -9,7 +9,7 @@ This lets you write out CUDA IR as classic OpenCL 1.2
 
 ## Example
 
-Lets say we hae the following cuda file:
+Lets say we have the following cuda file:
 ```
 __device__ float bar(float a, float b) {
     return a + b;
