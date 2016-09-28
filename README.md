@@ -92,3 +92,19 @@ clang++-3.8 ${COMPILE_FLAGS} -fcxx-exceptions -o build/ir-to-opencl -g -O3 -I/us
 
 Tested on:
 - Ubuntu 16.04 64-bit
+
+## Details
+
+IR operations supported, at least partially:
+- `call`
+- `getelementptr`
+- `store`
+- `load`
+- `fadd`
+- `ret`
+- `bitcast`
+- `alloca`
+
+OpenCL/CUDA concepts supported, at least partially:
+- `global` assigned to incoming pointer arrays, and propagated to assigned variables appropriately
+- `kernel`s detected automatically

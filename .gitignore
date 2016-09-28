@@ -69,3 +69,5 @@ llvm/test1/env2
 
 llvm/langimpl01/run
 llvm/langimpl01/ir-to-opencl
+
+.fuse*
