@@ -34,6 +34,7 @@ static std::map<std::string, Value *> NamedValues;
 static std::map<string, bool> iskernel_by_name;
 
 map<Value *, string> nameByValue;
+static int nextNameIdx;
 
 std::string dumpType(Type *type);
 
@@ -178,7 +179,9 @@ void storeValueName(Value *value) {
     if(value->hasName()) {
         nameByValue[value] = string(value->getName());
     } else {
-        int idx = nameByValue.size();
+        // int idx = nameByValue.size();
+        int idx = nextNameIdx;
+        nextNameIdx++;
         ostringstream oss;
         oss << "v" << idx;
         string name = oss.str();
@@ -396,6 +399,8 @@ void dumpModule(Module *M) {
     // }
 
     for(auto it = M->begin(); it != M->end(); it++) {
+        nameByValue.clear();
+        nextNameIdx = 0;
         cout << "function " << string(it->getName()) << endl;
         string name = it->getName();
         if(name != "_ZL21__nvvm_reflect_anchorv" && name != "__nvvm_reflect") {
