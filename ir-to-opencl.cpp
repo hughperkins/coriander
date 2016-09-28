@@ -346,26 +346,6 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
     return gencode;
 }
 
-// __global__ void foo(float *data, int N) {
-//     int tid = threadIdx.x;
-//     if(tid < N) {
-//         data[tid] += 3.0f;
-//     }
-// }
-
-// __global__ void foo(float *data) {
-//     data[0] = 123.0f;
-// }
-
-// define void @_Z3fooPf(float* %data) #0 {
-//   %1 = alloca float*, align 8
-//   store float* %data, float** %1, align 8
-//   %2 = load float*, float** %1, align 8
-//   %3 = getelementptr inbounds float, float* %2, i64 0
-//   store float 1.230000e+02, float* %3, align 4
-//   ret void
-// }
-
 void myDump(Function *F) {
     // cout << "myDump" << endl;
     Type *retType = F->getReturnType();
@@ -493,7 +473,6 @@ int main(int argc, char *argv[]) {
         Err.print(argv[0], errs());
         return 1;
     }
-    // TheModule = llvm::make_unique<Module>("my cool jit", TheContext);
     dumpModule(TheModule.get());
     return 0;
 }
