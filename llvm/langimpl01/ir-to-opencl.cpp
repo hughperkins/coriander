@@ -214,7 +214,7 @@ std::string dumpAlloca(Instruction *alloca) {
 }
 
 std::string dumpBasicBlock(BasicBlock *basicBlock) {
-    cout << "dumpBasicBlock" << endl;
+    // cout << "dumpBasicBlock" << endl;
     std::string gencode = "";
     for(BasicBlock::iterator it=basicBlock->begin(), e=basicBlock->end(); it != e; it++) {
         // cout << "instruction" << endl;
@@ -238,7 +238,7 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
         }
         cout << endl;
         if(opcode == Instruction::FAdd) {
-            cout << "FAdd" << endl;
+            // cout << "FAdd" << endl;
             gencode += resultType + " " + resultName + " = ";
             Value *op1 = instruction->getOperand(0);
             gencode += dumpValue(op1) + " ";
@@ -249,23 +249,23 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             // cout << "alloca" << endl;
             gencode += dumpAlloca(instruction);
         } else if(opcode == Instruction::Store) {
-            cout << "store" << endl;
+            // cout << "store" << endl;
         } else if(opcode == Instruction::Call) {
-            cout << "call" << endl;
+            // cout << "call" << endl;
         } else if(opcode == Instruction::Load) {
-            cout << "load" << endl;
+            // cout << "load" << endl;
         } else if(opcode == Instruction::ICmp) {
-            cout << "icmp" << endl;
+            // cout << "icmp" << endl;
         } else if(opcode == Instruction::Br) {
-            cout << "br" << endl;
+            // cout << "br" << endl;
         } else if(opcode == Instruction::SExt) {
-            cout << "sext" << endl;
+            // cout << "sext" << endl;
         } else if(opcode == Instruction::BitCast) {
-            cout << "bitcast" << endl;
+            // cout << "bitcast" << endl;
         } else if(opcode == Instruction::GetElementPtr) {
-            cout << "getelementptr" << endl;
+            // cout << "getelementptr" << endl;
         } else if(opcode == Instruction::Ret) {
-            cout << "Ret " << " num operands " << instruction->getNumOperands() << endl;
+            // cout << "Ret " << " num operands " << instruction->getNumOperands() << endl;
             gencode += dumpReturn((ReturnInst *)instruction);
         } else {
             cout << "opcode string " << instruction->getOpcodeName() << endl;
