@@ -2,7 +2,7 @@
 
 TARGET=testcudakernel1
 
-clang++-3.8 -I/usr/local/cuda-7.5/include data/${TARGET}.cu --cuda-device-only -emit-llvm -O3 -S -o data/${TARGET}.ll
+clang++-3.8 -I/usr/local/cuda-7.5/include data/${TARGET}.cu --cuda-device-only -emit-llvm -O3 -S -o data/${TARGET}.ll || exit 1
 
 # clang++-3.8 -std=c++11 -o run -g -O3 -I/usr/include/llvm-3.8 run.cpp || exit 1
 COMPILE_FLAGS="$(llvm-config-3.8 --cxxflags) -std=c++11"
