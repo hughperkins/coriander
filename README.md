@@ -141,3 +141,6 @@ C++ things:
 - how to "package"/market this repo, in relation to tensorflow? ie should blas stuff be part of this, or should we have
   a separate tensorflow-cl project, that uses clblast, ir-to-opencl etc as tools/libraries to achieve its aims?
     - tentatively, I favor the latter approach, better reuse, better factorized
+- should I use bazel or cmake (or something else?) to package this?
+    - if this repo is going to be orthogonal to tensorflow-cl repo, then lets use CMake, which is fairly standard, on
+      non-Google projects
