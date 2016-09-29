@@ -71,7 +71,16 @@ __global__ void testbooleanops(int *data) {
     data[2] = (int)(a && b);
     data[3] = (int)(a || b);
     data[4] = (int)(!a);
-    // data[5] = (int)(a >= b);
+}
+
+__global__ void testcomparisons_int(int *data) {
+    data[5] = (int)(data[0] >= data[1]);
+    data[6] = (int)(data[0] <= data[1]);
+    data[7] = (int)(data[0] > data[1]);
+    data[8] = (int)(data[0] < data[1]);
+    data[9] = (int)(data[0] == data[1]);
+    data[10] = (int)(data[0] != data[1]);
+
     // data[6] = (int)(a <= b);
     // data[7] = (int)(a < b);
     // data[8] = (int)(a > b);

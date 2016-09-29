@@ -390,6 +390,18 @@ std::string dumpIcmp(ICmpInst *instr) {
         case CmpInst::ICMP_SGT:
             predicate_string = ">";
             break;
+        case CmpInst::ICMP_SGE:
+            predicate_string = ">=";
+            break;
+        case CmpInst::ICMP_SLE:
+            predicate_string = "<=";
+            break;
+        case CmpInst::ICMP_EQ:
+            predicate_string = "==";
+            break;
+        case CmpInst::ICMP_NE:
+            predicate_string = "!=";
+            break;
         default:
             cout << "predicate " << predicate << endl;
             throw runtime_error("predicate not supported");

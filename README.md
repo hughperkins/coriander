@@ -104,7 +104,8 @@ IR operations supported, at least partially:
 - `fptrunc`
 - `bitcast`
 - float maths operators: +, -, *, /
-- int maths operators: +, -, *, /, <, >
+- int maths operators: +, -, *, /
+- signed int comparisons: < > == != <= >=
 - boolean maths operators: &&, ||
 - bitwise operators: ^
 - unary float maths: `sqrt`, `tanh`, `log`, `exp`
