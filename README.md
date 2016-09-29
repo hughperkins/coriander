@@ -141,6 +141,9 @@ Other cool things:
 - if
 - while
 - ternary
+- && || < > <= >= != ==
+- bool type
+- vector types, ie float4 etc
 
 ## open questions
 
