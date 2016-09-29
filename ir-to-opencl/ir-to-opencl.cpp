@@ -87,13 +87,6 @@ std::string dumpPointerType(PointerType *ptr) {
 }
 
 std::string dumpIntegerType(IntegerType *type) {
-    // std::string unsignedstring = "";
-    // if(type->getSignBit() > 1) {
-    //     unsignedstring = "unsigned ";
-    // }
-    // cout << "sign bit " << type->getSignBit() << endl;
-    // cout << "bitmask " << type->getBitMask() << endl;
-    // cout << "bitwidth " << type->getBitWidth() << endl;
     switch(type->getPrimitiveSizeInBits()) {
         case 32:
             return "int";
@@ -107,6 +100,20 @@ std::string dumpIntegerType(IntegerType *type) {
     }
 }
 
+std::string dumpStructType(StructType *type) {
+    if(type->hasName()) {
+        string name = type->getName();
+        if(name == "struct.float4") {
+            return "float4";
+        } else {
+            cout << "struct name: " << name << endl;
+            throw runtime_error("not implemented: struct name " + name);
+        }
+    } else {
+        throw runtime_error("not implemented: anonymous struct types");
+    }
+}
+
 std::string dumpType(Type *type) {
     Type::TypeID typeID = type->getTypeID();
     switch(typeID) {
@@ -114,6 +121,14 @@ std::string dumpType(Type *type) {
             return "void";
         case Type::FloatTyID:
             return "float";
+        // case Type::UnionTyID:
+        //     throw runtime_error("not implemented: union type");
+        case Type::StructTyID:
+            return dumpStructType((StructType *)type);
+        case Type::VectorTyID:
+            throw runtime_error("not implemented: vector type");
+        case Type::ArrayTyID:
+            throw runtime_error("not implemented: array type");
         case Type::DoubleTyID:
             if(single_precision) {
                 return "float";
@@ -250,14 +265,23 @@ string dumpStore(StoreInst *instr) {
 
 string dumpGetElementPtr(GetElementPtrInst *instr) {
     string gencode = "";
+    // cout << "instr type " << dumpType(instr->getType()) << endl;
+    // cout << "op0 type " << dumpType(instr->getOperand(0)->getType()) << endl;
+    // cout << "op1 type " << dumpType(instr->getOperand(1)->getType()) << endl;
     PointerType *inType = (PointerType *)instr->getOperand(0)->getType();
     int addressspace = inType->getAddressSpace();
     if(addressspace != 0) {
         updateAddressSpace(instr, addressspace);
     }
-    string typestr = dumpType(instr->getType());
-    string offset = dumpOperand(instr->getOperand(1));
-    gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + "[" + offset + "];\n";
+    // string typestr = dumpType(instr->getType());
+    string typestr = dumpType(inType);
+    string offset = dumpOperand(instr->getOperand(2));
+    if(offset != "") { // this is a bit hacky for now...
+        gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + " + " + offset + ";\n";
+    } else {
+        offset = dumpOperand(instr->getOperand(1));
+        gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + "[" + offset + "];\n";
+    }
     return gencode;
 }
 

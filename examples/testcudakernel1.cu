@@ -153,6 +153,13 @@ __global__ void testTernary(float *data) {
     data[0] = data[1] > 0 ? data[2] : data[3];
 }
 
+// __global__ void testFloat4(float4 *data) {
+//     float4 myregister4 = data[1];
+//     float *myregisterfloat = (float *)&myregister4;
+//     myregisterfloat[1] = myregisterfloat[2] * myregisterfloat[3];
+//     data[0] = myregister4;
+// }
+
 // __global__ void testLocal(float *data) {
 //     __shared__ float myshared[32];
 //     int tid = threadIdx.x;
