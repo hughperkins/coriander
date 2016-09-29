@@ -281,7 +281,9 @@ std::string dumpBitcast(BitCastInst *instr) {
 std::string dumpCall(CallInst *instr) {
     string gencode = "";
     string typestr = dumpType(instr->getType());
-    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    if(typestr != "void") {
+        gencode += typestr + " " + dumpOperand(instr) + " = ";
+    }
 
     string functionName = string(instr->getCalledValue()->getName());
     if(functionName == "llvm.ptx.read.tid.x") {
@@ -292,6 +294,9 @@ std::string dumpCall(CallInst *instr) {
     }
     if(functionName == "llvm.ptx.read.tid.z") {
         return gencode + "get_global_id(2);\n";
+    }
+    if(functionName == "llvm.cuda.syncthreads") {
+        return gencode + "barrier(CLK_GLOBAL_MEM_FENCE);\n";
     }
     if(knownFunctionsMap.find(functionName) != knownFunctionsMap.end()) {
         // cout << "replace " << functionName << " with " << knownFunctionsMap[functionName] << endl;
@@ -520,6 +525,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     ignoredFunctionNames.insert("llvm.ptx.read.tid.x");
+    ignoredFunctionNames.insert("llvm.cuda.syncthreads");
     ignoredFunctionNames.insert("_ZL21__nvvm_reflect_anchorv");
     ignoredFunctionNames.insert("__nvvm_reflect");
 
