@@ -105,6 +105,13 @@ __global__ void testDoWhile(int *data, int N) {
     } while(data[p] != 0);
 }
 
+__global__ void testWhile(int *data, int N) {
+    int p = threadIdx.x;
+    while(data[p] != 0) {
+        p++;
+    }
+}
+
 // __global__ void testIf(int *data, int N) {
 //     int tid = threadIdx.x;
 //     if(tid < N) {
