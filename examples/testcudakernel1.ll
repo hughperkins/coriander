@@ -167,6 +167,10 @@ define void @_Z14testbooleanopsPi(i32* nocapture %data) #2 {
   %10 = zext i1 %9 to i32
   %11 = getelementptr inbounds i32, i32* %data, i64 3
   store i32 %10, i32* %11, align 4, !tbaa !21
+  %12 = zext i1 %2 to i32
+  %13 = xor i32 %12, 1
+  %14 = getelementptr inbounds i32, i32* %data, i64 4
+  store i32 %13, i32* %14, align 4, !tbaa !21
   ret void
 }
 

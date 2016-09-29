@@ -106,6 +106,7 @@ IR operations supported, at least partially:
 - float maths operators: +, -, *, /
 - int maths operators: +, -, *, /, <, >
 - boolean maths operators: &&, ||
+- bitwise operators: ^
 - unary float maths: `sqrt`, `tanh`, `log`, `exp`
 
 OpenCL/CUDA concepts supported, at least partially:

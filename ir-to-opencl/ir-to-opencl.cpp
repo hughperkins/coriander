@@ -437,6 +437,8 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "&&");
         } else if(opcode == Instruction::Or) {
             instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "||");
+        } else if(opcode == Instruction::Xor) { // bitwise
+            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "^");
         // } else if(opcode == Instruction::Alloca) {
         //     gencode += dumpAlloca(instruction);
         } else if(opcode == Instruction::Store) {
