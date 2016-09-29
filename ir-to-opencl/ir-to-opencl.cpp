@@ -424,8 +424,22 @@ std::string dumpIcmp(ICmpInst *instr) {
 }
 
 std::string dumpBranch(BranchInst *instr) {
-    cout << "ignoring br for now" << endl;
-    return "";
+    string gencode = "";
+    // cout << "br conditional " << instr->isConditional() << " numSuccessors " << instr->getNumSuccessors() << endl;
+    // for(unsigned int i = 0; i < instr->getNumSuccessors(); i++) {
+    //     cout << "successor " << i << " " << dumpOperand(instr->getSuccessor(i)) << endl;
+    // }
+    // cout << "ignoring br for now" << endl;
+    if(instr->isConditional()) {
+        if(instr->getNumSuccessors() == 1) {
+            gencode += "goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
+        } else {
+            throw runtime_error("not implemented numsuccessors != 1 br");
+        }
+    } else {
+        throw runtime_error("not implemented conditional br");
+    }
+    return gencode;
 }
 
 std::string dumpBasicBlock(BasicBlock *basicBlock) {
