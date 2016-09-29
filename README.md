@@ -111,6 +111,7 @@ OpenCL/CUDA concepts supported, at least partially:
 - `global` assigned to incoming pointer arrays, and propagated to assigned variables appropriately
 - `kernel`s detected automatically
 - `get_global_id()` / `threadIx.`
+- `get_group_id()` / `blockIdx.`
 - `synchthreads()` / `barrier()`
 
 C++ things:

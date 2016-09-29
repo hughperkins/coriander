@@ -19,6 +19,11 @@ __global__ void use_tid(float *data) {
     data[tid] = 123.0f;
 }
 
+__global__ void use_blockid(float *data) {
+    int blkid = blockIdx.x;
+    data[blkid] = 123.0f;
+}
+
 template< typename T >
 __device__ T addNumbers(T one, T two) {
     return one + two;

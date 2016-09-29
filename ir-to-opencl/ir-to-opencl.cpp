@@ -295,6 +295,15 @@ std::string dumpCall(CallInst *instr) {
     if(functionName == "llvm.ptx.read.tid.z") {
         return gencode + "get_global_id(2);\n";
     }
+    if(functionName == "llvm.ptx.read.ctaid.x") {
+        return gencode + "get_group_id(0);\n";
+    }
+    if(functionName == "llvm.ptx.read.ctaid.y") {
+        return gencode + "get_group_id(1);\n";
+    }
+    if(functionName == "llvm.ptx.read.ctaid.z") {
+        return gencode + "get_group_id(2);\n";
+    }
     if(functionName == "llvm.cuda.syncthreads") {
         return gencode + "barrier(CLK_GLOBAL_MEM_FENCE);\n";
     }
@@ -528,6 +537,9 @@ int main(int argc, char *argv[]) {
     ignoredFunctionNames.insert("llvm.cuda.syncthreads");
     ignoredFunctionNames.insert("_ZL21__nvvm_reflect_anchorv");
     ignoredFunctionNames.insert("__nvvm_reflect");
+    ignoredFunctionNames.insert("llvm.ptx.read.ctaid.x");
+    ignoredFunctionNames.insert("llvm.ptx.read.ctaid.y");
+    ignoredFunctionNames.insert("llvm.ptx.read.ctaid.z");
 
     knownFunctionsMap["llvm.nvvm.sqrt.rn.d"] = "sqrt";
     knownFunctionsMap["_Z16our_pretend_tanhf"] = "tanh";
