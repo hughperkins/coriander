@@ -82,18 +82,13 @@ You'll need:
 - CUDA toolkit (tested with CUDA 7.5)
 - Have done `sudo apt-get install libc6-dev-i386`
 
-Then run:
+Simply clone this repo, then run:
 ```
-COMPILE_FLAGS="$(llvm-config-3.8 --cxxflags) -std=c++11"
-LINK_FLAGS="$(llvm-config-3.8 --ldflags --system-libs --libs all)"
-mkdir -p build
-clang++-3.8 ${COMPILE_FLAGS} -fcxx-exceptions -o build/ir-to-opencl -g -O3 -I/usr/include/llvm-3.8 ir-to-opencl/ir-to-opencl.cpp ${LINK_FLAGS} || exit 1
+./run-ir-to-opencl.sh
 ```
-
-=> `ir-to-opencl` will be built into `build/ir-to-opencl`
-
-Tested on:
-- Ubuntu 16.04 64-bit
+=> it should:
+- run a demonstration of converting the device side code in examples/testcudakernel1.cu into open
+- run a demonstration of compiling, and using/running, the hostside code in this same sourcefile
 
 ## Details
 
