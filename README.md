@@ -120,10 +120,11 @@ OpenCL/CUDA concepts supported, at least partially:
 C++ things:
 - templating working ok (llvm cuda compiler handles this for us :-) )
 
+Other cool things:
+- single-source compilation works ok :-)
+
 ## Things that would be cool to get working
 
-- single source:
-  - show we can compile host code as well :-)
 - kernel launch
   - compile host-side kernel launch code, and launch a kernel :-)
 - be able to handle pointer arithmetic for host-side `float *`s representing opencl gpu memory :-P
