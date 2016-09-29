@@ -538,6 +538,9 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             case Instruction::Xor:
                 instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "^");
                 break;
+            case Instruction::Shl:
+                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "<<");
+                break;
             case Instruction::Store:
                 instructioncode = dumpStore((StoreInst*)instruction);
                 break;

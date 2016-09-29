@@ -112,12 +112,12 @@ __global__ void testWhile(int *data, int N) {
     }
 }
 
-// __global__ void testIf(int *data, int N) {
-//     int tid = threadIdx.x;
-//     if(tid < N) {
-//         data[tid] *= 2;
-//     }
-// }
+__global__ void testIf(int *data, int N) {
+    int tid = threadIdx.x;
+    if(tid < N) {
+        data[tid] *= 2;
+    }
+}
 
 // __global__ void testIfElse(int *data, int N) {
 //     int tid = threadIdx.x;
