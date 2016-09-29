@@ -132,6 +132,16 @@ Other cool things:
    - lets use CLblast for blas stuff
    - use im2col for convolution for now (maybe libdnn?)
 
+## Other things we should probalby get working
+
+- local/shared memory
+- barriers
+- get group id etc
+- for
+- if
+- while
+- ternary
+
 ## open questions
 
 - how to "package"/market this repo, in relation to tensorflow? ie should blas stuff be part of this, or should we have
