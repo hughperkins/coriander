@@ -65,6 +65,20 @@ __global__ void someops_int(int *data) {
     data[0] += data[1] * data[2];
 }
 
+__global__ void testbooleanops(int *data) {
+    bool a = data[0] > 0;
+    bool b = data[1] < 0;
+    // data[2] = (int)(a && b);
+    // data[3] = (int)(a || b);
+    // data[4] = (int)(!a);
+    // data[5] = (int)(a >= b);
+    // data[6] = (int)(a <= b);
+    // data[7] = (int)(a < b);
+    // data[8] = (int)(a > b);
+    // data[9] = (int)(a == b);
+    // data[10] = (int)(a != b);
+}
+
 __global__ void testsyncthreads(float *data) {
     int tid = threadIdx.x;
     data[tid] *= 2;
