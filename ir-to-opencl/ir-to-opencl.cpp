@@ -555,6 +555,8 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     ignoredFunctionNames.insert("llvm.ptx.read.tid.x");
+    ignoredFunctionNames.insert("llvm.ptx.read.tid.y");
+    ignoredFunctionNames.insert("llvm.ptx.read.tid.z");
     ignoredFunctionNames.insert("llvm.cuda.syncthreads");
     ignoredFunctionNames.insert("_ZL21__nvvm_reflect_anchorv");
     ignoredFunctionNames.insert("__nvvm_reflect");
