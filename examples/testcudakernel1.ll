@@ -148,7 +148,11 @@ define void @_Z11someops_intPi(i32* nocapture %data) #2 {
   %7 = add i32 %6, %2
   %8 = mul nsw i32 %4, %2
   %9 = add nsw i32 %8, %7
-  store i32 %9, i32* %data, align 4, !tbaa !26
+  %10 = shl i32 %2, %4
+  %11 = add nsw i32 %10, %9
+  %12 = ashr i32 %2, %4
+  %13 = add nsw i32 %12, %11
+  store i32 %13, i32* %data, align 4, !tbaa !26
   ret void
 }
 

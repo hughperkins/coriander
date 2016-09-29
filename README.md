@@ -104,7 +104,7 @@ IR operations supported, at least partially:
 - `fptrunc`
 - `bitcast`
 - float maths operators: +, -, *, /
-- int maths operators: +, -, *, /
+- int maths operators: +, -, *, /, <<, >>
 - int comparisons: < > == != <= >=
 - boolean maths operators: &&, ||
 - bitwise operators: ^
@@ -146,7 +146,6 @@ Other cool things:
 - for
 - ternary
 - vector types, ie float4 etc
-- >>
 
 ## open questions
 
