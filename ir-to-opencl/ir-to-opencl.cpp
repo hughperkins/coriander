@@ -378,6 +378,14 @@ std::string dumpSExt(CastInst *instr) {
     return gencode;
 }
 
+std::string dumpUIToFP(UIToFPInst *instr) {
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    gencode += dumpValue(instr->getOperand(0)) + ";\n";
+    return gencode;
+}
+
 std::string dumpFPTrunc(CastInst *instr) {
     // since this is float point trunc, lets just assume we're going from double to float
     // fix any exceptiosn to this rule later
@@ -423,13 +431,54 @@ std::string dumpIcmp(ICmpInst *instr) {
     return gencode;
 }
 
+std::string dumpFcmp(FCmpInst *instr) {
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    CmpInst::Predicate predicate = instr->getPredicate();
+    string predicate_string = "";
+    switch(predicate) {
+        case CmpInst::FCMP_ULT:
+        case CmpInst::FCMP_OLT:
+            predicate_string = "<";
+            break;
+        case CmpInst::FCMP_UGT:
+        case CmpInst::FCMP_OGT:
+            predicate_string = ">";
+            break;
+        case CmpInst::FCMP_UGE:
+        case CmpInst::FCMP_OGE:
+            predicate_string = ">=";
+            break;
+        case CmpInst::FCMP_ULE:
+        case CmpInst::FCMP_OLE:
+            predicate_string = "<=";
+            break;
+        case CmpInst::FCMP_UEQ:
+        case CmpInst::FCMP_OEQ:
+            predicate_string = "==";
+            break;
+        case CmpInst::FCMP_UNE:
+        case CmpInst::FCMP_ONE:
+            predicate_string = "!=";
+            break;
+        default:
+            cout << "predicate " << predicate << endl;
+            throw runtime_error("predicate not supported");
+    }
+    gencode += dumpOperand(instr->getOperand(0));
+    gencode += " " + predicate_string + " ";
+    gencode += dumpOperand(instr->getOperand(1)) + ";\n";
+    return gencode;
+}
+
 std::string dumpPhi(BranchInst *branchInstr, BasicBlock *nextBlock) {
     std::string gencode = "";
     auto it = nextBlock->begin();
     if(it != nextBlock->end()) {
         Instruction *firstInstruction = &*it;
         if(firstInstruction->getOpcode() == Instruction::PHI) {
-            cout << "successor first instruction is a phi" << endl;
+            // cout << "successor first instruction is a phi" << endl;
             PHINode *phi = (PHINode *)firstInstruction;
             storeValueName(phi);
             gencode += dumpOperand(phi) + " = ";
@@ -443,10 +492,10 @@ std::string dumpPhi(BranchInst *branchInstr, BasicBlock *nextBlock) {
 
 std::string dumpBranch(BranchInst *instr) {
     string gencode = "";
-    cout << "br conditional " << instr->isConditional() << " numSuccessors " << instr->getNumSuccessors() << endl;
-    for(unsigned int i = 0; i < instr->getNumSuccessors(); i++) {
-        cout << "successor " << i << " " << dumpOperand(instr->getSuccessor(i)) << endl;
-    }
+    // cout << "br conditional " << instr->isConditional() << " numSuccessors " << instr->getNumSuccessors() << endl;
+    // for(unsigned int i = 0; i < instr->getNumSuccessors(); i++) {
+    //     cout << "successor " << i << " " << dumpOperand(instr->getSuccessor(i)) << endl;
+    // }
     if(instr->isConditional()) {
         gencode += "if(" + dumpOperand(instr->getCondition()) + ") {\n";
         gencode += "    " + dumpPhi(instr, instr->getSuccessor(0));
@@ -457,7 +506,7 @@ std::string dumpBranch(BranchInst *instr) {
             gencode += "    " + dumpPhi(instr, instr->getSuccessor(1));
             gencode += "    goto " + dumpOperand(instr->getSuccessor(1)) + ";\n";
         } else {
-            cout << "numsuccessors " << instr->getNumSuccessors() << endl;
+            // cout << "numsuccessors " << instr->getNumSuccessors() << endl;
             throw runtime_error("not implemented for this numsuccessors br");
         }
         gencode += "}\n";
@@ -556,6 +605,9 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             case Instruction::ICmp:
                 instructioncode = dumpIcmp((ICmpInst*)instruction);
                 break;
+            case Instruction::FCmp:
+                instructioncode = dumpFcmp((FCmpInst*)instruction);
+                break;
             case Instruction::SExt:
                 instructioncode = dumpSExt((CastInst*)instruction);
                 break;
@@ -570,6 +622,9 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
                 break;
             case Instruction::BitCast:
                 instructioncode = dumpBitcast((BitCastInst *)instruction);
+                break;
+            case Instruction::UIToFP:
+                instructioncode = dumpUIToFP((UIToFPInst *)instruction);
                 break;
             case Instruction::GetElementPtr:
                 instructioncode = dumpGetElementPtr((GetElementPtrInst *)instruction);

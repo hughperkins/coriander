@@ -84,6 +84,15 @@ __global__ void testcomparisons_int_signed(int *data) {
     data[10] = (int)(data[0] != data[1]);
 }
 
+__global__ void testcomparisons_float(float *data) {
+    data[5] = (data[0] >= data[1]);
+    data[6] = (data[0] <= data[1]);
+    data[7] = (data[0] > data[1]);
+    data[8] = (data[0] < data[1]);
+    data[9] = (data[0] == data[1]);
+    data[10] = (data[0] != data[1]);
+}
+
 // __global__ void testcomparisons_int_unsigned(unsigned int *data) {
 //     data[5] = (unsigned int)(data[0] >= data[1]);
 //     data[6] = (unsigned int)(data[0] <= data[1]);
@@ -139,6 +148,10 @@ __global__ void testFor(float *data, int N) {
     }
     data[0] = sum;
 }
+
+// __global__ void testTernary(float *data) {
+//     data[0] = data[1] > 0 ? data[2] : data[3];
+// }
 
 // __global__ void testLocal(float *data) {
 //     __shared__ float myshared[32];

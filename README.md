@@ -106,6 +106,7 @@ IR operations supported, at least partially:
 - float maths operators: +, -, *, /
 - int maths operators: +, -, *, /, <<, >>
 - int comparisons: < > == != <= >=
+- float comparisons: < > == != <= >=
 - boolean maths operators: &&, ||
 - bitwise operators: ^
 - unary float maths: `sqrt`, `tanh`, `log`, `exp`
