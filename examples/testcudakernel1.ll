@@ -152,8 +152,17 @@ define void @_Z11someops_intPi(i32* nocapture %data) #2 {
   ret void
 }
 
-; Function Attrs: norecurse nounwind readnone
-define void @_Z14testbooleanopsPi(i32* nocapture %data) #1 {
+; Function Attrs: norecurse nounwind
+define void @_Z14testbooleanopsPi(i32* nocapture %data) #2 {
+  %1 = load i32, i32* %data, align 4, !tbaa !21
+  %2 = icmp sgt i32 %1, 0
+  %3 = getelementptr inbounds i32, i32* %data, i64 1
+  %4 = load i32, i32* %3, align 4, !tbaa !21
+  %5 = icmp slt i32 %4, 0
+  %6 = and i1 %2, %5
+  %7 = zext i1 %6 to i32
+  %8 = getelementptr inbounds i32, i32* %data, i64 2
+  store i32 %7, i32* %8, align 4, !tbaa !21
   ret void
 }
 

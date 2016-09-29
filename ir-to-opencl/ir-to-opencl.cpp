@@ -351,6 +351,22 @@ std::string dumpFPExt(CastInst *instr) {
     return gencode;
 }
 
+std::string dumpZExt(CastInst *instr) {
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    gencode += dumpValue(instr->getOperand(0)) + ";\n";
+    return gencode;
+}
+
+std::string dumpSExt(CastInst *instr) {
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    gencode += dumpValue(instr->getOperand(0)) + ";\n";
+    return gencode;
+}
+
 std::string dumpFPTrunc(CastInst *instr) {
     // since this is float point trunc, lets just assume we're going from double to float
     // fix any exceptiosn to this rule later
@@ -417,6 +433,8 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "*");
         } else if(opcode == Instruction::SDiv) {
             instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "/");
+        } else if(opcode == Instruction::And) {
+            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "&&");
         // } else if(opcode == Instruction::Alloca) {
         //     gencode += dumpAlloca(instruction);
         } else if(opcode == Instruction::Store) {
@@ -429,7 +447,9 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             instructioncode = dumpIcmp((ICmpInst*)instruction);
         // } else if(opcode == Instruction::Br) {
         } else if(opcode == Instruction::SExt) {
-            cout << "note to self: this needs implementing :-P" << endl;
+            instructioncode = dumpSExt((CastInst*)instruction);
+        } else if(opcode == Instruction::ZExt) {
+            instructioncode = dumpZExt((CastInst*)instruction);
         } else if(opcode == Instruction::FPExt) {
             instructioncode = dumpFPExt((CastInst *)instruction);
         } else if(opcode == Instruction::FPTrunc) {
