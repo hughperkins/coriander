@@ -49,3 +49,17 @@ __global__ void someops_int(int *data) {
     data[0] += data[1] + data[2];
     data[0] += data[1] * data[2];
 }
+
+__global__ void testIf(int *data, int N) {
+    int tid = threadIdx.x;
+    if(tid < N) {
+        data[tid] *= 2;
+    }
+}
+
+// __global__ void testLocal(float *data) {
+//     __shared__ float myshared[32];
+//     int tid = threadIdx.x;
+//     myshared[tid] = data[tid];
+//     data[0] = myshared[tid + 1];
+// }

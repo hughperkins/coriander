@@ -109,6 +109,8 @@ std::string dumpType(Type *type) {
                     return "int";
                 case 64:
                     return "long";
+                case 1:
+                    return "bool";
                 default:
                     cout << "integer size " << type->getPrimitiveSizeInBits() << endl;
                     throw runtime_error("unrecognized size");
@@ -327,6 +329,26 @@ std::string dumpFPTrunc(CastInst *instr) {
     return gencode;
 }
 
+std::string dumpIcmp(ICmpInst *instr) {
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    CmpInst::Predicate predicate = instr->getSignedPredicate();  // note: we should detect signedness...
+    string predicate_string = "";
+    switch(predicate) {
+        case CmpInst::ICMP_SLT:
+            predicate_string = "<";
+            break;
+        default:
+            cout << "predicate " << predicate << endl;
+            throw runtime_error("predicate not supported");
+    }
+    gencode += dumpOperand(instr->getOperand(0));
+    gencode += " " + predicate_string + " ";
+    gencode += dumpOperand(instr->getOperand(1)) + ";\n";
+    return gencode;
+}
+
 std::string dumpBasicBlock(BasicBlock *basicBlock) {
     std::string gencode = "";
     for(BasicBlock::iterator it=basicBlock->begin(), e=basicBlock->end(); it != e; it++) {
@@ -368,7 +390,8 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             instructioncode = dumpCall((CallInst *)instruction);
         } else if(opcode == Instruction::Load) {
             instructioncode = dumpLoad((LoadInst*)instruction);
-        // } else if(opcode == Instruction::ICmp) {
+        } else if(opcode == Instruction::ICmp) {
+            instructioncode = dumpIcmp((ICmpInst*)instruction);
         // } else if(opcode == Instruction::Br) {
         } else if(opcode == Instruction::SExt) {
             cout << "note to self: this needs implementing :-P" << endl;

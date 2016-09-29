@@ -144,6 +144,7 @@ Other cool things:
 - && || < > <= >= != ==
 - bool type
 - vector types, ie float4 etc
+- unsigned ints
 
 ## open questions
 
