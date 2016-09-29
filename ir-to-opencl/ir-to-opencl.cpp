@@ -434,6 +434,20 @@ std::string dumpBranch(BranchInst *instr) {
         throw runtime_error("not implemented conditional br");
     } else {
         if(instr->getNumSuccessors() == 1) {
+            BasicBlock *nextBlock = instr->getSuccessor(0);
+            auto it = nextBlock->begin();
+            if(it != nextBlock->end()) {
+                Instruction *firstInstruction = &*it;
+                if(firstInstruction->getOpcode() == Instruction::PHI) {
+                    cout << "successor first instruction is a phi" << endl;
+                    PHINode *phi = (PHINode *)firstInstruction;
+                    storeValueName(phi);
+                    gencode += dumpOperand(phi) + " = ";
+                    BasicBlock *ourBlock = instr->getParent();
+                    Value *sourceValue = phi->getIncomingValueForBlock(ourBlock);
+                    gencode += dumpOperand(sourceValue) + ";\n";
+                }
+            }
             gencode += "goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
         } else {
             throw runtime_error("not implemented numsuccessors != 1 br");
@@ -542,6 +556,9 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
                 break;
             case Instruction::Ret:
                 instructioncode = dumpReturn((ReturnInst *)instruction);
+                break;
+            case Instruction::PHI:
+                // just ignore, we dealt with it in the br (hopefully)
                 break;
             default:
                 cout << "opcode string " << instruction->getOpcodeName() << endl;
