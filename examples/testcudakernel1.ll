@@ -175,7 +175,7 @@ define void @_Z14testbooleanopsPi(i32* nocapture %data) #2 {
 }
 
 ; Function Attrs: norecurse nounwind
-define void @_Z19testcomparisons_intPi(i32* nocapture %data) #2 {
+define void @_Z26testcomparisons_int_signedPi(i32* nocapture %data) #2 {
   %1 = load i32, i32* %data, align 4, !tbaa !22
   %2 = getelementptr inbounds i32, i32* %data, i64 1
   %3 = load i32, i32* %2, align 4, !tbaa !22
@@ -265,7 +265,7 @@ attributes #6 = { nounwind }
 !7 = !{void (float*)* @_Z13someops_floatPf, !"kernel", i32 1}
 !8 = !{void (i32*)* @_Z11someops_intPi, !"kernel", i32 1}
 !9 = !{void (i32*)* @_Z14testbooleanopsPi, !"kernel", i32 1}
-!10 = !{void (i32*)* @_Z19testcomparisons_intPi, !"kernel", i32 1}
+!10 = !{void (i32*)* @_Z26testcomparisons_int_signedPi, !"kernel", i32 1}
 !11 = !{void (float*)* @_Z15testsyncthreadsPf, !"kernel", i32 1}
 !12 = !{null, !"align", i32 8}
 !13 = !{null, !"align", i32 8, !"align", i32 65544, !"align", i32 131080}

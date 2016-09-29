@@ -86,6 +86,27 @@ std::string dumpPointerType(PointerType *ptr) {
     return gencode;
 }
 
+std::string dumpIntegerType(IntegerType *type) {
+    // std::string unsignedstring = "";
+    // if(type->getSignBit() > 1) {
+    //     unsignedstring = "unsigned ";
+    // }
+    // cout << "sign bit " << type->getSignBit() << endl;
+    // cout << "bitmask " << type->getBitMask() << endl;
+    // cout << "bitwidth " << type->getBitWidth() << endl;
+    switch(type->getPrimitiveSizeInBits()) {
+        case 32:
+            return "int";
+        case 64:
+            return "long";
+        case 1:
+            return "bool";
+        default:
+            cout << "integer size " << type->getPrimitiveSizeInBits() << endl;
+            throw runtime_error("unrecognized size");
+    }
+}
+
 std::string dumpType(Type *type) {
     Type::TypeID typeID = type->getTypeID();
     switch(typeID) {
@@ -104,17 +125,7 @@ std::string dumpType(Type *type) {
         case Type::PointerTyID:
             return dumpPointerType((PointerType *)type);
         case Type::IntegerTyID:
-            switch(type->getPrimitiveSizeInBits()) {
-                case 32:
-                    return "int";
-                case 64:
-                    return "long";
-                case 1:
-                    return "bool";
-                default:
-                    cout << "integer size " << type->getPrimitiveSizeInBits() << endl;
-                    throw runtime_error("unrecognized size");
-            }
+            return dumpIntegerType((IntegerType *)type);
         default:
             cout << "type id " << typeID << endl;
             throw runtime_error("unrecognized type");

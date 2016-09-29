@@ -73,20 +73,23 @@ __global__ void testbooleanops(int *data) {
     data[4] = (int)(!a);
 }
 
-__global__ void testcomparisons_int(int *data) {
+__global__ void testcomparisons_int_signed(int *data) {
     data[5] = (int)(data[0] >= data[1]);
     data[6] = (int)(data[0] <= data[1]);
     data[7] = (int)(data[0] > data[1]);
     data[8] = (int)(data[0] < data[1]);
     data[9] = (int)(data[0] == data[1]);
     data[10] = (int)(data[0] != data[1]);
-
-    // data[6] = (int)(a <= b);
-    // data[7] = (int)(a < b);
-    // data[8] = (int)(a > b);
-    // data[9] = (int)(a == b);
-    // data[10] = (int)(a != b);
 }
+
+// __global__ void testcomparisons_int_unsigned(unsigned int *data) {
+//     data[5] = (unsigned int)(data[0] >= data[1]);
+//     data[6] = (unsigned int)(data[0] <= data[1]);
+//     data[7] = (unsigned int)(data[0] > data[1]);
+//     data[8] = (unsigned int)(data[0] < data[1]);
+//     data[9] = (unsigned int)(data[0] == data[1]);
+//     data[10] = (unsigned int)(data[0] != data[1]);
+// }
 
 __global__ void testsyncthreads(float *data) {
     int tid = threadIdx.x;

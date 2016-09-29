@@ -105,7 +105,7 @@ IR operations supported, at least partially:
 - `bitcast`
 - float maths operators: +, -, *, /
 - int maths operators: +, -, *, /
-- signed int comparisons: < > == != <= >=
+- int comparisons: < > == != <= >=
 - boolean maths operators: &&, ||
 - bitwise operators: ^
 - unary float maths: `sqrt`, `tanh`, `log`, `exp`
