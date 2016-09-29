@@ -431,13 +431,13 @@ std::string dumpBranch(BranchInst *instr) {
     // }
     // cout << "ignoring br for now" << endl;
     if(instr->isConditional()) {
+        throw runtime_error("not implemented conditional br");
+    } else {
         if(instr->getNumSuccessors() == 1) {
             gencode += "goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
         } else {
             throw runtime_error("not implemented numsuccessors != 1 br");
         }
-    } else {
-        throw runtime_error("not implemented conditional br");
     }
     return gencode;
 }
