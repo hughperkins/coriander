@@ -423,34 +423,51 @@ std::string dumpIcmp(ICmpInst *instr) {
     return gencode;
 }
 
+std::string dumpPhi(BranchInst *branchInstr, BasicBlock *nextBlock) {
+    std::string gencode = "";
+    auto it = nextBlock->begin();
+    if(it != nextBlock->end()) {
+        Instruction *firstInstruction = &*it;
+        if(firstInstruction->getOpcode() == Instruction::PHI) {
+            cout << "successor first instruction is a phi" << endl;
+            PHINode *phi = (PHINode *)firstInstruction;
+            storeValueName(phi);
+            gencode += dumpOperand(phi) + " = ";
+            BasicBlock *ourBlock = branchInstr->getParent();
+            Value *sourceValue = phi->getIncomingValueForBlock(ourBlock);
+            gencode += dumpOperand(sourceValue) + ";\n";
+        }
+    }
+    return gencode;
+}
+
 std::string dumpBranch(BranchInst *instr) {
     string gencode = "";
-    // cout << "br conditional " << instr->isConditional() << " numSuccessors " << instr->getNumSuccessors() << endl;
-    // for(unsigned int i = 0; i < instr->getNumSuccessors(); i++) {
-    //     cout << "successor " << i << " " << dumpOperand(instr->getSuccessor(i)) << endl;
-    // }
-    // cout << "ignoring br for now" << endl;
+    cout << "br conditional " << instr->isConditional() << " numSuccessors " << instr->getNumSuccessors() << endl;
+    for(unsigned int i = 0; i < instr->getNumSuccessors(); i++) {
+        cout << "successor " << i << " " << dumpOperand(instr->getSuccessor(i)) << endl;
+    }
     if(instr->isConditional()) {
-        throw runtime_error("not implemented conditional br");
+        gencode += "if(" + dumpOperand(instr->getCondition()) + ") {\n";
+        gencode += "    " + dumpPhi(instr, instr->getSuccessor(0));
+        gencode += "    goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
+        if(instr->getNumSuccessors() == 1) {
+        } else if(instr->getNumSuccessors() == 2) {
+            gencode += "} else {\n";
+            gencode += "    " + dumpPhi(instr, instr->getSuccessor(1));
+            gencode += "    goto " + dumpOperand(instr->getSuccessor(1)) + ";\n";
+        } else {
+            cout << "numsuccessors " << instr->getNumSuccessors() << endl;
+            throw runtime_error("not implemented for this numsuccessors br");
+        }
+        gencode += "}\n";
     } else {
         if(instr->getNumSuccessors() == 1) {
             BasicBlock *nextBlock = instr->getSuccessor(0);
-            auto it = nextBlock->begin();
-            if(it != nextBlock->end()) {
-                Instruction *firstInstruction = &*it;
-                if(firstInstruction->getOpcode() == Instruction::PHI) {
-                    cout << "successor first instruction is a phi" << endl;
-                    PHINode *phi = (PHINode *)firstInstruction;
-                    storeValueName(phi);
-                    gencode += dumpOperand(phi) + " = ";
-                    BasicBlock *ourBlock = instr->getParent();
-                    Value *sourceValue = phi->getIncomingValueForBlock(ourBlock);
-                    gencode += dumpOperand(sourceValue) + ";\n";
-                }
-            }
+            gencode += dumpPhi(instr, nextBlock);
             gencode += "goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
         } else {
-            throw runtime_error("not implemented numsuccessors != 1 br");
+            throw runtime_error("not implemented sucessors != 1 for unconditional br");
         }
     }
     return gencode;
