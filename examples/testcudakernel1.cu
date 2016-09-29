@@ -149,9 +149,9 @@ __global__ void testFor(float *data, int N) {
     data[0] = sum;
 }
 
-// __global__ void testTernary(float *data) {
-//     data[0] = data[1] > 0 ? data[2] : data[3];
-// }
+__global__ void testTernary(float *data) {
+    data[0] = data[1] > 0 ? data[2] : data[3];
+}
 
 // __global__ void testLocal(float *data) {
 //     __shared__ float myshared[32];

@@ -111,6 +111,7 @@ IR operations supported, at least partially:
 - bitwise operators: ^
 - unary float maths: `sqrt`, `tanh`, `log`, `exp`
 - branch, conditional branch, phi: `while`, `do....while`, `if`, if...else...`, `for` working
+- ternary (ie `a = c ? d : e;` syntax)
 
 OpenCL/CUDA concepts supported, at least partially:
 - `global` assigned to incoming pointer arrays, and propagated to assigned variables appropriately
@@ -144,7 +145,6 @@ Other cool things:
 ## Other things we should probalby get working
 
 - local/shared memory
-- ternary
 - vector types, ie float4 etc
 
 ## open questions

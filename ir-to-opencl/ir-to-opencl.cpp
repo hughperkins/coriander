@@ -478,7 +478,6 @@ std::string dumpPhi(BranchInst *branchInstr, BasicBlock *nextBlock) {
     if(it != nextBlock->end()) {
         Instruction *firstInstruction = &*it;
         if(firstInstruction->getOpcode() == Instruction::PHI) {
-            // cout << "successor first instruction is a phi" << endl;
             PHINode *phi = (PHINode *)firstInstruction;
             storeValueName(phi);
             gencode += dumpOperand(phi) + " = ";
@@ -492,10 +491,6 @@ std::string dumpPhi(BranchInst *branchInstr, BasicBlock *nextBlock) {
 
 std::string dumpBranch(BranchInst *instr) {
     string gencode = "";
-    // cout << "br conditional " << instr->isConditional() << " numSuccessors " << instr->getNumSuccessors() << endl;
-    // for(unsigned int i = 0; i < instr->getNumSuccessors(); i++) {
-    //     cout << "successor " << i << " " << dumpOperand(instr->getSuccessor(i)) << endl;
-    // }
     if(instr->isConditional()) {
         gencode += "if(" + dumpOperand(instr->getCondition()) + ") {\n";
         gencode += "    " + dumpPhi(instr, instr->getSuccessor(0));
@@ -506,7 +501,6 @@ std::string dumpBranch(BranchInst *instr) {
             gencode += "    " + dumpPhi(instr, instr->getSuccessor(1));
             gencode += "    goto " + dumpOperand(instr->getSuccessor(1)) + ";\n";
         } else {
-            // cout << "numsuccessors " << instr->getNumSuccessors() << endl;
             throw runtime_error("not implemented for this numsuccessors br");
         }
         gencode += "}\n";
@@ -519,6 +513,15 @@ std::string dumpBranch(BranchInst *instr) {
             throw runtime_error("not implemented sucessors != 1 for unconditional br");
         }
     }
+    return gencode;
+}
+
+std::string dumpSelect(SelectInst *instr) {
+    string gencode = "";
+    gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
+    gencode += dumpOperand(instr->getCondition()) + " ? ";
+    gencode += dumpOperand(instr->getOperand(1)) + " : ";
+    gencode += dumpOperand(instr->getOperand(2)) + ";\n";
     return gencode;
 }
 
@@ -631,6 +634,9 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
                 break;
             case Instruction::Br:
                 instructioncode = dumpBranch((BranchInst *)instruction);
+                break;
+            case Instruction::Select:
+                instructioncode = dumpSelect((SelectInst *)instruction);
                 break;
             case Instruction::Ret:
                 instructioncode = dumpReturn((ReturnInst *)instruction);
