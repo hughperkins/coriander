@@ -34,7 +34,7 @@ TARGET=mycudafile
 clang++-3.8 -I/usr/local/cuda-7.5/include ${TARGET}.cu --cuda-device-only -emit-llvm -O3 -S -o ${TARGET}.ll
 ```
 
-The output looks like, ... well... it's a bit noisy :-P  cos it's IR, so I'll just link to it, which is: [data/testcudakernel1.ll](data/testcudakernel1.ll)
+The output looks like, ... well... it's a bit noisy :-P  cos it's IR, so I'll just link to it, which is: [examples/testcudakernel1.ll](examples/testcudakernel1.ll)
 
 Then we run cuda-ir-to-opencl on this:
 ```
