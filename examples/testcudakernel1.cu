@@ -132,6 +132,14 @@ __global__ void testIfElse(int *data, int N) {
     }
 }
 
+__global__ void testFor(float *data, int N) {
+    float sum = 0.0f;
+    for(int i = 0; i < N; i++) {
+        sum += data[i];
+    }
+    data[0] = sum;
+}
+
 // __global__ void testLocal(float *data) {
 //     __shared__ float myshared[32];
 //     int tid = threadIdx.x;
