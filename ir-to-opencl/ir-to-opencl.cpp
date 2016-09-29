@@ -425,10 +425,26 @@ std::string dumpIcmp(ICmpInst *instr) {
 
 std::string dumpBranch(BranchInst *instr) {
     cout << "ignoring br for now" << endl;
+    return "";
 }
 
 std::string dumpBasicBlock(BasicBlock *basicBlock) {
+    if(debug) {
+        cout << "basicblock" << endl;
+    //     cout << "hasname " << string(basicBlock->getName()) << endl;
+    }
+    string label = "";
+    if(nameByValue.find(basicBlock) != nameByValue.end()) {
+        label = nameByValue[basicBlock];
+    } else {
+        ostringstream oss;
+        oss << "label" << nextNameIdx;
+        nextNameIdx++;
+        label = oss.str();
+        nameByValue[basicBlock] = label;
+    }
     std::string gencode = "";
+    gencode += label + ":\n";
     for(BasicBlock::iterator it=basicBlock->begin(), e=basicBlock->end(); it != e; it++) {
         Instruction *instruction = &*it;
         auto opcode = instruction->getOpcode();
@@ -446,56 +462,76 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             }
             cout << endl;
         }
-        if(opcode == Instruction::FAdd) {
-            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "+");
-        } else if(opcode == Instruction::FSub) {
-            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "-");
-        } else if(opcode == Instruction::FDiv) {
-            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "/");
-        } else if(opcode == Instruction::FMul) {
-            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "*");
-        } else if(opcode == Instruction::Add) {
-            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "+");
-        } else if(opcode == Instruction::Mul) {
-            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "*");
-        } else if(opcode == Instruction::SDiv) {
-            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "/");
-        } else if(opcode == Instruction::And) {
-            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "&&");
-        } else if(opcode == Instruction::Or) {
-            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "||");
-        } else if(opcode == Instruction::Xor) { // bitwise
-            instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "^");
-        // } else if(opcode == Instruction::Alloca) {
-        //     gencode += dumpAlloca(instruction);
-        } else if(opcode == Instruction::Store) {
-            instructioncode = dumpStore((StoreInst*)instruction);
-        } else if(opcode == Instruction::Call) {
-            instructioncode = dumpCall((CallInst *)instruction);
-        } else if(opcode == Instruction::Load) {
-            instructioncode = dumpLoad((LoadInst*)instruction);
-        } else if(opcode == Instruction::ICmp) {
-            instructioncode = dumpIcmp((ICmpInst*)instruction);
-        // } else if(opcode == Instruction::Br) {
-        } else if(opcode == Instruction::SExt) {
-            instructioncode = dumpSExt((CastInst*)instruction);
-        } else if(opcode == Instruction::ZExt) {
-            instructioncode = dumpZExt((CastInst*)instruction);
-        } else if(opcode == Instruction::FPExt) {
-            instructioncode = dumpFPExt((CastInst *)instruction);
-        } else if(opcode == Instruction::FPTrunc) {
-            instructioncode = dumpFPTrunc((CastInst *)instruction);
-        } else if(opcode == Instruction::BitCast) {
-            instructioncode = dumpBitcast((BitCastInst *)instruction);
-        } else if(opcode == Instruction::GetElementPtr) {
-            instructioncode = dumpGetElementPtr((GetElementPtrInst *)instruction);
-        } else if(opcode == Instruction::Br) {
-            instructioncode = dumpBranch((BranchInst *)instruction);
-        } else if(opcode == Instruction::Ret) {
-            instructioncode = dumpReturn((ReturnInst *)instruction);
-        } else {
-            cout << "opcode string " << instruction->getOpcodeName() << endl;
-            throw runtime_error("unknown opcode");
+        switch(opcode) {
+            case Instruction::FAdd:
+                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "+");
+                break;
+            case Instruction::FSub:
+                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "-");
+                break;
+            case Instruction::FMul:
+                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "*");
+                break;
+            case Instruction::FDiv:
+                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "/");
+                break;
+            case Instruction::Add:
+                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "+");
+                break;
+            case Instruction::Mul:
+                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "*");
+                break;
+            case Instruction::SDiv:
+                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "/");
+                break;
+            case Instruction::And:
+                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "&&");
+                break;
+            case Instruction::Or:
+                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "||");
+                break;
+            case Instruction::Xor:
+                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "^");
+                break;
+            case Instruction::Store:
+                instructioncode = dumpStore((StoreInst*)instruction);
+                break;
+            case Instruction::Call:
+                instructioncode = dumpCall((CallInst *)instruction);
+                break;
+            case Instruction::Load:
+                instructioncode = dumpLoad((LoadInst*)instruction);
+                break;
+            case Instruction::ICmp:
+                instructioncode = dumpIcmp((ICmpInst*)instruction);
+                break;
+            case Instruction::SExt:
+                instructioncode = dumpSExt((CastInst*)instruction);
+                break;
+            case Instruction::ZExt:
+                instructioncode = dumpZExt((CastInst*)instruction);
+                break;
+            case Instruction::FPExt:
+                instructioncode = dumpFPExt((CastInst *)instruction);
+                break;
+            case Instruction::FPTrunc:
+                instructioncode = dumpFPTrunc((CastInst *)instruction);
+                break;
+            case Instruction::BitCast:
+                instructioncode = dumpBitcast((BitCastInst *)instruction);
+                break;
+            case Instruction::GetElementPtr:
+                instructioncode = dumpGetElementPtr((GetElementPtrInst *)instruction);
+                break;
+            case Instruction::Br:
+                instructioncode = dumpBranch((BranchInst *)instruction);
+                break;
+            case Instruction::Ret:
+                instructioncode = dumpReturn((ReturnInst *)instruction);
+                break;
+            default:
+                cout << "opcode string " << instruction->getOpcodeName() << endl;
+                throw runtime_error("unknown opcode");
         }
         if(debug) {
             cout << instructioncode << endl;
@@ -532,6 +568,16 @@ void myDump(Function *F) {
         i++;
     }
     gencode += ") {\n";
+    // label the blocks first
+    i = 0;
+    for(auto it=F->begin(); it != F->end(); it++) {
+        BasicBlock *basicBlock = &*it;
+        ostringstream oss;
+        oss << "label" << i;
+        string label = oss.str();
+        nameByValue[basicBlock] = label;
+        i++;
+    }
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
         gencode += dumpBasicBlock(basicBlock);
