@@ -304,6 +304,24 @@ std::string dumpCall(CallInst *instr) {
     if(functionName == "llvm.ptx.read.ctaid.z") {
         return gencode + "get_group_id(2);\n";
     }
+    if(functionName == "llvm.ptx.read.nctaid.x") {
+        return gencode + "get_num_groups(0);\n";
+    }
+    if(functionName == "llvm.ptx.read.nctaid.y") {
+        return gencode + "get_num_groups(1);\n";
+    }
+    if(functionName == "llvm.ptx.read.nctaid.z") {
+        return gencode + "get_num_groups(2);\n";
+    }
+    if(functionName == "llvm.ptx.read.ntid.x") {
+        return gencode + "get_local_size(0);\n";
+    }
+    if(functionName == "llvm.ptx.read.ntid.y") {
+        return gencode + "get_local_size(1);\n";
+    }
+    if(functionName == "llvm.ptx.read.ntid.z") {
+        return gencode + "get_local_size(2);\n";
+    }
     if(functionName == "llvm.cuda.syncthreads") {
         return gencode + "barrier(CLK_GLOBAL_MEM_FENCE);\n";
     }
@@ -540,6 +558,12 @@ int main(int argc, char *argv[]) {
     ignoredFunctionNames.insert("llvm.ptx.read.ctaid.x");
     ignoredFunctionNames.insert("llvm.ptx.read.ctaid.y");
     ignoredFunctionNames.insert("llvm.ptx.read.ctaid.z");
+    ignoredFunctionNames.insert("llvm.ptx.read.nctaid.x");
+    ignoredFunctionNames.insert("llvm.ptx.read.nctaid.y");
+    ignoredFunctionNames.insert("llvm.ptx.read.nctaid.z");
+    ignoredFunctionNames.insert("llvm.ptx.read.ntid.x");
+    ignoredFunctionNames.insert("llvm.ptx.read.ntid.y");
+    ignoredFunctionNames.insert("llvm.ptx.read.ntid.z");
 
     knownFunctionsMap["llvm.nvvm.sqrt.rn.d"] = "sqrt";
     knownFunctionsMap["_Z16our_pretend_tanhf"] = "tanh";

@@ -24,6 +24,16 @@ __global__ void use_blockid(float *data) {
     data[blkid] = 123.0f;
 }
 
+__global__ void use_griddim(float *data) {
+    int blkid = gridDim.x;
+    data[blkid] = 123.0f;
+}
+
+__global__ void use_blockdim(float *data) {
+    int blkid = blockDim.x;
+    data[blkid] = 123.0f;
+}
+
 template< typename T >
 __device__ T addNumbers(T one, T two) {
     return one + two;

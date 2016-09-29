@@ -112,6 +112,8 @@ OpenCL/CUDA concepts supported, at least partially:
 - `kernel`s detected automatically
 - `get_global_id()` / `threadIx.`
 - `get_group_id()` / `blockIdx.`
+- `get_num_groups()`
+- `get_local_size()`
 - `synchthreads()` / `barrier()`
 
 C++ things:
@@ -137,7 +139,6 @@ Other cool things:
 ## Other things we should probalby get working
 
 - local/shared memory
-- get group id etc
 - for
 - if
 - while
