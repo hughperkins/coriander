@@ -119,16 +119,16 @@ __global__ void testIf(int *data, int N) {
     }
 }
 
-// __global__ void testIfElse(int *data, int N) {
-//     int tid = threadIdx.x;
-//     if(tid < N) {
-//         data[tid] *= 2;
-//         data[tid + 3] *= 2;
-//     } else {
-//         data[tid] -= 20;
-//         data[tid + 5] -= 20;
-//     }
-// }
+__global__ void testIfElse(int *data, int N) {
+    int tid = threadIdx.x;
+    if(tid < N) {
+        data[tid] *= 2;
+        data[tid + 3] *= 2;
+    } else {
+        data[tid] -= 20;
+        data[tid + 5] -= 20;
+    }
+}
 
 // __global__ void testLocal(float *data) {
 //     __shared__ float myshared[32];
