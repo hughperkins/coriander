@@ -29,6 +29,10 @@ __global__ void use_template1(float *data, int *intdata) {
     intdata[0] = addNumbers(intdata[1], intdata[2]);
 }
 
+__host__ float someHostFunction(float input) {
+    return input * 100.0f;
+}
+
 __global__ void someops_float(float *data) {
     data[0] = data[1] - data[2];
     data[0] += data[1] / data[2];
