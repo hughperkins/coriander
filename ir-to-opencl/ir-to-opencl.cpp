@@ -600,6 +600,7 @@ void myDump(Function *F) {
     }
     gencode += ") {\n";
     // label the blocks first
+    // also dump phi declarations
     i = 0;
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
@@ -607,8 +608,20 @@ void myDump(Function *F) {
         oss << "label" << i;
         string label = oss.str();
         nameByValue[basicBlock] = label;
+        auto instructionIt = basicBlock->begin();
+        if(instructionIt != basicBlock->end()) {
+            Instruction *instr = &*instructionIt;
+            if(PHINode::classof(instr)) {
+                PHINode *phi = (PHINode *)instr;
+                storeValueName(phi);
+                gencode += dumpType(phi->getType()) + " " + dumpOperand(phi) + ";\n";
+            }
+        }
         i++;
     }
+    // if(debug) {
+    //     cout << "function code so far " << gencode << endl;
+    // }
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
         gencode += dumpBasicBlock(basicBlock);
