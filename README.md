@@ -142,14 +142,9 @@ Other cool things:
 ## Other things we should probalby get working
 
 - local/shared memory
-- for
-- if
-- while
+- for, if, while
 - ternary
-- && || < > <= >= != ==
-- bool type
 - vector types, ie float4 etc
-- unsigned ints
 
 ## open questions
 

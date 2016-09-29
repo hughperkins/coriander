@@ -98,6 +98,13 @@ __global__ void testsyncthreads(float *data) {
     data[tid + 1] += 2;
 }
 
+__global__ void testDoWhile(int *data, int N) {
+    int p = threadIdx.x;
+    do {
+        p++;
+    } while(data[p] != 0);
+}
+
 // __global__ void testIf(int *data, int N) {
 //     int tid = threadIdx.x;
 //     if(tid < N) {

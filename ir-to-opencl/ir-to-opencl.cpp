@@ -423,6 +423,10 @@ std::string dumpIcmp(ICmpInst *instr) {
     return gencode;
 }
 
+std::string dumpBranch(BranchInst *instr) {
+    cout << "ignoring br for now" << endl;
+}
+
 std::string dumpBasicBlock(BasicBlock *basicBlock) {
     std::string gencode = "";
     for(BasicBlock::iterator it=basicBlock->begin(), e=basicBlock->end(); it != e; it++) {
@@ -485,6 +489,8 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             instructioncode = dumpBitcast((BitCastInst *)instruction);
         } else if(opcode == Instruction::GetElementPtr) {
             instructioncode = dumpGetElementPtr((GetElementPtrInst *)instruction);
+        } else if(opcode == Instruction::Br) {
+            instructioncode = dumpBranch((BranchInst *)instruction);
         } else if(opcode == Instruction::Ret) {
             instructioncode = dumpReturn((ReturnInst *)instruction);
         } else {
