@@ -135,3 +135,12 @@ Other cool things:
 - should I use bazel or cmake (or something else?) to package this?
     - if this repo is going to be orthogonal to tensorflow-cl repo, then lets use CMake, which is fairly standard, on
       non-Google projects
+
+## News
+
+- 30 September 2016:
+  - started to write some unit tests, that actually try to compile the opencl code
+  - notice that tons of the code doesnt compile :-P
+  - fixing it...
+- 28 September 2016:
+  - first create this repo
