@@ -44,29 +44,32 @@ def test_cloutput():
 
     prg = cl.Program(ctx, sourcecode).build()
 
+    cl.enqueue_copy(q, float_data_gpu, float_data)
     prg.__getattr__(mangle('foo', ['float *']))(q, (32,), (32,), float_data_gpu)
     q.finish()
     cl.enqueue_copy(q, float_data_res, float_data_gpu)
     assert float_data_res[0] == 123
 
+    cl.enqueue_copy(q, float_data_gpu, float_data)
     prg.__getattr__(mangle('copy_float', ['float *']))(q, (32,), (32,), float_data_gpu)
     q.finish()
     cl.enqueue_copy(q, float_data_res, float_data_gpu)
     assert float_data_res[0] == float_data[1]
 
+    cl.enqueue_copy(q, int_data_gpu, int_data)
     prg.__getattr__(mangle('use_tid2', ['int *']))(q, (32,), (32,), int_data_gpu)
-    q.finish()
     cl.enqueue_copy(q, int_data_res, int_data_gpu)
     q.finish()
     assert int_data_res[0] == int_data[0] + 0
     assert int_data_res[10] == int_data[10] + 10
     assert int_data_res[31] == int_data[31] + 31
 
+    cl.enqueue_copy(q, float_data_gpu, float_data)
+    cl.enqueue_copy(q, int_data_gpu, int_data)
     prg.__getattr__(mangle('use_template1', ['float *', 'int *']))(q, (32,), (32,), float_data_gpu, int_data_gpu)
-    q.finish()
     cl.enqueue_copy(q, float_data_res, float_data_gpu)
     cl.enqueue_copy(q, int_data_res, int_data_gpu)
     q.finish()
 
-    assert int_data_res[0] == int_data[1] + int_data[2]
     assert float_data_res[0] == float_data[1] + float_data[2]
+    assert int_data_res[0] == int_data[1] + int_data[2]

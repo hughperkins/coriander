@@ -85,18 +85,26 @@ define void @_Z12use_blockdimPf(float* nocapture %data) #2 {
 
 ; Function Attrs: norecurse nounwind
 define void @_Z13use_template1PfPi(float* nocapture %data, i32* nocapture %intdata) #2 {
-  %1 = getelementptr inbounds float, float* %data, i64 1
-  %2 = load float, float* %1, align 4, !tbaa !14
-  %3 = getelementptr inbounds float, float* %data, i64 2
-  %4 = load float, float* %3, align 4, !tbaa !14
-  %5 = fadd float %2, %4
-  store float %5, float* %data, align 4, !tbaa !14
-  %6 = getelementptr inbounds i32, i32* %intdata, i64 1
-  %7 = load i32, i32* %6, align 4, !tbaa !18
-  %8 = getelementptr inbounds i32, i32* %intdata, i64 2
-  %9 = load i32, i32* %8, align 4, !tbaa !18
-  %10 = add nsw i32 %9, %7
-  store i32 %10, i32* %intdata, align 4, !tbaa !18
+  %1 = tail call i32 @llvm.ptx.read.tid.x() #4
+  %2 = icmp eq i32 %1, 0
+  br i1 %2, label %3, label %14
+
+; <label>:3                                       ; preds = %0
+  %4 = getelementptr inbounds float, float* %data, i64 1
+  %5 = load float, float* %4, align 4, !tbaa !14
+  %6 = getelementptr inbounds float, float* %data, i64 2
+  %7 = load float, float* %6, align 4, !tbaa !14
+  %8 = fadd float %5, %7
+  store float %8, float* %data, align 4, !tbaa !14
+  %9 = getelementptr inbounds i32, i32* %intdata, i64 1
+  %10 = load i32, i32* %9, align 4, !tbaa !18
+  %11 = getelementptr inbounds i32, i32* %intdata, i64 2
+  %12 = load i32, i32* %11, align 4, !tbaa !18
+  %13 = add nsw i32 %12, %10
+  store i32 %13, i32* %intdata, align 4, !tbaa !18
+  br label %14
+
+; <label>:14                                      ; preds = %3, %0
   ret void
 }
 

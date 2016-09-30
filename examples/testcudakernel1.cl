@@ -62,16 +62,26 @@ kernel void _Z12use_blockdimPf(global float* data) {
 
 kernel void _Z13use_template1PfPi(global float* data, global int* intdata) {
     label0:;
-    global float* v0 = data + 1;
-    float v1 = v0[0];
-    global float* v2 = data + 2;
-    float v3 = v2[0];
-    float v4 = v1 + v3;
-    data[0] = v4;
-    global int* v6 = intdata + 1;
-    int v7 = v6[0];
-    global int* v8 = intdata + 2;
-    int v9 = v8[0];
-    int v10 = v9 + v7;
-    intdata[0] = v10;
+    int v0 = get_global_id(0);
+    bool v1 = v0 == 0;
+    if(v1) {
+        goto     label1;
+} else {
+        goto     label2;
+}
+    label1:;
+    global float* v3 = data + 1;
+    float v4 = v3[0];
+    global float* v5 = data + 2;
+    float v6 = v5[0];
+    float v7 = v4 + v6;
+    data[0] = v7;
+    global int* v9 = intdata + 1;
+    int v10 = v9[0];
+    global int* v11 = intdata + 2;
+    int v12 = v11[0];
+    int v13 = v12 + v10;
+    intdata[0] = v13;
+    goto     label2;
+    label2:;
 }
