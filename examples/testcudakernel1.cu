@@ -15,24 +15,29 @@ __global__ void use_tid(float *data) {
     data[tid] = 123.0f;
 }
 
+__global__ void use_tid2(int *data) {
+    int tid = threadIdx.x;
+    data[tid] = data[tid] + tid;
+}
+
 __global__ void copy_float(float *a) {
     a[0] = a[1];
 }
 
-// __global__ void use_blockid(float *data) {
-//     int blkid = blockIdx.x;
-//     data[blkid] = 123.0f;
-// }
+__global__ void use_blockid(float *data) {
+    int blkid = blockIdx.x;
+    data[blkid] = 123.0f;
+}
 
-// __global__ void use_griddim(float *data) {
-//     int blkid = gridDim.x;
-//     data[blkid] = 123.0f;
-// }
+__global__ void use_griddim(float *data) {
+    int blkid = gridDim.x;
+    data[blkid] = 123.0f;
+}
 
-// __global__ void use_blockdim(float *data) {
-//     int blkid = blockDim.x;
-//     data[blkid] = 123.0f;
-// }
+__global__ void use_blockdim(float *data) {
+    int blkid = blockDim.x;
+    data[blkid] = 123.0f;
+}
 
 // template< typename T >
 // __device__ T addNumbers(T one, T two) {

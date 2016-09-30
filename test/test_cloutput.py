@@ -7,6 +7,8 @@ def mangle(name, param_types):
     for param in param_types:
         if param.replace(' ', '') == 'float*':
             mangled += 'Pf'
+        if param.replace(' ', '') == 'int*':
+            mangled += 'Pi'
     return mangled
 
 
@@ -27,7 +29,10 @@ def test_cloutput():
     q = cl.CommandQueue(ctx)
 
     mf = cl.mem_flags
+
+    np.random.seed(123)
     int_data = np.random.randint(1024, size=(1024,), dtype=np.int32)
+    int_data_res = np.random.randint(1024, size=(1024,), dtype=np.int32)
     float_data = np.random.randn(1024).astype(np.float32)
     float_data_res = np.random.randn(1024).astype(np.float32)
 
@@ -48,3 +53,11 @@ def test_cloutput():
     q.finish()
     cl.enqueue_copy(q, float_data_res, float_data_gpu)
     assert float_data_res[0] == float_data[1]
+
+    prg.__getattr__(mangle('use_tid2', ['int *']))(q, (32,), (32,), int_data_gpu)
+    q.finish()
+    cl.enqueue_copy(q, int_data_res, int_data_gpu)
+    q.finish()
+    assert int_data_res[0] == int_data[0] + 0
+    assert int_data_res[10] == int_data[10] + 10
+    assert int_data_res[31] == int_data[31] + 31
