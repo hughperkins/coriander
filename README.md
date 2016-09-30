@@ -142,5 +142,5 @@ Other cool things:
   - started to write some unit tests, that actually try to compile the opencl code
   - notice that tons of the code doesnt compile :-P
   - fixing it...
-- 28 September 2016:
+- 27 September 2016:
   - first create this repo
