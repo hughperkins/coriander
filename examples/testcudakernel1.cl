@@ -340,3 +340,17 @@ kernel void _Z10testIfElsePii(global int* data, int N) {
     goto     label3;
     label3:;
 }
+
+kernel void _Z11testTernaryPf(global float* data) {
+    label0:;
+    global float* v0 = data + 1;
+    float v1 = v0[0];
+    bool v2 = v1 > 0;
+    global float* v3 = data + 2;
+    global float* v4 = data + 3;
+    global float* v_in = v2 ? v3 : v4;
+    global int*v5 = (global int*)v_in;
+    int v6 = v5[0];
+    global int*v7 = (global int*)data;
+    v7[0] = v6;
+}

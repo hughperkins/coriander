@@ -148,16 +148,16 @@ __global__ void testIfElse(int *data, int N) {
     }
 }
 
+__global__ void testTernary(float *data) {
+    data[0] = data[1] > 0 ? data[2] : data[3];
+}
+
 // __global__ void testFor(float *data, int N) {
 //     float sum = 0.0f;
 //     for(int i = 0; i < N; i++) {
 //         sum += data[i];
 //     }
 //     data[0] = sum;
-// }
-
-// __global__ void testTernary(float *data) {
-//     data[0] = data[1] > 0 ? data[2] : data[3];
 // }
 
 // // __global__ void testFloat4(float4 *data) {

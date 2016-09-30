@@ -346,14 +346,8 @@ std::string dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
 std::string dumpBitcast(BitCastInst *instr) {
     string gencode = "";
     Value *op0 = instr->getOperand(0);
-    Type *op0type = instr->getOperand(0)->getType();
-    if(op0type->getTypeID() == Type::PointerTyID) {
-        PointerType *inType = (PointerType *)op0type;
-        int addressspace = inType->getAddressSpace();
-        if(addressspace != 0) {
-            updateAddressSpace(instr, addressspace);
-        }
-    }
+    // Type *op0type = instr->getOperand(0)->getType();
+    copyAddressSpace(instr, instr->getOperand(0));
     gencode += dumpType(instr->getType());
     gencode += dumpOperand(instr) + " = (" + dumpType(instr->getType()) + ")" + dumpOperand(op0) + ";\n";
     return gencode;
@@ -588,6 +582,7 @@ std::string dumpBranch(BranchInst *instr) {
 
 std::string dumpSelect(SelectInst *instr) {
     string gencode = "";
+    copyAddressSpace(instr, instr->getOperand(1));
     gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
     gencode += dumpOperand(instr->getCondition()) + " ? ";
     gencode += dumpOperand(instr->getOperand(1)) + " : ";
