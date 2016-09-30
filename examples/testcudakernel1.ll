@@ -21,6 +21,14 @@ define float @_Z3barff(float %a, float %b) #1 {
 }
 
 ; Function Attrs: norecurse nounwind
+define void @_Z7incrvalPf(float* nocapture %a) #2 {
+  %1 = load float, float* %a, align 4, !tbaa !24
+  %2 = fadd float %1, 3.000000e+00
+  store float %2, float* %a, align 4, !tbaa !24
+  ret void
+}
+
+; Function Attrs: norecurse nounwind
 define void @_Z3fooPf(float* nocapture %data) #2 {
   store float 1.230000e+02, float* %data, align 4, !tbaa !24
   ret void

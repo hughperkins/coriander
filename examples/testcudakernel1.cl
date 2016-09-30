@@ -4,6 +4,13 @@ float _Z3barff(float a, float b) {
     return v0;
 }
 
+void _Z7incrvalPf(global float* a) {
+    label0:;
+    float v0 = a[0];
+    float v1 = v0 + 3;
+    a[0] = v1;
+}
+
 kernel void _Z3fooPf(global float* data) {
     label0:;
     data[0] = 123;

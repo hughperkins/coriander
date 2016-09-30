@@ -2,9 +2,9 @@ __device__ float bar(float a, float b) {
     return a + b;
 }
 
-// __device__ void incrval(float *a) {
-//     *a += 3;
-// }
+__device__ void incrval(float *a) {
+    *a += 3;
+}
 
 __global__ void foo(float *data) {
     data[0] = 123.0f;
