@@ -13,6 +13,9 @@ Goal is to be able to build tensorflow for OpenCL.  It's not the only way forwar
 ### Compared to using SPIR-V
 - OpenCL is a mature standard, supported by a wide variety of GPUs, from a large number of manufacturers (AMD, Intel, NVIDIA, Qualcomm, ...)
 
+### Downsides
+- you do need CUDA toolkit installed, in order to run clang against the cuda code.  This does imply you have a CUDA-enabled GPU.  Obviously if youre trying to build OpenCL, this might not be the case.  But we can use Amazon EC2 g2.2xlarge instances, in the worst case, then copy the generated OpenCL code onto our target, non-CUDA, device
+
 ## How it works
 
 - we use `clang` to build the CUDA code into LLVM IR code
