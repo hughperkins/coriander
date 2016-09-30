@@ -108,13 +108,23 @@ C++ things:
 Other cool things:
 - single-source compilation works ok :-)
 
-## Things that would be cool to get working
+## Test
+
+This is new.  Tests currently failing :-P  Working on this.  To run tests, do:
+```
+test/test.sh
+```
+A stream of error messages will ensure :-P  I'm fixing these...
+
+## Roadmap
+
+### Things that would be cool to get working
 
 - kernel launch
   - compile host-side kernel launch code, and launch a kernel :-)
 - be able to handle pointer arithmetic for host-side `float *`s representing opencl gpu memory :-P
 
-## Things we *need* to be working for tensorflow
+### Things we *need* to be working for tensorflow
 
 - tanh, exp, log (for sigmoid etc) (done)
 - basic per-element add, subtract, sqrt, etc; so we can create cost functions (done)
@@ -122,12 +132,12 @@ Other cool things:
    - lets use CLblast for blas stuff
    - use im2col for convolution for now (maybe libdnn?)
 
-## Other things we should probalby get working
+### Other things we should probalby get working
 
 - local/shared memory
 - vector types, ie float4 etc
 
-## open questions
+### open questions
 
 - how to "package"/market this repo, in relation to tensorflow? ie should blas stuff be part of this, or should we have
   a separate tensorflow-cl project, that uses clblast, ir-to-opencl etc as tools/libraries to achieve its aims?
