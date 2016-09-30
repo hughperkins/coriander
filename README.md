@@ -72,11 +72,21 @@ From this repo, run:
 
 ## Test
 
-This is new.  Tests currently failing :-P  Working on this.  To run tests, do:
+To run tests, you will need:
+- python 3.5
+- an OpenCL enabled GPU, with an OpenCL-enabled driver installed
+
+Setup python:
+```
+pip -install -r test/requirements.txt
+```
+
+To run tests:
 ```
 test/test.sh
 ```
-A stream of error messages will ensure :-P  I'm fixing these...
+
+More info: [test/README.md](test/README.md)
 
 ## What's working?
 
@@ -118,10 +128,6 @@ Other cool things:
 
 ## Roadmap
 
-### Right now
-
-Getting the tests to pass...
-
 ### Things that would be cool to get working
 
 - kernel launch
@@ -153,8 +159,6 @@ Getting the tests to pass...
 ## News
 
 - 30 September 2016:
-  - started to write some unit tests, that actually try to compile the opencl code
-  - notice that tons of the code doesnt compile :-P
-  - fixing it...
+  - added initial unit tests, that use pyopencl to compile the generated OpenCL code, and run tests against it
 - 27 September 2016:
   - first create this repo
