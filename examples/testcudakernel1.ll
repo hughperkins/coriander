@@ -22,7 +22,7 @@ define float @_Z3barff(float %a, float %b) #1 {
 
 ; Function Attrs: norecurse nounwind
 define void @_Z3fooPf(float* nocapture %data) #2 {
-  store float 1.230000e+02, float* %data, align 4, !tbaa !13
+  store float 1.230000e+02, float* %data, align 4, !tbaa !14
   ret void
 }
 
@@ -31,7 +31,7 @@ define void @_Z7use_tidPf(float* nocapture %data) #2 {
   %1 = tail call i32 @llvm.ptx.read.tid.x() #4
   %2 = sext i32 %1 to i64
   %3 = getelementptr inbounds float, float* %data, i64 %2
-  store float 1.230000e+02, float* %3, align 4, !tbaa !13
+  store float 1.230000e+02, float* %3, align 4, !tbaa !14
   ret void
 }
 
@@ -40,9 +40,9 @@ define void @_Z8use_tid2Pi(i32* nocapture %data) #2 {
   %1 = tail call i32 @llvm.ptx.read.tid.x() #4
   %2 = sext i32 %1 to i64
   %3 = getelementptr inbounds i32, i32* %data, i64 %2
-  %4 = load i32, i32* %3, align 4, !tbaa !17
+  %4 = load i32, i32* %3, align 4, !tbaa !18
   %5 = add nsw i32 %4, %1
-  store i32 %5, i32* %3, align 4, !tbaa !17
+  store i32 %5, i32* %3, align 4, !tbaa !18
   ret void
 }
 
@@ -50,9 +50,9 @@ define void @_Z8use_tid2Pi(i32* nocapture %data) #2 {
 define void @_Z10copy_floatPf(float* nocapture %a) #2 {
   %1 = getelementptr inbounds float, float* %a, i64 1
   %2 = bitcast float* %1 to i32*
-  %3 = load i32, i32* %2, align 4, !tbaa !13
+  %3 = load i32, i32* %2, align 4, !tbaa !14
   %4 = bitcast float* %a to i32*
-  store i32 %3, i32* %4, align 4, !tbaa !13
+  store i32 %3, i32* %4, align 4, !tbaa !14
   ret void
 }
 
@@ -61,7 +61,7 @@ define void @_Z11use_blockidPf(float* nocapture %data) #2 {
   %1 = tail call i32 @llvm.ptx.read.ctaid.x() #4
   %2 = sext i32 %1 to i64
   %3 = getelementptr inbounds float, float* %data, i64 %2
-  store float 1.230000e+02, float* %3, align 4, !tbaa !13
+  store float 1.230000e+02, float* %3, align 4, !tbaa !14
   ret void
 }
 
@@ -70,7 +70,7 @@ define void @_Z11use_griddimPf(float* nocapture %data) #2 {
   %1 = tail call i32 @llvm.ptx.read.nctaid.x() #4
   %2 = sext i32 %1 to i64
   %3 = getelementptr inbounds float, float* %data, i64 %2
-  store float 1.230000e+02, float* %3, align 4, !tbaa !13
+  store float 1.230000e+02, float* %3, align 4, !tbaa !14
   ret void
 }
 
@@ -79,7 +79,24 @@ define void @_Z12use_blockdimPf(float* nocapture %data) #2 {
   %1 = tail call i32 @llvm.ptx.read.ntid.x() #4
   %2 = sext i32 %1 to i64
   %3 = getelementptr inbounds float, float* %data, i64 %2
-  store float 1.230000e+02, float* %3, align 4, !tbaa !13
+  store float 1.230000e+02, float* %3, align 4, !tbaa !14
+  ret void
+}
+
+; Function Attrs: norecurse nounwind
+define void @_Z13use_template1PfPi(float* nocapture %data, i32* nocapture %intdata) #2 {
+  %1 = getelementptr inbounds float, float* %data, i64 1
+  %2 = load float, float* %1, align 4, !tbaa !14
+  %3 = getelementptr inbounds float, float* %data, i64 2
+  %4 = load float, float* %3, align 4, !tbaa !14
+  %5 = fadd float %2, %4
+  store float %5, float* %data, align 4, !tbaa !14
+  %6 = getelementptr inbounds i32, i32* %intdata, i64 1
+  %7 = load i32, i32* %6, align 4, !tbaa !18
+  %8 = getelementptr inbounds i32, i32* %intdata, i64 2
+  %9 = load i32, i32* %8, align 4, !tbaa !18
+  %10 = add nsw i32 %9, %7
+  store i32 %10, i32* %intdata, align 4, !tbaa !18
   ret void
 }
 
@@ -101,10 +118,10 @@ attributes #2 = { norecurse nounwind "disable-tail-calls"="false" "less-precise-
 attributes #3 = { nounwind readnone }
 attributes #4 = { nounwind }
 
-!nvvm.annotations = !{!0, !1, !2, !3, !4, !5, !6, !7, !8, !7, !9, !9, !9, !9, !10, !10, !9}
-!llvm.ident = !{!11}
+!nvvm.annotations = !{!0, !1, !2, !3, !4, !5, !6, !7, !8, !9, !8, !10, !10, !10, !10, !11, !11, !10}
+!llvm.ident = !{!12}
 !nvvm.internalize.after.link = !{}
-!nvvmir.version = !{!12}
+!nvvmir.version = !{!13}
 
 !0 = !{void (float*)* @_Z3fooPf, !"kernel", i32 1}
 !1 = !{void (float*)* @_Z7use_tidPf, !"kernel", i32 1}
@@ -113,15 +130,16 @@ attributes #4 = { nounwind }
 !4 = !{void (float*)* @_Z11use_blockidPf, !"kernel", i32 1}
 !5 = !{void (float*)* @_Z11use_griddimPf, !"kernel", i32 1}
 !6 = !{void (float*)* @_Z12use_blockdimPf, !"kernel", i32 1}
-!7 = !{null, !"align", i32 8}
-!8 = !{null, !"align", i32 8, !"align", i32 65544, !"align", i32 131080}
-!9 = !{null, !"align", i32 16}
-!10 = !{null, !"align", i32 16, !"align", i32 65552, !"align", i32 131088}
-!11 = !{!"clang version 3.8.0-2ubuntu4 (tags/RELEASE_380/final)"}
-!12 = !{i32 1, i32 2}
-!13 = !{!14, !14, i64 0}
-!14 = !{!"float", !15, i64 0}
-!15 = !{!"omnipotent char", !16, i64 0}
-!16 = !{!"Simple C/C++ TBAA"}
-!17 = !{!18, !18, i64 0}
-!18 = !{!"int", !15, i64 0}
+!7 = !{void (float*, i32*)* @_Z13use_template1PfPi, !"kernel", i32 1}
+!8 = !{null, !"align", i32 8}
+!9 = !{null, !"align", i32 8, !"align", i32 65544, !"align", i32 131080}
+!10 = !{null, !"align", i32 16}
+!11 = !{null, !"align", i32 16, !"align", i32 65552, !"align", i32 131088}
+!12 = !{!"clang version 3.8.0-2ubuntu4 (tags/RELEASE_380/final)"}
+!13 = !{i32 1, i32 2}
+!14 = !{!15, !15, i64 0}
+!15 = !{!"float", !16, i64 0}
+!16 = !{!"omnipotent char", !17, i64 0}
+!17 = !{!"Simple C/C++ TBAA"}
+!18 = !{!19, !19, i64 0}
+!19 = !{!"int", !16, i64 0}

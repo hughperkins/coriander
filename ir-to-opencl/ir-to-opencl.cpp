@@ -719,14 +719,16 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
                 throw runtime_error("unknown opcode");
         }
         if(debug) {
-            cout << instructioncode << endl;
+            cout <<  instructioncode << endl;
         }
-        gencode += instructioncode;
+        if(instructioncode != "") {
+            gencode += "    " + instructioncode;
+        }
     }
     return gencode;
 }
 
-void myDump(Function *F) {
+void dumpFunction(Function *F) {
     Type *retType = F->getReturnType();
     std::string retTypeString = dumpType(retType);
     string fname = F->getName();
@@ -759,7 +761,7 @@ void myDump(Function *F) {
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
         ostringstream oss;
-        oss << "label" << i;
+        oss << "    label" << i;
         string label = oss.str();
         nameByValue[basicBlock] = label;
         auto instructionIt = basicBlock->begin();
@@ -781,7 +783,7 @@ void myDump(Function *F) {
         gencode += dumpBasicBlock(basicBlock);
     }
     gencode += "}\n";
-    cout << gencode << endl;
+    cout << gencode;
 }
 
 void dumpModule(Module *M) {
@@ -818,6 +820,7 @@ void dumpModule(Module *M) {
         }
     }
 
+    int i = 0;
     for(auto it = M->begin(); it != M->end(); it++) {
         nameByValue.clear();
         nextNameIdx = 0;
@@ -825,7 +828,11 @@ void dumpModule(Module *M) {
         if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
                 knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
             Function *F = &*it;
-            myDump(F);
+            if(i > 0) {
+                cout << endl;
+            }
+            dumpFunction(F);
+            i++;
         }
     }
 }
