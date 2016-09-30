@@ -28,9 +28,7 @@ Then, using `ir-to-opencl`, we can convert this into OpenCL, giving [examples/te
 
 It's not very beautiful OpenCL, but it's OpenCL.  Standard, compilable, portable.
 
-## Demos
-
-### Device-side OpenCL Generation
+## Pre-requisites for build and demos
 
 You'll need:
 - Ubuntu 16.04
@@ -39,7 +37,17 @@ You'll need:
 - CUDA toolkit 7.5 installed into `/usr/local/cuda-7.5`
 - Have done `sudo apt-get install libc6-dev-i386`
 
-Simply clone this repo, then run:
+Clone this repo:
+```
+git clone https://github.com/hughperkins/cuda-ir-to-opencl
+cd cuda-ir-to-opencl
+```
+
+## Demos
+
+### Device-side OpenCL Generation
+
+From this repo, run:
 ```
 ./build.sh
 ./run-ir-to-opencl-demo.sh
@@ -48,29 +56,15 @@ Simply clone this repo, then run:
 
 ### Host-side demonstration
 
-You'll need:
-- Ubuntu 16.04
-- llvm 3.8
-- clang 3.8
-- CUDA toolkit 7.5 installed into `/usr/local/cuda-7.5`
-- Have done `sudo apt-get install libc6-dev-i386`
-
 This demo shows we can build host-side code, from the same source-code file containing device-side code.
-This doesnt use/need any `ir-to-opencl`, just uses clang functionality, already present in clang-3.8.  Run:
+This doesnt use/need any `ir-to-opencl`, just uses clang functionality, already present in clang-3.8.  From this repo, run:
 ```
 ./demo-hostside.sh
 ```
 
 ## Build
 
-You'll need:
-- Ubuntu 16.04
-- llvm 3.8
-- clang 3.8
-- CUDA toolkit (tested with CUDA 7.5)
-- Have done `sudo apt-get install libc6-dev-i386`
-
-Then do:
+From this repo, run:
 ```
 ./build.sh
 ```
