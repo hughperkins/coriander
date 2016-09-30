@@ -557,22 +557,22 @@ std::string dumpBranch(BranchInst *instr) {
     string gencode = "";
     if(instr->isConditional()) {
         gencode += "if(" + dumpOperand(instr->getCondition()) + ") {\n";
-        gencode += "    " + dumpPhi(instr, instr->getSuccessor(0));
-        gencode += "    goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
+        gencode += "        " + dumpPhi(instr, instr->getSuccessor(0));
+        gencode += "        goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
         if(instr->getNumSuccessors() == 1) {
         } else if(instr->getNumSuccessors() == 2) {
-            gencode += "} else {\n";
-            gencode += "    " + dumpPhi(instr, instr->getSuccessor(1));
-            gencode += "    goto " + dumpOperand(instr->getSuccessor(1)) + ";\n";
+            gencode += "    } else {\n";
+            gencode += "        " + dumpPhi(instr, instr->getSuccessor(1));
+            gencode += "        goto " + dumpOperand(instr->getSuccessor(1)) + ";\n";
         } else {
             throw runtime_error("not implemented for this numsuccessors br");
         }
-        gencode += "}\n";
+        gencode += "    }\n";
     } else {
         if(instr->getNumSuccessors() == 1) {
             BasicBlock *nextBlock = instr->getSuccessor(0);
-            gencode += dumpPhi(instr, nextBlock);
-            gencode += "goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
+            gencode += "    " + dumpPhi(instr, nextBlock);
+            gencode += "    goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
         } else {
             throw runtime_error("not implemented sucessors != 1 for unconditional br");
         }

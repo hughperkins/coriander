@@ -72,10 +72,10 @@ kernel void _Z13use_template1PfPi(global float* data, global int* intdata) {
     int v0 = get_global_id(0);
     bool v1 = v0 == 0;
     if(v1) {
-        goto     label1;
-} else {
-        goto     label2;
-}
+                goto     label1;
+    } else {
+                goto     label2;
+    }
     label1:;
     global float* v3 = data + 1;
     float v4 = v3[0];
@@ -89,7 +89,7 @@ kernel void _Z13use_template1PfPi(global float* data, global int* intdata) {
     int v12 = v11[0];
     int v13 = v12 + v10;
     intdata[0] = v13;
-    goto     label2;
+            goto     label2;
     label2:;
 }
 
@@ -249,8 +249,8 @@ kernel void _Z11testDoWhilePii(global int* data, int N) {
 int p_0;
     label0:;
     int v0 = get_global_id(0);
-    p_0 = v0;
-goto     label1;
+        p_0 = v0;
+    goto     label1;
     label1:;
     int v2 = p_0 + 1;
     long v3 = v2;
@@ -258,11 +258,11 @@ goto     label1;
     int v5 = v4[0];
     bool v6 = v5 == 0;
     if(v6) {
-        goto     label2;
-} else {
-    p_0 = v2;
-    goto     label1;
-}
+                goto     label2;
+    } else {
+        p_0 = v2;
+        goto     label1;
+    }
     label2:;
 }
 
@@ -270,8 +270,8 @@ kernel void _Z9testWhilePii(global int* data, int N) {
 int p_0;
     label0:;
     int v0 = get_global_id(0);
-    p_0 = v0;
-goto     label1;
+        p_0 = v0;
+    goto     label1;
     label1:;
     long v2 = p_0;
     global int* v3 = data + v2;
@@ -279,11 +279,11 @@ goto     label1;
     bool v5 = v4 == 0;
     int v6 = p_0 + 1;
     if(v5) {
-        goto     label2;
-} else {
-    p_0 = v6;
-    goto     label1;
-}
+                goto     label2;
+    } else {
+        p_0 = v6;
+        goto     label1;
+    }
     label2:;
 }
 
@@ -292,17 +292,17 @@ kernel void _Z6testIfPii(global int* data, int N) {
     int v0 = get_global_id(0);
     bool v1 = v0 < N;
     if(v1) {
-        goto     label1;
-} else {
-        goto     label2;
-}
+                goto     label1;
+    } else {
+                goto     label2;
+    }
     label1:;
     long v3 = v0;
     global int* v4 = data + v3;
     int v5 = v4[0];
     int v6 = v5 << 1;
     v4[0] = v6;
-    goto     label2;
+            goto     label2;
     label2:;
 }
 
@@ -314,10 +314,10 @@ kernel void _Z10testIfElsePii(global int* data, int N) {
     global int* v3 = data + v2;
     int v4 = v3[0];
     if(v1) {
-        goto     label1;
-} else {
-        goto     label2;
-}
+                goto     label1;
+    } else {
+                goto     label2;
+    }
     label1:;
     int v6 = v4 << 1;
     v3[0] = v6;
@@ -327,7 +327,7 @@ kernel void _Z10testIfElsePii(global int* data, int N) {
     int v11 = v10[0];
     int v12 = v11 << 1;
     v10[0] = v12;
-    goto     label3;
+            goto     label3;
     label2:;
     int v15 = v4 + -20;
     v3[0] = v15;
@@ -337,7 +337,7 @@ kernel void _Z10testIfElsePii(global int* data, int N) {
     int v20 = v19[0];
     int v21 = v20 + -20;
     v19[0] = v21;
-    goto     label3;
+            goto     label3;
     label3:;
 }
 
@@ -366,24 +366,24 @@ int i_02;
     label0:;
     bool v0 = N > 0;
     if(v0) {
-        goto     label1;
-} else {
-    sum_0_lcssa = 0;
-    goto     label9;
-}
+                goto     label1;
+    } else {
+        sum_0_lcssa = 0;
+        goto     label9;
+    }
     label1:;
     int v2 = N + -1;
     int xtraiter = N & 3;
     bool lcmp_mod = xtraiter == 0;
     if(lcmp_mod) {
-    v_lcssa_unr = ;
-    goto     label5;
-} else {
-        goto     label2;
-}
+        v_lcssa_unr = ;
+        goto     label5;
+    } else {
+                goto     label2;
+    }
     label2:;
-    i_02_prol = 0;
-goto     label3;
+        i_02_prol = 0;
+    goto     label3;
     label3:;
     long v5 = i_02_prol;
     global float* v6 = data + v5;
@@ -393,32 +393,32 @@ goto     label3;
     int prol_iter_sub = prol_iter + -1;
     bool prol_iter_cmp = prol_iter_sub == 0;
     if(prol_iter_cmp) {
-    v_lcssa5 = v9;
-    goto     label4;
-} else {
-    i_02_prol = v9;
-    goto     label3;
-}
+        v_lcssa5 = v9;
+        goto     label4;
+    } else {
+        i_02_prol = v9;
+        goto     label3;
+    }
     label4:;
-    v_lcssa_unr = v_lcssa4;
-goto     label5;
+        v_lcssa_unr = v_lcssa4;
+    goto     label5;
     label5:;
     bool v12 = v2 < 3;
     if(v12) {
-    v_lcssa = v_lcssa_unr;
-    goto     label8;
-} else {
-        goto     label6;
-}
+        v_lcssa = v_lcssa_unr;
+        goto     label8;
+    } else {
+                goto     label6;
+    }
     label6:;
-    i_02 = i_02_unr;
-goto     label10;
+        i_02 = i_02_unr;
+    goto     label10;
     label7:;
-    v_lcssa = v_lcssa3;
-goto     label8;
+        v_lcssa = v_lcssa3;
+    goto     label8;
     label8:;
-    sum_0_lcssa = v_lcssa;
-goto     label9;
+        sum_0_lcssa = v_lcssa;
+    goto     label9;
     label9:;
     data[0] = sum_0_lcssa;
     label10:;
@@ -444,10 +444,10 @@ goto     label9;
     int v38 = i_02 + 4;
     bool exitcond_3 = v38 == N;
     if(exitcond_3) {
-    v_lcssa3 = v37;
-    goto     label7;
-} else {
-    i_02 = v38;
-    goto     label10;
-}
+        v_lcssa3 = v37;
+        goto     label7;
+    } else {
+        i_02 = v38;
+        goto     label10;
+    }
 }
