@@ -30,7 +30,7 @@ It's not very beautiful OpenCL, but it's OpenCL.  Standard, compilable, portable
 
 ## Demos
 
-### Device-side generation to OpenCL
+### Device-side OpenCL Generation
 
 You'll need:
 - Ubuntu 16.04
@@ -44,7 +44,7 @@ Simply clone this repo, then run:
 ./build.sh
 ./run-ir-to-opencl-demo.sh
 ```
-=> this will run a demonstration of converting the device side code in examples/testcudakernel1.cu into OpenCL
+=> this will run a demonstration of converting the device side code in [examples/testcudakernel1.cu](examples/testcudakernel1.cu) into OpenCL
 
 ### Host-side demonstration
 
