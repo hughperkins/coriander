@@ -118,6 +118,10 @@ A stream of error messages will ensure :-P  I'm fixing these...
 
 ## Roadmap
 
+### Right now
+
+Getting the tests to pass...
+
 ### Things that would be cool to get working
 
 - kernel launch
