@@ -9,69 +9,21 @@ This lets you write out CUDA IR as classic OpenCL 1.2
 
 ## Example
 
-Lets say we have the following cuda file:
-```
-__device__ float bar(float a, float b) {
-    return a + b;
-}
-
-__device__ void incrval(float *a) {
-    *a += 3;
-}
-
-__global__ void somekernel1(float *a) {
-    a[0] = a[1];
-}
-
-__global__ void foo(float *data) {
-    data[0] = 123.0f;
-}
-```
+Lets say we have the following cuda file [examples/testcudakernel1.cu](examples/testcudakernel1.cu)
 
 We use `llvm` to write this out as CUDA IR.  We run:
 ```
-TARGET=mycudafile
-clang++-3.8 -I/usr/local/cuda-7.5/include ${TARGET}.cu --cuda-device-only -emit-llvm -O3 -S -o ${TARGET}.ll
+clang++-3.8 -I/usr/local/cuda-7.5/include examples/testcudakernel1.cu --cuda-device-only -emit-llvm -O3 -S -o examples/testcudakernel1.ll
 ```
 
-The output looks like, ... well... it's a bit noisy :-P  cos it's IR, so I'll just link to it, which is: [examples/testcudakernel1.ll](examples/testcudakernel1.ll)
+The output of this step is llvm IR: [examples/testcudakernel1.ll](examples/testcudakernel1.ll)
 
 Then we run cuda-ir-to-opencl on this:
 ```
-TARGET=mycudafile
-build/ir-to-opencl ${TARGET}.ll
+build/ir-to-opencl examples/testcudakernel1.ll
 ```
 
-And the output is this gloriously "beautiful" OpenCL code:
-```
-float _Z3barff(float a, float b) {
-float v0 = a + b;
-return v0;
-}
-
-void _Z7incrvalPf(global float* a) {
-float v0 = a[0];
-float v1 = v0 + 3;
-a[0] = v1;
-}
-
-kernel void _Z11somekernel1Pf(global float* a) {
-global float* v0 = a[1];
-global int*v1 = (global int*)v0;
-int v2 = v1[0];
-global int*v3 = (global int*)a;
-v3[0] = v2;
-}
-
-kernel void _Z3fooPf(global float* data) {
-data[0] = 123;
-}
-```
-
-Notice that:
-- the `kernel` methods are correctly identified as being kernel methods (this comes from the metadata)
-- the float pointer parameters for the kernel methods are correctly marked as `global float *`
-- the `global`ness correctly propagates through to other variables
+And the output is OpenCL :-)  Not very beautiful OpenCL, but OpenCL: [examples/testcudakernel1.cl](examples/testcudakernel1.cl)
 
 ## How to build ir-to-opencl
 
@@ -82,13 +34,28 @@ You'll need:
 - CUDA toolkit (tested with CUDA 7.5)
 - Have done `sudo apt-get install libc6-dev-i386`
 
+Then do:
+```
+./build.sh
+```
+=> `ir-to-opencl` should be built into `build` subdirectory
+
+## Run demos
+
+### Device-side generation to OpenCL
+
 Simply clone this repo, then run:
 ```
-./run-ir-to-opencl.sh
+./run-ir-to-opencl-demo.sh
 ```
-=> it should:
-- run a demonstration of converting the device side code in examples/testcudakernel1.cu into open
-- run a demonstration of compiling, and using/running, the hostside code in this same sourcefile
+=> this willrun a demonstration of converting the device side code in examples/testcudakernel1.cu into OpenCL
+
+### Demonstration that we can also build host-side code
+
+Host-side code doesnt use `ir-to-opencl`, just uses standard llvm functionality.  Run:
+```
+./demo-hostside.sh
+```
 
 ## Details
 
