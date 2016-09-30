@@ -2,6 +2,17 @@
 
 This lets you write out CUDA IR as classic OpenCL 1.2
 
+## Why?
+
+Goal is to be able to build tensorflow for OpenCL.  It's not the only way forward.  There are also multiple streams in progress to build using SYCL, into SPIR-V.
+
+Compared to using SYCL:
+- no need to modify the original source-code files quite so much (hopefully)
+- portable to other projects, that have not been modified for SYCL (hopefully)
+
+Compared to using SPIR-V:
+- OpenCL is a mature standard, supported by a wide variety of GPUs, from a large number of manufacturers (AMD, Intel, NVIDIA, Qualcomm, ...)
+
 ## How to use
 
 - first, compile CUDA into CUDA IR
