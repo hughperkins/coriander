@@ -1,3 +1,6 @@
+#include <iostream>
+using namespace std;
+
 __device__ float bar(float a, float b) {
     return a + b;
 }
@@ -52,6 +55,7 @@ __global__ void use_template1(float *data, int *intdata) {
 }
 
 __host__ float someHostFunction(float input) {
+    cout << "You called: someHostFunction()" << endl;
     return input * 100.0f;
 }
 
@@ -183,5 +187,5 @@ __global__ void setValue(float *data, int idx, float value) {
 // // }
 
 __host__ void launchSetValue(float *data, int idx, float value) {
-    setValue<<<32, 32>>>(data, idx, value);
+    setValue<<<17, 34>>>(data, idx, value);
 }

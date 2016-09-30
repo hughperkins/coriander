@@ -880,6 +880,7 @@ int main(int argc, char *argv[]) {
     ignoredFunctionNames.insert("llvm.ptx.read.ntid.y");
     ignoredFunctionNames.insert("llvm.ptx.read.ntid.z");
 
+    knownFunctionsMap["_ZSt4sqrtf"] = "sqrt";
     knownFunctionsMap["llvm.nvvm.sqrt.rn.d"] = "sqrt";
     knownFunctionsMap["_Z16our_pretend_tanhf"] = "tanh";
     knownFunctionsMap["_Z15our_pretend_logf"] = "log";

@@ -140,13 +140,12 @@ define void @_Z13someops_floatPf(float* nocapture %data) #3 {
   %18 = tail call float @_Z16our_pretend_tanhf(float %17)
   %19 = load float, float* %data, align 4, !tbaa !27
   %20 = fadd float %18, %19
+  store float %20, float* %data, align 4, !tbaa !27
   %21 = load float, float* %1, align 4, !tbaa !27
-  %22 = fpext float %21 to double
-  %23 = tail call double @llvm.nvvm.sqrt.rn.d(double %22) #7
-  %24 = fpext float %20 to double
-  %25 = fsub double %24, %23
-  %26 = fptrunc double %25 to float
-  store float %26, float* %data, align 4, !tbaa !27
+  %22 = tail call float @_ZSt4sqrtf(float %21)
+  %23 = load float, float* %data, align 4, !tbaa !27
+  %24 = fsub float %23, %22
+  store float %24, float* %data, align 4, !tbaa !27
   ret void
 }
 
@@ -155,6 +154,8 @@ declare float @_Z15our_pretend_logf(float) #3
 declare float @_Z15our_pretend_expf(float) #3
 
 declare float @_Z16our_pretend_tanhf(float) #3
+
+declare float @_ZSt4sqrtf(float) #3
 
 ; Function Attrs: norecurse nounwind
 define void @_Z11someops_intPi(i32* nocapture %data) #2 {
@@ -503,9 +504,6 @@ declare i32 @llvm.ptx.read.ntid.x() #5
 
 ; Function Attrs: noduplicate nounwind
 declare void @llvm.cuda.syncthreads() #6
-
-; Function Attrs: nounwind readnone
-declare double @llvm.nvvm.sqrt.rn.d(double) #5
 
 attributes #0 = { nounwind readnone "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="sm_20" "target-features"="+ptx42" "unsafe-fp-math"="false" "use-soft-float"="false" }
 attributes #1 = { norecurse nounwind readnone "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="sm_20" "target-features"="+ptx42" "unsafe-fp-math"="false" "use-soft-float"="false" }

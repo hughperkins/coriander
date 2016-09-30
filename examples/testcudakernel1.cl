@@ -118,13 +118,12 @@ kernel void _Z13someops_floatPf(global float* data) {
     float v20 = tanh(v19);
     float v21 = data[0];
     float v22 = v20 + v21;
-    float v23 = v0[0];
-    float v24 = v23;
+    data[0] = v22;
+    float v24 = v0[0];
     float v25 = sqrt(v24);
-    float v26 = v22;
+    float v26 = data[0];
     float v27 = v26 - v25;
-    float v28 = (float)v27;
-    data[0] = v28;
+    data[0] = v27;
 }
 
 kernel void _Z11someops_intPi(global int* data) {
