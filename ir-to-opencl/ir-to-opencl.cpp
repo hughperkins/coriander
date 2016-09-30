@@ -647,10 +647,10 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
                 instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "/");
                 break;
             case Instruction::And:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "&&");
+                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "&");
                 break;
             case Instruction::Or:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "||");
+                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "|");
                 break;
             case Instruction::Xor:
                 instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "^");

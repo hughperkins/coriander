@@ -152,11 +152,11 @@ kernel void _Z14testbooleanopsPi(global int* data) {
     global int* v2 = data + 1;
     int v3 = v2[0];
     bool v4 = v3 < 0;
-    bool v5 = v1 && v4;
+    bool v5 = v1 & v4;
     int v6 = v5;
     global int* v7 = data + 2;
     v7[0] = v6;
-    bool v9 = v1 || v4;
+    bool v9 = v1 | v4;
     int v10 = v9;
     global int* v11 = data + 3;
     v11[0] = v10;
@@ -353,4 +353,101 @@ kernel void _Z11testTernaryPf(global float* data) {
     int v6 = v5[0];
     global int*v7 = (global int*)data;
     v7[0] = v6;
+}
+
+kernel void _Z7testForPfi(global float* data, int N) {
+int i_02_prol;
+int v_lcssa5;
+float v_lcssa_unr;
+float v_lcssa3;
+float v_lcssa;
+float sum_0_lcssa;
+int i_02;
+    label0:;
+    bool v0 = N > 0;
+    if(v0) {
+        goto     label1;
+} else {
+    sum_0_lcssa = 0;
+    goto     label9;
+}
+    label1:;
+    int v2 = N + -1;
+    int xtraiter = N & 3;
+    bool lcmp_mod = xtraiter == 0;
+    if(lcmp_mod) {
+    v_lcssa_unr = ;
+    goto     label5;
+} else {
+        goto     label2;
+}
+    label2:;
+    i_02_prol = 0;
+goto     label3;
+    label3:;
+    long v5 = i_02_prol;
+    global float* v6 = data + v5;
+    float v7 = v6[0];
+    float v8 = sum_01_prol + v7;
+    int v9 = i_02_prol + 1;
+    int prol_iter_sub = prol_iter + -1;
+    bool prol_iter_cmp = prol_iter_sub == 0;
+    if(prol_iter_cmp) {
+    v_lcssa5 = v9;
+    goto     label4;
+} else {
+    i_02_prol = v9;
+    goto     label3;
+}
+    label4:;
+    v_lcssa_unr = v_lcssa4;
+goto     label5;
+    label5:;
+    bool v12 = v2 < 3;
+    if(v12) {
+    v_lcssa = v_lcssa_unr;
+    goto     label8;
+} else {
+        goto     label6;
+}
+    label6:;
+    i_02 = i_02_unr;
+goto     label10;
+    label7:;
+    v_lcssa = v_lcssa3;
+goto     label8;
+    label8:;
+    sum_0_lcssa = v_lcssa;
+goto     label9;
+    label9:;
+    data[0] = sum_0_lcssa;
+    label10:;
+    long v19 = i_02;
+    global float* v20 = data + v19;
+    float v21 = v20[0];
+    float v22 = sum_01 + v21;
+    int v23 = i_02 + 1;
+    long v24 = v23;
+    global float* v25 = data + v24;
+    float v26 = v25[0];
+    float v27 = v22 + v26;
+    int v28 = i_02 + 2;
+    long v29 = v28;
+    global float* v30 = data + v29;
+    float v31 = v30[0];
+    float v32 = v27 + v31;
+    int v33 = i_02 + 3;
+    long v34 = v33;
+    global float* v35 = data + v34;
+    float v36 = v35[0];
+    float v37 = v32 + v36;
+    int v38 = i_02 + 4;
+    bool exitcond_3 = v38 == N;
+    if(exitcond_3) {
+    v_lcssa3 = v37;
+    goto     label7;
+} else {
+    i_02 = v38;
+    goto     label10;
+}
 }
