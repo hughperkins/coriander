@@ -76,7 +76,7 @@ Then do:
 ```
 => `ir-to-opencl` should be built into `build` subdirectory
 
-## Details
+## What's working?
 
 IR operations supported, at least partially:
 - `call`
