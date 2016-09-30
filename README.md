@@ -72,6 +72,8 @@ From this repo, run:
 
 ## Test
 
+The tests will compile the OpenCL code, and run it on the GPU, testing the returned results
+
 To run tests, you will need:
 - python 3.5
 - an OpenCL enabled GPU, with an OpenCL-enabled driver installed
