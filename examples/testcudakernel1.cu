@@ -51,54 +51,54 @@ __global__ void use_template1(float *data, int *intdata) {
     }
 }
 
-// __host__ float someHostFunction(float input) {
-//     return input * 100.0f;
-// }
+__host__ float someHostFunction(float input) {
+    return input * 100.0f;
+}
 
-// __global__ void someops_float(float *data) {
-//     data[0] = data[1] - data[2];
-//     data[0] += data[1] / data[2];
-//     data[0] += data[1] * data[2];
-//     data[0] += log(data[1]);
-//     data[0] += exp(data[1]);
-//     data[0] += tanh(data[1]);
-//     data[0] -= sqrt(data[1]);
-// }
+__global__ void someops_float(float *data) {
+    data[0] = data[1] - data[2];
+    data[0] += data[1] / data[2];
+    data[0] += data[1] * data[2];
+    data[0] += log(data[1]);
+    data[0] += exp(data[1]);
+    data[0] += tanh(data[1]);
+    data[0] -= sqrt(data[1]);
+}
 
-// __global__ void someops_int(int *data) {
-//     data[0] = data[1] - data[2];
-//     data[0] += data[1] / data[2];
-//     data[0] += data[1] + data[2];
-//     data[0] += data[1] * data[2];
-//     data[0] += data[1] << data[2];
-//     data[0] += data[1] >> data[2];
-// }
+__global__ void someops_int(int *data) {
+    data[0] = data[1] - data[2];
+    data[0] += data[1] / data[2];
+    data[0] += data[1] + data[2];
+    data[0] += data[1] * data[2];
+    data[0] += data[1] << data[2];
+    data[0] += data[1] >> data[2];
+}
 
-// __global__ void testbooleanops(int *data) {
-//     bool a = data[0] > 0;
-//     bool b = data[1] < 0;
-//     data[2] = (int)(a && b);
-//     data[3] = (int)(a || b);
-//     data[4] = (int)(!a);
-// }
+__global__ void testbooleanops(int *data) {
+    bool a = data[0] > 0;
+    bool b = data[1] < 0;
+    data[2] = (int)(a && b);
+    data[3] = (int)(a || b);
+    data[4] = (int)(!a);
+}
 
-// __global__ void testcomparisons_int_signed(int *data) {
-//     data[5] = (int)(data[0] >= data[1]);
-//     data[6] = (int)(data[0] <= data[1]);
-//     data[7] = (int)(data[0] > data[1]);
-//     data[8] = (int)(data[0] < data[1]);
-//     data[9] = (int)(data[0] == data[1]);
-//     data[10] = (int)(data[0] != data[1]);
-// }
+__global__ void testcomparisons_int_signed(int *data) {
+    data[5] = (int)(data[0] >= data[1]);
+    data[6] = (int)(data[0] <= data[1]);
+    data[7] = (int)(data[0] > data[1]);
+    data[8] = (int)(data[0] < data[1]);
+    data[9] = (int)(data[0] == data[1]);
+    data[10] = (int)(data[0] != data[1]);
+}
 
-// __global__ void testcomparisons_float(float *data) {
-//     data[5] = (data[0] >= data[1]);
-//     data[6] = (data[0] <= data[1]);
-//     data[7] = (data[0] > data[1]);
-//     data[8] = (data[0] < data[1]);
-//     data[9] = (data[0] == data[1]);
-//     data[10] = (data[0] != data[1]);
-// }
+__global__ void testcomparisons_float(float *data) {
+    data[5] = (data[0] >= data[1]);
+    data[6] = (data[0] <= data[1]);
+    data[7] = (data[0] > data[1]);
+    data[8] = (data[0] < data[1]);
+    data[9] = (data[0] == data[1]);
+    data[10] = (data[0] != data[1]);
+}
 
 // // __global__ void testcomparisons_int_unsigned(unsigned int *data) {
 // //     data[5] = (unsigned int)(data[0] >= data[1]);
@@ -109,44 +109,44 @@ __global__ void use_template1(float *data, int *intdata) {
 // //     data[10] = (unsigned int)(data[0] != data[1]);
 // // }
 
-// __global__ void testsyncthreads(float *data) {
-//     int tid = threadIdx.x;
-//     data[tid] *= 2;
-//     syncthreads();
-//     data[tid + 1] += 2;
-// }
+__global__ void testsyncthreads(float *data) {
+    int tid = threadIdx.x;
+    data[tid] *= 2;
+    syncthreads();
+    data[tid + 1] += 2;
+}
 
-// __global__ void testDoWhile(int *data, int N) {
-//     int p = threadIdx.x;
-//     do {
-//         p++;
-//     } while(data[p] != 0);
-// }
+__global__ void testDoWhile(int *data, int N) {
+    int p = threadIdx.x;
+    do {
+        p++;
+    } while(data[p] != 0);
+}
 
-// __global__ void testWhile(int *data, int N) {
-//     int p = threadIdx.x;
-//     while(data[p] != 0) {
-//         p++;
-//     }
-// }
+__global__ void testWhile(int *data, int N) {
+    int p = threadIdx.x;
+    while(data[p] != 0) {
+        p++;
+    }
+}
 
-// __global__ void testIf(int *data, int N) {
-//     int tid = threadIdx.x;
-//     if(tid < N) {
-//         data[tid] *= 2;
-//     }
-// }
+__global__ void testIf(int *data, int N) {
+    int tid = threadIdx.x;
+    if(tid < N) {
+        data[tid] *= 2;
+    }
+}
 
-// __global__ void testIfElse(int *data, int N) {
-//     int tid = threadIdx.x;
-//     if(tid < N) {
-//         data[tid] *= 2;
-//         data[tid + 3] *= 2;
-//     } else {
-//         data[tid] -= 20;
-//         data[tid + 5] -= 20;
-//     }
-// }
+__global__ void testIfElse(int *data, int N) {
+    int tid = threadIdx.x;
+    if(tid < N) {
+        data[tid] *= 2;
+        data[tid + 3] *= 2;
+    } else {
+        data[tid] -= 20;
+        data[tid + 5] -= 20;
+    }
+}
 
 // __global__ void testFor(float *data, int N) {
 //     float sum = 0.0f;
