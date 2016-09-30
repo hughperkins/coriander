@@ -70,6 +70,14 @@ From this repo, run:
 ```
 => `ir-to-opencl` should be built into `build` subdirectory
 
+## Test
+
+This is new.  Tests currently failing :-P  Working on this.  To run tests, do:
+```
+test/test.sh
+```
+A stream of error messages will ensure :-P  I'm fixing these...
+
 ## What's working?
 
 IR operations supported, at least partially:
@@ -107,14 +115,6 @@ C++ things:
 
 Other cool things:
 - single-source compilation works ok :-)
-
-## Test
-
-This is new.  Tests currently failing :-P  Working on this.  To run tests, do:
-```
-test/test.sh
-```
-A stream of error messages will ensure :-P  I'm fixing these...
 
 ## Roadmap
 
