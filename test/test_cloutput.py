@@ -50,14 +50,14 @@ def test_cloutput():
 
     cl.enqueue_copy(q, float_data_gpu, float_data)
     prg.__getattr__(mangle('foo', ['float *']))(q, (32,), (32,), float_data_gpu)
-    q.finish()
     cl.enqueue_copy(q, float_data_res, float_data_gpu)
+    q.finish()
     assert float_data_res[0] == 123
 
     cl.enqueue_copy(q, float_data_gpu, float_data)
     prg.__getattr__(mangle('copy_float', ['float *']))(q, (32,), (32,), float_data_gpu)
-    q.finish()
     cl.enqueue_copy(q, float_data_res, float_data_gpu)
+    q.finish()
     assert float_data_res[0] == float_data[1]
 
     cl.enqueue_copy(q, int_data_gpu, int_data)
@@ -79,6 +79,22 @@ def test_cloutput():
 
     cl.enqueue_copy(q, float_data_gpu, float_data)
     prg.__getattr__(mangle('testFor', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int32(32))
-    q.finish()
     cl.enqueue_copy(q, float_data_res, float_data_gpu)
+    q.finish()
     assert abs(float_data_res[0] - sum(float_data[0:32])) < 1e-4
+
+    def set_float_value(gpu_buffer, idx, value):
+        prg.__getattr__(mangle('setValue', ['float *', 'int', 'float']))(
+            q, (32,), (32,), float_data_gpu, np.int32(idx), np.float32(value))
+
+    cl.enqueue_copy(q, float_data_gpu, float_data)
+    set_float_value(float_data_gpu, 1, 10)
+    prg.__getattr__(mangle('testTernary', ['float *']))(q, (32,), (32,), float_data_gpu)
+    cl.enqueue_copy(q, float_data_res, float_data_gpu)
+    q.finish()
+    assert float_data_res[0] == float_data[2]
+    set_float_value(float_data_gpu, 1, -2)
+    prg.__getattr__(mangle('testTernary', ['float *']))(q, (32,), (32,), float_data_gpu)
+    cl.enqueue_copy(q, float_data_res, float_data_gpu)
+    q.finish()
+    assert float_data_res[0] == float_data[3]

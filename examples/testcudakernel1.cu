@@ -162,6 +162,12 @@ __global__ void testFor(float *data, int N) {
     }
 }
 
+__global__ void setValue(float *data, int idx, float value) {
+    if(threadIdx.x == 0) {
+        data[idx] = value;
+    }
+}
+
 // // __global__ void testFloat4(float4 *data) {
 // //     float4 myregister4 = data[1];
 // //     float *myregisterfloat = (float *)&myregister4;

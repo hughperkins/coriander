@@ -477,3 +477,20 @@ sum_01 = v40;
     }
     label12:;
 }
+
+kernel void _Z8setValuePfif(global float* data, int idx, float value) {
+    label0:;
+    int v0 = get_global_id(0);
+    bool v1 = v0 == 0;
+    if(v1) {
+                goto     label1;
+    } else {
+                goto     label2;
+    }
+    label1:;
+    long v3 = idx;
+    global float* v4 = data + v3;
+    v4[0] = value;
+            goto     label2;
+    label2:;
+}
