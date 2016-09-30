@@ -275,29 +275,45 @@ string dumpStore(StoreInst *instr) {
 
 string dumpGetElementPtr(GetElementPtrInst *instr) {
     string gencode = "";
+    // cout << "v0.2" << endl;
+    // cout << "getNumOperands " << instr->getNumOperands() << endl;
     // cout << "instr type " << dumpType(instr->getType()) << endl;
     // cout << "op0 type " << dumpType(instr->getOperand(0)->getType()) << endl;
     // cout << "op1 type " << dumpType(instr->getOperand(1)->getType()) << endl;
-    // string typestr = dumpType(instr->getType());
-    string offset = dumpOperand(instr->getOperand(2));
-    if(offset != "") { // this is a bit hacky for now...
-        PointerType *inType = (PointerType *)instr->getOperand(0)->getType();
-        int addressspace = inType->getAddressSpace();
-        if(addressspace != 0) {
-            updateAddressSpace(instr, addressspace);
-        }
-        string typestr = dumpType(inType);
-        gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + " + " + offset + ";\n";
+    // // cout << "op2 type " << dumpType(instr->getOperand(2)->getType()) << endl;
+    // cout << "op0 " << dumpOperand(instr->getOperand(0)) << endl;
+    // cout << "op1 " << dumpOperand(instr->getOperand(1)) << endl;
+    // // cout << "op2 " << dumpOperand(instr->getOperand(2)) << endl;
+
+    int numOperands = instr->getNumOperands();
+    if(numOperands == 2) {
+        gencode += dumpType(instr->getOperand(0)->getType()) + " " + dumpOperand(instr) + " = ";
+        gencode += dumpOperand(instr->getOperand(0)) + " + " + dumpOperand(instr->getOperand(1)) + ";\n";
     } else {
-        // PointerType *inType = (PointerType *)instr->getOperand(0)->getType();
-        // int addressspace = inType->getAddressSpace();
-        // if(addressspace != 0) {
-        //     updateAddressSpace(instr, addressspace);
-        // }
-        string typestr = dumpType(instr->getType()->getPointerElementType());
-        offset = dumpOperand(instr->getOperand(1));
-        gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + "[" + offset + "];\n";
+        cout << "number operands: " << numOperands << endl;
+        throw runtime_error("dumpGetElementPtr not implemented for this number of operands");
     }
+
+    // string typestr = dumpType(instr->getType());
+    // string offset = dumpOperand(instr->getOperand(2));
+    // if(offset != "") { // this is a bit hacky for now...
+    //     PointerType *inType = (PointerType *)instr->getOperand(0)->getType();
+    //     int addressspace = inType->getAddressSpace();
+    //     if(addressspace != 0) {
+    //         updateAddressSpace(instr, addressspace);
+    //     }
+    //     string typestr = dumpType(inType);
+    //     gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + " + " + offset + ";\n";
+    // } else {
+    //     // PointerType *inType = (PointerType *)instr->getOperand(0)->getType();
+    //     // int addressspace = inType->getAddressSpace();
+    //     // if(addressspace != 0) {
+    //     //     updateAddressSpace(instr, addressspace);
+    //     // }
+    //     string typestr = dumpType(instr->getType()->getPointerElementType());
+    //     offset = dumpOperand(instr->getOperand(1));
+    //     gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + "[" + offset + "];\n";
+    // }
     return gencode;
 }
 

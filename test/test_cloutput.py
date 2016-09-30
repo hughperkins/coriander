@@ -2,6 +2,14 @@ import numpy as np
 import pyopencl as cl
 
 
+def mangle(name, param_types):
+    mangled = '_Z3' + name
+    for param in param_types:
+        if param.replace(' ', '') == 'float*':
+            mangled += 'Pf'
+    return mangled
+
+
 def test_cloutput():
     gpu_idx = 0
 
@@ -21,6 +29,7 @@ def test_cloutput():
     mf = cl.mem_flags
     int_data = np.random.randint(1024, size=(1024,), dtype=np.int32)
     float_data = np.random.randn(1024).astype(np.float32)
+    float_data_res = np.random.randn(1024).astype(np.float32)
 
     float_data_gpu = cl.Buffer(ctx, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf=float_data)
     int_data_gpu = cl.Buffer(ctx, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf=int_data)
@@ -30,5 +39,7 @@ def test_cloutput():
 
     prg = cl.Program(ctx, sourcecode).build()
 
-    prg.bar(q, (32,), 3, 5)
+    prg.__getattr__(mangle('foo', ['float *']))(q, (32,), (32,), float_data_gpu)
     q.finish()
+    cl.enqueue_copy(q, float_data_res, float_data_gpu)
+    assert float_data_res[0] == 123
