@@ -385,11 +385,16 @@ define void @_Z11testTernaryPf(float* nocapture %data) #2 {
 
 ; Function Attrs: norecurse nounwind
 define void @_Z7testForPfi(float* nocapture %data, i32 %N) #2 {
-  %1 = icmp sgt i32 %N, 0
-  br i1 %1, label %.lr.ph.preheader, label %._crit_edge
+  %1 = tail call i32 @llvm.ptx.read.tid.x() #7
+  %2 = icmp eq i32 %1, 0
+  br i1 %2, label %.preheader, label %31
 
-.lr.ph.preheader:                                 ; preds = %0
-  %2 = add i32 %N, -1
+.preheader:                                       ; preds = %0
+  %3 = icmp sgt i32 %N, 0
+  br i1 %3, label %.lr.ph.preheader, label %._crit_edge
+
+.lr.ph.preheader:                                 ; preds = %.preheader
+  %4 = add i32 %N, -1
   %xtraiter = and i32 %N, 3
   %lcmp.mod = icmp eq i32 %xtraiter, 0
   br i1 %lcmp.mod, label %.lr.ph.preheader.split, label %.lr.ph.prol.preheader
@@ -398,71 +403,74 @@ define void @_Z7testForPfi(float* nocapture %data, i32 %N) #2 {
   br label %.lr.ph.prol
 
 .lr.ph.prol:                                      ; preds = %.lr.ph.prol.preheader, %.lr.ph.prol
-  %i.02.prol = phi i32 [ %7, %.lr.ph.prol ], [ 0, %.lr.ph.prol.preheader ]
-  %sum.01.prol = phi float [ %6, %.lr.ph.prol ], [ 0.000000e+00, %.lr.ph.prol.preheader ]
+  %i.02.prol = phi i32 [ %9, %.lr.ph.prol ], [ 0, %.lr.ph.prol.preheader ]
+  %sum.01.prol = phi float [ %8, %.lr.ph.prol ], [ 0.000000e+00, %.lr.ph.prol.preheader ]
   %prol.iter = phi i32 [ %prol.iter.sub, %.lr.ph.prol ], [ %xtraiter, %.lr.ph.prol.preheader ]
-  %3 = sext i32 %i.02.prol to i64
-  %4 = getelementptr inbounds float, float* %data, i64 %3
-  %5 = load float, float* %4, align 4, !tbaa !26
-  %6 = fadd float %sum.01.prol, %5
-  %7 = add nuw nsw i32 %i.02.prol, 1
+  %5 = sext i32 %i.02.prol to i64
+  %6 = getelementptr inbounds float, float* %data, i64 %5
+  %7 = load float, float* %6, align 4, !tbaa !26
+  %8 = fadd float %sum.01.prol, %7
+  %9 = add nuw nsw i32 %i.02.prol, 1
   %prol.iter.sub = add i32 %prol.iter, -1
   %prol.iter.cmp = icmp eq i32 %prol.iter.sub, 0
   br i1 %prol.iter.cmp, label %.lr.ph.preheader.split.loopexit, label %.lr.ph.prol, !llvm.loop !32
 
 .lr.ph.preheader.split.loopexit:                  ; preds = %.lr.ph.prol
-  %.lcssa5 = phi i32 [ %7, %.lr.ph.prol ]
-  %.lcssa4 = phi float [ %6, %.lr.ph.prol ]
+  %.lcssa5 = phi i32 [ %9, %.lr.ph.prol ]
+  %.lcssa4 = phi float [ %8, %.lr.ph.prol ]
   br label %.lr.ph.preheader.split
 
 .lr.ph.preheader.split:                           ; preds = %.lr.ph.preheader.split.loopexit, %.lr.ph.preheader
   %.lcssa.unr = phi float [ undef, %.lr.ph.preheader ], [ %.lcssa4, %.lr.ph.preheader.split.loopexit ]
   %i.02.unr = phi i32 [ 0, %.lr.ph.preheader ], [ %.lcssa5, %.lr.ph.preheader.split.loopexit ]
   %sum.01.unr = phi float [ 0.000000e+00, %.lr.ph.preheader ], [ %.lcssa4, %.lr.ph.preheader.split.loopexit ]
-  %8 = icmp ult i32 %2, 3
-  br i1 %8, label %._crit_edge.loopexit, label %.lr.ph.preheader.split.split
+  %10 = icmp ult i32 %4, 3
+  br i1 %10, label %._crit_edge.loopexit, label %.lr.ph.preheader.split.split
 
 .lr.ph.preheader.split.split:                     ; preds = %.lr.ph.preheader.split
   br label %.lr.ph
 
 ._crit_edge.loopexit.unr-lcssa:                   ; preds = %.lr.ph
-  %.lcssa3 = phi float [ %27, %.lr.ph ]
+  %.lcssa3 = phi float [ %29, %.lr.ph ]
   br label %._crit_edge.loopexit
 
 ._crit_edge.loopexit:                             ; preds = %.lr.ph.preheader.split, %._crit_edge.loopexit.unr-lcssa
   %.lcssa = phi float [ %.lcssa.unr, %.lr.ph.preheader.split ], [ %.lcssa3, %._crit_edge.loopexit.unr-lcssa ]
   br label %._crit_edge
 
-._crit_edge:                                      ; preds = %._crit_edge.loopexit, %0
-  %sum.0.lcssa = phi float [ 0.000000e+00, %0 ], [ %.lcssa, %._crit_edge.loopexit ]
+._crit_edge:                                      ; preds = %._crit_edge.loopexit, %.preheader
+  %sum.0.lcssa = phi float [ 0.000000e+00, %.preheader ], [ %.lcssa, %._crit_edge.loopexit ]
   store float %sum.0.lcssa, float* %data, align 4, !tbaa !26
-  ret void
+  br label %31
 
 .lr.ph:                                           ; preds = %.lr.ph, %.lr.ph.preheader.split.split
-  %i.02 = phi i32 [ %i.02.unr, %.lr.ph.preheader.split.split ], [ %28, %.lr.ph ]
-  %sum.01 = phi float [ %sum.01.unr, %.lr.ph.preheader.split.split ], [ %27, %.lr.ph ]
-  %9 = sext i32 %i.02 to i64
-  %10 = getelementptr inbounds float, float* %data, i64 %9
-  %11 = load float, float* %10, align 4, !tbaa !26
-  %12 = fadd float %sum.01, %11
-  %13 = add nuw nsw i32 %i.02, 1
-  %14 = sext i32 %13 to i64
-  %15 = getelementptr inbounds float, float* %data, i64 %14
-  %16 = load float, float* %15, align 4, !tbaa !26
-  %17 = fadd float %12, %16
-  %18 = add nsw i32 %i.02, 2
-  %19 = sext i32 %18 to i64
-  %20 = getelementptr inbounds float, float* %data, i64 %19
-  %21 = load float, float* %20, align 4, !tbaa !26
-  %22 = fadd float %17, %21
-  %23 = add nsw i32 %i.02, 3
-  %24 = sext i32 %23 to i64
-  %25 = getelementptr inbounds float, float* %data, i64 %24
-  %26 = load float, float* %25, align 4, !tbaa !26
-  %27 = fadd float %22, %26
-  %28 = add nsw i32 %i.02, 4
-  %exitcond.3 = icmp eq i32 %28, %N
+  %i.02 = phi i32 [ %i.02.unr, %.lr.ph.preheader.split.split ], [ %30, %.lr.ph ]
+  %sum.01 = phi float [ %sum.01.unr, %.lr.ph.preheader.split.split ], [ %29, %.lr.ph ]
+  %11 = sext i32 %i.02 to i64
+  %12 = getelementptr inbounds float, float* %data, i64 %11
+  %13 = load float, float* %12, align 4, !tbaa !26
+  %14 = fadd float %sum.01, %13
+  %15 = add nuw nsw i32 %i.02, 1
+  %16 = sext i32 %15 to i64
+  %17 = getelementptr inbounds float, float* %data, i64 %16
+  %18 = load float, float* %17, align 4, !tbaa !26
+  %19 = fadd float %14, %18
+  %20 = add nsw i32 %i.02, 2
+  %21 = sext i32 %20 to i64
+  %22 = getelementptr inbounds float, float* %data, i64 %21
+  %23 = load float, float* %22, align 4, !tbaa !26
+  %24 = fadd float %19, %23
+  %25 = add nsw i32 %i.02, 3
+  %26 = sext i32 %25 to i64
+  %27 = getelementptr inbounds float, float* %data, i64 %26
+  %28 = load float, float* %27, align 4, !tbaa !26
+  %29 = fadd float %24, %28
+  %30 = add nsw i32 %i.02, 4
+  %exitcond.3 = icmp eq i32 %30, %N
   br i1 %exitcond.3, label %._crit_edge.loopexit.unr-lcssa, label %.lr.ph
+
+; <label>:31                                      ; preds = %._crit_edge, %0
+  ret void
 }
 
 ; Function Attrs: nounwind readnone

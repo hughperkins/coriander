@@ -153,11 +153,13 @@ __global__ void testTernary(float *data) {
 }
 
 __global__ void testFor(float *data, int N) {
-    float sum = 0.0f;
-    for(int i = 0; i < N; i++) {
-        sum += data[i];
+    if(threadIdx.x == 0) {
+        float sum = 0.0f;
+        for(int i = 0; i < N; i++) {
+            sum += data[i];
+        }
+        data[0] = sum;
     }
-    data[0] = sum;
 }
 
 // // __global__ void testFloat4(float4 *data) {

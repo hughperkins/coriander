@@ -9,6 +9,10 @@ def mangle(name, param_types):
             mangled += 'Pf'
         if param.replace(' ', '') == 'int*':
             mangled += 'Pi'
+        if param.replace(' ', '') == 'int':
+            mangled += 'i'
+        if param.replace(' ', '') == 'float':
+            mangled += 'f'
     return mangled
 
 
@@ -70,6 +74,11 @@ def test_cloutput():
     cl.enqueue_copy(q, float_data_res, float_data_gpu)
     cl.enqueue_copy(q, int_data_res, int_data_gpu)
     q.finish()
-
     assert float_data_res[0] == float_data[1] + float_data[2]
     assert int_data_res[0] == int_data[1] + int_data[2]
+
+    cl.enqueue_copy(q, float_data_gpu, float_data)
+    prg.__getattr__(mangle('testFor', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int32(32))
+    q.finish()
+    cl.enqueue_copy(q, float_data_res, float_data_gpu)
+    assert abs(float_data_res[0] - sum(float_data[0:32])) < 1e-4

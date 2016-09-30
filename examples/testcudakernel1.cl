@@ -370,100 +370,110 @@ float sum_0_lcssa;
 int i_02;
 float sum_01;
     label0:;
-    bool v0 = N > 0;
-    if(v0) {
+    int v0 = get_global_id(0);
+    bool v1 = v0 == 0;
+    if(v1) {
                 goto     label1;
     } else {
-        sum_0_lcssa = 0;
-        goto     label9;
+                goto     label12;
     }
     label1:;
-    int v2 = N + -1;
+    bool v3 = N > 0;
+    if(v3) {
+                goto     label2;
+    } else {
+        sum_0_lcssa = 0;
+        goto     label10;
+    }
+    label2:;
+    int v5 = N + -1;
     int xtraiter = N & 3;
     bool lcmp_mod = xtraiter == 0;
     if(lcmp_mod) {
         i_02_unr = 0;
 sum_01_unr = 0;
-        goto     label5;
+        goto     label6;
     } else {
-                goto     label2;
+                goto     label3;
     }
-    label2:;
+    label3:;
         i_02_prol = 0;
 sum_01_prol = 0;
 prol_iter = xtraiter;
-    goto     label3;
-    label3:;
-    long v5 = i_02_prol;
-    global float* v6 = data + v5;
-    float v7 = v6[0];
-    float v8 = sum_01_prol + v7;
-    int v9 = i_02_prol + 1;
+    goto     label4;
+    label4:;
+    long v8 = i_02_prol;
+    global float* v9 = data + v8;
+    float v10 = v9[0];
+    float v11 = sum_01_prol + v10;
+    int v12 = i_02_prol + 1;
     int prol_iter_sub = prol_iter + -1;
     bool prol_iter_cmp = prol_iter_sub == 0;
     if(prol_iter_cmp) {
-        v_lcssa5 = v9;
-v_lcssa4 = v8;
-        goto     label4;
+        v_lcssa5 = v12;
+v_lcssa4 = v11;
+        goto     label5;
     } else {
-        i_02_prol = v9;
-sum_01_prol = v8;
+        i_02_prol = v12;
+sum_01_prol = v11;
 prol_iter = prol_iter_sub;
-        goto     label3;
+        goto     label4;
     }
-    label4:;
+    label5:;
         v_lcssa_unr = v_lcssa4;
 i_02_unr = v_lcssa5;
 sum_01_unr = v_lcssa4;
-    goto     label5;
-    label5:;
-    bool v12 = v2 < 3;
-    if(v12) {
-        v_lcssa = v_lcssa_unr;
-        goto     label8;
-    } else {
-                goto     label6;
-    }
+    goto     label6;
     label6:;
+    bool v15 = v5 < 3;
+    if(v15) {
+        v_lcssa = v_lcssa_unr;
+        goto     label9;
+    } else {
+                goto     label7;
+    }
+    label7:;
         i_02 = i_02_unr;
 sum_01 = sum_01_unr;
-    goto     label10;
-    label7:;
-        v_lcssa = v_lcssa3;
-    goto     label8;
+    goto     label11;
     label8:;
-        sum_0_lcssa = v_lcssa;
+        v_lcssa = v_lcssa3;
     goto     label9;
     label9:;
-    data[0] = sum_0_lcssa;
+        sum_0_lcssa = v_lcssa;
+    goto     label10;
     label10:;
-    long v19 = i_02;
-    global float* v20 = data + v19;
-    float v21 = v20[0];
-    float v22 = sum_01 + v21;
-    int v23 = i_02 + 1;
-    long v24 = v23;
-    global float* v25 = data + v24;
-    float v26 = v25[0];
-    float v27 = v22 + v26;
-    int v28 = i_02 + 2;
-    long v29 = v28;
-    global float* v30 = data + v29;
-    float v31 = v30[0];
-    float v32 = v27 + v31;
-    int v33 = i_02 + 3;
-    long v34 = v33;
-    global float* v35 = data + v34;
-    float v36 = v35[0];
-    float v37 = v32 + v36;
-    int v38 = i_02 + 4;
-    bool exitcond_3 = v38 == N;
+    data[0] = sum_0_lcssa;
+            goto     label12;
+    label11:;
+    long v22 = i_02;
+    global float* v23 = data + v22;
+    float v24 = v23[0];
+    float v25 = sum_01 + v24;
+    int v26 = i_02 + 1;
+    long v27 = v26;
+    global float* v28 = data + v27;
+    float v29 = v28[0];
+    float v30 = v25 + v29;
+    int v31 = i_02 + 2;
+    long v32 = v31;
+    global float* v33 = data + v32;
+    float v34 = v33[0];
+    float v35 = v30 + v34;
+    int v36 = i_02 + 3;
+    long v37 = v36;
+    global float* v38 = data + v37;
+    float v39 = v38[0];
+    float v40 = v35 + v39;
+    int v41 = i_02 + 4;
+    bool exitcond_3 = v41 == N;
     if(exitcond_3) {
-        v_lcssa3 = v37;
-        goto     label7;
+        v_lcssa3 = v40;
+        goto     label8;
     } else {
-        i_02 = v38;
-sum_01 = v37;
-        goto     label10;
+        i_02 = v41;
+sum_01 = v40;
+        goto     label11;
     }
+    label12:;
 }
