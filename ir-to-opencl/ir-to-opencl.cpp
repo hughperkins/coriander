@@ -215,7 +215,11 @@ string dumpOperand(Value *value) {
 
 void storeValueName(Value *value) {
     if(value->hasName()) {
-        nameByValue[value] = string(value->getName());
+        string name = string(value->getName());
+        if(name[0] == '.') {
+            name = "v" + name;
+        }
+        nameByValue[value] = name;
     } else {
         int idx = nextNameIdx;
         nextNameIdx++;
@@ -268,17 +272,23 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
     // cout << "instr type " << dumpType(instr->getType()) << endl;
     // cout << "op0 type " << dumpType(instr->getOperand(0)->getType()) << endl;
     // cout << "op1 type " << dumpType(instr->getOperand(1)->getType()) << endl;
-    PointerType *inType = (PointerType *)instr->getOperand(0)->getType();
-    int addressspace = inType->getAddressSpace();
-    if(addressspace != 0) {
-        updateAddressSpace(instr, addressspace);
-    }
     // string typestr = dumpType(instr->getType());
-    string typestr = dumpType(inType);
     string offset = dumpOperand(instr->getOperand(2));
     if(offset != "") { // this is a bit hacky for now...
+        PointerType *inType = (PointerType *)instr->getOperand(0)->getType();
+        int addressspace = inType->getAddressSpace();
+        if(addressspace != 0) {
+            updateAddressSpace(instr, addressspace);
+        }
+        string typestr = dumpType(inType);
         gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + " + " + offset + ";\n";
     } else {
+        // PointerType *inType = (PointerType *)instr->getOperand(0)->getType();
+        // int addressspace = inType->getAddressSpace();
+        // if(addressspace != 0) {
+        //     updateAddressSpace(instr, addressspace);
+        // }
+        string typestr = dumpType(instr->getType()->getPointerElementType());
         offset = dumpOperand(instr->getOperand(1));
         gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + "[" + offset + "];\n";
     }
@@ -565,7 +575,7 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
         nameByValue[basicBlock] = label;
     }
     std::string gencode = "";
-    gencode += label + ":\n";
+    gencode += label + ":;\n";
     for(BasicBlock::iterator it=basicBlock->begin(), e=basicBlock->end(); it != e; it++) {
         Instruction *instruction = &*it;
         auto opcode = instruction->getOpcode();
