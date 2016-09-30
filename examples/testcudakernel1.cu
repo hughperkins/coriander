@@ -181,3 +181,7 @@ __global__ void setValue(float *data, int idx, float value) {
 // //     myshared[tid] = data[tid];
 // //     data[0] = myshared[tid + 1];
 // // }
+
+__host__ void launchSetValue(float *data, int idx, float value) {
+    setValue<<<32, 32>>>(data, idx, value);
+}
