@@ -3,7 +3,7 @@ import pyopencl as cl
 
 
 def mangle(name, param_types):
-    mangled = '_Z3' + name
+    mangled = '_Z%s%s' % (len(name), name)
     for param in param_types:
         if param.replace(' ', '') == 'float*':
             mangled += 'Pf'
@@ -43,3 +43,8 @@ def test_cloutput():
     q.finish()
     cl.enqueue_copy(q, float_data_res, float_data_gpu)
     assert float_data_res[0] == 123
+
+    prg.__getattr__(mangle('copy_float', ['float *']))(q, (32,), (32,), float_data_gpu)
+    q.finish()
+    cl.enqueue_copy(q, float_data_res, float_data_gpu)
+    assert float_data_res[0] == float_data[1]

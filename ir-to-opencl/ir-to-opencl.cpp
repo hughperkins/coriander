@@ -260,6 +260,19 @@ void updateAddressSpace(Value *value, int newSpace) {
     value->mutateType(newType);
 }
 
+void copyAddressSpace(Value *dest, Value *src) {
+    // copies address space from src value to dest value
+    int srcTypeID = src->getType()->getTypeID();
+    if(srcTypeID != Type::PointerTyID) { // not a pointer, so skipe
+        return;
+    }
+    PointerType *srcType = (PointerType *)src->getType();
+    int addressspace = srcType->getAddressSpace();
+    if(addressspace != 0) {
+        updateAddressSpace(dest, addressspace);
+    }
+}
+
 string dumpLoad(LoadInst *instr) {
     string gencode = "";
     string typestr = dumpType(instr->getType());
@@ -287,6 +300,7 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
 
     int numOperands = instr->getNumOperands();
     if(numOperands == 2) {
+        copyAddressSpace(instr, instr->getOperand(0));
         gencode += dumpType(instr->getOperand(0)->getType()) + " " + dumpOperand(instr) + " = ";
         gencode += dumpOperand(instr->getOperand(0)) + " + " + dumpOperand(instr->getOperand(1)) + ";\n";
     } else {

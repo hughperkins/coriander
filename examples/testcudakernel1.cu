@@ -15,7 +15,7 @@ __global__ void use_tid(float *data) {
     data[tid] = 123.0f;
 }
 
-__global__ void somekernel1(float *a) {
+__global__ void copy_float(float *a) {
     a[0] = a[1];
 }
 

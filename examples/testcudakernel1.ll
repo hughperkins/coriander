@@ -36,7 +36,7 @@ define void @_Z7use_tidPf(float* nocapture %data) #2 {
 }
 
 ; Function Attrs: norecurse nounwind
-define void @_Z11somekernel1Pf(float* nocapture %a) #2 {
+define void @_Z10copy_floatPf(float* nocapture %a) #2 {
   %1 = getelementptr inbounds float, float* %a, i64 1
   %2 = bitcast float* %1 to i32*
   %3 = load i32, i32* %2, align 4, !tbaa !9
@@ -61,7 +61,7 @@ attributes #4 = { nounwind }
 
 !0 = !{void (float*)* @_Z3fooPf, !"kernel", i32 1}
 !1 = !{void (float*)* @_Z7use_tidPf, !"kernel", i32 1}
-!2 = !{void (float*)* @_Z11somekernel1Pf, !"kernel", i32 1}
+!2 = !{void (float*)* @_Z10copy_floatPf, !"kernel", i32 1}
 !3 = !{null, !"align", i32 8}
 !4 = !{null, !"align", i32 8, !"align", i32 65544, !"align", i32 131080}
 !5 = !{null, !"align", i32 16}
