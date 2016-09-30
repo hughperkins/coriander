@@ -62,7 +62,7 @@ This doesnt use/need any `ir-to-opencl`, just uses clang functionality, already 
 ./demo-hostside.sh
 ```
 
-## Build
+## How to build
 
 From this repo, run:
 ```
