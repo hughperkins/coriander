@@ -25,7 +25,7 @@ build/ir-to-opencl examples/testcudakernel1.ll
 
 And the output is OpenCL :-)  Not very beautiful OpenCL, but OpenCL: [examples/testcudakernel1.cl](examples/testcudakernel1.cl)
 
-## How to build ir-to-opencl
+## To build ir-to-opencl
 
 You'll need:
 - Ubuntu 16.04
@@ -46,13 +46,15 @@ Then do:
 
 Simply clone this repo, then run:
 ```
+./build.sh
 ./run-ir-to-opencl-demo.sh
 ```
-=> this willrun a demonstration of converting the device side code in examples/testcudakernel1.cu into OpenCL
+=> this will run a demonstration of converting the device side code in examples/testcudakernel1.cu into OpenCL
 
-### Demonstration that we can also build host-side code
+### Host-side demonstration
 
-Host-side code doesnt use `ir-to-opencl`, just uses standard llvm functionality.  Run:
+This demo shows we can build host-side code, from the same source-code file containing device-side code.
+This doesnt use/need any `ir-to-opencl`, just uses clang functionality, already present in clang-3.8.  Run:
 ```
 ./demo-hostside.sh
 ```
