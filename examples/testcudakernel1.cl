@@ -226,13 +226,13 @@ v9[0] = v11;
 }
 
 kernel void _Z11testDoWhilePii(global int* data, int N) {
-int p.0;
+int p_0;
 label0:;
 int v0 = get_global_id(0);
-p.0 = v0;
+p_0 = v0;
 goto label1;
 label1:;
-int v2 = p.0 + 1;
+int v2 = p_0 + 1;
 long v3 = v2;
 int v4 = data[v3];
 int v5 = v4[0];
@@ -240,28 +240,28 @@ bool v6 = v5 == 0;
 if(v6) {
         goto label2;
 } else {
-    p.0 = v2;
+    p_0 = v2;
     goto label1;
 }
 label2:;
 }
 
 kernel void _Z9testWhilePii(global int* data, int N) {
-int p.0;
+int p_0;
 label0:;
 int v0 = get_global_id(0);
-p.0 = v0;
+p_0 = v0;
 goto label1;
 label1:;
-long v2 = p.0;
+long v2 = p_0;
 int v3 = data[v2];
 int v4 = v3[0];
 bool v5 = v4 == 0;
-int v6 = p.0 + 1;
+int v6 = p_0 + 1;
 if(v5) {
         goto label2;
 } else {
-    p.0 = v6;
+    p_0 = v6;
     goto label1;
 }
 label2:;
@@ -322,98 +322,98 @@ label3:;
 }
 
 kernel void _Z7testForPfi(global float* data, int N) {
-int i.02.prol;
-int v.lcssa5;
-float v.lcssa.unr;
-float v.lcssa3;
-float v.lcssa;
-float sum.0.lcssa;
-int i.02;
+int i_02_prol;
+int v_lcssa5;
+float v_lcssa_unr;
+float v_lcssa3;
+float v_lcssa;
+float sum_0_lcssa;
+int i_02;
 label0:;
 bool v0 = N > 0;
 if(v0) {
         goto label1;
 } else {
-    sum.0.lcssa = 0;
+    sum_0_lcssa = 0;
     goto label9;
 }
 label1:;
 int v2 = N + -1;
 int xtraiter = N && 3;
-bool lcmp.mod = xtraiter == 0;
-if(lcmp.mod) {
-    v.lcssa.unr = ;
+bool lcmp_mod = xtraiter == 0;
+if(lcmp_mod) {
+    v_lcssa_unr = ;
     goto label5;
 } else {
         goto label2;
 }
 label2:;
-i.02.prol = 0;
+i_02_prol = 0;
 goto label3;
 label3:;
-long v5 = i.02.prol;
+long v5 = i_02_prol;
 float v6 = data[v5];
 float v7 = v6[0];
-float v8 = sum.01.prol + v7;
-int v9 = i.02.prol + 1;
-int prol.iter.sub = prol.iter + -1;
-bool prol.iter.cmp = prol.iter.sub == 0;
-if(prol.iter.cmp) {
-    v.lcssa5 = v9;
+float v8 = sum_01_prol + v7;
+int v9 = i_02_prol + 1;
+int prol_iter_sub = prol_iter + -1;
+bool prol_iter_cmp = prol_iter_sub == 0;
+if(prol_iter_cmp) {
+    v_lcssa5 = v9;
     goto label4;
 } else {
-    i.02.prol = v9;
+    i_02_prol = v9;
     goto label3;
 }
 label4:;
-v.lcssa.unr = v.lcssa4;
+v_lcssa_unr = v_lcssa4;
 goto label5;
 label5:;
 bool v12 = v2 < 3;
 if(v12) {
-    v.lcssa = v.lcssa.unr;
+    v_lcssa = v_lcssa_unr;
     goto label8;
 } else {
         goto label6;
 }
 label6:;
-i.02 = i.02.unr;
+i_02 = i_02_unr;
 goto label10;
 label7:;
-v.lcssa = v.lcssa3;
+v_lcssa = v_lcssa3;
 goto label8;
 label8:;
-sum.0.lcssa = v.lcssa;
+sum_0_lcssa = v_lcssa;
 goto label9;
 label9:;
-data[0] = sum.0.lcssa;
+data[0] = sum_0_lcssa;
 label10:;
-long v19 = i.02;
+long v19 = i_02;
 float v20 = data[v19];
 float v21 = v20[0];
-float v22 = sum.01 + v21;
-int v23 = i.02 + 1;
+float v22 = sum_01 + v21;
+int v23 = i_02 + 1;
 long v24 = v23;
 float v25 = data[v24];
 float v26 = v25[0];
 float v27 = v22 + v26;
-int v28 = i.02 + 2;
+int v28 = i_02 + 2;
 long v29 = v28;
 float v30 = data[v29];
 float v31 = v30[0];
 float v32 = v27 + v31;
-int v33 = i.02 + 3;
+int v33 = i_02 + 3;
 long v34 = v33;
 float v35 = data[v34];
 float v36 = v35[0];
 float v37 = v32 + v36;
-int v38 = i.02 + 4;
-bool exitcond.3 = v38 == N;
-if(exitcond.3) {
-    v.lcssa3 = v37;
+int v38 = i_02 + 4;
+bool exitcond_3 = v38 == N;
+if(exitcond_3) {
+    v_lcssa3 = v37;
     goto label7;
 } else {
-    i.02 = v38;
+    i_02 = v38;
     goto label10;
 }
 }
@@ -425,8 +425,8 @@ float v1 = v0[0];
 bool v2 = v1 > 0;
 float v3 = data[2];
 float v4 = data[3];
-float* v.in = v2 ? v3 : v4;
-int*v5 = (int*)v.in;
+float* v_in = v2 ? v3 : v4;
+int*v5 = (int*)v_in;
 int v6 = v5[0];
 global int*v7 = (global int*)data;
 v7[0] = v6;
