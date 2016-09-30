@@ -357,12 +357,18 @@ kernel void _Z11testTernaryPf(global float* data) {
 
 kernel void _Z7testForPfi(global float* data, int N) {
 int i_02_prol;
+float sum_01_prol;
+int prol_iter;
 int v_lcssa5;
+float v_lcssa4;
 float v_lcssa_unr;
+int i_02_unr;
+float sum_01_unr;
 float v_lcssa3;
 float v_lcssa;
 float sum_0_lcssa;
 int i_02;
+float sum_01;
     label0:;
     bool v0 = N > 0;
     if(v0) {
@@ -376,13 +382,16 @@ int i_02;
     int xtraiter = N & 3;
     bool lcmp_mod = xtraiter == 0;
     if(lcmp_mod) {
-        v_lcssa_unr = ;
+        i_02_unr = 0;
+sum_01_unr = 0;
         goto     label5;
     } else {
                 goto     label2;
     }
     label2:;
         i_02_prol = 0;
+sum_01_prol = 0;
+prol_iter = xtraiter;
     goto     label3;
     label3:;
     long v5 = i_02_prol;
@@ -394,13 +403,18 @@ int i_02;
     bool prol_iter_cmp = prol_iter_sub == 0;
     if(prol_iter_cmp) {
         v_lcssa5 = v9;
+v_lcssa4 = v8;
         goto     label4;
     } else {
         i_02_prol = v9;
+sum_01_prol = v8;
+prol_iter = prol_iter_sub;
         goto     label3;
     }
     label4:;
         v_lcssa_unr = v_lcssa4;
+i_02_unr = v_lcssa5;
+sum_01_unr = v_lcssa4;
     goto     label5;
     label5:;
     bool v12 = v2 < 3;
@@ -412,6 +426,7 @@ int i_02;
     }
     label6:;
         i_02 = i_02_unr;
+sum_01 = sum_01_unr;
     goto     label10;
     label7:;
         v_lcssa = v_lcssa3;
@@ -448,6 +463,7 @@ int i_02;
         goto     label7;
     } else {
         i_02 = v38;
+sum_01 = v37;
         goto     label10;
     }
 }

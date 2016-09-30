@@ -538,17 +538,25 @@ std::string dumpFcmp(FCmpInst *instr) {
 
 std::string dumpPhi(BranchInst *branchInstr, BasicBlock *nextBlock) {
     std::string gencode = "";
-    auto it = nextBlock->begin();
-    if(it != nextBlock->end()) {
-        Instruction *firstInstruction = &*it;
-        if(firstInstruction->getOpcode() == Instruction::PHI) {
-            PHINode *phi = (PHINode *)firstInstruction;
-            storeValueName(phi);
-            gencode += dumpOperand(phi) + " = ";
-            BasicBlock *ourBlock = branchInstr->getParent();
-            Value *sourceValue = phi->getIncomingValueForBlock(ourBlock);
-            gencode += dumpOperand(sourceValue) + ";\n";
+    for(auto it = nextBlock->begin(); it != nextBlock->end(); it++) {
+    // auto it = nextBlock->begin();
+    // if(it != nextBlock->end()) {
+        Instruction *instr = &*it;
+        if(instr->getOpcode() != Instruction::PHI) {
+            break;
         }
+        // if(firstInstruction->getOpcode() == Instruction::PHI) {
+        PHINode *phi = (PHINode *)instr;
+        storeValueName(phi);
+        BasicBlock *ourBlock = branchInstr->getParent();
+        Value *sourceValue = phi->getIncomingValueForBlock(ourBlock);
+        string sourceValueCode = dumpOperand(sourceValue);
+        if(sourceValueCode == "") { // this is a hack really..
+            continue;  // assume its an undef. which it might be
+        }
+        gencode += dumpOperand(phi) + " = ";
+        gencode += sourceValueCode + ";\n";
+        // }
     }
     return gencode;
 }
@@ -759,14 +767,17 @@ void dumpFunction(Function *F) {
         oss << "    label" << i;
         string label = oss.str();
         nameByValue[basicBlock] = label;
-        auto instructionIt = basicBlock->begin();
-        if(instructionIt != basicBlock->end()) {
+        // write out phi declarations
+        for(auto instructionIt = basicBlock->begin(); instructionIt != basicBlock->end(); instructionIt++) {
+        // auto instructionIt = basicBlock->begin();
+        // if(instructionIt != basicBlock->end()) {
             Instruction *instr = &*instructionIt;
-            if(PHINode::classof(instr)) {
-                PHINode *phi = (PHINode *)instr;
-                storeValueName(phi);
-                gencode += dumpType(phi->getType()) + " " + dumpOperand(phi) + ";\n";
+            if(!PHINode::classof(instr)) {
+                break;
             }
+            PHINode *phi = (PHINode *)instr;
+            storeValueName(phi);
+            gencode += dumpType(phi->getType()) + " " + dumpOperand(phi) + ";\n";
         }
         i++;
     }
