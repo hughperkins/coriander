@@ -48,6 +48,8 @@ should be fairly straightforward/low-risk.
 
 ## Example
 
+### Device-side
+
 Lets say we have the following cuda file [examples/testcudakernel1.cu](examples/testcudakernel1.cu)
 
 Compiled into LLVM IR, this looks like: [examples/testcudakernel1.ll](examples/testcudakernel1.ll)
@@ -55,6 +57,10 @@ Compiled into LLVM IR, this looks like: [examples/testcudakernel1.ll](examples/t
 Then, using `ir-to-opencl`, we can convert this into OpenCL, giving [examples/testcudakernel1.cl](examples/testcudakernel1.cl)
 
 It's not very beautiful OpenCL, but it's OpenCL.  Standard, compilable, portable.
+
+### Host-side
+
+This is still in progress, to the point where, no clear example for now :-P
 
 ## Pre-requisites for build and demos
 
