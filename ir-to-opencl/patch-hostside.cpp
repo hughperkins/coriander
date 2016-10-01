@@ -125,70 +125,31 @@ void patchFunction(Function *F) {
     ConstantInt *constzero = ConstantInt::getSigned(inttype, 0);
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
-        // cout << "block name " << string(basicBlock->getName()) << endl;
         for(auto insit=basicBlock->begin(); insit != basicBlock->end(); insit++) {
             if(CallInst *inst = dyn_cast<CallInst>(&*insit)) {
-                // cout << "got a call instruction " << endl;
-                // cout << string(inst->getName()) << endl;
-                // if(!inst->hasName()) {
-                //     cout << "no name" << endl;
-                //     continue;
-                // }
-                // // cout << "no name" << endl;
-                // cout << "call inst name " << string(inst->getName()) << endl;
                 Function *called = inst->getCalledFunction();
                 if(called == 0) {
-                    // cout << "called is null" << endl;
                     continue;
                 }
-                // cout << "got called" << endl;
                 if(!called->hasName()) {
-                    // cout << "called has no name" << endl;
                     continue;
                 }
                 string calledFunctionName = called->getName();
-                // cout << calledFunctionName << endl;
                 if(calledFunctionName == "cudaLaunch") {
                     getLaunchTypes(inst, launchCallInfo.get());
-                    // inst->eraseFromParent();
                     to_erase.push_back(inst);
-                    // launchCallInfo->launchInstruction = dyn_cast<CallInst>(inst);
-                    // cout << "erased from parent" << endl;
                     cout << *launchCallInfo << endl;
                     launchCallInfo.reset(new LaunchCallInfo);
                 } else if(calledFunctionName == "cudaSetupArgument") {
                     getLaunchArgValue(inst, launchCallInfo.get());
-                    // Instruction *prev = LLVMGetPreviousInstruction(inst);
-                    BasicBlock::iterator it3(inst);
-                    cout << (it3 == inst->getParent()->begin()) << endl;
-                    if((it3 != inst->getParent()->begin())) {
-                        it3--;
-                        Instruction *prev = &*it3;
-                        cout << "prev->dump():" << endl;
-                        prev->dump();
-                    }
-                    // inst->getParent()->dump();
-                    for(auto it4=inst->user_begin(); it4 != inst->user_end(); it4++) {
-                        Instruction *inst3 = dyn_cast<Instruction>(*it4);
-                        inst3->dump();
-                        cout << "inst3 numoperands " << inst3->getNumOperands() << endl;
-                        // Instruction *newinst = new ICmpInst(CmpInst::Predicate::ICMP_EQ,
-                        //     constzero, constzero);
-                        // cout << "created inst " << endl;
-                        // ReplaceInstWithInst(inst3, newinst);
-                        // cout << "did replace" << endl;
-                    }
-                    to_replace_with_zero.push_back(inst);
-                    // for(auto it3=inst->use_begin(); it3 != inst->use_end(); it3++) {
-                    //     Value *inst3 = it3->get();
+                    // for(auto it4=inst->user_begin(); it4 != inst->user_end(); it4++) {
+                    //     Instruction *inst3 = dyn_cast<Instruction>(*it4);
                     //     inst3->dump();
+                    //     cout << "inst3 numoperands " << inst3->getNumOperands() << endl;
                     // }
-                    // Value *parent = inst->
-                    // to_erase.push_back(inst->)
-                    // to_erase.push_back(inst);
+                    to_replace_with_zero.push_back(inst);
                 }
             }
-                // break;
         }
     }
     cout << *launchCallInfo << endl;

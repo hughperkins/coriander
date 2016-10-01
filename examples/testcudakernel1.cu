@@ -179,7 +179,7 @@ void myprintvoidstar(void *value) {
 }
 
 void mynop() {
-    
+
 }
 
 __global__ void setValue(float *data, int idx, float value) {
@@ -203,11 +203,10 @@ __global__ void setValue(float *data, int idx, float value) {
 // // }
 
 __host__ void launchSetValue(float *data, int idx, float value) {
-    cout << "launching set value" << endl;
+    // cout << "launching set value" << endl;
     myprintvoidstar(data);
     myprintint(idx);
     myprintfloat(value);
-    setValue<<<17, 34>>>(data, idx, value);
-    cout << "launching set value again " << endl;
-    setValue<<<5, 10>>>(data, idx, value);
+    setValue<<<dim3(17, 5, 11), dim3(34, 10, 22)>>>(data, idx, value);
+    // setValue<<<5, 10>>>(data, idx, value);
 }
