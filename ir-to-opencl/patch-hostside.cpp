@@ -120,6 +120,9 @@ void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
 void patchFunction(Function *F) {
     vector<Instruction *> to_erase;
     unique_ptr<LaunchCallInfo> launchCallInfo(new LaunchCallInfo);
+    vector<Instruction *> to_replace_with_zero;
+    IntegerType *inttype = IntegerType::get(TheContext, 32);
+    ConstantInt *constzero = ConstantInt::getSigned(inttype, 0);
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
         // cout << "block name " << string(basicBlock->getName()) << endl;
@@ -168,22 +171,21 @@ void patchFunction(Function *F) {
                     for(auto it4=inst->user_begin(); it4 != inst->user_end(); it4++) {
                         Instruction *inst3 = dyn_cast<Instruction>(*it4);
                         inst3->dump();
-                        IntegerType *inttype = IntegerType::get(TheContext, 32);
-                        ConstantInt *constzero = ConstantInt::getSigned(inttype, 0);
                         cout << "inst3 numoperands " << inst3->getNumOperands() << endl;
-                        Instruction *newinst = new ICmpInst(CmpInst::Predicate::ICMP_EQ,
-                            constzero, constzero);
-                        cout << "created inst " << endl;
-                        ReplaceInstWithInst(inst3, newinst);
-                        cout << "did replace" << endl;
+                        // Instruction *newinst = new ICmpInst(CmpInst::Predicate::ICMP_EQ,
+                        //     constzero, constzero);
+                        // cout << "created inst " << endl;
+                        // ReplaceInstWithInst(inst3, newinst);
+                        // cout << "did replace" << endl;
                     }
+                    to_replace_with_zero.push_back(inst);
                     // for(auto it3=inst->use_begin(); it3 != inst->use_end(); it3++) {
                     //     Value *inst3 = it3->get();
                     //     inst3->dump();
                     // }
                     // Value *parent = inst->
                     // to_erase.push_back(inst->)
-                    to_erase.push_back(inst);
+                    // to_erase.push_back(inst);
                 }
             }
                 // break;
@@ -197,6 +199,13 @@ void patchFunction(Function *F) {
         }
         inst->eraseFromParent();
     }
+    for(auto it=to_replace_with_zero.begin(); it != to_replace_with_zero.end(); it++) {
+        Instruction *inst = *it;
+        BasicBlock::iterator ii(inst);
+        ReplaceInstWithValue(inst->getParent()->getInstList(), ii, constzero);
+        cout << "after replacevalue" << endl;
+    }
+
     // if(launchCallInfo != 0 && launchCallInfo->launchInstruction != 0) {
     //     cout << "erasing" << endl;
     //     launchCallInfo->launchInstruction->eraseFromParent();
