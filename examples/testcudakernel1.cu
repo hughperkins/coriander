@@ -187,5 +187,8 @@ __global__ void setValue(float *data, int idx, float value) {
 // // }
 
 __host__ void launchSetValue(float *data, int idx, float value) {
+    cout << "launching set value " << endl;
     setValue<<<17, 34>>>(data, idx, value);
+    cout << "launching set value again " << endl;
+    setValue<<<5, 10>>>(data, idx, value);
 }
