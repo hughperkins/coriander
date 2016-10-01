@@ -12,6 +12,11 @@ using namespace std;
 
 void launchSetValue(float *data, int idx, float value);
 
+void pretendLaunch(const char *kernelName) {
+    // just a mock for now... can we call this from our modified ir?
+    cout << "pretendLaunch(" << kernelName << ")" << endl;
+}
+
 int main(int argc, char *argv[]) {
     // cl_int err;
     // cl_platform_id platform = 0;

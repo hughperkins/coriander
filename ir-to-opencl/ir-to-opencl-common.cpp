@@ -1,6 +1,22 @@
 #include <iostream>
 #include <sstream>
 
+#include "llvm/IR/AssemblyAnnotationWriter.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IRReader/IRReader.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Verifier.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/ValueSymbolTable.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/DebugInfoMetadata.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/SourceMgr.h"
+#include "llvm/Support/raw_os_ostream.h"
+#include "llvm/Transforms/Utils/BasicBlockUtils.h"
+
 #include "ir-to-opencl-common.h"
 
 using namespace std;
@@ -9,6 +25,37 @@ using namespace llvm;
 std::string dumpType(Type *type);
 
 extern bool single_precision;
+// extern llvm::LLVMContext TheContext;
+
+GlobalVariable *addGlobalVariable(Module *M, string name, string value) {
+    // string name = ".mystr1";
+    // string desiredString = value;
+    int N = value.size() + 1;
+    LLVMContext &context = M->getContext();
+    ArrayType *strtype = ArrayType::get(IntegerType::get(context, 8), N);
+    Constant *charConst = M->getOrInsertGlobal(StringRef(name), strtype);
+    ConstantDataSequential *charConstSeq = cast<ConstantDataSequential>(charConst);
+
+    ConstantDataArray *constchararray = cast<ConstantDataArray>(ConstantDataArray::get(context, ArrayRef<uint8_t>((uint8_t *)value.c_str(), N)));
+    GlobalVariable *str = M->getNamedGlobal(StringRef(name));
+    str->setInitializer(constchararray);
+    return str;
+}
+
+Instruction *addStringInstr(Module *M, string name, string value) {
+    // Module *M = prev->getParent();
+    GlobalVariable *var = addGlobalVariable(M, name, value);
+
+    int N = value.size() + 1;
+    LLVMContext &context = M->getContext();
+    ArrayType *arrayType = ArrayType::get(IntegerType::get(context, 8), N);
+    Value * indices[2];
+    indices[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
+    indices[1] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
+    GetElementPtrInst *elem = GetElementPtrInst::CreateInBounds(arrayType, var, ArrayRef<Value *>(indices, 2));
+    // elem->insertAfter(prev);
+    return elem;
+}
 
 std::string dumpFunctionType(FunctionType *fn) {
     cout << "function" << endl;

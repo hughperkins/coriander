@@ -34,5 +34,5 @@ clang++-3.8 -c build/${TARGET}-host2.ll -O3 -o build/${TARGET}-host.o
 clang++-3.8 -std=c++11 -Isrc/EasyCL -I${CUDA_HOME}/include -c examples/test_call_cl.cpp --cuda-host-only -O3 -o build/test_call_cl.o
 
 # link, and run
-g++ -o build/test_call_cl build/test_call_cl.o build/${TARGET}-host.o -L${CUDA_HOME}/lib64 -lcudart -lOpenCL
-LD_LIBRARY_PATH=${CUDA_HOME}/lib64:$LD_LIBRARY_PATH build/test_call_cl
+g++ -o build/test_call_cl build/test_call_cl.o build/${TARGET}-host.o -L${CUDA_HOME}/lib64 -lcudart -lOpenCL -Lbuild -lEasyCL
+LD_LIBRARY_PATH=build:${CUDA_HOME}/lib64:$LD_LIBRARY_PATH build/test_call_cl
