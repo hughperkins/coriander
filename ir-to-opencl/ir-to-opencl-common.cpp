@@ -149,3 +149,7 @@ std::string dumpType(Type *type) {
             throw runtime_error("unrecognized type");
     }
 }
+
+llvm::Constant *createInt32Constant(llvm::LLVMContext *context, int value) {
+    return ConstantInt::getSigned(IntegerType::get(*context, 32), value);
+}

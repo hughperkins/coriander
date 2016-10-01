@@ -12,9 +12,10 @@ using namespace std;
 
 void launchSetValue(float *data, int idx, float value);
 
-void pretendLaunch(const char *kernelName) {
+void pretendLaunch(const char *kernelName, int grid_x, int grid_y, int grid_z) {
     // just a mock for now... can we call this from our modified ir?
     cout << "pretendLaunch(" << kernelName << ")" << endl;
+    cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl;
 }
 
 int main(int argc, char *argv[]) {

@@ -15,3 +15,5 @@ std::string dumpType(llvm::Type *type);
 
 llvm::GlobalVariable *addGlobalVariable(llvm::Module *M, std::string name, std::string value);
 llvm::Instruction *addStringInstr(llvm::Module *M, std::string name, std::string value);
+
+llvm::Constant *createInt32Constant(llvm::LLVMContext *context, int value);

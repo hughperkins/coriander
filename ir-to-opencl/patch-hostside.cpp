@@ -217,11 +217,19 @@ void patchFunction(Function *F) {
                     Instruction *stringInstr = addStringInstr(F->getParent(), "s." + launchCallInfo->kernelName, launchCallInfo->kernelName);
                     stringInstr->insertBefore(inst);
                     Function *pretendLaunch = cast<Function>(F->getParent()->getOrInsertFunction(
-                        "_Z13pretendLaunchPKc",
+                        "_Z13pretendLaunchPKciii",
                         Type::getVoidTy(TheContext),
                         PointerType::get(IntegerType::get(TheContext, 8), 0),
+                        IntegerType::get(TheContext, 32),
+                        IntegerType::get(TheContext, 32),
+                        IntegerType::get(TheContext, 32),
                         NULL));
-                    CallInst *callLaunch = CallInst::Create(pretendLaunch, stringInstr);
+                    Value *args[4];
+                    args[0] = stringInstr;
+                    args[1] = createInt32Constant(&TheContext, launchCallInfo->grid[0]);
+                    args[2] = createInt32Constant(&TheContext, launchCallInfo->grid[1]);
+                    args[3] = createInt32Constant(&TheContext, launchCallInfo->grid[2]);
+                    CallInst *callLaunch = CallInst::Create(pretendLaunch, ArrayRef<Value *>(args));
                     callLaunch->insertAfter(stringInstr);
                     launchCallInfo.reset(new LaunchCallInfo);
                 } else if(calledFunctionName == "cudaSetupArgument") {
