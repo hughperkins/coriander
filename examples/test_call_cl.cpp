@@ -12,6 +12,9 @@ using namespace std;
 
 void launchSetValue(float *data, int idx, float value);
 
+unique_ptr<CLKernel> kernel;
+unique_ptr<EasyCL> cl;
+
 void pretendLaunch(
         const char *kernelName,
         int grid_x, int grid_y, int grid_z,
@@ -20,10 +23,14 @@ void pretendLaunch(
     cout << "pretendLaunch(" << kernelName << ")" << endl;
     cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl;
     cout << "block(" << block_x << ", " << block_y << ", " << block_z << ")" << endl;
+
+    // lets just read the kernel from file for now, with hardcoded filename
+    // kernel.reset(buildKernelFromString("", kernelName, "", "internal"));
+    kernel.reset(cl->buildKernel("examples/testcudakernel1.cl", kernelName, ""));
 }
 
 int main(int argc, char *argv[]) {
-    unique_ptr<EasyCL> cl(EasyCL::createForFirstGpuOtherwiseCpu());
+    cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
     cl_int err;
     cl_context *ctx = cl->context;
     cl_command_queue *queue = cl->queue;
