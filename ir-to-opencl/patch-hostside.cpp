@@ -165,7 +165,11 @@ ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
         type->print(my_raw_os_ostream);
         i++;
     }
-    my_raw_os_ostream << ");";
+    my_raw_os_ostream << ");\n";
+    for(auto it=info.callValues.begin(); it != info.callValues.end(); it++) {
+        Value *value = *it;
+        my_raw_os_ostream << "value " << dumpType(value->getType()) << "\n";
+    }
     return os;
 }
 
@@ -192,13 +196,28 @@ void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
     // cout << "numoperands " << inst->getNumOperands() << endl;
     Instruction *op0 = dyn_cast<Instruction>(inst->getOperand(0));
     if(dyn_cast<BitCastInst>(op0)) {
-        cout << "op0 is BitCastInst" << endl;
+        // cout << "op0 is BitCastInst" << endl;
     }
-    cout << "op0 type " << dumpType(op0->getType()) << endl;
-    cout << "op0 numoperands " << op0->getNumOperands() << endl;
-    cout << "op0 op0 type " << dumpType(op0->getOperand(0)->getType()) << endl;
+    // cout << "op0 type " << dumpType(op0->getType()) << endl;
+    // cout << "op0 numoperands " << op0->getNumOperands() << endl;
+    // cout << "op0 op0 type " << dumpType(op0->getOperand(0)->getType()) << endl;
     // cout << "op1 type " << dumpType(inst->getOperand(1)->getType()) << endl;
-    // Instruction *op0_0 = dyn_cast<Instruction>(op0->getOperand(0));
+    Instruction *op0_0 = dyn_cast<Instruction>(op0->getOperand(0));
+    // cout << "op0_0" << endl;
+    // op0_0->dump();
+    for(auto it=op0_0->user_begin(); it != op0_0->user_end(); it++) {
+        // cout << "use" << endl;
+        if(Instruction *useInst = dyn_cast<Instruction>(*it)) {
+            // cout << "got an instruction" << endl;
+            // useInst->dump();
+            if(StoreInst *store = dyn_cast<StoreInst>(useInst)) {
+                // cout << " found a store" << endl;
+                // cout << "store operands " << store->getNumOperands() << endl;
+                cout << "store operand 0 type " << dumpType(store->getOperand(0)->getType()) << endl;
+                info->callValues.push_back(store->getOperand(0));
+            }
+        }
+    }
     // cout << "op0_0 numoperands " << op0_0->getNumOperands() << endl;
     // cout << "op0_0 type " << dumpType(op0_0->getType()) << endl;
     // cout << "op0_0 op0 type " << dumpType(op0_0->getOperand(0)->getType()) << endl;

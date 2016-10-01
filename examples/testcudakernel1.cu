@@ -166,6 +166,18 @@ __global__ void testFor(float *data, int N) {
     }
 }
 
+void myprintint(int value) {
+    cout << "myprintint " << value << endl;
+}
+
+void myprintfloat(float value) {
+    cout << "myprintfloat " << value << endl;
+}
+
+void myprintvoidstar(void *value) {
+    cout << "myprintvoid* " << value << endl;
+}
+
 __global__ void setValue(float *data, int idx, float value) {
     if(threadIdx.x == 0) {
         data[idx] = value;
@@ -187,7 +199,10 @@ __global__ void setValue(float *data, int idx, float value) {
 // // }
 
 __host__ void launchSetValue(float *data, int idx, float value) {
-    cout << "launching set value " << endl;
+    cout << "launching set value" << endl;
+    myprintvoidstar(data);
+    myprintint(idx);
+    myprintfloat(value);
     setValue<<<17, 34>>>(data, idx, value);
     cout << "launching set value again " << endl;
     setValue<<<5, 10>>>(data, idx, value);
