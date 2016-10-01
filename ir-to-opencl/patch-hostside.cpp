@@ -57,18 +57,48 @@ bool single_precision = true;
 class LaunchCallInfo {
 public:
     LaunchCallInfo() {
-        launchInstruction = 0;
+        // launchInstruction = 0;
+        // kernelName = "";
+        for(int i = 0; i < 3; i++) {
+            grid[i] = 0;
+            block[i] = 0;
+        }
     }
-    std::string kernelName;
-    CallInst *launchInstruction;
+    std::string kernelName = "";
+    // CallInst *launchInstruction;
     vector<Type *> callTypes;
     vector<Value *> callValues;
+    int grid[3];
+    int block[3];
 };
 
 ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
-    int i = 0;
     raw_os_ostream my_raw_os_ostream(os);
-    my_raw_os_ostream << "LaunchCallInfo " << info.kernelName << "(";
+    my_raw_os_ostream << "LaunchCallInfo " << info.kernelName;
+    my_raw_os_ostream << "<<<";
+
+    my_raw_os_ostream << "dim3(";
+    for(int j = 0; j < 3; j++) {
+        if(j > 0) {
+            my_raw_os_ostream << ", ";
+        }
+        my_raw_os_ostream << info.grid[j];
+    }
+    my_raw_os_ostream << ")";
+    my_raw_os_ostream << ", ";
+
+    my_raw_os_ostream << "dim3(";
+    for(int j = 0; j < 3; j++) {
+        if(j > 0) {
+            my_raw_os_ostream << ", ";
+        }
+        my_raw_os_ostream << info.block[j];
+    }
+    my_raw_os_ostream << ")";
+
+    my_raw_os_ostream << ">>>";
+    my_raw_os_ostream << "(";
+    int i = 0;
     for(auto it=info.callTypes.begin(); it != info.callTypes.end(); it++) {
         if(i > 0){
             my_raw_os_ostream << ", ";
@@ -116,6 +146,50 @@ void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
     }
 }
 
+uint64_t readIntConstant_uint64(ConstantInt *constant) {
+    return constant->getZExtValue();
+}
+
+uint32_t readIntConstant_uint32(ConstantInt *constant) {
+    assert(contant->getBitWidth() <= 32);
+    return (uint32_t)constant->getZExtValue();
+}
+
+void getBlockGridDimensions(CallInst *inst, LaunchCallInfo *info) {
+    // there are 6 args:
+    // grid:
+    // 0 i64: x, y, as 32-bit ints
+    // 1 i32: z
+    // block:
+    // 2 i64: x, y, as 32-bit ints
+    // 3 i32: z
+    // 4 shared memory.  since we're not handling it right now, must be 0
+    // 5 stream must be null, for now
+
+    uint64_t grid_xy = readIntConstant_uint64(cast<ConstantInt>(inst->getArgOperand(0)));
+    uint32_t grid_x = grid_xy & ((1 << 31) - 1);
+    uint32_t grid_y = grid_xy >> 32;
+    uint32_t grid_z = readIntConstant_uint32(cast<ConstantInt>(inst->getArgOperand(1)));
+    // cout << "grid " << grid_x << " " << grid_y << " " << grid_z << endl;
+
+    uint64_t block_xy = readIntConstant_uint64(cast<ConstantInt>(inst->getArgOperand(2)));
+    uint32_t block_x = block_xy & ((1 << 31) - 1);
+    uint32_t block_y = block_xy >> 32;
+    uint32_t block_z = readIntConstant_uint32(cast<ConstantInt>(inst->getArgOperand(3)));
+    // cout << "block " << block_x << " " << block_y << " " << block_z << endl;
+
+    info->grid[0] = grid_x;
+    info->grid[1] = grid_y;
+    info->grid[2] = grid_z;
+
+    info->block[0] = block_x;
+    info->block[1] = block_y;
+    info->block[2] = block_z;
+
+    assert(readIntConstant_uint64(inst->getArgOperand(4)) == 0);
+    // we should assert on the stream too really TODO: FIXME:
+    // assert(readIntConstant_uint64(inst->getArgOperand(5)) == 0);
+}
 
 void patchFunction(Function *F) {
     vector<Instruction *> to_erase;
@@ -142,11 +216,10 @@ void patchFunction(Function *F) {
                     launchCallInfo.reset(new LaunchCallInfo);
                 } else if(calledFunctionName == "cudaSetupArgument") {
                     getLaunchArgValue(inst, launchCallInfo.get());
-                    // for(auto it4=inst->user_begin(); it4 != inst->user_end(); it4++) {
-                    //     Instruction *inst3 = dyn_cast<Instruction>(*it4);
-                    //     inst3->dump();
-                    //     cout << "inst3 numoperands " << inst3->getNumOperands() << endl;
-                    // }
+                    to_replace_with_zero.push_back(inst);
+                } else if(calledFunctionName == "cudaConfigureCall") {
+                    // cout << "got call to cudaconfigurecall" << endl;
+                    getBlockGridDimensions(inst, launchCallInfo.get());
                     to_replace_with_zero.push_back(inst);
                 }
             }
