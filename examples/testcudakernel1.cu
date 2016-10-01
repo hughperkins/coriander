@@ -178,6 +178,10 @@ void myprintvoidstar(void *value) {
     cout << "myprintvoid* " << value << endl;
 }
 
+void mynop() {
+    
+}
+
 __global__ void setValue(float *data, int idx, float value) {
     if(threadIdx.x == 0) {
         data[idx] = value;

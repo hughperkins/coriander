@@ -148,7 +148,11 @@ std::string dumpType(Type *type) {
 
 class LaunchCallInfo {
 public:
+    LaunchCallInfo() {
+        launchInstruction = 0;
+    }
     std::string kernelName;
+    CallInst *launchInstruction;
     vector<Type *> callTypes;
     vector<Value *> callValues;
 };
@@ -206,6 +210,7 @@ void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
 
 
 void patchFunction(Function *F) {
+    vector<Instruction *> to_erase;
     unique_ptr<LaunchCallInfo> launchCallInfo(new LaunchCallInfo);
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
@@ -234,16 +239,30 @@ void patchFunction(Function *F) {
                 // cout << calledFunctionName << endl;
                 if(calledFunctionName == "cudaLaunch") {
                     getLaunchTypes(inst, launchCallInfo.get());
+                    // inst->eraseFromParent();
+                    to_erase.push_back(inst);
+                    // launchCallInfo->launchInstruction = dyn_cast<CallInst>(inst);
+                    // cout << "erased from parent" << endl;
                     cout << *launchCallInfo << endl;
                     launchCallInfo.reset(new LaunchCallInfo);
                 } else if(calledFunctionName == "cudaSetupArgument") {
                     getLaunchArgValue(inst, launchCallInfo.get());
+                    // to_erase.push_back(inst->)
+                    // to_erase.push_back(inst);
                 }
             }
                 // break;
         }
     }
     cout << *launchCallInfo << endl;
+    for(auto it=to_erase.begin(); it != to_erase.end(); it++) {
+        Instruction *inst = *it;
+        inst->eraseFromParent();
+    }
+    // if(launchCallInfo != 0 && launchCallInfo->launchInstruction != 0) {
+    //     cout << "erasing" << endl;
+    //     launchCallInfo->launchInstruction->eraseFromParent();
+    // }
 }
 
 
