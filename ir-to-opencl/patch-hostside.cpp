@@ -263,13 +263,13 @@ void patchModule(Module *M) {
         string name = it->getName();
         // cout << "name " << name << endl;
         Function *F = &*it;
-        if(name == "_Z14launchSetValuePfif") {
+        // if(name == "_Z14launchSetValuePfif") {
             cout << "Function " << name << endl;
             patchFunction(F);
             cout << "verifying function..." << endl;
             verifyFunction(*F);
             cout << "function verified" << endl;
-        }
+        // }
         // if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
         //         knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
         //     Function *F = &*it;
