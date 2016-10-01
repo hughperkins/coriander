@@ -18,8 +18,32 @@ Goal is to be able to build tensorflow for OpenCL.  It's not the only way forwar
 
 ## How it works
 
-- we use `clang` to build the CUDA code into LLVM IR code
-- we use this project, `cuda-ir-to-opencl` to convert the CUDA IR into OpenCL 1.2
+We need to handle host-side code, which means, convert the cuda kernel launch code into opencl kernel launch code.  This is
+under feasibility study.  And we need to convert the device-side code from cuda IR into OpenCL, to feed to any OpenCL
+device driver.
+
+The way these works is:
+
+### For host-side code
+
+- we use clang to convert the incoming `.cu` file into IR
+- then we hack on the IR to replace the cuda kernel launch commands with opencl kernel launch commands
+- then we use clang to compile this updated IR to object code
+
+This is currently in progress: we can get hold of the name of the kernel, the kernel arguments, and the grid/dim
+dimensions, and strip all these cuda calls from the IR. Todo: add in opencl kernel launch commands instead.
+
+This bit is still fairly up in the air /high risk.
+
+### For device side:
+
+- we use `clang` to compile the CUDA code into LLVM IR code
+- we read in the IR code, and write it out as OpenCL
+
+This is well underway.  You can see below that many standard things, like arithmetic, load/store, tanh, exp, sqrt, and
+branching instructions, such as if/else/for/while are all working.  In addition, kernels are detected correctly,
+and their arguments marked as `global`.  Still need to handle shared memory, and some other things, but seems like
+should be fairly straightforward/low-risk.
 
 ## Example
 
@@ -95,6 +119,11 @@ More info: [test/README.md](test/README.md)
 
 ## What's working?
 
+I've started working on host-side kernel launch.  That's a work in progress.  Device-side translation into OpenCL is
+well underway.
+
+### Device-side
+
 IR operations supported, at least partially:
 - `call`
 - `getelementptr`
@@ -130,6 +159,17 @@ C++ things:
 
 Other cool things:
 - single-source compilation works ok :-)
+
+### Host-side
+
+On the host-side, currently, there is code to:
+- get hold of the name of the kernel being called
+- get hold of the llvm `Value *`s being passed to the kernel call
+- get hold of the `grid` and `block` dimensions being passed to the kernel launch
+- in addition, all these cuda commands are being stripped from the IR
+
+To do:
+- replace the (already purged) cuda kernel launch calls with opencl kernel launch calls
 
 ## Roadmap
 
