@@ -31,6 +31,7 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_os_ostream.h"
+#include "llvm/Transforms/Utils/BasicBlockUtils.h"
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
@@ -154,8 +155,35 @@ void patchFunction(Function *F) {
                     launchCallInfo.reset(new LaunchCallInfo);
                 } else if(calledFunctionName == "cudaSetupArgument") {
                     getLaunchArgValue(inst, launchCallInfo.get());
+                    // Instruction *prev = LLVMGetPreviousInstruction(inst);
+                    BasicBlock::iterator it3(inst);
+                    cout << (it3 == inst->getParent()->begin()) << endl;
+                    if((it3 != inst->getParent()->begin())) {
+                        it3--;
+                        Instruction *prev = &*it3;
+                        cout << "prev->dump():" << endl;
+                        prev->dump();
+                    }
+                    // inst->getParent()->dump();
+                    for(auto it4=inst->user_begin(); it4 != inst->user_end(); it4++) {
+                        Instruction *inst3 = dyn_cast<Instruction>(*it4);
+                        inst3->dump();
+                        IntegerType *inttype = IntegerType::get(TheContext, 32);
+                        ConstantInt *constzero = ConstantInt::getSigned(inttype, 0);
+                        cout << "inst3 numoperands " << inst3->getNumOperands() << endl;
+                        Instruction *newinst = new ICmpInst(CmpInst::Predicate::ICMP_EQ,
+                            constzero, constzero);
+                        cout << "created inst " << endl;
+                        ReplaceInstWithInst(inst3, newinst);
+                        cout << "did replace" << endl;
+                    }
+                    // for(auto it3=inst->use_begin(); it3 != inst->use_end(); it3++) {
+                    //     Value *inst3 = it3->get();
+                    //     inst3->dump();
+                    // }
+                    // Value *parent = inst->
                     // to_erase.push_back(inst->)
-                    // to_erase.push_back(inst);
+                    to_erase.push_back(inst);
                 }
             }
                 // break;
@@ -164,6 +192,9 @@ void patchFunction(Function *F) {
     cout << *launchCallInfo << endl;
     for(auto it=to_erase.begin(); it != to_erase.end(); it++) {
         Instruction *inst = *it;
+        if(!inst->use_empty()) {
+            throw runtime_error("cannot erase used instructions");
+        }
         inst->eraseFromParent();
     }
     // if(launchCallInfo != 0 && launchCallInfo->launchInstruction != 0) {
@@ -184,6 +215,9 @@ void patchModule(Module *M) {
         if(name == "_Z14launchSetValuePfif") {
             cout << "Function " << name << endl;
             patchFunction(F);
+            cout << "verifying function..." << endl;
+            verifyFunction(*F);
+            cout << "function verified" << endl;
         }
         // if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
         //         knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
@@ -225,6 +259,8 @@ int main(int argc, char *argv[]) {
     ofstream ofile;
     ofile.open(argv[2]);
     raw_os_ostream my_raw_os_ostream(ofile);
+    verifyModule(*TheModule);
+    cout << "printing module" << endl;
     TheModule->print(my_raw_os_ostream, &assemblyAnnotationWriter);
     // my_raw_os_ostream.close();
     ofile.close();

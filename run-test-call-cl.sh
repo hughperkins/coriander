@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-set -x
+# set -x
 
 export CUDA_HOME=/usr/local/cuda-7.5
 TARGET=testcudakernel1
