@@ -212,6 +212,7 @@ void patchFunction(Function *F) {
                 if(calledFunctionName == "cudaLaunch") {
                     getLaunchTypes(inst, launchCallInfo.get());
                     to_erase.push_back(inst);
+                    cout << "patching launch in " << string(F->getName()) << endl;
                     cout << *launchCallInfo << endl;
                     Instruction *stringInstr = addStringInstr(F->getParent(), "s." + launchCallInfo->kernelName, launchCallInfo->kernelName);
                     stringInstr->insertBefore(inst);
@@ -233,7 +234,7 @@ void patchFunction(Function *F) {
             }
         }
     }
-    cout << *launchCallInfo << endl;
+    // cout << *launchCallInfo << endl;
     for(auto it=to_erase.begin(); it != to_erase.end(); it++) {
         Instruction *inst = *it;
         if(!inst->use_empty()) {
@@ -264,11 +265,11 @@ void patchModule(Module *M) {
         // cout << "name " << name << endl;
         Function *F = &*it;
         // if(name == "_Z14launchSetValuePfif") {
-            cout << "Function " << name << endl;
+            // cout << "Function " << name << endl;
             patchFunction(F);
-            cout << "verifying function..." << endl;
+            // cout << "verifying function..." << endl;
             verifyFunction(*F);
-            cout << "function verified" << endl;
+            // cout << "function verified" << endl;
         // }
         // if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
         //         knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
