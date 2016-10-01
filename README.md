@@ -84,11 +84,26 @@ From this repo, run:
 
 ### Host-side demonstration
 
+#### Basic non-cuda code
+
 This demo shows we can build host-side code, from the same source-code file containing device-side code.
 This doesnt use/need any `ir-to-opencl`, just uses clang functionality, already present in clang-3.8.  From this repo, run:
 ```
 ./demo-hostside.sh
 ```
+
+#### kernel launch code
+
+Run:
+```
+./run-test-call-cl.sh
+```
+This will:
+- compile [examples/testcudakernel1.cu](examples/testcudakernel1.cu) host-side code into IR
+- read the kernel launch parameters for the kernel launch in the hostside function `launchSetValue`
+- write those to stdout
+- strip the cuda launch IR commands from the IR, for this function
+... and thats it for now :-P  But it shows much of the hard bit is already done
 
 ## How to build
 
@@ -98,7 +113,15 @@ From this repo, run:
 ```
 => `ir-to-opencl` should be built into `build` subdirectory
 
+To build `patch-hostside`, run the hostside kernel launch demo-in-progress:
+```
+./run-test-call-cl.sh
+```
+=> `patch-hostside` should appear in the `build` subdirectory
+
 ## Test
+
+### Device-side
 
 The tests will compile the OpenCL code, and run it on the GPU, testing the returned results
 
@@ -117,6 +140,10 @@ test/test.sh
 ```
 
 More info: [test/README.md](test/README.md)
+
+### Host-side
+
+No host-side tests yet really, except the kernel launch demo-in-progress (see above).
 
 ## What's working?
 
