@@ -1,0 +1,3 @@
+[submodule "src/EasyCL"]
+	path = src/EasyCL
+	url = https://github.com/hughperkins/EasyCL
