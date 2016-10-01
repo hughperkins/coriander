@@ -214,8 +214,6 @@ void patchFunction(Function *F) {
                     to_erase.push_back(inst);
                     cout << *launchCallInfo << endl;
                     Instruction *stringInstr = addStringInstr(F->getParent(), "s." + launchCallInfo->kernelName, launchCallInfo->kernelName);
-                    cout << "got stringinstr" << endl;
-                    stringInstr->dump();
                     stringInstr->insertBefore(inst);
                     Function *pretendLaunch = cast<Function>(F->getParent()->getOrInsertFunction(
                         "_Z13pretendLaunchPKc",
@@ -229,7 +227,6 @@ void patchFunction(Function *F) {
                     getLaunchArgValue(inst, launchCallInfo.get());
                     to_replace_with_zero.push_back(inst);
                 } else if(calledFunctionName == "cudaConfigureCall") {
-                    // cout << "got call to cudaconfigurecall" << endl;
                     getBlockGridDimensions(inst, launchCallInfo.get());
                     to_replace_with_zero.push_back(inst);
                 }
@@ -259,7 +256,7 @@ void patchFunction(Function *F) {
 
 
 void patchModule(Module *M) {
-    int i = 0;
+    // int i = 0;
     for(auto it = M->begin(); it != M->end(); it++) {
         // nameByValue.clear();
         // nextNameIdx = 0;

@@ -33,8 +33,8 @@ GlobalVariable *addGlobalVariable(Module *M, string name, string value) {
     int N = value.size() + 1;
     LLVMContext &context = M->getContext();
     ArrayType *strtype = ArrayType::get(IntegerType::get(context, 8), N);
-    Constant *charConst = M->getOrInsertGlobal(StringRef(name), strtype);
-    ConstantDataSequential *charConstSeq = cast<ConstantDataSequential>(charConst);
+    M->getOrInsertGlobal(StringRef(name), strtype);
+    // ConstantDataSequential *charConstSeq = cast<ConstantDataSequential>(charConst);
 
     ConstantDataArray *constchararray = cast<ConstantDataArray>(ConstantDataArray::get(context, ArrayRef<uint8_t>((uint8_t *)value.c_str(), N)));
     GlobalVariable *str = M->getNamedGlobal(StringRef(name));
