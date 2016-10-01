@@ -260,7 +260,7 @@ void patchFunction(Function *F) {
         Instruction *inst = *it;
         BasicBlock::iterator ii(inst);
         ReplaceInstWithValue(inst->getParent()->getInstList(), ii, constzero);
-        cout << "after replacevalue" << endl;
+        // cout << "after replacevalue" << endl;
     }
 
     // if(launchCallInfo != 0 && launchCallInfo->launchInstruction != 0) {
