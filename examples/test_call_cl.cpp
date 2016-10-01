@@ -45,13 +45,13 @@ void setKernelArgMem(float *clmem_as_floatstar) {
 void setKernelArgInt(int value) {
     // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
     cout << "setkernelargint " << value << endl;
-    kernel->in(value);
+    // kernel->in(value);
 }
 
 void setKernelArgFloat(float value) {
     // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
     cout << "setkernelargfloat " << value << endl;
-    kernel->in(value);
+    // kernel->in(value);
 }
 
 void kernelGo() {

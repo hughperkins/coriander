@@ -237,6 +237,34 @@ void patchFunction(Function *F) {
                     args[6] = createInt32Constant(&TheContext, launchCallInfo->block[2]);
                     CallInst *callLaunch = CallInst::Create(pretendLaunch, ArrayRef<Value *>(args));
                     callLaunch->insertAfter(stringInstr);
+
+                    Instruction *lastInst = callLaunch;
+                    // pass args now
+                    for(auto argit=launchCallInfo->callValues.begin(); argit != launchCallInfo->callValues.end(); argit++) {
+                        Value *value = *argit;
+                        if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
+                            cout << "got an int" << endl;
+                            Function *setKernelArgInt = cast<Function>(F->getParent()->getOrInsertFunction(
+                                "_Z15setKernelArgInti",
+                                Type::getVoidTy(TheContext),
+                                IntegerType::get(TheContext, 32),
+                                NULL));
+                            CallInst *call = CallInst::Create(setKernelArgInt, value);
+                            call->insertAfter(lastInst);
+                            lastInst = call;
+                        } else if(value->getType()->isFloatingPointTy()) {
+                            cout << "got a float" << endl;
+                            Function *setKernelArgFloat = cast<Function>(F->getParent()->getOrInsertFunction(
+                                "_Z17setKernelArgFloatf",
+                                Type::getVoidTy(TheContext),
+                                Type::getFloatTy(TheContext),
+                                NULL));
+                            CallInst *call = CallInst::Create(setKernelArgFloat, value);
+                            call->insertAfter(lastInst);
+                            lastInst = call;
+                        }
+                    }
+
                     launchCallInfo.reset(new LaunchCallInfo);
                 } else if(calledFunctionName == "cudaSetupArgument") {
                     getLaunchArgValue(inst, launchCallInfo.get());
