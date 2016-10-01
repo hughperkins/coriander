@@ -36,22 +36,22 @@ void pretendLaunch(
     kernel.reset(cl->buildKernel("examples/testcudakernel1.cl", kernelName, ""));
 }
 
-void setKernelArgMem(float *clmem_as_floatstar) {
+void setKernelArgFloatStar(float *clmem_as_floatstar) {
     cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
-    cout << "setkernelargmem" << endl;
+    cout << "setKernelArgFloatStar" << endl;
     kernel->inout(p_mem);
 }
 
 void setKernelArgInt(int value) {
     // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
     cout << "setkernelargint " << value << endl;
-    // kernel->in(value);
+    kernel->in(value);
 }
 
 void setKernelArgFloat(float value) {
     // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
     cout << "setkernelargfloat " << value << endl;
-    // kernel->in(value);
+    kernel->in(value);
 }
 
 void kernelGo() {
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
     err = clEnqueueWriteBuffer(*queue, float_data_gpu, CL_TRUE, 0,
                                       N * sizeof(float), float_data, 0, NULL, NULL);
 
-    launchSetValue((float *)float_data_gpu, 2, 123.0f);
+    launchSetValue((float *)&float_data_gpu, 2, 123.0f);
 
     return 0;
 }

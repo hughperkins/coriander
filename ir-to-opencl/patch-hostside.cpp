@@ -262,6 +262,19 @@ void patchFunction(Function *F) {
                             CallInst *call = CallInst::Create(setKernelArgFloat, value);
                             call->insertAfter(lastInst);
                             lastInst = call;
+                        } else if(value->getType()->isPointerTy()) {
+                            Type *elementType = value->getType()->getPointerElementType();
+                            if(elementType->isFloatingPointTy()) {
+                                cout << "got a float *" << endl;
+                                Function *setKernelArgFloatStar = cast<Function>(F->getParent()->getOrInsertFunction(
+                                    "_Z21setKernelArgFloatStarPf",
+                                    Type::getVoidTy(TheContext),
+                                    PointerType::get(Type::getFloatTy(TheContext), 0),
+                                    NULL));
+                                CallInst *call = CallInst::Create(setKernelArgFloatStar, value);
+                                call->insertAfter(lastInst);
+                                lastInst = call;
+                            }
                         }
                     }
 
