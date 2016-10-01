@@ -146,24 +146,31 @@ std::string dumpType(Type *type) {
     }
 }
 
+class LaunchCallInfo {
+public:
+    std::string kernelName;
+    vector<Type *> callTypes;
+    vector<Value *> callValues;
+};
 
-void exploreLaunch(Function *f) {
-    // cout << "numargs " << f->
-    int numArgs = 0;
-    for(auto it=f->arg_begin(); it != f->arg_end(); it++) {
-        Argument *arg = &*it;
-        Type *argType = arg->getType();
-        cout << "arg type " << dumpType(argType) << endl;
-        numArgs++;
+ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
+    int i = 0;
+    raw_os_ostream my_raw_os_ostream(os);
+    my_raw_os_ostream << "LaunchCallInfo " << info.kernelName << "(";
+    for(auto it=info.callTypes.begin(); it != info.callTypes.end(); it++) {
+        if(i > 0){
+            my_raw_os_ostream << ", ";
+        }
+        Type *type = *it;
+        type->print(my_raw_os_ostream);
+        i++;
     }
-    cout << "numargs " << numArgs << endl;
+    my_raw_os_ostream << ");";
+    return os;
 }
 
-
-void exploreLaunchCall(CallInst *inst) {
-    string kernelName = "";
-    vector<Type *> callTypes;
-
+void getLaunchTypes(CallInst *inst, LaunchCallInfo *info) {
+    // unique_ptr<LaunchCallInfo> launchCallInfo(new LaunchCallInfo);
     Value *argOperand = inst->getArgOperand(0);
     if(ConstantExpr *expr = dyn_cast<ConstantExpr>(argOperand)) {
         Instruction *instr = expr->getAsInstruction();
@@ -172,37 +179,71 @@ void exploreLaunchCall(CallInst *inst) {
         if(FunctionType *fn = dyn_cast<FunctionType>(op0typepointed)) {
             for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
                 Type * paramType = *it;
-                callTypes.push_back(paramType);
+                info->callTypes.push_back(paramType);
             }
         }
-        kernelName = instr->getOperand(0)->getName();
+        info->kernelName = instr->getOperand(0)->getName();
     }
-    cout << "kernelName " << kernelName << endl;
-    for(auto it=callTypes.begin(); it != callTypes.end(); it++) {
-        cout << dumpType(*it) << endl;
+    // return launchCallInfo;
+}
+
+void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
+    // cout << "getLaunchArgValue " << endl;
+    // cout << "numoperands " << inst->getNumOperands() << endl;
+    Instruction *op0 = dyn_cast<Instruction>(inst->getOperand(0));
+    if(dyn_cast<BitCastInst>(op0)) {
+        cout << "op0 is BitCastInst" << endl;
     }
+    cout << "op0 type " << dumpType(op0->getType()) << endl;
+    cout << "op0 numoperands " << op0->getNumOperands() << endl;
+    cout << "op0 op0 type " << dumpType(op0->getOperand(0)->getType()) << endl;
+    // cout << "op1 type " << dumpType(inst->getOperand(1)->getType()) << endl;
+    // Instruction *op0_0 = dyn_cast<Instruction>(op0->getOperand(0));
+    // cout << "op0_0 numoperands " << op0_0->getNumOperands() << endl;
+    // cout << "op0_0 type " << dumpType(op0_0->getType()) << endl;
+    // cout << "op0_0 op0 type " << dumpType(op0_0->getOperand(0)->getType()) << endl;
 }
 
 
 void patchFunction(Function *F) {
+    unique_ptr<LaunchCallInfo> launchCallInfo(new LaunchCallInfo);
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
-        cout << "block name " << string(basicBlock->getName()) << endl;
+        // cout << "block name " << string(basicBlock->getName()) << endl;
         for(auto insit=basicBlock->begin(); insit != basicBlock->end(); insit++) {
             if(CallInst *inst = dyn_cast<CallInst>(&*insit)) {
-                cout << "got a call instruction " << endl;
+                // cout << "got a call instruction " << endl;
                 // cout << string(inst->getName()) << endl;
+                // if(!inst->hasName()) {
+                //     cout << "no name" << endl;
+                //     continue;
+                // }
+                // // cout << "no name" << endl;
+                // cout << "call inst name " << string(inst->getName()) << endl;
                 Function *called = inst->getCalledFunction();
+                if(called == 0) {
+                    // cout << "called is null" << endl;
+                    continue;
+                }
+                // cout << "got called" << endl;
+                if(!called->hasName()) {
+                    // cout << "called has no name" << endl;
+                    continue;
+                }
                 string calledFunctionName = called->getName();
-                cout << calledFunctionName << endl;
+                // cout << calledFunctionName << endl;
                 if(calledFunctionName == "cudaLaunch") {
-                    exploreLaunch(called);
-                    exploreLaunchCall(inst);
+                    getLaunchTypes(inst, launchCallInfo.get());
+                    cout << *launchCallInfo << endl;
+                    launchCallInfo.reset(new LaunchCallInfo);
+                } else if(calledFunctionName == "cudaSetupArgument") {
+                    getLaunchArgValue(inst, launchCallInfo.get());
                 }
             }
-            break;
+                // break;
         }
     }
+    cout << *launchCallInfo << endl;
 }
 
 
@@ -215,6 +256,7 @@ void patchModule(Module *M) {
         // cout << "name " << name << endl;
         Function *F = &*it;
         if(name == "_Z14launchSetValuePfif") {
+            cout << "Function " << name << endl;
             patchFunction(F);
         }
         // if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
