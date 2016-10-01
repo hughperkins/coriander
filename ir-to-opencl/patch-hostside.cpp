@@ -164,67 +164,18 @@ void exploreLaunchCall(CallInst *inst) {
     string kernelName = "";
     vector<Type *> callTypes;
 
-    Value *calledValue = inst->getCalledValue();
-    calledValue->getType()->dump();
-    cout << "value id " << calledValue->getValueID() << endl;
-    int numArgOperands = inst->getNumArgOperands();
-    cout << "numargoperands " << numArgOperands << endl;
     Value *argOperand = inst->getArgOperand(0);
-    argOperand->dump();
-    if(Argument *arg = dyn_cast<Argument>(argOperand)) {
-        cout << "its an arg" << endl;
-    }
-    if(User *user = dyn_cast<User>(argOperand)) {
-        cout << "its a User" << endl;
-        if(Constant *constant = dyn_cast<Constant>(argOperand)) {
-            cout << "its a Constant" << endl;
-            if(GlobalValue *glob = dyn_cast<GlobalValue>(argOperand)) {
-                cout << "its a globalvlaue" << endl;
-            }
-            if(ConstantExpr *expr = dyn_cast<ConstantExpr>(argOperand)) {
-                cout << "its a constantexpr" << endl;
-                Instruction *instr = expr->getAsInstruction();
-                cout << "num operands " << instr->getNumOperands() << endl;
-                cout << dumpType(instr->getOperand(0)->getType()) << endl;
-                Type *op0type = instr->getOperand(0)->getType();
-                Type *op0typepointed = op0type->getPointerElementType();
-                cout << dumpType(op0typepointed) << endl;
-                if(FunctionType *fn = dyn_cast<FunctionType>(op0typepointed)) {
-                    cout << "got function type" << endl;
-                    for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
-                        Type * paramType = *it;
-                        cout << "param " << dumpType(paramType) << endl;
-                        callTypes.push_back(paramType);
-                    }
-                }
-                cout << string(instr->getOperand(0)->getName()) << endl;
-                kernelName = instr->getOperand(0)->getName();
+    if(ConstantExpr *expr = dyn_cast<ConstantExpr>(argOperand)) {
+        Instruction *instr = expr->getAsInstruction();
+        Type *op0type = instr->getOperand(0)->getType();
+        Type *op0typepointed = op0type->getPointerElementType();
+        if(FunctionType *fn = dyn_cast<FunctionType>(op0typepointed)) {
+            for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
+                Type * paramType = *it;
+                callTypes.push_back(paramType);
             }
         }
-    }
-    if(Function *F = dyn_cast<Function>(argOperand)) {
-        cout << "its a function" << endl;
-    }
-    if(Instruction *inst = dyn_cast<Instruction>(argOperand)) {
-        cout << "its an instruction" << endl;
-    }
-    if(BitCastInst *bitcast = dyn_cast<BitCastInst>(argOperand)) {
-        cout << "bitcast num operands " << bitcast->getNumOperands() << endl;
-        Value *bitcast0 = bitcast->getOperand(0);
-        // cout << dumpType(bitcast0->getType()) << endl;
-        // if(Function *F = dyn_cast<Function>(bitcast0->getType()){
-        //     // F->dump();
-        //     // for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        //     //     Argument *arg = &*it;
-        //     //     Type *argType = arg->getType();
-        //     //     cout << "arg type " << dumpType(argType) << endl;
-        //     //     // numArgs++;
-        //     // }
-        //     // exploreLaunch(F);
-        //     // cout << "function numargs " << F->
-        //     cout << string(F->getName()) << endl;
-        //     // bitcast0->dump();
-        // }
+        kernelName = instr->getOperand(0)->getName();
     }
     cout << "kernelName " << kernelName << endl;
     for(auto it=callTypes.begin(); it != callTypes.end(); it++) {
