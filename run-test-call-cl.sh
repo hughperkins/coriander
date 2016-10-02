@@ -22,13 +22,13 @@ cd ..
 clang++-3.8 ${COMPILE_FLAGS} -fcxx-exceptions -o build/patch-hostside ir-to-opencl/ir-to-opencl-common.cpp -g -O3 -I/usr/include/llvm-3.8 ir-to-opencl/patch-hostside.cpp ${LINK_FLAGS}
 
 # convert the cuda file to IR
-clang++-3.8 -I${CUDA_HOME}/include examples/${TARGET}.cu --cuda-host-only -emit-llvm  -O3 -S -o build/${TARGET}-host.ll
+clang++-3.8 -I${CUDA_HOME}/include examples/${TARGET}.cu --cuda-host-only -emit-llvm  -O3 -S -o examples/${TARGET}-host.ll
 
 # run build/patch-hostside, to patch the IR
-build/patch-hostside build/${TARGET}-host.ll build/${TARGET}-host2.ll
+build/patch-hostside examples/${TARGET}-host.ll examples/${TARGET}-host2.ll
 
 # compile the patched IR
-clang++-3.8 -c build/${TARGET}-host2.ll -O3 -o build/${TARGET}-host.o
+clang++-3.8 -c examples/${TARGET}-host2.ll -O3 -o build/${TARGET}-host.o
 
 # compile our main method
 clang++-3.8 -std=c++11 -Isrc/EasyCL -c examples/test_call_cl.cpp --cuda-host-only -O3 -o build/test_call_cl.o
