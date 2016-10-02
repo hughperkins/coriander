@@ -17,13 +17,13 @@ In more detail:
 
 ### For host-side code
 
-- use `clang` to convert the incoming `.cu` file into IR (this bit needs cuda include files)
+- use `clang` to convert the incoming `.cu` file into IR
 - use [src/patch-hostside.cpp](src/patch-hostside.cpp) to replace the cuda kernel launch commands with opencl kernel launch commands
 - use `llvm` to compile the updated IR to object code
 
 ### For device side:
 
-- we use `clang` to compile the CUDA code into LLVM IR code (this bit needs cuda include files)
+- we use `clang` to compile the CUDA code into LLVM IR code
 - use [src/ir-to-opencl.cpp](src/ir-to-opencl.cpp) we read in the IR code, and write it out as OpenCL
 
 ## Example
