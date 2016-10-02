@@ -138,6 +138,7 @@ IR operations supported, at least partially:
 - unary float maths: `sqrt`, `tanh`, `log`, `exp`
 - branch, conditional branch, phi: `while`, `do....while`, `if`, if...else...`, `for` working
 - ternary (ie `a = c ? d : e;` syntax)
+- structs
 
 OpenCL/CUDA concepts supported, at least partially:
 - `global` assigned to incoming pointer arrays, and propagated to assigned variables appropriately
@@ -179,7 +180,6 @@ On the host-side, there is code to:
 - blas stuff (matrix mul, and convolutions):
    - lets use CLblast for blas stuff
    - use im2col for convolution for now
-- structs
 
 ### Other things we should probalby get working
 
