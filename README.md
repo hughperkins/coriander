@@ -15,7 +15,7 @@ Goal is to be able to build tensorflow for OpenCL.  It's not the only way forwar
 
 ### Notes on CUDA dependency
 - to generate the OpenCL code, you need CUDA include files available (only need include files, dont need libraries etc)
-- the OpenCL code just needs clang and opencl to compile/run
+- the OpenCL code, and the generated hostside code, just needs clang and opencl to compile/run
 
 ## How it works
 
