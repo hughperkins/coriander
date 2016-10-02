@@ -183,17 +183,6 @@ On the host-side, there is code to:
 - local/shared memory
 - vector types, ie float4 etc
 
-## Similar projects
-
-Compiling the CUDA code to IR, then compiling device-side IR to OpenCL, and patching the hostside to use OpenCL is not the only way forward.  Other approaches use SYCL to parse the sourcecode, and write the output as SPIR-V.  Advantage of using SYCL approach is that it's standard, downside is that Eigen/tensorflow code is not written to work with this standard currently.  In addition, there are a zillion CUDA projects out there, all of which might benefit from being able to compile directly, now, as OpenCL.  As far as SPIR-V, SPIR-V has two advantages: its a standard, and it avoids some unnecessary compilation steps (it's just a formally spec'd llvm IR essentially).  The downside of SPIR-V is that many OpenCL devices today are not yet SPIR-V enabled.  In addition SPIR-V is a very new standard, and any existing implementations might not yet be complete.  So, summarizing, for the `cuda-ir-to-opencl` approach:
-
-### Compared to using SYCL
-- no need to modify the original source-code files quite so much (hopefully)
-- portable to other projects, that have not been modified for SYCL (hopefully)
-
-### Compared to using SPIR-V
-- OpenCL is a mature standard, supported by a wide variety of GPUs, from a large number of manufacturers (AMD, Intel, NVIDIA, Qualcomm, ...)
-
 ## News
 
 - 1 October 2016:
