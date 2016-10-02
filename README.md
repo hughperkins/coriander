@@ -193,6 +193,10 @@ SYCL is an evolving and new standard.  tensorflow and Eigen are not yet parseabl
 
 SPIR-V is an evolving and new standard, and not widely supported yet by OpenCL-enabled devices
 
+- is this really a viable approach for Tensorflow?
+
+I dont know :-P
+
 ## News
 
 - 1 October 2016:
