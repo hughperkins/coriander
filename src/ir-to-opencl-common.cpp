@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <set>
 
 #include "llvm/IR/AssemblyAnnotationWriter.h"
 #include "llvm/IR/DerivedTypes.h"
@@ -26,6 +27,13 @@ std::string dumpType(Type *type);
 
 extern bool single_precision;
 // extern llvm::LLVMContext TheContext;
+
+static std::string declarations_to_write = "";
+
+std::string getDeclarationsToWrite() {
+    return declarations_to_write;
+}
+std::set<string> declaredStructs;
 
 GlobalVariable *addGlobalVariable(Module *M, string name, string value) {
     // string name = ".mystr1";
@@ -102,6 +110,24 @@ std::string dumpIntegerType(IntegerType *type) {
     }
 }
 
+void declareStruct(string name, StructType *type) {
+    // writes out the declaration to declarations_to_write
+    // its not hte only way of doing this, nor necessarily the best, but seems easier than
+    // eg querying global vraibales by hand
+    std::string declaration = "";
+    // declaredStructs.add()
+    declaration += name + " {\n";
+    int i = 0;
+    for(auto it=type->element_begin(); it != type->element_end(); it++) {
+        Type *elementType = *it;
+        declaration += "    " + dumpType(elementType) + " f" + toString(i) + ";\n";
+        i++;
+    }
+    declaration += "};\n";
+    declarations_to_write += declaration + "\n";
+    cout << "declarations_to_write " << declarations_to_write << endl;
+}
+
 std::string dumpStructType(StructType *type) {
     if(type->hasName()) {
         string name = type->getName();
@@ -110,6 +136,10 @@ std::string dumpStructType(StructType *type) {
         } else {
             if(name.find("struct.") != string::npos) {
                 name[6] = ' ';
+                if(declaredStructs.find(name) == declaredStructs.end()) {
+                    declaredStructs.insert(name);
+                    declareStruct(name, type);
+                }
                 return name;
             }else {
                 cout << "struct name: " << name << endl;

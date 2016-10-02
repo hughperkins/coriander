@@ -202,13 +202,6 @@ string dumpStore(StoreInst *instr) {
 }
 
 
-template<typename T>
-string toString(T value) {
-    ostringstream oss;
-    oss << value;
-    return oss.str();
-}
-
 string dumpGetElementPtr(GetElementPtrInst *instr) {
     string gencode = "";
     // cout << "v0.2" << endl;
@@ -781,6 +774,18 @@ std::string dumpModule(Module *M) {
         }
     }
 
+    // cout << "dumpvaluesymboltable" << endl;
+    // ValueSymbolTable *valueSymbolTable = &M->getValueSymbolTable();
+    // for(auto it=valueSymbolTable->begin(); it != valueSymbolTable->end(); it++) {
+    //     cout << "vst entry " << endl;
+    //     // Value *value = &*it;
+    //     StringMapEntry<Value *> *sme = &*it;
+    //     cout << string(sme->getKey()) << endl;
+    //     // sme->dump;
+    //     // value->dump();
+    // }
+    // return "";
+
     int i = 0;
     for(auto it = M->begin(); it != M->end(); it++) {
         nameByValue.clear();
@@ -796,6 +801,7 @@ std::string dumpModule(Module *M) {
             i++;
         }
     }
+    gencode = getDeclarationsToWrite() + "\n" + gencode;
     return gencode;
 }
 

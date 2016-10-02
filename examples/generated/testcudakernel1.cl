@@ -1,3 +1,9 @@
+struct MyStruct {
+    int f0;
+    float f1;
+};
+
+
 float _Z3barff(float a, float b) {
     label0:;
     float v0 = a + b;
