@@ -63,7 +63,6 @@ You'll need:
 
 ## How to build
 
-From this repo, run:
 ```
 git clone --recursive https://github.com/hughperkins/cuda-ir-to-opencl
 cd cuda-ir-to-opencl
