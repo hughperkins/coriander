@@ -42,9 +42,9 @@ The way these works is:
 
 Lets say we have the following cuda file [examples/testcudakernel1.cu](examples/testcudakernel1.cu)
 
-Compiled into LLVM IR, this looks like: [examples/generated/testcudakernel1.ll](examples/testcudakernel1.ll)
+Compiled into LLVM IR, this looks like: [examples/generated/testcudakernel1.ll](examples/generated/testcudakernel1.ll)
 
-Then, using [src/ir-to-opencl.cpp](src/ir-to-opencl.cpp), we can convert this into OpenCL, giving [examples/generated/testcudakernel1.cl](examples/testcudakernel1.cl)
+Then, using [src/ir-to-opencl.cpp](src/ir-to-opencl.cpp), we can convert this into OpenCL, giving [examples/generated/testcudakernel1.cl](examples/generated/testcudakernel1.cl)
 
 It's not very beautiful OpenCL, but it's OpenCL.  Standard, compilable, portable.
 
@@ -52,9 +52,9 @@ It's not very beautiful OpenCL, but it's OpenCL.  Standard, compilable, portable
 
 Using the same example file as above, ie [examples/testcudakernel1.cu](examples/testcudakernel1.cu)
 
-The host-side LLVM IR, output from `clang`, is [examples/generated/testcudakernel1-host.ll](examples/testcudakernel1-host.ll)
+The host-side LLVM IR, output from `clang`, is [examples/generated/testcudakernel1-host.ll](examples/generated/testcudakernel1-host.ll)
 
-After running [src/patch-hostside.cpp](src/patch-hostside.cpp) against this IR, we get: [examples/generated/testcudakernel1-host2.ll](examples/testcudakernel1-host2.ll)
+After running [src/patch-hostside.cpp](src/patch-hostside.cpp) against this IR, we get: [examples/generated/testcudakernel1-host2.ll](examples/generated/testcudakernel1-host2.ll)
 
 This can then be compiled to object code, doesnt need cuda any more, just needs clang, and OpenCL.
 
