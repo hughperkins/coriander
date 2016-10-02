@@ -6,7 +6,7 @@ First step is to compile one single tensorflow cuda file, eg cwise_op_gpu_add.cu
 
 What I have so far:
 
-[tensorflow/build_cwise_add.sh](https://github.com/cuda-ir-to-opencl/tree/master/tensorflow/build_cwise_add.sh)
+[tensorflow/build_cwise_add.sh](https://github.com/hughperkins/cuda-ir-to-opencl/tree/master/tensorflow/build_cwise_add.sh)
 
 This gives:
 ```
