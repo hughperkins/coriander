@@ -14,8 +14,8 @@ Goal is to be able to build tensorflow for OpenCL.  It's not the only way forwar
 - OpenCL is a mature standard, supported by a wide variety of GPUs, from a large number of manufacturers (AMD, Intel, NVIDIA, Qualcomm, ...)
 
 ### Notes on CUDA dependency
-- you do need CUDA toolkit installed, to get the initial IR code out.  Once you have the IR code, you can carry out the remaining steps, including execution of course, on any OpenCL platform,
-providing clang 3.8.  After compilation, execution should just need an OpenCL platform, not even a clang dependency (I think? Might need some runtime libraries possibly?).
+- to generate the OpenCL code, you need CUDA include files available
+- the OpenCL code just needs clang and opencl to compile/run
 
 ## How it works
 
