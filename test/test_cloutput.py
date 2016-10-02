@@ -58,7 +58,7 @@ def test_cloutput():
     float_data_gpu = cl.Buffer(ctx, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf=float_data)
     int_data_gpu = cl.Buffer(ctx, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf=int_data)
 
-    with open('examples/testcudakernel1.cl', 'r') as f:
+    with open('examples/generated/testcudakernel1.cl', 'r') as f:
         sourcecode = f.read()
 
     prg = cl.Program(ctx, sourcecode).build()
