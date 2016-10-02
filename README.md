@@ -27,14 +27,14 @@ The way these works is:
 ### For host-side code
 
 - use clang to convert the incoming `.cu` file into IR (this bit needs cuda include files)
-- use [ir-to-opencl/patch-hostside.cpp](ir-to-opencl/patch-hostside.cpp) to replace the cuda kernel launch commands with opencl kernel launch commands, in the IR
+- use [src/patch-hostside.cpp](src/patch-hostside.cpp) to replace the cuda kernel launch commands with opencl kernel launch commands, in the IR
   (dependencies: clang, cuda-ir-to-opencl)
 - use clang to compile the updated IR to object code (dependencies: clang)
 
 ### For device side:
 
 - we use `clang` to compile the CUDA code into LLVM IR code (this bit needs cuda include files)
-- we read in the IR code, and write it out as OpenCL (dependencies: clang, cuda-ir-to-opencl)
+- use [src/ir-to-opencl.cpp](src/ir-to-opencl.cpp) we read in the IR code, and write it out as OpenCL (dependencies: clang, cuda-ir-to-opencl)
 
 ## Example
 
@@ -44,7 +44,7 @@ Lets say we have the following cuda file [examples/testcudakernel1.cu](examples/
 
 Compiled into LLVM IR, this looks like: [examples/testcudakernel1.ll](examples/testcudakernel1.ll)
 
-Then, using `ir-to-opencl`, we can convert this into OpenCL, giving [examples/testcudakernel1.cl](examples/testcudakernel1.cl)
+Then, using [src/ir-to-opencl.cpp](src/ir-to-opencl.cpp), we can convert this into OpenCL, giving [examples/testcudakernel1.cl](examples/testcudakernel1.cl)
 
 It's not very beautiful OpenCL, but it's OpenCL.  Standard, compilable, portable.
 
@@ -54,7 +54,7 @@ Using the same example file as above, ie [examples/testcudakernel1.cu](examples/
 
 The host-side LLVM IR, output from `clang`, is [examples/testcudakernel1-host.ll](examples/testcudakernel1-host.ll)
 
-After running [ir-to-opencl/patch-hostside.cpp](ir-to-opencl/patch-hostside.cpp) against this IR, we get: [examples/testcudakernel1-host2.ll](examples/testcudakernel1-host2.ll)
+After running [src/patch-hostside.cpp](src/patch-hostside.cpp) against this IR, we get: [examples/testcudakernel1-host2.ll](examples/testcudakernel1-host2.ll)
 
 This can then be compiled to object code, doesnt need cuda any more, just needs clang, and OpenCL.
 
@@ -90,7 +90,8 @@ You will need an OpenCL-enabled GPU in order to run this part.
 
 Run:
 ```
-./run-test-call-cl.sh
+./build.sh
+./run-end-to-end-demo.sh
 ```
 This will:
 - compile [examples/testcudakernel1.cu](examples/testcudakernel1.cu) host-side code into IR
@@ -103,13 +104,7 @@ From this repo, run:
 ```
 ./build.sh
 ```
-=> `ir-to-opencl` should be built into `build` subdirectory
-
-To build `patch-hostside`, run the hostside kernel launch demo-in-progress:
-```
-./run-test-call-cl.sh
-```
-=> `patch-hostside` should appear in the `build` subdirectory
+=> `ir-to-opencl`, and `patch-hostside` should be built into `build` subdirectory
 
 ## Test
 
