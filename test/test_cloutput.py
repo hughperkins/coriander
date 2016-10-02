@@ -15,6 +15,7 @@ limitations under the License.
 
 import numpy as np
 import pyopencl as cl
+import pyopencl.tools
 import pytest
 import os
 
@@ -29,12 +30,18 @@ def mangle(name, param_types):
     for param in param_types:
         if param.replace(' ', '') == 'float*':
             mangled += 'Pf'
-        if param.replace(' ', '') == 'int*':
+        elif param.replace(' ', '') == 'int*':
             mangled += 'Pi'
-        if param.replace(' ', '') == 'int':
+        elif param.replace(' ', '') == 'int':
             mangled += 'i'
-        if param.replace(' ', '') == 'float':
+        elif param.replace(' ', '') == 'float':
             mangled += 'f'
+        elif param.endswith('*'):
+            # assume pointer to struct
+            param = param.replace(' ', '').replace('*', '')
+            mangled += 'P%s%s' % (len(param), param)
+        else:
+            raise Exception('not implemented %s' % param)
     return mangled
 
 
@@ -177,7 +184,23 @@ def test_ternary(testcudakernel1, q, float_data, float_data_gpu):
     assert float_data[0] == float_data_orig[3]
 
 
-def test_structs(testcudakernel1, ctx, q, float_data, float_data_gpu):
+def test_structs(testcudakernel1, ctx, q, float_data, float_data_gpu, int_data, int_data_gpu):
     my_struct = np.dtype([("x", np.int32), ("y", np.float32)])
-    my_struct, my_struct_c_decl = cl.tools.match_dtype_to_c_struct(
+    my_struct, my_struct_c_decl = pyopencl.tools.match_dtype_to_c_struct(
         ctx.devices[0], "MyStruct", my_struct)
+    my_struct = cl.tools.get_or_register_dtype("MyStruct", my_struct)
+    structs = np.empty(2, my_struct)
+    structs[0]['x'] = 123
+    structs[0]['y'] = 567
+    structs[1]['x'] = 33
+    structs[1]['y'] = 44
+    testcudakernel1.__getattr__(mangle('testStructs', ['MyStruct *', 'float *', 'int *']))(
+        q, (32,), (32,),
+        structs.data, float_data_gpu, int_data_gpu)
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    cl.enqueue_copy(q, int_data, int_data_gpu)
+    q.finish()
+    print(float_data[0])
+    print(float_data[1])
+    print(int_data[0])
+    print(int_data[1])
