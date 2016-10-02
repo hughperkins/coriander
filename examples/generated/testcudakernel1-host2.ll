@@ -1,4 +1,4 @@
-; ModuleID = 'examples/testcudakernel1-host.ll'
+; ModuleID = 'examples/generated/testcudakernel1-host.ll'
 target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
@@ -68,7 +68,7 @@ define void @_Z3fooPf(float* %data) #2 {
 
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [9 x i8], [9 x i8]* @s._Z3fooPf, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z21setKernelArgFloatStarPf(float* %data)
   call void @_Z8kernelGov()
   br label %6
@@ -91,7 +91,7 @@ define void @_Z7use_tidPf(float* %data) #2 {
 
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [13 x i8], [13 x i8]* @s._Z7use_tidPf, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z21setKernelArgFloatStarPf(float* %data)
   call void @_Z8kernelGov()
   br label %6
@@ -110,7 +110,7 @@ define void @_Z8use_tid2Pi(i32* %data) #2 {
 
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [14 x i8], [14 x i8]* @s._Z8use_tid2Pi, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z8kernelGov()
   br label %6
 
@@ -128,7 +128,7 @@ define void @_Z10copy_floatPf(float* %a) #2 {
 
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [17 x i8], [17 x i8]* @s._Z10copy_floatPf, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z21setKernelArgFloatStarPf(float* %a)
   call void @_Z8kernelGov()
   br label %6
@@ -147,7 +147,7 @@ define void @_Z11use_blockidPf(float* %data) #2 {
 
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [18 x i8], [18 x i8]* @s._Z11use_blockidPf, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z21setKernelArgFloatStarPf(float* %data)
   call void @_Z8kernelGov()
   br label %6
@@ -166,7 +166,7 @@ define void @_Z11use_griddimPf(float* %data) #2 {
 
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [18 x i8], [18 x i8]* @s._Z11use_griddimPf, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z21setKernelArgFloatStarPf(float* %data)
   call void @_Z8kernelGov()
   br label %6
@@ -185,7 +185,7 @@ define void @_Z12use_blockdimPf(float* %data) #2 {
 
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [19 x i8], [19 x i8]* @s._Z12use_blockdimPf, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z21setKernelArgFloatStarPf(float* %data)
   call void @_Z8kernelGov()
   br label %6
@@ -211,7 +211,7 @@ define void @_Z13use_template1PfPi(float* %data, i32* %intdata) #2 {
 
 ; <label>:8                                       ; preds = %5
   %9 = getelementptr inbounds [22 x i8], [22 x i8]* @s._Z13use_template1PfPi, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z21setKernelArgFloatStarPf(float* %data)
   call void @_Z8kernelGov()
   br label %10
@@ -276,7 +276,7 @@ define void @_Z13someops_floatPf(float* %data) #2 {
 
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [20 x i8], [20 x i8]* @s._Z13someops_floatPf, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z21setKernelArgFloatStarPf(float* %data)
   call void @_Z8kernelGov()
   br label %6
@@ -295,7 +295,7 @@ define void @_Z11someops_intPi(i32* %data) #2 {
 
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [18 x i8], [18 x i8]* @s._Z11someops_intPi, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z8kernelGov()
   br label %6
 
@@ -313,7 +313,7 @@ define void @_Z14testbooleanopsPi(i32* %data) #2 {
 
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [21 x i8], [21 x i8]* @s._Z14testbooleanopsPi, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z8kernelGov()
   br label %6
 
@@ -331,7 +331,7 @@ define void @_Z26testcomparisons_int_signedPi(i32* %data) #2 {
 
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [33 x i8], [33 x i8]* @s._Z26testcomparisons_int_signedPi, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z8kernelGov()
   br label %6
 
@@ -349,7 +349,7 @@ define void @_Z21testcomparisons_floatPf(float* %data) #2 {
 
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [28 x i8], [28 x i8]* @s._Z21testcomparisons_floatPf, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z21setKernelArgFloatStarPf(float* %data)
   call void @_Z8kernelGov()
   br label %6
@@ -368,7 +368,7 @@ define void @_Z15testsyncthreadsPf(float* %data) #2 {
 
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [22 x i8], [22 x i8]* @s._Z15testsyncthreadsPf, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z21setKernelArgFloatStarPf(float* %data)
   call void @_Z8kernelGov()
   br label %6
@@ -394,7 +394,7 @@ define void @_Z11testDoWhilePii(i32* %data, i32 %N) #2 {
 
 ; <label>:8                                       ; preds = %5
   %9 = getelementptr inbounds [19 x i8], [19 x i8]* @s._Z11testDoWhilePii, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z15setKernelArgInti(i32 %N)
   call void @_Z8kernelGov()
   br label %10
@@ -420,7 +420,7 @@ define void @_Z9testWhilePii(i32* %data, i32 %N) #2 {
 
 ; <label>:8                                       ; preds = %5
   %9 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z9testWhilePii, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z15setKernelArgInti(i32 %N)
   call void @_Z8kernelGov()
   br label %10
@@ -446,7 +446,7 @@ define void @_Z6testIfPii(i32* %data, i32 %N) #2 {
 
 ; <label>:8                                       ; preds = %5
   %9 = getelementptr inbounds [13 x i8], [13 x i8]* @s._Z6testIfPii, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z15setKernelArgInti(i32 %N)
   call void @_Z8kernelGov()
   br label %10
@@ -472,7 +472,7 @@ define void @_Z10testIfElsePii(i32* %data, i32 %N) #2 {
 
 ; <label>:8                                       ; preds = %5
   %9 = getelementptr inbounds [18 x i8], [18 x i8]* @s._Z10testIfElsePii, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z15setKernelArgInti(i32 %N)
   call void @_Z8kernelGov()
   br label %10
@@ -491,7 +491,7 @@ define void @_Z11testTernaryPf(float* %data) #2 {
 
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [18 x i8], [18 x i8]* @s._Z11testTernaryPf, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z21setKernelArgFloatStarPf(float* %data)
   call void @_Z8kernelGov()
   br label %6
@@ -517,7 +517,7 @@ define void @_Z7testForPfi(float* %data, i32 %N) #2 {
 
 ; <label>:8                                       ; preds = %5
   %9 = getelementptr inbounds [14 x i8], [14 x i8]* @s._Z7testForPfi, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z21setKernelArgFloatStarPf(float* %data)
   call void @_Z15setKernelArgInti(i32 %N)
   call void @_Z8kernelGov()
@@ -703,7 +703,7 @@ define void @_Z8setValuePfif(float* %data, i32 %idx, float %value) #2 {
 
 ; <label>:12                                      ; preds = %9
   %13 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z8setValuePfif, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %13, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKciiiiii(i8* %13, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z21setKernelArgFloatStarPf(float* %data)
   call void @_Z15setKernelArgInti(i32 %idx)
   call void @_Z17setKernelArgFloatf(float %value)
@@ -745,7 +745,7 @@ define void @_Z14launchSetValuePfif(float* %data, i32 %idx, float %value) #2 {
 
 ; <label>:14                                      ; preds = %12
   %15 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z8setValuePfif, i32 0, i32 0
-  call void @_Z13pretendLaunchPKciiiiii(i8* %15, i32 32, i32 1, i32 1, i32 32, i32 1, i32 1)
+  call void @_Z15configureKernelPKciiiiii(i8* %15, i32 32, i32 1, i32 1, i32 32, i32 1, i32 1)
   call void @_Z21setKernelArgFloatStarPf(float* %data)
   call void @_Z15setKernelArgInti(i32 %idx)
   call void @_Z17setKernelArgFloatf(float %value)
@@ -804,7 +804,7 @@ declare void @llvm.lifetime.start(i64, i8* nocapture) #6
 ; Function Attrs: argmemonly nounwind
 declare void @llvm.lifetime.end(i64, i8* nocapture) #6
 
-declare void @_Z13pretendLaunchPKciiiiii(i8*, i32, i32, i32, i32, i32, i32)
+declare void @_Z15configureKernelPKciiiiii(i8*, i32, i32, i32, i32, i32, i32)
 
 declare void @_Z21setKernelArgFloatStarPf(float*)
 

@@ -216,8 +216,8 @@ void patchFunction(Function *F) {
                     cout << *launchCallInfo << endl;
                     Instruction *stringInstr = addStringInstr(F->getParent(), "s." + launchCallInfo->kernelName, launchCallInfo->kernelName);
                     stringInstr->insertBefore(inst);
-                    Function *pretendLaunch = cast<Function>(F->getParent()->getOrInsertFunction(
-                        "_Z13pretendLaunchPKciiiiii",
+                    Function *configureKernel = cast<Function>(F->getParent()->getOrInsertFunction(
+                        "_Z15configureKernelPKciiiiii",
                         Type::getVoidTy(TheContext),
                         PointerType::get(IntegerType::get(TheContext, 8), 0),
                         IntegerType::get(TheContext, 32),
@@ -235,7 +235,7 @@ void patchFunction(Function *F) {
                     args[4] = createInt32Constant(&TheContext, launchCallInfo->block[0]);
                     args[5] = createInt32Constant(&TheContext, launchCallInfo->block[1]);
                     args[6] = createInt32Constant(&TheContext, launchCallInfo->block[2]);
-                    CallInst *callLaunch = CallInst::Create(pretendLaunch, ArrayRef<Value *>(args));
+                    CallInst *callLaunch = CallInst::Create(configureKernel, ArrayRef<Value *>(args));
                     callLaunch->insertAfter(stringInstr);
 
                     Instruction *lastInst = callLaunch;

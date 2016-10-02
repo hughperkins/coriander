@@ -17,12 +17,12 @@ size_t block[3];
 unique_ptr<CLKernel> kernel;
 unique_ptr<EasyCL> cl;
 
-void pretendLaunch(
+void configureKernel(
         const char *kernelName,
         int grid_x, int grid_y, int grid_z,
         int block_x, int block_y, int block_z) {
     // just a mock for now... can we call this from our modified ir?
-    cout << "pretendLaunch(" << kernelName << ")" << endl;
+    cout << "configureKernel(" << kernelName << ")" << endl;
     cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl;
     cout << "block(" << block_x << ", " << block_y << ", " << block_z << ")" << endl;
     grid[0] = grid_x;
@@ -33,7 +33,7 @@ void pretendLaunch(
     block[2] = block_z;
     // lets just read the kernel from file for now, with hardcoded filename
     // kernel.reset(buildKernelFromString("", kernelName, "", "internal"));
-    kernel.reset(cl->buildKernel("examples/testcudakernel1.cl", kernelName, ""));
+    kernel.reset(cl->buildKernel("examples/generated/testcudakernel1.cl", kernelName, ""));
 }
 
 void setKernelArgFloatStar(float *clmem_as_floatstar) {
@@ -59,9 +59,9 @@ void kernelGo() {
     for(int i = 0; i < 3; i++) {
         global[i] = grid[i] * block[i];
     }
-    cout << "launching kernel?" << endl;
+    cout << "launching kernel..." << endl;
     kernel->run(3, global, block);
-    cout << "if we got here, kernel launch didnt cause crash" << endl;
+    cout << ".. kernel finished" << endl;
 }
 
 int main(int argc, char *argv[]) {
