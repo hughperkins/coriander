@@ -194,9 +194,12 @@ def test_structs(testcudakernel1, ctx, q, float_data, float_data_gpu, int_data, 
     structs[0]['y'] = 567
     structs[1]['x'] = 33
     structs[1]['y'] = 44
+    structs_gpu = cl.array.to_device(q, structs)
+    q.finish()
     testcudakernel1.__getattr__(mangle('testStructs', ['MyStruct *', 'float *', 'int *']))(
         q, (32,), (32,),
-        structs.data, float_data_gpu, int_data_gpu)
+        structs_gpu.data, float_data_gpu, int_data_gpu)
+    q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     cl.enqueue_copy(q, int_data, int_data_gpu)
     q.finish()
