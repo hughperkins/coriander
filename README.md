@@ -24,7 +24,7 @@ In more detail:
 ### For device side:
 
 - we use `clang` to compile the CUDA code into LLVM IR code
-- use [src/ir-to-opencl.cpp](src/ir-to-opencl.cpp) we read in the IR code, and write it out as OpenCL
+- using [src/ir-to-opencl.cpp](src/ir-to-opencl.cpp) we read in the IR code, and write it out as OpenCL
 
 ## Example
 
