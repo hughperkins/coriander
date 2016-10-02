@@ -15,6 +15,12 @@ limitations under the License.
 
 import numpy as np
 import pyopencl as cl
+import pytest
+
+
+gpu_idx = 0
+
+mf = cl.mem_flags
 
 
 def mangle(name, param_types):
@@ -31,9 +37,8 @@ def mangle(name, param_types):
     return mangled
 
 
-def test_cloutput():
-    gpu_idx = 0
-
+@pytest.fixture(scope='module')
+def context():
     platforms = cl.get_platforms()
     i = 0
     for platform in platforms:
@@ -45,71 +50,124 @@ def test_cloutput():
 
     print('context', ctx)
     # ctx = cl.create_some_context()
-    q = cl.CommandQueue(ctx)
+    return ctx
 
-    mf = cl.mem_flags
 
-    np.random.seed(123)
-    int_data = np.random.randint(1024, size=(1024,), dtype=np.int32)
-    int_data_res = np.random.randint(1024, size=(1024,), dtype=np.int32)
-    float_data = np.random.randn(1024).astype(np.float32)
-    float_data_res = np.random.randn(1024).astype(np.float32)
+@pytest.fixture(scope='module')
+def queue(context):
+    q = cl.CommandQueue(context)
+    return q
 
-    float_data_gpu = cl.Buffer(ctx, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf=float_data)
-    int_data_gpu = cl.Buffer(ctx, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf=int_data)
 
+@pytest.fixture(scope='module')
+def q(queue):
+    return queue
+
+
+@pytest.fixture(scope='module')
+def ctx(context):
+    return context
+
+
+@pytest.fixture(scope='module')
+def testcudakernel1(context):
     with open('examples/generated/testcudakernel1.cl', 'r') as f:
         sourcecode = f.read()
 
-    prg = cl.Program(ctx, sourcecode).build()
+    prog = cl.Program(context, sourcecode).build()
+    return prog
 
-    cl.enqueue_copy(q, float_data_gpu, float_data)
-    prg.__getattr__(mangle('foo', ['float *']))(q, (32,), (32,), float_data_gpu)
-    cl.enqueue_copy(q, float_data_res, float_data_gpu)
-    q.finish()
-    assert float_data_res[0] == 123
 
-    cl.enqueue_copy(q, float_data_gpu, float_data)
-    prg.__getattr__(mangle('copy_float', ['float *']))(q, (32,), (32,), float_data_gpu)
-    cl.enqueue_copy(q, float_data_res, float_data_gpu)
-    q.finish()
-    assert float_data_res[0] == float_data[1]
+@pytest.fixture
+def int_data():
+    np.random.seed(123)
+    int_data = np.random.randint(1024, size=(1024,), dtype=np.int32)
+    return int_data
 
-    cl.enqueue_copy(q, int_data_gpu, int_data)
-    prg.__getattr__(mangle('use_tid2', ['int *']))(q, (32,), (32,), int_data_gpu)
-    cl.enqueue_copy(q, int_data_res, int_data_gpu)
-    q.finish()
-    assert int_data_res[0] == int_data[0] + 0
-    assert int_data_res[10] == int_data[10] + 10
-    assert int_data_res[31] == int_data[31] + 31
 
-    cl.enqueue_copy(q, float_data_gpu, float_data)
-    cl.enqueue_copy(q, int_data_gpu, int_data)
-    prg.__getattr__(mangle('use_template1', ['float *', 'int *']))(q, (32,), (32,), float_data_gpu, int_data_gpu)
-    cl.enqueue_copy(q, float_data_res, float_data_gpu)
-    cl.enqueue_copy(q, int_data_res, int_data_gpu)
-    q.finish()
-    assert float_data_res[0] == float_data[1] + float_data[2]
-    assert int_data_res[0] == int_data[1] + int_data[2]
+@pytest.fixture
+def float_data():
+    np.random.seed(124)
+    float_data = np.random.randn(1024).astype(np.float32)
+    return float_data
 
-    cl.enqueue_copy(q, float_data_gpu, float_data)
-    prg.__getattr__(mangle('testFor', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int32(32))
-    cl.enqueue_copy(q, float_data_res, float_data_gpu)
+
+@pytest.fixture
+def int_data_gpu(int_data, ctx):
+    int_data_gpu = cl.Buffer(ctx, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf=int_data)
+    return int_data_gpu
+
+
+@pytest.fixture
+def float_data_gpu(float_data, ctx):
+    float_data_gpu = cl.Buffer(ctx, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf=float_data)
+    return float_data_gpu
+
+
+def test_program_compiles(testcudakernel1):
+    pass
+
+
+def test_foo(testcudakernel1, q, float_data, float_data_gpu):
+    testcudakernel1.__getattr__(mangle('foo', ['float *']))(q, (32,), (32,), float_data_gpu)
+    cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
-    assert abs(float_data_res[0] - sum(float_data[0:32])) < 1e-4
+    assert float_data[0] == 123
+
+
+def test_copy_float(testcudakernel1, q, float_data, float_data_gpu):
+    testcudakernel1.__getattr__(mangle('copy_float', ['float *']))(q, (32,), (32,), float_data_gpu)
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    assert float_data[0] == float_data[1]
+
+
+def test_use_tid2(testcudakernel1, q, int_data, int_data_gpu):
+    int_data_orig = np.copy(int_data)
+    testcudakernel1.__getattr__(mangle('use_tid2', ['int *']))(q, (32,), (32,), int_data_gpu)
+    cl.enqueue_copy(q, int_data, int_data_gpu)
+    q.finish()
+    assert int_data[0] == int_data_orig[0] + 0
+    assert int_data[10] == int_data_orig[10] + 10
+    assert int_data[31] == int_data_orig[31] + 31
+
+
+def test_use_template1(testcudakernel1, q, int_data, int_data_gpu, float_data, float_data_gpu):
+    float_data_orig = np.copy(float_data)
+    int_data_orig = np.copy(int_data)
+
+    testcudakernel1.__getattr__(mangle('use_template1', ['float *', 'int *']))(q, (32,), (32,), float_data_gpu, int_data_gpu)
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    cl.enqueue_copy(q, int_data, int_data_gpu)
+    q.finish()
+    assert float_data[0] == float_data_orig[1] + float_data_orig[2]
+    assert int_data[0] == int_data_orig[1] + int_data_orig[2]
+
+
+def test_testFor(testcudakernel1, q, float_data, float_data_gpu):
+    float_data_orig = np.copy(float_data)
+
+    testcudakernel1.__getattr__(mangle('testFor', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int32(32))
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    assert abs(float_data[0] - sum(float_data_orig[0:32])) < 1e-4
+
+
+def test_ternary(testcudakernel1, q, float_data, float_data_gpu):
+    float_data_orig = np.copy(float_data)
 
     def set_float_value(gpu_buffer, idx, value):
-        prg.__getattr__(mangle('setValue', ['float *', 'int', 'float']))(
+        testcudakernel1.__getattr__(mangle('setValue', ['float *', 'int', 'float']))(
             q, (32,), (32,), float_data_gpu, np.int32(idx), np.float32(value))
 
-    cl.enqueue_copy(q, float_data_gpu, float_data)
     set_float_value(float_data_gpu, 1, 10)
-    prg.__getattr__(mangle('testTernary', ['float *']))(q, (32,), (32,), float_data_gpu)
-    cl.enqueue_copy(q, float_data_res, float_data_gpu)
+    testcudakernel1.__getattr__(mangle('testTernary', ['float *']))(q, (32,), (32,), float_data_gpu)
+    cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
-    assert float_data_res[0] == float_data[2]
+    assert float_data[0] == float_data_orig[2]
+
     set_float_value(float_data_gpu, 1, -2)
-    prg.__getattr__(mangle('testTernary', ['float *']))(q, (32,), (32,), float_data_gpu)
-    cl.enqueue_copy(q, float_data_res, float_data_gpu)
+    testcudakernel1.__getattr__(mangle('testTernary', ['float *']))(q, (32,), (32,), float_data_gpu)
+    cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
-    assert float_data_res[0] == float_data[3]
+    assert float_data[0] == float_data_orig[3]
