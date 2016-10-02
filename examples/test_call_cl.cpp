@@ -78,6 +78,11 @@ int main(int argc, char *argv[]) {
                                       N * sizeof(float), float_data, 0, NULL, NULL);
 
     launchSetValue((float *)&float_data_gpu, 2, 123.0f);
+    err = clEnqueueReadBuffer(*queue, float_data_gpu, CL_TRUE, 0,
+                                      N * sizeof(float), float_data, 0, NULL, NULL);
+    cl->finish();
+
+    cout << "value of float_data[2] after calling kernel: " << float_data[2] << endl;
 
     return 0;
 }
