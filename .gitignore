@@ -71,3 +71,5 @@ llvm/langimpl01/run
 llvm/langimpl01/ir-to-opencl
 
 .fuse*
+
+test/junit-pytest-report.xml

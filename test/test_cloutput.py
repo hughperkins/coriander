@@ -16,9 +16,10 @@ limitations under the License.
 import numpy as np
 import pyopencl as cl
 import pytest
+import os
 
 
-gpu_idx = 0
+gpu_idx = int(os.environ.get('TARGET_GPU', 0))
 
 mf = cl.mem_flags
 
@@ -41,6 +42,7 @@ def mangle(name, param_types):
 def context():
     platforms = cl.get_platforms()
     i = 0
+    ctx = None
     for platform in platforms:
         gpu_devices = platform.get_devices(device_type=cl.device_type.GPU)
         if gpu_idx < i + len(gpu_devices):
@@ -48,6 +50,8 @@ def context():
             break
         i += len(gpu_devices)
 
+    if ctx is None:
+        raise Exception('unable to find gpu at index %s' % gpu_idx)
     print('context', ctx)
     # ctx = cl.create_some_context()
     return ctx
