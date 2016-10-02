@@ -1,6 +1,6 @@
 # cuda-ir-to-opencl
 
-This lets you write out CUDA IR as classic OpenCL 1.2
+This lets you compile CUDA code for use on non-CUDA OpenCL devices.
 
 ## Why?
 
