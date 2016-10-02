@@ -216,16 +216,15 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
 
     int numOperands = instr->getNumOperands();
 
-    copyAddressSpace(instr, instr->getOperand(0));
-    gencode += dumpType(instr->getOperand(0)->getType()) + " " + dumpOperand(instr) + " = ";
-    gencode += "&" + dumpOperand(instr->getOperand(0));
     Type *currentType = instr->getOperand(0)->getType();
+    string rhs = "";
+    rhs += "&" + dumpOperand(instr->getOperand(0));
     for(int d=0; d < numOperands - 1; d++) {
         cout << "currentType " << dumpType(currentType) << endl;
         cout << "d " << d << endl;
         Type *newType = 0;
         if(currentType->isPointerTy()) {
-            gencode += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
+            rhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
             newType = currentType->getPointerElementType();
         } else if(currentType->isStructTy()) {
             cout << "its a struct " << endl;
@@ -233,7 +232,7 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
             int idx = getIntConstant(instr->getOperand(d + 1));
             cout << "idx " << idx;
             Type *elementType = structtype->getElementType(idx);
-            gencode += string(".f") + toString(idx);
+            rhs += string(".f") + toString(idx);
             newType = elementType;
             // for(auto it=structtype->element_begin(); it != structtype->element_end(); it++) {
             //     Type *elementType = *it;
@@ -247,6 +246,11 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
         }
         currentType = newType;
     }
+    copyAddressSpace(instr, instr->getOperand(0));
+    // currentType->
+    int addressspace = cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace();
+    Type *lhsType = PointerType::get(currentType, addressspace);
+    gencode += dumpType(lhsType) + " " + dumpOperand(instr) + " = " + rhs;
     gencode += ";\n";
 
     // string typestr = dumpType(instr->getType());
