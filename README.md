@@ -184,6 +184,10 @@ On the host-side, there is code to:
 
 ## Roadmap
 
+### Tensorflow
+
+- Get [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_add.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_add.cc) compiling/running on OpenCL
+
 ### Things that would be cool to get working
 
 - be able to handle pointer arithmetic for host-side `float *`s representing opencl gpu memory :-P
@@ -194,21 +198,12 @@ On the host-side, there is code to:
 - basic per-element add, subtract, sqrt, etc; so we can create cost functions (done)
 - blas stuff (matrix mul, and convolutions):
    - lets use CLblast for blas stuff
-   - use im2col for convolution for now (maybe libdnn?)
+   - use im2col for convolution for now
 
 ### Other things we should probalby get working
 
 - local/shared memory
 - vector types, ie float4 etc
-
-### open questions
-
-- how to "package"/market this repo, in relation to tensorflow? ie should blas stuff be part of this, or should we have
-  a separate tensorflow-cl project, that uses clblast, ir-to-opencl etc as tools/libraries to achieve its aims?
-    - tentatively, I favor the latter approach, better reuse, better factorized
-- should I use bazel or cmake (or something else?) to package this?
-    - if this repo is going to be orthogonal to tensorflow-cl repo, then lets use CMake, which is fairly standard, on
-      non-Google projects
 
 ## News
 
