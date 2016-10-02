@@ -11,7 +11,9 @@ Goal is to be able to build tensorflow for OpenCL.
 Host-side, we need convert the cuda kernel launch code into opencl kernel launch code.
 Device-side, we need to convert the CUDA kernels into OpenCL kernels.
 
-The way these works is:
+<img src="doc/img/cudairtoopenclarchitecture.png?raw=true" width="600" height="400" />
+
+In more detail:
 
 ### For host-side code
 
