@@ -19,9 +19,8 @@ Goal is to be able to build tensorflow for OpenCL.  It's not the only way forwar
 
 ## How it works
 
-We need to handle host-side code, which means, convert the cuda kernel launch code into opencl kernel launch code.  This is
-under feasibility study.  And we need to convert the device-side code from cuda IR into OpenCL, to feed to any OpenCL
-device driver.
+Host-side, we need convert the cuda kernel launch code into opencl kernel launch code.
+Device-side, we need to convert the CUDA kernels into OpenCL kernels.
 
 The way these works is:
 
