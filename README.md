@@ -64,7 +64,7 @@ You'll need:
 - Ubuntu 16.04
 - llvm 3.8
 - clang 3.8
-- CUDA toolkit 7.5 installed into `/usr/local/cuda-7.5`
+- CUDA toolkit 7.5 installed into `/usr/local/cuda-7.5`, (or just the CUDA toolkit include files installed into `/usr/local/cuda-7.5/include` is enough actually)
 - Have done `sudo apt-get install libc6-dev-i386`
 
 Clone this repo:
