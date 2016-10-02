@@ -74,7 +74,6 @@ cd cuda-ir-to-opencl
 
 ### Device-side OpenCL Generation
 
-From this repo, run:
 ```
 ./run-ir-to-opencl-demo.sh
 ```
@@ -84,7 +83,6 @@ From this repo, run:
 
 You will need an OpenCL-enabled GPU in order to run this part.
 
-Run:
 ```
 ./run-end-to-end-demo.sh
 ```
