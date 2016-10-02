@@ -207,7 +207,7 @@ __host__ void launchSetValue(float *data, int idx, float value) {
     myprintvoidstar(data);
     myprintint(idx);
     myprintfloat(value);
-    setValue<<<dim3(17, 5, 11), dim3(34, 10, 22)>>>(data, idx, value);
-    setValue<<<dim3(17, 5, 11), dim3(34, 10, 22)>>>(data, idx, value);
+    setValue<<<dim3(32, 1, 1), dim3(32, 1, 1)>>>(data, idx, value);
+    setValue<<<dim3(32, 1, 1), dim3(32, 1, 1)>>>(data, idx, value);
     // setValue<<<5, 10>>>(data, idx, value);
 }

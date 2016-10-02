@@ -277,6 +277,14 @@ void patchFunction(Function *F) {
                             }
                         }
                     }
+                    // trigger the kernel...
+                    Function *kernelGo = cast<Function>(F->getParent()->getOrInsertFunction(
+                        "_Z8kernelGov",
+                        Type::getVoidTy(TheContext),
+                        NULL));
+                    CallInst *kernelGoInst = CallInst::Create(kernelGo);
+                    kernelGoInst->insertAfter(lastInst);
+                    lastInst = kernelGoInst;
 
                     launchCallInfo.reset(new LaunchCallInfo);
                 } else if(calledFunctionName == "cudaSetupArgument") {

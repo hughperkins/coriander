@@ -59,7 +59,9 @@ void kernelGo() {
     for(int i = 0; i < 3; i++) {
         global[i] = grid[i] * block[i];
     }
+    cout << "launching kernel?" << endl;
     kernel->run(3, global, block);
+    cout << "if we got here, kernel launch didnt cause crash" << endl;
 }
 
 int main(int argc, char *argv[]) {
