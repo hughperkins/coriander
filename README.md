@@ -104,6 +104,8 @@ To run tests:
 test/test.sh
 ```
 
+Tests are at [test/test_cloutput.py](test/test_cloutput.py).  They test the generated OpenCL kernels at [examples/generated/testcudakernel1.cl](examples/generated/testcudakernel1.cl), which were generated from [examples/testcudakernel.cu](examples/testcudakernel.cu)
+
 More info: [test/README.md](test/README.md)
 
 ### Host-side
