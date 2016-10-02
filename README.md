@@ -14,7 +14,7 @@ Goal is to be able to build tensorflow for OpenCL.  It's not the only way forwar
 - OpenCL is a mature standard, supported by a wide variety of GPUs, from a large number of manufacturers (AMD, Intel, NVIDIA, Qualcomm, ...)
 
 ### Notes on CUDA dependency
-- to generate the OpenCL code, you need CUDA include files available
+- to generate the OpenCL code, you need CUDA include files available (only need include files, dont need libraries etc)
 - the OpenCL code just needs clang and opencl to compile/run
 
 ## How it works
