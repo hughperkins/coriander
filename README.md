@@ -61,11 +61,15 @@ You'll need:
 - CUDA toolkit 7.5 installed into `/usr/local/cuda-7.5`, (or just the CUDA toolkit include files installed into `/usr/local/cuda-7.5/include` is enough actually)
 - Have done `sudo apt-get install libc6-dev-i386`
 
-Clone this repo:
+## How to build
+
+From this repo, run:
 ```
-git clone https://github.com/hughperkins/cuda-ir-to-opencl
+git clone --recursive https://github.com/hughperkins/cuda-ir-to-opencl
 cd cuda-ir-to-opencl
+./build.sh
 ```
+=> `ir-to-opencl`, and `patch-hostside` should be built into `build` subdirectory
 
 ## Demos
 
@@ -73,7 +77,6 @@ cd cuda-ir-to-opencl
 
 From this repo, run:
 ```
-./build.sh
 ./run-ir-to-opencl-demo.sh
 ```
 => this will run a demonstration of converting the device side code in [examples/testcudakernel1.cu](examples/testcudakernel1.cu) into OpenCL
@@ -84,21 +87,12 @@ You will need an OpenCL-enabled GPU in order to run this part.
 
 Run:
 ```
-./build.sh
 ./run-end-to-end-demo.sh
 ```
 This will:
 - compile [examples/testcudakernel1.cu](examples/testcudakernel1.cu) host-side code into IR
 - replace the cuda launch IR commands, with OpenCL kernel launch commands
 - compile the new IR to object code, link with [examples/test_call_cl.cpp](examples/test_call_cl.cpp) , and run this
-
-## How to build
-
-From this repo, run:
-```
-./build.sh
-```
-=> `ir-to-opencl`, and `patch-hostside` should be built into `build` subdirectory
 
 ## Test
 
