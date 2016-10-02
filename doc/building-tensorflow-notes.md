@@ -5,21 +5,8 @@ This is *very* draft, work in progress :-P
 First step is to compile one single tensorflow cuda file, eg cwise_op_gpu_add.cu.cc, into llvm IR.  This doc is working on this bit for now.
 
 What I have so far:
-```
-#!/bin/bash
 
-set -e
-
-export CUDA_HOME=/usr/local/cuda-7.5
-export EIGEN_HOME=bazel-tensorflow/external/eigen_archive
-
-TARGET=tensorflow/core/kernels/cwise_op_gpu_add.cu.cc
-OUTPUT=tensorflow/core/kernels/cwise_op_gpu_add.ll
-
-# convert incoming .cu file to device-side IR.  This bit needs CUDA include files
-# clang++-3.8 -include include/fake_funcs.h -I${CUDA_HOME}/include ${TARGET} --cuda-device-only -emit-llvm -O3 -S -o ${OUTPUT}
-clang++-3.8 -std=c++11 -x cuda -DGOOGLE_CUDA -I/usr/include/x86_64-linux-gnu -I. -I${CUDA_HOME}/include -I${EIGEN_HOME} ${TARGET} --cuda-device-only -emit-llvm -O3 -S -o ${OUTPUT}
-```
+[tensorflow/build_cwise_add.sh](tensorflow/build_cwise_add.sh)
 
 This gives:
 ```
