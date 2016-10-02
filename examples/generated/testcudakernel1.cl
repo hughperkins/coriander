@@ -501,6 +501,7 @@ kernel void _Z8setValuePfif(global float* data, int idx, float value) {
 }
 
 kernel void _Z11testStructsP8MyStructPfPi(global struct MyStruct* structs, global float* float_data, global int* int_data) {
+    if(get_global_id(0) == 0) {
     label0:;
     global int* v0 = &structs[0].f0;
     int v1 = v0[0];
@@ -516,4 +517,7 @@ kernel void _Z11testStructsP8MyStructPfPi(global struct MyStruct* structs, globa
     global float* v11 = &float_data[1];
     global int*v12 = (global int*)v11;
     v12[0] = v10;
+    float_data[0] = structs[0].f1;
+    float_data[1] = structs[1].f1;
+}
 }

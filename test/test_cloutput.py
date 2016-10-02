@@ -185,7 +185,7 @@ def test_ternary(testcudakernel1, q, float_data, float_data_gpu):
 
 
 def test_structs(testcudakernel1, ctx, q, float_data, float_data_gpu, int_data, int_data_gpu):
-    my_struct = np.dtype([("x", np.int32), ("y", np.float32)])
+    my_struct = np.dtype([("x", np.float32), ("y", np.int32)])  # I dont know why, but seems these are back to front...
     my_struct, my_struct_c_decl = pyopencl.tools.match_dtype_to_c_struct(
         ctx.devices[0], "MyStruct", my_struct)
     my_struct = cl.tools.get_or_register_dtype("MyStruct", my_struct)
@@ -195,7 +195,9 @@ def test_structs(testcudakernel1, ctx, q, float_data, float_data_gpu, int_data, 
     structs[1]['x'] = 33
     structs[1]['y'] = 44
     structs_gpu = cl.array.to_device(q, structs)
-    q.finish()
+    # p = structs_gpu.map_to_host(q)
+    # print('p', p)
+    # q.finish()
     testcudakernel1.__getattr__(mangle('testStructs', ['MyStruct *', 'float *', 'int *']))(
         q, (32,), (32,),
         structs_gpu.data, float_data_gpu, int_data_gpu)
@@ -207,3 +209,7 @@ def test_structs(testcudakernel1, ctx, q, float_data, float_data_gpu, int_data, 
     print(float_data[1])
     print(int_data[0])
     print(int_data[1])
+    assert float_data[0] == 123
+    assert float_data[1] == 33
+    assert int_data[0] == 567
+    # assert int_data[1] == 44
