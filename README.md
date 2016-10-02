@@ -27,24 +27,15 @@ The way these works is:
 
 ### For host-side code
 
-- we use clang to convert the incoming `.cu` file into IR
-- then we hack on the IR to replace the cuda kernel launch commands with opencl kernel launch commands
-- then we use clang to compile this updated IR to object code
-
-This is currently in progress: we can get hold of the name of the kernel, the kernel arguments, and the grid/dim
-dimensions, and strip all these cuda calls from the IR. Todo: add in opencl kernel launch commands instead.
-
-This bit is still fairly up in the air /high risk.
+- use clang to convert the incoming `.cu` file into IR (this bit needs cuda include files)
+- use [ir-to-opencl/patch-hostside.cpp](ir-to-opencl/patch-hostside.cpp) to replace the cuda kernel launch commands with opencl kernel launch commands, in the IR
+  (dependencies: clang, cuda-ir-to-opencl)
+- use clang to compile the updated IR to object code (dependencies: clang)
 
 ### For device side:
 
-- we use `clang` to compile the CUDA code into LLVM IR code
-- we read in the IR code, and write it out as OpenCL
-
-This is well underway.  You can see below that many standard things, like arithmetic, load/store, tanh, exp, sqrt, and
-branching instructions, such as if/else/for/while are all working.  In addition, kernels are detected correctly,
-and their arguments marked as `global`.  Still need to handle shared memory, and some other things, but seems like
-should be fairly straightforward/low-risk.
+- we use `clang` to compile the CUDA code into LLVM IR code (this bit needs cuda include files)
+- we read in the IR code, and write it out as OpenCL (dependencies: clang, cuda-ir-to-opencl)
 
 ## Example
 
@@ -60,7 +51,13 @@ It's not very beautiful OpenCL, but it's OpenCL.  Standard, compilable, portable
 
 ### Host-side
 
-This is still in progress, to the point where, no clear example for now :-P
+Using the same example file as above, ie [examples/testcudakernel1.cu](examples/testcudakernel1.cu)
+
+The host-side LLVM IR, output from `clang`, is [examples/testcudakernel1-host.ll](examples/testcudakernel1-host.ll)
+
+After running [ir-to-opencl/patch-hostside.cpp](ir-to-opencl/patch-hostside.cpp) against this IR, we get: [examples/testcudakernel1-host2.ll](examples/testcudakernel1-host2.ll)
+
+This can then be compiled to object code, doesnt need cuda any more, just needs clang, and OpenCL.
 
 ## Pre-requisites for build and demos
 
@@ -90,15 +87,7 @@ From this repo, run:
 
 ### Host-side demonstration
 
-#### Basic non-cuda code
-
-This demo shows we can build host-side code, from the same source-code file containing device-side code.
-This doesnt use/need any `ir-to-opencl`, just uses clang functionality, already present in clang-3.8.  From this repo, run:
-```
-./demo-hostside.sh
-```
-
-#### kernel launch code
+You will need an OpenCL-enabled GPU in order to run this part.
 
 Run:
 ```
@@ -106,11 +95,8 @@ Run:
 ```
 This will:
 - compile [examples/testcudakernel1.cu](examples/testcudakernel1.cu) host-side code into IR
-- read the kernel launch parameters for the kernel launch in the hostside function `launchSetValue`
-- write those to stdout
-- strip the cuda launch IR commands from the IR, for this function
-
-... and thats it for now :-P  But it shows much of the hard bit is already done
+- replace the cuda launch IR commands, with OpenCL kernel launch commands
+- compile the new IR to object code, link with [examples/test_call_cl.cpp](examples/test_call_cl.cpp) , and run this
 
 ## How to build
 
@@ -150,12 +136,11 @@ More info: [test/README.md](test/README.md)
 
 ### Host-side
 
-No host-side tests yet really, except the kernel launch demo-in-progress (see above).
+Run the kernel launch demo, see above.
 
 ## What's working?
 
-I've started working on host-side kernel launch.  That's a work in progress.  Device-side translation into OpenCL is
-well underway.
+Host-side kernel launch is working, in POC.  Device-side translation into OpenCL is well underway.
 
 ### Device-side
 
@@ -197,21 +182,16 @@ Other cool things:
 
 ### Host-side
 
-On the host-side, currently, there is code to:
+On the host-side, there is code to:
 - get hold of the name of the kernel being called
 - get hold of the llvm `Value *`s being passed to the kernel call
 - get hold of the `grid` and `block` dimensions being passed to the kernel launch
-- in addition, all these cuda commands are being stripped from the IR
-
-To do:
-- replace the (already purged) cuda kernel launch calls with opencl kernel launch calls
+- replace the cuda kernel launch calls with opencl kernel launch calls
 
 ## Roadmap
 
 ### Things that would be cool to get working
 
-- kernel launch
-  - compile host-side kernel launch code, and launch a kernel :-)
 - be able to handle pointer arithmetic for host-side `float *`s representing opencl gpu memory :-P
 
 ### Things we *need* to be working for tensorflow
@@ -238,6 +218,8 @@ To do:
 
 ## News
 
+- 1 October 2016:
+  - first working end-to-end kernel launch, using both host-side and device-side code :-)
 - 30 September 2016:
   - added initial unit tests, that use pyopencl to compile the generated OpenCL code, and run tests against it
 - 27 September 2016:
