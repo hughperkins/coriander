@@ -37,6 +37,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
+#include <fstream>
 
 using namespace llvm;
 using namespace std;
@@ -57,6 +58,8 @@ static int nextNameIdx;
 static bool debug;
 bool single_precision = true;
 
+static int instructions_processed = 0;
+
 std::string dumpValue(Value *value) {
     std::string gencode = "";
     unsigned int valueTy = value->getValueID();
@@ -71,6 +74,8 @@ std::string dumpValue(Value *value) {
 
 int getIntConstant(Value *value) {
     unsigned int valueTy = value->getValueID();
+    // cout << "getIntConstant" << endl;
+    // value->dump();
     if(valueTy != AShrOperator::ConstantIntVal) {
         throw runtime_error("not a constant int");
     }
@@ -196,6 +201,14 @@ string dumpStore(StoreInst *instr) {
     return gencode;
 }
 
+
+template<typename T>
+string toString(T value) {
+    ostringstream oss;
+    oss << value;
+    return oss.str();
+}
+
 string dumpGetElementPtr(GetElementPtrInst *instr) {
     string gencode = "";
     // cout << "v0.2" << endl;
@@ -209,14 +222,39 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
     // // cout << "op2 " << dumpOperand(instr->getOperand(2)) << endl;
 
     int numOperands = instr->getNumOperands();
-    if(numOperands == 2) {
-        copyAddressSpace(instr, instr->getOperand(0));
-        gencode += dumpType(instr->getOperand(0)->getType()) + " " + dumpOperand(instr) + " = ";
-        gencode += dumpOperand(instr->getOperand(0)) + " + " + dumpOperand(instr->getOperand(1)) + ";\n";
-    } else {
-        cout << "number operands: " << numOperands << endl;
-        throw runtime_error("dumpGetElementPtr not implemented for this number of operands");
+
+    copyAddressSpace(instr, instr->getOperand(0));
+    gencode += dumpType(instr->getOperand(0)->getType()) + " " + dumpOperand(instr) + " = ";
+    gencode += "&" + dumpOperand(instr->getOperand(0));
+    Type *currentType = instr->getOperand(0)->getType();
+    for(int d=0; d < numOperands - 1; d++) {
+        cout << "currentType " << dumpType(currentType) << endl;
+        cout << "d " << d << endl;
+        Type *newType = 0;
+        if(currentType->isPointerTy()) {
+            gencode += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
+            newType = currentType->getPointerElementType();
+        } else if(currentType->isStructTy()) {
+            cout << "its a struct " << endl;
+            StructType *structtype = cast<StructType>(currentType);
+            int idx = getIntConstant(instr->getOperand(d + 1));
+            cout << "idx " << idx;
+            Type *elementType = structtype->getElementType(idx);
+            gencode += string(".f") + toString(idx);
+            newType = elementType;
+            // for(auto it=structtype->element_begin(); it != structtype->element_end(); it++) {
+            //     Type *elementType = *it;
+            //     cout << "element " << dumpType(elementType) << endl;
+            //     cout << "hasname " << elementType->hasName() << endl;
+            //     cout << string(elementType->getName()) << endl;
+            // }
+            // throw runtime_error("type not implemented in gpe");
+        } else {
+            throw runtime_error("type not implemented in gpe");
+        }
+        currentType = newType;
     }
+    gencode += ";\n";
 
     // string typestr = dumpType(instr->getType());
     // string offset = dumpOperand(instr->getOperand(2));
@@ -635,13 +673,14 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             cout <<  instructioncode << endl;
         }
         if(instructioncode != "") {
+            instructions_processed++;
             gencode += "    " + instructioncode;
         }
     }
     return gencode;
 }
 
-void dumpFunction(Function *F) {
+std::string dumpFunction(Function *F) {
     Type *retType = F->getReturnType();
     std::string retTypeString = dumpType(retType);
     string fname = F->getName();
@@ -651,6 +690,8 @@ void dumpFunction(Function *F) {
     }
     gencode += dumpType(retType) + " " + fname + "(";
     int i = 0;
+    cout << "dumping function " << fname << endl;
+    cout << "getting arg types " << endl;
     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
         Argument *arg = &*it;
         storeValueName(arg);
@@ -661,6 +702,7 @@ void dumpFunction(Function *F) {
             arg->mutateType(newtype);
         }
         string argname = dumpType(arg->getType()) + " " + string(arg->getName());
+        cout << "arg " << argname << endl;
         if(i > 0) {
             gencode += ", ";
         }
@@ -668,6 +710,7 @@ void dumpFunction(Function *F) {
         i++;
     }
     gencode += ") {\n";
+    cout << "finished getting arg types" << endl;
     // label the blocks first
     // also dump phi declarations
     i = 0;
@@ -699,10 +742,12 @@ void dumpFunction(Function *F) {
         gencode += dumpBasicBlock(basicBlock);
     }
     gencode += "}\n";
-    cout << gencode;
+    // cout << gencode;
+    return gencode;
 }
 
-void dumpModule(Module *M) {
+std::string dumpModule(Module *M) {
+    string gencode;
     for(auto it=M->named_metadata_begin(); it != M->named_metadata_end(); it++) {
         NamedMDNode *namedMDNode = &*it;
         for(auto it2=namedMDNode->op_begin(); it2 != namedMDNode->op_end(); it2++) {
@@ -745,27 +790,31 @@ void dumpModule(Module *M) {
                 knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
             Function *F = &*it;
             if(i > 0) {
-                cout << endl;
+                gencode += "\n";
             }
-            dumpFunction(F);
+            gencode += dumpFunction(F);
             i++;
         }
     }
+    return gencode;
 }
 
 int main(int argc, char *argv[]) {
     SMDiagnostic Err;
-    if(argc < 2) {
-        cout << "Usage: " << argv[0] << " [--debug] target.ll" << endl;
+    if(argc < 3) {
+        cout << "Usage: " << argv[0] << " [--debug] <input ir file> <output cl file>" << endl;
         return 1;
     }
-    string target = argv[argc - 1];
+    string target = argv[argc - 2];
+    string outputfilepath = argv[argc - 1];
     debug = false;
-    if(argc == 3) {
+    cout << "argc " << argc << " argv[1] " << argv[1] << endl;
+    if(argc == 4) {
         if(string(argv[1]) != "--debug") {
-            cout << "Usage: " << argv[0] << " [--debug] target.ll" << endl;
+            cout << "Usage: " << argv[0] << " [--debug] <input ir file> <output cl file>" << endl;
             return 1;
         } else {
+            cout << "enabling debug mode" << endl;
             debug = true;
         }
     }
@@ -796,7 +845,18 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["_Z15our_pretend_logf"] = "log";
     knownFunctionsMap["_Z15our_pretend_expf"] = "exp";
 
-    dumpModule(TheModule.get());
+    try {
+        string gencode = dumpModule(TheModule.get());
+        ofstream of;
+        of.open(outputfilepath, ios_base::out);
+        of << gencode;
+        of.close();
+    } catch(const runtime_error &e) {
+        cout << "instructions processed before crash " << instructions_processed << endl;
+        throw e;
+    } catch(...) {
+        cout << "some unknown exception" << endl;
+    }
     return 0;
 }
 

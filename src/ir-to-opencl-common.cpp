@@ -108,8 +108,13 @@ std::string dumpStructType(StructType *type) {
         if(name == "struct.float4") {
             return "float4";
         } else {
-            cout << "struct name: " << name << endl;
-            throw runtime_error("not implemented: struct name " + name);
+            if(name.find("struct.") != string::npos) {
+                name[6] = ' ';
+                return name;
+            }else {
+                cout << "struct name: " << name << endl;
+                throw runtime_error("not implemented: struct name " + name);
+            }
         }
     } else {
         throw runtime_error("not implemented: anonymous struct types");

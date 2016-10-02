@@ -4,5 +4,5 @@ set -e
 
 # ./build.sh
 
-./run-ir-to-opencl-demo.sh > examples/generated/testcudakernel1.cl
+./run-ir-to-opencl-demo.sh $1
 py.test -sv test

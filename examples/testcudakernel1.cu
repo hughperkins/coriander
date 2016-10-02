@@ -205,3 +205,14 @@ __global__ void setValue(float *data, int idx, float value) {
 __host__ void launchSetValue(float *data, int idx, float value) {
     setValue<<<dim3(32, 1, 1), dim3(32, 1, 1)>>>(data, idx, value);
 }
+
+struct MyStruct {
+    int x;
+    float y;
+};
+
+__global__ void testStructs(MyStruct *structs, float *float_data, int *int_data) {
+    int_data[0] = structs[0].x;
+    float_data[0] = structs[0].y;
+    float_data[1] = structs[1].y;
+}

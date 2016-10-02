@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+set -x
 
 export CUDA_HOME=/usr/local/cuda-7.5
 TARGET=testcudakernel1
@@ -9,4 +10,4 @@ TARGET=testcudakernel1
 clang++-3.8 -include include/fake_funcs.h -I${CUDA_HOME}/include examples/${TARGET}.cu --cuda-device-only -emit-llvm -O3 -S -o examples/generated/${TARGET}.ll
 
 # run ir-to-opencl, to convert the IR into OpenCL.  This bit only depends on clang, not on CUDA
-build/ir-to-opencl $1 examples/generated/${TARGET}.ll
+build/ir-to-opencl $1 examples/generated/${TARGET}.ll examples/generated/${TARGET}.cl

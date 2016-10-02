@@ -175,3 +175,9 @@ def test_ternary(testcudakernel1, q, float_data, float_data_gpu):
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     assert float_data[0] == float_data_orig[3]
+
+
+def test_structs(testcudakernel1, ctx, q, float_data, float_data_gpu):
+    my_struct = np.dtype([("x", np.int32), ("y", np.float32)])
+    my_struct, my_struct_c_decl = cl.tools.match_dtype_to_c_struct(
+        ctx.devices[0], "MyStruct", my_struct)
