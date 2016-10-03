@@ -214,9 +214,7 @@ string dumpStore(StoreInst *instr) {
 }
 
 void addSharedDeclaration(Value *value) {
-    // cout << "addSharedDeclaration" << endl;
     value ->dump();
-    // cout << "already seen name? " << (nameByValue.find(value) != nameByValue.end()) << endl;
     if(nameByValue.find(value) != nameByValue.end()) {
         return;
     }
@@ -225,15 +223,11 @@ void addSharedDeclaration(Value *value) {
     cout << name << endl;
     string declaration = "";
     Type *type = glob->getType();
-    // cout << "glob type:" << endl;
     type->dump();
     ArrayType *arraytype = cast<ArrayType>(type->getPointerElementType());
-    // cout << "array type:" << endl;
     arraytype->dump();
     int length = arraytype->getNumElements();
-    // cout << "length " << length << endl;
     Type *elementType = arraytype->getElementType();
-    // cout << "elementType " << dumpType(elementType) << endl;
     string typestr = dumpType(elementType);
     declaration += "    local " + typestr + " " + name + "[" + toString(length) + "];\n";
     if(debug) {
@@ -257,7 +251,6 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
         cout << "dumpoperand(instr) " << dumpOperand(instr) << endl;
         // pointer into shared memory.
         addSharedDeclaration(instr->getOperand(0));
-        // firstD = 1;  // we skip the first indirectio nfor shared memory
     }
     for(int d=firstD; d < numOperands - 1; d++) {
         Type *newType = 0;
@@ -270,12 +263,10 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
             if(!skip) {
                 rhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
             }
-            // int addressspace = cast<PointerType>(currentType)->getAddressSpace();
             newType = currentType->getPointerElementType();
         } else if(currentType->isStructTy()) {
             StructType *structtype = cast<StructType>(currentType);
             string structName = structtype->getName();
-            // cout << "struct name " << structName << endl;
             if(structName == "struct.float4") {
                 int idx = getIntConstant(instr->getOperand(d + 1));
                 Type *elementType = structtype->getElementType(idx);
@@ -290,30 +281,6 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
                 rhs += string(".f") + toString(idx);
                 newType = elementType;
             }
-        // } else if(cast<VectorType>(currentType)) {
-        //     cout << "VectorType" << endl;
-        //     throw runtime_error("type not implemented in gpe");
-        // } else if(ArrayType *arrayType = dyn_cast<ArrayType>(currentType)) {
-        //     cout << "addressspace " << addressspace << endl;
-        //     cout << "ArrayType" << endl;
-        //     cout << "d " << d << endl;
-        //     cout << dumpOperand(instr->getOperand(0)) << endl;
-        //     cout << "instr op0:" << endl;
-        //     instr->getOperand(0)->dump();
-        //     cout << "current type:" << endl;
-        //     currentType->dump();
-        //     cout << "instr op0:" << endl;
-        //     instr->getOperand(0)->dump();
-        //     cout << "instr op1:" << endl;
-        //     instr->getOperand(1)->dump();
-        //     // cout << "numoperands " << instr->getNumOperands() << endl;
-        //     throw runtime_error("type not implemented in gpe");
-        // } else if(cast<SequentialType>(currentType)) {
-        //     cout << "SequentialType" << endl;
-        //     throw runtime_error("type not implemented in gpe");
-        // } else if(cast<CompositeType>(currentType)) {
-        //     cout << "composite type" << endl;
-        //     throw runtime_error("type not implemented in gpe");
         } else {
             currentType->dump();
             throw runtime_error("type not implemented in gpe");
