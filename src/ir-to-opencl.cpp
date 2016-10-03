@@ -172,14 +172,26 @@ std::string dumpReturn(ReturnInst *retInst) {
     return gencode;
 }
 
-// std::string dumpAlloca(Instruction *alloca) {
-//     std::string gencode = "";
-//     std::string typestring = dumpType(alloca->getType()->getPointerElementType());
-//     // cout << "alloca typestring " << typestring << endl;
-//     // int count = getIntConstant(alloca->getOperand(0));
-//     // cout << "count " << count << endl;
-//     return gencode;
-// }
+std::string dumpAlloca(Instruction *alloca) {
+    // std::string gencode = "";
+    PointerType *ptrElementType = cast<PointerType>(alloca->getType()->getPointerElementType());
+    std::string typestring = dumpType(ptrElementType);
+    cout << "alloca typestring " << typestring << endl;
+    int count = getIntConstant(alloca->getOperand(0));
+    cout << "count " << count << endl;
+    if(count == 1) {
+        if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType->getPointerElementType())) {
+            cout << "its an array" << endl;
+            int innercount = arrayType->getNumElements();
+            cout << "length " << innercount << endl;
+            throw runtime_error("not implemented: alloca for arraytype");
+        } else {
+            return typestring + " " + dumpOperand(alloca) + ";\n";
+        }
+    } else {
+        throw runtime_error("not implemented: alloca for count != 1");
+    }
+}
 
 void updateAddressSpace(Value *value, int newSpace) {
     Type *elementType = value->getType()->getPointerElementType();
@@ -682,6 +694,9 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
                 break;
             case Instruction::GetElementPtr:
                 instructioncode = dumpGetElementPtr((GetElementPtrInst *)instruction);
+                break;
+            case Instruction::Alloca:
+                instructioncode = dumpAlloca(cast<AllocaInst>(instruction));
                 break;
             case Instruction::Br:
                 instructioncode = dumpBranch((BranchInst *)instruction);
