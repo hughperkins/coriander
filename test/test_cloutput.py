@@ -213,3 +213,14 @@ def test_structs(testcudakernel1, ctx, q, float_data, float_data_gpu, int_data, 
     assert float_data[1] == 33
     assert int_data[0] == 567
     # assert int_data[1] == 44
+
+
+def test_float4(testcudakernel1, ctx, q, float_data, float_data_gpu):
+    float_data_orig = np.copy(float_data)
+    testcudakernel1.__getattr__(mangle('testFloat4', ['float4 *']))(q, (32,), (32,), float_data_gpu)
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+
+    print('float_data_orig[:8]', float_data_orig[:8])
+    print('float_data[:8]', float_data[:8])
+    assert float_data[1] == float_data_orig[4 + 2] * float_data_orig[4 + 3]

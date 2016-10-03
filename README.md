@@ -146,6 +146,7 @@ OpenCL/CUDA concepts supported, at least partially:
 - `get_num_groups()`
 - `get_local_size()`
 - `synchthreads()` / `barrier()`
+- `float4` (beta)
 
 C++ things:
 - templating working ok (llvm cuda compiler handles this for us :-) )
@@ -182,7 +183,6 @@ On the host-side, there is code to:
 ### Other things we should probalby get working
 
 - local/shared memory
-- vector types, ie float4 etc
 
 ## FAQ
 
@@ -200,9 +200,13 @@ I dont know :-P
 
 ## News
 
-- 1 October 2016:
+- Oct 3
+  - added `float4` (beta)
+- Oct 2:
+  - added structs
+- Oct 1:
   - first working end-to-end kernel launch, using both host-side and device-side code :-)
-- 30 September 2016:
+- Sept 30:
   - added initial unit tests, that use pyopencl to compile the generated OpenCL code, and run tests against it
-- 27 September 2016:
-  - first create this repo
+- Sept 27:
+  - first created
