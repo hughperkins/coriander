@@ -147,6 +147,7 @@ OpenCL/CUDA concepts supported, at least partially:
 - `get_local_size()`
 - `synchthreads()` / `barrier()`
 - `float4` (beta)
+- `local`/`shared` memory
 
 C++ things:
 - templating working ok (llvm cuda compiler handles this for us :-) )
@@ -182,7 +183,6 @@ On the host-side, there is code to:
 
 ### CUDA/OpenCL language/concepts we need to get working
 
-- local/shared memory
 - (private) array types
 - `llvm.memcpy.p0i8.p0i8.i64`
 
