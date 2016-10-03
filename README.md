@@ -114,8 +114,6 @@ Run the kernel launch demo, see above.
 
 ## What's working?
 
-Host-side kernel launch is working, in POC.  Device-side translation into OpenCL is well underway.
-
 ### Device-side
 
 IR operations supported, at least partially:
