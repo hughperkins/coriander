@@ -204,75 +204,35 @@ string dumpStore(StoreInst *instr) {
 
 string dumpGetElementPtr(GetElementPtrInst *instr) {
     string gencode = "";
-    // cout << "v0.2" << endl;
-    // cout << "getNumOperands " << instr->getNumOperands() << endl;
-    // cout << "instr type " << dumpType(instr->getType()) << endl;
-    // cout << "op0 type " << dumpType(instr->getOperand(0)->getType()) << endl;
-    // cout << "op1 type " << dumpType(instr->getOperand(1)->getType()) << endl;
-    // // cout << "op2 type " << dumpType(instr->getOperand(2)->getType()) << endl;
-    // cout << "op0 " << dumpOperand(instr->getOperand(0)) << endl;
-    // cout << "op1 " << dumpOperand(instr->getOperand(1)) << endl;
-    // // cout << "op2 " << dumpOperand(instr->getOperand(2)) << endl;
-
     int numOperands = instr->getNumOperands();
-
     Type *currentType = instr->getOperand(0)->getType();
     string rhs = "";
     rhs += "&" + dumpOperand(instr->getOperand(0));
     for(int d=0; d < numOperands - 1; d++) {
-        cout << "currentType " << dumpType(currentType) << endl;
-        cout << "d " << d << endl;
+        // cout << "currentType " << dumpType(currentType) << endl;
+        // cout << "d " << d << endl;
         Type *newType = 0;
         if(currentType->isPointerTy()) {
             rhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
             newType = currentType->getPointerElementType();
         } else if(currentType->isStructTy()) {
-            cout << "its a struct " << endl;
+            // cout << "its a struct " << endl;
             StructType *structtype = cast<StructType>(currentType);
             int idx = getIntConstant(instr->getOperand(d + 1));
-            cout << "idx " << idx;
+            // cout << "idx " << idx;
             Type *elementType = structtype->getElementType(idx);
             rhs += string(".f") + toString(idx);
             newType = elementType;
-            // for(auto it=structtype->element_begin(); it != structtype->element_end(); it++) {
-            //     Type *elementType = *it;
-            //     cout << "element " << dumpType(elementType) << endl;
-            //     cout << "hasname " << elementType->hasName() << endl;
-            //     cout << string(elementType->getName()) << endl;
-            // }
-            // throw runtime_error("type not implemented in gpe");
         } else {
             throw runtime_error("type not implemented in gpe");
         }
         currentType = newType;
     }
     copyAddressSpace(instr, instr->getOperand(0));
-    // currentType->
     int addressspace = cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace();
     Type *lhsType = PointerType::get(currentType, addressspace);
     gencode += dumpType(lhsType) + " " + dumpOperand(instr) + " = " + rhs;
     gencode += ";\n";
-
-    // string typestr = dumpType(instr->getType());
-    // string offset = dumpOperand(instr->getOperand(2));
-    // if(offset != "") { // this is a bit hacky for now...
-    //     PointerType *inType = (PointerType *)instr->getOperand(0)->getType();
-    //     int addressspace = inType->getAddressSpace();
-    //     if(addressspace != 0) {
-    //         updateAddressSpace(instr, addressspace);
-    //     }
-    //     string typestr = dumpType(inType);
-    //     gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + " + " + offset + ";\n";
-    // } else {
-    //     // PointerType *inType = (PointerType *)instr->getOperand(0)->getType();
-    //     // int addressspace = inType->getAddressSpace();
-    //     // if(addressspace != 0) {
-    //     //     updateAddressSpace(instr, addressspace);
-    //     // }
-    //     string typestr = dumpType(instr->getType()->getPointerElementType());
-    //     offset = dumpOperand(instr->getOperand(1));
-    //     gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + "[" + offset + "];\n";
-    // }
     return gencode;
 }
 
