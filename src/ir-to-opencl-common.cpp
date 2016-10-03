@@ -90,6 +90,9 @@ std::string dumpPointerType(PointerType *ptr) {
     if(addressspace == 1) {
         gencode += "global ";
     }
+    if(addressspace == 3) {
+        gencode += "local ";
+    }
     gencode += elementTypeString + "*";
     return gencode;
 }
