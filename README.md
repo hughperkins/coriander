@@ -204,6 +204,7 @@ I dont know :-P
 
 - Oct 3
   - added `float4` (beta)
+  - added `local` memory (beta)
 - Oct 2:
   - added structs
 - Oct 1:
