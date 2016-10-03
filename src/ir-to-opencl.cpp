@@ -266,8 +266,10 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
     for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
         if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
-            if(addressspace == 3 && d == 0) {
-                rhs = "(&" + rhs + ")";
+            if(d == 0) {
+                if(isa<ArrayType>(currentType->getPointerElementType())) {
+                    rhs = "(&" + rhs + ")";
+                }
             }
             rhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
             newType = currentType->getPointerElementType();
