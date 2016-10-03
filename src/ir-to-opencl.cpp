@@ -257,24 +257,19 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
     rhs += "" + dumpOperand(instr->getOperand(0));
     copyAddressSpace(instr, instr->getOperand(0));
     int addressspace = cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace();
-    int firstD = 0;
     if(addressspace == 3) { // local/shared memory
         cout << "got access to local memory." << endl;
         cout << "dumpoperand(instr) " << dumpOperand(instr) << endl;
         // pointer into shared memory.
         addSharedDeclaration(instr->getOperand(0));
     }
-    for(int d=firstD; d < numOperands - 1; d++) {
+    for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
         if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
-            bool skip = false;
-            if(addressspace == 3) {
-                // skip first indirection for shared memory
-                skip = true;
+            if(addressspace == 3 && d == 0) {
+                rhs = "(&" + rhs + ")";
             }
-            if(!skip) {
-                rhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
-            }
+            rhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
             newType = currentType->getPointerElementType();
         } else if(currentType->isStructTy()) {
             StructType *structtype = cast<StructType>(currentType);
@@ -299,9 +294,7 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
         }
         currentType = newType;
     }
-    if(addressspace != 3) {  // more strnageness for shared memory...
-        rhs = "&" + rhs;
-    }
+    rhs = "&" + rhs;
     Type *lhsType = PointerType::get(currentType, addressspace);
     gencode += dumpType(lhsType) + " " + dumpOperand(instr) + " = " + rhs;
     gencode += ";\n";
