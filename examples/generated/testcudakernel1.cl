@@ -587,3 +587,14 @@ kernel void _Z10testLocal2Pf(global float* data) {
     global int*v21 = (global int*)v20;
     v21[0] = v19;
 }
+
+kernel void _Z9testArrayPf(global float* data) {
+    label0:;
+    global char*data6 = (global char*)data;
+    global float* scevgep = &data[1];
+    global char*scevgep5 = (global char*)scevgep;
+    llvm.memmove.p0i8.p0i8.i64(scevgep5, data6, , , );
+}
+
+void llvm.memmove.p0i8.p0i8.i64(global char* , global char* , long , int , bool ) {
+}

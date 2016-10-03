@@ -154,6 +154,16 @@ std::string dumpStructType(StructType *type) {
     }
 }
 
+std::string dumpArrayType(ArrayType *type) {
+    int length = type->getNumElements();
+    // cout << "array length " << length << endl;
+    Type *elementType = type->getElementType();
+    // cout << "elemtn type " << dumpType(elementType) << endl;
+    // throw runtime_error("not implemented: array type");
+    // return "";
+    return dumpType(elementType) + "[" + toString(length) + "]";
+}
+
 std::string dumpType(Type *type) {
     Type::TypeID typeID = type->getTypeID();
     switch(typeID) {
@@ -168,7 +178,7 @@ std::string dumpType(Type *type) {
         case Type::VectorTyID:
             throw runtime_error("not implemented: vector type");
         case Type::ArrayTyID:
-            throw runtime_error("not implemented: array type");
+            return dumpArrayType(cast<ArrayType>(type));
         case Type::DoubleTyID:
             if(single_precision) {
                 return "float";
