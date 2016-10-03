@@ -185,6 +185,7 @@ On the host-side, there is code to:
 
 - (private) array types
 - `llvm.memcpy.p0i8.p0i8.i64`
+- `llvm.memmove.p0i8.p0i8.i64`
 
 ## FAQ
 
