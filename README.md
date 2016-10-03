@@ -137,6 +137,7 @@ IR operations supported, at least partially:
 - branch, conditional branch, phi: `while`, `do....while`, `if`, if...else...`, `for` working
 - ternary (ie `a = c ? d : e;` syntax)
 - structs
+- private arrays
 
 OpenCL/CUDA concepts supported, at least partially:
 - `global` assigned to incoming pointer arrays, and propagated to assigned variables appropriately
@@ -183,7 +184,6 @@ On the host-side, there is code to:
 
 ### Basic c/c++/llvm/CUDA/OpenCL language/concepts
 
-- (private) array types
 - `llvm.memcpy.p0i8.p0i8.i64`
 - `llvm.memmove.p0i8.p0i8.i64`
 - `llvm.lifetime`

@@ -240,12 +240,12 @@ __global__ void testLocal2(float *data) {
     data[1] = myshared[tid];
 }
 
-__global__ void testArray(float *data) {
-    float privateFloats[32];
-    for(int i = 0; i < 32; i++) {
-        privateFloats[i] = data[i];
-    }
-    for(int i = 0; i < 32; i+= 2) {
-        data[i + 1] = privateFloats[i];
-    }
-}
+// __global__ void testArray(float *data) {
+//     float privateFloats[32];
+//     for(int i = 0; i < 32; i++) {
+//         privateFloats[i] = data[i];
+//     }
+//     for(int i = 0; i < 32; i+= 2) {
+//         data[i + 1] = privateFloats[i];
+//     }
+// }

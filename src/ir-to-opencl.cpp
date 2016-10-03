@@ -180,11 +180,14 @@ std::string dumpAlloca(Instruction *alloca) {
     int count = getIntConstant(alloca->getOperand(0));
     cout << "count " << count << endl;
     if(count == 1) {
-        if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType->getPointerElementType())) {
+        if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
             cout << "its an array" << endl;
             int innercount = arrayType->getNumElements();
             cout << "length " << innercount << endl;
-            throw runtime_error("not implemented: alloca for arraytype");
+            Type *elementType = arrayType->getElementType();
+            cout << "element type " << dumpType(elementType) << endl;
+            // throw runtime_error("not implemented: alloca for arraytype");
+            return dumpType(elementType) + " " + dumpOperand(alloca) + "[" + toString(innercount) + "];\n";
         } else {
             return typestring + " " + dumpOperand(alloca) + ";\n";
         }
@@ -381,6 +384,12 @@ std::string dumpCall(CallInst *instr) {
     }
     if(functionName == "llvm.cuda.syncthreads") {
         return gencode + "barrier(CLK_GLOBAL_MEM_FENCE);\n";
+    }
+    if(functionName == "llvm.lifetime.start") {
+        return "";  // just ignore for now
+    }
+    if(functionName == "llvm.lifetime.end") {
+        return "";  // just ignore for now
     }
     if(knownFunctionsMap.find(functionName) != knownFunctionsMap.end()) {
         // cout << "replace " << functionName << " with " << knownFunctionsMap[functionName] << endl;
@@ -903,6 +912,8 @@ int main(int argc, char *argv[]) {
     ignoredFunctionNames.insert("llvm.ptx.read.ntid.z");
     ignoredFunctionNames.insert("llvm.memcpy.p0i8.p0i8.i64");
     ignoredFunctionNames.insert("llvm.memcpy.p0i8.p0i8.i32");
+    ignoredFunctionNames.insert("llvm.lifetime.start");
+    ignoredFunctionNames.insert("llvm.lifetime.end");
 
     knownFunctionsMap["_ZSt4sqrtf"] = "sqrt";
     knownFunctionsMap["llvm.nvvm.sqrt.rn.d"] = "sqrt";

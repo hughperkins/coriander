@@ -30,12 +30,6 @@ kernel void _Z7use_tidPf(global float* data) {
     v2[0] = 123;
 }
 
-void llvm.lifetime.start(long , global char* ) {
-}
-
-void llvm.lifetime.end(long , global char* ) {
-}
-
 kernel void _Z8use_tid2Pi(global int* data) {
     label0:;
     int v0 = get_global_id(0);
@@ -552,13 +546,13 @@ kernel void _Z9testLocalPf(global float* data) {
     global float* v2 = &data[v1];
     global int*v3 = (global int*)v2;
     int v4 = v3[0];
-    local float* v5 = _ZZ9testLocalPfE8myshared;
+    local float* v5 = &(&_ZZ9testLocalPfE8myshared)[0][v1];
     local int*v6 = (local int*)v5;
     local int* v7 = (local int*)v6;
     v7[0] = v4;
     int v9 = v0 + 1;
     long v10 = v9;
-    local float* v11 = _ZZ9testLocalPfE8myshared;
+    local float* v11 = &(&_ZZ9testLocalPfE8myshared)[0][v10];
     local int*v12 = (local int*)v11;
     local int* v13 = (local int*)v12;
     int v14 = v13[0];
@@ -574,13 +568,13 @@ kernel void _Z10testLocal2Pf(global float* data) {
     global float* v2 = &data[v1];
     global int*v3 = (global int*)v2;
     int v4 = v3[0];
-    local float* v5 = _ZZ10testLocal2PfE8myshared;
+    local float* v5 = &(&_ZZ10testLocal2PfE8myshared)[0][v1];
     local int*v6 = (local int*)v5;
     local int* v7 = (local int*)v6;
     v7[0] = v4;
     int v9 = v0 + 1;
     long v10 = v9;
-    local float* v11 = _ZZ10testLocal2PfE8myshared;
+    local float* v11 = &(&_ZZ10testLocal2PfE8myshared)[0][v10];
     local int*v12 = (local int*)v11;
     local int* v13 = (local int*)v12;
     int v14 = v13[0];
@@ -592,109 +586,4 @@ kernel void _Z10testLocal2Pf(global float* data) {
     global float* v20 = &data[1];
     global int*v21 = (global int*)v20;
     v21[0] = v19;
-}
-
-kernel void _Z9testArrayPf(global float* data) {
-    label0:;
-    global char*data4 = (global char*)data;
-    float[32] privateFloats;
-    char*v0 = (char*)privateFloats;
-    llvm.lifetime.start(, v0);
-    llvm.memcpy.p0i8.p0i8.i64(v0, data4, , , );
-    int*v3 = (int*)privateFloats;
-    int v4 = v3[0];
-    global float* v5 = &data[1];
-    global int*v6 = (global int*)v5;
-    v6[0] = v4;
-    float* v8 = &privateFloats[0][2];
-    int*v9 = (int*)v8;
-    int v10 = v9[0];
-    global float* v11 = &data[3];
-    global int*v12 = (global int*)v11;
-    v12[0] = v10;
-    float* v14 = &privateFloats[0][4];
-    int*v15 = (int*)v14;
-    int v16 = v15[0];
-    global float* v17 = &data[5];
-    global int*v18 = (global int*)v17;
-    v18[0] = v16;
-    float* v20 = &privateFloats[0][6];
-    int*v21 = (int*)v20;
-    int v22 = v21[0];
-    global float* v23 = &data[7];
-    global int*v24 = (global int*)v23;
-    v24[0] = v22;
-    float* v26 = &privateFloats[0][8];
-    int*v27 = (int*)v26;
-    int v28 = v27[0];
-    global float* v29 = &data[9];
-    global int*v30 = (global int*)v29;
-    v30[0] = v28;
-    float* v32 = &privateFloats[0][10];
-    int*v33 = (int*)v32;
-    int v34 = v33[0];
-    global float* v35 = &data[11];
-    global int*v36 = (global int*)v35;
-    v36[0] = v34;
-    float* v38 = &privateFloats[0][12];
-    int*v39 = (int*)v38;
-    int v40 = v39[0];
-    global float* v41 = &data[13];
-    global int*v42 = (global int*)v41;
-    v42[0] = v40;
-    float* v44 = &privateFloats[0][14];
-    int*v45 = (int*)v44;
-    int v46 = v45[0];
-    global float* v47 = &data[15];
-    global int*v48 = (global int*)v47;
-    v48[0] = v46;
-    float* v50 = &privateFloats[0][16];
-    int*v51 = (int*)v50;
-    int v52 = v51[0];
-    global float* v53 = &data[17];
-    global int*v54 = (global int*)v53;
-    v54[0] = v52;
-    float* v56 = &privateFloats[0][18];
-    int*v57 = (int*)v56;
-    int v58 = v57[0];
-    global float* v59 = &data[19];
-    global int*v60 = (global int*)v59;
-    v60[0] = v58;
-    float* v62 = &privateFloats[0][20];
-    int*v63 = (int*)v62;
-    int v64 = v63[0];
-    global float* v65 = &data[21];
-    global int*v66 = (global int*)v65;
-    v66[0] = v64;
-    float* v68 = &privateFloats[0][22];
-    int*v69 = (int*)v68;
-    int v70 = v69[0];
-    global float* v71 = &data[23];
-    global int*v72 = (global int*)v71;
-    v72[0] = v70;
-    float* v74 = &privateFloats[0][24];
-    int*v75 = (int*)v74;
-    int v76 = v75[0];
-    global float* v77 = &data[25];
-    global int*v78 = (global int*)v77;
-    v78[0] = v76;
-    float* v80 = &privateFloats[0][26];
-    int*v81 = (int*)v80;
-    int v82 = v81[0];
-    global float* v83 = &data[27];
-    global int*v84 = (global int*)v83;
-    v84[0] = v82;
-    float* v86 = &privateFloats[0][28];
-    int*v87 = (int*)v86;
-    int v88 = v87[0];
-    global float* v89 = &data[29];
-    global int*v90 = (global int*)v89;
-    v90[0] = v88;
-    float* v92 = &privateFloats[0][30];
-    int*v93 = (int*)v92;
-    int v94 = v93[0];
-    global float* v95 = &data[31];
-    global int*v96 = (global int*)v95;
-    v96[0] = v94;
-    llvm.lifetime.end(, v0);
 }
