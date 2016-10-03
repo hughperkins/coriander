@@ -556,12 +556,18 @@ std::string dumpBranch(BranchInst *instr) {
     string gencode = "";
     if(instr->isConditional()) {
         gencode += "if(" + dumpOperand(instr->getCondition()) + ") {\n";
-        gencode += "        " + dumpPhi(instr, instr->getSuccessor(0));
+        string phicode = dumpPhi(instr, instr->getSuccessor(0));
+        if(phicode != "") {
+            gencode += "        " + phicode;
+        }
         gencode += "        goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
         if(instr->getNumSuccessors() == 1) {
         } else if(instr->getNumSuccessors() == 2) {
             gencode += "    } else {\n";
-            gencode += "        " + dumpPhi(instr, instr->getSuccessor(1));
+            string phicode = dumpPhi(instr, instr->getSuccessor(1));
+            if(phicode != "") {
+                gencode += "        " + phicode;
+            }
             gencode += "        goto " + dumpOperand(instr->getSuccessor(1)) + ";\n";
         } else {
             throw runtime_error("not implemented for this numsuccessors br");
@@ -570,7 +576,10 @@ std::string dumpBranch(BranchInst *instr) {
     } else {
         if(instr->getNumSuccessors() == 1) {
             BasicBlock *nextBlock = instr->getSuccessor(0);
-            gencode += "    " + dumpPhi(instr, nextBlock);
+            string phicode = dumpPhi(instr, nextBlock);
+            if(phicode != "") {
+                gencode += "    " + phicode;
+            }
             gencode += "    goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
         } else {
             throw runtime_error("not implemented sucessors != 1 for unconditional br");
@@ -605,7 +614,7 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
         nameByValue[basicBlock] = label;
     }
     std::string gencode = "";
-    gencode += label + ":;\n";
+    gencode += "    " + label + ":;\n";
     for(BasicBlock::iterator it=basicBlock->begin(), e=basicBlock->end(); it != e; it++) {
         Instruction *instruction = &*it;
         auto opcode = instruction->getOpcode();
@@ -771,7 +780,7 @@ std::string dumpFunction(Function *F) {
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
         ostringstream oss;
-        oss << "    label" << i;
+        oss << "label" << i;
         string label = oss.str();
         nameByValue[basicBlock] = label;
         // write out phi declarations
@@ -935,4 +944,3 @@ int main(int argc, char *argv[]) {
     }
     return 0;
 }
-
