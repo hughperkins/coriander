@@ -817,6 +817,8 @@ int main(int argc, char *argv[]) {
     ignoredFunctionNames.insert("llvm.ptx.read.ntid.x");
     ignoredFunctionNames.insert("llvm.ptx.read.ntid.y");
     ignoredFunctionNames.insert("llvm.ptx.read.ntid.z");
+    ignoredFunctionNames.insert("llvm.memcpy.p0i8.p0i8.i64");
+    ignoredFunctionNames.insert("llvm.memcpy.p0i8.p0i8.i32");
 
     knownFunctionsMap["_ZSt4sqrtf"] = "sqrt";
     knownFunctionsMap["llvm.nvvm.sqrt.rn.d"] = "sqrt";

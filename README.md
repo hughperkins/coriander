@@ -180,9 +180,11 @@ On the host-side, there is code to:
    - lets use CLblast for blas stuff
    - use im2col for convolution for now
 
-### Other things we should probalby get working
+### CUDA/OpenCL language/concepts we need to get working
 
 - local/shared memory
+- (private) array types
+- `llvm.memcpy.p0i8.p0i8.i64`
 
 ## FAQ
 
