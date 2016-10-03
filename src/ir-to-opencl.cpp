@@ -54,6 +54,8 @@ static std::map<string, string> knownFunctionsMap; // from cuda to opencl, eg ti
 
 map<Value *, string> nameByValue;
 static int nextNameIdx;
+static string currentFunctionSharedDeclarations = "";
+// static set<string> currentFunctionDeclaredShareds;
 
 static bool debug;
 bool single_precision = true;
@@ -111,6 +113,8 @@ string dumpConstant(Constant *constant) {
 }
 
 string dumpOperand(Value *value) {
+    // cout << "dumpOperand" << endl;
+    // value->dump();
     unsigned int valueTy = value->getValueID();
     if(valueTy == AShrOperator::ConstantIntVal) {
         int intvalue = getIntConstant(value);
@@ -124,6 +128,14 @@ string dumpOperand(Value *value) {
         oss << floatvalue;
         return oss.str();
     }
+    if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
+        // cout << " dumping global variable" << endl;
+        // cout << string(glob->getName()) << endl;
+        return string(glob->getName());
+    }
+    // if(ArrayType *arrayType = dyn_cast<ArrayType>(value->getType())) {
+    //     return "arraytype";
+    // }
     string name = nameByValue[value];
     return name;
 }
@@ -201,6 +213,35 @@ string dumpStore(StoreInst *instr) {
     return gencode;
 }
 
+void addSharedDeclaration(Value *value) {
+    // cout << "addSharedDeclaration" << endl;
+    value ->dump();
+    // cout << "already seen name? " << (nameByValue.find(value) != nameByValue.end()) << endl;
+    if(nameByValue.find(value) != nameByValue.end()) {
+        return;
+    }
+    GlobalVariable *glob = cast<GlobalVariable>(value);
+    string name = glob->getName();
+    cout << name << endl;
+    string declaration = "";
+    Type *type = glob->getType();
+    // cout << "glob type:" << endl;
+    type->dump();
+    ArrayType *arraytype = cast<ArrayType>(type->getPointerElementType());
+    // cout << "array type:" << endl;
+    arraytype->dump();
+    int length = arraytype->getNumElements();
+    // cout << "length " << length << endl;
+    Type *elementType = arraytype->getElementType();
+    // cout << "elementType " << dumpType(elementType) << endl;
+    string typestr = dumpType(elementType);
+    declaration += "shared " + typestr + " " + name + "[" + toString(length) + "];\n";
+    if(debug) {
+        cout << declaration << endl;
+    }
+    nameByValue[value] = name;
+    currentFunctionSharedDeclarations += declaration;
+}
 
 string dumpGetElementPtr(GetElementPtrInst *instr) {
     string gencode = "";
@@ -210,15 +251,22 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
     rhs += "" + dumpOperand(instr->getOperand(0));
     copyAddressSpace(instr, instr->getOperand(0));
     int addressspace = cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace();
+    if(addressspace == 3) { // local/shared memory
+        cout << "got access to local memory." << endl;
+        cout << "dumpoperand(instr) " << dumpOperand(instr) << endl;
+        // pointer into shared memory.
+        addSharedDeclaration(instr->getOperand(0));
+    }
     for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
-        if(currentType->isPointerTy()) {
+        if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
             rhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
+            // int addressspace = cast<PointerType>(currentType)->getAddressSpace();
             newType = currentType->getPointerElementType();
         } else if(currentType->isStructTy()) {
             StructType *structtype = cast<StructType>(currentType);
             string structName = structtype->getName();
-            cout << "struct name " << structName << endl;
+            // cout << "struct name " << structName << endl;
             if(structName == "struct.float4") {
                 int idx = getIntConstant(instr->getOperand(d + 1));
                 Type *elementType = structtype->getElementType(idx);
@@ -233,7 +281,32 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
                 rhs += string(".f") + toString(idx);
                 newType = elementType;
             }
+        // } else if(cast<VectorType>(currentType)) {
+        //     cout << "VectorType" << endl;
+        //     throw runtime_error("type not implemented in gpe");
+        } else if(ArrayType *arrayType = dyn_cast<ArrayType>(currentType)) {
+            cout << "addressspace " << addressspace << endl;
+            cout << "ArrayType" << endl;
+            cout << "d " << d << endl;
+            cout << dumpOperand(instr->getOperand(0)) << endl;
+            cout << "instr op0:" << endl;
+            instr->getOperand(0)->dump();
+            cout << "current type:" << endl;
+            currentType->dump();
+            cout << "instr op0:" << endl;
+            instr->getOperand(0)->dump();
+            cout << "instr op1:" << endl;
+            instr->getOperand(1)->dump();
+            // cout << "numoperands " << instr->getNumOperands() << endl;
+            throw runtime_error("type not implemented in gpe");
+        } else if(cast<SequentialType>(currentType)) {
+            cout << "SequentialType" << endl;
+            throw runtime_error("type not implemented in gpe");
+        } else if(cast<CompositeType>(currentType)) {
+            cout << "composite type" << endl;
+            throw runtime_error("type not implemented in gpe");
         } else {
+            currentType->dump();
             throw runtime_error("type not implemented in gpe");
         }
         currentType = newType;
@@ -647,6 +720,8 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
 }
 
 std::string dumpFunction(Function *F) {
+    currentFunctionSharedDeclarations = "";
+    // currentFunctionDeclaredShareds.clear();
     Type *retType = F->getReturnType();
     std::string retTypeString = dumpType(retType);
     string fname = F->getName();
@@ -654,10 +729,11 @@ std::string dumpFunction(Function *F) {
     if(iskernel_by_name[fname]) {
         gencode += "kernel ";
     }
-    gencode += dumpType(retType) + " " + fname + "(";
+    string declaration = "";
+    declaration += dumpType(retType) + " " + fname + "(";
     int i = 0;
     cout << "dumping function " << fname << endl;
-    cout << "getting arg types " << endl;
+    // cout << "getting arg types " << endl;
     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
         Argument *arg = &*it;
         storeValueName(arg);
@@ -668,17 +744,19 @@ std::string dumpFunction(Function *F) {
             arg->mutateType(newtype);
         }
         string argname = dumpType(arg->getType()) + " " + string(arg->getName());
-        cout << "arg " << argname << endl;
+        // cout << "arg " << argname << endl;
         if(i > 0) {
-            gencode += ", ";
+            declaration += ", ";
         }
-        gencode += argname;
+        declaration += argname;
         i++;
     }
-    gencode += ") {\n";
-    cout << "finished getting arg types" << endl;
+    declaration += ")";
+    cout << declaration << endl;
+    // cout << "finished getting arg types" << endl;
     // label the blocks first
     // also dump phi declarations
+    string body = "";
     i = 0;
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
@@ -696,7 +774,7 @@ std::string dumpFunction(Function *F) {
             }
             PHINode *phi = (PHINode *)instr;
             storeValueName(phi);
-            gencode += dumpType(phi->getType()) + " " + dumpOperand(phi) + ";\n";
+            body += dumpType(phi->getType()) + " " + dumpOperand(phi) + ";\n";
         }
         i++;
     }
@@ -705,10 +783,15 @@ std::string dumpFunction(Function *F) {
     // }
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
-        gencode += dumpBasicBlock(basicBlock);
+        body += dumpBasicBlock(basicBlock);
     }
-    gencode += "}\n";
-    // cout << gencode;
+    gencode =
+        declaration + " {\n" +
+        currentFunctionSharedDeclarations +
+        body +
+    "}\n";
+    // gencode += "}\n";
+    cout << gencode;
     return gencode;
 }
 

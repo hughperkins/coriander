@@ -188,13 +188,6 @@ __global__ void setValue(float *data, int idx, float value) {
     }
 }
 
-// // __global__ void testLocal(float *data) {
-// //     __shared__ float myshared[32];
-// //     int tid = threadIdx.x;
-// //     myshared[tid] = data[tid];
-// //     data[0] = myshared[tid + 1];
-// // }
-
 __host__ void launchSetValue(float *data, int idx, float value) {
     setValue<<<dim3(32, 1, 1), dim3(32, 1, 1)>>>(data, idx, value);
 }
@@ -230,3 +223,19 @@ __global__ void testFloat4(float4 *data) {
 //         data[i + 1] = privateFloats[i];
 //     }
 // }
+
+__global__ void testLocal(float *data) {
+    __shared__ float myshared[32];
+    int tid = threadIdx.x;
+    myshared[tid] = data[tid];
+    data[0] = myshared[tid + 1];
+}
+
+__global__ void testLocal2(float *data) {
+    __shared__ float myshared[64];
+    int tid = threadIdx.x;
+    myshared[tid] = data[tid];
+    data[0] = myshared[tid + 1];
+    myshared[tid + 1] = data[tid];
+    data[1] = myshared[tid];
+}
