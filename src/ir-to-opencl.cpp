@@ -750,10 +750,10 @@ std::string dumpFunction(Function *F) {
     std::string retTypeString = dumpType(retType);
     string fname = F->getName();
     string gencode = "";
-    if(iskernel_by_name[fname]) {
-        gencode += "kernel ";
-    }
     string declaration = "";
+    if(iskernel_by_name[fname]) {
+        declaration += "kernel ";
+    }
     declaration += dumpType(retType) + " " + fname + "(";
     int i = 0;
     cout << "dumping function " << fname << endl;

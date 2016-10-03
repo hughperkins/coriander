@@ -17,12 +17,12 @@ void _Z7incrvalPf(global float* a) {
     a[0] = v1;
 }
 
-void _Z3fooPf(global float* data) {
+kernel void _Z3fooPf(global float* data) {
     label0:;
     data[0] = 123;
 }
 
-void _Z7use_tidPf(global float* data) {
+kernel void _Z7use_tidPf(global float* data) {
     label0:;
     int v0 = get_global_id(0);
     long v1 = v0;
@@ -30,7 +30,7 @@ void _Z7use_tidPf(global float* data) {
     v2[0] = 123;
 }
 
-void _Z8use_tid2Pi(global int* data) {
+kernel void _Z8use_tid2Pi(global int* data) {
     label0:;
     int v0 = get_global_id(0);
     long v1 = v0;
@@ -40,7 +40,7 @@ void _Z8use_tid2Pi(global int* data) {
     v2[0] = v4;
 }
 
-void _Z10copy_floatPf(global float* a) {
+kernel void _Z10copy_floatPf(global float* a) {
     label0:;
     global float* v0 = &a[1];
     global int*v1 = (global int*)v0;
@@ -49,7 +49,7 @@ void _Z10copy_floatPf(global float* a) {
     v3[0] = v2;
 }
 
-void _Z11use_blockidPf(global float* data) {
+kernel void _Z11use_blockidPf(global float* data) {
     label0:;
     int v0 = get_group_id(0);
     long v1 = v0;
@@ -57,7 +57,7 @@ void _Z11use_blockidPf(global float* data) {
     v2[0] = 123;
 }
 
-void _Z11use_griddimPf(global float* data) {
+kernel void _Z11use_griddimPf(global float* data) {
     label0:;
     int v0 = get_num_groups(0);
     long v1 = v0;
@@ -65,7 +65,7 @@ void _Z11use_griddimPf(global float* data) {
     v2[0] = 123;
 }
 
-void _Z12use_blockdimPf(global float* data) {
+kernel void _Z12use_blockdimPf(global float* data) {
     label0:;
     int v0 = get_local_size(0);
     long v1 = v0;
@@ -73,7 +73,7 @@ void _Z12use_blockdimPf(global float* data) {
     v2[0] = 123;
 }
 
-void _Z13use_template1PfPi(global float* data, global int* intdata) {
+kernel void _Z13use_template1PfPi(global float* data, global int* intdata) {
     label0:;
     int v0 = get_global_id(0);
     bool v1 = v0 == 0;
@@ -99,7 +99,7 @@ void _Z13use_template1PfPi(global float* data, global int* intdata) {
     label2:;
 }
 
-void _Z13someops_floatPf(global float* data) {
+kernel void _Z13someops_floatPf(global float* data) {
     label0:;
     global float* v0 = &data[1];
     float v1 = v0[0];
@@ -132,7 +132,7 @@ void _Z13someops_floatPf(global float* data) {
     data[0] = v27;
 }
 
-void _Z11someops_intPi(global int* data) {
+kernel void _Z11someops_intPi(global int* data) {
     label0:;
     global int* v0 = &data[1];
     int v1 = v0[0];
@@ -150,7 +150,7 @@ void _Z11someops_intPi(global int* data) {
     data[0] = v12;
 }
 
-void _Z14testbooleanopsPi(global int* data) {
+kernel void _Z14testbooleanopsPi(global int* data) {
     label0:;
     int v0 = data[0];
     bool v1 = v0 > 0;
@@ -171,7 +171,7 @@ void _Z14testbooleanopsPi(global int* data) {
     v15[0] = v14;
 }
 
-void _Z26testcomparisons_int_signedPi(global int* data) {
+kernel void _Z26testcomparisons_int_signedPi(global int* data) {
     label0:;
     int v0 = data[0];
     global int* v1 = &data[1];
@@ -202,7 +202,7 @@ void _Z26testcomparisons_int_signedPi(global int* data) {
     v25[0] = v24;
 }
 
-void _Z21testcomparisons_floatPf(global float* data) {
+kernel void _Z21testcomparisons_floatPf(global float* data) {
     label0:;
     float v0 = data[0];
     global float* v1 = &data[1];
@@ -233,7 +233,7 @@ void _Z21testcomparisons_floatPf(global float* data) {
     v25[0] = v24;
 }
 
-void _Z15testsyncthreadsPf(global float* data) {
+kernel void _Z15testsyncthreadsPf(global float* data) {
     label0:;
     int v0 = get_global_id(0);
     long v1 = v0;
@@ -250,7 +250,7 @@ void _Z15testsyncthreadsPf(global float* data) {
     v9[0] = v11;
 }
 
-void _Z11testDoWhilePii(global int* data, int N) {
+kernel void _Z11testDoWhilePii(global int* data, int N) {
 int p_0;
     label0:;
     int v0 = get_global_id(0);
@@ -271,7 +271,7 @@ int p_0;
     label2:;
 }
 
-void _Z9testWhilePii(global int* data, int N) {
+kernel void _Z9testWhilePii(global int* data, int N) {
 int p_0;
     label0:;
     int v0 = get_global_id(0);
@@ -292,7 +292,7 @@ int p_0;
     label2:;
 }
 
-void _Z6testIfPii(global int* data, int N) {
+kernel void _Z6testIfPii(global int* data, int N) {
     label0:;
     int v0 = get_global_id(0);
     bool v1 = v0 < N;
@@ -311,7 +311,7 @@ void _Z6testIfPii(global int* data, int N) {
     label2:;
 }
 
-void _Z10testIfElsePii(global int* data, int N) {
+kernel void _Z10testIfElsePii(global int* data, int N) {
     label0:;
     int v0 = get_global_id(0);
     bool v1 = v0 < N;
@@ -346,7 +346,7 @@ void _Z10testIfElsePii(global int* data, int N) {
     label3:;
 }
 
-void _Z11testTernaryPf(global float* data) {
+kernel void _Z11testTernaryPf(global float* data) {
     label0:;
     global float* v0 = &data[1];
     float v1 = v0[0];
@@ -360,7 +360,7 @@ void _Z11testTernaryPf(global float* data) {
     v7[0] = v6;
 }
 
-void _Z7testForPfi(global float* data, int N) {
+kernel void _Z7testForPfi(global float* data, int N) {
 int i_02_prol;
 float sum_01_prol;
 int prol_iter;
@@ -483,7 +483,7 @@ sum_01 = v40;
     label12:;
 }
 
-void _Z8setValuePfif(global float* data, int idx, float value) {
+kernel void _Z8setValuePfif(global float* data, int idx, float value) {
     label0:;
     int v0 = get_global_id(0);
     bool v1 = v0 == 0;
@@ -500,7 +500,7 @@ void _Z8setValuePfif(global float* data, int idx, float value) {
     label2:;
 }
 
-void _Z11testStructsP8MyStructPfPi(global struct MyStruct* structs, global float* float_data, global int* int_data) {
+kernel void _Z11testStructsP8MyStructPfPi(global struct MyStruct* structs, global float* float_data, global int* int_data) {
     label0:;
     global int* v0 = &structs[0].f0;
     int v1 = v0[0];
@@ -518,7 +518,7 @@ void _Z11testStructsP8MyStructPfPi(global struct MyStruct* structs, global float
     v12[0] = v10;
 }
 
-void _Z10testFloat4P6float4(global float4* data) {
+kernel void _Z10testFloat4P6float4(global float4* data) {
     label0:;
     global float* v0 = &((global float*)&data[1])[0];
     global int*v1 = (global int*)v0;
@@ -538,7 +538,7 @@ void _Z10testFloat4P6float4(global float4* data) {
     v14[0] = v6;
 }
 
-void _Z9testLocalPf(global float* data) {
+kernel void _Z9testLocalPf(global float* data) {
     local float _ZZ9testLocalPfE8myshared[32];
     label0:;
     int v0 = get_global_id(0);
@@ -560,7 +560,7 @@ void _Z9testLocalPf(global float* data) {
     v15[0] = v14;
 }
 
-void _Z10testLocal2Pf(global float* data) {
+kernel void _Z10testLocal2Pf(global float* data) {
     local float _ZZ10testLocal2PfE8myshared[64];
     label0:;
     int v0 = get_global_id(0);
