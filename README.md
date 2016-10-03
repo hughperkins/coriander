@@ -181,11 +181,12 @@ On the host-side, there is code to:
    - lets use CLblast for blas stuff
    - use im2col for convolution for now
 
-### CUDA/OpenCL language/concepts we need to get working
+### Basic c/c++/llvm/CUDA/OpenCL language/concepts
 
 - (private) array types
 - `llvm.memcpy.p0i8.p0i8.i64`
 - `llvm.memmove.p0i8.p0i8.i64`
+- `llvm.lifetime`
 
 ## FAQ
 
