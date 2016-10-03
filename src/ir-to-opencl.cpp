@@ -207,29 +207,38 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
     int numOperands = instr->getNumOperands();
     Type *currentType = instr->getOperand(0)->getType();
     string rhs = "";
-    rhs += "&" + dumpOperand(instr->getOperand(0));
+    rhs += "" + dumpOperand(instr->getOperand(0));
+    copyAddressSpace(instr, instr->getOperand(0));
+    int addressspace = cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace();
     for(int d=0; d < numOperands - 1; d++) {
-        // cout << "currentType " << dumpType(currentType) << endl;
-        // cout << "d " << d << endl;
         Type *newType = 0;
         if(currentType->isPointerTy()) {
             rhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
             newType = currentType->getPointerElementType();
         } else if(currentType->isStructTy()) {
-            // cout << "its a struct " << endl;
             StructType *structtype = cast<StructType>(currentType);
-            int idx = getIntConstant(instr->getOperand(d + 1));
-            // cout << "idx " << idx;
-            Type *elementType = structtype->getElementType(idx);
-            rhs += string(".f") + toString(idx);
-            newType = elementType;
+            string structName = structtype->getName();
+            cout << "struct name " << structName << endl;
+            if(structName == "struct.float4") {
+                int idx = getIntConstant(instr->getOperand(d + 1));
+                Type *elementType = structtype->getElementType(idx);
+                Type *castType = PointerType::get(elementType, addressspace);
+                newType = elementType;
+                rhs = "((" + dumpType(castType) + ")&" + rhs + ")";
+                rhs += string("[") + toString(idx) + "]";
+            } else {
+                // generic struct
+                int idx = getIntConstant(instr->getOperand(d + 1));
+                Type *elementType = structtype->getElementType(idx);
+                rhs += string(".f") + toString(idx);
+                newType = elementType;
+            }
         } else {
             throw runtime_error("type not implemented in gpe");
         }
         currentType = newType;
     }
-    copyAddressSpace(instr, instr->getOperand(0));
-    int addressspace = cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace();
+    rhs = "&" + rhs;
     Type *lhsType = PointerType::get(currentType, addressspace);
     gencode += dumpType(lhsType) + " " + dumpOperand(instr) + " = " + rhs;
     gencode += ";\n";

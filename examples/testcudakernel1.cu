@@ -188,13 +188,6 @@ __global__ void setValue(float *data, int idx, float value) {
     }
 }
 
-// // __global__ void testFloat4(float4 *data) {
-// //     float4 myregister4 = data[1];
-// //     float *myregisterfloat = (float *)&myregister4;
-// //     myregisterfloat[1] = myregisterfloat[2] * myregisterfloat[3];
-// //     data[0] = myregister4;
-// // }
-
 // // __global__ void testLocal(float *data) {
 // //     __shared__ float myshared[32];
 // //     int tid = threadIdx.x;
@@ -215,4 +208,11 @@ __global__ void testStructs(MyStruct *structs, float *float_data, int *int_data)
     int_data[0] = structs[0].x;
     float_data[0] = structs[0].y;
     float_data[1] = structs[1].y;
+}
+
+__global__ void testFloat4(float4 *data) {
+    float4 myregister4 = data[1];
+    float *myregisterfloat = (float *)&myregister4;
+    myregisterfloat[1] = myregisterfloat[2] * myregisterfloat[3];
+    data[0] = myregister4;
 }

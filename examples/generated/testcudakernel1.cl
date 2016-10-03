@@ -517,3 +517,23 @@ kernel void _Z11testStructsP8MyStructPfPi(global struct MyStruct* structs, globa
     global int*v12 = (global int*)v11;
     v12[0] = v10;
 }
+
+kernel void _Z10testFloat4P6float4(global float4* data) {
+    label0:;
+    global float* v0 = &((global float*)&data[1])[0];
+    global int*v1 = (global int*)v0;
+    int v2 = v1[0];
+    global float* v3 = &((global float*)&data[1])[2];
+    float v4 = v3[0];
+    global float* v5 = &((global float*)&data[1])[3];
+    float v6 = v5[0];
+    float v7 = v4 * v6;
+    global int*v8 = (global int*)data;
+    v8[0] = v2;
+    global float* v10 = &((global float*)&data[0])[1];
+    v10[0] = v7;
+    global float* v12 = &((global float*)&data[0])[2];
+    v12[0] = v4;
+    global float* v14 = &((global float*)&data[0])[3];
+    v14[0] = v6;
+}
