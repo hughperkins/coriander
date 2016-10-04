@@ -117,18 +117,14 @@ Run the kernel launch demo, see above.
 ### Device-side
 
 IR operations supported, at least partially:
-- `call`
+- `call`, `ret`
 - `getelementptr`
-- `store`
-- `load`
--  `add`
-- `fadd`
-- `ret`
-- `fpext`, `zext`, `sext`
-- `fptrunc`
+- `store`, `load`
+- `fpext`, `zext`, `sext`, `fptrunc`, `trunc`
 - `bitcast`
+- `inttoptr`
 - float maths operators: +, -, *, /
-- int maths operators: +, -, *, /, <<, >>
+- int maths operators: +, -, *, /, <<, >>, %
 - int comparisons: < > == != <= >=
 - float comparisons: < > == != <= >=
 - boolean maths operators: &&, ||
@@ -187,6 +183,7 @@ On the host-side, there is code to:
 
 - `llvm.memmove.p0i8.p0i8.i64`
 - `llvm.lifetime`
+- `extractvalue`
 
 ## FAQ
 
