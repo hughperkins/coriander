@@ -201,10 +201,10 @@ I dont know :-P
 ## News
 
 - Oct 5
-  - added `llvm.memcpy`
   - fix float constants to correctly have `.0f` at the end
   - added `extractvalue`
   Oct 4:
+  - added `llvm.memcpy`
   - added `insertvalue`
   - added `dumpinttoptr`, `trunc`, `srem` (beta)
 - Oct 3
