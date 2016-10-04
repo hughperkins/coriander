@@ -210,7 +210,7 @@ std::string dumpType(Type *type) {
         // case Type::UnionTyID:
         //     throw runtime_error("not implemented: union type");
         case Type::StructTyID:
-            return dumpStructType((StructType *)type);
+            return dumpStructType(cast<StructType>(type));
         case Type::VectorTyID:
             throw runtime_error("not implemented: vector type");
         case Type::ArrayTyID:
@@ -222,12 +222,12 @@ std::string dumpType(Type *type) {
                 return "double";
             }
         case Type::FunctionTyID:
-            return dumpFunctionType(dyn_cast<FunctionType>(type));
+            return dumpFunctionType(cast<FunctionType>(type));
         case Type::PointerTyID:
             // cout << "pointer type" << endl;
-            return dumpPointerType((PointerType *)type);
+            return dumpPointerType(cast<PointerType>(type));
         case Type::IntegerTyID:
-            return dumpIntegerType((IntegerType *)type);
+            return dumpIntegerType(cast<IntegerType>(type));
         default:
             cout << "type id " << typeID << endl;
             throw runtime_error("unrecognized type");

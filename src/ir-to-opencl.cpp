@@ -67,7 +67,7 @@ std::string dumpValue(Value *value) {
     unsigned int valueTy = value->getValueID();
     switch(valueTy) {
         case AShrOperator::ConstantIntVal:
-            cout << "constant " << ((ConstantInt *)value)->getSExtValue() << endl;
+            cout << "constant " << (cast<ConstantInt>(value))->getSExtValue() << endl;
     }
     string name = nameByValue[value];
     gencode += name;
@@ -78,9 +78,9 @@ string dumpConstant(Constant *constant) {
     unsigned int valueTy = constant->getValueID();
     ostringstream oss;
     if(valueTy == AShrOperator::ConstantIntVal) {
-        oss << "int:" << ((ConstantInt *)constant)->getSExtValue();
+        oss << "int:" << cast<ConstantInt>(constant)->getSExtValue();
     } else if(GlobalValue::classof(constant)) {
-        GlobalValue *global = (GlobalValue *)constant;
+        GlobalValue *global = cast<GlobalValue>(constant);
         PointerType *pointerType = global->getType();
         Type *elementType = pointerType->getPointerElementType();
         cout << "element type " << elementType << endl;
@@ -665,7 +665,7 @@ std::string dumpPhi(BranchInst *branchInstr, BasicBlock *nextBlock) {
             break;
         }
         // if(firstInstruction->getOpcode() == Instruction::PHI) {
-        PHINode *phi = (PHINode *)instr;
+        PHINode *phi = cast<PHINode>(instr);
         storeValueName(phi);
         BasicBlock *ourBlock = branchInstr->getParent();
         Value *sourceValue = phi->getIncomingValueForBlock(ourBlock);
@@ -762,82 +762,82 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
         }
         switch(opcode) {
             case Instruction::FAdd:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "+");
+                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
                 break;
             case Instruction::FSub:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "-");
+                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "-");
                 break;
             case Instruction::FMul:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "*");
+                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "*");
                 break;
             case Instruction::FDiv:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "/");
+                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
                 break;
             case Instruction::Sub:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "-");
+                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "-");
                 break;
             case Instruction::Add:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "+");
+                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
                 break;
             case Instruction::Mul:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "*");
+                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "*");
                 break;
             case Instruction::SDiv:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "/");
+                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
                 break;
             case Instruction::SRem:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "%");
+                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "%");
                 break;
             case Instruction::And:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "&");
+                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "&");
                 break;
             case Instruction::Or:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "|");
+                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "|");
                 break;
             case Instruction::Xor:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "^");
+                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "^");
                 break;
             case Instruction::LShr:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, ">>");
+                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
                 break;
             case Instruction::Shl:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "<<");
+                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "<<");
                 break;
             case Instruction::AShr:
-                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, ">>");
+                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
                 break;
             case Instruction::Store:
-                instructioncode = dumpStore((StoreInst*)instruction);
+                instructioncode = dumpStore(cast<StoreInst>(instruction));
                 break;
             case Instruction::Call:
-                instructioncode = dumpCall((CallInst *)instruction);
+                instructioncode = dumpCall(cast<CallInst>(instruction));
                 break;
             case Instruction::Load:
-                instructioncode = dumpLoad((LoadInst*)instruction);
+                instructioncode = dumpLoad(cast<LoadInst>(instruction));
                 break;
             case Instruction::ICmp:
-                instructioncode = dumpIcmp((ICmpInst*)instruction);
+                instructioncode = dumpIcmp(cast<ICmpInst>(instruction));
                 break;
             case Instruction::FCmp:
-                instructioncode = dumpFcmp((FCmpInst*)instruction);
+                instructioncode = dumpFcmp(cast<FCmpInst>(instruction));
                 break;
             case Instruction::SExt:
-                instructioncode = dumpSExt((CastInst*)instruction);
+                instructioncode = dumpSExt(cast<CastInst>(instruction));
                 break;
             case Instruction::ZExt:
-                instructioncode = dumpZExt((CastInst*)instruction);
+                instructioncode = dumpZExt(cast<CastInst>(instruction));
                 break;
             case Instruction::FPExt:
-                instructioncode = dumpFPExt((CastInst *)instruction);
+                instructioncode = dumpFPExt(cast<CastInst>(instruction));
                 break;
             case Instruction::FPTrunc:
-                instructioncode = dumpFPTrunc((CastInst *)instruction);
+                instructioncode = dumpFPTrunc(cast<CastInst>(instruction));
                 break;
             case Instruction::Trunc:
-                instructioncode = dumpTrunc((CastInst *)instruction);
+                instructioncode = dumpTrunc(cast<CastInst>(instruction));
                 break;
             case Instruction::BitCast:
-                instructioncode = dumpBitcast((BitCastInst *)instruction);
+                instructioncode = dumpBitcast(cast<BitCastInst>(instruction));
                 break;
             case Instruction::AddrSpaceCast:
                 instructioncode = dumpAddrSpaceCast(cast<AddrSpaceCastInst>(instruction));
@@ -846,10 +846,10 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
                 instructioncode = dumpInttoPtr(cast<IntToPtrInst>(instruction));
                 break;
             case Instruction::UIToFP:
-                instructioncode = dumpUIToFP((UIToFPInst *)instruction);
+                instructioncode = dumpUIToFP(cast<UIToFPInst>(instruction));
                 break;
             case Instruction::GetElementPtr:
-                instructioncode = dumpGetElementPtr((GetElementPtrInst *)instruction);
+                instructioncode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
                 break;
             case Instruction::ExtractValue:
                 instructioncode = dumpExtract(cast<ExtractElementInst>(instruction));
@@ -858,13 +858,13 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
                 instructioncode = dumpAlloca(cast<AllocaInst>(instruction));
                 break;
             case Instruction::Br:
-                instructioncode = dumpBranch((BranchInst *)instruction);
+                instructioncode = dumpBranch(cast<BranchInst>(instruction));
                 break;
             case Instruction::Select:
-                instructioncode = dumpSelect((SelectInst *)instruction);
+                instructioncode = dumpSelect(cast<SelectInst>(instruction));
                 break;
             case Instruction::Ret:
-                instructioncode = dumpReturn((ReturnInst *)instruction);
+                instructioncode = dumpReturn(cast<ReturnInst>(instruction));
                 break;
             case Instruction::PHI:
                 // just ignore, we dealt with it in the br (hopefully)
@@ -937,7 +937,7 @@ std::string dumpFunction(Function *F) {
             if(!PHINode::classof(instr)) {
                 break;
             }
-            PHINode *phi = (PHINode *)instr;
+            PHINode *phi = cast<PHINode>(instr);
             storeValueName(phi);
             body += dumpType(phi->getType()) + " " + dumpOperand(phi) + ";\n";
         }
@@ -973,14 +973,14 @@ std::string dumpModule(Module *M) {
                 Metadata *metadata = op->get();
                 if(metadata != 0) {
                     if(MDString::classof(metadata)) {
-                        string meta_value = string(((MDString *)metadata)->getString());
+                        string meta_value = string((cast<MDString>(metadata))->getString());
                         if(meta_value == "kernel") {
                             isKernel = true;
                         }
                     } else if(ConstantAsMetadata::classof(metadata)) {
-                        Constant *constant = ((ConstantAsMetadata *)metadata)->getValue();
+                        Constant *constant = (cast<ConstantAsMetadata>(metadata))->getValue();
                         if(GlobalValue::classof(constant)) {
-                            GlobalValue *global = (GlobalValue *)constant;
+                            GlobalValue *global = cast<GlobalValue>(constant);
                             if(global->getType()->getPointerElementType()->getTypeID() == Type::FunctionTyID) {
                                 string functionName = string(constant->getName());
                                 kernelName = functionName;
