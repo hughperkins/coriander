@@ -224,3 +224,15 @@ def test_float4(testcudakernel1, ctx, q, float_data, float_data_gpu):
     print('float_data_orig[:8]', float_data_orig[:8])
     print('float_data[:8]', float_data[:8])
     assert float_data[1] == float_data_orig[4 + 2] * float_data_orig[4 + 3]
+
+
+def test_float4_test2(testcudakernel1, ctx, q, float_data, float_data_gpu):
+    float_data_orig = np.copy(float_data)
+    testcudakernel1.__getattr__(mangle('testFloat4_test2', ['float4 *']))(q, (32,), (32,), float_data_gpu)
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+
+    print('float_data_orig[:8]', float_data_orig[:8])
+    print('float_data[:8]', float_data[:8])
+    for i in range(4):
+        assert float_data[i] == float_data_orig[i + 4]

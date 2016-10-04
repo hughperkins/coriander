@@ -338,12 +338,16 @@ std::string dumpMemcpyCharCharLong(CallInst *instr) {
         throw runtime_error("not implemented dumpmemcpy for align " + toString(align));
     }
     int numElements = totalLength / align;
-    gencode += "#pragma unroll\n";
-    gencode += "    for(int __i=0; __i < " + toString(numElements) + "; __i++) {\n";
-    gencode += "        ((" + dstAddressSpaceStr + " " + elementTypeString + " *)" + dumpOperand(instr->getOperand(0)) + ")[__i] = ";
-    gencode += "((" + srcAddressSpaceStr + " " + elementTypeString + " *)" + dumpOperand(instr->getOperand(1)) + ")[__i];\n";
-    gencode += "    }\n";
-    // throw runtime_error("not implemented dumpmemcpy");
+    if(numElements >1) {
+        gencode += "#pragma unroll\n";
+        gencode += "    for(int __i=0; __i < " + toString(numElements) + "; __i++) {\n";
+        gencode += "        ((" + dstAddressSpaceStr + " " + elementTypeString + " *)" + dumpOperand(instr->getOperand(0)) + ")[__i] = ";
+        gencode += "((" + srcAddressSpaceStr + " " + elementTypeString + " *)" + dumpOperand(instr->getOperand(1)) + ")[__i];\n";
+        gencode += "    }\n";
+    } else {
+        gencode += "((" + dstAddressSpaceStr + " " + elementTypeString + " *)" + dumpOperand(instr->getOperand(0)) + ")[0] = ";
+        gencode += "((" + srcAddressSpaceStr + " " + elementTypeString + " *)" + dumpOperand(instr->getOperand(1)) + ")[0];\n";
+    }
     return gencode;
 }
 

@@ -543,10 +543,7 @@ kernel void _Z16testFloat4_test2P6float4(global float4* data) {
     global float4* v0 = &data[1];
     global char*v1 = (global char*)data;
     global char*v2 = (global char*)v0;
-    #pragma unroll
-    for(int __i=0; __i < 1; __i++) {
-        ((global int4 *)v1)[__i] = ((global int4 *)v2)[__i];
-    }
+    ((global int4 *)v1)[0] = ((global int4 *)v2)[0];
 }
 
 kernel void _Z9testLocalPf(global float* data) {
