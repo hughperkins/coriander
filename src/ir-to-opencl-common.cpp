@@ -26,7 +26,6 @@ using namespace llvm;
 std::string dumpType(Type *type);
 
 extern bool single_precision;
-// extern llvm::LLVMContext TheContext;
 
 static std::string declarations_to_write = "";
 
@@ -36,14 +35,10 @@ std::string getDeclarationsToWrite() {
 std::set<string> declaredStructs;
 
 GlobalVariable *addGlobalVariable(Module *M, string name, string value) {
-    // string name = ".mystr1";
-    // string desiredString = value;
     int N = value.size() + 1;
     LLVMContext &context = M->getContext();
     ArrayType *strtype = ArrayType::get(IntegerType::get(context, 8), N);
     M->getOrInsertGlobal(StringRef(name), strtype);
-    // ConstantDataSequential *charConstSeq = cast<ConstantDataSequential>(charConst);
-
     ConstantDataArray *constchararray = cast<ConstantDataArray>(ConstantDataArray::get(context, ArrayRef<uint8_t>((uint8_t *)value.c_str(), N)));
     GlobalVariable *str = M->getNamedGlobal(StringRef(name));
     str->setInitializer(constchararray);
@@ -69,7 +64,6 @@ std::string dumpAddressSpace(llvm::Type *type) {
 }
 
 Instruction *addStringInstr(Module *M, string name, string value) {
-    // Module *M = prev->getParent();
     GlobalVariable *var = addGlobalVariable(M, name, value);
 
     int N = value.size() + 1;
@@ -79,13 +73,11 @@ Instruction *addStringInstr(Module *M, string name, string value) {
     indices[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
     indices[1] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
     GetElementPtrInst *elem = GetElementPtrInst::CreateInBounds(arrayType, var, ArrayRef<Value *>(indices, 2));
-    // elem->insertAfter(prev);
     return elem;
 }
 
 std::string dumpFunctionType(FunctionType *fn) {
     cout << "function" << endl;
-    // cout << "name " << string(fn->getName()) << endl;
     std::string params_str = "";
     int i = 0;
     for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
@@ -138,7 +130,6 @@ void declareStruct(string name, StructType *type) {
     // its not hte only way of doing this, nor necessarily the best, but seems easier than
     // eg querying global vraibales by hand
     std::string declaration = "";
-    // declaredStructs.add()
     declaration += name + " {\n";
     int i = 0;
     for(auto it=type->element_begin(); it != type->element_end(); it++) {
@@ -189,11 +180,7 @@ std::string dumpStructType(StructType *type) {
 
 std::string dumpArrayType(ArrayType *type) {
     int length = type->getNumElements();
-    // cout << "array length " << length << endl;
     Type *elementType = type->getElementType();
-    // cout << "elemtn type " << dumpType(elementType) << endl;
-    // throw runtime_error("not implemented: array type");
-    // return "";
     return dumpType(elementType) + "[" + toString(length) + "]";
 }
 
@@ -235,19 +222,9 @@ llvm::Constant *createInt32Constant(llvm::LLVMContext *context, int value) {
 }
 
 int readInt32Constant(Value *value) {
-    // unsigned int valueTy = value->getValueID();
-    // // cout << "readIntConstant" << endl;
-    // // value->dump();
-    // if(valueTy != AShrOperator::ConstantIntVal) {
-    //     throw runtime_error("not a constant int");
-    // }
     return cast<ConstantInt>(value)->getSExtValue();
 }
 
 float readFloatConstant(Value *value) {
-    // unsigned int valueTy = value->getValueID();
-    // if(valueTy != AShrOperator::ConstantFPVal) {
-    //     throw runtime_error("not a constant float");
-    // }
     return cast<ConstantFP>(value)->getValueAPF().convertToFloat();
 }
