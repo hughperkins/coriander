@@ -105,10 +105,22 @@ string dumpOperand(Value *value) {
         return oss.str();
     }
     if(valueTy == AShrOperator::ConstantFPVal) {
-        double floatvalue = readFloatConstant(value);
+        float floatvalue = readFloatConstant(value);
         ostringstream oss;
         oss << floatvalue;
-        return oss.str();
+        string floatvaluestr = oss.str();
+        if(single_precision) {
+            if(floatvaluestr.find('.') == string::npos) {
+                floatvaluestr += ".0";
+            }
+            floatvaluestr += "f";
+        }
+        return floatvaluestr;
+        // return oss.str();
+        // string asstring = oss.str();
+        // if(asstring.find('.') == string::npos) {
+        //     asstring += ".0f";
+        // }
     }
     if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
         // cout << " dumping global variable" << endl;
