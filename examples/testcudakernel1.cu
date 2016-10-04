@@ -260,7 +260,7 @@ __global__ void testmemcpy(float *data) {
     }
 }
 
-__host__ float4 getfloat4(float a) {
+__device__ float4 getfloat4(float a) {
     float4 res;
     res.x = a;
     res.y = a + 1;

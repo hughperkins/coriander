@@ -943,3 +943,29 @@ kernel void _Z10testmemcpyPf(global float* data) {
     global int*v95 = (global int*)v94;
     v95[0] = v93;
 }
+
+float4 _Z9getfloat4f(float a) {
+    label0:;
+    float v0 = a + 1;
+    float v1 = a + 2.5;
+    float4 v2;
+    ((float*)&v2)[0] = a;
+    ((float*)&v2)[1] = v0;
+    float4 v3 = v2;
+    ((float*)&v3)[2] = v1;
+    float4 v4 = v3;
+    return v4;
+}
+
+kernel void _Z23testFloat4_extractvalueP6float4Pfi(global float4* data, global float* data2, int N) {
+    label0:;
+    float v0 = data2[0];
+    float v1 = v0 + 1;
+    float v2 = v0 + 2.5;
+    global float* v3 = &((global float*)&data[0])[0];
+    v3[0] = v0;
+    global float* v5 = &((global float*)&data[0])[1];
+    v5[0] = v1;
+    global float* v7 = &((global float*)&data[0])[2];
+    v7[0] = v2;
+}

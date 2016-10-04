@@ -165,7 +165,6 @@ std::string dumpStructType(StructType *type) {
                 }
                 return name;
             } else if(name.find("class.") != string::npos) {
-                // name = "struct " + "class_" + name.substr(6);
                 name[5] = '_';
                 name = "struct " + name;
                 size_t pos = name.find(':');
@@ -173,8 +172,6 @@ std::string dumpStructType(StructType *type) {
                     name[pos] = '_';
                     pos = name.find(':');
                 }
-                cout << "name " << name << endl;
-                // name[5] = ' ';
                 if(declaredStructs.find(name) == declaredStructs.end()) {
                     declaredStructs.insert(name);
                     declareStruct(name, type);
@@ -224,7 +221,6 @@ std::string dumpType(Type *type) {
         case Type::FunctionTyID:
             return dumpFunctionType(cast<FunctionType>(type));
         case Type::PointerTyID:
-            // cout << "pointer type" << endl;
             return dumpPointerType(cast<PointerType>(type));
         case Type::IntegerTyID:
             return dumpIntegerType(cast<IntegerType>(type));

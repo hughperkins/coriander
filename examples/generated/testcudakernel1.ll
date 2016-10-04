@@ -946,25 +946,29 @@ define void @_Z10testmemcpyPf(float* nocapture %data) #2 {
   ret void
 }
 
-define void @_Z23testFloat4_extractvalueP6float4Pfi(%struct.float4* nocapture %data, float* nocapture readonly %data2, i32 %N) #4 {
-  %1 = load float, float* %data2, align 4, !tbaa !36
-  %2 = tail call %struct.float4 @_Z9getfloat4f(float %1)
-  %3 = extractvalue %struct.float4 %2, 0
-  %4 = extractvalue %struct.float4 %2, 1
-  %5 = extractvalue %struct.float4 %2, 2
-  %6 = extractvalue %struct.float4 %2, 3
-  %7 = getelementptr inbounds %struct.float4, %struct.float4* %data, i64 0, i32 0
-  store float %3, float* %7, align 16
-  %8 = getelementptr inbounds %struct.float4, %struct.float4* %data, i64 0, i32 1
-  store float %4, float* %8, align 4
-  %9 = getelementptr inbounds %struct.float4, %struct.float4* %data, i64 0, i32 2
-  store float %5, float* %9, align 8
-  %10 = getelementptr inbounds %struct.float4, %struct.float4* %data, i64 0, i32 3
-  store float %6, float* %10, align 4
-  ret void
+; Function Attrs: norecurse nounwind readnone
+define %struct.float4 @_Z9getfloat4f(float %a) #1 {
+  %1 = fadd float %a, 1.000000e+00
+  %2 = fadd float %a, 2.500000e+00
+  %3 = insertvalue %struct.float4 undef, float %a, 0
+  %4 = insertvalue %struct.float4 %3, float %1, 1
+  %5 = insertvalue %struct.float4 %4, float %2, 2
+  ret %struct.float4 %5
 }
 
-declare %struct.float4 @_Z9getfloat4f(float) #4
+; Function Attrs: norecurse nounwind
+define void @_Z23testFloat4_extractvalueP6float4Pfi(%struct.float4* nocapture %data, float* nocapture readonly %data2, i32 %N) #2 {
+  %1 = load float, float* %data2, align 4, !tbaa !36
+  %2 = fadd float %1, 1.000000e+00
+  %3 = fadd float %1, 2.500000e+00
+  %4 = getelementptr inbounds %struct.float4, %struct.float4* %data, i64 0, i32 0
+  store float %1, float* %4, align 16
+  %5 = getelementptr inbounds %struct.float4, %struct.float4* %data, i64 0, i32 1
+  store float %2, float* %5, align 4
+  %6 = getelementptr inbounds %struct.float4, %struct.float4* %data, i64 0, i32 2
+  store float %3, float* %6, align 8
+  ret void
+}
 
 ; Function Attrs: nounwind readnone
 declare i32 @llvm.ptx.read.tid.x() #6
