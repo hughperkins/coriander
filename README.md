@@ -118,7 +118,7 @@ Run the kernel launch demo, see above.
 
 IR operations supported, at least partially:
 - `call`, `ret`
-- `getelementptr`
+- `extractvalue`, `insertvalue`, `getelementptr`
 - `store`, `load`
 - `fpext`, `zext`, `sext`, `fptrunc`, `trunc`
 - `bitcast`
@@ -183,7 +183,6 @@ On the host-side, there is code to:
 
 - `llvm.memmove.p0i8.p0i8.i64`
 - `llvm.lifetime`
-- `extractvalue`
 
 ## FAQ
 
