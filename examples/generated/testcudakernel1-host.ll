@@ -19,6 +19,8 @@ target triple = "x86_64-pc-linux-gnu"
 %"class.std::num_put" = type { %"class.std::locale::facet.base", [4 x i8] }
 %"class.std::num_get" = type { %"class.std::locale::facet.base", [4 x i8] }
 %struct.CUstream_st = type opaque
+%struct.MyStruct = type { i32, float }
+%struct.float4 = type { float, float, float, float }
 
 @_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
 @__dso_handle = external global i8
@@ -708,6 +710,191 @@ _Z8setValuePfif.exit:                             ; preds = %6, %12, %15, %18
 }
 
 declare i32 @cudaConfigureCall(i64, i32, i64, i32, i64, %struct.CUstream_st*) #0
+
+; Function Attrs: uwtable
+define void @_Z11testStructsP8MyStructPfPi(%struct.MyStruct* %structs, float* %float_data, i32* %int_data) #2 {
+  %1 = alloca %struct.MyStruct*, align 8
+  %2 = alloca float*, align 8
+  %3 = alloca i32*, align 8
+  store %struct.MyStruct* %structs, %struct.MyStruct** %1, align 8, !tbaa !1
+  store float* %float_data, float** %2, align 8, !tbaa !1
+  store i32* %int_data, i32** %3, align 8, !tbaa !1
+  %4 = bitcast %struct.MyStruct** %1 to i8*
+  %5 = call i32 @cudaSetupArgument(i8* %4, i64 8, i64 0)
+  %6 = icmp eq i32 %5, 0
+  br i1 %6, label %7, label %17
+
+; <label>:7                                       ; preds = %0
+  %8 = bitcast float** %2 to i8*
+  %9 = call i32 @cudaSetupArgument(i8* %8, i64 8, i64 8)
+  %10 = icmp eq i32 %9, 0
+  br i1 %10, label %11, label %17
+
+; <label>:11                                      ; preds = %7
+  %12 = bitcast i32** %3 to i8*
+  %13 = call i32 @cudaSetupArgument(i8* %12, i64 8, i64 16)
+  %14 = icmp eq i32 %13, 0
+  br i1 %14, label %15, label %17
+
+; <label>:15                                      ; preds = %11
+  %16 = call i32 @cudaLaunch(i8* nonnull bitcast (void (%struct.MyStruct*, float*, i32*)* @_Z11testStructsP8MyStructPfPi to i8*))
+  br label %17
+
+; <label>:17                                      ; preds = %15, %11, %7, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z10testFloat4P6float4(%struct.float4* %data) #2 {
+  %1 = alloca %struct.float4*, align 8
+  store %struct.float4* %data, %struct.float4** %1, align 8, !tbaa !1
+  %2 = bitcast %struct.float4** %1 to i8*
+  %3 = call i32 @cudaSetupArgument(i8* %2, i64 8, i64 0)
+  %4 = icmp eq i32 %3, 0
+  br i1 %4, label %5, label %7
+
+; <label>:5                                       ; preds = %0
+  %6 = call i32 @cudaLaunch(i8* nonnull bitcast (void (%struct.float4*)* @_Z10testFloat4P6float4 to i8*))
+  br label %7
+
+; <label>:7                                       ; preds = %5, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z16testFloat4_test2P6float4(%struct.float4* %data) #2 {
+  %1 = alloca %struct.float4*, align 8
+  store %struct.float4* %data, %struct.float4** %1, align 8, !tbaa !1
+  %2 = bitcast %struct.float4** %1 to i8*
+  %3 = call i32 @cudaSetupArgument(i8* %2, i64 8, i64 0)
+  %4 = icmp eq i32 %3, 0
+  br i1 %4, label %5, label %7
+
+; <label>:5                                       ; preds = %0
+  %6 = call i32 @cudaLaunch(i8* nonnull bitcast (void (%struct.float4*)* @_Z16testFloat4_test2P6float4 to i8*))
+  br label %7
+
+; <label>:7                                       ; preds = %5, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z16testFloat4_test3P6float4(%struct.float4* %data) #2 {
+  %1 = alloca %struct.float4*, align 8
+  store %struct.float4* %data, %struct.float4** %1, align 8, !tbaa !1
+  %2 = bitcast %struct.float4** %1 to i8*
+  %3 = call i32 @cudaSetupArgument(i8* %2, i64 8, i64 0)
+  %4 = icmp eq i32 %3, 0
+  br i1 %4, label %5, label %7
+
+; <label>:5                                       ; preds = %0
+  %6 = call i32 @cudaLaunch(i8* nonnull bitcast (void (%struct.float4*)* @_Z16testFloat4_test3P6float4 to i8*))
+  br label %7
+
+; <label>:7                                       ; preds = %5, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z9testLocalPf(float* %data) #2 {
+  %1 = alloca float*, align 8
+  store float* %data, float** %1, align 8, !tbaa !1
+  %2 = bitcast float** %1 to i8*
+  %3 = call i32 @cudaSetupArgument(i8* %2, i64 8, i64 0)
+  %4 = icmp eq i32 %3, 0
+  br i1 %4, label %5, label %7
+
+; <label>:5                                       ; preds = %0
+  %6 = call i32 @cudaLaunch(i8* nonnull bitcast (void (float*)* @_Z9testLocalPf to i8*))
+  br label %7
+
+; <label>:7                                       ; preds = %5, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z10testLocal2Pf(float* %data) #2 {
+  %1 = alloca float*, align 8
+  store float* %data, float** %1, align 8, !tbaa !1
+  %2 = bitcast float** %1 to i8*
+  %3 = call i32 @cudaSetupArgument(i8* %2, i64 8, i64 0)
+  %4 = icmp eq i32 %3, 0
+  br i1 %4, label %5, label %7
+
+; <label>:5                                       ; preds = %0
+  %6 = call i32 @cudaLaunch(i8* nonnull bitcast (void (float*)* @_Z10testLocal2Pf to i8*))
+  br label %7
+
+; <label>:7                                       ; preds = %5, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z9testArrayPf(float* %data) #2 {
+  %1 = alloca float*, align 8
+  store float* %data, float** %1, align 8, !tbaa !1
+  %2 = bitcast float** %1 to i8*
+  %3 = call i32 @cudaSetupArgument(i8* %2, i64 8, i64 0)
+  %4 = icmp eq i32 %3, 0
+  br i1 %4, label %5, label %7
+
+; <label>:5                                       ; preds = %0
+  %6 = call i32 @cudaLaunch(i8* nonnull bitcast (void (float*)* @_Z9testArrayPf to i8*))
+  br label %7
+
+; <label>:7                                       ; preds = %5, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z10testmemcpyPf(float* %data) #2 {
+  %1 = alloca float*, align 8
+  store float* %data, float** %1, align 8, !tbaa !1
+  %2 = bitcast float** %1 to i8*
+  %3 = call i32 @cudaSetupArgument(i8* %2, i64 8, i64 0)
+  %4 = icmp eq i32 %3, 0
+  br i1 %4, label %5, label %7
+
+; <label>:5                                       ; preds = %0
+  %6 = call i32 @cudaLaunch(i8* nonnull bitcast (void (float*)* @_Z10testmemcpyPf to i8*))
+  br label %7
+
+; <label>:7                                       ; preds = %5, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z22testFloat4_insertvalueP6float4Pfi(%struct.float4* %data, float* %data2, i32 %N) #2 {
+  %1 = alloca %struct.float4*, align 8
+  %2 = alloca float*, align 8
+  %3 = alloca i32, align 4
+  store %struct.float4* %data, %struct.float4** %1, align 8, !tbaa !1
+  store float* %data2, float** %2, align 8, !tbaa !1
+  store i32 %N, i32* %3, align 4, !tbaa !13
+  %4 = bitcast %struct.float4** %1 to i8*
+  %5 = call i32 @cudaSetupArgument(i8* %4, i64 8, i64 0)
+  %6 = icmp eq i32 %5, 0
+  br i1 %6, label %7, label %17
+
+; <label>:7                                       ; preds = %0
+  %8 = bitcast float** %2 to i8*
+  %9 = call i32 @cudaSetupArgument(i8* %8, i64 8, i64 8)
+  %10 = icmp eq i32 %9, 0
+  br i1 %10, label %11, label %17
+
+; <label>:11                                      ; preds = %7
+  %12 = bitcast i32* %3 to i8*
+  %13 = call i32 @cudaSetupArgument(i8* %12, i64 4, i64 16)
+  %14 = icmp eq i32 %13, 0
+  br i1 %14, label %15, label %17
+
+; <label>:15                                      ; preds = %11
+  %16 = call i32 @cudaLaunch(i8* nonnull bitcast (void (%struct.float4*, float*, i32)* @_Z22testFloat4_insertvalueP6float4Pfi to i8*))
+  br label %17
+
+; <label>:17                                      ; preds = %15, %11, %7, %0
+  ret void
+}
 
 declare dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* dereferenceable(272), i8*, i64) #0
 

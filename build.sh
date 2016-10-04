@@ -14,7 +14,7 @@ make -j 4 install
 cd ..
 
 # build build/ir-to-opencl
-clang++-3.8 ${COMPILE_FLAGS} -fcxx-exceptions -o build/ir-to-opencl -g -O3 -I/usr/include/llvm-3.8 src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp ${LINK_FLAGS}
+bash ./build-ir-to-opencl.sh
 
 # build build/patch-hostside
 clang++-3.8 ${COMPILE_FLAGS} -fcxx-exceptions -o build/patch-hostside src/ir-to-opencl-common.cpp -g -O3 -I/usr/include/llvm-3.8 src/patch-hostside.cpp ${LINK_FLAGS}

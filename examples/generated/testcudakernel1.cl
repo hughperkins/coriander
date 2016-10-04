@@ -13,13 +13,13 @@ float _Z3barff(float a, float b) {
 void _Z7incrvalPf(global float* a) {
     label0:;
     float v0 = a[0];
-    float v1 = v0 + 3;
+    float v1 = v0 + 3.0f;
     a[0] = v1;
 }
 
 kernel void _Z3fooPf(global float* data) {
     label0:;
-    data[0] = 123;
+    data[0] = 123.0f;
 }
 
 kernel void _Z7use_tidPf(global float* data) {
@@ -27,7 +27,7 @@ kernel void _Z7use_tidPf(global float* data) {
     int v0 = get_global_id(0);
     long v1 = v0;
     global float* v2 = &data[v1];
-    v2[0] = 123;
+    v2[0] = 123.0f;
 }
 
 kernel void _Z8use_tid2Pi(global int* data) {
@@ -54,7 +54,7 @@ kernel void _Z11use_blockidPf(global float* data) {
     int v0 = get_group_id(0);
     long v1 = v0;
     global float* v2 = &data[v1];
-    v2[0] = 123;
+    v2[0] = 123.0f;
 }
 
 kernel void _Z11use_griddimPf(global float* data) {
@@ -62,7 +62,7 @@ kernel void _Z11use_griddimPf(global float* data) {
     int v0 = get_num_groups(0);
     long v1 = v0;
     global float* v2 = &data[v1];
-    v2[0] = 123;
+    v2[0] = 123.0f;
 }
 
 kernel void _Z12use_blockdimPf(global float* data) {
@@ -70,7 +70,7 @@ kernel void _Z12use_blockdimPf(global float* data) {
     int v0 = get_local_size(0);
     long v1 = v0;
     global float* v2 = &data[v1];
-    v2[0] = 123;
+    v2[0] = 123.0f;
 }
 
 kernel void _Z13use_template1PfPi(global float* data, global int* intdata) {
@@ -239,14 +239,14 @@ kernel void _Z15testsyncthreadsPf(global float* data) {
     long v1 = v0;
     global float* v2 = &data[v1];
     float v3 = v2[0];
-    float v4 = v3 * 2;
+    float v4 = v3 * 2.0f;
     v2[0] = v4;
     barrier(CLK_GLOBAL_MEM_FENCE);
     int v7 = v0 + 1;
     long v8 = v7;
     global float* v9 = &data[v8];
     float v10 = v9[0];
-    float v11 = v10 + 2;
+    float v11 = v10 + 2.0f;
     v9[0] = v11;
 }
 
@@ -350,7 +350,7 @@ kernel void _Z11testTernaryPf(global float* data) {
     label0:;
     global float* v0 = &data[1];
     float v1 = v0[0];
-    bool v2 = v1 > 0;
+    bool v2 = v1 > 0.0f;
     global float* v3 = &data[2];
     global float* v4 = &data[3];
     global float* v_in = v2 ? v3 : v4;
@@ -387,7 +387,7 @@ float sum_01;
     if(v3) {
         goto label2;
     } else {
-        sum_0_lcssa = 0;
+        sum_0_lcssa = 0.0f;
         goto label10;
     }
     label2:;
@@ -396,14 +396,14 @@ float sum_01;
     bool lcmp_mod = xtraiter == 0;
     if(lcmp_mod) {
         i_02_unr = 0;
-sum_01_unr = 0;
+sum_01_unr = 0.0f;
         goto label6;
     } else {
         goto label3;
     }
     label3:;
         i_02_prol = 0;
-sum_01_prol = 0;
+sum_01_prol = 0.0f;
 prol_iter = xtraiter;
     goto label4;
     label4:;
@@ -946,8 +946,8 @@ kernel void _Z10testmemcpyPf(global float* data) {
 
 float4 _Z9getfloat4f(float a) {
     label0:;
-    float v0 = a + 1;
-    float v1 = a + 2.5;
+    float v0 = a + 1.0f;
+    float v1 = a + 2.5f;
     float4 v2;
     ((float*)&v2)[0] = a;
     ((float*)&v2)[1] = v0;
@@ -957,11 +957,34 @@ float4 _Z9getfloat4f(float a) {
     return v4;
 }
 
-kernel void _Z23testFloat4_extractvalueP6float4Pfi(global float4* data, global float* data2, int N) {
+float _Z19getfloat4ElementSumfii(float a, int e0, int e1) {
+    label0:;
+    float4 res;
+    char*v0 = (char*)res;
+    float v2 = a + 1.0f;
+    float v3 = a + 2.5f;
+    float* v4 = &((float*)&res[0])[0];
+    v4[0] = a;
+    float* v6 = &((float*)&res[0])[1];
+    v6[0] = v2;
+    float* v8 = &((float*)&res[0])[2];
+    v8[0] = v3;
+    long v10 = e0;
+    float* v11 = &v4[v10];
+    float v12 = v11[0];
+    float v13 = v12 + 0.0f;
+    long v14 = e1;
+    float* v15 = &v4[v14];
+    float v16 = v15[0];
+    float v17 = v13 + v16;
+    return v17;
+}
+
+kernel void _Z22testFloat4_insertvalueP6float4Pfi(global float4* data, global float* data2, int N) {
     label0:;
     float v0 = data2[0];
-    float v1 = v0 + 1;
-    float v2 = v0 + 2.5;
+    float v1 = v0 + 1.0f;
+    float v2 = v0 + 2.5f;
     global float* v3 = &((global float*)&data[0])[0];
     v3[0] = v0;
     global float* v5 = &((global float*)&data[0])[1];

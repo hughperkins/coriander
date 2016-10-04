@@ -268,7 +268,21 @@ __device__ float4 getfloat4(float a) {
     return res;
 }
 
-__global__ void testFloat4_extractvalue(float4 *data, float *data2, int N) {
+// attempting to generate an extractvalue instruciton, but failing :-P
+__device__ float getfloat4ElementSum(float a, int e0, int e1) {
+    float4 res = getfloat4(a);
+    float sum = 0;
+    sum += ((float *)&res)[e0];
+    sum += ((float *)&res)[e1];
+    // float4 res;
+    // res.x = a;
+    // res.y = a + 1;
+    // res.z = a + 2.5f;
+    // return res;
+    return sum;
+}
+
+__global__ void testFloat4_insertvalue(float4 *data, float *data2, int N) {
     float4 res = getfloat4(data2[0]);
     data[0] = res;
 }

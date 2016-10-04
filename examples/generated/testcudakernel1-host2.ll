@@ -19,6 +19,8 @@ target triple = "x86_64-pc-linux-gnu"
 %"class.std::num_put" = type { %"class.std::locale::facet.base", [4 x i8] }
 %"class.std::num_get" = type { %"class.std::locale::facet.base", [4 x i8] }
 %struct.CUstream_st = type opaque
+%struct.MyStruct = type { i32, float }
+%struct.float4 = type { float, float, float, float }
 
 @_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
 @__dso_handle = external global i8
@@ -50,6 +52,15 @@ target triple = "x86_64-pc-linux-gnu"
 @s._Z11testTernaryPf = global [18 x i8] c"_Z11testTernaryPf\00"
 @s._Z7testForPfi = global [14 x i8] c"_Z7testForPfi\00"
 @s._Z8setValuePfif = global [16 x i8] c"_Z8setValuePfif\00"
+@s._Z11testStructsP8MyStructPfPi = global [30 x i8] c"_Z11testStructsP8MyStructPfPi\00"
+@s._Z10testFloat4P6float4 = global [23 x i8] c"_Z10testFloat4P6float4\00"
+@s._Z16testFloat4_test2P6float4 = global [29 x i8] c"_Z16testFloat4_test2P6float4\00"
+@s._Z16testFloat4_test3P6float4 = global [29 x i8] c"_Z16testFloat4_test3P6float4\00"
+@s._Z9testLocalPf = global [15 x i8] c"_Z9testLocalPf\00"
+@s._Z10testLocal2Pf = global [17 x i8] c"_Z10testLocal2Pf\00"
+@s._Z9testArrayPf = global [15 x i8] c"_Z9testArrayPf\00"
+@s._Z10testmemcpyPf = global [17 x i8] c"_Z10testmemcpyPf\00"
+@s._Z22testFloat4_insertvalueP6float4Pfi = global [38 x i8] c"_Z22testFloat4_insertvalueP6float4Pfi\00"
 
 declare void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"*) #0
 
@@ -763,6 +774,203 @@ _Z8setValuePfif.exit:                             ; preds = %14, %12, %10, %5
 }
 
 declare i32 @cudaConfigureCall(i64, i32, i64, i32, i64, %struct.CUstream_st*) #0
+
+; Function Attrs: uwtable
+define void @_Z11testStructsP8MyStructPfPi(%struct.MyStruct* %structs, float* %float_data, i32* %int_data) #2 {
+  %1 = alloca %struct.MyStruct*, align 8
+  %2 = alloca float*, align 8
+  %3 = alloca i32*, align 8
+  store %struct.MyStruct* %structs, %struct.MyStruct** %1, align 8, !tbaa !1
+  store float* %float_data, float** %2, align 8, !tbaa !1
+  store i32* %int_data, i32** %3, align 8, !tbaa !1
+  %4 = bitcast %struct.MyStruct** %1 to i8*
+  %5 = icmp eq i32 0, 0
+  br i1 %5, label %6, label %14
+
+; <label>:6                                       ; preds = %0
+  %7 = bitcast float** %2 to i8*
+  %8 = icmp eq i32 0, 0
+  br i1 %8, label %9, label %14
+
+; <label>:9                                       ; preds = %6
+  %10 = bitcast i32** %3 to i8*
+  %11 = icmp eq i32 0, 0
+  br i1 %11, label %12, label %14
+
+; <label>:12                                      ; preds = %9
+  %13 = getelementptr inbounds [30 x i8], [30 x i8]* @s._Z11testStructsP8MyStructPfPi, i32 0, i32 0
+  call void @_Z15configureKernelPKciiiiii(i8* %13, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z21setKernelArgFloatStarPf(float* %float_data)
+  call void @_Z8kernelGov()
+  br label %14
+
+; <label>:14                                      ; preds = %12, %9, %6, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z10testFloat4P6float4(%struct.float4* %data) #2 {
+  %1 = alloca %struct.float4*, align 8
+  store %struct.float4* %data, %struct.float4** %1, align 8, !tbaa !1
+  %2 = bitcast %struct.float4** %1 to i8*
+  %3 = icmp eq i32 0, 0
+  br i1 %3, label %4, label %6
+
+; <label>:4                                       ; preds = %0
+  %5 = getelementptr inbounds [23 x i8], [23 x i8]* @s._Z10testFloat4P6float4, i32 0, i32 0
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z8kernelGov()
+  br label %6
+
+; <label>:6                                       ; preds = %4, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z16testFloat4_test2P6float4(%struct.float4* %data) #2 {
+  %1 = alloca %struct.float4*, align 8
+  store %struct.float4* %data, %struct.float4** %1, align 8, !tbaa !1
+  %2 = bitcast %struct.float4** %1 to i8*
+  %3 = icmp eq i32 0, 0
+  br i1 %3, label %4, label %6
+
+; <label>:4                                       ; preds = %0
+  %5 = getelementptr inbounds [29 x i8], [29 x i8]* @s._Z16testFloat4_test2P6float4, i32 0, i32 0
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z8kernelGov()
+  br label %6
+
+; <label>:6                                       ; preds = %4, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z16testFloat4_test3P6float4(%struct.float4* %data) #2 {
+  %1 = alloca %struct.float4*, align 8
+  store %struct.float4* %data, %struct.float4** %1, align 8, !tbaa !1
+  %2 = bitcast %struct.float4** %1 to i8*
+  %3 = icmp eq i32 0, 0
+  br i1 %3, label %4, label %6
+
+; <label>:4                                       ; preds = %0
+  %5 = getelementptr inbounds [29 x i8], [29 x i8]* @s._Z16testFloat4_test3P6float4, i32 0, i32 0
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z8kernelGov()
+  br label %6
+
+; <label>:6                                       ; preds = %4, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z9testLocalPf(float* %data) #2 {
+  %1 = alloca float*, align 8
+  store float* %data, float** %1, align 8, !tbaa !1
+  %2 = bitcast float** %1 to i8*
+  %3 = icmp eq i32 0, 0
+  br i1 %3, label %4, label %6
+
+; <label>:4                                       ; preds = %0
+  %5 = getelementptr inbounds [15 x i8], [15 x i8]* @s._Z9testLocalPf, i32 0, i32 0
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z8kernelGov()
+  br label %6
+
+; <label>:6                                       ; preds = %4, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z10testLocal2Pf(float* %data) #2 {
+  %1 = alloca float*, align 8
+  store float* %data, float** %1, align 8, !tbaa !1
+  %2 = bitcast float** %1 to i8*
+  %3 = icmp eq i32 0, 0
+  br i1 %3, label %4, label %6
+
+; <label>:4                                       ; preds = %0
+  %5 = getelementptr inbounds [17 x i8], [17 x i8]* @s._Z10testLocal2Pf, i32 0, i32 0
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z8kernelGov()
+  br label %6
+
+; <label>:6                                       ; preds = %4, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z9testArrayPf(float* %data) #2 {
+  %1 = alloca float*, align 8
+  store float* %data, float** %1, align 8, !tbaa !1
+  %2 = bitcast float** %1 to i8*
+  %3 = icmp eq i32 0, 0
+  br i1 %3, label %4, label %6
+
+; <label>:4                                       ; preds = %0
+  %5 = getelementptr inbounds [15 x i8], [15 x i8]* @s._Z9testArrayPf, i32 0, i32 0
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z8kernelGov()
+  br label %6
+
+; <label>:6                                       ; preds = %4, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z10testmemcpyPf(float* %data) #2 {
+  %1 = alloca float*, align 8
+  store float* %data, float** %1, align 8, !tbaa !1
+  %2 = bitcast float** %1 to i8*
+  %3 = icmp eq i32 0, 0
+  br i1 %3, label %4, label %6
+
+; <label>:4                                       ; preds = %0
+  %5 = getelementptr inbounds [17 x i8], [17 x i8]* @s._Z10testmemcpyPf, i32 0, i32 0
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z8kernelGov()
+  br label %6
+
+; <label>:6                                       ; preds = %4, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z22testFloat4_insertvalueP6float4Pfi(%struct.float4* %data, float* %data2, i32 %N) #2 {
+  %1 = alloca %struct.float4*, align 8
+  %2 = alloca float*, align 8
+  %3 = alloca i32, align 4
+  store %struct.float4* %data, %struct.float4** %1, align 8, !tbaa !1
+  store float* %data2, float** %2, align 8, !tbaa !1
+  store i32 %N, i32* %3, align 4, !tbaa !13
+  %4 = bitcast %struct.float4** %1 to i8*
+  %5 = icmp eq i32 0, 0
+  br i1 %5, label %6, label %14
+
+; <label>:6                                       ; preds = %0
+  %7 = bitcast float** %2 to i8*
+  %8 = icmp eq i32 0, 0
+  br i1 %8, label %9, label %14
+
+; <label>:9                                       ; preds = %6
+  %10 = bitcast i32* %3 to i8*
+  %11 = icmp eq i32 0, 0
+  br i1 %11, label %12, label %14
+
+; <label>:12                                      ; preds = %9
+  %13 = getelementptr inbounds [38 x i8], [38 x i8]* @s._Z22testFloat4_insertvalueP6float4Pfi, i32 0, i32 0
+  call void @_Z15configureKernelPKciiiiii(i8* %13, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z21setKernelArgFloatStarPf(float* %data2)
+  call void @_Z15setKernelArgInti(i32 %N)
+  call void @_Z8kernelGov()
+  br label %14
+
+; <label>:14                                      ; preds = %12, %9, %6, %0
+  ret void
+}
 
 declare dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* dereferenceable(272), i8*, i64) #0
 

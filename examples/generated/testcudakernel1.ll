@@ -956,8 +956,33 @@ define %struct.float4 @_Z9getfloat4f(float %a) #1 {
   ret %struct.float4 %5
 }
 
+; Function Attrs: norecurse nounwind readnone
+define float @_Z19getfloat4ElementSumfii(float %a, i32 %e0, i32 %e1) #1 {
+  %res = alloca %struct.float4, align 16
+  %1 = bitcast %struct.float4* %res to i8*
+  call void @llvm.lifetime.start(i64 16, i8* %1) #8
+  %2 = fadd float %a, 1.000000e+00
+  %3 = fadd float %a, 2.500000e+00
+  %4 = getelementptr inbounds %struct.float4, %struct.float4* %res, i64 0, i32 0
+  store float %a, float* %4, align 16
+  %5 = getelementptr inbounds %struct.float4, %struct.float4* %res, i64 0, i32 1
+  store float %2, float* %5, align 4
+  %6 = getelementptr inbounds %struct.float4, %struct.float4* %res, i64 0, i32 2
+  store float %3, float* %6, align 8
+  %7 = sext i32 %e0 to i64
+  %8 = getelementptr inbounds float, float* %4, i64 %7
+  %9 = load float, float* %8, align 4, !tbaa !36
+  %10 = fadd float %9, 0.000000e+00
+  %11 = sext i32 %e1 to i64
+  %12 = getelementptr inbounds float, float* %4, i64 %11
+  %13 = load float, float* %12, align 4, !tbaa !36
+  %14 = fadd float %10, %13
+  call void @llvm.lifetime.end(i64 16, i8* %1) #8
+  ret float %14
+}
+
 ; Function Attrs: norecurse nounwind
-define void @_Z23testFloat4_extractvalueP6float4Pfi(%struct.float4* nocapture %data, float* nocapture readonly %data2, i32 %N) #2 {
+define void @_Z22testFloat4_insertvalueP6float4Pfi(%struct.float4* nocapture %data, float* nocapture readonly %data2, i32 %N) #2 {
   %1 = load float, float* %data2, align 4, !tbaa !36
   %2 = fadd float %1, 1.000000e+00
   %3 = fadd float %1, 2.500000e+00
@@ -1029,7 +1054,7 @@ attributes #8 = { nounwind }
 !26 = !{void (float*)* @_Z10testLocal2Pf, !"kernel", i32 1}
 !27 = !{void (float*)* @_Z9testArrayPf, !"kernel", i32 1}
 !28 = !{void (float*)* @_Z10testmemcpyPf, !"kernel", i32 1}
-!29 = !{void (%struct.float4*, float*, i32)* @_Z23testFloat4_extractvalueP6float4Pfi, !"kernel", i32 1}
+!29 = !{void (%struct.float4*, float*, i32)* @_Z22testFloat4_insertvalueP6float4Pfi, !"kernel", i32 1}
 !30 = !{null, !"align", i32 8}
 !31 = !{null, !"align", i32 8, !"align", i32 65544, !"align", i32 131080}
 !32 = !{null, !"align", i32 16}
