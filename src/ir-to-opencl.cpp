@@ -683,6 +683,9 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             case Instruction::SDiv:
                 instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "/");
                 break;
+            case Instruction::SRem:
+                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "%");
+                break;
             case Instruction::And:
                 instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "&");
                 break;
