@@ -469,6 +469,14 @@ std::string dumpFPTrunc(CastInst *instr) {
     return gencode;
 }
 
+std::string dumpTrunc(CastInst *instr) {
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0)) + ";\n";
+    return gencode;
+}
+
 std::string dumpIcmp(ICmpInst *instr) {
     string gencode = "";
     string typestr = dumpType(instr->getType());
@@ -684,6 +692,9 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
             case Instruction::Xor:
                 instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "^");
                 break;
+            case Instruction::LShr:
+                instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, ">>");
+                break;
             case Instruction::Shl:
                 instructioncode = dumpBinaryOperator((BinaryOperator*)instruction, "<<");
                 break;
@@ -716,6 +727,9 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
                 break;
             case Instruction::FPTrunc:
                 instructioncode = dumpFPTrunc((CastInst *)instruction);
+                break;
+            case Instruction::Trunc:
+                instructioncode = dumpTrunc((CastInst *)instruction);
                 break;
             case Instruction::BitCast:
                 instructioncode = dumpBitcast((BitCastInst *)instruction);
