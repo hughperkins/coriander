@@ -214,15 +214,15 @@ __global__ void testFloat4_test2(float4 *data) {
     data[0] = data[1];
 }
 
-// __global__ void testFloat4_test3(float4 *data) {
-//     float4 privateFloats[32];
-//     for(int i = 0; i < 32; i++) {
-//         privateFloats[i] = data[i];
-//     }
-//     for(int i = 0; i < 32; i++) {
-//         data[i + 1] = privateFloats[i];
-//     }
-// }
+__global__ void testFloat4_test3(float4 *data) {
+    float4 privateFloats[32];
+    for(int i = 0; i < 32; i++) {
+        privateFloats[i] = data[i];
+    }
+    for(int i = 0; i < 32; i++) {
+        data[i + 1] = privateFloats[i];
+    }
+}
 
 __global__ void testLocal(float *data) {
     __shared__ float myshared[32];

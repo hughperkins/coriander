@@ -546,6 +546,96 @@ kernel void _Z16testFloat4_test2P6float4(global float4* data) {
     ((global int4 *)v1)[0] = ((global int4 *)v2)[0];
 }
 
+kernel void _Z16testFloat4_test3P6float4(global float4* data) {
+int i_03;
+int i1_02;
+    label0:;
+    float4 privateFloats[32];
+    char*v0 = (char*)privateFloats;
+        i_03 = 0;
+    goto label1;
+    label1:;
+    long v3 = i_03;
+    float4* v4 = &(&privateFloats)[0][v3];
+    global float4* v5 = &data[v3];
+    char*v6 = (char*)v4;
+    global char*v7 = (global char*)v5;
+    (( int4 *)v6)[0] = ((global int4 *)v7)[0];
+    int v9 = i_03 | 1;
+    long v10 = v9;
+    float4* v11 = &(&privateFloats)[0][v10];
+    global float4* v12 = &data[v10];
+    char*v13 = (char*)v11;
+    global char*v14 = (global char*)v12;
+    (( int4 *)v13)[0] = ((global int4 *)v14)[0];
+    int v16 = i_03 | 2;
+    long v17 = v16;
+    float4* v18 = &(&privateFloats)[0][v17];
+    global float4* v19 = &data[v17];
+    char*v20 = (char*)v18;
+    global char*v21 = (global char*)v19;
+    (( int4 *)v20)[0] = ((global int4 *)v21)[0];
+    int v23 = i_03 | 3;
+    long v24 = v23;
+    float4* v25 = &(&privateFloats)[0][v24];
+    global float4* v26 = &data[v24];
+    char*v27 = (char*)v25;
+    global char*v28 = (global char*)v26;
+    (( int4 *)v27)[0] = ((global int4 *)v28)[0];
+    int v30 = i_03 + 4;
+    bool exitcond4_3 = v30 == 32;
+    if(exitcond4_3) {
+        goto label2;
+    } else {
+        i_03 = v30;
+        goto label1;
+    }
+    label2:;
+        i1_02 = 0;
+    goto label4;
+    label3:;
+    label4:;
+    int v35 = i1_02 | 1;
+    long v36 = v35;
+    global float4* v37 = &data[v36];
+    long v38 = i1_02;
+    float4* v39 = &(&privateFloats)[0][v38];
+    global char*v40 = (global char*)v37;
+    char*v41 = (char*)v39;
+    ((global int4 *)v40)[0] = (( int4 *)v41)[0];
+    int v43 = i1_02 | 2;
+    long v44 = v43;
+    global float4* v45 = &data[v44];
+    long v46 = v35;
+    float4* v47 = &(&privateFloats)[0][v46];
+    global char*v48 = (global char*)v45;
+    char*v49 = (char*)v47;
+    ((global int4 *)v48)[0] = (( int4 *)v49)[0];
+    int v51 = i1_02 | 3;
+    long v52 = v51;
+    global float4* v53 = &data[v52];
+    long v54 = v43;
+    float4* v55 = &(&privateFloats)[0][v54];
+    global char*v56 = (global char*)v53;
+    char*v57 = (char*)v55;
+    ((global int4 *)v56)[0] = (( int4 *)v57)[0];
+    int v59 = i1_02 + 4;
+    long v60 = v59;
+    global float4* v61 = &data[v60];
+    long v62 = v51;
+    float4* v63 = &(&privateFloats)[0][v62];
+    global char*v64 = (global char*)v61;
+    char*v65 = (char*)v63;
+    ((global int4 *)v64)[0] = (( int4 *)v65)[0];
+    bool exitcond_3 = v59 == 32;
+    if(exitcond_3) {
+        goto label3;
+    } else {
+        i1_02 = v59;
+        goto label4;
+    }
+}
+
 kernel void _Z9testLocalPf(global float* data) {
     local float _ZZ9testLocalPfE8myshared[32];
     label0:;
