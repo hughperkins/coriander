@@ -329,24 +329,21 @@ std::string dumpMemcpyCharCharLong(CallInst *instr) {
     cout << "align " << align << endl;
     string dstAddressSpaceStr = dumpAddressSpace(instr->getOperand(0)->getType());
     string srcAddressSpaceStr = dumpAddressSpace(instr->getOperand(1)->getType());
+    string elementTypeString = "";
     if(align == 4) {
-        // copy as ints?
-        int numElements = totalLength / align;
-        gencode += "#pragma unroll\n";
-        gencode += "    for(int __i=0; __i < " + toString(numElements) + "; __i++) {\n";
-        gencode += "        ((" + dstAddressSpaceStr + " int *)" + dumpOperand(instr->getOperand(0)) + ")[__i] = ";
-        gencode += "((" + srcAddressSpaceStr + " int *)" + dumpOperand(instr->getOperand(1)) + ")[__i];\n";
-        gencode += "    }\n";
-
-        // for(int i = 0; i < numElements; i++) {
-        //     gencode += "(int *)" + dumpOperand(instr->getOperand(0)) + "[" + toString(i) + "] = ";
-        //     gencode += dumpOperand(instr->getOperand(1)) + "[" + toString(i) + "];\n";
-        // }
-        return gencode;
+        elementTypeString = "int";
+    } else if(align == 16) {
+        elementTypeString = "int4";
     } else {
-        throw runtime_error("not implemented dumpmemcpy for align != 4");
+        throw runtime_error("not implemented dumpmemcpy for align " + toString(align));
     }
-    throw runtime_error("not implemented dumpmemcpy");
+    int numElements = totalLength / align;
+    gencode += "#pragma unroll\n";
+    gencode += "    for(int __i=0; __i < " + toString(numElements) + "; __i++) {\n";
+    gencode += "        ((" + dstAddressSpaceStr + " " + elementTypeString + " *)" + dumpOperand(instr->getOperand(0)) + ")[__i] = ";
+    gencode += "((" + srcAddressSpaceStr + " " + elementTypeString + " *)" + dumpOperand(instr->getOperand(1)) + ")[__i];\n";
+    gencode += "    }\n";
+    // throw runtime_error("not implemented dumpmemcpy");
     return gencode;
 }
 

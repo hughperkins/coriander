@@ -210,9 +210,9 @@ __global__ void testFloat4(float4 *data) {
     data[0] = myregister4;
 }
 
-// __global__ void testFloat4_test2(float4 *data) {
-//     data[0] = data[1];
-// }
+__global__ void testFloat4_test2(float4 *data) {
+    data[0] = data[1];
+}
 
 // __global__ void testFloat4_test3(float4 *data) {
 //     float4 privateFloats[32];
