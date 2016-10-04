@@ -121,6 +121,8 @@ std::string dumpIntegerType(IntegerType *type) {
             return "int";
         case 64:
             return "long";
+        case 16:
+            return "short";
         case 8:
             return "char";
         case 1:
@@ -162,9 +164,25 @@ std::string dumpStructType(StructType *type) {
                     declareStruct(name, type);
                 }
                 return name;
-            }else {
+            } else if(name.find("class.") != string::npos) {
+                // name = "struct " + "class_" + name.substr(6);
+                name[5] = '_';
+                name = "struct " + name;
+                size_t pos = name.find(':');
+                while(pos != string::npos) {
+                    name[pos] = '_';
+                    pos = name.find(':');
+                }
+                cout << "name " << name << endl;
+                // name[5] = ' ';
+                if(declaredStructs.find(name) == declaredStructs.end()) {
+                    declaredStructs.insert(name);
+                    declareStruct(name, type);
+                }
+                return name;
+            } else {
                 cout << "struct name: " << name << endl;
-                throw runtime_error("not implemented: struct name " + name);
+                throw runtime_error("dumpStructType() not implemented: struct name " + name);
             }
         }
     } else {
