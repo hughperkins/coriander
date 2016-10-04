@@ -379,7 +379,101 @@ std::string dumpInsertValue(InsertValueInst *instr) {
     return gencode;
 }
 
-std::string dumpExtractValue(ExtractElementInst *instr) {
+std::string dumpExtractValue(ExtractValueInst *instr) {
+    string gencode = "";
+    int numOperands = instr->getNumOperands();
+    cout << "instr:" << endl;
+    instr->dump();
+    string lhs = "";
+    string incomingOperand = dumpOperand(instr->getAggregateOperand());
+    // if rhs is empty, that means its 'undef', so we better declare it, I guess...
+    // Type *currentType = instr->getType();
+    Type *currentType = instr->getAggregateOperand()->getType();
+    // bool declaredVar = false;
+    // if(incomingOperand == "") {
+    //     gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + ";\n";
+    //     gencode += "    ";
+    //     incomingOperand = dumpOperand(instr);
+    //     declaredVar = true;
+    // }
+    lhs += incomingOperand;
+    cout << gencode << endl;
+    cout << "dumpType(instr->getType()) " << dumpType(instr->getType()) << endl;
+    cout << "lhs " << lhs << endl;
+    cout << "numOperands " << numOperands << endl;
+    cout << "op1 " << dumpOperand(instr->getOperand(1)) << endl;
+    // cout << "op0 " << dumpOperand(instr->getOperand(0)) << endl;
+    // copyAddressSpace(instr, instr->getOperand(0));
+    // int addressspace = cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace();
+    // if(addressspace == 3) { // local/shared memory
+    //     cout << "got access to local memory." << endl;
+    //     cout << "dumpoperand(instr) " << dumpOperand(instr) << endl;
+    //     // pointer into shared memory.
+    //     addSharedDeclaration(instr->getOperand(0));
+    // }
+    ArrayRef<unsigned> indices = instr->getIndices();
+    int numIndices = instr->getNumIndices();
+    cout << "numINdices " << instr->getNumIndices() << endl;
+    for(auto it=instr->idx_begin(); it != instr->idx_end(); it++) {
+        int idx = *it;
+        cout << "idx " << idx << endl;
+    }
+    cout << "indices[0] " << indices[0] << endl;
+    // indices.dump();
+    for(int d=0; d < numIndices; d++) {
+        cout << "d " << d << endl;
+        cout << "current Type " << dumpType(currentType) << endl;
+        int idx = indices[d];
+        Type *newType = 0;
+        if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
+            cout << "pointer || array" << endl;
+            if(d == 0) {
+                if(isa<ArrayType>(currentType->getPointerElementType())) {
+                    lhs = "(&" + lhs + ")";
+                }
+            }
+            lhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
+            newType = currentType->getPointerElementType();
+        } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
+            cout << "struct " << endl;
+            // StructType *structtype = cast<StructType>(currentType);
+            cout << "hasName " << structtype->hasName() << endl;
+            string structName = structtype->getName();
+            cout << "structName " << structName << endl;
+            if(structName == "struct.float4") {
+                cout << "idx " << idx << endl;
+                Type *elementType = structtype->getElementType(idx);
+                Type *castType = PointerType::get(elementType, 0);
+                newType = elementType;
+                lhs = "((" + dumpType(castType) + ")&" + lhs + ")";
+                lhs += string("[") + toString(idx) + "]";
+            } else {
+                // generic struct
+                // int idx = readInt32Constant(instr->getOperand(d + 1));
+                Type *elementType = structtype->getElementType(idx);
+                lhs += string(".f") + toString(idx);
+                newType = elementType;
+            }
+        } else {
+            currentType->dump();
+            throw runtime_error("type not implemented in extractvalue");
+        }
+        currentType = newType;
+    }
+    // rhs = "&" + rhs;
+    // Type *lhsType = PointerType::get(currentType, addressspace);
+    gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + lhs + ";\n";
+    // if(!declaredVar) {
+        // gencode += "    " + dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand + ";\n";
+    // }
+    // gencode += dumpType(currentType) + " " + dumpOperand(instr) + " = " + rhs;
+    // gencode += ";\n";
+    cout << "gencode " << gencode << endl;
+    // throw runtime_error("not implemented dumpExtractValue");
+    return gencode;
+}
+
+std::string dumpExtractValue__(ExtractElementInst *instr) {
     // seems like this is basically same as gep?
     // lets copy and hack gep for now...
     string gencode = "";
@@ -957,7 +1051,7 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
                 instructioncode = dumpInsertValue(cast<InsertValueInst>(instruction));
                 break;
             case Instruction::ExtractValue:
-                instructioncode = dumpExtractValue(cast<ExtractElementInst>(instruction));
+                instructioncode = dumpExtractValue(cast<ExtractValueInst>(instruction));
                 break;
             case Instruction::Alloca:
                 instructioncode = dumpAlloca(cast<AllocaInst>(instruction));
