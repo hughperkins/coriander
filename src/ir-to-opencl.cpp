@@ -55,7 +55,6 @@ static std::map<string, string> knownFunctionsMap; // from cuda to opencl, eg ti
 map<Value *, string> nameByValue;
 static int nextNameIdx;
 static string currentFunctionSharedDeclarations = "";
-// static set<string> currentFunctionDeclaredShareds;
 
 static bool debug;
 bool single_precision = true;
@@ -95,8 +94,6 @@ string dumpConstant(Constant *constant) {
 }
 
 string dumpOperand(Value *value) {
-    // cout << "dumpOperand" << endl;
-    // value->dump();
     unsigned int valueTy = value->getValueID();
     if(valueTy == AShrOperator::ConstantIntVal) {
         int intvalue = readInt32Constant(value);
@@ -116,20 +113,10 @@ string dumpOperand(Value *value) {
             floatvaluestr += "f";
         }
         return floatvaluestr;
-        // return oss.str();
-        // string asstring = oss.str();
-        // if(asstring.find('.') == string::npos) {
-        //     asstring += ".0f";
-        // }
     }
     if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
-        // cout << " dumping global variable" << endl;
-        // cout << string(glob->getName()) << endl;
         return string(glob->getName());
     }
-    // if(ArrayType *arrayType = dyn_cast<ArrayType>(value->getType())) {
-    //     return "arraytype";
-    // }
     string name = nameByValue[value];
     return name;
 }
@@ -145,7 +132,6 @@ void storeValueName(Value *value) {
             name[pos] = '_';
             pos = name.find(".");
         }
-        // name = name.replace(".", "_");
         nameByValue[value] = name;
     } else {
         int idx = nextNameIdx;
@@ -674,7 +660,6 @@ std::string dumpInttoPtr(IntToPtrInst *instr) {
     string typestr = dumpType(instr->getType());
     gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0)) + ";\n";
-    // throw runtime_error("dumpinttoptr not implemented");
     return gencode;
 }
 
@@ -1051,8 +1036,6 @@ std::string dumpFunction(Function *F) {
         nameByValue[basicBlock] = label;
         // write out phi declarations
         for(auto instructionIt = basicBlock->begin(); instructionIt != basicBlock->end(); instructionIt++) {
-        // auto instructionIt = basicBlock->begin();
-        // if(instructionIt != basicBlock->end()) {
             Instruction *instr = &*instructionIt;
             if(!PHINode::classof(instr)) {
                 break;
@@ -1075,7 +1058,6 @@ std::string dumpFunction(Function *F) {
         currentFunctionSharedDeclarations +
         body +
     "}\n";
-    // gencode += "}\n";
     cout << gencode;
     return gencode;
 }
