@@ -459,6 +459,15 @@ std::string dumpUIToFP(UIToFPInst *instr) {
     return gencode;
 }
 
+std::string dumpInttoPtr(IntToPtrInst *instr) {
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0)) + ";\n";
+    // throw runtime_error("dumpinttoptr not implemented");
+    return gencode;
+}
+
 std::string dumpFPTrunc(CastInst *instr) {
     // since this is float point trunc, lets just assume we're going from double to float
     // fix any exceptiosn to this rule later
@@ -739,6 +748,9 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
                 break;
             case Instruction::AddrSpaceCast:
                 instructioncode = dumpAddrSpaceCast(cast<AddrSpaceCastInst>(instruction));
+                break;
+            case Instruction::IntToPtr:
+                instructioncode = dumpInttoPtr(cast<IntToPtrInst>(instruction));
                 break;
             case Instruction::UIToFP:
                 instructioncode = dumpUIToFP((UIToFPInst *)instruction);
