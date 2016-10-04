@@ -288,6 +288,99 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
     return gencode;
 }
 
+std::string dumpExtract(ExtractElementInst *instr) {
+    // seems like this is basically same as gep?
+    // lets copy and hack gep for now...
+    string gencode = "";
+    int numOperands = instr->getNumOperands();
+    // Type *currentType = instr->getOperand(0)->getType();
+    // string rhs = "";
+    // rhs += "" + dumpOperand(instr->getOperand(0));
+    // copyAddressSpace(instr, instr->getOperand(0));
+    int addressspace = cast<PointerType>(instr->getOperand(1)->getType())->getAddressSpace();
+
+    // actually, seems this is used for float4, eg:
+    // %51 = extractvalue %struct.float4 %50, 0
+    // %52 = extractvalue %struct.float4 %50, 1
+    // lets make this handle only that case for now
+    cout << "instr:" << endl;
+    instr->dump();
+    cout << "op0" << endl;
+    instr->getOperand(0)->dump();
+    cout << "op1" << endl;
+    instr->getOperand(1)->dump();
+    cout << "op2" << endl;
+    instr->getOperand(2)->dump();
+    string instrtype = dumpType(instr->getType());
+    cout << "instrtype " << instrtype << endl;
+    // string intype = dumpType(instr->getOperand(0)->getType());
+    // cout << "intype " << intype << endl;
+    string intype = dumpType(instr->getOperand(0)->getType());
+    cout << "intype " << intype << endl;
+    if(numOperands != 2) {
+        throw runtime_error("not implemented dumpextract for numoperands " + toString(numOperands));
+    }
+    if(intype == "float4" && instrtype == "float") {
+        Type *castType = PointerType::get(instr->getType(), addressspace);
+        gencode += instrtype + " " + dumpOperand(instr) + " = ";
+        gencode += "((" + dumpType(castType) + ")" + dumpOperand(instr->getOperand(0)) + ")";
+        gencode += "[" + dumpOperand(instr->getOperand(1)) + "];\n";
+        cout << gencode << endl;
+        // return gencode;
+    } else {
+        throw runtime_error("not implemented dumpextract for type " + intype + " and instrtype " + instrtype);
+    }
+    throw runtime_error("not implemented dumpextract");
+
+    // if(addressspace == 3) { // local/shared memory
+    //     cout << "got access to local memory." << endl;
+    //     cout << "dumpoperand(instr) " << dumpOperand(instr) << endl;
+    //     // pointer into shared memory.
+    //     addSharedDeclaration(instr->getOperand(0));
+    // }
+    // for(int d=0; d < numOperands - 1; d++) {
+    //     Type *newType = 0;
+    //     cout << "d " << d << endl;
+    //     cout << "currentType:" << endl;
+    //     currentType->dump();
+    //     if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
+    //         // if(d == 0) {
+    //         //     if(isa<ArrayType>(currentType->getPointerElementType())) {
+    //         //         rhs = "(&" + rhs + ")";
+    //         //     }
+    //         // }
+    //         rhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
+    //         newType = currentType->getPointerElementType();
+    //     } else if(currentType->isStructTy()) {
+    //         StructType *structtype = cast<StructType>(currentType);
+    //         string structName = structtype->getName();
+    //         if(structName == "struct.float4") {
+    //             int idx = readInt32Constant(instr->getOperand(d + 1));
+    //             Type *elementType = structtype->getElementType(idx);
+    //             Type *castType = PointerType::get(elementType, addressspace);
+    //             newType = elementType;
+    //             rhs = "((" + dumpType(castType) + ")&" + rhs + ")";
+    //             rhs += string("[") + toString(idx) + "]";
+    //         } else {
+    //             // generic struct
+    //             int idx = readInt32Constant(instr->getOperand(d + 1));
+    //             Type *elementType = structtype->getElementType(idx);
+    //             rhs += string(".f") + toString(idx);
+    //             newType = elementType;
+    //         }
+    //     } else {
+    //         currentType->dump();
+    //         throw runtime_error("type not implemented in gpe");
+    //     }
+    //     currentType = newType;
+    // }
+    // rhs = "&" + rhs;
+    // Type *lhsType = PointerType::get(currentType, addressspace);
+    // gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + rhs;
+    // gencode += ";\n";
+    return gencode;
+}
+
 std::string dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
     string gencode = "";
     string typestr = dumpType(instr->getType());
@@ -757,6 +850,9 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
                 break;
             case Instruction::GetElementPtr:
                 instructioncode = dumpGetElementPtr((GetElementPtrInst *)instruction);
+                break;
+            case Instruction::ExtractValue:
+                instructioncode = dumpExtract(cast<ExtractElementInst>(instruction));
                 break;
             case Instruction::Alloca:
                 instructioncode = dumpAlloca(cast<AllocaInst>(instruction));
