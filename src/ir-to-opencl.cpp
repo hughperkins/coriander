@@ -332,6 +332,8 @@ std::string dumpMemcpyCharCharLong(CallInst *instr) {
     string elementTypeString = "";
     if(align == 4) {
         elementTypeString = "int";
+    } else if(align == 8) {
+        elementTypeString = "int2";
     } else if(align == 16) {
         elementTypeString = "int4";
     } else {
