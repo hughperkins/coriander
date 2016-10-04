@@ -78,9 +78,9 @@ kernel void _Z13use_template1PfPi(global float* data, global int* intdata) {
     int v0 = get_global_id(0);
     bool v1 = v0 == 0;
     if(v1) {
-                goto     label1;
+        goto label1;
     } else {
-                goto     label2;
+        goto label2;
     }
     label1:;
     global float* v3 = &data[1];
@@ -95,7 +95,7 @@ kernel void _Z13use_template1PfPi(global float* data, global int* intdata) {
     int v12 = v11[0];
     int v13 = v12 + v10;
     intdata[0] = v13;
-            goto     label2;
+        goto label2;
     label2:;
 }
 
@@ -255,7 +255,7 @@ int p_0;
     label0:;
     int v0 = get_global_id(0);
         p_0 = v0;
-    goto     label1;
+    goto label1;
     label1:;
     int v2 = p_0 + 1;
     long v3 = v2;
@@ -263,10 +263,10 @@ int p_0;
     int v5 = v4[0];
     bool v6 = v5 == 0;
     if(v6) {
-                goto     label2;
+        goto label2;
     } else {
         p_0 = v2;
-        goto     label1;
+        goto label1;
     }
     label2:;
 }
@@ -276,7 +276,7 @@ int p_0;
     label0:;
     int v0 = get_global_id(0);
         p_0 = v0;
-    goto     label1;
+    goto label1;
     label1:;
     long v2 = p_0;
     global int* v3 = &data[v2];
@@ -284,10 +284,10 @@ int p_0;
     bool v5 = v4 == 0;
     int v6 = p_0 + 1;
     if(v5) {
-                goto     label2;
+        goto label2;
     } else {
         p_0 = v6;
-        goto     label1;
+        goto label1;
     }
     label2:;
 }
@@ -297,9 +297,9 @@ kernel void _Z6testIfPii(global int* data, int N) {
     int v0 = get_global_id(0);
     bool v1 = v0 < N;
     if(v1) {
-                goto     label1;
+        goto label1;
     } else {
-                goto     label2;
+        goto label2;
     }
     label1:;
     long v3 = v0;
@@ -307,7 +307,7 @@ kernel void _Z6testIfPii(global int* data, int N) {
     int v5 = v4[0];
     int v6 = v5 << 1;
     v4[0] = v6;
-            goto     label2;
+        goto label2;
     label2:;
 }
 
@@ -319,9 +319,9 @@ kernel void _Z10testIfElsePii(global int* data, int N) {
     global int* v3 = &data[v2];
     int v4 = v3[0];
     if(v1) {
-                goto     label1;
+        goto label1;
     } else {
-                goto     label2;
+        goto label2;
     }
     label1:;
     int v6 = v4 << 1;
@@ -332,7 +332,7 @@ kernel void _Z10testIfElsePii(global int* data, int N) {
     int v11 = v10[0];
     int v12 = v11 << 1;
     v10[0] = v12;
-            goto     label3;
+        goto label3;
     label2:;
     int v15 = v4 + -20;
     v3[0] = v15;
@@ -342,7 +342,7 @@ kernel void _Z10testIfElsePii(global int* data, int N) {
     int v20 = v19[0];
     int v21 = v20 + -20;
     v19[0] = v21;
-            goto     label3;
+        goto label3;
     label3:;
 }
 
@@ -378,17 +378,17 @@ float sum_01;
     int v0 = get_global_id(0);
     bool v1 = v0 == 0;
     if(v1) {
-                goto     label1;
+        goto label1;
     } else {
-                goto     label12;
+        goto label12;
     }
     label1:;
     bool v3 = N > 0;
     if(v3) {
-                goto     label2;
+        goto label2;
     } else {
         sum_0_lcssa = 0;
-        goto     label10;
+        goto label10;
     }
     label2:;
     int v5 = N + -1;
@@ -397,15 +397,15 @@ float sum_01;
     if(lcmp_mod) {
         i_02_unr = 0;
 sum_01_unr = 0;
-        goto     label6;
+        goto label6;
     } else {
-                goto     label3;
+        goto label3;
     }
     label3:;
         i_02_prol = 0;
 sum_01_prol = 0;
 prol_iter = xtraiter;
-    goto     label4;
+    goto label4;
     label4:;
     long v8 = i_02_prol;
     global float* v9 = &data[v8];
@@ -417,39 +417,39 @@ prol_iter = xtraiter;
     if(prol_iter_cmp) {
         v_lcssa5 = v12;
 v_lcssa4 = v11;
-        goto     label5;
+        goto label5;
     } else {
         i_02_prol = v12;
 sum_01_prol = v11;
 prol_iter = prol_iter_sub;
-        goto     label4;
+        goto label4;
     }
     label5:;
         v_lcssa_unr = v_lcssa4;
 i_02_unr = v_lcssa5;
 sum_01_unr = v_lcssa4;
-    goto     label6;
+    goto label6;
     label6:;
     bool v15 = v5 < 3;
     if(v15) {
         v_lcssa = v_lcssa_unr;
-        goto     label9;
+        goto label9;
     } else {
-                goto     label7;
+        goto label7;
     }
     label7:;
         i_02 = i_02_unr;
 sum_01 = sum_01_unr;
-    goto     label11;
+    goto label11;
     label8:;
         v_lcssa = v_lcssa3;
-    goto     label9;
+    goto label9;
     label9:;
         sum_0_lcssa = v_lcssa;
-    goto     label10;
+    goto label10;
     label10:;
     data[0] = sum_0_lcssa;
-            goto     label12;
+        goto label12;
     label11:;
     long v22 = i_02;
     global float* v23 = &data[v22];
@@ -474,11 +474,11 @@ sum_01 = sum_01_unr;
     bool exitcond_3 = v41 == N;
     if(exitcond_3) {
         v_lcssa3 = v40;
-        goto     label8;
+        goto label8;
     } else {
         i_02 = v41;
 sum_01 = v40;
-        goto     label11;
+        goto label11;
     }
     label12:;
 }
@@ -488,15 +488,15 @@ kernel void _Z8setValuePfif(global float* data, int idx, float value) {
     int v0 = get_global_id(0);
     bool v1 = v0 == 0;
     if(v1) {
-                goto     label1;
+        goto label1;
     } else {
-                goto     label2;
+        goto label2;
     }
     label1:;
     long v3 = idx;
     global float* v4 = &data[v3];
     v4[0] = value;
-            goto     label2;
+        goto label2;
     label2:;
 }
 
@@ -586,4 +586,157 @@ kernel void _Z10testLocal2Pf(global float* data) {
     global float* v20 = &data[1];
     global int*v21 = (global int*)v20;
     v21[0] = v19;
+}
+
+kernel void _Z9testArrayPf(global float* data) {
+int i_03;
+    label0:;
+    float privateFloats[32];
+    char*v0 = (char*)privateFloats;
+        i_03 = 0;
+    goto label1;
+    label1:;
+    int v3 = i_03 * 3;
+    long v4 = v3;
+    global float* v5 = &data[v4];
+    global int*v6 = (global int*)v5;
+    int v7 = v6[0];
+    long v8 = i_03;
+    float* v9 = &(&privateFloats)[0][v8];
+    int*v10 = (int*)v9;
+    v10[0] = v7;
+    int v12 = i_03 | 1;
+    int v13 = v12 * 3;
+    long v14 = v13;
+    global float* v15 = &data[v14];
+    global int*v16 = (global int*)v15;
+    int v17 = v16[0];
+    long v18 = v12;
+    float* v19 = &(&privateFloats)[0][v18];
+    int*v20 = (int*)v19;
+    v20[0] = v17;
+    int v22 = i_03 | 2;
+    int v23 = v22 * 3;
+    long v24 = v23;
+    global float* v25 = &data[v24];
+    global int*v26 = (global int*)v25;
+    int v27 = v26[0];
+    long v28 = v22;
+    float* v29 = &(&privateFloats)[0][v28];
+    int*v30 = (int*)v29;
+    v30[0] = v27;
+    int v32 = i_03 | 3;
+    int v33 = v32 * 3;
+    long v34 = v33;
+    global float* v35 = &data[v34];
+    global int*v36 = (global int*)v35;
+    int v37 = v36[0];
+    long v38 = v32;
+    float* v39 = &(&privateFloats)[0][v38];
+    int*v40 = (int*)v39;
+    v40[0] = v37;
+    int v42 = i_03 + 4;
+    bool exitcond_3 = v42 == 32;
+    if(exitcond_3) {
+        goto label2;
+    } else {
+        i_03 = v42;
+        goto label1;
+    }
+    label2:;
+    int*v44 = (int*)privateFloats;
+    int v45 = v44[0];
+    global float* v46 = &data[1];
+    global int*v47 = (global int*)v46;
+    v47[0] = v45;
+    float* v49 = &(&privateFloats)[0][2];
+    int*v50 = (int*)v49;
+    int v51 = v50[0];
+    global float* v52 = &data[3];
+    global int*v53 = (global int*)v52;
+    v53[0] = v51;
+    float* v55 = &(&privateFloats)[0][4];
+    int*v56 = (int*)v55;
+    int v57 = v56[0];
+    global float* v58 = &data[5];
+    global int*v59 = (global int*)v58;
+    v59[0] = v57;
+    float* v61 = &(&privateFloats)[0][6];
+    int*v62 = (int*)v61;
+    int v63 = v62[0];
+    global float* v64 = &data[7];
+    global int*v65 = (global int*)v64;
+    v65[0] = v63;
+    float* v67 = &(&privateFloats)[0][8];
+    int*v68 = (int*)v67;
+    int v69 = v68[0];
+    global float* v70 = &data[9];
+    global int*v71 = (global int*)v70;
+    v71[0] = v69;
+    float* v73 = &(&privateFloats)[0][10];
+    int*v74 = (int*)v73;
+    int v75 = v74[0];
+    global float* v76 = &data[11];
+    global int*v77 = (global int*)v76;
+    v77[0] = v75;
+    float* v79 = &(&privateFloats)[0][12];
+    int*v80 = (int*)v79;
+    int v81 = v80[0];
+    global float* v82 = &data[13];
+    global int*v83 = (global int*)v82;
+    v83[0] = v81;
+    float* v85 = &(&privateFloats)[0][14];
+    int*v86 = (int*)v85;
+    int v87 = v86[0];
+    global float* v88 = &data[15];
+    global int*v89 = (global int*)v88;
+    v89[0] = v87;
+    float* v91 = &(&privateFloats)[0][16];
+    int*v92 = (int*)v91;
+    int v93 = v92[0];
+    global float* v94 = &data[17];
+    global int*v95 = (global int*)v94;
+    v95[0] = v93;
+    float* v97 = &(&privateFloats)[0][18];
+    int*v98 = (int*)v97;
+    int v99 = v98[0];
+    global float* v100 = &data[19];
+    global int*v101 = (global int*)v100;
+    v101[0] = v99;
+    float* v103 = &(&privateFloats)[0][20];
+    int*v104 = (int*)v103;
+    int v105 = v104[0];
+    global float* v106 = &data[21];
+    global int*v107 = (global int*)v106;
+    v107[0] = v105;
+    float* v109 = &(&privateFloats)[0][22];
+    int*v110 = (int*)v109;
+    int v111 = v110[0];
+    global float* v112 = &data[23];
+    global int*v113 = (global int*)v112;
+    v113[0] = v111;
+    float* v115 = &(&privateFloats)[0][24];
+    int*v116 = (int*)v115;
+    int v117 = v116[0];
+    global float* v118 = &data[25];
+    global int*v119 = (global int*)v118;
+    v119[0] = v117;
+    float* v121 = &(&privateFloats)[0][26];
+    int*v122 = (int*)v121;
+    int v123 = v122[0];
+    global float* v124 = &data[27];
+    global int*v125 = (global int*)v124;
+    v125[0] = v123;
+    float* v127 = &(&privateFloats)[0][28];
+    int*v128 = (int*)v127;
+    int v129 = v128[0];
+    global float* v130 = &data[29];
+    global int*v131 = (global int*)v130;
+    v131[0] = v129;
+    float* v133 = &(&privateFloats)[0][30];
+    int*v134 = (int*)v133;
+    int v135 = v134[0];
+    global float* v136 = &data[31];
+    global int*v137 = (global int*)v136;
+    v137[0] = v135;
 }
