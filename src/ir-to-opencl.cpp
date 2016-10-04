@@ -169,7 +169,7 @@ std::string dumpAlloca(Instruction *alloca) {
             // throw runtime_error("not implemented: alloca for arraytype");
             return dumpType(elementType) + " " + dumpOperand(alloca) + "[" + toString(innercount) + "];\n";
         } else {
-            return typestring + " " + dumpOperand(alloca) + ";\n";
+            return typestring + " " + dumpOperand(alloca) + "[1];\n";
         }
     } else {
         throw runtime_error("not implemented: alloca for count != 1");

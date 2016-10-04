@@ -959,7 +959,7 @@ float4 _Z9getfloat4f(float a) {
 
 float _Z19getfloat4ElementSumfii(float a, int e0, int e1) {
     label0:;
-    float4 res;
+    float4 res[1];
     char*v0 = (char*)res;
     float v2 = a + 1.0f;
     float v3 = a + 2.5f;
