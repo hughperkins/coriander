@@ -259,3 +259,16 @@ __global__ void testmemcpy(float *data) {
         data[i] = privateFloats[i];
     }
 }
+
+__host__ float4 getfloat4(float a) {
+    float4 res;
+    res.x = a;
+    res.y = a + 1;
+    res.z = a + 2.5f;
+    return res;
+}
+
+__global__ void testFloat4_extractvalue(float4 *data, float *data2, int N) {
+    float4 res = getfloat4(data2[0]);
+    data[0] = res;
+}
