@@ -74,24 +74,6 @@ std::string dumpValue(Value *value) {
     return gencode;
 }
 
-int getIntConstant(Value *value) {
-    unsigned int valueTy = value->getValueID();
-    // cout << "getIntConstant" << endl;
-    // value->dump();
-    if(valueTy != AShrOperator::ConstantIntVal) {
-        throw runtime_error("not a constant int");
-    }
-    return ((ConstantInt *)value)->getSExtValue();
-}
-
-double getFloatConstant(Value *value) {
-    unsigned int valueTy = value->getValueID();
-    if(valueTy != AShrOperator::ConstantFPVal) {
-        throw runtime_error("not a constant float");
-    }
-    return ((ConstantFP *)value)->getValueAPF().convertToFloat();
-}
-
 string dumpConstant(Constant *constant) {
     unsigned int valueTy = constant->getValueID();
     ostringstream oss;
@@ -117,13 +99,13 @@ string dumpOperand(Value *value) {
     // value->dump();
     unsigned int valueTy = value->getValueID();
     if(valueTy == AShrOperator::ConstantIntVal) {
-        int intvalue = getIntConstant(value);
+        int intvalue = readInt32Constant(value);
         ostringstream oss;
         oss << intvalue;
         return oss.str();
     }
     if(valueTy == AShrOperator::ConstantFPVal) {
-        double floatvalue = getFloatConstant(value);
+        double floatvalue = readFloatConstant(value);
         ostringstream oss;
         oss << floatvalue;
         return oss.str();
@@ -177,7 +159,7 @@ std::string dumpAlloca(Instruction *alloca) {
     PointerType *ptrElementType = cast<PointerType>(alloca->getType()->getPointerElementType());
     std::string typestring = dumpType(ptrElementType);
     cout << "alloca typestring " << typestring << endl;
-    int count = getIntConstant(alloca->getOperand(0));
+    int count = readInt32Constant(alloca->getOperand(0));
     cout << "count " << count << endl;
     if(count == 1) {
         if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
@@ -280,7 +262,7 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
             StructType *structtype = cast<StructType>(currentType);
             string structName = structtype->getName();
             if(structName == "struct.float4") {
-                int idx = getIntConstant(instr->getOperand(d + 1));
+                int idx = readInt32Constant(instr->getOperand(d + 1));
                 Type *elementType = structtype->getElementType(idx);
                 Type *castType = PointerType::get(elementType, addressspace);
                 newType = elementType;
@@ -288,7 +270,7 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
                 rhs += string("[") + toString(idx) + "]";
             } else {
                 // generic struct
-                int idx = getIntConstant(instr->getOperand(d + 1));
+                int idx = readInt32Constant(instr->getOperand(d + 1));
                 Type *elementType = structtype->getElementType(idx);
                 rhs += string(".f") + toString(idx);
                 newType = elementType;
@@ -335,6 +317,36 @@ std::string dumpAddrSpaceCast(AddrSpaceCastInst *instr) {
     gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
     gencode += "(" + dumpType(instr->getType()) + ")" + dumpOperand(instr->getOperand(0)) + ";\n";
     // throw runtime_error("not implemented");
+    return gencode;
+}
+
+std::string dumpMemcpyCharCharLong(CallInst *instr) {
+    std::string gencode = "";
+        // int intvalue = readInt32Constant(value);
+    int totalLength = cast<ConstantInt>(instr->getOperand(2))->getSExtValue();
+    cout << "totalLength " << totalLength << endl;
+    int align = cast<ConstantInt>(instr->getOperand(3))->getSExtValue();
+    cout << "align " << align << endl;
+    string dstAddressSpaceStr = dumpAddressSpace(instr->getOperand(0)->getType());
+    string srcAddressSpaceStr = dumpAddressSpace(instr->getOperand(1)->getType());
+    if(align == 4) {
+        // copy as ints?
+        int numElements = totalLength / align;
+        gencode += "#pragma unroll\n";
+        gencode += "    for(int __i=0; __i < " + toString(numElements) + "; __i++) {\n";
+        gencode += "        ((" + dstAddressSpaceStr + " int *)" + dumpOperand(instr->getOperand(0)) + ")[__i] = ";
+        gencode += "((" + srcAddressSpaceStr + " int *)" + dumpOperand(instr->getOperand(1)) + ")[__i];\n";
+        gencode += "    }\n";
+
+        // for(int i = 0; i < numElements; i++) {
+        //     gencode += "(int *)" + dumpOperand(instr->getOperand(0)) + "[" + toString(i) + "] = ";
+        //     gencode += dumpOperand(instr->getOperand(1)) + "[" + toString(i) + "];\n";
+        // }
+        return gencode;
+    } else {
+        throw runtime_error("not implemented dumpmemcpy for align != 4");
+    }
+    throw runtime_error("not implemented dumpmemcpy");
     return gencode;
 }
 
@@ -390,6 +402,9 @@ std::string dumpCall(CallInst *instr) {
     }
     if(functionName == "llvm.lifetime.end") {
         return "";  // just ignore for now
+    }
+    if(functionName == "llvm.memcpy.p0i8.p0i8.i64") {
+        return dumpMemcpyCharCharLong(instr);  // just ignore for now
     }
     if(knownFunctionsMap.find(functionName) != knownFunctionsMap.end()) {
         // cout << "replace " << functionName << " with " << knownFunctionsMap[functionName] << endl;

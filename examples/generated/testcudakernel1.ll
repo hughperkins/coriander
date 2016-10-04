@@ -27,15 +27,15 @@ define float @_Z3barff(float %a, float %b) #1 {
 
 ; Function Attrs: norecurse nounwind
 define void @_Z7incrvalPf(float* nocapture %a) #2 {
-  %1 = load float, float* %a, align 4, !tbaa !32
+  %1 = load float, float* %a, align 4, !tbaa !33
   %2 = fadd float %1, 3.000000e+00
-  store float %2, float* %a, align 4, !tbaa !32
+  store float %2, float* %a, align 4, !tbaa !33
   ret void
 }
 
 ; Function Attrs: norecurse nounwind
 define void @_Z3fooPf(float* nocapture %data) #2 {
-  store float 1.230000e+02, float* %data, align 4, !tbaa !32
+  store float 1.230000e+02, float* %data, align 4, !tbaa !33
   ret void
 }
 
@@ -44,7 +44,7 @@ define void @_Z7use_tidPf(float* nocapture %data) #2 {
   %1 = tail call i32 @llvm.ptx.read.tid.x() #8
   %2 = sext i32 %1 to i64
   %3 = getelementptr inbounds float, float* %data, i64 %2
-  store float 1.230000e+02, float* %3, align 4, !tbaa !32
+  store float 1.230000e+02, float* %3, align 4, !tbaa !33
   ret void
 }
 
@@ -59,9 +59,9 @@ define void @_Z8use_tid2Pi(i32* nocapture %data) #2 {
   %1 = tail call i32 @llvm.ptx.read.tid.x() #8
   %2 = sext i32 %1 to i64
   %3 = getelementptr inbounds i32, i32* %data, i64 %2
-  %4 = load i32, i32* %3, align 4, !tbaa !36
+  %4 = load i32, i32* %3, align 4, !tbaa !37
   %5 = add nsw i32 %4, %1
-  store i32 %5, i32* %3, align 4, !tbaa !36
+  store i32 %5, i32* %3, align 4, !tbaa !37
   ret void
 }
 
@@ -69,9 +69,9 @@ define void @_Z8use_tid2Pi(i32* nocapture %data) #2 {
 define void @_Z10copy_floatPf(float* nocapture %a) #2 {
   %1 = getelementptr inbounds float, float* %a, i64 1
   %2 = bitcast float* %1 to i32*
-  %3 = load i32, i32* %2, align 4, !tbaa !32
+  %3 = load i32, i32* %2, align 4, !tbaa !33
   %4 = bitcast float* %a to i32*
-  store i32 %3, i32* %4, align 4, !tbaa !32
+  store i32 %3, i32* %4, align 4, !tbaa !33
   ret void
 }
 
@@ -80,7 +80,7 @@ define void @_Z11use_blockidPf(float* nocapture %data) #2 {
   %1 = tail call i32 @llvm.ptx.read.ctaid.x() #8
   %2 = sext i32 %1 to i64
   %3 = getelementptr inbounds float, float* %data, i64 %2
-  store float 1.230000e+02, float* %3, align 4, !tbaa !32
+  store float 1.230000e+02, float* %3, align 4, !tbaa !33
   ret void
 }
 
@@ -89,7 +89,7 @@ define void @_Z11use_griddimPf(float* nocapture %data) #2 {
   %1 = tail call i32 @llvm.ptx.read.nctaid.x() #8
   %2 = sext i32 %1 to i64
   %3 = getelementptr inbounds float, float* %data, i64 %2
-  store float 1.230000e+02, float* %3, align 4, !tbaa !32
+  store float 1.230000e+02, float* %3, align 4, !tbaa !33
   ret void
 }
 
@@ -98,7 +98,7 @@ define void @_Z12use_blockdimPf(float* nocapture %data) #2 {
   %1 = tail call i32 @llvm.ptx.read.ntid.x() #8
   %2 = sext i32 %1 to i64
   %3 = getelementptr inbounds float, float* %data, i64 %2
-  store float 1.230000e+02, float* %3, align 4, !tbaa !32
+  store float 1.230000e+02, float* %3, align 4, !tbaa !33
   ret void
 }
 
@@ -110,17 +110,17 @@ define void @_Z13use_template1PfPi(float* nocapture %data, i32* nocapture %intda
 
 ; <label>:3                                       ; preds = %0
   %4 = getelementptr inbounds float, float* %data, i64 1
-  %5 = load float, float* %4, align 4, !tbaa !32
+  %5 = load float, float* %4, align 4, !tbaa !33
   %6 = getelementptr inbounds float, float* %data, i64 2
-  %7 = load float, float* %6, align 4, !tbaa !32
+  %7 = load float, float* %6, align 4, !tbaa !33
   %8 = fadd float %5, %7
-  store float %8, float* %data, align 4, !tbaa !32
+  store float %8, float* %data, align 4, !tbaa !33
   %9 = getelementptr inbounds i32, i32* %intdata, i64 1
-  %10 = load i32, i32* %9, align 4, !tbaa !36
+  %10 = load i32, i32* %9, align 4, !tbaa !37
   %11 = getelementptr inbounds i32, i32* %intdata, i64 2
-  %12 = load i32, i32* %11, align 4, !tbaa !36
+  %12 = load i32, i32* %11, align 4, !tbaa !37
   %13 = add nsw i32 %12, %10
-  store i32 %13, i32* %intdata, align 4, !tbaa !36
+  store i32 %13, i32* %intdata, align 4, !tbaa !37
   br label %14
 
 ; <label>:14                                      ; preds = %3, %0
@@ -129,34 +129,34 @@ define void @_Z13use_template1PfPi(float* nocapture %data, i32* nocapture %intda
 
 define void @_Z13someops_floatPf(float* nocapture %data) #4 {
   %1 = getelementptr inbounds float, float* %data, i64 1
-  %2 = load float, float* %1, align 4, !tbaa !32
+  %2 = load float, float* %1, align 4, !tbaa !33
   %3 = getelementptr inbounds float, float* %data, i64 2
-  %4 = load float, float* %3, align 4, !tbaa !32
+  %4 = load float, float* %3, align 4, !tbaa !33
   %5 = fsub float %2, %4
   %6 = fdiv float %2, %4
   %7 = fadd float %5, %6
   %8 = fmul float %4, %2
   %9 = fadd float %7, %8
-  store float %9, float* %data, align 4, !tbaa !32
+  store float %9, float* %data, align 4, !tbaa !33
   %10 = tail call float @_Z15our_pretend_logf(float %2)
-  %11 = load float, float* %data, align 4, !tbaa !32
+  %11 = load float, float* %data, align 4, !tbaa !33
   %12 = fadd float %10, %11
-  store float %12, float* %data, align 4, !tbaa !32
-  %13 = load float, float* %1, align 4, !tbaa !32
+  store float %12, float* %data, align 4, !tbaa !33
+  %13 = load float, float* %1, align 4, !tbaa !33
   %14 = tail call float @_Z15our_pretend_expf(float %13)
-  %15 = load float, float* %data, align 4, !tbaa !32
+  %15 = load float, float* %data, align 4, !tbaa !33
   %16 = fadd float %14, %15
-  store float %16, float* %data, align 4, !tbaa !32
-  %17 = load float, float* %1, align 4, !tbaa !32
+  store float %16, float* %data, align 4, !tbaa !33
+  %17 = load float, float* %1, align 4, !tbaa !33
   %18 = tail call float @_Z16our_pretend_tanhf(float %17)
-  %19 = load float, float* %data, align 4, !tbaa !32
+  %19 = load float, float* %data, align 4, !tbaa !33
   %20 = fadd float %18, %19
-  store float %20, float* %data, align 4, !tbaa !32
-  %21 = load float, float* %1, align 4, !tbaa !32
+  store float %20, float* %data, align 4, !tbaa !33
+  %21 = load float, float* %1, align 4, !tbaa !33
   %22 = tail call float @_ZSt4sqrtf(float %21)
-  %23 = load float, float* %data, align 4, !tbaa !32
+  %23 = load float, float* %data, align 4, !tbaa !33
   %24 = fsub float %23, %22
-  store float %24, float* %data, align 4, !tbaa !32
+  store float %24, float* %data, align 4, !tbaa !33
   ret void
 }
 
@@ -171,9 +171,9 @@ declare float @_ZSt4sqrtf(float) #4
 ; Function Attrs: norecurse nounwind
 define void @_Z11someops_intPi(i32* nocapture %data) #2 {
   %1 = getelementptr inbounds i32, i32* %data, i64 1
-  %2 = load i32, i32* %1, align 4, !tbaa !36
+  %2 = load i32, i32* %1, align 4, !tbaa !37
   %3 = getelementptr inbounds i32, i32* %data, i64 2
-  %4 = load i32, i32* %3, align 4, !tbaa !36
+  %4 = load i32, i32* %3, align 4, !tbaa !37
   %5 = sdiv i32 %2, %4
   %6 = add i32 %2, %5
   %7 = add i32 %6, %2
@@ -183,93 +183,93 @@ define void @_Z11someops_intPi(i32* nocapture %data) #2 {
   %11 = add nsw i32 %10, %9
   %12 = ashr i32 %2, %4
   %13 = add nsw i32 %12, %11
-  store i32 %13, i32* %data, align 4, !tbaa !36
+  store i32 %13, i32* %data, align 4, !tbaa !37
   ret void
 }
 
 ; Function Attrs: norecurse nounwind
 define void @_Z14testbooleanopsPi(i32* nocapture %data) #2 {
-  %1 = load i32, i32* %data, align 4, !tbaa !36
+  %1 = load i32, i32* %data, align 4, !tbaa !37
   %2 = icmp sgt i32 %1, 0
   %3 = getelementptr inbounds i32, i32* %data, i64 1
-  %4 = load i32, i32* %3, align 4, !tbaa !36
+  %4 = load i32, i32* %3, align 4, !tbaa !37
   %5 = icmp slt i32 %4, 0
   %6 = and i1 %2, %5
   %7 = zext i1 %6 to i32
   %8 = getelementptr inbounds i32, i32* %data, i64 2
-  store i32 %7, i32* %8, align 4, !tbaa !36
+  store i32 %7, i32* %8, align 4, !tbaa !37
   %9 = or i1 %2, %5
   %10 = zext i1 %9 to i32
   %11 = getelementptr inbounds i32, i32* %data, i64 3
-  store i32 %10, i32* %11, align 4, !tbaa !36
+  store i32 %10, i32* %11, align 4, !tbaa !37
   %12 = zext i1 %2 to i32
   %13 = xor i32 %12, 1
   %14 = getelementptr inbounds i32, i32* %data, i64 4
-  store i32 %13, i32* %14, align 4, !tbaa !36
+  store i32 %13, i32* %14, align 4, !tbaa !37
   ret void
 }
 
 ; Function Attrs: norecurse nounwind
 define void @_Z26testcomparisons_int_signedPi(i32* nocapture %data) #2 {
-  %1 = load i32, i32* %data, align 4, !tbaa !36
+  %1 = load i32, i32* %data, align 4, !tbaa !37
   %2 = getelementptr inbounds i32, i32* %data, i64 1
-  %3 = load i32, i32* %2, align 4, !tbaa !36
+  %3 = load i32, i32* %2, align 4, !tbaa !37
   %4 = icmp sge i32 %1, %3
   %5 = zext i1 %4 to i32
   %6 = getelementptr inbounds i32, i32* %data, i64 5
-  store i32 %5, i32* %6, align 4, !tbaa !36
+  store i32 %5, i32* %6, align 4, !tbaa !37
   %7 = icmp sle i32 %1, %3
   %8 = zext i1 %7 to i32
   %9 = getelementptr inbounds i32, i32* %data, i64 6
-  store i32 %8, i32* %9, align 4, !tbaa !36
+  store i32 %8, i32* %9, align 4, !tbaa !37
   %10 = icmp sgt i32 %1, %3
   %11 = zext i1 %10 to i32
   %12 = getelementptr inbounds i32, i32* %data, i64 7
-  store i32 %11, i32* %12, align 4, !tbaa !36
+  store i32 %11, i32* %12, align 4, !tbaa !37
   %13 = icmp slt i32 %1, %3
   %14 = zext i1 %13 to i32
   %15 = getelementptr inbounds i32, i32* %data, i64 8
-  store i32 %14, i32* %15, align 4, !tbaa !36
+  store i32 %14, i32* %15, align 4, !tbaa !37
   %16 = icmp eq i32 %1, %3
   %17 = zext i1 %16 to i32
   %18 = getelementptr inbounds i32, i32* %data, i64 9
-  store i32 %17, i32* %18, align 4, !tbaa !36
+  store i32 %17, i32* %18, align 4, !tbaa !37
   %19 = icmp ne i32 %1, %3
   %20 = zext i1 %19 to i32
   %21 = getelementptr inbounds i32, i32* %data, i64 10
-  store i32 %20, i32* %21, align 4, !tbaa !36
+  store i32 %20, i32* %21, align 4, !tbaa !37
   ret void
 }
 
 ; Function Attrs: norecurse nounwind
 define void @_Z21testcomparisons_floatPf(float* nocapture %data) #2 {
-  %1 = load float, float* %data, align 4, !tbaa !32
+  %1 = load float, float* %data, align 4, !tbaa !33
   %2 = getelementptr inbounds float, float* %data, i64 1
-  %3 = load float, float* %2, align 4, !tbaa !32
+  %3 = load float, float* %2, align 4, !tbaa !33
   %4 = fcmp oge float %1, %3
   %5 = uitofp i1 %4 to float
   %6 = getelementptr inbounds float, float* %data, i64 5
-  store float %5, float* %6, align 4, !tbaa !32
+  store float %5, float* %6, align 4, !tbaa !33
   %7 = fcmp ole float %1, %3
   %8 = uitofp i1 %7 to float
   %9 = getelementptr inbounds float, float* %data, i64 6
-  store float %8, float* %9, align 4, !tbaa !32
+  store float %8, float* %9, align 4, !tbaa !33
   %10 = fcmp ogt float %1, %3
   %11 = uitofp i1 %10 to float
   %12 = getelementptr inbounds float, float* %data, i64 7
-  store float %11, float* %12, align 4, !tbaa !32
+  store float %11, float* %12, align 4, !tbaa !33
   %13 = fcmp olt float %1, %3
   %14 = uitofp i1 %13 to float
   %15 = getelementptr inbounds float, float* %data, i64 8
-  store float %14, float* %15, align 4, !tbaa !32
+  store float %14, float* %15, align 4, !tbaa !33
   %16 = fcmp oeq float %1, %3
   %17 = uitofp i1 %16 to float
   %18 = getelementptr inbounds float, float* %data, i64 9
-  store float %17, float* %18, align 4, !tbaa !32
+  store float %17, float* %18, align 4, !tbaa !33
   %19 = fcmp une float %1, %3
   %20 = uitofp i1 %19 to float
   %21 = getelementptr inbounds float, float* %data, i64 10
-  store float %20, float* %21, align 4, !tbaa !32
+  store float %20, float* %21, align 4, !tbaa !33
   ret void
 }
 
@@ -278,16 +278,16 @@ define void @_Z15testsyncthreadsPf(float* nocapture %data) #2 {
   %1 = tail call i32 @llvm.ptx.read.tid.x() #8
   %2 = sext i32 %1 to i64
   %3 = getelementptr inbounds float, float* %data, i64 %2
-  %4 = load float, float* %3, align 4, !tbaa !32
+  %4 = load float, float* %3, align 4, !tbaa !33
   %5 = fmul float %4, 2.000000e+00
-  store float %5, float* %3, align 4, !tbaa !32
+  store float %5, float* %3, align 4, !tbaa !33
   tail call void @llvm.cuda.syncthreads() #8
   %6 = add nsw i32 %1, 1
   %7 = sext i32 %6 to i64
   %8 = getelementptr inbounds float, float* %data, i64 %7
-  %9 = load float, float* %8, align 4, !tbaa !32
+  %9 = load float, float* %8, align 4, !tbaa !33
   %10 = fadd float %9, 2.000000e+00
-  store float %10, float* %8, align 4, !tbaa !32
+  store float %10, float* %8, align 4, !tbaa !33
   ret void
 }
 
@@ -301,7 +301,7 @@ define void @_Z11testDoWhilePii(i32* nocapture %data, i32 %N) #5 {
   %3 = add nsw i32 %p.0, 1
   %4 = sext i32 %3 to i64
   %5 = getelementptr inbounds i32, i32* %data, i64 %4
-  %6 = load i32, i32* %5, align 4, !tbaa !36
+  %6 = load i32, i32* %5, align 4, !tbaa !37
   %7 = icmp eq i32 %6, 0
   br i1 %7, label %8, label %2
 
@@ -318,7 +318,7 @@ define void @_Z9testWhilePii(i32* nocapture %data, i32 %N) #5 {
   %p.0 = phi i32 [ %1, %0 ], [ %7, %2 ]
   %3 = sext i32 %p.0 to i64
   %4 = getelementptr inbounds i32, i32* %data, i64 %3
-  %5 = load i32, i32* %4, align 4, !tbaa !36
+  %5 = load i32, i32* %4, align 4, !tbaa !37
   %6 = icmp eq i32 %5, 0
   %7 = add nsw i32 %p.0, 1
   br i1 %6, label %8, label %2
@@ -336,9 +336,9 @@ define void @_Z6testIfPii(i32* nocapture %data, i32 %N) #2 {
 ; <label>:3                                       ; preds = %0
   %4 = sext i32 %1 to i64
   %5 = getelementptr inbounds i32, i32* %data, i64 %4
-  %6 = load i32, i32* %5, align 4, !tbaa !36
+  %6 = load i32, i32* %5, align 4, !tbaa !37
   %7 = shl nsw i32 %6, 1
-  store i32 %7, i32* %5, align 4, !tbaa !36
+  store i32 %7, i32* %5, align 4, !tbaa !37
   br label %8
 
 ; <label>:8                                       ; preds = %3, %0
@@ -351,29 +351,29 @@ define void @_Z10testIfElsePii(i32* nocapture %data, i32 %N) #2 {
   %2 = icmp slt i32 %1, %N
   %3 = sext i32 %1 to i64
   %4 = getelementptr inbounds i32, i32* %data, i64 %3
-  %5 = load i32, i32* %4, align 4, !tbaa !36
+  %5 = load i32, i32* %4, align 4, !tbaa !37
   br i1 %2, label %6, label %13
 
 ; <label>:6                                       ; preds = %0
   %7 = shl nsw i32 %5, 1
-  store i32 %7, i32* %4, align 4, !tbaa !36
+  store i32 %7, i32* %4, align 4, !tbaa !37
   %8 = add nsw i32 %1, 3
   %9 = sext i32 %8 to i64
   %10 = getelementptr inbounds i32, i32* %data, i64 %9
-  %11 = load i32, i32* %10, align 4, !tbaa !36
+  %11 = load i32, i32* %10, align 4, !tbaa !37
   %12 = shl nsw i32 %11, 1
-  store i32 %12, i32* %10, align 4, !tbaa !36
+  store i32 %12, i32* %10, align 4, !tbaa !37
   br label %20
 
 ; <label>:13                                      ; preds = %0
   %14 = add nsw i32 %5, -20
-  store i32 %14, i32* %4, align 4, !tbaa !36
+  store i32 %14, i32* %4, align 4, !tbaa !37
   %15 = add nsw i32 %1, 5
   %16 = sext i32 %15 to i64
   %17 = getelementptr inbounds i32, i32* %data, i64 %16
-  %18 = load i32, i32* %17, align 4, !tbaa !36
+  %18 = load i32, i32* %17, align 4, !tbaa !37
   %19 = add nsw i32 %18, -20
-  store i32 %19, i32* %17, align 4, !tbaa !36
+  store i32 %19, i32* %17, align 4, !tbaa !37
   br label %20
 
 ; <label>:20                                      ; preds = %13, %6
@@ -383,15 +383,15 @@ define void @_Z10testIfElsePii(i32* nocapture %data, i32 %N) #2 {
 ; Function Attrs: norecurse nounwind
 define void @_Z11testTernaryPf(float* nocapture %data) #2 {
   %1 = getelementptr inbounds float, float* %data, i64 1
-  %2 = load float, float* %1, align 4, !tbaa !32
+  %2 = load float, float* %1, align 4, !tbaa !33
   %3 = fcmp ogt float %2, 0.000000e+00
   %4 = getelementptr inbounds float, float* %data, i64 2
   %5 = getelementptr inbounds float, float* %data, i64 3
   %.in = select i1 %3, float* %4, float* %5
   %6 = bitcast float* %.in to i32*
-  %7 = load i32, i32* %6, align 4, !tbaa !32
+  %7 = load i32, i32* %6, align 4, !tbaa !33
   %8 = bitcast float* %data to i32*
-  store i32 %7, i32* %8, align 4, !tbaa !32
+  store i32 %7, i32* %8, align 4, !tbaa !33
   ret void
 }
 
@@ -420,12 +420,12 @@ define void @_Z7testForPfi(float* nocapture %data, i32 %N) #2 {
   %prol.iter = phi i32 [ %prol.iter.sub, %.lr.ph.prol ], [ %xtraiter, %.lr.ph.prol.preheader ]
   %5 = sext i32 %i.02.prol to i64
   %6 = getelementptr inbounds float, float* %data, i64 %5
-  %7 = load float, float* %6, align 4, !tbaa !32
+  %7 = load float, float* %6, align 4, !tbaa !33
   %8 = fadd float %sum.01.prol, %7
   %9 = add nuw nsw i32 %i.02.prol, 1
   %prol.iter.sub = add i32 %prol.iter, -1
   %prol.iter.cmp = icmp eq i32 %prol.iter.sub, 0
-  br i1 %prol.iter.cmp, label %.lr.ph.preheader.split.loopexit, label %.lr.ph.prol, !llvm.loop !38
+  br i1 %prol.iter.cmp, label %.lr.ph.preheader.split.loopexit, label %.lr.ph.prol, !llvm.loop !39
 
 .lr.ph.preheader.split.loopexit:                  ; preds = %.lr.ph.prol
   %.lcssa5 = phi i32 [ %9, %.lr.ph.prol ]
@@ -452,7 +452,7 @@ define void @_Z7testForPfi(float* nocapture %data, i32 %N) #2 {
 
 ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %.preheader
   %sum.0.lcssa = phi float [ 0.000000e+00, %.preheader ], [ %.lcssa, %._crit_edge.loopexit ]
-  store float %sum.0.lcssa, float* %data, align 4, !tbaa !32
+  store float %sum.0.lcssa, float* %data, align 4, !tbaa !33
   br label %31
 
 .lr.ph:                                           ; preds = %.lr.ph, %.lr.ph.preheader.split.split
@@ -460,22 +460,22 @@ define void @_Z7testForPfi(float* nocapture %data, i32 %N) #2 {
   %sum.01 = phi float [ %sum.01.unr, %.lr.ph.preheader.split.split ], [ %29, %.lr.ph ]
   %11 = sext i32 %i.02 to i64
   %12 = getelementptr inbounds float, float* %data, i64 %11
-  %13 = load float, float* %12, align 4, !tbaa !32
+  %13 = load float, float* %12, align 4, !tbaa !33
   %14 = fadd float %sum.01, %13
   %15 = add nuw nsw i32 %i.02, 1
   %16 = sext i32 %15 to i64
   %17 = getelementptr inbounds float, float* %data, i64 %16
-  %18 = load float, float* %17, align 4, !tbaa !32
+  %18 = load float, float* %17, align 4, !tbaa !33
   %19 = fadd float %14, %18
   %20 = add nsw i32 %i.02, 2
   %21 = sext i32 %20 to i64
   %22 = getelementptr inbounds float, float* %data, i64 %21
-  %23 = load float, float* %22, align 4, !tbaa !32
+  %23 = load float, float* %22, align 4, !tbaa !33
   %24 = fadd float %19, %23
   %25 = add nsw i32 %i.02, 3
   %26 = sext i32 %25 to i64
   %27 = getelementptr inbounds float, float* %data, i64 %26
-  %28 = load float, float* %27, align 4, !tbaa !32
+  %28 = load float, float* %27, align 4, !tbaa !33
   %29 = fadd float %24, %28
   %30 = add nsw i32 %i.02, 4
   %exitcond.3 = icmp eq i32 %30, %N
@@ -494,7 +494,7 @@ define void @_Z8setValuePfif(float* nocapture %data, i32 %idx, float %value) #2 
 ; <label>:3                                       ; preds = %0
   %4 = sext i32 %idx to i64
   %5 = getelementptr inbounds float, float* %data, i64 %4
-  store float %value, float* %5, align 4, !tbaa !32
+  store float %value, float* %5, align 4, !tbaa !33
   br label %6
 
 ; <label>:6                                       ; preds = %3, %0
@@ -504,19 +504,19 @@ define void @_Z8setValuePfif(float* nocapture %data, i32 %idx, float %value) #2 
 ; Function Attrs: norecurse nounwind
 define void @_Z11testStructsP8MyStructPfPi(%struct.MyStruct* nocapture readonly %structs, float* nocapture %float_data, i32* nocapture %int_data) #2 {
   %1 = getelementptr inbounds %struct.MyStruct, %struct.MyStruct* %structs, i64 0, i32 0
-  %2 = load i32, i32* %1, align 4, !tbaa !40
-  store i32 %2, i32* %int_data, align 4, !tbaa !36
+  %2 = load i32, i32* %1, align 4, !tbaa !41
+  store i32 %2, i32* %int_data, align 4, !tbaa !37
   %3 = getelementptr inbounds %struct.MyStruct, %struct.MyStruct* %structs, i64 0, i32 1
   %4 = bitcast float* %3 to i32*
-  %5 = load i32, i32* %4, align 4, !tbaa !42
+  %5 = load i32, i32* %4, align 4, !tbaa !43
   %6 = bitcast float* %float_data to i32*
-  store i32 %5, i32* %6, align 4, !tbaa !32
+  store i32 %5, i32* %6, align 4, !tbaa !33
   %7 = getelementptr inbounds %struct.MyStruct, %struct.MyStruct* %structs, i64 1, i32 1
   %8 = bitcast float* %7 to i32*
-  %9 = load i32, i32* %8, align 4, !tbaa !42
+  %9 = load i32, i32* %8, align 4, !tbaa !43
   %10 = getelementptr inbounds float, float* %float_data, i64 1
   %11 = bitcast float* %10 to i32*
-  store i32 %9, i32* %11, align 4, !tbaa !32
+  store i32 %9, i32* %11, align 4, !tbaa !33
   ret void
 }
 
@@ -541,25 +541,28 @@ define void @_Z10testFloat4P6float4(%struct.float4* nocapture %data) #2 {
   ret void
 }
 
+; Function Attrs: argmemonly nounwind
+declare void @llvm.memcpy.p0i8.p0i8.i64(i8* nocapture, i8* nocapture readonly, i64, i32, i1) #3
+
 ; Function Attrs: norecurse nounwind
 define void @_Z9testLocalPf(float* nocapture %data) #2 {
   %1 = tail call i32 @llvm.ptx.read.tid.x() #8
   %2 = sext i32 %1 to i64
   %3 = getelementptr inbounds float, float* %data, i64 %2
   %4 = bitcast float* %3 to i32*
-  %5 = load i32, i32* %4, align 4, !tbaa !32
+  %5 = load i32, i32* %4, align 4, !tbaa !33
   %6 = getelementptr inbounds [32 x float], [32 x float] addrspace(3)* @_ZZ9testLocalPfE8myshared, i64 0, i64 %2
   %7 = bitcast float addrspace(3)* %6 to i32 addrspace(3)*
   %8 = addrspacecast i32 addrspace(3)* %7 to i32*
-  store i32 %5, i32* %8, align 4, !tbaa !32
+  store i32 %5, i32* %8, align 4, !tbaa !33
   %9 = add nsw i32 %1, 1
   %10 = sext i32 %9 to i64
   %11 = getelementptr inbounds [32 x float], [32 x float] addrspace(3)* @_ZZ9testLocalPfE8myshared, i64 0, i64 %10
   %12 = bitcast float addrspace(3)* %11 to i32 addrspace(3)*
   %13 = addrspacecast i32 addrspace(3)* %12 to i32*
-  %14 = load i32, i32* %13, align 4, !tbaa !32
+  %14 = load i32, i32* %13, align 4, !tbaa !33
   %15 = bitcast float* %data to i32*
-  store i32 %14, i32* %15, align 4, !tbaa !32
+  store i32 %14, i32* %15, align 4, !tbaa !33
   ret void
 }
 
@@ -569,25 +572,25 @@ define void @_Z10testLocal2Pf(float* nocapture %data) #2 {
   %2 = sext i32 %1 to i64
   %3 = getelementptr inbounds float, float* %data, i64 %2
   %4 = bitcast float* %3 to i32*
-  %5 = load i32, i32* %4, align 4, !tbaa !32
+  %5 = load i32, i32* %4, align 4, !tbaa !33
   %6 = getelementptr inbounds [64 x float], [64 x float] addrspace(3)* @_ZZ10testLocal2PfE8myshared, i64 0, i64 %2
   %7 = bitcast float addrspace(3)* %6 to i32 addrspace(3)*
   %8 = addrspacecast i32 addrspace(3)* %7 to i32*
-  store i32 %5, i32* %8, align 4, !tbaa !32
+  store i32 %5, i32* %8, align 4, !tbaa !33
   %9 = add nsw i32 %1, 1
   %10 = sext i32 %9 to i64
   %11 = getelementptr inbounds [64 x float], [64 x float] addrspace(3)* @_ZZ10testLocal2PfE8myshared, i64 0, i64 %10
   %12 = bitcast float addrspace(3)* %11 to i32 addrspace(3)*
   %13 = addrspacecast i32 addrspace(3)* %12 to i32*
-  %14 = load i32, i32* %13, align 4, !tbaa !32
+  %14 = load i32, i32* %13, align 4, !tbaa !33
   %15 = bitcast float* %data to i32*
-  store i32 %14, i32* %15, align 4, !tbaa !32
-  %16 = load i32, i32* %4, align 4, !tbaa !32
-  store i32 %16, i32* %13, align 4, !tbaa !32
-  %17 = load i32, i32* %8, align 4, !tbaa !32
+  store i32 %14, i32* %15, align 4, !tbaa !33
+  %16 = load i32, i32* %4, align 4, !tbaa !33
+  store i32 %16, i32* %13, align 4, !tbaa !33
+  %17 = load i32, i32* %8, align 4, !tbaa !33
   %18 = getelementptr inbounds float, float* %data, i64 1
   %19 = bitcast float* %18 to i32*
-  store i32 %17, i32* %19, align 4, !tbaa !32
+  store i32 %17, i32* %19, align 4, !tbaa !33
   ret void
 }
 
@@ -604,142 +607,248 @@ define void @_Z9testArrayPf(float* nocapture %data) #2 {
   %4 = sext i32 %3 to i64
   %5 = getelementptr inbounds float, float* %data, i64 %4
   %6 = bitcast float* %5 to i32*
-  %7 = load i32, i32* %6, align 4, !tbaa !32
+  %7 = load i32, i32* %6, align 4, !tbaa !33
   %8 = sext i32 %i.03 to i64
   %9 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 %8
   %10 = bitcast float* %9 to i32*
-  store i32 %7, i32* %10, align 4, !tbaa !32
+  store i32 %7, i32* %10, align 4, !tbaa !33
   %11 = or i32 %i.03, 1
   %12 = mul nuw nsw i32 %11, 3
   %13 = sext i32 %12 to i64
   %14 = getelementptr inbounds float, float* %data, i64 %13
   %15 = bitcast float* %14 to i32*
-  %16 = load i32, i32* %15, align 4, !tbaa !32
+  %16 = load i32, i32* %15, align 4, !tbaa !33
   %17 = sext i32 %11 to i64
   %18 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 %17
   %19 = bitcast float* %18 to i32*
-  store i32 %16, i32* %19, align 4, !tbaa !32
+  store i32 %16, i32* %19, align 4, !tbaa !33
   %20 = or i32 %i.03, 2
   %21 = mul nuw nsw i32 %20, 3
   %22 = sext i32 %21 to i64
   %23 = getelementptr inbounds float, float* %data, i64 %22
   %24 = bitcast float* %23 to i32*
-  %25 = load i32, i32* %24, align 4, !tbaa !32
+  %25 = load i32, i32* %24, align 4, !tbaa !33
   %26 = sext i32 %20 to i64
   %27 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 %26
   %28 = bitcast float* %27 to i32*
-  store i32 %25, i32* %28, align 4, !tbaa !32
+  store i32 %25, i32* %28, align 4, !tbaa !33
   %29 = or i32 %i.03, 3
   %30 = mul nuw nsw i32 %29, 3
   %31 = sext i32 %30 to i64
   %32 = getelementptr inbounds float, float* %data, i64 %31
   %33 = bitcast float* %32 to i32*
-  %34 = load i32, i32* %33, align 4, !tbaa !32
+  %34 = load i32, i32* %33, align 4, !tbaa !33
   %35 = sext i32 %29 to i64
   %36 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 %35
   %37 = bitcast float* %36 to i32*
-  store i32 %34, i32* %37, align 4, !tbaa !32
+  store i32 %34, i32* %37, align 4, !tbaa !33
   %38 = add nsw i32 %i.03, 4
   %exitcond.3 = icmp eq i32 %38, 32
   br i1 %exitcond.3, label %.preheader.preheader, label %2
 
 .preheader.preheader:                             ; preds = %2
   %39 = bitcast [32 x float]* %privateFloats to i32*
-  %40 = load i32, i32* %39, align 4, !tbaa !32
+  %40 = load i32, i32* %39, align 4, !tbaa !33
   %41 = getelementptr inbounds float, float* %data, i64 1
   %42 = bitcast float* %41 to i32*
-  store i32 %40, i32* %42, align 4, !tbaa !32
+  store i32 %40, i32* %42, align 4, !tbaa !33
   %43 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 2
   %44 = bitcast float* %43 to i32*
-  %45 = load i32, i32* %44, align 4, !tbaa !32
+  %45 = load i32, i32* %44, align 4, !tbaa !33
   %46 = getelementptr inbounds float, float* %data, i64 3
   %47 = bitcast float* %46 to i32*
-  store i32 %45, i32* %47, align 4, !tbaa !32
+  store i32 %45, i32* %47, align 4, !tbaa !33
   %48 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 4
   %49 = bitcast float* %48 to i32*
-  %50 = load i32, i32* %49, align 4, !tbaa !32
+  %50 = load i32, i32* %49, align 4, !tbaa !33
   %51 = getelementptr inbounds float, float* %data, i64 5
   %52 = bitcast float* %51 to i32*
-  store i32 %50, i32* %52, align 4, !tbaa !32
+  store i32 %50, i32* %52, align 4, !tbaa !33
   %53 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 6
   %54 = bitcast float* %53 to i32*
-  %55 = load i32, i32* %54, align 4, !tbaa !32
+  %55 = load i32, i32* %54, align 4, !tbaa !33
   %56 = getelementptr inbounds float, float* %data, i64 7
   %57 = bitcast float* %56 to i32*
-  store i32 %55, i32* %57, align 4, !tbaa !32
+  store i32 %55, i32* %57, align 4, !tbaa !33
   %58 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 8
   %59 = bitcast float* %58 to i32*
-  %60 = load i32, i32* %59, align 4, !tbaa !32
+  %60 = load i32, i32* %59, align 4, !tbaa !33
   %61 = getelementptr inbounds float, float* %data, i64 9
   %62 = bitcast float* %61 to i32*
-  store i32 %60, i32* %62, align 4, !tbaa !32
+  store i32 %60, i32* %62, align 4, !tbaa !33
   %63 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 10
   %64 = bitcast float* %63 to i32*
-  %65 = load i32, i32* %64, align 4, !tbaa !32
+  %65 = load i32, i32* %64, align 4, !tbaa !33
   %66 = getelementptr inbounds float, float* %data, i64 11
   %67 = bitcast float* %66 to i32*
-  store i32 %65, i32* %67, align 4, !tbaa !32
+  store i32 %65, i32* %67, align 4, !tbaa !33
   %68 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 12
   %69 = bitcast float* %68 to i32*
-  %70 = load i32, i32* %69, align 4, !tbaa !32
+  %70 = load i32, i32* %69, align 4, !tbaa !33
   %71 = getelementptr inbounds float, float* %data, i64 13
   %72 = bitcast float* %71 to i32*
-  store i32 %70, i32* %72, align 4, !tbaa !32
+  store i32 %70, i32* %72, align 4, !tbaa !33
   %73 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 14
   %74 = bitcast float* %73 to i32*
-  %75 = load i32, i32* %74, align 4, !tbaa !32
+  %75 = load i32, i32* %74, align 4, !tbaa !33
   %76 = getelementptr inbounds float, float* %data, i64 15
   %77 = bitcast float* %76 to i32*
-  store i32 %75, i32* %77, align 4, !tbaa !32
+  store i32 %75, i32* %77, align 4, !tbaa !33
   %78 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 16
   %79 = bitcast float* %78 to i32*
-  %80 = load i32, i32* %79, align 4, !tbaa !32
+  %80 = load i32, i32* %79, align 4, !tbaa !33
   %81 = getelementptr inbounds float, float* %data, i64 17
   %82 = bitcast float* %81 to i32*
-  store i32 %80, i32* %82, align 4, !tbaa !32
+  store i32 %80, i32* %82, align 4, !tbaa !33
   %83 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 18
   %84 = bitcast float* %83 to i32*
-  %85 = load i32, i32* %84, align 4, !tbaa !32
+  %85 = load i32, i32* %84, align 4, !tbaa !33
   %86 = getelementptr inbounds float, float* %data, i64 19
   %87 = bitcast float* %86 to i32*
-  store i32 %85, i32* %87, align 4, !tbaa !32
+  store i32 %85, i32* %87, align 4, !tbaa !33
   %88 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 20
   %89 = bitcast float* %88 to i32*
-  %90 = load i32, i32* %89, align 4, !tbaa !32
+  %90 = load i32, i32* %89, align 4, !tbaa !33
   %91 = getelementptr inbounds float, float* %data, i64 21
   %92 = bitcast float* %91 to i32*
-  store i32 %90, i32* %92, align 4, !tbaa !32
+  store i32 %90, i32* %92, align 4, !tbaa !33
   %93 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 22
   %94 = bitcast float* %93 to i32*
-  %95 = load i32, i32* %94, align 4, !tbaa !32
+  %95 = load i32, i32* %94, align 4, !tbaa !33
   %96 = getelementptr inbounds float, float* %data, i64 23
   %97 = bitcast float* %96 to i32*
-  store i32 %95, i32* %97, align 4, !tbaa !32
+  store i32 %95, i32* %97, align 4, !tbaa !33
   %98 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 24
   %99 = bitcast float* %98 to i32*
-  %100 = load i32, i32* %99, align 4, !tbaa !32
+  %100 = load i32, i32* %99, align 4, !tbaa !33
   %101 = getelementptr inbounds float, float* %data, i64 25
   %102 = bitcast float* %101 to i32*
-  store i32 %100, i32* %102, align 4, !tbaa !32
+  store i32 %100, i32* %102, align 4, !tbaa !33
   %103 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 26
   %104 = bitcast float* %103 to i32*
-  %105 = load i32, i32* %104, align 4, !tbaa !32
+  %105 = load i32, i32* %104, align 4, !tbaa !33
   %106 = getelementptr inbounds float, float* %data, i64 27
   %107 = bitcast float* %106 to i32*
-  store i32 %105, i32* %107, align 4, !tbaa !32
+  store i32 %105, i32* %107, align 4, !tbaa !33
   %108 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 28
   %109 = bitcast float* %108 to i32*
-  %110 = load i32, i32* %109, align 4, !tbaa !32
+  %110 = load i32, i32* %109, align 4, !tbaa !33
   %111 = getelementptr inbounds float, float* %data, i64 29
   %112 = bitcast float* %111 to i32*
-  store i32 %110, i32* %112, align 4, !tbaa !32
+  store i32 %110, i32* %112, align 4, !tbaa !33
   %113 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 30
   %114 = bitcast float* %113 to i32*
-  %115 = load i32, i32* %114, align 4, !tbaa !32
+  %115 = load i32, i32* %114, align 4, !tbaa !33
   %116 = getelementptr inbounds float, float* %data, i64 31
   %117 = bitcast float* %116 to i32*
-  store i32 %115, i32* %117, align 4, !tbaa !32
+  store i32 %115, i32* %117, align 4, !tbaa !33
   call void @llvm.lifetime.end(i64 128, i8* nonnull %1) #8
+  ret void
+}
+
+; Function Attrs: norecurse nounwind
+define void @_Z10testmemcpyPf(float* nocapture %data) #2 {
+.preheader.preheader:
+  %data4 = bitcast float* %data to i8*
+  %privateFloats = alloca [32 x float], align 4
+  %0 = bitcast [32 x float]* %privateFloats to i8*
+  call void @llvm.lifetime.start(i64 128, i8* %0) #8
+  call void @llvm.memcpy.p0i8.p0i8.i64(i8* %0, i8* %data4, i64 128, i32 4, i1 false)
+  %1 = bitcast [32 x float]* %privateFloats to i32*
+  %2 = load i32, i32* %1, align 4, !tbaa !33
+  %3 = bitcast float* %data to i32*
+  store i32 %2, i32* %3, align 4, !tbaa !33
+  %4 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 2
+  %5 = bitcast float* %4 to i32*
+  %6 = load i32, i32* %5, align 4, !tbaa !33
+  %7 = getelementptr inbounds float, float* %data, i64 2
+  %8 = bitcast float* %7 to i32*
+  store i32 %6, i32* %8, align 4, !tbaa !33
+  %9 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 4
+  %10 = bitcast float* %9 to i32*
+  %11 = load i32, i32* %10, align 4, !tbaa !33
+  %12 = getelementptr inbounds float, float* %data, i64 4
+  %13 = bitcast float* %12 to i32*
+  store i32 %11, i32* %13, align 4, !tbaa !33
+  %14 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 6
+  %15 = bitcast float* %14 to i32*
+  %16 = load i32, i32* %15, align 4, !tbaa !33
+  %17 = getelementptr inbounds float, float* %data, i64 6
+  %18 = bitcast float* %17 to i32*
+  store i32 %16, i32* %18, align 4, !tbaa !33
+  %19 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 8
+  %20 = bitcast float* %19 to i32*
+  %21 = load i32, i32* %20, align 4, !tbaa !33
+  %22 = getelementptr inbounds float, float* %data, i64 8
+  %23 = bitcast float* %22 to i32*
+  store i32 %21, i32* %23, align 4, !tbaa !33
+  %24 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 10
+  %25 = bitcast float* %24 to i32*
+  %26 = load i32, i32* %25, align 4, !tbaa !33
+  %27 = getelementptr inbounds float, float* %data, i64 10
+  %28 = bitcast float* %27 to i32*
+  store i32 %26, i32* %28, align 4, !tbaa !33
+  %29 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 12
+  %30 = bitcast float* %29 to i32*
+  %31 = load i32, i32* %30, align 4, !tbaa !33
+  %32 = getelementptr inbounds float, float* %data, i64 12
+  %33 = bitcast float* %32 to i32*
+  store i32 %31, i32* %33, align 4, !tbaa !33
+  %34 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 14
+  %35 = bitcast float* %34 to i32*
+  %36 = load i32, i32* %35, align 4, !tbaa !33
+  %37 = getelementptr inbounds float, float* %data, i64 14
+  %38 = bitcast float* %37 to i32*
+  store i32 %36, i32* %38, align 4, !tbaa !33
+  %39 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 16
+  %40 = bitcast float* %39 to i32*
+  %41 = load i32, i32* %40, align 4, !tbaa !33
+  %42 = getelementptr inbounds float, float* %data, i64 16
+  %43 = bitcast float* %42 to i32*
+  store i32 %41, i32* %43, align 4, !tbaa !33
+  %44 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 18
+  %45 = bitcast float* %44 to i32*
+  %46 = load i32, i32* %45, align 4, !tbaa !33
+  %47 = getelementptr inbounds float, float* %data, i64 18
+  %48 = bitcast float* %47 to i32*
+  store i32 %46, i32* %48, align 4, !tbaa !33
+  %49 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 20
+  %50 = bitcast float* %49 to i32*
+  %51 = load i32, i32* %50, align 4, !tbaa !33
+  %52 = getelementptr inbounds float, float* %data, i64 20
+  %53 = bitcast float* %52 to i32*
+  store i32 %51, i32* %53, align 4, !tbaa !33
+  %54 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 22
+  %55 = bitcast float* %54 to i32*
+  %56 = load i32, i32* %55, align 4, !tbaa !33
+  %57 = getelementptr inbounds float, float* %data, i64 22
+  %58 = bitcast float* %57 to i32*
+  store i32 %56, i32* %58, align 4, !tbaa !33
+  %59 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 24
+  %60 = bitcast float* %59 to i32*
+  %61 = load i32, i32* %60, align 4, !tbaa !33
+  %62 = getelementptr inbounds float, float* %data, i64 24
+  %63 = bitcast float* %62 to i32*
+  store i32 %61, i32* %63, align 4, !tbaa !33
+  %64 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 26
+  %65 = bitcast float* %64 to i32*
+  %66 = load i32, i32* %65, align 4, !tbaa !33
+  %67 = getelementptr inbounds float, float* %data, i64 26
+  %68 = bitcast float* %67 to i32*
+  store i32 %66, i32* %68, align 4, !tbaa !33
+  %69 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 28
+  %70 = bitcast float* %69 to i32*
+  %71 = load i32, i32* %70, align 4, !tbaa !33
+  %72 = getelementptr inbounds float, float* %data, i64 28
+  %73 = bitcast float* %72 to i32*
+  store i32 %71, i32* %73, align 4, !tbaa !33
+  %74 = getelementptr inbounds [32 x float], [32 x float]* %privateFloats, i64 0, i64 30
+  %75 = bitcast float* %74 to i32*
+  %76 = load i32, i32* %75, align 4, !tbaa !33
+  %77 = getelementptr inbounds float, float* %data, i64 30
+  %78 = bitcast float* %77 to i32*
+  store i32 %76, i32* %78, align 4, !tbaa !33
+  call void @llvm.lifetime.end(i64 128, i8* %0) #8
   ret void
 }
 
@@ -768,10 +877,10 @@ attributes #6 = { nounwind readnone }
 attributes #7 = { noduplicate nounwind }
 attributes #8 = { nounwind }
 
-!nvvm.annotations = !{!0, !1, !2, !3, !4, !5, !6, !7, !8, !9, !10, !11, !12, !13, !14, !15, !16, !17, !18, !19, !20, !21, !22, !23, !24, !25, !26, !27, !26, !28, !28, !28, !28, !29, !29, !28}
-!llvm.ident = !{!30}
+!nvvm.annotations = !{!0, !1, !2, !3, !4, !5, !6, !7, !8, !9, !10, !11, !12, !13, !14, !15, !16, !17, !18, !19, !20, !21, !22, !23, !24, !25, !26, !27, !28, !27, !29, !29, !29, !29, !30, !30, !29}
+!llvm.ident = !{!31}
 !nvvm.internalize.after.link = !{}
-!nvvmir.version = !{!31}
+!nvvmir.version = !{!32}
 
 !0 = !{void (float*)* @_Z3fooPf, !"kernel", i32 1}
 !1 = !{void (float*)* @_Z7use_tidPf, !"kernel", i32 1}
@@ -799,20 +908,21 @@ attributes #8 = { nounwind }
 !23 = !{void (float*)* @_Z9testLocalPf, !"kernel", i32 1}
 !24 = !{void (float*)* @_Z10testLocal2Pf, !"kernel", i32 1}
 !25 = !{void (float*)* @_Z9testArrayPf, !"kernel", i32 1}
-!26 = !{null, !"align", i32 8}
-!27 = !{null, !"align", i32 8, !"align", i32 65544, !"align", i32 131080}
-!28 = !{null, !"align", i32 16}
-!29 = !{null, !"align", i32 16, !"align", i32 65552, !"align", i32 131088}
-!30 = !{!"clang version 3.8.0-2ubuntu4 (tags/RELEASE_380/final)"}
-!31 = !{i32 1, i32 2}
-!32 = !{!33, !33, i64 0}
-!33 = !{!"float", !34, i64 0}
-!34 = !{!"omnipotent char", !35, i64 0}
-!35 = !{!"Simple C/C++ TBAA"}
-!36 = !{!37, !37, i64 0}
-!37 = !{!"int", !34, i64 0}
-!38 = distinct !{!38, !39}
-!39 = !{!"llvm.loop.unroll.disable"}
-!40 = !{!41, !37, i64 0}
-!41 = !{!"_ZTS8MyStruct", !37, i64 0, !33, i64 4}
-!42 = !{!41, !33, i64 4}
+!26 = !{void (float*)* @_Z10testmemcpyPf, !"kernel", i32 1}
+!27 = !{null, !"align", i32 8}
+!28 = !{null, !"align", i32 8, !"align", i32 65544, !"align", i32 131080}
+!29 = !{null, !"align", i32 16}
+!30 = !{null, !"align", i32 16, !"align", i32 65552, !"align", i32 131088}
+!31 = !{!"clang version 3.8.0-2ubuntu4 (tags/RELEASE_380/final)"}
+!32 = !{i32 1, i32 2}
+!33 = !{!34, !34, i64 0}
+!34 = !{!"float", !35, i64 0}
+!35 = !{!"omnipotent char", !36, i64 0}
+!36 = !{!"Simple C/C++ TBAA"}
+!37 = !{!38, !38, i64 0}
+!38 = !{!"int", !35, i64 0}
+!39 = distinct !{!39, !40}
+!40 = !{!"llvm.loop.unroll.disable"}
+!41 = !{!42, !38, i64 0}
+!42 = !{!"_ZTS8MyStruct", !38, i64 0, !34, i64 4}
+!43 = !{!42, !34, i64 4}

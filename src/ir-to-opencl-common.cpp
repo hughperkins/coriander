@@ -50,6 +50,24 @@ GlobalVariable *addGlobalVariable(Module *M, string name, string value) {
     return str;
 }
 
+std::string dumpAddressSpace(llvm::Type *type) {
+    if(PointerType *ptr = dyn_cast<PointerType>(type)) {
+        int addressspace = ptr->getAddressSpace();
+        switch(addressspace) {
+            case 0:
+                return "";
+            case 1:
+                return "global";
+            case 3:
+                return "local";
+            default:
+                throw runtime_error("not implemented, addressspace " + toString(addressspace));
+        }
+    } else {
+        return "";
+    }
+}
+
 Instruction *addStringInstr(Module *M, string name, string value) {
     // Module *M = prev->getParent();
     GlobalVariable *var = addGlobalVariable(M, name, value);
@@ -200,4 +218,22 @@ std::string dumpType(Type *type) {
 
 llvm::Constant *createInt32Constant(llvm::LLVMContext *context, int value) {
     return ConstantInt::getSigned(IntegerType::get(*context, 32), value);
+}
+
+int readInt32Constant(Value *value) {
+    // unsigned int valueTy = value->getValueID();
+    // // cout << "readIntConstant" << endl;
+    // // value->dump();
+    // if(valueTy != AShrOperator::ConstantIntVal) {
+    //     throw runtime_error("not a constant int");
+    // }
+    return cast<ConstantInt>(value)->getSExtValue();
+}
+
+float readFloatConstant(Value *value) {
+    // unsigned int valueTy = value->getValueID();
+    // if(valueTy != AShrOperator::ConstantFPVal) {
+    //     throw runtime_error("not a constant float");
+    // }
+    return cast<ConstantFP>(value)->getValueAPF().convertToFloat();
 }

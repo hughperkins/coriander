@@ -15,6 +15,7 @@ std::string dumpPointerType(llvm::PointerType *ptr);
 std::string dumpIntegerType(llvm::IntegerType *type);
 std::string dumpStructType(llvm::StructType *type);
 std::string dumpType(llvm::Type *type);
+std::string dumpAddressSpace(llvm::Type *type);
 
 llvm::GlobalVariable *addGlobalVariable(llvm::Module *M, std::string name, std::string value);
 llvm::Instruction *addStringInstr(llvm::Module *M, std::string name, std::string value);
@@ -27,3 +28,6 @@ std::string toString(T value) {
     oss << value;
     return oss.str();
 }
+
+int readInt32Constant(llvm::Value *value);
+float readFloatConstant(llvm::Value *value);
