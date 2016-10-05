@@ -168,11 +168,14 @@ On the host-side, there is code to:
 
 - `llvm.memmove.p0i8.p0i8.i64`
 - `llvm.lifetime`
-- forward declarations of functions
 
 ### Tensorflow
 
 - Get [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_add.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_add.cc) compiling/running on OpenCL
+
+#### Current Issues
+
+- `  %18 = load float, float* addrspacecast (float addrspace(1)* bitcast (%"union.Eigen::half_impl::FP32" addrspace(1)* @_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic to float addrspace(1)*) to float*), align 4, !tbaa !171, !noalias !173` => generates opencl `float v17 = [0];`
 
 ### Things we *need* to be working for tensorflow
 
