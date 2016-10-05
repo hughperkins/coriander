@@ -39,6 +39,6 @@ def cwise_op_gpu_add(context, extract_value_cl):
     return prog
 
 
-# @pytest.mark.xfail
+@pytest.mark.xfail
 def test_program_compiles(cwise_op_gpu_add):
     pass
