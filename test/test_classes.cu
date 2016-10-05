@@ -51,3 +51,11 @@ void doSomething(mynamespace::Bar bar, mynamespace::Templated<T> t, T *data, int
 __host__ void doSomething_host(mynamespace::Bar bar, mynamespace::Templated<float> t, float *data, int *int_data) {
     doSomething<<<dim3(32), dim3(32)>>>(bar, t, data, int_data);
 }
+
+__host__ void doSomething_host2(mynamespace::Bar bar, mynamespace::Templated<int> t, int *data, int *int_data) {
+    doSomething<<<dim3(32), dim3(32)>>>(bar, t, data, int_data);
+}
+
+__host__ void doSomething_host2(mynamespace::Bar bar, mynamespace::Templated<double> t, double *data, int *int_data) {
+    doSomething<<<dim3(32), dim3(32)>>>(bar, t, data, int_data);
+}
