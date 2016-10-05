@@ -157,7 +157,8 @@ std::string dumpStructType(StructType *type) {
         string name = type->getName();
         cout << "name " << name << endl;
         name = replace(name, '.', '_');
-        if(name == "struct.float4") {
+                name = replace(name, ':', '_');
+        if(name == "struct_float4") {
             return "float4";
         } else {
             if(name.find("struct_") == 0) {
@@ -170,7 +171,6 @@ std::string dumpStructType(StructType *type) {
             } else if(name.find("class_") == 0) {
                 name[5] = '_';
                 name = "struct " + name;
-                name = replace(name, ':', '_');
                 if(declaredStructs.find(name) == declaredStructs.end()) {
                     declaredStructs.insert(name);
                     declareStruct(name, type);
