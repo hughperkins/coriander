@@ -49,6 +49,7 @@ You'll need:
 - llvm 3.8
 - clang 3.8
 - include files from CUDA toolkit 7.5, in /usr/local/cuda-7.5/include
+- make
 - Have done `sudo apt-get install libc6-dev-i386`
 - OpenCL-enabled GPU, and appropriate OpenCL drivers installed for the GPU
 
@@ -59,7 +60,7 @@ Other operating systems, and clang/llvm versions, might be supported, but untest
 ```
 git clone --recursive https://github.com/hughperkins/cuda-ir-to-opencl
 cd cuda-ir-to-opencl
-./build.sh
+make
 ```
 => `ir-to-opencl`, and `patch-hostside` should be built into `build` subdirectory
 
