@@ -82,7 +82,7 @@ def ctx(context):
 
 @pytest.fixture(scope='module')
 def testcudakernel1(context):
-    with open('test/generated/testcudakernel1.cl', 'r') as f:
+    with open('test/generated/testcudakernel1-device.cl', 'r') as f:
         sourcecode = f.read()
 
     prog = cl.Program(context, sourcecode).build()

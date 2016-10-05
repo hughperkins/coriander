@@ -13,9 +13,11 @@ LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
 all: build/ir-to-opencl build/patch-hostside
 
 build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h
+	mkdir -p build
 	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/ir-to-opencl -g -O3 -I$(LLVM_INCLUDE) src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp $(LINK_FLAGS)
 
 build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h
+	mkdir -p build
 	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/patch-hostside -g -O3 -I$(LLVM_INCLUDE) src/patch-hostside.cpp src/ir-to-opencl-common.cpp $(LINK_FLAGS)
 
 easycl:
@@ -25,3 +27,42 @@ easycl:
 
 clean:
 	rm -Rf build/*
+
+# IR
+
+# deviceside goes directly from .cu => -device.ll
+
+test/generated/%-device.ll: test/%.cu include/fake_funcs.h
+	echo building $@ from $<
+	$(CLANG) -include include/fake_funcs.h -I$(CUDA_HOME)/include $< --cuda-device-only -emit-llvm -O3 -S -o $@
+
+# hostside goes from .cu -> -hostraw.ll => -hostpatched.ll
+
+test/generated/%-hostraw.ll: test/%.cu
+	echo building $@ from $<
+	$(CLANG) -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
+
+test/generated/%-hostpatched.ll: test/generated/%-hostraw.ll build/patch-hostside
+	echo building $@ from $<
+	build/patch-hostside $< $@
+
+# opencl (from the -device.ll)
+
+%-device.cl: %-device.ll build/ir-to-opencl
+	echo building $@ from $<
+	build/ir-to-opencl $< $@
+
+# objects
+
+## objects from hostside patched ll
+
+build/%-hostpatched.o: test/generated/%-hostpatched.ll
+	echo building $@ from $<
+	$(CLANG) -c $< -O3 -o $@
+
+## generic cpp objects, from cpp code
+build/%.o: test/%.cpp easycl
+	echo building $@ from $<
+	$(CLANG) -std=c++11 -Isrc/EasyCL -c $< --cuda-host-only -O3 -o $@
+
+.SECONDARY:

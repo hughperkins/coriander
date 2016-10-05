@@ -33,7 +33,7 @@ void configureKernel(
     block[2] = block_z;
     // lets just read the kernel from file for now, with hardcoded filename
     // kernel.reset(buildKernelFromString("", kernelName, "", "internal"));
-    kernel.reset(cl->buildKernel("test/generated/testcudakernel1.cl", kernelName, ""));
+    kernel.reset(cl->buildKernel("test/generated/testcudakernel1-device.cl", kernelName, ""));
 }
 
 void setKernelArgFloatStar(float *clmem_as_floatstar) {
