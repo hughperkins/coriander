@@ -13,8 +13,8 @@ Run:
 
 Currently:
 ```
-$ py.test -sv -k cwise 2>&1 | grep '^E ' | wc -l
-1146
+$ py.test -sv -k cwise --runxfail 2>&1 | grep '^E ' | wc -l
+946
 ```
 
 (out of total ~12,000 lines, so about ~90% is compiling ok, and ~10% needs fixing)
