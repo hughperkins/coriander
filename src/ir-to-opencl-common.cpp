@@ -134,6 +134,17 @@ void declareStruct(string name, StructType *type) {
     int i = 0;
     for(auto it=type->element_begin(); it != type->element_end(); it++) {
         Type *elementType = *it;
+        bool isPtrPtrFunction = false;
+        if(PointerType *ptr = dyn_cast<PointerType>(elementType)) {
+            Type *ptrElementType = ptr->getPointerElementType();
+            if(PointerType *ptrptr = dyn_cast<PointerType>(ptrElementType)) {
+                Type *ptrptrElementType = ptrptr->getPointerElementType();
+                isPtrPtrFunction = isa<FunctionType>(ptrptrElementType);
+            }
+        }
+        if(isPtrPtrFunction) {
+            continue;
+        }
         std::string memberName = "f" + toString(i);
         if(ArrayType *arraytype = dyn_cast<ArrayType>(elementType)) {
             Type *arrayelementtype = arraytype->getPointerElementType();

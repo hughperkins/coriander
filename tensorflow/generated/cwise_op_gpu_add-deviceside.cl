@@ -19,7 +19,6 @@ struct Eigen__DSizes {
 };
 
 struct class_Eigen__StreamInterface {
-    ** f0;
 };
 
 struct Eigen__GpuDevice {
