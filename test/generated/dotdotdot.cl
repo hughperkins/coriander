@@ -2,6 +2,8 @@ struct class_Eigen__StreamInterface {
 };
 
 
+void _Z7test_siPf(global struct class_Eigen__StreamInterface* data);
+
 void _Z7test_siPf(global struct class_Eigen__StreamInterface* data) {
     label0:;
 }

@@ -294,3 +294,13 @@ struct hasArray {
 __global__ void useHasArray(hasArray *data) {
     data[0].foo[0] = data[1].foo[2];
 }
+
+__device__ float declaredAfterUse(float val1, float val2);
+
+__global__ void usesForwardDeclaration(float *data) {
+    data[0] = declaredAfterUse(data[1], data[2]);
+}
+
+__device__ float declaredAfterUse(float val1, float val2) {
+    return val1 * val2;
+}

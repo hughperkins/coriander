@@ -889,14 +889,11 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
     return gencode;
 }
 
-std::string dumpFunction(Function *F) {
-    currentFunctionSharedDeclarations = "";
-    // currentFunctionDeclaredShareds.clear();
+std::string dumpFunctionDeclaration(Function *F) {
+    string declaration = "";
     Type *retType = F->getReturnType();
     std::string retTypeString = dumpType(retType);
     string fname = F->getName();
-    string gencode = "";
-    string declaration = "";
     if(iskernel_by_name[fname]) {
         declaration += "kernel ";
     }
@@ -922,12 +919,24 @@ std::string dumpFunction(Function *F) {
         i++;
     }
     declaration += ")";
+    return declaration;
+}
+
+std::string dumpFunction(Function *F) {
+    currentFunctionSharedDeclarations = "";
+    // currentFunctionDeclaredShareds.clear();
+    // Type *retType = F->getReturnType();
+    // std::string retTypeString = dumpType(retType);
+    // string fname = F->getName();
+    string gencode = "";
+    // string declaration = "";
+    string declaration = dumpFunctionDeclaration(F);
     cout << declaration << endl;
     // cout << "finished getting arg types" << endl;
     // label the blocks first
     // also dump phi declarations
     string body = "";
-    i = 0;
+    int i = 0;
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
         ostringstream oss;
@@ -964,6 +973,7 @@ std::string dumpFunction(Function *F) {
 
 std::string dumpModule(Module *M) {
     string gencode;
+    // figure out which functions are kernels
     for(auto it=M->named_metadata_begin(); it != M->named_metadata_end(); it++) {
         NamedMDNode *namedMDNode = &*it;
         for(auto it2=namedMDNode->op_begin(); it2 != namedMDNode->op_end(); it2++) {
@@ -996,6 +1006,20 @@ std::string dumpModule(Module *M) {
             }
         }
     }
+
+    // dump function declarations
+    for(auto it = M->begin(); it != M->end(); it++) {
+        string name = it->getName();
+        if(iskernel_by_name[name]) {
+            continue;  // no point in declaring kernels I think
+        }
+        if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
+                knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
+            Function *F = &*it;
+            gencode += dumpFunctionDeclaration(F) + ";\n";
+        }
+    }
+    gencode += "\n";
 
     // cout << "dumpvaluesymboltable" << endl;
     // ValueSymbolTable *valueSymbolTable = &M->getValueSymbolTable();

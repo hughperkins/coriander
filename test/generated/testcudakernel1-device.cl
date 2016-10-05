@@ -8,6 +8,12 @@ struct hasArray {
 };
 
 
+float _Z3barff(float a, float b);
+void _Z7incrvalPf(global float* a);
+float4 _Z9getfloat4f(float a);
+float _Z19getfloat4ElementSumfii(float a, int e0, int e1);
+float _Z16declaredAfterUseff(float val1, float val2);
+
 float _Z3barff(float a, float b) {
     label0:;
     float v0 = a + b;
@@ -1003,4 +1009,20 @@ kernel void _Z11useHasArrayP8hasArray(global struct hasArray* data) {
     int v1 = v0[0];
     global int* v2 = &data[0].f0[0];
     v2[0] = v1;
+}
+
+kernel void _Z22usesForwardDeclarationPf(global float* data) {
+    label0:;
+    global float* v0 = &data[1];
+    float v1 = v0[0];
+    global float* v2 = &data[2];
+    float v3 = v2[0];
+    float v4 = v1 * v3;
+    data[0] = v4;
+}
+
+float _Z16declaredAfterUseff(float val1, float val2) {
+    label0:;
+    float v0 = val1 * val2;
+    return v0;
 }
