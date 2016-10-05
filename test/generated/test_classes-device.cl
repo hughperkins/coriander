@@ -13,12 +13,12 @@ struct class_mynamespace__Templated {
     float f1;
 };
 
-struct class_mynamespace__Templated.0 {
+struct class_mynamespace__Templated_0 {
     struct class_mynamespace__subnamespace__Foo f0;
     int f1;
 };
 
-struct class_mynamespace__Templated.1 {
+struct class_mynamespace__Templated_1 {
     struct class_mynamespace__subnamespace__Foo f0;
     float f1;
 };
@@ -38,7 +38,7 @@ kernel void _Z11doSomethingIfEvN11mynamespace3BarENS0_9TemplatedIT_EEPS3_Pi(glob
     int_data[0] = v8;
 }
 
-kernel void _Z11doSomethingIiEvN11mynamespace3BarENS0_9TemplatedIT_EEPS3_Pi(global struct class_mynamespace__Bar* bar, global struct class_mynamespace__Templated.0* t, global int* data, global int* int_data) {
+kernel void _Z11doSomethingIiEvN11mynamespace3BarENS0_9TemplatedIT_EEPS3_Pi(global struct class_mynamespace__Bar* bar, global struct class_mynamespace__Templated_0* t, global int* data, global int* int_data) {
     label0:;
     global int* v0 = &bar[0].f0.f0;
     v0[0] = 123;
@@ -50,7 +50,7 @@ kernel void _Z11doSomethingIiEvN11mynamespace3BarENS0_9TemplatedIT_EEPS3_Pi(glob
     int_data[0] = v6;
 }
 
-kernel void _Z11doSomethingIdEvN11mynamespace3BarENS0_9TemplatedIT_EEPS3_Pi(global struct class_mynamespace__Bar* bar, global struct class_mynamespace__Templated.1* t, global float* data, global int* int_data) {
+kernel void _Z11doSomethingIdEvN11mynamespace3BarENS0_9TemplatedIT_EEPS3_Pi(global struct class_mynamespace__Bar* bar, global struct class_mynamespace__Templated_1* t, global float* data, global int* int_data) {
     label0:;
     global int* v0 = &bar[0].f0.f0;
     v0[0] = 123;

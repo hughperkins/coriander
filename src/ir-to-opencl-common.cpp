@@ -142,27 +142,35 @@ void declareStruct(string name, StructType *type) {
     cout << "declarations_to_write " << declarations_to_write << endl;
 }
 
+std::string replace(std::string target, char old_char, char new_char) {
+    size_t pos = target.find(old_char);
+    while(pos != string::npos) {
+        target[pos] = new_char;
+        pos = target.find(old_char);
+    }
+    return target;
+}
+
 std::string dumpStructType(StructType *type) {
+    cout << "dumpstructtype" << endl;
     if(type->hasName()) {
         string name = type->getName();
+        cout << "name " << name << endl;
+        name = replace(name, '.', '_');
         if(name == "struct.float4") {
             return "float4";
         } else {
-            if(name.find("struct.") != string::npos) {
+            if(name.find("struct_") == 0) {
                 name[6] = ' ';
                 if(declaredStructs.find(name) == declaredStructs.end()) {
                     declaredStructs.insert(name);
                     declareStruct(name, type);
                 }
                 return name;
-            } else if(name.find("class.") != string::npos) {
+            } else if(name.find("class_") == 0) {
                 name[5] = '_';
                 name = "struct " + name;
-                size_t pos = name.find(':');
-                while(pos != string::npos) {
-                    name[pos] = '_';
-                    pos = name.find(':');
-                }
+                name = replace(name, ':', '_');
                 if(declaredStructs.find(name) == declaredStructs.end()) {
                     declaredStructs.insert(name);
                     declareStruct(name, type);

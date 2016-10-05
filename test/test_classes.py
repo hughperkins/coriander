@@ -27,10 +27,12 @@ from test import test_common
 def test_classes_cl():
     cl_filepath = 'test/generated/test_classes-device.cl'
 
+    print('running make...')
     print(subprocess.check_output([
         'make',
         cl_filepath
     ]).decode('utf-8'))
+    print('... make finished')
     return cl_filepath
 
 
@@ -47,6 +49,5 @@ def test_classes(context, test_classes_cl):
     return prog
 
 
-@pytest.mark.xfail
 def test_program_compiles(test_classes):
     pass
