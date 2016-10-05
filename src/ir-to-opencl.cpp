@@ -905,10 +905,12 @@ std::string dumpFunctionDeclaration(Function *F) {
         Argument *arg = &*it;
         storeValueName(arg);
         Type *argType = arg->getType();
-        if(argType->getTypeID() == Type::PointerTyID) {
-            Type *elementType = argType->getPointerElementType();
-            Type *newtype = PointerType::get(elementType, 1);
-            arg->mutateType(newtype);
+        if(iskernel_by_name[fname]) {
+            if(argType->getTypeID() == Type::PointerTyID) {
+                Type *elementType = argType->getPointerElementType();
+                Type *newtype = PointerType::get(elementType, 1);
+                arg->mutateType(newtype);
+            }
         }
         string argname = dumpType(arg->getType()) + " " + dumpOperand(arg);
         // cout << "arg " << argname << endl;

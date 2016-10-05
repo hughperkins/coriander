@@ -9,7 +9,7 @@ struct hasArray {
 
 
 float _Z3barff(float a, float b);
-void _Z7incrvalPf(global float* a);
+void _Z7incrvalPf(float* a);
 float4 _Z9getfloat4f(float a);
 float _Z19getfloat4ElementSumfii(float a, int e0, int e1);
 float _Z16declaredAfterUseff(float val1, float val2);
@@ -20,7 +20,7 @@ float _Z3barff(float a, float b) {
     return v0;
 }
 
-void _Z7incrvalPf(global float* a) {
+void _Z7incrvalPf(float* a) {
     label0:;
     float v0 = a[0];
     float v1 = v0 + 3.0f;
