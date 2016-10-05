@@ -168,7 +168,7 @@ On the host-side, there is code to:
 
 - `llvm.memmove.p0i8.p0i8.i64`
 - `llvm.lifetime`
-- add classes to unit tests
+- forward declarations of functions
 
 ### Tensorflow
 
