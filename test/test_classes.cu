@@ -1,6 +1,6 @@
 namespace mynamespace {
     namespace subnamespace {
-        __device__ __host__ class Foo {
+        class Foo {
         public:
             int a;
             Foo() {
@@ -15,7 +15,7 @@ namespace mynamespace {
         };
     }
 
-    __device__ __host__ class Bar : public subnamespace::Foo {
+    class Bar : public subnamespace::Foo {
     public:
         Foo foo;
         int b;
@@ -29,8 +29,25 @@ namespace mynamespace {
 
         }
     };
+
+    template<typename T>
+    class Templated : public subnamespace::Foo {
+    public:
+        T someattribute;
+        void doSomething(T val) {
+
+        }
+    };
 }
 
-__global__ void doSomething(mynamespace::Bar bar) {
+template<typename T>
+__global__
+void doSomething(mynamespace::Bar bar, mynamespace::Templated<T> t, T *data, int *int_data) {
     bar.a = 123;
+    data[0] = t.someattribute;
+    int_data[0] = bar.b;
+}
+
+__host__ void doSomething_host(mynamespace::Bar bar, mynamespace::Templated<float> t, float *data, int *int_data) {
+    doSomething<<<dim3(32), dim3(32)>>>(bar, t, data, int_data);
 }
