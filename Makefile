@@ -32,7 +32,7 @@ clean:
 
 # deviceside goes directly from .cu => -device.ll
 
-test/generated/%-device.ll: test/%.cu include/fake_funcs.h
+test/generated/%-device.ll: test/%.cu include/fake_funcs.h build/ir-to-opencl
 	echo building $@ from $<
 	mkdir -p test/generated
 	$(CLANG) -include include/fake_funcs.h -I$(CUDA_HOME)/include $< --cuda-device-only -emit-llvm -O3 -S -o $@
@@ -51,6 +51,10 @@ test/generated/%-hostpatched.ll: test/generated/%-hostraw.ll build/patch-hostsid
 # opencl (from the -device.ll)
 
 %-device.cl: %-device.ll build/ir-to-opencl
+	echo building $@ from $<
+	build/ir-to-opencl $< $@
+
+tensorflow/generated/%.cl: tensorflow/generated/%.ll build/ir-to-opencl
 	echo building $@ from $<
 	build/ir-to-opencl $< $@
 

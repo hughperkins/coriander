@@ -11,7 +11,7 @@ struct Eigen__half {
 };
 
 struct class_Eigen__array {
-    int[1] f0;
+    int f0[1];
 };
 
 struct Eigen__DSizes {
@@ -25,7 +25,7 @@ struct class_Eigen__StreamInterface {
 struct Eigen__GpuDevice {
     struct class_Eigen__StreamInterface* f0;
     int f1;
-    char[4] f2;
+    char f2[4];
 };
 
 struct Eigen__TensorEvaluator_0 {
@@ -45,7 +45,7 @@ struct Eigen__TensorEvaluator_2 {
 };
 
 struct class_Eigen__array_5 {
-    long[1] f0;
+    long f0[1];
 };
 
 struct Eigen__DSizes_4 {
@@ -138,7 +138,7 @@ struct Eigen__TensorEvaluator_15 {
 };
 
 struct class_Eigen__array_20 {
-    int[2] f0;
+    int f0[2];
 };
 
 struct Eigen__DSizes_19 {
@@ -198,7 +198,7 @@ struct Eigen__TensorEvaluator_26 {
 };
 
 struct class_Eigen__array_31 {
-    int[3] f0;
+    int f0[3];
 };
 
 struct Eigen__DSizes_30 {
@@ -258,7 +258,7 @@ struct Eigen__TensorEvaluator_37 {
 };
 
 struct class_Eigen__array_42 {
-    int[4] f0;
+    int f0[4];
 };
 
 struct Eigen__DSizes_41 {
@@ -318,7 +318,7 @@ struct Eigen__TensorEvaluator_48 {
 };
 
 struct class_Eigen__array_53 {
-    int[5] f0;
+    int f0[5];
 };
 
 struct Eigen__DSizes_52 {
