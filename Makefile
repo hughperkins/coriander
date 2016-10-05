@@ -26,7 +26,7 @@ easycl:
 	cd build && make -j 4
 
 clean:
-	rm -Rf build/*
+	rm -Rf build/* test/generated/*
 
 # IR
 
