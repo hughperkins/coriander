@@ -205,8 +205,7 @@ I dont know :-P
   - fix float constants to correctly have `.0f` at the end
   - added `extractvalue`
   - conversion of [tensorflow/generated/cwise_op_gpu_add-deviceside.ll](tensorflow/generated/cwise_op_gpu_add-deviceside.ll) to [tensorflow/generated/cwise_op_gpu_add-deviceside.cl](tensorflow/generated/cwise_op_gpu_add-deviceside.cl) runs to completion now, though a "bit" buggy :-P
-
-  Oct 4:
+- Oct 4:
   - added `llvm.memcpy`
   - added `insertvalue`
   - added `dumpinttoptr`, `trunc`, `srem` (beta)
