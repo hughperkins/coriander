@@ -910,7 +910,7 @@ std::string dumpFunctionDeclaration(Function *F) {
             Type *newtype = PointerType::get(elementType, 1);
             arg->mutateType(newtype);
         }
-        string argname = dumpType(arg->getType()) + " " + string(arg->getName());
+        string argname = dumpType(arg->getType()) + " " + dumpOperand(arg);
         // cout << "arg " << argname << endl;
         if(i > 0) {
             declaration += ", ";
