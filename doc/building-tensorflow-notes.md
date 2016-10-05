@@ -9,3 +9,12 @@ Run:
 
 [tensorflow/build_cwise_add.sh](https://github.com/hughperkins/cuda-ir-to-opencl/tree/master/tensorflow/build_cwise_add.sh)
 
+## Compiling the output, progress
+
+Currently:
+```
+$ py.test -sv -k cwise 2>&1 | grep '^E ' | wc -l
+1146
+```
+
+(out of total ~12,000 lines, so about ~90% is compiling ok, and ~10% needs fixing)
