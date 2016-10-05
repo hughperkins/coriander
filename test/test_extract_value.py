@@ -18,7 +18,6 @@ This needs CUDA_HOME defined, pointing to eg /usr/local/cuda-7.5
 import subprocess
 import numpy as np
 import pyopencl as cl
-import pyopencl.tools
 import pytest
 import os
 from os import path
