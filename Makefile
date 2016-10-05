@@ -13,13 +13,9 @@ LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
 all: build/ir-to-opencl build/patch-hostside
 
 build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h
-	echo CLANG $(CLANG)
-	echo $(COMPILE_FLAGS)
 	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/ir-to-opencl -g -O3 -I$(LLVM_INCLUDE) src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp $(LINK_FLAGS)
 
 build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h
-	echo CLANG $(CLANG)
-	echo $(COMPILE_FLAGS)
 	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/patch-hostside -g -O3 -I$(LLVM_INCLUDE) src/patch-hostside.cpp src/ir-to-opencl-common.cpp $(LINK_FLAGS)
 
 easycl:

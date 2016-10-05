@@ -4,6 +4,8 @@
 
 set -e
 
-./build.sh
+make
+make easycl
+
 ./run-end-to-end-demo.sh "$@"
 # ./run-ir-to-opencl-demo.sh "$@"

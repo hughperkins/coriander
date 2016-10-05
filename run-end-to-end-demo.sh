@@ -6,8 +6,7 @@ set -e
 export CUDA_HOME=/usr/local/cuda-7.5
 TARGET=testcudakernel1
 
-COMPILE_FLAGS="$(llvm-config-3.8 --cxxflags) -std=c++11"
-LINK_FLAGS="$(llvm-config-3.8 --ldflags --system-libs --libs all)"
+make
 
 # convert the cuda file to IR; this bit needs CUDA include files
 clang++-3.8 -I${CUDA_HOME}/include test/${TARGET}.cu --cuda-host-only -emit-llvm  -O3 -S -o test/generated/${TARGET}-host.ll

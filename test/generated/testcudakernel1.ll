@@ -1,4 +1,4 @@
-; ModuleID = 'examples/testcudakernel1.cu'
+; ModuleID = 'test/testcudakernel1.cu'
 target datalayout = "e-i64:64-v16:16-v32:32-n16:32:64"
 target triple = "nvptx64-nvidia-cuda"
 

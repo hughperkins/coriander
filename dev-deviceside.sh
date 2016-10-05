@@ -4,5 +4,6 @@
 
 set -e
 
-./build.sh
+make bin/ir-to-opencl
+
 ./run-ir-to-opencl-demo.sh "$@"
