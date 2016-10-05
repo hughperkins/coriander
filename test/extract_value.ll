@@ -1,3 +1,7 @@
+; couldnt figure out how to convince cuda to compile into extractvalue ll, so just
+; writing extractvalue into raw ll
+
+
 %struct.float4 = type { float, float, float, float }
 
 ; Function Attrs: norecurse nounwind readnone
