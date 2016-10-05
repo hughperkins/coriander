@@ -21,6 +21,6 @@ make build/${TARGET}-hostpatched.o
 make build/test_call_cl.o
 
 # link, and run
-g++ -o build/test_call_cl build/test_call_cl.o build/${TARGET}-hostpatched.o -lOpenCL -Lbuild -lEasyCL
+make build/test_call_cl
 
 LD_LIBRARY_PATH=build:$LD_LIBRARY_PATH build/test_call_cl
