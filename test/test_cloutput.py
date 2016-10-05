@@ -16,12 +16,27 @@ import numpy as np
 import pyopencl as cl
 import pyopencl.tools
 import pytest
+import subprocess
 from test import test_common
 
 
 @pytest.fixture(scope='module')
-def testcudakernel1(context):
-    with open('test/generated/testcudakernel1-device.cl', 'r') as f:
+def testcudakernel1_cl():
+    cl_path = 'test/generated/testcudakernel1-device.cl'
+    print(subprocess.check_output([
+        'make',
+        cl_path
+    ]).decode('utf-8'))
+    return cl_path
+
+
+def test_cl_generates(testcudakernel1_cl):
+    pass
+
+
+@pytest.fixture(scope='module')
+def testcudakernel1(context, testcudakernel1_cl):
+    with open(testcudakernel1_cl, 'r') as f:
         sourcecode = f.read()
 
     prog = cl.Program(context, sourcecode).build()

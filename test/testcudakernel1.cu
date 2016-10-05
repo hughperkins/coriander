@@ -286,3 +286,11 @@ __global__ void testFloat4_insertvalue(float4 *data, float *data2, int N) {
     float4 res = getfloat4(data2[0]);
     data[0] = res;
 }
+
+struct hasArray {
+    int foo[4];
+};
+
+__global__ void useHasArray(hasArray *data) {
+    data[0].foo[0] = data[1].foo[2];
+}

@@ -134,7 +134,18 @@ void declareStruct(string name, StructType *type) {
     int i = 0;
     for(auto it=type->element_begin(); it != type->element_end(); it++) {
         Type *elementType = *it;
-        declaration += "    " + dumpType(elementType) + " f" + toString(i) + ";\n";
+        std::string memberName = "f" + toString(i);
+        if(ArrayType *arraytype = dyn_cast<ArrayType>(elementType)) {
+            Type *arrayelementtype = arraytype->getPointerElementType();
+            cout << "arrayelementtype " << dumpType(arrayelementtype) << endl;
+            int numElements = arraytype->getNumElements();
+            cout << "numelements " << numElements << endl;
+            declaration += "    " + dumpType(arrayelementtype) + " ";
+            declaration += memberName + "[" + toString(numElements) + "];\n";
+            // throw runtime_error("not implemented declarestruct for arraytype elements");
+        } else {
+            declaration += "    " + dumpType(elementType) + " " + memberName + ";\n";
+        }
         i++;
     }
     declaration += "};\n";

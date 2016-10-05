@@ -3,6 +3,10 @@ struct MyStruct {
     float f1;
 };
 
+struct hasArray {
+    int f0[4];
+};
+
 
 float _Z3barff(float a, float b) {
     label0:;
@@ -991,4 +995,12 @@ kernel void _Z22testFloat4_insertvalueP6float4Pfi(global float4* data, global fl
     v5[0] = v1;
     global float* v7 = &((global float*)&data[0])[2];
     v7[0] = v2;
+}
+
+kernel void _Z11useHasArrayP8hasArray(global struct hasArray* data) {
+    label0:;
+    global int* v0 = &data[1].f0[2];
+    int v1 = v0[0];
+    global int* v2 = &data[0].f0[0];
+    v2[0] = v1;
 }
