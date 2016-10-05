@@ -25,15 +25,28 @@ from test import test_common
 
 @pytest.fixture(scope='module')
 def test_classes_cl():
-    cu_filepath = 'test/test_classes.cu'
-    ll_filepath = 'test/generated/test_classes-device.ll'
     cl_filepath = 'test/generated/test_classes-device.cl'
 
     print(subprocess.check_output([
         'make',
         cl_filepath
     ]).decode('utf-8'))
+    return cl_filepath
 
 
 def test_build_cl(test_classes_cl):
+    pass
+
+
+@pytest.fixture(scope='module')
+def test_classes(context, test_classes_cl):
+    with open(test_classes_cl, 'r') as f:
+        sourcecode = f.read()
+
+    prog = cl.Program(context, sourcecode).build()
+    return prog
+
+
+@pytest.mark.xfail
+def test_program_compiles(test_classes):
     pass
