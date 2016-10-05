@@ -163,13 +163,15 @@ On the host-side, there is code to:
 
 ## Roadmap
 
+### Basic c/c++/llvm/CUDA/OpenCL language/concepts
+
+- `llvm.memmove.p0i8.p0i8.i64`
+- `llvm.lifetime`
+- add classes to unit tests
+
 ### Tensorflow
 
 - Get [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_add.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_add.cc) compiling/running on OpenCL
-
-### Things that would be cool to get working
-
-- be able to handle pointer arithmetic for host-side `float *`s representing opencl gpu memory :-P
 
 ### Things we *need* to be working for tensorflow
 
@@ -178,12 +180,6 @@ On the host-side, there is code to:
 - blas stuff (matrix mul, and convolutions):
    - lets use CLblast for blas stuff
    - use im2col for convolution for now
-
-### Basic c/c++/llvm/CUDA/OpenCL language/concepts
-
-- `llvm.memmove.p0i8.p0i8.i64`
-- `llvm.lifetime`
-- add classes to unit tests
 
 ## FAQ
 
