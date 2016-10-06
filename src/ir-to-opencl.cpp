@@ -55,6 +55,7 @@ static std::map<string, string> knownFunctionsMap; // from cuda to opencl, eg ti
 map<Value *, string> nameByValue;
 static int nextNameIdx;
 static string currentFunctionSharedDeclarations = "";
+static string globalDeclarations = "";
 
 static bool debug;
 bool single_precision = true;
@@ -73,6 +74,10 @@ std::string dumpValue(Value *value) {
     string name = nameByValue[value];
     gencode += name;
     return gencode;
+}
+
+void declareGlobal(GlobalValue *global) {
+    throw runtime_error("declareGlobal not impelmented");
 }
 
 string dumpConstant(Constant *constant) {
@@ -118,10 +123,16 @@ string dumpConstant(Constant *constant) {
         int addressspace = pointerType->getAddressSpace();
         cout << "address space " << addressspace << endl;
         // oss << dumpType(elementType) << endl;
+        string name = global->getName();
         if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
-            oss << string(global->getName());
+            return name;
         } else {
-            throw runtime_error("not implemented: global variables with addressspace " + toString(addressspace));
+            // we'd better declare them...
+            cout << "name declared? " << (nameByValue.find(global) != nameByValue.end()) << endl;
+            declareGlobal(global);
+            nameByValue[global] = name;
+            return name;
+            // throw runtime_error("not implemented: global variables with addressspace " + toString(addressspace));
         }
         // cout << "constant has name " << constant->hasName() << " " << string(constant->getName()) << endl;
     } else if(isa<UndefValue>(constant)) {
@@ -1124,7 +1135,7 @@ std::string dumpModule(Module *M) {
             i++;
         }
     }
-    gencode = getDeclarationsToWrite() + "\n" + gencode;
+    gencode = getDeclarationsToWrite() + "\n" + globalDeclarations + "\n" + gencode;
     return gencode;
 }
 
