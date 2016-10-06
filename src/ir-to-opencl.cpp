@@ -77,7 +77,27 @@ std::string dumpValue(Value *value) {
 }
 
 void declareGlobal(GlobalValue *global) {
-    throw runtime_error("declareGlobal not impelmented");
+    string gencode = "";
+
+    Type *globalType = global->getType();
+    cout << "global ispointer " << isa<PointerType>(globalType) << endl;
+    cout << "global isvector " << isa<VectorType>(globalType) << endl;
+    PointerType *ptr = cast<PointerType>(globalType);
+    Type *elementType = ptr->getPointerElementType();
+    string elementtypestr = dumpType(elementType);
+    cout << "elementtypestr " << elementtypestr << endl;
+    // cout << "global isvector " << isa<VectorType>(elementType) << endl;
+    // VectorType *vector = cast<VectorType>(elementType);
+    // int len = vector->getNumElements();
+    // cout << "len " << len << endl;
+    // Type *vectorElementType = vector->getElementType();
+    // cout << "vector element type " << dumpType(vectorElementType) << endl;
+    string name = global->getName();
+    gencode += elementtypestr + " " + name + ";\n";
+    cout << gencode << endl;
+
+    globalDeclarations += gencode + "\n";
+    // throw runtime_error("declareGlobal not impelmented");
 }
 
 string dumpConstant(Constant *constant) {
@@ -129,8 +149,10 @@ string dumpConstant(Constant *constant) {
         } else {
             // we'd better declare them...
             cout << "name declared? " << (nameByValue.find(global) != nameByValue.end()) << endl;
-            declareGlobal(global);
-            nameByValue[global] = name;
+            if(nameByValue.find(global) == nameByValue.end()) {
+                nameByValue[global] = name;
+                declareGlobal(global);
+            }
             return name;
             // throw runtime_error("not implemented: global variables with addressspace " + toString(addressspace));
         }
