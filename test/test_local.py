@@ -24,43 +24,24 @@ from test import test_common
 
 
 @pytest.fixture(scope='module')
-def union_cl():
-    # lets check it's compileable ll first, using llvm
-    ll_filepath = 'test/union-device.ll'
-    cl_filepath = 'test/generated/union-device.cl'
-
-    print(subprocess.check_output([
-        test_common.clang_path,
-        '-c', ll_filepath,
-        '-O3',
-        '-o', '/tmp/~foo'
-    ]).decode('utf-8'))
+def test_local_cl():
+    cl_filepath = 'test/generated/test_local-device.cl'
 
     print(subprocess.check_output([
         'make',
-        'build/ir-to-opencl',
-    ]).decode('utf-8'))
-
-    if not path.isdir('test/generated'):
-        os.makedirs('test/generated')
-    print(subprocess.check_output([
-        'build/ir-to-opencl',
-        '--debug',
-        ll_filepath,
         cl_filepath
     ]).decode('utf-8'))
     return cl_filepath
 
 
 @pytest.fixture(scope='module')
-def union(context, union_cl):
-    with open(union_cl, 'r') as f:
+def test_local(context, test_local_cl):
+    with open(test_local_cl, 'r') as f:
         sourcecode = f.read()
 
     prog = cl.Program(context, sourcecode).build()
     return prog
 
 
-@pytest.mark.xfail
-def test_program_compiles(union):
+def test_program_compiles(test_local):
     pass

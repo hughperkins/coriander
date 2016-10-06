@@ -58,6 +58,10 @@ tensorflow/generated/%.cl: tensorflow/generated/%.ll build/ir-to-opencl
 	echo building $@ from $<
 	build/ir-to-opencl $< $@
 
+test/generated/%-device.cl: test/%-device.ll build/ir-to-opencl
+	echo building $@ from $<
+	build/ir-to-opencl $< $@
+
 # objects
 
 ## objects from hostside patched ll

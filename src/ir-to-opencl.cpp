@@ -61,6 +61,8 @@ bool single_precision = true;
 
 static int instructions_processed = 0;
 
+std::string dumpInstruction(Instruction *instruction);
+
 std::string dumpValue(Value *value) {
     std::string gencode = "";
     unsigned int valueTy = value->getValueID();
@@ -76,33 +78,25 @@ std::string dumpValue(Value *value) {
 string dumpConstant(Constant *constant) {
     unsigned int valueTy = constant->getValueID();
     ostringstream oss;
-    if(valueTy == AShrOperator::ConstantIntVal) {
-        oss << "int:" << cast<ConstantInt>(constant)->getSExtValue();
-    } else if(GlobalValue::classof(constant)) {
-        GlobalValue *global = cast<GlobalValue>(constant);
-        PointerType *pointerType = global->getType();
-        Type *elementType = pointerType->getPointerElementType();
-        cout << "element type " << elementType << endl;
-        cout << dumpType(elementType) << endl;
-        cout << "constant has name " << constant->hasName() << " " << string(constant->getName()) << endl;
-    } else {
-        cout << "valueTy " << valueTy << endl;
-        cout << GlobalValue::classof(constant) << endl;
-        oss << "unknown";
-    }
-    return oss.str();
-}
-
-string dumpOperand(Value *value) {
-    unsigned int valueTy = value->getValueID();
-    if(valueTy == AShrOperator::ConstantIntVal) {
-        int intvalue = readInt32Constant(value);
-        ostringstream oss;
-        oss << intvalue;
-        return oss.str();
-    }
-    if(valueTy == AShrOperator::ConstantFPVal) {
-        float floatvalue = readFloatConstant(value);
+    // if(valueTy == AShrOperator::ConstantIntVal) {
+    // cout << "constant" << endl;
+    if(ConstantInt *constantInt = dyn_cast<ConstantInt>(constant)) {
+        // cout << "constantint" << endl;
+        oss << constantInt->getSExtValue();
+    } else if(isa<ConstantStruct>(constant)) {
+        throw runtime_error("constantStruct not implemented in dumpconstnat");
+    } else if(ConstantExpr *expr = dyn_cast<ConstantExpr>(constant)) {
+        cout << "constantexp" << endl;
+        cout << "opcode name " << expr->getOpcodeName() << endl;
+        Instruction *instr = expr->getAsInstruction();
+        instr->dump();
+        cout << dumpInstruction(instr) << endl;
+        return dumpInstruction(instr);
+        // throw runtime_error("ConstantExpr not implemented in dumpconstnat");
+    } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
+        // cout << "constantfp" << endl;
+        float floatvalue = constantFP->getValueAPF().convertToFloat();
+        // cout << "floatvalue " << floatvalue << endl;
         ostringstream oss;
         oss << floatvalue;
         string floatvaluestr = oss.str();
@@ -113,11 +107,75 @@ string dumpOperand(Value *value) {
             floatvaluestr += "f";
         }
         return floatvaluestr;
+    } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
+        cout << "globalvalue" << endl;
+        // PointerType *pointerType = global->getType();
+        // Type *elementType = pointerType->getPointerElementType();
+        // cout << "element type " << elementType << endl;
+        // oss << dumpType(elementType) << endl;
+        oss << string(global->getName());
+        // cout << "constant has name " << constant->hasName() << " " << string(constant->getName()) << endl;
+    } else if(isa<UndefValue>(constant)) {
+        cout << "undef" << endl;
+        return "";
+    } else {
+        cout << "valueTy " << valueTy << endl;
+        // cout << GlobalValue::classof(constant) << endl;
+        oss << "unknown";
+        constant->dump();
+        throw runtime_error("unknown constnat type");
     }
-    if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
-        return string(glob->getName());
+    return oss.str();
+}
+
+
+//     return cast<ConstantInt>(value)->getSExtValue();
+// }
+
+// float readFloatConstant(Value *value) {
+//     return cast<ConstantFP>(value)->getValueAPF().convertToFloat();
+
+string dumpOperand(Value *value) {
+    unsigned int valueTy = value->getValueID();
+    // cout << "dumpOperand " << endl;
+    if(Constant *constant = dyn_cast<Constant>(value)) {
+        // cout << "constant" << endl;
+        // constant->dump();
+        return dumpConstant(constant);
+        // if(valueTy == AShrOperator::ConstantIntVal) {
+        //     int intvalue = readInt32Constant(value);
+        //     ostringstream oss;
+        //     oss << intvalue;
+        //     return oss.str();
+        // }
+        // if(valueTy == AShrOperator::ConstantFPVal) {
+        //     float floatvalue = readFloatConstant(value);
+        //     ostringstream oss;
+        //     oss << floatvalue;
+        //     string floatvaluestr = oss.str();
+        //     if(single_precision) {
+        //         if(floatvaluestr.find('.') == string::npos) {
+        //             floatvaluestr += ".0";
+        //         }
+        //         floatvaluestr += "f";
+        //     }
+        //     return floatvaluestr;
+        // }
     }
+    // if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
+    //     cout << "global variable " << string(glob->getName()) << endl;
+    //     return string(glob->getName());
+    // }
     string name = nameByValue[value];
+    // cout << "dumpOperand name " << name << endl;
+    // value->dump();
+    // cout << "op type name " << dumpType(value->getType()) << endl;
+    // cout << "is bitcast " << isa<BitCastInst>(value) << endl;
+    // cout << "is addrspacecast " << isa<AddrSpaceCastInst>(value) << endl;
+    // cout << "is globavalue " << isa<GlobalValue>(value) << endl;
+    // cout << "is instruction " << isa<Instruction>(value) << endl;
+    // cout << "is constant " << isa<Constant>(value) << endl;
+    // cout << "is pointer " << isa<Po>(value) << endl;
     return name;
 }
 
@@ -245,6 +303,8 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
         cout << "dumpoperand(instr) " << dumpOperand(instr) << endl;
         // pointer into shared memory.
         addSharedDeclaration(instr->getOperand(0));
+        cout << "rhs " << rhs << endl;
+        // throw runtime_error("dumpgep stop");
     }
     for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
@@ -728,6 +788,141 @@ std::string dumpSelect(SelectInst *instr) {
     return gencode;
 }
 
+std::string dumpInstruction(Instruction *instruction) {
+    auto opcode = instruction->getOpcode();
+    storeValueName(instruction);
+    string resultName = nameByValue[instruction];
+    string resultType = dumpType(instruction->getType());
+
+    string instructioncode = "";
+    if(debug) {
+        cout << resultType << " " << resultName << " =";
+        cout << " " << string(instruction->getOpcodeName());
+        for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
+            Value *op = &*it->get();
+            cout << " " << dumpOperand(op);
+        }
+        cout << endl;
+    }
+    switch(opcode) {
+        case Instruction::FAdd:
+            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
+            break;
+        case Instruction::FSub:
+            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "-");
+            break;
+        case Instruction::FMul:
+            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "*");
+            break;
+        case Instruction::FDiv:
+            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
+            break;
+        case Instruction::Sub:
+            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "-");
+            break;
+        case Instruction::Add:
+            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
+            break;
+        case Instruction::Mul:
+            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "*");
+            break;
+        case Instruction::SDiv:
+            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
+            break;
+        case Instruction::SRem:
+            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "%");
+            break;
+        case Instruction::And:
+            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "&");
+            break;
+        case Instruction::Or:
+            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "|");
+            break;
+        case Instruction::Xor:
+            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "^");
+            break;
+        case Instruction::LShr:
+            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
+            break;
+        case Instruction::Shl:
+            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "<<");
+            break;
+        case Instruction::AShr:
+            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
+            break;
+        case Instruction::Store:
+            instructioncode = dumpStore(cast<StoreInst>(instruction));
+            break;
+        case Instruction::Call:
+            instructioncode = dumpCall(cast<CallInst>(instruction));
+            break;
+        case Instruction::Load:
+            instructioncode = dumpLoad(cast<LoadInst>(instruction));
+            break;
+        case Instruction::ICmp:
+            instructioncode = dumpIcmp(cast<ICmpInst>(instruction));
+            break;
+        case Instruction::FCmp:
+            instructioncode = dumpFcmp(cast<FCmpInst>(instruction));
+            break;
+        case Instruction::SExt:
+            instructioncode = dumpSExt(cast<CastInst>(instruction));
+            break;
+        case Instruction::ZExt:
+            instructioncode = dumpZExt(cast<CastInst>(instruction));
+            break;
+        case Instruction::FPExt:
+            instructioncode = dumpFPExt(cast<CastInst>(instruction));
+            break;
+        case Instruction::FPTrunc:
+            instructioncode = dumpFPTrunc(cast<CastInst>(instruction));
+            break;
+        case Instruction::Trunc:
+            instructioncode = dumpTrunc(cast<CastInst>(instruction));
+            break;
+        case Instruction::BitCast:
+            instructioncode = dumpBitcast(cast<BitCastInst>(instruction));
+            break;
+        case Instruction::AddrSpaceCast:
+            instructioncode = dumpAddrSpaceCast(cast<AddrSpaceCastInst>(instruction));
+            break;
+        case Instruction::IntToPtr:
+            instructioncode = dumpInttoPtr(cast<IntToPtrInst>(instruction));
+            break;
+        case Instruction::UIToFP:
+            instructioncode = dumpUIToFP(cast<UIToFPInst>(instruction));
+            break;
+        case Instruction::GetElementPtr:
+            instructioncode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
+            break;
+        case Instruction::InsertValue:
+            instructioncode = dumpInsertValue(cast<InsertValueInst>(instruction));
+            break;
+        case Instruction::ExtractValue:
+            instructioncode = dumpExtractValue(cast<ExtractValueInst>(instruction));
+            break;
+        case Instruction::Alloca:
+            instructioncode = dumpAlloca(cast<AllocaInst>(instruction));
+            break;
+        case Instruction::Br:
+            instructioncode = dumpBranch(cast<BranchInst>(instruction));
+            break;
+        case Instruction::Select:
+            instructioncode = dumpSelect(cast<SelectInst>(instruction));
+            break;
+        case Instruction::Ret:
+            instructioncode = dumpReturn(cast<ReturnInst>(instruction));
+            break;
+        case Instruction::PHI:
+            // just ignore, we dealt with it in the br (hopefully)
+            break;
+        default:
+            cout << "opcode string " << instruction->getOpcodeName() << endl;
+            throw runtime_error("unknown opcode");
+    }
+    return instructioncode;
+}
+
 std::string dumpBasicBlock(BasicBlock *basicBlock) {
     if(debug) {
         cout << "basicblock" << endl;
@@ -747,137 +942,7 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
     gencode += "    " + label + ":;\n";
     for(BasicBlock::iterator it=basicBlock->begin(), e=basicBlock->end(); it != e; it++) {
         Instruction *instruction = &*it;
-        auto opcode = instruction->getOpcode();
-        storeValueName(instruction);
-        string resultName = nameByValue[instruction];
-        string resultType = dumpType(instruction->getType());
-
-        string instructioncode = "";
-        if(debug) {
-            cout << resultType << " " << resultName << " =";
-            cout << " " << string(instruction->getOpcodeName());
-            for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
-                Value *op = &*it->get();
-                cout << " " << dumpOperand(op);
-            }
-            cout << endl;
-        }
-        switch(opcode) {
-            case Instruction::FAdd:
-                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
-                break;
-            case Instruction::FSub:
-                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "-");
-                break;
-            case Instruction::FMul:
-                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "*");
-                break;
-            case Instruction::FDiv:
-                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
-                break;
-            case Instruction::Sub:
-                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "-");
-                break;
-            case Instruction::Add:
-                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
-                break;
-            case Instruction::Mul:
-                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "*");
-                break;
-            case Instruction::SDiv:
-                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
-                break;
-            case Instruction::SRem:
-                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "%");
-                break;
-            case Instruction::And:
-                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "&");
-                break;
-            case Instruction::Or:
-                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "|");
-                break;
-            case Instruction::Xor:
-                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "^");
-                break;
-            case Instruction::LShr:
-                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
-                break;
-            case Instruction::Shl:
-                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "<<");
-                break;
-            case Instruction::AShr:
-                instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
-                break;
-            case Instruction::Store:
-                instructioncode = dumpStore(cast<StoreInst>(instruction));
-                break;
-            case Instruction::Call:
-                instructioncode = dumpCall(cast<CallInst>(instruction));
-                break;
-            case Instruction::Load:
-                instructioncode = dumpLoad(cast<LoadInst>(instruction));
-                break;
-            case Instruction::ICmp:
-                instructioncode = dumpIcmp(cast<ICmpInst>(instruction));
-                break;
-            case Instruction::FCmp:
-                instructioncode = dumpFcmp(cast<FCmpInst>(instruction));
-                break;
-            case Instruction::SExt:
-                instructioncode = dumpSExt(cast<CastInst>(instruction));
-                break;
-            case Instruction::ZExt:
-                instructioncode = dumpZExt(cast<CastInst>(instruction));
-                break;
-            case Instruction::FPExt:
-                instructioncode = dumpFPExt(cast<CastInst>(instruction));
-                break;
-            case Instruction::FPTrunc:
-                instructioncode = dumpFPTrunc(cast<CastInst>(instruction));
-                break;
-            case Instruction::Trunc:
-                instructioncode = dumpTrunc(cast<CastInst>(instruction));
-                break;
-            case Instruction::BitCast:
-                instructioncode = dumpBitcast(cast<BitCastInst>(instruction));
-                break;
-            case Instruction::AddrSpaceCast:
-                instructioncode = dumpAddrSpaceCast(cast<AddrSpaceCastInst>(instruction));
-                break;
-            case Instruction::IntToPtr:
-                instructioncode = dumpInttoPtr(cast<IntToPtrInst>(instruction));
-                break;
-            case Instruction::UIToFP:
-                instructioncode = dumpUIToFP(cast<UIToFPInst>(instruction));
-                break;
-            case Instruction::GetElementPtr:
-                instructioncode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
-                break;
-            case Instruction::InsertValue:
-                instructioncode = dumpInsertValue(cast<InsertValueInst>(instruction));
-                break;
-            case Instruction::ExtractValue:
-                instructioncode = dumpExtractValue(cast<ExtractValueInst>(instruction));
-                break;
-            case Instruction::Alloca:
-                instructioncode = dumpAlloca(cast<AllocaInst>(instruction));
-                break;
-            case Instruction::Br:
-                instructioncode = dumpBranch(cast<BranchInst>(instruction));
-                break;
-            case Instruction::Select:
-                instructioncode = dumpSelect(cast<SelectInst>(instruction));
-                break;
-            case Instruction::Ret:
-                instructioncode = dumpReturn(cast<ReturnInst>(instruction));
-                break;
-            case Instruction::PHI:
-                // just ignore, we dealt with it in the br (hopefully)
-                break;
-            default:
-                cout << "opcode string " << instruction->getOpcodeName() << endl;
-                throw runtime_error("unknown opcode");
-        }
+        string instructioncode = dumpInstruction(instruction);
         if(debug) {
             cout <<  instructioncode << endl;
         }

@@ -148,9 +148,9 @@ void declareStruct(string name, StructType *type) {
         std::string memberName = "f" + toString(i);
         if(ArrayType *arraytype = dyn_cast<ArrayType>(elementType)) {
             Type *arrayelementtype = arraytype->getPointerElementType();
-            cout << "arrayelementtype " << dumpType(arrayelementtype) << endl;
+            // cout << "arrayelementtype " << dumpType(arrayelementtype) << endl;
             int numElements = arraytype->getNumElements();
-            cout << "numelements " << numElements << endl;
+            // cout << "numelements " << numElements << endl;
             declaration += "    " + dumpType(arrayelementtype) + " ";
             declaration += memberName + "[" + toString(numElements) + "];\n";
             // throw runtime_error("not implemented declarestruct for arraytype elements");
@@ -161,7 +161,7 @@ void declareStruct(string name, StructType *type) {
     }
     declaration += "};\n";
     declarations_to_write += declaration + "\n";
-    cout << "declarations_to_write " << declarations_to_write << endl;
+    // cout << "declarations_to_write " << declarations_to_write << endl;
 }
 
 std::string replace(std::string target, char old_char, char new_char) {
@@ -174,10 +174,10 @@ std::string replace(std::string target, char old_char, char new_char) {
 }
 
 std::string dumpStructType(StructType *type) {
-    cout << "dumpstructtype" << endl;
+    // cout << "dumpstructtype" << endl;
     if(type->hasName()) {
         string name = type->getName();
-        cout << "name " << name << endl;
+        // cout << "name " << name << endl;
         name = replace(name, '.', '_');
                 name = replace(name, ':', '_');
         if(name == "struct_float4") {
