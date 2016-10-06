@@ -62,7 +62,8 @@ bool single_precision = true;
 
 static int instructions_processed = 0;
 
-std::string dumpInstruction(Instruction *instruction);
+std::string dumpInstruction(llvm::Instruction *instruction);
+std::string dumpOperand(llvm::Value *value);
 
 std::string dumpValue(Value *value) {
     std::string gencode = "";
@@ -86,14 +87,64 @@ void declareGlobal(GlobalValue *global) {
     Type *elementType = ptr->getPointerElementType();
     string elementtypestr = dumpType(elementType);
     cout << "elementtypestr " << elementtypestr << endl;
+    cout << "global->dump()";
+    global->dump();
+    cout << endl;
+    cout << "isa ConstantStruct " << isa<ConstantStruct>(global) << endl;
+    cout << "isa GlobalVariable " << isa<GlobalVariable>(global) << endl;
+
+    string name = global->getName();
+    gencode += elementtypestr + " " + name;
+    if(GlobalVariable *var = dyn_cast<GlobalVariable>(global)) {
+        cout << "its a globalvariable" << endl;
+        cout << "has initializer " << var->hasInitializer() << endl;
+        Constant *initializer = var->getInitializer();
+        initializer->dump();
+        cout << endl;
+        cout << "isa ConstStruct " << isa<ConstantStruct>(initializer) << endl;
+         // = {11.0f}
+
+        if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
+            Type *elementType = pointerType->getPointerElementType();
+            cout << "element type " << dumpType(elementType) << endl;
+            int addressspace = pointerType->getAddressSpace();
+            cout << "address space " << addressspace << endl;
+            if(addressspace == 3) { // shared/local => skip
+                return;
+            }
+        }
+
+        if(ConstantStruct *constStruct = dyn_cast<ConstantStruct>(initializer)) {
+            cout << "got a ConstantStruct initializer" << endl;
+            constStruct->dump();
+            cout << endl;
+            int i = 0;
+            while(Value *aggel = constStruct->getAggregateElement(i)) {
+                if(i == 0) {
+                    gencode += " = {";
+                } else {
+                    gencode += ", ";
+                }
+                cout << "aggel:\n";
+                aggel->dump();
+                gencode += dumpOperand(aggel);
+                cout << "aggel type " << dumpType(aggel->getType()) << endl;
+                i++;
+            }
+            if(i > 0) {
+                gencode += "}";
+            }
+        }
+    }
+    // cout << "numoperands " << global->getNu
     // cout << "global isvector " << isa<VectorType>(elementType) << endl;
     // VectorType *vector = cast<VectorType>(elementType);
     // int len = vector->getNumElements();
     // cout << "len " << len << endl;
     // Type *vectorElementType = vector->getElementType();
     // cout << "vector element type " << dumpType(vectorElementType) << endl;
-    string name = global->getName();
-    gencode += elementtypestr + " " + name + ";\n";
+    // string name = global->getName();
+    gencode += ";\n";
     cout << gencode << endl;
 
     globalDeclarations += gencode + "\n";
@@ -147,12 +198,12 @@ string dumpConstant(Constant *constant) {
         if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
             return name;
         } else {
-            // we'd better declare them...
-            cout << "name declared? " << (nameByValue.find(global) != nameByValue.end()) << endl;
-            if(nameByValue.find(global) == nameByValue.end()) {
-                nameByValue[global] = name;
-                declareGlobal(global);
-            }
+            // // we'd better declare them...
+            // cout << "name declared? " << (nameByValue.find(global) != nameByValue.end()) << endl;
+            // if(nameByValue.find(global) == nameByValue.end()) {
+            //     nameByValue[global] = name;
+            //     declareGlobal(global);
+            // }
             return name;
             // throw runtime_error("not implemented: global variables with addressspace " + toString(addressspace));
         }
@@ -1082,6 +1133,48 @@ std::string dumpFunction(Function *F) {
 
 std::string dumpModule(Module *M) {
     string gencode;
+
+    // for(auto it=M->alias_begin(); it != M->alias_end(); it++) {
+    //     GlobalAlias *alias = &*it;
+    //     alias->dump();
+    // }
+
+    // ValueSymbolTable &V = M->getValueSymbolTable();
+    // for(auto it=V.begin(); it != V.end(); it++) {
+    //     cout << string(it->first()) << endl;
+    //     // ValueSymbol *v = &*it;
+    //     // v->dump();
+    // }
+
+    // get struct declarations
+    // global_begin/end returns all the bits that start with '@', at the top of the .ll
+    for(auto it=M->global_begin(); it != M->global_end(); it++) {
+        GlobalVariable *glob = &*it;
+        string name = glob->getName();
+        if(name == "llvm.used") {
+            continue;
+        }
+        if(name.find(".str") == 0) {
+            // ignore global strings for now (probably add in locally; though I dont think opencl really uses strings..)
+            continue;
+        }
+        if(name == "llvm.global_ctors") {
+            // we should handle these sooner or later, but skip for now
+            cerr << "warning: skipping @llvm.global_ctors" << endl;
+            continue;
+        }
+        glob->dump();
+        cout << "name " << name << endl;
+        declareGlobal(glob);
+    }
+    cout << getDeclarationsToWrite() << endl;
+    cout << globalDeclarations << endl;
+
+    // get global constant declarations
+
+
+    // throw runtime_error("stop here");
+
     // figure out which functions are kernels
     for(auto it=M->named_metadata_begin(); it != M->named_metadata_end(); it++) {
         NamedMDNode *namedMDNode = &*it;

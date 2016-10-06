@@ -1,5 +1,6 @@
 
 
+
 kernel void _Z11test_floatsPf(global float* data) {
     label0:;
     global float* v0 = &data[1];

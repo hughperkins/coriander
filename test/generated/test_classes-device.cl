@@ -25,6 +25,7 @@ struct class_mynamespace__Templated_1 {
 
 
 
+
 kernel void _Z11doSomethingIfEvN11mynamespace3BarENS0_9TemplatedIT_EEPS3_Pi(global struct class_mynamespace__Bar* bar, global struct class_mynamespace__Templated* t, global float* data, global int* int_data) {
     label0:;
     global int* v0 = &bar[0].f0.f0;

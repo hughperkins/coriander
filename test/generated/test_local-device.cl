@@ -1,5 +1,6 @@
 
 
+
 kernel void _Z9testLocalPf(global float* data) {
     local float _ZZ9testLocalPfE8myshared[32];
     label0:;

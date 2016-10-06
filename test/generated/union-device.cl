@@ -3,6 +3,9 @@ struct firsttype {
 };
 
 
+struct firsttype myglobal = {1234};
+
+
 
 kernel void test_union1(global float* data) {
     label0:;
@@ -11,7 +14,7 @@ kernel void test_union1(global float* data) {
 
 kernel void test_union(global float* data) {
     label0:;
-    float v0 = global float* v4 = (global float*)global float*v6 = (global float*)myglobal;
+    float v0 = global float* v16 = (global float*)global float*v20 = (global float*)myglobal;
 ;
 [0];
 }

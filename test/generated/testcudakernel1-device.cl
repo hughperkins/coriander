@@ -8,6 +8,7 @@ struct hasArray {
 };
 
 
+
 float _Z3barff(float a, float b);
 void _Z7incrvalPf(float* a);
 float4 _Z9getfloat4f(float a);

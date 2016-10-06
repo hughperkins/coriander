@@ -28,8 +28,9 @@ __host__ __device__ float getSomeClassValue(SomeClass someclass, SomeClass c2) {
     return someclass.foo.somefloat + c2.foo.somefloat;
 }
 
-SomeClass myg1;
-SomeClass myg2(7.89f);
+__constant__ SomeClass myg1;
+__constant__ SomeClass myg2(7.89f);
+__constant__ struct Foo foo = {11.0f};
 
 __global__ void somekernel(float *data) {
     struct Foo bar = { 23.4f };
@@ -47,4 +48,12 @@ __global__ void somekernel(float *data) {
     }
     data[8] = myg1.getValue3(data[9]);
     data[10] = myg2.getValue3(data[11]);
+}
+
+__global__ void somekernel2(float *data) {
+    data[0] = getSomeClassValue(myg1, myg2);
+}
+
+__global__ void getFooValue(float *data) {
+    data[0] = foo.somefloat;
 }
