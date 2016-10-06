@@ -12,7 +12,7 @@ def test_compile(context, cl_filepath):
     print(subprocess.check_output([
         'make',
         cl_filepath
-    ]))
+    ]).decode('utf-8'))
 
     with open(cl_filepath, 'r') as f:
         sourcecode = f.read()

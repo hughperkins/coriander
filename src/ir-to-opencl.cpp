@@ -89,8 +89,11 @@ string dumpConstant(Constant *constant) {
         cout << "constantexp" << endl;
         cout << "opcode name " << expr->getOpcodeName() << endl;
         Instruction *instr = expr->getAsInstruction();
+        cout << "instr->dump() :";
         instr->dump();
-        cout << dumpInstruction(instr) << endl;
+        cout << "\n(dump done)" << endl;
+        string dumpInstructionRes = dumpInstruction(instr);
+        cout << "dumpInstructionRes[" << dumpInstructionRes << "]" << endl;
         return dumpInstruction(instr);
         // throw runtime_error("ConstantExpr not implemented in dumpconstnat");
     } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
@@ -109,11 +112,17 @@ string dumpConstant(Constant *constant) {
         return floatvaluestr;
     } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
         cout << "globalvalue" << endl;
-        // PointerType *pointerType = global->getType();
-        // Type *elementType = pointerType->getPointerElementType();
-        // cout << "element type " << elementType << endl;
+        PointerType *pointerType = cast<PointerType>(global->getType());
+        Type *elementType = pointerType->getPointerElementType();
+        cout << "element type " << dumpType(elementType) << endl;
+        int addressspace = pointerType->getAddressSpace();
+        cout << "address space " << addressspace << endl;
         // oss << dumpType(elementType) << endl;
-        oss << string(global->getName());
+        if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
+            oss << string(global->getName());
+        } else {
+            throw runtime_error("not implemented: global variables with addressspace " + toString(addressspace));
+        }
         // cout << "constant has name " << constant->hasName() << " " << string(constant->getName()) << endl;
     } else if(isa<UndefValue>(constant)) {
         cout << "undef" << endl;
@@ -468,7 +477,7 @@ std::string dumpBitcast(BitCastInst *instr) {
 
 std::string dumpAddrSpaceCast(AddrSpaceCastInst *instr) {
     string gencode = "";
-    cout << "addrspacecast";
+    cout << "addrspacecast" << endl;
     copyAddressSpace(instr, instr->getOperand(0));
     gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
     gencode += "(" + dumpType(instr->getType()) + ")" + dumpOperand(instr->getOperand(0)) + ";\n";
