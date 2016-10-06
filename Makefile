@@ -52,15 +52,15 @@ test/generated/%-hostpatched.ll: test/generated/%-hostraw.ll build/patch-hostsid
 
 %-device.cl: %-device.ll build/ir-to-opencl
 	echo building $@ from $<
-	build/ir-to-opencl $< $@
+	build/ir-to-opencl $(DEBUG) $< $@
 
 tensorflow/generated/%.cl: tensorflow/generated/%.ll build/ir-to-opencl
 	echo building $@ from $<
-	build/ir-to-opencl $< $@
+	build/ir-to-opencl $(DEBUG) $< $@
 
 test/generated/%-device.cl: test/%-device.ll build/ir-to-opencl
 	echo building $@ from $<
-	build/ir-to-opencl $< $@
+	build/ir-to-opencl $(DEBUG) $< $@
 
 # objects
 

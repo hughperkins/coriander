@@ -1,4 +1,9 @@
+struct Bar {
+    float somefloat;
+};
+
 struct Foo {
+    int myint;
     float somefloat;
 };
 
@@ -12,7 +17,7 @@ public:
     SomeClass(float value) {
         foo.somefloat = value;
     }
-    struct Foo foo = { 1.23f };
+    struct Foo foo = { 123, 1.23f };
     float getValue() {
         return foo.somefloat;
     }
@@ -30,7 +35,8 @@ __host__ __device__ float getSomeClassValue(SomeClass someclass, SomeClass c2) {
 
 __constant__ SomeClass myg1;
 __constant__ SomeClass myg2(7.89f);
-__constant__ struct Foo foo = {11.0f};
+__constant__ struct Foo foo = {777, 11.0f};
+__constant__ struct Bar bar = {12.0f};
 
 __global__ void somekernel(float *data) {
     struct Foo bar = { 23.4f };
@@ -54,6 +60,11 @@ __global__ void somekernel2(float *data) {
     data[0] = getSomeClassValue(myg1, myg2);
 }
 
-__global__ void getFooValue(float *data) {
+__global__ void getFooValue(float *data, int *intdata) {
     data[0] = foo.somefloat;
+    intdata[0] = foo.myint;
+}
+
+__global__ void getBarValue(float *data) {
+    data[0] = bar.somefloat;
 }
