@@ -1,46 +1,52 @@
 struct Foo {
-    float f0;
+    int f0;
+    float f1;
 };
 
 struct class_SomeClass {
     struct Foo f0;
 };
 
+struct Bar {
+    float f0;
+};
 
-struct class_SomeClass myg1;
 
-struct class_SomeClass myg2;
+constant struct class_SomeClass myg1 = {};
 
-struct Foo foo = {11.0f};
+constant struct class_SomeClass myg2 = {};
+
+constant struct Foo foo = {777, 11.0f};
+
+constant struct Bar bar = {12.0f};
 
 
 float _Z11getFooValue3Foo(struct Foo* foo);
 float _Z17getSomeClassValue9SomeClassS_(struct class_SomeClass* someclass, struct class_SomeClass* c2);
-void _GLOBAL__sub_I_struct_initializer.cu();
 
 float _Z11getFooValue3Foo(struct Foo* foo) {
     label0:;
-    float* v0 = &foo[0].f0;
+    float* v0 = &foo[0].f1;
     float v1 = v0[0];
     return v1;
 }
 
 float _Z17getSomeClassValue9SomeClassS_(struct class_SomeClass* someclass, struct class_SomeClass* c2) {
     label0:;
-    float* v0 = &someclass[0].f0.f0;
+    float* v0 = &someclass[0].f0.f1;
     float v1 = v0[0];
-    float* v2 = &c2[0].f0.f0;
+    float* v2 = &c2[0].f0.f1;
     float v3 = v2[0];
     float v4 = v1 + v3;
     return v4;
 }
 
 kernel void _Z10somekernelPf(global float* data) {
-int i_03;
+int i_08;
     label0:;
-    data[0] = 23.4f;
+    data[0] = 0.0f;
     global float* v1 = &data[1];
-    v1[0] = 23.4f;
+    v1[0] = 0.0f;
     global float* v3 = &data[2];
     global int*v4 = (global int*)v3;
     v4[0] = 1067282596;
@@ -56,87 +62,76 @@ int i_03;
     float v15 = v14 + 2.0f;
     global float* v16 = &data[6];
     v16[0] = v15;
-        i_03 = 0;
+        i_08 = 0;
     goto label2;
     label1:;
     global float* v19 = &data[9];
     float v20 = v19[0];
-    float v21 = float* v25 = &struct class_SomeClass* v27 = (struct class_SomeClass*)myg1;
-[0].f0.f0;
-[0];
-    float v28 = v21 * 100.0f;
-    float v29 = v20 * v28;
-    float v30 = v29 + 2.0f;
-    global float* v31 = &data[8];
-    v31[0] = v30;
-    global float* v33 = &data[11];
-    float v34 = v33[0];
-    float v35 = float* v39 = &struct class_SomeClass* v41 = (struct class_SomeClass*)myg2;
-[0].f0.f0;
-[0];
-    float v42 = v35 * 100.0f;
-    float v43 = v34 * v42;
-    float v44 = v43 + 2.0f;
-    global float* v45 = &data[10];
-    v45[0] = v44;
+    float v21 = (&(&myg1)[0].f0.f1)[0];
+    float v22 = v21 * 100.0f;
+    float v23 = v20 * v22;
+    float v24 = v23 + 2.0f;
+    global float* v25 = &data[8];
+    v25[0] = v24;
+    global float* v27 = &data[11];
+    float v28 = v27[0];
+    float v29 = (&(&myg2)[0].f0.f1)[0];
+    float v30 = v29 * 100.0f;
+    float v31 = v28 * v30;
+    float v32 = v31 + 2.0f;
+    global float* v33 = &data[10];
+    v33[0] = v32;
     label2:;
-    int v48 = i_03 + 10100;
-    long v49 = v48;
-    global float* v50 = &data[v49];
-    float v51 = v50[0];
-    float v52 = v51 * 345.0f;
-    float v53 = v52 + 2.0f;
-    int v54 = i_03 + 100;
-    long v55 = v54;
-    global float* v56 = &data[v55];
-    v56[0] = v53;
-    int v58 = i_03 + 10101;
-    long v59 = v58;
-    global float* v60 = &data[v59];
-    float v61 = v60[0];
-    float v62 = v61 * 345.0f;
-    float v63 = v62 + 2.0f;
-    int v64 = i_03 + 101;
-    long v65 = v64;
-    global float* v66 = &data[v65];
-    v66[0] = v63;
-    int v68 = i_03 + 2;
-    bool exitcond_1 = v68 == 10000;
+    int v36 = i_08 + 10100;
+    long v37 = v36;
+    global float* v38 = &data[v37];
+    float v39 = v38[0];
+    float v40 = v39 * 345.0f;
+    float v41 = v40 + 2.0f;
+    int v42 = i_08 + 100;
+    long v43 = v42;
+    global float* v44 = &data[v43];
+    v44[0] = v41;
+    int v46 = i_08 + 10101;
+    long v47 = v46;
+    global float* v48 = &data[v47];
+    float v49 = v48[0];
+    float v50 = v49 * 345.0f;
+    float v51 = v50 + 2.0f;
+    int v52 = i_08 + 101;
+    long v53 = v52;
+    global float* v54 = &data[v53];
+    v54[0] = v51;
+    int v56 = i_08 + 2;
+    bool exitcond_1 = v56 == 10000;
     if(exitcond_1) {
         goto label1;
     } else {
-        i_03 = v68;
+        i_08 = v56;
         goto label2;
     }
 }
 
 kernel void _Z11somekernel2Pf(global float* data) {
     label0:;
-    float v0 = float* v4 = (float*)float* v6 = &myg1[0].f0.f0;
-;
-[0];
-    float v7 = float* v11 = (float*)float* v13 = &myg2[0].f0.f0;
-;
-[0];
-    float v14 = v0 + v7;
-    data[0] = v14;
+    float v0 = (&(&myg1)[0].f0.f1)[0];
+    float v1 = (&(&myg2)[0].f0.f1)[0];
+    float v2 = v0 + v1;
+    data[0] = v2;
 }
 
-kernel void _Z11getFooValuePf(global float* data) {
+kernel void _Z11getFooValuePfPi(global float* data, global int* intdata) {
     label0:;
-    int v0 = int* v4 = (int*)int*v6 = (int*)foo;
-;
-[0];
-    global int*v7 = (global int*)data;
-    v7[0] = v0;
+    int v0 = (((&(&foo)[0].f1)))[0];
+    global int*v1 = (global int*)data;
+    v1[0] = v0;
+    int v3 = (&(&foo)[0].f0)[0];
+    intdata[0] = v3;
 }
 
-void _GLOBAL__sub_I_struct_initializer.cu() {
+kernel void _Z11getBarValuePf(global float* data) {
     label0:;
-    float* v4 = &struct class_SomeClass* v6 = (struct class_SomeClass*)myg1;
-[0].f0.f0;
-[0] = 1.23f;
-    float* v11 = &struct class_SomeClass* v13 = (struct class_SomeClass*)myg2;
-[0].f0.f0;
-[0] = 7.89f;
+    int v0 = (((&bar)))[0];
+    global int*v1 = (global int*)data;
+    v1[0] = v0;
 }

@@ -170,6 +170,7 @@ On the host-side, there is code to:
 - `llvm.lifetime`
 - `@llvm.global_ctors`
 - global declarations
+- `_GLOBAL__sub_I_struct_initializer.cu()`
 
 ### Tensorflow
 
