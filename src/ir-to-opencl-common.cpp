@@ -103,6 +103,9 @@ std::string dumpPointerType(PointerType *ptr) {
     if(addressspace == 3) {
         gencode += "local ";
     }
+    if(addressspace == 4) {
+        gencode += "constant ";
+    }
     gencode += elementTypeString + "*";
     return gencode;
 }
