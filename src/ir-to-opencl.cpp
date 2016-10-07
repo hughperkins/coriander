@@ -114,7 +114,8 @@ void declareGlobal(GlobalValue *global) {
             cout << "address space " << addressspace << endl;
             if(addressspace == 3) { // shared/local => skip
                 return;
-            } else if(addressspace == 4) {
+            // } else if(addressspace == 4) {
+            } else {
                 gencode = "constant " + gencode;
             }
         }
@@ -216,8 +217,10 @@ string dumpChainedInstruction(int level, Instruction * instr) {
         cout << "numoperands " << bitcast->getNumOperands() << endl;
         // string op0 = dumpOperand(bitcast->getOperand(0));
         // string thisinstrstring = op0;
-        string lhstype = dumpType(bitcast->getType());
-        string thisinstrstring = "((constant " + lhstype + ")" + dumpChainedNextOp(level, bitcast->getOperand(0)) + ")";
+        // string lhstype = dumpType(bitcast->getType());
+        Type *lhstype = PointerType::get(cast<PointerType>(bitcast->getType())->getPointerElementType(), 4);
+        string lhstypestr = dumpType(lhstype);
+        string thisinstrstring = "((constant " + lhstypestr + ")" + dumpChainedNextOp(level, bitcast->getOperand(0)) + ")";
         nameByValue[bitcast] = thisinstrstring;
         return thisinstrstring;
     } else if(AddrSpaceCastInst *addrspacecast = dyn_cast<AddrSpaceCastInst>(instr)) {
@@ -669,7 +672,7 @@ std::string dumpBitcast(BitCastInst *instr) {
     Value *op0 = instr->getOperand(0);
     // Type *op0type = instr->getOperand(0)->getType();
     copyAddressSpace(instr, instr->getOperand(0));
-    gencode += dumpType(instr->getType());
+    gencode += dumpType(instr->getType()) + " ";
     gencode += dumpOperand(instr) + " = (" + dumpType(instr->getType()) + ")" + dumpOperand(op0) + ";\n";
     return gencode;
 }

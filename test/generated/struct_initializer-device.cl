@@ -48,7 +48,7 @@ int i_08;
     global float* v1 = &data[1];
     v1[0] = 0.0f;
     global float* v3 = &data[2];
-    global int*v4 = (global int*)v3;
+    global int* v4 = (global int*)v3;
     v4[0] = 1067282596;
     global float* v6 = &data[3];
     v6[0] = 4.68f;
@@ -123,7 +123,7 @@ kernel void _Z11somekernel2Pf(global float* data) {
 kernel void _Z11getFooValuePfPi(global float* data, global int* intdata) {
     label0:;
     int v0 = ((constant int*)((&(&foo)[0].f1)))[0];
-    global int*v1 = (global int*)data;
+    global int* v1 = (global int*)data;
     v1[0] = v0;
     int v3 = (&(&foo)[0].f0)[0];
     intdata[0] = v3;
@@ -132,6 +132,6 @@ kernel void _Z11getFooValuePfPi(global float* data, global int* intdata) {
 kernel void _Z11getBarValuePf(global float* data) {
     label0:;
     int v0 = ((((constant int*)&bar)))[0];
-    global int*v1 = (global int*)data;
+    global int* v1 = (global int*)data;
     v1[0] = v0;
 }

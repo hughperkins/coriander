@@ -190,8 +190,8 @@ std::string dumpStructType(StructType *type) {
                     declareStruct(name, type);
                 }
                 return name;
-            } else if(name.find("class_") == 0) {
-                name[5] = '_';
+            } else if(name.find("class_") != string::npos) {
+                // name[5] = '_';
                 name = "struct " + name;
                 if(declaredStructs.find(name) == declaredStructs.end()) {
                     declaredStructs.insert(name);
@@ -199,8 +199,14 @@ std::string dumpStructType(StructType *type) {
                 }
                 return name;
             } else {
-                cout << "struct name: " << name << endl;
-                throw runtime_error("dumpStructType() not implemented: struct name " + name);
+                name = "struct " + name;
+                if(declaredStructs.find(name) == declaredStructs.end()) {
+                    declaredStructs.insert(name);
+                    declareStruct(name, type);
+                }
+                return name;
+                // cout << "struct name: " << name << endl;
+                // throw runtime_error("dumpStructType() not implemented: struct name " + name);
             }
         }
     } else {

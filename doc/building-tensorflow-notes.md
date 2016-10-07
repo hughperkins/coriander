@@ -14,7 +14,7 @@ Run:
 Currently:
 ```
 $ py.test -sv -k cwise --runxfail 2>&1 | grep '^E ' | wc -l
-946
+407
 ```
 
-(out of total ~12,000 lines, so about ~90% is compiling ok, and ~10% needs fixing)
+(out of total ~12,000 lines, so about ~95% is compiling ok, and ~4% needs fixing)
