@@ -134,19 +134,15 @@ string dumpChainedInstruction(int level, Instruction * instr);
 string dumpChainedNextOp(int level, Value *op0) {
     string op0string = "";
     if(ConstantExpr*expr = dyn_cast<ConstantExpr>(op0)) {
-        cout << "constantexpr" << endl;
         Instruction *childinstr = expr->getAsInstruction();
         string childresult = dumpChainedInstruction(level + 1, childinstr);
-        cout << "childresult " << childresult << endl;
         op0string = "(" + childresult + ")";
     } else if(Constant*constant = dyn_cast<Constant>(op0)) {
-        cout << "constant" << endl;
         string constantstring = dumpConstant(constant);
-        cout << "constantstring " << constantstring << endl;
         nameByValue[op0] = constantstring;
         return constantstring;
-        throw runtime_error("dumpchained gep constant not implemented ");
     } else {
+        op0->dump();
         throw runtime_error("dumpchained gep unknown operand1 type ");
     }
     nameByValue[op0] = op0string;
@@ -154,42 +150,18 @@ string dumpChainedNextOp(int level, Value *op0) {
 }
 
 string dumpChainedInstruction(int level, Instruction * instr) {
-    cout << "dumpChainedInstruction level " << level << endl;
-    instr->dump();
-    cout << endl;
-    cout << "numooperands " << instr->getNumOperands() << endl;
     if(GetElementPtrInst *gep = dyn_cast<GetElementPtrInst>(instr)) {
-        // Value *op0 = gep->getOperand(0);
-        // dumpChainedNextOp(level, op0);
         string thisinstrstring = dumpGetElementPtrRhs(gep);
         nameByValue[instr] = thisinstrstring;
-        cout << "gepres thisinstrstring " << thisinstrstring << endl;
         return thisinstrstring;
     } else if(BitCastInst *bitcast = dyn_cast<BitCastInst>(instr)) {
-        cout << "bitcast " << endl;
         string thisinstrstring = dumpBitCastRhs(bitcast);
-        // cout << "numoperands " << bitcast->getNumOperands() << endl;
-        // Type *lhstype = PointerType::get(cast<PointerType>(bitcast->getType())->getPointerElementType(), 4);
-        // string lhstypestr = dumpType(lhstype);
-        // string thisinstrstring = "((constant " + lhstypestr + ")" + dumpChainedNextOp(level, bitcast->getOperand(0)) + ")";
         nameByValue[bitcast] = thisinstrstring;
         return thisinstrstring;
     } else if(AddrSpaceCastInst *addrspacecast = dyn_cast<AddrSpaceCastInst>(instr)) {
-        // cout << "addrsspacecast level " << level << endl;
-        // string thisinstrstring = dumpChainedNextOp(level, addrspacecast->getOperand(0));
-        // string op0 = thisinstrstring;
-        // cout << "addrsspacecast op0 " << op0 << endl;
-        // Value *pointerOperand = addrspacecast->getOperand(0);
-        // Type *pointerType = pointerOperand->getType();
-        // cout << "pointer type " << dumpType(pointerType);
-        // Type *pointerElementType = pointerType->getPointerElementType();
-        // Type *toType = PointerType::get(pointerElementType, 1); // assume it was in constant addressspace
-        // thisinstrstring = "(" + op0 + ")";
         string thisinstrstring = dumpAddrSpaceCastRhs(addrspacecast);
         nameByValue[addrspacecast] = thisinstrstring;
         return thisinstrstring;
-        // return op0;
-        throw runtime_error("dumpChainedInstruction addrsspacecast not implemented ");
     } else {
         instr->dump();
         throw runtime_error("dumpchained unknown instruction type ");
@@ -230,17 +202,10 @@ string dumpConstant(Constant *constant) {
     } else if(isa<ConstantStruct>(constant)) {
         throw runtime_error("constantStruct not implemented in dumpconstnat");
     } else if(ConstantExpr *expr = dyn_cast<ConstantExpr>(constant)) {
-        // cout << "constantexp" << endl;
-        // cout << "opcode name " << expr->getOpcodeName() << endl;
-        // cout << "dumpconstant expr expr space " << cast<PointerType>(expr->getType())->getAddressSpace() << endl;
         Instruction *instr = expr->getAsInstruction();
         copyAddressSpace(constant, instr);
-        // cout << "dumpconstant expr instr space " << cast<PointerType>(instr->getType())->getAddressSpace() << endl;
-        // cout << "dumpconstant before dci constanttype " << dumpType(constant->getType()) <<  " instrtype " << dumpType(instr->getType()) << endl;
         string dcires = dumpChainedInstruction(0, instr);
-        // cout << "dcires " << dcires << endl;
         copyAddressSpace(instr, constant);
-        // cout << "dumpconstant after dci instr type " << dumpType(instr->getType()) << " constant type " << dumpType(constant->getType()) << endl;
         nameByValue[constant] = dcires;
         return dcires;
     } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
@@ -256,12 +221,8 @@ string dumpConstant(Constant *constant) {
         }
         return floatvaluestr;
     } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
-    //     cout << "globalvalue" << endl;
          if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
-        //     Type *elementType = pointerType->getPointerElementType();
-        //     cout << "element type " << dumpType(elementType) << endl;
              int addressspace = pointerType->getAddressSpace();
-        //     cout << "address space " << addressspace << endl;
              string name = getName(global);
              if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
                  return name;
@@ -274,19 +235,10 @@ string dumpConstant(Constant *constant) {
          string ourinstrstr = "(&" + name + ")";
          updateAddressSpace(constant, 4);
          nameByValue[constant] = ourinstrstr;
-         cout << "dumpconstant, globalvalue, reutrn & plus name [" << name << "]" << endl;
 
          return ourinstrstr;
-         // return name;
-         throw runtime_error("dumpconstant globalvalue: shouldnt get to here for non-local/shared vars");
-         // else {
-    //         string ourinstrstr = "&" + name;
-    //         nameByValue[constant] = ourinstrstr;
-    //         return ourinstrstr;
-    //     }
     } else if(isa<UndefValue>(constant)) {
         cout << "undef" << endl;
-        // throw runtime_error("undef encountered");
         return "";
     } else {
         cout << "valueTy " << valueTy << endl;
@@ -346,17 +298,11 @@ std::string dumpAlloca(Instruction *alloca) {
     if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
         Type *ptrElementType = allocatypeptr->getPointerElementType();
         std::string typestring = dumpType(ptrElementType);
-        cout << "alloca typestring " << typestring << endl;
         int count = readInt32Constant(alloca->getOperand(0));
-        cout << "count " << count << endl;
         if(count == 1) {
             if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
-                cout << "its an array" << endl;
                 int innercount = arrayType->getNumElements();
-                cout << "length " << innercount << endl;
                 Type *elementType = arrayType->getElementType();
-                cout << "element type " << dumpType(elementType) << endl;
-                // throw runtime_error("not implemented: alloca for arraytype");
                 return dumpType(elementType) + " " + dumpOperand(alloca) + "[" + toString(innercount) + "];\n";
             } else {
                 return typestring + " " + dumpOperand(alloca) + "[1];\n";
@@ -436,21 +382,14 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
     rhs += "" + dumpOperand(instr->getOperand(0));
     Type *currentType = instr->getOperand(0)->getType();
     copyAddressSpace(instr->getOperand(0), instr);
-    // cout << "gep addressspace instr after copy " << cast<PointerType>(instr->getType())->getAddressSpace() << endl;
     PointerType *op0typeptr = dyn_cast<PointerType>(instr->getOperand(0)->getType());
     if(op0typeptr == 0) {
         throw runtime_error("dumpgetelementptrrhs op0typeptr is 0");
     }
     int addressspace = op0typeptr->getAddressSpace();
-    cout << "gep addressspace op0 " << addressspace << endl;
-    // cout << "gep addressspace instr " << cast<PointerType>(instr->getType())->getAddressSpace() << endl;
     if(addressspace == 3) { // local/shared memory
-        cout << "got access to local memory." << endl;
-        cout << "dumpoperand(instr) " << dumpOperand(instr) << endl;
         // pointer into shared memory.
         addSharedDeclaration(instr->getOperand(0));
-        cout << "rhs " << rhs << endl;
-        // throw runtime_error("dumpgep stop");
     }
     for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
@@ -611,23 +550,16 @@ std::string dumpBitCastRhs(BitCastInst *instr) {
     string gencode = "";
     string op0str = dumpOperand(instr->getOperand(0));
     Value *op0 = instr->getOperand(0);
-    // cout << "dumpbitcastrh op0 space " << cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace() << endl;
     if(PointerType *srcType = dyn_cast<PointerType>(instr->getSrcTy())) {
         if(PointerType *destType = dyn_cast<PointerType>(instr->getDestTy())) {
             Type *castType = PointerType::get(destType->getElementType(), srcType->getAddressSpace());
-            // cout << "dumpbitcastrhs srctype " << dumpType(srcType) << " desttype " << dumpType(destType) << " casttype " << dumpType(castType) << endl;
             gencode += "((" + dumpType(castType) + ")" + op0str + ")";
             copyAddressSpace(instr->getOperand(0), instr);
         }
     } else {
         // just pass through?
-        // Type *srcTypescal = instr->getSrcTy();
-        // Type *destTypescal = instr->getDestTy();
-        // cout << "bitcastrhs srctype " << dumpType(srcTypescal) << " desttype " << dumpType(destTypescal) << endl;
         gencode += "((" + dumpType(instr->getDestTy()) + ")" + op0str + ")";
-        // throw runtime_error("not implemented: bitcast for non pointer type");
     }
-    // nameByValue[instr] = gencode;
     return gencode;
 }
 
@@ -637,30 +569,23 @@ std::string dumpBitCast(BitCastInst *instr) {
     gencode += dumpType(instr->getType()) + " ";
     string instrop = dumpOperand(instr);
     gencode += instrop + " = " + rhs + ";\n";
-    // nameByValue[instr] = instrop;
     return gencode;
 }
 
 std::string dumpAddrSpaceCastRhs(AddrSpaceCastInst *instr) {
     string gencode = "";
-    cout << "addrspacecast" << endl;
-    // gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
-    // gencode += "(" + dumpType(instr->getType()) + ")" + dumpOperand(instr->getOperand(0)) + ";\n";
     string op0str = dumpOperand(instr->getOperand(0));
     copyAddressSpace(instr->getOperand(0), instr);
     gencode += "(" + op0str + ")";
-    // throw runtime_error("not implemented");
     return gencode;
 }
 
 std::string dumpAddrSpaceCast(AddrSpaceCastInst *instr) {
     string gencode = "";
-    cout << "addrspacecast" << endl;
     copyAddressSpace(instr->getOperand(0), instr);
     string rhs = dumpAddrSpaceCastRhs(instr);
     gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
     gencode += rhs + ";\n";
-    // throw runtime_error("not implemented");
     return gencode;
 }
 
