@@ -286,6 +286,7 @@ string dumpConstant(Constant *constant) {
     //     }
     } else if(isa<UndefValue>(constant)) {
         cout << "undef" << endl;
+        // throw runtime_error("undef encountered");
         return "";
     } else {
         cout << "valueTy " << valueTy << endl;
@@ -618,6 +619,13 @@ std::string dumpBitCastRhs(BitCastInst *instr) {
             gencode += "((" + dumpType(castType) + ")" + op0str + ")";
             copyAddressSpace(instr->getOperand(0), instr);
         }
+    } else {
+        // just pass through?
+        // Type *srcTypescal = instr->getSrcTy();
+        // Type *destTypescal = instr->getDestTy();
+        // cout << "bitcastrhs srctype " << dumpType(srcTypescal) << " desttype " << dumpType(destTypescal) << endl;
+        gencode += "((" + dumpType(instr->getDestTy()) + ")" + op0str + ")";
+        // throw runtime_error("not implemented: bitcast for non pointer type");
     }
     // nameByValue[instr] = gencode;
     return gencode;
