@@ -72,6 +72,8 @@ std::string dumpAddrSpaceCastRhs(AddrSpaceCastInst *instr);
 void updateAddressSpace(Value *value, int newSpace);
 void copyAddressSpace(Value *src, Value *dest);
 std::string getName(Value *value);
+std::string getName(StructType *value);
+std::string getName(Function *value);
 
 
 std::string dumpValue(Value *value) {
@@ -217,6 +219,22 @@ std::string getName(Value *value) {
     return value->getName();
 }
 
+std::string getName(StructType *type) {
+    if(!type->hasName()) {
+        type->dump();
+        throw runtime_error("type doesnt have name");
+    }
+    return type->getName();
+}
+
+std::string getName(Function *type) {
+    if(!type->hasName()) {
+        type->dump();
+        throw runtime_error("function doesnt have name");
+    }
+    return type->getName();
+}
+
 string dumpConstant(Constant *constant) {
     unsigned int valueTy = constant->getValueID();
     ostringstream oss;
@@ -308,7 +326,7 @@ string dumpOperand(Value *value) {
 
 void storeValueName(Value *value) {
     if(value->hasName()) {
-        string name = string(value->getName());
+        string name = getName(value);
         if(name[0] == '.') {
             name = "v" + name;
         }
@@ -412,7 +430,7 @@ void addSharedDeclaration(Value *value) {
         return;
     }
     GlobalVariable *glob = cast<GlobalVariable>(value);
-    string name = glob->getName();
+    string name = getName(glob);
     cout << name << endl;
     string declaration = "";
     Type *type = glob->getType();
@@ -461,7 +479,7 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
             newType = currentType->getPointerElementType();
         } else if(currentType->isStructTy()) {
             StructType *structtype = cast<StructType>(currentType);
-            string structName = structtype->getName();
+            string structName = getName(structtype);
             if(structName == "struct.float4") {
                 int idx = readInt32Constant(instr->getOperand(d + 1));
                 Type *elementType = structtype->getElementType(idx);
@@ -527,7 +545,7 @@ std::string dumpInsertValue(InsertValueInst *instr) {
             lhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
             newType = currentType->getPointerElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
-            string structName = structtype->getName();
+            string structName = getName(structtype);
             if(structName == "struct.float4") {
                 Type *elementType = structtype->getElementType(idx);
                 Type *castType = PointerType::get(elementType, 0);
@@ -574,7 +592,7 @@ std::string dumpExtractValue(ExtractValueInst *instr) {
             lhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
             newType = currentType->getPointerElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
-            string structName = structtype->getName();
+            string structName = getName(structtype);
             if(structName == "struct.float4") {
                 Type *elementType = structtype->getElementType(idx);
                 Type *castType = PointerType::get(elementType, 0);
@@ -697,7 +715,7 @@ std::string dumpCall(CallInst *instr) {
         gencode += typestr + " " + dumpOperand(instr) + " = ";
     }
 
-    string functionName = string(instr->getCalledValue()->getName());
+    string functionName = getName(instr->getCalledValue());
     if(functionName == "llvm.ptx.read.tid.x") {
         return gencode + "get_global_id(0);\n";
     }
@@ -1140,7 +1158,7 @@ std::string dumpFunctionDeclaration(Function *F) {
     string declaration = "";
     Type *retType = F->getReturnType();
     std::string retTypeString = dumpType(retType);
-    string fname = F->getName();
+    string fname = getName(F);
     if(iskernel_by_name[fname]) {
         declaration += "kernel ";
     }
@@ -1238,7 +1256,7 @@ std::string dumpModule(Module *M) {
     cout << "begin declare global variables" << endl;
     for(auto it=M->global_begin(); it != M->global_end(); it++) {
         GlobalVariable *glob = &*it;
-        string name = glob->getName();
+        string name = getName(glob);
         if(name == "llvm.used") {
             continue;
         }
@@ -1285,7 +1303,7 @@ std::string dumpModule(Module *M) {
                         if(GlobalValue::classof(constant)) {
                             GlobalValue *global = cast<GlobalValue>(constant);
                             if(global->getType()->getPointerElementType()->getTypeID() == Type::FunctionTyID) {
-                                string functionName = string(constant->getName());
+                                string functionName = getName(constant);
                                 kernelName = functionName;
                             }
                         }
@@ -1301,13 +1319,13 @@ std::string dumpModule(Module *M) {
     // dump function declarations
     cout << "beginning function declarations" << endl;
     for(auto it = M->begin(); it != M->end(); it++) {
-        string name = it->getName();
+        Function *F = &*it;
+        string name = getName(F);
         if(iskernel_by_name[name]) {
             continue;  // no point in declaring kernels I think
         }
         if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
                 knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
-            Function *F = &*it;
             string declaration = dumpFunctionDeclaration(F) + ";";
             cout << declaration << endl;
             gencode += declaration + "\n";
@@ -1333,10 +1351,10 @@ std::string dumpModule(Module *M) {
     for(auto it = M->begin(); it != M->end(); it++) {
         nameByValue.clear();
         nextNameIdx = 0;
-        string name = it->getName();
+        Function *F = &*it;
+        string name = getName(F);
         if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
                 knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
-            Function *F = &*it;
             if(i > 0) {
                 gencode += "\n";
             }
