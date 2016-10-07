@@ -105,7 +105,6 @@ void declareGlobal(GlobalValue *global) {
         initializer->dump();
         cout << endl;
         cout << "isa ConstStruct " << isa<ConstantStruct>(initializer) << endl;
-         // = {11.0f}
 
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
             Type *elementType = pointerType->getPointerElementType();
@@ -114,7 +113,6 @@ void declareGlobal(GlobalValue *global) {
             cout << "address space " << addressspace << endl;
             if(addressspace == 3) { // shared/local => skip
                 return;
-            // } else if(addressspace == 4) {
             } else {
                 gencode = "constant " + gencode;
             }
@@ -142,24 +140,15 @@ void declareGlobal(GlobalValue *global) {
         }
         gencode += "}";
     }
-    // cout << "numoperands " << global->getNu
-    // cout << "global isvector " << isa<VectorType>(elementType) << endl;
-    // VectorType *vector = cast<VectorType>(elementType);
-    // int len = vector->getNumElements();
-    // cout << "len " << len << endl;
-    // Type *vectorElementType = vector->getElementType();
-    // cout << "vector element type " << dumpType(vectorElementType) << endl;
-    // string name = global->getName();
     gencode += ";\n";
     cout << gencode << endl;
 
     globalDeclarations += gencode + "\n";
-    // throw runtime_error("declareGlobal not impelmented");
 }
 
 string dumpChainedInstruction(int level, Instruction * instr);
+
 string dumpChainedNextOp(int level, Value *op0) {
-    // Value *op0 = gep->getOperand(0);
     string op0string = "";
     if(ConstantExpr*expr = dyn_cast<ConstantExpr>(op0)) {
         cout << "constantexpr" << endl;
@@ -167,7 +156,6 @@ string dumpChainedNextOp(int level, Value *op0) {
         string childresult = dumpChainedInstruction(level + 1, childinstr);
         cout << "childresult " << childresult << endl;
         op0string = "(" + childresult + ")";
-        // throw runtime_error("dumpchained gep constantexpr not implemented ");
     } else if(Constant*constant = dyn_cast<Constant>(op0)) {
         cout << "constant" << endl;
         string constantstring = dumpConstant(constant);
@@ -190,24 +178,6 @@ string dumpChainedInstruction(int level, Instruction * instr) {
     if(GetElementPtrInst *gep = dyn_cast<GetElementPtrInst>(instr)) {
         Value *op0 = gep->getOperand(0);
         dumpChainedNextOp(level, op0);
-        // string op0string = "";
-        // if(ConstantExpr*expr = dyn_cast<ConstantExpr>(op0)) {
-        //     cout << "constantexpr" << endl;
-        //     Instruction *childinstr = expr->getAsInstruction();
-        //     string childresult = dumpChainedInstruction(level + 1, childinstr);
-        //     cout << "childresult " << childresult << endl;
-        //     op0string = "(" + childresult + ")";
-        //     // throw runtime_error("dumpchained gep constantexpr not implemented ");
-        // } else if(Constant*constant = dyn_cast<Constant>(op0)) {
-        //     cout << "constant" << endl;
-        //     string constantstring = dumpConstant(constant);
-        //     cout << "constantstring " << constantstring << endl;
-        //     throw runtime_error("dumpchained gep constant not implemented ");
-        // } else {
-        //     throw runtime_error("dumpchained gep unknown operand1 type ");
-        // }
-        // nameByValue[op0] = op0string;
-        // nameByValue[gep] = "notyetdefined";
         string gepres = "(" + dumpGetElementPtrRhs(gep) + ")";
         nameByValue[instr] = gepres;
         cout << "gepres " << gepres << endl;
@@ -215,9 +185,6 @@ string dumpChainedInstruction(int level, Instruction * instr) {
     } else if(BitCastInst *bitcast = dyn_cast<BitCastInst>(instr)) {
         cout << "bitcast " << endl;
         cout << "numoperands " << bitcast->getNumOperands() << endl;
-        // string op0 = dumpOperand(bitcast->getOperand(0));
-        // string thisinstrstring = op0;
-        // string lhstype = dumpType(bitcast->getType());
         Type *lhstype = PointerType::get(cast<PointerType>(bitcast->getType())->getPointerElementType(), 4);
         string lhstypestr = dumpType(lhstype);
         string thisinstrstring = "((constant " + lhstypestr + ")" + dumpChainedNextOp(level, bitcast->getOperand(0)) + ")";
@@ -225,7 +192,6 @@ string dumpChainedInstruction(int level, Instruction * instr) {
         return thisinstrstring;
     } else if(AddrSpaceCastInst *addrspacecast = dyn_cast<AddrSpaceCastInst>(instr)) {
         cout << "addrsspacecast level " << level << endl;
-        // string op0 = dumpOperand(addrspacecast->getOperand(0));
         string thisinstrstring = dumpChainedNextOp(level, addrspacecast->getOperand(0));
         string op0 = thisinstrstring;
         cout << "addrsspacecast op0 " << op0 << endl;
@@ -234,7 +200,6 @@ string dumpChainedInstruction(int level, Instruction * instr) {
         cout << "pointer type " << dumpType(pointerType);
         Type *pointerElementType = pointerType->getPointerElementType();
         Type *toType = PointerType::get(pointerElementType, 1); // assume it was in constant addressspace
-        // thisinstrstring = "((" + dumpType(toType) + ")" + op0 + ")";
         thisinstrstring = "(" + op0 + ")";
         nameByValue[addrspacecast] = thisinstrstring;
         return thisinstrstring;
@@ -249,8 +214,6 @@ string dumpChainedInstruction(int level, Instruction * instr) {
 string dumpConstant(Constant *constant) {
     unsigned int valueTy = constant->getValueID();
     ostringstream oss;
-    // if(valueTy == AShrOperator::ConstantIntVal) {
-    // cout << "constant" << endl;
     if(ConstantInt *constantInt = dyn_cast<ConstantInt>(constant)) {
         cout << "constantint" << endl;
         oss << constantInt->getSExtValue();
@@ -267,22 +230,8 @@ string dumpConstant(Constant *constant) {
         cout << "dcires " << dcires << endl;
         nameByValue[constant] = dcires;
         return dcires;
-        // cout << "instr->dump() :";
-        // instr->dump();
-        // cout << "\n(dump done)" << endl;
-        // string dumpInstructionRes = dumpInstruction(instr);
-        // cout << "expr->numoperands " << expr->getNumOperands() << endl;
-        // cout << "dumpOperand(expr->getOperand(0) " << dumpOperand(expr->getOperand(0)) << endl;
-        // string op0 = dumpOperand(expr->getOperand(0));
-        // cout << "op0 " << op0 << endl;
-        // cout << "dumpInstructionRes[" << dumpInstructionRes << "]" << endl;
-        // return dumpInstruction(instr);
-        // return dumpOperand(expr->getOperand(0));
-        throw runtime_error("ConstantExpr not implemented in dumpconstnat");
     } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
-        // cout << "constantfp" << endl;
         float floatvalue = constantFP->getValueAPF().convertToFloat();
-        // cout << "floatvalue " << floatvalue << endl;
         ostringstream oss;
         oss << floatvalue;
         string floatvaluestr = oss.str();
@@ -300,29 +249,19 @@ string dumpConstant(Constant *constant) {
         cout << "element type " << dumpType(elementType) << endl;
         int addressspace = pointerType->getAddressSpace();
         cout << "address space " << addressspace << endl;
-        // oss << dumpType(elementType) << endl;
         string name = global->getName();
         if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
             return name;
         } else {
-            // // we'd better declare them...
-            // cout << "name declared? " << (nameByValue.find(global) != nameByValue.end()) << endl;
-            // if(nameByValue.find(global) == nameByValue.end()) {
-            //     nameByValue[global] = name;
-            //     declareGlobal(global);
-            // }
             string ourinstrstr = "&" + name;
             nameByValue[constant] = ourinstrstr;
             return ourinstrstr;
-            // throw runtime_error("not implemented: global variables with addressspace " + toString(addressspace));
         }
-        // cout << "constant has name " << constant->hasName() << " " << string(constant->getName()) << endl;
     } else if(isa<UndefValue>(constant)) {
         cout << "undef" << endl;
         return "";
     } else {
         cout << "valueTy " << valueTy << endl;
-        // cout << GlobalValue::classof(constant) << endl;
         oss << "unknown";
         constant->dump();
         throw runtime_error("unknown constnat type");
@@ -331,53 +270,12 @@ string dumpConstant(Constant *constant) {
 }
 
 
-//     return cast<ConstantInt>(value)->getSExtValue();
-// }
-
-// float readFloatConstant(Value *value) {
-//     return cast<ConstantFP>(value)->getValueAPF().convertToFloat();
-
 string dumpOperand(Value *value) {
     unsigned int valueTy = value->getValueID();
-    // cout << "dumpOperand " << endl;
     if(Constant *constant = dyn_cast<Constant>(value)) {
-        // cout << "constant" << endl;
-        // constant->dump();
         return dumpConstant(constant);
-        // if(valueTy == AShrOperator::ConstantIntVal) {
-        //     int intvalue = readInt32Constant(value);
-        //     ostringstream oss;
-        //     oss << intvalue;
-        //     return oss.str();
-        // }
-        // if(valueTy == AShrOperator::ConstantFPVal) {
-        //     float floatvalue = readFloatConstant(value);
-        //     ostringstream oss;
-        //     oss << floatvalue;
-        //     string floatvaluestr = oss.str();
-        //     if(single_precision) {
-        //         if(floatvaluestr.find('.') == string::npos) {
-        //             floatvaluestr += ".0";
-        //         }
-        //         floatvaluestr += "f";
-        //     }
-        //     return floatvaluestr;
-        // }
     }
-    // if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
-    //     cout << "global variable " << string(glob->getName()) << endl;
-    //     return string(glob->getName());
-    // }
     string name = nameByValue[value];
-    // cout << "dumpOperand name " << name << endl;
-    // value->dump();
-    // cout << "op type name " << dumpType(value->getType()) << endl;
-    // cout << "is bitcast " << isa<BitCastInst>(value) << endl;
-    // cout << "is addrspacecast " << isa<AddrSpaceCastInst>(value) << endl;
-    // cout << "is globavalue " << isa<GlobalValue>(value) << endl;
-    // cout << "is instruction " << isa<Instruction>(value) << endl;
-    // cout << "is constant " << isa<Constant>(value) << endl;
-    // cout << "is pointer " << isa<Po>(value) << endl;
     return name;
 }
 
