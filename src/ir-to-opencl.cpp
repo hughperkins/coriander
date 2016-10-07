@@ -432,13 +432,15 @@ void addSharedDeclaration(Value *value) {
 
 string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
     string gencode = "";
-    copyAddressSpace(instr->getOperand(0), instr);
     int numOperands = instr->getNumOperands();
-    Type *currentType = instr->getOperand(0)->getType();
     string rhs = "";
     rhs += "" + dumpOperand(instr->getOperand(0));
+    Type *currentType = instr->getOperand(0)->getType();
+    copyAddressSpace(instr->getOperand(0), instr);
+    cout << "gep addressspace instr after copy " << cast<PointerType>(instr->getType())->getAddressSpace() << endl;
     int addressspace = cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace();
-    cout << "gep addressspace " << addressspace << endl;
+    cout << "gep addressspace op0 " << addressspace << endl;
+    cout << "gep addressspace instr " << cast<PointerType>(instr->getType())->getAddressSpace() << endl;
     if(addressspace == 3) { // local/shared memory
         cout << "got access to local memory." << endl;
         cout << "dumpoperand(instr) " << dumpOperand(instr) << endl;
@@ -481,7 +483,7 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
         // copyAddressSpace(newType, instr->getOperand(0));
         currentType = newType;
     }
-    rhs = "gep[" + dumpType(instr->getType()) + "](&" + rhs + ")";
+    rhs = "(&" + rhs + ")";
     return rhs;
 }
 
@@ -609,13 +611,15 @@ std::string dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
 
 std::string dumpBitCastRhs(BitCastInst *instr) {
     string gencode = "";
+    string op0str = dumpOperand(instr->getOperand(0));
     Value *op0 = instr->getOperand(0);
+    cout << "dumpbitcastrh op0 space " << cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace() << endl;
     PointerType *srcType = cast<PointerType>(instr->getSrcTy());
     PointerType *destType = cast<PointerType>(instr->getDestTy());
     Type *castType = PointerType::get(destType->getElementType(), srcType->getAddressSpace());
-    copyAddressSpace(instr->getOperand(0), instr);
     cout << "dumpbitcastrhs srctype " << dumpType(srcType) << " desttype " << dumpType(destType) << " casttype " << dumpType(castType) << endl;
-    gencode += "bitcast[" + dumpType(instr->getType()) + "]((" + dumpType(castType) + ")" + dumpOperand(op0) + ")";
+    gencode += "((" + dumpType(castType) + ")" + op0str + ")";
+    copyAddressSpace(instr->getOperand(0), instr);
     // nameByValue[instr] = gencode;
     return gencode;
 }
@@ -633,10 +637,11 @@ std::string dumpBitCast(BitCastInst *instr) {
 std::string dumpAddrSpaceCastRhs(AddrSpaceCastInst *instr) {
     string gencode = "";
     cout << "addrspacecast" << endl;
-    copyAddressSpace(instr->getOperand(0), instr);
     // gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
     // gencode += "(" + dumpType(instr->getType()) + ")" + dumpOperand(instr->getOperand(0)) + ";\n";
-    gencode += "addrspacecast[" + dumpType(instr->getType()) + "](" + dumpOperand(instr->getOperand(0)) + ")";
+    string op0str = dumpOperand(instr->getOperand(0));
+    copyAddressSpace(instr->getOperand(0), instr);
+    gencode += "(" + op0str + ")";
     // throw runtime_error("not implemented");
     return gencode;
 }

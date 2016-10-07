@@ -11,7 +11,7 @@ void _Z7test_siPf(struct class_Eigen__StreamInterface* data) {
 
 kernel void _Z11test_floatsPf(global float* data) {
     label0:;
-    global float* v0 = &data[1];
+    global float* v0 = (&data[1]);
     float v1 = v0[0];
     data[0] = v1;
 }
