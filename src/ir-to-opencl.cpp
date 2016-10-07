@@ -78,10 +78,9 @@ std::string getName(Function *value);
 
 std::string dumpValue(Value *value) {
     std::string gencode = "";
-    unsigned int valueTy = value->getValueID();
-    switch(valueTy) {
-        case AShrOperator::ConstantIntVal:
-            cout << "constant " << (cast<ConstantInt>(value))->getSExtValue() << endl;
+    if(nameByValue.find(value) == nameByValue.end()) {
+        value->dump();
+        throw runtime_error("dumpvalue value not found");
     }
     string name = nameByValue[value];
     gencode += name;
@@ -90,13 +89,6 @@ std::string dumpValue(Value *value) {
 
 void declareGlobal(GlobalValue *global) {
     string gencode = "";
-
-    // Type *globalType = global->getType();
-    // PointerType *ptr = cast<PointerType>(globalType);
-    // Type *elementType = ptr->getPointerElementType();
-    // string elementtypestr = dumpType(elementType);
-    // string name = global->getName();
-    // gencode += elementtypestr + " " + name;
     if(GlobalVariable *var = dyn_cast<GlobalVariable>(global)) {
         Constant *initializer = var->getInitializer();
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
@@ -111,13 +103,6 @@ void declareGlobal(GlobalValue *global) {
                 // gencode = "constant " + gencode;
             }
         }
-
-        // Type *globalType = global->getType();
-        // PointerType *ptr = cast<PointerType>(globalType);
-        // Type *elementType = ptr->getPointerElementType();
-        // string elementtypestr = dumpType(elementType);
-        // string name = getName(global);
-        // gencode += elementtypestr + " " + name;
         gencode += "constant " + dumpType(global->getType()->getPointerElementType()) + " " + getName(global);
         gencode += " = {";
         if(ConstantStruct *constStruct = dyn_cast<ConstantStruct>(initializer)) {
@@ -245,17 +230,17 @@ string dumpConstant(Constant *constant) {
     } else if(isa<ConstantStruct>(constant)) {
         throw runtime_error("constantStruct not implemented in dumpconstnat");
     } else if(ConstantExpr *expr = dyn_cast<ConstantExpr>(constant)) {
-        cout << "constantexp" << endl;
-        cout << "opcode name " << expr->getOpcodeName() << endl;
-        cout << "dumpconstant expr expr space " << cast<PointerType>(expr->getType())->getAddressSpace() << endl;
+        // cout << "constantexp" << endl;
+        // cout << "opcode name " << expr->getOpcodeName() << endl;
+        // cout << "dumpconstant expr expr space " << cast<PointerType>(expr->getType())->getAddressSpace() << endl;
         Instruction *instr = expr->getAsInstruction();
         copyAddressSpace(constant, instr);
         // cout << "dumpconstant expr instr space " << cast<PointerType>(instr->getType())->getAddressSpace() << endl;
-        cout << "dumpconstant before dci constanttype " << dumpType(constant->getType()) <<  " instrtype " << dumpType(instr->getType()) << endl;
+        // cout << "dumpconstant before dci constanttype " << dumpType(constant->getType()) <<  " instrtype " << dumpType(instr->getType()) << endl;
         string dcires = dumpChainedInstruction(0, instr);
-        cout << "dcires " << dcires << endl;
+        // cout << "dcires " << dcires << endl;
         copyAddressSpace(instr, constant);
-        cout << "dumpconstant after dci instr type " << dumpType(instr->getType()) << " constant type " << dumpType(constant->getType()) << endl;
+        // cout << "dumpconstant after dci instr type " << dumpType(instr->getType()) << " constant type " << dumpType(constant->getType()) << endl;
         nameByValue[constant] = dcires;
         return dcires;
     } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
@@ -357,25 +342,29 @@ std::string dumpReturn(ReturnInst *retInst) {
 
 std::string dumpAlloca(Instruction *alloca) {
     // std::string gencode = "";
-    PointerType *ptrElementType = cast<PointerType>(alloca->getType()->getPointerElementType());
-    std::string typestring = dumpType(ptrElementType);
-    cout << "alloca typestring " << typestring << endl;
-    int count = readInt32Constant(alloca->getOperand(0));
-    cout << "count " << count << endl;
-    if(count == 1) {
-        if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
-            cout << "its an array" << endl;
-            int innercount = arrayType->getNumElements();
-            cout << "length " << innercount << endl;
-            Type *elementType = arrayType->getElementType();
-            cout << "element type " << dumpType(elementType) << endl;
-            // throw runtime_error("not implemented: alloca for arraytype");
-            return dumpType(elementType) + " " + dumpOperand(alloca) + "[" + toString(innercount) + "];\n";
+    if(PointerType *ptrElementType = dyn_cast<PointerType>(alloca->getType()->getPointerElementType())) {
+        std::string typestring = dumpType(ptrElementType);
+        cout << "alloca typestring " << typestring << endl;
+        int count = readInt32Constant(alloca->getOperand(0));
+        cout << "count " << count << endl;
+        if(count == 1) {
+            if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
+                cout << "its an array" << endl;
+                int innercount = arrayType->getNumElements();
+                cout << "length " << innercount << endl;
+                Type *elementType = arrayType->getElementType();
+                cout << "element type " << dumpType(elementType) << endl;
+                // throw runtime_error("not implemented: alloca for arraytype");
+                return dumpType(elementType) + " " + dumpOperand(alloca) + "[" + toString(innercount) + "];\n";
+            } else {
+                return typestring + " " + dumpOperand(alloca) + "[1];\n";
+            }
         } else {
-            return typestring + " " + dumpOperand(alloca) + "[1];\n";
+            throw runtime_error("not implemented: alloca for count != 1");
         }
     } else {
-        throw runtime_error("not implemented: alloca for count != 1");
+        alloca->dump();
+        throw runtime_error("dumpalloca not implemented for non pointer type");
     }
 }
 
@@ -385,29 +374,17 @@ void updateAddressSpace(Value *value, int newSpace) {
     value->mutateType(newType);
 }
 
-// void copyAddressSpace(Value *dest, Value *src) {
-//     // copies address space from src value to dest value
-//     int srcTypeID = src->getType()->getTypeID();
-//     if(srcTypeID != Type::PointerTyID) { // not a pointer, so skipe
-//         return;
-//     }
-//     PointerType *srcType = cast<PointerType>(src->getType());
-//     int addressspace = srcType->getAddressSpace();
-//     if(addressspace != 0) {
-//         updateAddressSpace(dest, addressspace);
-//     }
-// }
-
 void copyAddressSpace(Value *src, Value *dest) {
     // copies address space from src value to dest value
     int srcTypeID = src->getType()->getTypeID();
     if(srcTypeID != Type::PointerTyID) { // not a pointer, so skipe
         return;
     }
-    PointerType *srcType = cast<PointerType>(src->getType());
-    int addressspace = srcType->getAddressSpace();
-    if(addressspace != 0) {
-        updateAddressSpace(dest, addressspace);
+    if(PointerType *srcType = dyn_cast<PointerType>(src->getType())) {
+        int addressspace = srcType->getAddressSpace();
+        if(addressspace != 0) {
+            updateAddressSpace(dest, addressspace);
+        }
     }
 }
 
@@ -429,23 +406,25 @@ void addSharedDeclaration(Value *value) {
     if(nameByValue.find(value) != nameByValue.end()) {
         return;
     }
-    GlobalVariable *glob = cast<GlobalVariable>(value);
-    string name = getName(glob);
-    cout << name << endl;
-    string declaration = "";
-    Type *type = glob->getType();
-    type->dump();
-    ArrayType *arraytype = cast<ArrayType>(type->getPointerElementType());
-    arraytype->dump();
-    int length = arraytype->getNumElements();
-    Type *elementType = arraytype->getElementType();
-    string typestr = dumpType(elementType);
-    declaration += "    local " + typestr + " " + name + "[" + toString(length) + "];\n";
-    if(debug) {
-        cout << declaration << endl;
+    if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
+        string name = getName(glob);
+        cout << name << endl;
+        string declaration = "";
+        Type *type = glob->getType();
+        type->dump();
+        if(ArrayType *arraytype = dyn_cast<ArrayType>(type->getPointerElementType())) {
+            arraytype->dump();
+            int length = arraytype->getNumElements();
+            Type *elementType = arraytype->getElementType();
+            string typestr = dumpType(elementType);
+            declaration += "    local " + typestr + " " + name + "[" + toString(length) + "];\n";
+            if(debug) {
+                cout << declaration << endl;
+            }
+            nameByValue[value] = name;
+            currentFunctionSharedDeclarations += declaration;
+        }
     }
-    nameByValue[value] = name;
-    currentFunctionSharedDeclarations += declaration;
 }
 
 string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
@@ -455,10 +434,14 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
     rhs += "" + dumpOperand(instr->getOperand(0));
     Type *currentType = instr->getOperand(0)->getType();
     copyAddressSpace(instr->getOperand(0), instr);
-    cout << "gep addressspace instr after copy " << cast<PointerType>(instr->getType())->getAddressSpace() << endl;
-    int addressspace = cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace();
+    // cout << "gep addressspace instr after copy " << cast<PointerType>(instr->getType())->getAddressSpace() << endl;
+    PointerType *op0typeptr = dyn_cast<PointerType>(instr->getOperand(0)->getType());
+    if(op0typeptr == 0) {
+        throw runtime_error("dumpgetelementptrrhs op0typeptr is 0");
+    }
+    int addressspace = op0typeptr->getAddressSpace();
     cout << "gep addressspace op0 " << addressspace << endl;
-    cout << "gep addressspace instr " << cast<PointerType>(instr->getType())->getAddressSpace() << endl;
+    // cout << "gep addressspace instr " << cast<PointerType>(instr->getType())->getAddressSpace() << endl;
     if(addressspace == 3) { // local/shared memory
         cout << "got access to local memory." << endl;
         cout << "dumpoperand(instr) " << dumpOperand(instr) << endl;
@@ -477,8 +460,7 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
             }
             rhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
             newType = currentType->getPointerElementType();
-        } else if(currentType->isStructTy()) {
-            StructType *structtype = cast<StructType>(currentType);
+        } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
             string structName = getName(structtype);
             if(structName == "struct.float4") {
                 int idx = readInt32Constant(instr->getOperand(d + 1));
@@ -507,11 +489,7 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
 
 string dumpGetElementPtr(GetElementPtrInst *instr) {
     string gencode = "";
-    // int numOperands = instr->getNumOperands();
-    // int addressspace = cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace();
-    // Type *currentType = instr->getOperand(0)->getType();
     string rhs = dumpGetElementPtrRhs(instr);
-    // Type *lhsType = PointerType::get(currentType, addressspace);
     gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + rhs;
     gencode += ";\n";
     return gencode;
@@ -631,13 +609,15 @@ std::string dumpBitCastRhs(BitCastInst *instr) {
     string gencode = "";
     string op0str = dumpOperand(instr->getOperand(0));
     Value *op0 = instr->getOperand(0);
-    cout << "dumpbitcastrh op0 space " << cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace() << endl;
-    PointerType *srcType = cast<PointerType>(instr->getSrcTy());
-    PointerType *destType = cast<PointerType>(instr->getDestTy());
-    Type *castType = PointerType::get(destType->getElementType(), srcType->getAddressSpace());
-    cout << "dumpbitcastrhs srctype " << dumpType(srcType) << " desttype " << dumpType(destType) << " casttype " << dumpType(castType) << endl;
-    gencode += "((" + dumpType(castType) + ")" + op0str + ")";
-    copyAddressSpace(instr->getOperand(0), instr);
+    // cout << "dumpbitcastrh op0 space " << cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace() << endl;
+    if(PointerType *srcType = dyn_cast<PointerType>(instr->getSrcTy())) {
+        if(PointerType *destType = dyn_cast<PointerType>(instr->getDestTy())) {
+            Type *castType = PointerType::get(destType->getElementType(), srcType->getAddressSpace());
+            // cout << "dumpbitcastrhs srctype " << dumpType(srcType) << " desttype " << dumpType(destType) << " casttype " << dumpType(castType) << endl;
+            gencode += "((" + dumpType(castType) + ")" + op0str + ")";
+            copyAddressSpace(instr->getOperand(0), instr);
+        }
+    }
     // nameByValue[instr] = gencode;
     return gencode;
 }
@@ -678,6 +658,7 @@ std::string dumpAddrSpaceCast(AddrSpaceCastInst *instr) {
 std::string dumpMemcpyCharCharLong(CallInst *instr) {
     std::string gencode = "";
         // int intvalue = readInt32Constant(value);
+    // if()
     int totalLength = cast<ConstantInt>(instr->getOperand(2))->getSExtValue();
     cout << "totalLength " << totalLength << endl;
     int align = cast<ConstantInt>(instr->getOperand(3))->getSExtValue();
@@ -927,16 +908,17 @@ std::string dumpPhi(BranchInst *branchInstr, BasicBlock *nextBlock) {
         if(instr->getOpcode() != Instruction::PHI) {
             break;
         }
-        PHINode *phi = cast<PHINode>(instr);
-        storeValueName(phi);
-        BasicBlock *ourBlock = branchInstr->getParent();
-        Value *sourceValue = phi->getIncomingValueForBlock(ourBlock);
-        string sourceValueCode = dumpOperand(sourceValue);
-        if(sourceValueCode == "") { // this is a hack really..
-            continue;  // assume its an undef. which it might be
+        if(PHINode *phi = dyn_cast<PHINode>(instr)) {
+            storeValueName(phi);
+            BasicBlock *ourBlock = branchInstr->getParent();
+            Value *sourceValue = phi->getIncomingValueForBlock(ourBlock);
+            string sourceValueCode = dumpOperand(sourceValue);
+            if(sourceValueCode == "") { // this is a hack really..
+                continue;  // assume its an undef. which it might be
+            }
+            gencode += dumpOperand(phi) + " = ";
+            gencode += sourceValueCode + ";\n";
         }
-        gencode += dumpOperand(phi) + " = ";
-        gencode += sourceValueCode + ";\n";
         // }
     }
     return gencode;
