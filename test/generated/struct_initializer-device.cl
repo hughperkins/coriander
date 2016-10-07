@@ -67,7 +67,7 @@ int i_08;
     label1:;
     global float* v19 = (&data[9]);
     float v20 = v19[0];
-    float v21 = (&(&myg1)[0].f0.f1)[0];
+    float v21 = (&((&myg1))[0].f0.f1)[0];
     float v22 = v21 * 100.0f;
     float v23 = v20 * v22;
     float v24 = v23 + 2.0f;
@@ -75,7 +75,7 @@ int i_08;
     v25[0] = v24;
     global float* v27 = (&data[11]);
     float v28 = v27[0];
-    float v29 = (&(&myg2)[0].f0.f1)[0];
+    float v29 = (&((&myg2))[0].f0.f1)[0];
     float v30 = v29 * 100.0f;
     float v31 = v28 * v30;
     float v32 = v31 + 2.0f;
@@ -114,24 +114,24 @@ int i_08;
 
 kernel void _Z11somekernel2Pf(global float* data) {
     label0:;
-    float v0 = (&(&myg1)[0].f0.f1)[0];
-    float v1 = (&(&myg2)[0].f0.f1)[0];
+    float v0 = (&((&myg1))[0].f0.f1)[0];
+    float v1 = (&((&myg2))[0].f0.f1)[0];
     float v2 = v0 + v1;
     data[0] = v2;
 }
 
 kernel void _Z11getFooValuePfPi(global float* data, global int* intdata) {
     label0:;
-    int v0 = ((constant int*)(&(&foo)[0].f1))[0];
+    int v0 = ((constant int*)(&((&foo))[0].f1))[0];
     global int* v1 = ((global int*)data);
     v1[0] = v0;
-    int v3 = (&(&foo)[0].f0)[0];
+    int v3 = (&((&foo))[0].f0)[0];
     intdata[0] = v3;
 }
 
 kernel void _Z11getBarValuePf(global float* data) {
     label0:;
-    int v0 = (((constant int*)&bar))[0];
+    int v0 = (((constant int*)(&bar)))[0];
     global int* v1 = ((global int*)data);
     v1[0] = v0;
 }

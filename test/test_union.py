@@ -61,6 +61,5 @@ def union(context, union_cl):
     return prog
 
 
-@pytest.mark.xfail
 def test_program_compiles(union):
     pass

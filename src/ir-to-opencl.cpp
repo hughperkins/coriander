@@ -271,7 +271,7 @@ string dumpConstant(Constant *constant) {
             return nameByValue[constant];
          }
          string name = getName(global);
-         string ourinstrstr = "&" + name;
+         string ourinstrstr = "(&" + name + ")";
          updateAddressSpace(constant, 4);
          nameByValue[constant] = ourinstrstr;
          cout << "dumpconstant, globalvalue, reutrn & plus name [" << name << "]" << endl;

@@ -1447,7 +1447,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v16 = v7 + 947912704;
-    float v17 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v17 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v18 = ((float)v16);
     float v19 = v18 - v17;
     int v20 = ((int)v19);
@@ -1483,7 +1483,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v37 = v28 + 947912704;
-    float v38 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v38 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v39 = ((float)v37);
     float v40 = v39 - v38;
     int v41 = ((int)v40);
@@ -1498,7 +1498,7 @@ int v_sroa_0_0_i_i_i_i;
     int v48 = ((int)v47);
     int v49 = v48 & -2147483648;
     int v50 = v49 ^ v48;
-    int v51 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v51 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v52 = v50 < v51;
     if(v52) {
         goto label10;
@@ -1506,7 +1506,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v54 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v54 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v55 = v50 > v54;
     int v56 = v55 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v56;
@@ -1519,7 +1519,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v60 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v60 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v61 = ((float)v50);
     float v62 = v61 + v60;
     int v63 = ((int)v62);
@@ -1570,7 +1570,7 @@ int v_sroa_0_0_i_i_i_i_i_i;
     global struct Eigen__half** v13 = (&memcopied_eval[0].f1.f0.f0);
     struct Eigen__half* v14 = v13[0];
     short* v15 = (&v14[0].f0.f0.f0);
-    int v16 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v16 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
         i_01_i = v4;
     goto label2;
     label2:;
@@ -1603,7 +1603,7 @@ int v_sroa_0_0_i_i_i_i_i_i;
     }
     label5:;
     int v31 = v22 + 947912704;
-    float v32 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v32 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v33 = ((float)v31);
     float v34 = v33 - v32;
     int v35 = ((int)v34);
@@ -1639,7 +1639,7 @@ int v_sroa_0_0_i_i_i_i_i_i;
     }
     label9:;
     int v52 = v43 + 947912704;
-    float v53 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v53 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v54 = ((float)v52);
     float v55 = v54 - v53;
     int v56 = ((int)v55);
@@ -1661,7 +1661,7 @@ int v_sroa_0_0_i_i_i_i_i_i;
         goto label11;
     }
     label11:;
-    int v68 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v68 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v69 = v65 > v68;
     int v70 = v69 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i_i_i = v70;
@@ -1674,7 +1674,7 @@ int v_sroa_0_0_i_i_i_i_i_i;
         goto label14;
     }
     label13:;
-    float v74 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v74 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v75 = ((float)v65);
     float v76 = v75 + v74;
     int v77 = ((int)v76);
@@ -1736,7 +1736,7 @@ int v_sroa_0_0_i_i_i_i_i_i;
     global struct Eigen__half** v13 = (&memcopied_eval[0].f1.f0.f0);
     struct Eigen__half* v14 = v13[0];
     short* v15 = (&v14[0].f0.f0.f0);
-    int v16 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v16 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
         i_01_i = v4;
     goto label2;
     label2:;
@@ -1768,7 +1768,7 @@ int v_sroa_0_0_i_i_i_i_i_i;
     }
     label5:;
     int v30 = v21 + 947912704;
-    float v31 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v31 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v32 = ((float)v30);
     float v33 = v32 - v31;
     int v34 = ((int)v33);
@@ -1805,7 +1805,7 @@ int v_sroa_0_0_i_i_i_i_i_i;
     }
     label9:;
     int v52 = v43 + 947912704;
-    float v53 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v53 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v54 = ((float)v52);
     float v55 = v54 - v53;
     int v56 = ((int)v55);
@@ -1827,7 +1827,7 @@ int v_sroa_0_0_i_i_i_i_i_i;
         goto label11;
     }
     label11:;
-    int v68 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v68 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v69 = v65 > v68;
     int v70 = v69 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i_i_i = v70;
@@ -1840,7 +1840,7 @@ int v_sroa_0_0_i_i_i_i_i_i;
         goto label14;
     }
     label13:;
-    float v74 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v74 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v75 = ((float)v65);
     float v76 = v75 + v74;
     int v77 = ((int)v76);
@@ -1977,7 +1977,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v20 = v11 + 947912704;
-    float v21 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v21 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v22 = ((float)v20);
     float v23 = v22 - v21;
     int v24 = ((int)v23);
@@ -2013,7 +2013,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v41 = v32 + 947912704;
-    float v42 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v42 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v43 = ((float)v41);
     float v44 = v43 - v42;
     int v45 = ((int)v44);
@@ -2028,7 +2028,7 @@ int v_sroa_0_0_i_i_i_i;
     int v52 = ((int)v51);
     int v53 = v52 & -2147483648;
     int v54 = v53 ^ v52;
-    int v55 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v55 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v56 = v54 < v55;
     if(v56) {
         goto label10;
@@ -2036,7 +2036,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v58 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v58 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v59 = v54 > v58;
     int v60 = v59 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v60;
@@ -2049,7 +2049,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v64 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v64 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v65 = ((float)v54);
     float v66 = v65 + v64;
     int v67 = ((int)v66);
@@ -2175,7 +2175,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v20 = v11 + 947912704;
-    float v21 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v21 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v22 = ((float)v20);
     float v23 = v22 - v21;
     int v24 = ((int)v23);
@@ -2211,7 +2211,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v41 = v32 + 947912704;
-    float v42 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v42 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v43 = ((float)v41);
     float v44 = v43 - v42;
     int v45 = ((int)v44);
@@ -2226,7 +2226,7 @@ int v_sroa_0_0_i_i_i_i;
     int v52 = ((int)v51);
     int v53 = v52 & -2147483648;
     int v54 = v53 ^ v52;
-    int v55 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v55 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v56 = v54 < v55;
     if(v56) {
         goto label10;
@@ -2234,7 +2234,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v58 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v58 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v59 = v54 > v58;
     int v60 = v59 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v60;
@@ -2247,7 +2247,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v64 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v64 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v65 = ((float)v54);
     float v66 = v65 + v64;
     int v67 = ((int)v66);
@@ -2376,7 +2376,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v23 = v14 + 947912704;
-    float v24 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v24 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v25 = ((float)v23);
     float v26 = v25 - v24;
     int v27 = ((int)v26);
@@ -2412,7 +2412,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v44 = v35 + 947912704;
-    float v45 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v45 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v46 = ((float)v44);
     float v47 = v46 - v45;
     int v48 = ((int)v47);
@@ -2427,7 +2427,7 @@ int v_sroa_0_0_i_i_i_i;
     int v55 = ((int)v54);
     int v56 = v55 & -2147483648;
     int v57 = v56 ^ v55;
-    int v58 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v58 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v59 = v57 < v58;
     if(v59) {
         goto label10;
@@ -2435,7 +2435,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v61 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v61 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v62 = v57 > v61;
     int v63 = v62 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v63;
@@ -2448,7 +2448,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v67 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v67 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v68 = ((float)v57);
     float v69 = v68 + v67;
     int v70 = ((int)v69);
@@ -2586,7 +2586,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v32 = v23 + 947912704;
-    float v33 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v33 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v34 = ((float)v32);
     float v35 = v34 - v33;
     int v36 = ((int)v35);
@@ -2622,7 +2622,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v53 = v44 + 947912704;
-    float v54 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v54 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v55 = ((float)v53);
     float v56 = v55 - v54;
     int v57 = ((int)v56);
@@ -2637,7 +2637,7 @@ int v_sroa_0_0_i_i_i_i;
     int v64 = ((int)v63);
     int v65 = v64 & -2147483648;
     int v66 = v65 ^ v64;
-    int v67 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v67 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v68 = v66 < v67;
     if(v68) {
         goto label10;
@@ -2645,7 +2645,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v70 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v70 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v71 = v66 > v70;
     int v72 = v71 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v72;
@@ -2658,7 +2658,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v76 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v76 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v77 = ((float)v66);
     float v78 = v77 + v76;
     int v79 = ((int)v78);
@@ -2796,7 +2796,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v32 = v23 + 947912704;
-    float v33 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v33 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v34 = ((float)v32);
     float v35 = v34 - v33;
     int v36 = ((int)v35);
@@ -2832,7 +2832,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v53 = v44 + 947912704;
-    float v54 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v54 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v55 = ((float)v53);
     float v56 = v55 - v54;
     int v57 = ((int)v56);
@@ -2847,7 +2847,7 @@ int v_sroa_0_0_i_i_i_i;
     int v64 = ((int)v63);
     int v65 = v64 & -2147483648;
     int v66 = v65 ^ v64;
-    int v67 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v67 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v68 = v66 < v67;
     if(v68) {
         goto label10;
@@ -2855,7 +2855,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v70 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v70 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v71 = v66 > v70;
     int v72 = v71 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v72;
@@ -2868,7 +2868,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v76 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v76 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v77 = ((float)v66);
     float v78 = v77 + v76;
     int v79 = ((int)v78);
@@ -3021,7 +3021,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v47 = v38 + 947912704;
-    float v48 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v48 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v49 = ((float)v47);
     float v50 = v49 - v48;
     int v51 = ((int)v50);
@@ -3057,7 +3057,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v68 = v59 + 947912704;
-    float v69 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v69 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v70 = ((float)v68);
     float v71 = v70 - v69;
     int v72 = ((int)v71);
@@ -3072,7 +3072,7 @@ int v_sroa_0_0_i_i_i_i;
     int v79 = ((int)v78);
     int v80 = v79 & -2147483648;
     int v81 = v80 ^ v79;
-    int v82 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v82 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v83 = v81 < v82;
     if(v83) {
         goto label10;
@@ -3080,7 +3080,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v85 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v85 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v86 = v81 > v85;
     int v87 = v86 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v87;
@@ -3093,7 +3093,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v91 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v91 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v92 = ((float)v81);
     float v93 = v92 + v91;
     int v94 = ((int)v93);
@@ -3243,7 +3243,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v44 = v35 + 947912704;
-    float v45 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v45 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v46 = ((float)v44);
     float v47 = v46 - v45;
     int v48 = ((int)v47);
@@ -3279,7 +3279,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v65 = v56 + 947912704;
-    float v66 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v66 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v67 = ((float)v65);
     float v68 = v67 - v66;
     int v69 = ((int)v68);
@@ -3294,7 +3294,7 @@ int v_sroa_0_0_i_i_i_i;
     int v76 = ((int)v75);
     int v77 = v76 & -2147483648;
     int v78 = v77 ^ v76;
-    int v79 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v79 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v80 = v78 < v79;
     if(v80) {
         goto label10;
@@ -3302,7 +3302,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v82 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v82 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v83 = v78 > v82;
     int v84 = v83 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v84;
@@ -3315,7 +3315,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v88 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v88 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v89 = ((float)v78);
     float v90 = v89 + v88;
     int v91 = ((int)v90);
@@ -3457,7 +3457,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v46 = v37 + 947912704;
-    float v47 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v47 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v48 = ((float)v46);
     float v49 = v48 - v47;
     int v50 = ((int)v49);
@@ -3493,7 +3493,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v67 = v58 + 947912704;
-    float v68 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v68 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v69 = ((float)v67);
     float v70 = v69 - v68;
     int v71 = ((int)v70);
@@ -3508,7 +3508,7 @@ int v_sroa_0_0_i_i_i_i;
     int v78 = ((int)v77);
     int v79 = v78 & -2147483648;
     int v80 = v79 ^ v78;
-    int v81 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v81 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v82 = v80 < v81;
     if(v82) {
         goto label10;
@@ -3516,7 +3516,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v84 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v84 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v85 = v80 > v84;
     int v86 = v85 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v86;
@@ -3529,7 +3529,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v90 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v90 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v91 = ((float)v80);
     float v92 = v91 + v90;
     int v93 = ((int)v92);
@@ -3706,7 +3706,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v71 = v62 + 947912704;
-    float v72 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v72 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v73 = ((float)v71);
     float v74 = v73 - v72;
     int v75 = ((int)v74);
@@ -3742,7 +3742,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v92 = v83 + 947912704;
-    float v93 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v93 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v94 = ((float)v92);
     float v95 = v94 - v93;
     int v96 = ((int)v95);
@@ -3757,7 +3757,7 @@ int v_sroa_0_0_i_i_i_i;
     int v103 = ((int)v102);
     int v104 = v103 & -2147483648;
     int v105 = v104 ^ v103;
-    int v106 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v106 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v107 = v105 < v106;
     if(v107) {
         goto label10;
@@ -3765,7 +3765,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v109 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v109 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v110 = v105 > v109;
     int v111 = v110 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v111;
@@ -3778,7 +3778,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v115 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v115 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v116 = ((float)v105);
     float v117 = v116 + v115;
     int v118 = ((int)v117);
@@ -3940,7 +3940,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v56 = v47 + 947912704;
-    float v57 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v57 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v58 = ((float)v56);
     float v59 = v58 - v57;
     int v60 = ((int)v59);
@@ -3976,7 +3976,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v77 = v68 + 947912704;
-    float v78 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v78 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v79 = ((float)v77);
     float v80 = v79 - v78;
     int v81 = ((int)v80);
@@ -3991,7 +3991,7 @@ int v_sroa_0_0_i_i_i_i;
     int v88 = ((int)v87);
     int v89 = v88 & -2147483648;
     int v90 = v89 ^ v88;
-    int v91 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v91 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v92 = v90 < v91;
     if(v92) {
         goto label10;
@@ -3999,7 +3999,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v94 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v94 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v95 = v90 > v94;
     int v96 = v95 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v96;
@@ -4012,7 +4012,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v100 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v100 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v101 = ((float)v90);
     float v102 = v101 + v100;
     int v103 = ((int)v102);
@@ -4174,7 +4174,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v56 = v47 + 947912704;
-    float v57 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v57 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v58 = ((float)v56);
     float v59 = v58 - v57;
     int v60 = ((int)v59);
@@ -4210,7 +4210,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v77 = v68 + 947912704;
-    float v78 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v78 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v79 = ((float)v77);
     float v80 = v79 - v78;
     int v81 = ((int)v80);
@@ -4225,7 +4225,7 @@ int v_sroa_0_0_i_i_i_i;
     int v88 = ((int)v87);
     int v89 = v88 & -2147483648;
     int v90 = v89 ^ v88;
-    int v91 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v91 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v92 = v90 < v91;
     if(v92) {
         goto label10;
@@ -4233,7 +4233,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v94 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v94 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v95 = v90 > v94;
     int v96 = v95 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v96;
@@ -4246,7 +4246,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v100 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v100 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v101 = ((float)v90);
     float v102 = v101 + v100;
     int v103 = ((int)v102);
@@ -4447,7 +4447,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v95 = v86 + 947912704;
-    float v96 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v96 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v97 = ((float)v95);
     float v98 = v97 - v96;
     int v99 = ((int)v98);
@@ -4483,7 +4483,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v116 = v107 + 947912704;
-    float v117 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v117 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v118 = ((float)v116);
     float v119 = v118 - v117;
     int v120 = ((int)v119);
@@ -4498,7 +4498,7 @@ int v_sroa_0_0_i_i_i_i;
     int v127 = ((int)v126);
     int v128 = v127 & -2147483648;
     int v129 = v128 ^ v127;
-    int v130 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v130 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v131 = v129 < v130;
     if(v131) {
         goto label10;
@@ -4506,7 +4506,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v133 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v133 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v134 = v129 > v133;
     int v135 = v134 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v135;
@@ -4519,7 +4519,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v139 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v139 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v140 = ((float)v129);
     float v141 = v140 + v139;
     int v142 = ((int)v141);
@@ -4693,7 +4693,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v68 = v59 + 947912704;
-    float v69 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v69 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v70 = ((float)v68);
     float v71 = v70 - v69;
     int v72 = ((int)v71);
@@ -4729,7 +4729,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v89 = v80 + 947912704;
-    float v90 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v90 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v91 = ((float)v89);
     float v92 = v91 - v90;
     int v93 = ((int)v92);
@@ -4744,7 +4744,7 @@ int v_sroa_0_0_i_i_i_i;
     int v100 = ((int)v99);
     int v101 = v100 & -2147483648;
     int v102 = v101 ^ v100;
-    int v103 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v103 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v104 = v102 < v103;
     if(v104) {
         goto label10;
@@ -4752,7 +4752,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v106 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v106 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v107 = v102 > v106;
     int v108 = v107 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v108;
@@ -4765,7 +4765,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v112 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v112 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v113 = ((float)v102);
     float v114 = v113 + v112;
     int v115 = ((int)v114);
@@ -4939,7 +4939,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v68 = v59 + 947912704;
-    float v69 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v69 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v70 = ((float)v68);
     float v71 = v70 - v69;
     int v72 = ((int)v71);
@@ -4975,7 +4975,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v89 = v80 + 947912704;
-    float v90 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v90 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v91 = ((float)v89);
     float v92 = v91 - v90;
     int v93 = ((int)v92);
@@ -4990,7 +4990,7 @@ int v_sroa_0_0_i_i_i_i;
     int v100 = ((int)v99);
     int v101 = v100 & -2147483648;
     int v102 = v101 ^ v100;
-    int v103 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v103 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v104 = v102 < v103;
     if(v104) {
         goto label10;
@@ -4998,7 +4998,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v106 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v106 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v107 = v102 > v106;
     int v108 = v107 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v108;
@@ -5011,7 +5011,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v112 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v112 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v113 = ((float)v102);
     float v114 = v113 + v112;
     int v115 = ((int)v114);
@@ -5236,7 +5236,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label3:;
     int v119 = v110 + 947912704;
-    float v120 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v120 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v121 = ((float)v119);
     float v122 = v121 - v120;
     int v123 = ((int)v122);
@@ -5272,7 +5272,7 @@ int v_sroa_0_0_i_i_i_i;
     }
     label7:;
     int v140 = v131 + 947912704;
-    float v141 = (((constant float*)&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic))[0];
+    float v141 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
     float v142 = ((float)v140);
     float v143 = v142 - v141;
     int v144 = ((int)v143);
@@ -5287,7 +5287,7 @@ int v_sroa_0_0_i_i_i_i;
     int v151 = ((int)v150);
     int v152 = v151 & -2147483648;
     int v153 = v152 ^ v151;
-    int v154 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max[0].f0))[0];
+    int v154 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
     bool v155 = v153 < v154;
     if(v155) {
         goto label10;
@@ -5295,7 +5295,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label9;
     }
     label9:;
-    int v157 = ((&&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty[0].f0))[0];
+    int v157 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
     bool v158 = v153 > v157;
     int v159 = v158 ? 32256 : 31744;
         v_sroa_0_0_i_i_i_i = v159;
@@ -5308,7 +5308,7 @@ int v_sroa_0_0_i_i_i_i;
         goto label12;
     }
     label11:;
-    float v163 = (((constant float*)&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic))[0];
+    float v163 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
     float v164 = ((float)v153);
     float v165 = v164 + v163;
     int v166 = ((int)v165);
