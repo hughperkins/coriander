@@ -263,11 +263,8 @@ void storeValueName(Value *value) {
         if(name[0] == '.') {
             name = "v" + name;
         }
-        size_t pos = name.find(".");
-        while(pos != string::npos) {
-            name[pos] = '_';
-            pos = name.find(".");
-        }
+        name = replace(name, '.', '_');
+        name = replace(name, '-', '_');
         nameByValue[value] = name;
     } else {
         int idx = nextNameIdx;

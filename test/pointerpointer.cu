@@ -12,6 +12,8 @@ __device__ __host__ float sumStruct(struct MyStruct **p_structs, int N) {
     return sum;
 }
 
-__global__ void mykernel(float *data, MyStruct **p_structs, int N) {
-    data[0] = sumStruct(p_structs, N);
+__global__ void mykernel(float *data, MyStruct *structs, int N) {
+    data[0] = sumStruct(&structs, N);
+    data[3] = sumStruct(&structs, 123);
+    data[4] = sumStruct(&structs, 12300);
 }

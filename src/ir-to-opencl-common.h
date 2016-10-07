@@ -28,6 +28,7 @@ std::string toString(T value) {
     oss << value;
     return oss.str();
 }
+std::string replace(std::string target, char old_char, char new_char);
 
 int readInt32Constant(llvm::Value *value);
 float readFloatConstant(llvm::Value *value);
