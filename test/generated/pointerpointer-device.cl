@@ -3,9 +3,51 @@ struct MyStruct {
     int f1;
 };
 
+struct class_HalfImpl {
+    short f0;
+};
+
+struct class_HalfBase {
+    struct class_HalfImpl f0;
+};
+
+struct class_Half {
+    struct class_HalfBase f0;
+};
+
+struct class_StreamInterface {
+    char f0;
+};
+
+struct class_GpuDevice {
+    int f0;
+    struct class_StreamInterface* f1;
+};
+
+struct class_TensorEvaluator0 {
+    struct class_Half* f0;
+    struct class_GpuDevice f1;
+};
+
+struct class_TensorEvaluator2 {
+    struct class_Half* f0;
+    struct class_GpuDevice f1;
+};
+
+struct class_TensorEvaluator7 {
+    struct class_Half* f0;
+    struct class_TensorEvaluator2 f1;
+};
+
+struct class_TensorEvaluator6 {
+    struct class_TensorEvaluator0 f0;
+    struct class_TensorEvaluator7 f1;
+};
+
 
 
 float _Z9sumStructPP8MyStructi(struct MyStruct** p_structs, int N);
+float _Z12getHalfValueP4Halfi(struct class_Half* half, int a);
 
 float _Z9sumStructPP8MyStructi(struct MyStruct** p_structs, int N) {
     int i_01;
@@ -282,4 +324,28 @@ i_01_i3 = v68;
     _Z9sumStructPP8MyStructi_exit6:;
     global float* v70 = (&data[4]);
     v70[0] = v_lcssa;
+}
+
+float _Z12getHalfValueP4Halfi(struct class_Half* half, int a) {
+    label0:;
+    long v1 = a;
+    short* v2 = (&half[v1].f0.f0.f0);
+    short v3 = v2[0];
+    int v4 = v3;
+    int v5 = v4 + 123;
+    float v6 = v5;
+    return v6;
+}
+
+kernel void _Z11myte6kernelP16TensorEvaluator6PfP9GpuDeviceiii(global struct class_TensorEvaluator6* structs, global float* data, global struct class_GpuDevice* gpudevices, int a, int b, int c) {
+    label0:;
+    long v1 = a;
+    global struct class_Half** v2 = (&structs[v1].f0.f0);
+    struct class_Half* v3 = v2[0];
+    short* v4 = (&v3[v1].f0.f0.f0);
+    short v5 = v4[0];
+    int v6 = v5;
+    int v7 = v6 + 123;
+    float v8 = v7;
+    data[0] = v8;
 }
