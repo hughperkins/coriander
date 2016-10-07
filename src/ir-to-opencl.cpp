@@ -93,7 +93,6 @@ void declareGlobal(GlobalValue *global) {
     if(GlobalVariable *var = dyn_cast<GlobalVariable>(global)) {
         Constant *initializer = var->getInitializer();
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
-            // Type *elementType = pointerType->getPointerElementType();
             int addressspace = pointerType->getAddressSpace();
             if(addressspace == 3) { // shared/local => skip
                 return;
@@ -723,6 +722,14 @@ std::string dumpUIToFP(UIToFPInst *instr) {
     return gencode;
 }
 
+std::string dumpSIToFP(SIToFPInst *instr) {
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    gencode += dumpValue(instr->getOperand(0)) + ";\n";
+    return gencode;
+}
+
 std::string dumpInttoPtr(IntToPtrInst *instr) {
     string gencode = "";
     string typestr = dumpType(instr->getType());
@@ -997,6 +1004,9 @@ std::string dumpInstruction(Instruction *instruction) {
             break;
         case Instruction::UIToFP:
             instructioncode = dumpUIToFP(cast<UIToFPInst>(instruction));
+            break;
+        case Instruction::SIToFP:
+            instructioncode = dumpSIToFP(cast<SIToFPInst>(instruction));
             break;
         case Instruction::GetElementPtr:
             instructioncode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
