@@ -55,6 +55,8 @@ static std::map<string, string> knownFunctionsMap; // from cuda to opencl, eg ti
 map<Value *, string> nameByValue;
 static int nextNameIdx;
 static string currentFunctionSharedDeclarations = "";
+static map<string, string> currentFunctionPhiDeclarationsByName;
+//set<string> currentFunction
 static string globalDeclarations = "";
 
 static bool debug;
@@ -75,6 +77,8 @@ void copyAddressSpace(Value *src, Value *dest);
 std::string getName(Value *value);
 std::string getName(StructType *value);
 std::string getName(Function *value);
+void addPHIDeclaration(PHINode *phi);
+void storeValueName(Value *value);
 
 
 std::string dumpValue(Value *value) {
@@ -253,11 +257,29 @@ string dumpOperand(Value *value) {
     if(Constant *constant = dyn_cast<Constant>(value)) {
         return dumpConstant(constant);
     }
+    cout << "isa phi " << isa<PHINode>(value) << endl;
+    cout << "isa basicblock " << isa<BasicBlock>(value) << endl;
+    // cout << "isa label " << isa<LabelNode>(value) << endl;
+    if(BasicBlock *basicBlock = dyn_cast<BasicBlock>(value)) {
+        cout << "dumpoperand basicblock" << endl;
+        storeValueName(value);
+        return nameByValue[value];
+    }
+    if(PHINode *phi = dyn_cast<PHINode>(value)) {
+        cout << "dumpoperand got a phi node" << endl;
+        addPHIDeclaration(phi);
+        string name = nameByValue[value];
+        cout << "phi name " << name << endl;
+        return name;
+    }
     value->dump();
     throw runtime_error("No way found to dump operand");
 }
 
 void storeValueName(Value *value) {
+    if(nameByValue.find(value) != nameByValue.end()) {
+        return;
+    }
     if(value->hasName()) {
         string name = getName(value);
         if(name[0] == '.') {
@@ -844,6 +866,7 @@ std::string dumpPhi(BranchInst *branchInstr, BasicBlock *nextBlock) {
             if(sourceValueCode == "") { // this is a hack really..
                 continue;  // assume its an undef. which it might be
             }
+            copyAddressSpace(sourceValue, phi);
             gencode += dumpOperand(phi) + " = ";
             gencode += sourceValueCode + ";\n";
         }
@@ -896,6 +919,15 @@ std::string dumpSelect(SelectInst *instr) {
     gencode += dumpOperand(instr->getOperand(1)) + " : ";
     gencode += dumpOperand(instr->getOperand(2)) + ";\n";
     return gencode;
+}
+
+void addPHIDeclaration(PHINode *phi) {
+    // currentFunctionPhiDeclarationsByName
+    storeValueName(phi);
+    string name = dumpOperand(phi);
+    string declaration = dumpType(phi->getType()) + " " + dumpOperand(phi);
+    cout << declaration << endl;
+    currentFunctionPhiDeclarationsByName[name] = declaration;
 }
 
 std::string dumpInstruction(Instruction *instruction) {
@@ -1027,7 +1059,7 @@ std::string dumpInstruction(Instruction *instruction) {
             instructioncode = dumpReturn(cast<ReturnInst>(instruction));
             break;
         case Instruction::PHI:
-            // just ignore, we dealt with it in the br (hopefully)
+            addPHIDeclaration(cast<PHINode>(instruction));
             break;
         default:
             cout << "opcode string " << instruction->getOpcodeName() << endl;
@@ -1102,6 +1134,7 @@ std::string dumpFunctionDeclaration(Function *F) {
 
 std::string dumpFunction(Function *F) {
     currentFunctionSharedDeclarations = "";
+    currentFunctionPhiDeclarationsByName.clear();
     // currentFunctionDeclaredShareds.clear();
     // Type *retType = F->getReturnType();
     // std::string retTypeString = dumpType(retType);
@@ -1113,26 +1146,27 @@ std::string dumpFunction(Function *F) {
     // cout << "finished getting arg types" << endl;
     // label the blocks first
     // also dump phi declarations
+    // prename phis
     string body = "";
     int i = 0;
-    for(auto it=F->begin(); it != F->end(); it++) {
-        BasicBlock *basicBlock = &*it;
-        ostringstream oss;
-        oss << "label" << i;
-        string label = oss.str();
-        nameByValue[basicBlock] = label;
-        // write out phi declarations
-        for(auto instructionIt = basicBlock->begin(); instructionIt != basicBlock->end(); instructionIt++) {
-            Instruction *instr = &*instructionIt;
-            if(!PHINode::classof(instr)) {
-                break;
-            }
-            PHINode *phi = cast<PHINode>(instr);
-            storeValueName(phi);
-            body += dumpType(phi->getType()) + " " + dumpOperand(phi) + ";\n";
-        }
-        i++;
-    }
+    // for(auto it=F->begin(); it != F->end(); it++) {
+    //     BasicBlock *basicBlock = &*it;
+    //     ostringstream oss;
+    //     oss << "label" << i;
+    //     string label = oss.str();
+    //     nameByValue[basicBlock] = label;
+    //     // write out phi declarations
+    //     for(auto instructionIt = basicBlock->begin(); instructionIt != basicBlock->end(); instructionIt++) {
+    //         Instruction *instr = &*instructionIt;
+    //         if(!PHINode::classof(instr)) {
+    //             break;
+    //         }
+    //         PHINode *phi = cast<PHINode>(instr);
+    //         storeValueName(phi);
+    //         body += dumpType(phi->getType()) + " " + dumpOperand(phi) + ";\n";
+    //     }
+    //     i++;
+    // }
     // if(debug) {
     //     cout << "function code so far " << gencode << endl;
     // }
@@ -1142,7 +1176,12 @@ std::string dumpFunction(Function *F) {
     }
     gencode =
         declaration + " {\n" +
-        currentFunctionSharedDeclarations +
+        currentFunctionSharedDeclarations;
+    // dump phis
+    for(auto it=currentFunctionPhiDeclarationsByName.begin(); it != currentFunctionPhiDeclarationsByName.end(); it++){
+        gencode += "    " + it->second + ";\n";
+    }
+    gencode +=
         body +
     "}\n";
     cout << gencode;

@@ -26,112 +26,112 @@ float _Z17getSomeClassValue9SomeClassS_(struct class_SomeClass* someclass, struc
 
 float _Z11getFooValue3Foo(struct Foo* foo) {
     label0:;
-    float* v0 = (&foo[0].f1);
-    float v1 = v0[0];
-    return v1;
+    float* v1 = (&foo[0].f1);
+    float v2 = v1[0];
+    return v2;
 }
 
 float _Z17getSomeClassValue9SomeClassS_(struct class_SomeClass* someclass, struct class_SomeClass* c2) {
     label0:;
-    float* v0 = (&someclass[0].f0.f1);
-    float v1 = v0[0];
-    float* v2 = (&c2[0].f0.f1);
-    float v3 = v2[0];
-    float v4 = v1 + v3;
-    return v4;
+    float* v1 = (&someclass[0].f0.f1);
+    float v2 = v1[0];
+    float* v3 = (&c2[0].f0.f1);
+    float v4 = v3[0];
+    float v5 = v2 + v4;
+    return v5;
 }
 
 kernel void _Z10somekernelPf(global float* data) {
-int i_08;
+    int i_08;
     label0:;
     data[0] = 0.0f;
-    global float* v1 = (&data[1]);
-    v1[0] = 0.0f;
-    global float* v3 = (&data[2]);
-    global int* v4 = ((global int*)v3);
-    v4[0] = 1067282596;
-    global float* v6 = (&data[3]);
-    v6[0] = 4.68f;
-    global float* v8 = (&data[4]);
-    v8[0] = 3.45f;
-    global float* v10 = (&data[5]);
-    v10[0] = 347.0f;
-    global float* v12 = (&data[7]);
-    float v13 = v12[0];
-    float v14 = v13 * 345.0f;
-    float v15 = v14 + 2.0f;
-    global float* v16 = (&data[6]);
-    v16[0] = v15;
+    global float* v2 = (&data[1]);
+    v2[0] = 0.0f;
+    global float* v4 = (&data[2]);
+    global int* v5 = ((global int*)v4);
+    v5[0] = 1067282596;
+    global float* v7 = (&data[3]);
+    v7[0] = 4.68f;
+    global float* v9 = (&data[4]);
+    v9[0] = 3.45f;
+    global float* v11 = (&data[5]);
+    v11[0] = 347.0f;
+    global float* v13 = (&data[7]);
+    float v14 = v13[0];
+    float v15 = v14 * 345.0f;
+    float v16 = v15 + 2.0f;
+    global float* v17 = (&data[6]);
+    v17[0] = v16;
         i_08 = 0;
-    goto label2;
-    label1:;
-    global float* v19 = (&data[9]);
-    float v20 = v19[0];
-    float v21 = (&((&myg1))[0].f0.f1)[0];
-    float v22 = v21 * 100.0f;
-    float v23 = v20 * v22;
-    float v24 = v23 + 2.0f;
-    global float* v25 = (&data[8]);
-    v25[0] = v24;
-    global float* v27 = (&data[11]);
-    float v28 = v27[0];
-    float v29 = (&((&myg2))[0].f0.f1)[0];
-    float v30 = v29 * 100.0f;
-    float v31 = v28 * v30;
-    float v32 = v31 + 2.0f;
-    global float* v33 = (&data[10]);
-    v33[0] = v32;
-    label2:;
-    int v36 = i_08 + 10100;
-    long v37 = v36;
-    global float* v38 = (&data[v37]);
-    float v39 = v38[0];
-    float v40 = v39 * 345.0f;
-    float v41 = v40 + 2.0f;
-    int v42 = i_08 + 100;
-    long v43 = v42;
-    global float* v44 = (&data[v43]);
-    v44[0] = v41;
-    int v46 = i_08 + 10101;
-    long v47 = v46;
-    global float* v48 = (&data[v47]);
-    float v49 = v48[0];
-    float v50 = v49 * 345.0f;
-    float v51 = v50 + 2.0f;
-    int v52 = i_08 + 101;
-    long v53 = v52;
-    global float* v54 = (&data[v53]);
-    v54[0] = v51;
-    int v56 = i_08 + 2;
-    bool exitcond_1 = v56 == 10000;
+    goto v20;
+    label21:;
+    global float* v22 = (&data[9]);
+    float v23 = v22[0];
+    float v24 = (&((&myg1))[0].f0.f1)[0];
+    float v25 = v24 * 100.0f;
+    float v26 = v23 * v25;
+    float v27 = v26 + 2.0f;
+    global float* v28 = (&data[8]);
+    v28[0] = v27;
+    global float* v30 = (&data[11]);
+    float v31 = v30[0];
+    float v32 = (&((&myg2))[0].f0.f1)[0];
+    float v33 = v32 * 100.0f;
+    float v34 = v31 * v33;
+    float v35 = v34 + 2.0f;
+    global float* v36 = (&data[10]);
+    v36[0] = v35;
+    v20:;
+    int v39 = i_08 + 10100;
+    long v40 = v39;
+    global float* v41 = (&data[v40]);
+    float v42 = v41[0];
+    float v43 = v42 * 345.0f;
+    float v44 = v43 + 2.0f;
+    int v45 = i_08 + 100;
+    long v46 = v45;
+    global float* v47 = (&data[v46]);
+    v47[0] = v44;
+    int v49 = i_08 + 10101;
+    long v50 = v49;
+    global float* v51 = (&data[v50]);
+    float v52 = v51[0];
+    float v53 = v52 * 345.0f;
+    float v54 = v53 + 2.0f;
+    int v55 = i_08 + 101;
+    long v56 = v55;
+    global float* v57 = (&data[v56]);
+    v57[0] = v54;
+    int v59 = i_08 + 2;
+    bool exitcond_1 = v59 == 10000;
     if(exitcond_1) {
-        goto label1;
+        goto label21;
     } else {
-        i_08 = v56;
-        goto label2;
+        i_08 = v59;
+        goto v20;
     }
 }
 
 kernel void _Z11somekernel2Pf(global float* data) {
     label0:;
-    float v0 = (&((&myg1))[0].f0.f1)[0];
-    float v1 = (&((&myg2))[0].f0.f1)[0];
-    float v2 = v0 + v1;
-    data[0] = v2;
+    float v1 = (&((&myg1))[0].f0.f1)[0];
+    float v2 = (&((&myg2))[0].f0.f1)[0];
+    float v3 = v1 + v2;
+    data[0] = v3;
 }
 
 kernel void _Z11getFooValuePfPi(global float* data, global int* intdata) {
     label0:;
-    int v0 = ((constant int*)(&((&foo))[0].f1))[0];
-    global int* v1 = ((global int*)data);
-    v1[0] = v0;
-    int v3 = (&((&foo))[0].f0)[0];
-    intdata[0] = v3;
+    int v1 = ((constant int*)(&((&foo))[0].f1))[0];
+    global int* v2 = ((global int*)data);
+    v2[0] = v1;
+    int v4 = (&((&foo))[0].f0)[0];
+    intdata[0] = v4;
 }
 
 kernel void _Z11getBarValuePf(global float* data) {
     label0:;
-    int v0 = (((constant int*)(&bar)))[0];
-    global int* v1 = ((global int*)data);
-    v1[0] = v0;
+    int v1 = (((constant int*)(&bar)))[0];
+    global int* v2 = ((global int*)data);
+    v2[0] = v1;
 }
