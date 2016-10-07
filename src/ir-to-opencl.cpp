@@ -84,33 +84,16 @@ void declareGlobal(GlobalValue *global) {
     string gencode = "";
 
     Type *globalType = global->getType();
-    cout << "global ispointer " << isa<PointerType>(globalType) << endl;
-    cout << "global isvector " << isa<VectorType>(globalType) << endl;
     PointerType *ptr = cast<PointerType>(globalType);
     Type *elementType = ptr->getPointerElementType();
     string elementtypestr = dumpType(elementType);
-    cout << "elementtypestr " << elementtypestr << endl;
-    cout << "global->dump()";
-    global->dump();
-    cout << endl;
-    cout << "isa ConstantStruct " << isa<ConstantStruct>(global) << endl;
-    cout << "isa GlobalVariable " << isa<GlobalVariable>(global) << endl;
-
     string name = global->getName();
     gencode += elementtypestr + " " + name;
     if(GlobalVariable *var = dyn_cast<GlobalVariable>(global)) {
-        cout << "its a globalvariable" << endl;
-        cout << "has initializer " << var->hasInitializer() << endl;
         Constant *initializer = var->getInitializer();
-        initializer->dump();
-        cout << endl;
-        cout << "isa ConstStruct " << isa<ConstantStruct>(initializer) << endl;
-
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
             Type *elementType = pointerType->getPointerElementType();
-            cout << "element type " << dumpType(elementType) << endl;
             int addressspace = pointerType->getAddressSpace();
-            cout << "address space " << addressspace << endl;
             if(addressspace == 3) { // shared/local => skip
                 return;
             } else {
@@ -120,19 +103,13 @@ void declareGlobal(GlobalValue *global) {
 
         gencode += " = {";
         if(ConstantStruct *constStruct = dyn_cast<ConstantStruct>(initializer)) {
-            cout << "got a ConstantStruct initializer" << endl;
-            constStruct->dump();
-            cout << endl;
             int i = 0;
             while(Value *aggel = constStruct->getAggregateElement(i)) {
                 if(i == 0) {
                 } else {
                     gencode += ", ";
                 }
-                cout << "aggel:\n";
-                aggel->dump();
                 gencode += dumpOperand(aggel);
-                cout << "aggel type " << dumpType(aggel->getType()) << endl;
                 i++;
             }
             if(i > 0) {
