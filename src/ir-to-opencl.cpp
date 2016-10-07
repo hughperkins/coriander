@@ -248,7 +248,6 @@ string dumpConstant(Constant *constant) {
 
 
 string dumpOperand(Value *value) {
-    // unsigned int valueTy = value->getValueID();
     if(nameByValue.find(value) != nameByValue.end()) {
         return nameByValue[value];
     }
@@ -291,7 +290,6 @@ std::string dumpReturn(ReturnInst *retInst) {
 }
 
 std::string dumpAlloca(Instruction *alloca) {
-    // std::string gencode = "";
     if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
         Type *ptrElementType = allocatypeptr->getPointerElementType();
         std::string typestring = dumpType(ptrElementType);
@@ -353,12 +351,11 @@ void addSharedDeclaration(Value *value) {
     }
     if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
         string name = getName(glob);
-        cout << name << endl;
         string declaration = "";
         Type *type = glob->getType();
-        type->dump();
+        // type->dump();
         if(ArrayType *arraytype = dyn_cast<ArrayType>(type->getPointerElementType())) {
-            arraytype->dump();
+            // arraytype->dump();
             int length = arraytype->getNumElements();
             Type *elementType = arraytype->getElementType();
             string typestr = dumpType(elementType);
@@ -418,7 +415,6 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
             currentType->dump();
             throw runtime_error("type not implemented in gpe");
         }
-        // copyAddressSpace(newType, instr->getOperand(0));
         currentType = newType;
     }
     rhs = "(&" + rhs + ")";
@@ -546,7 +542,6 @@ std::string dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
 std::string dumpBitCastRhs(BitCastInst *instr) {
     string gencode = "";
     string op0str = dumpOperand(instr->getOperand(0));
-    // Value *op0 = instr->getOperand(0);
     if(PointerType *srcType = dyn_cast<PointerType>(instr->getSrcTy())) {
         if(PointerType *destType = dyn_cast<PointerType>(instr->getDestTy())) {
             Type *castType = PointerType::get(destType->getElementType(), srcType->getAddressSpace());
@@ -588,8 +583,6 @@ std::string dumpAddrSpaceCast(AddrSpaceCastInst *instr) {
 
 std::string dumpMemcpyCharCharLong(CallInst *instr) {
     std::string gencode = "";
-        // int intvalue = readInt32Constant(value);
-    // if()
     int totalLength = cast<ConstantInt>(instr->getOperand(2))->getSExtValue();
     cout << "totalLength " << totalLength << endl;
     int align = cast<ConstantInt>(instr->getOperand(3))->getSExtValue();
