@@ -147,6 +147,7 @@ OpenCL/CUDA concepts supported, at least partially:
 - `synchthreads()` / `barrier()`
 - `float4` (beta)
 - `local`/`shared` memory
+- global constants
 
 C++ things:
 - templating working ok (llvm cuda compiler handles this for us :-) )
@@ -169,7 +170,6 @@ On the host-side, there is code to:
 - `llvm.memmove.p0i8.p0i8.i64`
 - `llvm.lifetime`
 - `@llvm.global_ctors`
-- global declarations
 - `_GLOBAL__sub_I_struct_initializer.cu()`
 
 ### Tensorflow
