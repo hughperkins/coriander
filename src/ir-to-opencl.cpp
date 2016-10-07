@@ -67,6 +67,7 @@ std::string dumpOperand(llvm::Value *value);
 string dumpConstant(Constant *constant);
 string dumpGetElementPtr(GetElementPtrInst *instr);
 string dumpGetElementPtrRhs(GetElementPtrInst *instr);
+string dumpChainedInstruction(int level, Instruction * instr);
 std::string dumpBitCastRhs(BitCastInst *instr);
 std::string dumpAddrSpaceCastRhs(AddrSpaceCastInst *instr);
 void updateAddressSpace(Value *value, int newSpace);
@@ -92,15 +93,13 @@ void declareGlobal(GlobalValue *global) {
     if(GlobalVariable *var = dyn_cast<GlobalVariable>(global)) {
         Constant *initializer = var->getInitializer();
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
-            Type *elementType = pointerType->getPointerElementType();
+            // Type *elementType = pointerType->getPointerElementType();
             int addressspace = pointerType->getAddressSpace();
             if(addressspace == 3) { // shared/local => skip
                 return;
             } else {
                 cout << "updating addressspace to 4" << endl;
                 updateAddressSpace(var, 4);
-                cout << "global type now " << dumpType(global->getType()) << endl;
-                // gencode = "constant " + gencode;
             }
         }
         gencode += "constant " + dumpType(global->getType()->getPointerElementType()) + " " + getName(global);
@@ -128,8 +127,6 @@ void declareGlobal(GlobalValue *global) {
 
     globalDeclarations += gencode + "\n";
 }
-
-string dumpChainedInstruction(int level, Instruction * instr);
 
 string dumpChainedNextOp(int level, Value *op0) {
     string op0string = "";
@@ -251,7 +248,7 @@ string dumpConstant(Constant *constant) {
 
 
 string dumpOperand(Value *value) {
-    unsigned int valueTy = value->getValueID();
+    // unsigned int valueTy = value->getValueID();
     if(nameByValue.find(value) != nameByValue.end()) {
         return nameByValue[value];
     }
@@ -549,7 +546,7 @@ std::string dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
 std::string dumpBitCastRhs(BitCastInst *instr) {
     string gencode = "";
     string op0str = dumpOperand(instr->getOperand(0));
-    Value *op0 = instr->getOperand(0);
+    // Value *op0 = instr->getOperand(0);
     if(PointerType *srcType = dyn_cast<PointerType>(instr->getSrcTy())) {
         if(PointerType *destType = dyn_cast<PointerType>(instr->getDestTy())) {
             Type *castType = PointerType::get(destType->getElementType(), srcType->getAddressSpace());
