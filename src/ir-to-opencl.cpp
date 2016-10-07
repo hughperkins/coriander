@@ -342,7 +342,8 @@ std::string dumpReturn(ReturnInst *retInst) {
 
 std::string dumpAlloca(Instruction *alloca) {
     // std::string gencode = "";
-    if(PointerType *ptrElementType = dyn_cast<PointerType>(alloca->getType()->getPointerElementType())) {
+    if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
+        Type *ptrElementType = allocatypeptr->getPointerElementType();
         std::string typestring = dumpType(ptrElementType);
         cout << "alloca typestring " << typestring << endl;
         int count = readInt32Constant(alloca->getOperand(0));
