@@ -6,7 +6,7 @@ import pytest
 
 
 @pytest.mark.parametrize("cl_filepath", [
-    pytest.mark.xfail("test/generated/struct_initializer-device.cl")
+    "test/generated/struct_initializer-device.cl"
 ])
 def test_compile(context, cl_filepath):
     print(subprocess.check_output([

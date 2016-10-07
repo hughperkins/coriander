@@ -216,7 +216,8 @@ string dumpChainedInstruction(int level, Instruction * instr) {
         cout << "numoperands " << bitcast->getNumOperands() << endl;
         // string op0 = dumpOperand(bitcast->getOperand(0));
         // string thisinstrstring = op0;
-        string thisinstrstring = "(" + dumpChainedNextOp(level, bitcast->getOperand(0)) + ")";
+        string lhstype = dumpType(bitcast->getType());
+        string thisinstrstring = "((constant " + lhstype + ")" + dumpChainedNextOp(level, bitcast->getOperand(0)) + ")";
         nameByValue[bitcast] = thisinstrstring;
         return thisinstrstring;
     } else if(AddrSpaceCastInst *addrspacecast = dyn_cast<AddrSpaceCastInst>(instr)) {
