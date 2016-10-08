@@ -123,10 +123,11 @@ $_ZTIN5Eigen16CudaStreamDeviceE = comdat any
 @.str.24 = private unnamed_addr constant [106 x i8] c"cudaMemcpyAsync(out.data(), d_out, out_bytes, cudaMemcpyDeviceToHost, gpu_device.stream()) == cudaSuccess\00", align 1
 @.str.25 = private unnamed_addr constant [42 x i8] c"test/eigen/test_cuda_elementwise_small.cu\00", align 1
 @__PRETTY_FUNCTION__._Z27test_cuda_elementwise_smallv = private unnamed_addr constant [35 x i8] c"void test_cuda_elementwise_small()\00", align 1
-@.str.26 = private unnamed_addr constant [7 x i8] c"d_out \00", align 1
-@.str.27 = private unnamed_addr constant [7 x i8] c"d_in2 \00", align 1
-@.str.28 = private unnamed_addr constant [22 x i8] c"Invalid repeat value \00", align 1
-@.str.29 = private unnamed_addr constant [20 x i8] c"Invalid seed value \00", align 1
+@.str.26 = private unnamed_addr constant [58 x i8] c"cudaStreamSynchronize(gpu_device.stream()) == cudaSuccess\00", align 1
+@.str.27 = private unnamed_addr constant [7 x i8] c"d_out \00", align 1
+@.str.28 = private unnamed_addr constant [7 x i8] c"d_in2 \00", align 1
+@.str.29 = private unnamed_addr constant [22 x i8] c"Invalid repeat value \00", align 1
+@.str.30 = private unnamed_addr constant [20 x i8] c"Invalid seed value \00", align 1
 @_ZTVN5Eigen16CudaStreamDeviceE = linkonce_odr unnamed_addr constant [10 x i8*] [i8* null, i8* bitcast ({ i8*, i8*, i8* }* @_ZTIN5Eigen16CudaStreamDeviceE to i8*), i8* bitcast (void (%"class.Eigen::CudaStreamDevice"*)* @_ZN5Eigen16CudaStreamDeviceD2Ev to i8*), i8* bitcast (void (%"class.Eigen::CudaStreamDevice"*)* @_ZN5Eigen16CudaStreamDeviceD0Ev to i8*), i8* bitcast (%struct.CUstream_st** (%"class.Eigen::CudaStreamDevice"*)* @_ZNK5Eigen16CudaStreamDevice6streamEv to i8*), i8* bitcast (%struct.cudaDeviceProp* (%"class.Eigen::CudaStreamDevice"*)* @_ZNK5Eigen16CudaStreamDevice16devicePropertiesEv to i8*), i8* bitcast (i8* (%"class.Eigen::CudaStreamDevice"*, i64)* @_ZNK5Eigen16CudaStreamDevice8allocateEm to i8*), i8* bitcast (void (%"class.Eigen::CudaStreamDevice"*, i8*)* @_ZNK5Eigen16CudaStreamDevice10deallocateEPv to i8*), i8* bitcast (i8* (%"class.Eigen::CudaStreamDevice"*)* @_ZNK5Eigen16CudaStreamDevice10scratchpadEv to i8*), i8* bitcast (i32* (%"class.Eigen::CudaStreamDevice"*)* @_ZNK5Eigen16CudaStreamDevice9semaphoreEv to i8*)], comdat, align 8
 @_ZN5EigenL14default_streamE = internal constant %struct.CUstream_st* null, align 8
 @_ZTVN10__cxxabiv120__si_class_type_infoE = external global i8*
@@ -138,18 +139,18 @@ $_ZTIN5Eigen16CudaStreamDeviceE = comdat any
 @_ZN5EigenL23m_devicePropInitializedE = internal unnamed_addr global i1 false
 @_ZZN5EigenL20initializeDevicePropEvE5first = internal global %"struct.std::atomic" { %"struct.std::__atomic_base" { i8 1 } }, align 1
 @_ZSt4cerr = external global %"class.std::basic_ostream", align 8
-@.str.30 = private unnamed_addr constant [43 x i8] c"Failed to get the number of CUDA devices: \00", align 1
-@.str.31 = private unnamed_addr constant [22 x i8] c"status == cudaSuccess\00", align 1
-@.str.32 = private unnamed_addr constant [71 x i8] c"/usr/local/eigen/unsupported/Eigen/CXX11/src/Tensor/TensorDeviceCuda.h\00", align 1
+@.str.31 = private unnamed_addr constant [43 x i8] c"Failed to get the number of CUDA devices: \00", align 1
+@.str.32 = private unnamed_addr constant [22 x i8] c"status == cudaSuccess\00", align 1
+@.str.33 = private unnamed_addr constant [71 x i8] c"/usr/local/eigen/unsupported/Eigen/CXX11/src/Tensor/TensorDeviceCuda.h\00", align 1
 @__PRETTY_FUNCTION__._ZN5EigenL20initializeDevicePropEv = private unnamed_addr constant [35 x i8] c"void Eigen::initializeDeviceProp()\00", align 1
 @_ZN5EigenL18m_devicePropertiesE = internal unnamed_addr global %struct.cudaDeviceProp* null, align 8
-@.str.33 = private unnamed_addr constant [35 x i8] c"Failed to initialize CUDA device #\00", align 1
-@.str.34 = private unnamed_addr constant [3 x i8] c": \00", align 1
-@.str.35 = private unnamed_addr constant [19 x i8] c"err == cudaSuccess\00", align 1
+@.str.34 = private unnamed_addr constant [35 x i8] c"Failed to initialize CUDA device #\00", align 1
+@.str.35 = private unnamed_addr constant [3 x i8] c": \00", align 1
+@.str.36 = private unnamed_addr constant [19 x i8] c"err == cudaSuccess\00", align 1
 @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice8allocateEm = private unnamed_addr constant [62 x i8] c"virtual void *Eigen::CudaStreamDevice::allocate(size_t) const\00", align 1
-@.str.36 = private unnamed_addr constant [15 x i8] c"result != NULL\00", align 1
+@.str.37 = private unnamed_addr constant [15 x i8] c"result != NULL\00", align 1
 @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv = private unnamed_addr constant [63 x i8] c"virtual void Eigen::CudaStreamDevice::deallocate(void *) const\00", align 1
-@.str.37 = private unnamed_addr constant [15 x i8] c"buffer != NULL\00", align 1
+@.str.38 = private unnamed_addr constant [15 x i8] c"buffer != NULL\00", align 1
 @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice9semaphoreEv = private unnamed_addr constant [65 x i8] c"virtual unsigned int *Eigen::CudaStreamDevice::semaphore() const\00", align 1
 @_ZTTNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE = external unnamed_addr constant [10 x i8*]
 @_ZTVNSt7__cxx1115basic_stringbufIcSt11char_traitsIcESaIcEEE = external unnamed_addr constant [16 x i8*]
@@ -1271,7 +1272,7 @@ define linkonce_odr void @_Z22set_repeat_from_stringPKc(i8* %str) #7 comdat {
   br i1 %or.cond, label %7, label %48
 
 ; <label>:7                                       ; preds = %0
-  %8 = tail call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([22 x i8], [22 x i8]* @.str.28, i64 0, i64 0), i64 21)
+  %8 = tail call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([22 x i8], [22 x i8]* @.str.29, i64 0, i64 0), i64 21)
   %9 = icmp eq i8* %str, null
   br i1 %9, label %10, label %21
 
@@ -1356,7 +1357,7 @@ define linkonce_odr void @_Z20set_seed_from_stringPKc(i8* %str) #7 comdat {
   br i1 %or.cond, label %7, label %48
 
 ; <label>:7                                       ; preds = %0
-  %8 = tail call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([20 x i8], [20 x i8]* @.str.29, i64 0, i64 0), i64 19)
+  %8 = tail call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([20 x i8], [20 x i8]* @.str.30, i64 0, i64 0), i64 19)
   %9 = icmp eq i8* %str, null
   br i1 %9, label %10, label %21
 
@@ -1666,14 +1667,14 @@ _ZNK5Eigen9GpuDevice6streamEv.exit:               ; preds = %89
           cleanup
   %104 = extractvalue { i8*, i32 } %103, 0
   %105 = extractvalue { i8*, i32 } %103, 1
-  br label %224
+  br label %234
 
 ; <label>:106                                     ; preds = %18
   %107 = landingpad { i8*, i32 }
           cleanup
   %108 = extractvalue { i8*, i32 } %107, 0
   %109 = extractvalue { i8*, i32 } %107, 1
-  br label %222
+  br label %232
 
 ; <label>:110                                     ; preds = %62, %40, %87, %83, %79, %76, %73, %63
   %111 = landingpad { i8*, i32 }
@@ -1682,7 +1683,7 @@ _ZNK5Eigen9GpuDevice6streamEv.exit:               ; preds = %89
   %113 = extractvalue { i8*, i32 } %111, 1
   br label %_ZN5Eigen16CudaStreamDeviceD2Ev.exit
 
-; <label>:114                                     ; preds = %179, %150, %.noexc53, %186, %.noexc47, %157, %.noexc37, %.noexc36, %_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc.exit31, %_ZNSolsEPFRSoS_E.exit, %.noexc27, %.noexc26, %_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc.exit, %135, %89, %199, %196, %_ZNSolsEPFRSoS_E.exit35, %_ZNK5Eigen9GpuDevice6streamEv.exit
+; <label>:114                                     ; preds = %189, %160, %.noexc55, %196, %.noexc49, %167, %.noexc39, %.noexc38, %_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc.exit33, %_ZNSolsEPFRSoS_E.exit, %.noexc29, %.noexc28, %_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc.exit, %145, %135, %89, %209, %206, %_ZNSolsEPFRSoS_E.exit37, %_ZNK5Eigen9GpuDevice6streamEv.exit24, %_ZNK5Eigen9GpuDevice6streamEv.exit
   %115 = landingpad { i8*, i32 }
           cleanup
   %116 = extractvalue { i8*, i32 } %115, 0
@@ -1705,7 +1706,7 @@ _ZNK5Eigen9GpuDevice6streamEv.exit:               ; preds = %89
   br i1 %126, label %128, label %127
 
 ; <label>:127                                     ; preds = %.noexc.i
-  call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.35, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 152, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
+  call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.36, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 152, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:128                                     ; preds = %.noexc.i
@@ -1717,7 +1718,7 @@ _ZNK5Eigen9GpuDevice6streamEv.exit:               ; preds = %89
   br i1 %130, label %_ZN5Eigen16CudaStreamDeviceD2Ev.exit, label %131
 
 ; <label>:131                                     ; preds = %.noexc1.i
-  call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.35, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 155, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
+  call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.36, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 155, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:132                                     ; preds = %128, %122
@@ -1728,196 +1729,216 @@ _ZNK5Eigen9GpuDevice6streamEv.exit:               ; preds = %89
   unreachable
 
 ; <label>:135                                     ; preds = %99
-  %136 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([7 x i8], [7 x i8]* @.str.26, i64 0, i64 0), i64 6)
+  %136 = load %struct.CUstream_st** (%"class.Eigen::StreamInterface"*)**, %struct.CUstream_st** (%"class.Eigen::StreamInterface"*)*** %92, align 8, !tbaa !17
+  %137 = getelementptr inbounds %struct.CUstream_st** (%"class.Eigen::StreamInterface"*)*, %struct.CUstream_st** (%"class.Eigen::StreamInterface"*)** %136, i64 2
+  %138 = load %struct.CUstream_st** (%"class.Eigen::StreamInterface"*)*, %struct.CUstream_st** (%"class.Eigen::StreamInterface"*)** %137, align 8
+  %139 = invoke dereferenceable(8) %struct.CUstream_st** %138(%"class.Eigen::StreamInterface"* %90)
+          to label %_ZNK5Eigen9GpuDevice6streamEv.exit24 unwind label %114
+
+_ZNK5Eigen9GpuDevice6streamEv.exit24:             ; preds = %135
+  %140 = load %struct.CUstream_st*, %struct.CUstream_st** %139, align 8, !tbaa !16
+  %141 = invoke i32 @cudaStreamSynchronize(%struct.CUstream_st* %140)
+          to label %142 unwind label %114
+
+; <label>:142                                     ; preds = %_ZNK5Eigen9GpuDevice6streamEv.exit24
+  %143 = icmp eq i32 %141, 0
+  br i1 %143, label %145, label %144
+
+; <label>:144                                     ; preds = %142
+  call void @__assert_fail(i8* nonnull getelementptr inbounds ([58 x i8], [58 x i8]* @.str.26, i64 0, i64 0), i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.25, i64 0, i64 0), i32 55, i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @__PRETTY_FUNCTION__._Z27test_cuda_elementwise_smallv, i64 0, i64 0)) #21
+  unreachable
+
+; <label>:145                                     ; preds = %142
+  %146 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([7 x i8], [7 x i8]* @.str.27, i64 0, i64 0), i64 6)
           to label %_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc.exit unwind label %114
 
-_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc.exit: ; preds = %135
-  %137 = load i8*, i8** %77, align 8, !tbaa !16
-  %138 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo9_M_insertIPKvEERSoT_(%"class.std::basic_ostream"* nonnull @_ZSt4cout, i8* %137)
+_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc.exit: ; preds = %145
+  %147 = load i8*, i8** %77, align 8, !tbaa !16
+  %148 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo9_M_insertIPKvEERSoT_(%"class.std::basic_ostream"* nonnull @_ZSt4cout, i8* %147)
           to label %_ZNSolsEPKv.exit unwind label %114
 
 _ZNSolsEPKv.exit:                                 ; preds = %_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc.exit
-  %139 = bitcast %"class.std::basic_ostream"* %138 to i8**
-  %140 = load i8*, i8** %139, align 8, !tbaa !17
-  %141 = getelementptr i8, i8* %140, i64 -24
-  %142 = bitcast i8* %141 to i64*
-  %143 = load i64, i64* %142, align 8
-  %144 = bitcast %"class.std::basic_ostream"* %138 to i8*
-  %145 = getelementptr inbounds i8, i8* %144, i64 %143
-  %146 = getelementptr inbounds i8, i8* %145, i64 240
-  %147 = bitcast i8* %146 to %"class.std::ctype"**
-  %148 = load %"class.std::ctype"*, %"class.std::ctype"** %147, align 8, !tbaa !26
-  %149 = icmp eq %"class.std::ctype"* %148, null
-  br i1 %149, label %150, label %.noexc45
+  %149 = bitcast %"class.std::basic_ostream"* %148 to i8**
+  %150 = load i8*, i8** %149, align 8, !tbaa !17
+  %151 = getelementptr i8, i8* %150, i64 -24
+  %152 = bitcast i8* %151 to i64*
+  %153 = load i64, i64* %152, align 8
+  %154 = bitcast %"class.std::basic_ostream"* %148 to i8*
+  %155 = getelementptr inbounds i8, i8* %154, i64 %153
+  %156 = getelementptr inbounds i8, i8* %155, i64 240
+  %157 = bitcast i8* %156 to %"class.std::ctype"**
+  %158 = load %"class.std::ctype"*, %"class.std::ctype"** %157, align 8, !tbaa !26
+  %159 = icmp eq %"class.std::ctype"* %158, null
+  br i1 %159, label %160, label %.noexc47
 
-; <label>:150                                     ; preds = %_ZNSolsEPKv.exit
+; <label>:160                                     ; preds = %_ZNSolsEPKv.exit
   invoke void @_ZSt16__throw_bad_castv() #20
-          to label %.noexc56 unwind label %114
+          to label %.noexc58 unwind label %114
 
-.noexc56:                                         ; preds = %150
+.noexc58:                                         ; preds = %160
   unreachable
 
-.noexc45:                                         ; preds = %_ZNSolsEPKv.exit
-  %151 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %148, i64 0, i32 8
-  %152 = load i8, i8* %151, align 8, !tbaa !29
-  %153 = icmp eq i8 %152, 0
-  br i1 %153, label %157, label %154
+.noexc47:                                         ; preds = %_ZNSolsEPKv.exit
+  %161 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %158, i64 0, i32 8
+  %162 = load i8, i8* %161, align 8, !tbaa !29
+  %163 = icmp eq i8 %162, 0
+  br i1 %163, label %167, label %164
 
-; <label>:154                                     ; preds = %.noexc45
-  %155 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %148, i64 0, i32 9, i64 10
-  %156 = load i8, i8* %155, align 1, !tbaa !14
-  br label %.noexc26
+; <label>:164                                     ; preds = %.noexc47
+  %165 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %158, i64 0, i32 9, i64 10
+  %166 = load i8, i8* %165, align 1, !tbaa !14
+  br label %.noexc28
 
-; <label>:157                                     ; preds = %.noexc45
-  invoke void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %148)
-          to label %.noexc47 unwind label %114
+; <label>:167                                     ; preds = %.noexc47
+  invoke void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %158)
+          to label %.noexc49 unwind label %114
 
-.noexc47:                                         ; preds = %157
-  %158 = bitcast %"class.std::ctype"* %148 to i8 (%"class.std::ctype"*, i8)***
-  %159 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %158, align 8, !tbaa !17
-  %160 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %159, i64 6
-  %161 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %160, align 8
-  %162 = invoke signext i8 %161(%"class.std::ctype"* nonnull %148, i8 signext 10)
-          to label %.noexc26 unwind label %114
+.noexc49:                                         ; preds = %167
+  %168 = bitcast %"class.std::ctype"* %158 to i8 (%"class.std::ctype"*, i8)***
+  %169 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %168, align 8, !tbaa !17
+  %170 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %169, i64 6
+  %171 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %170, align 8
+  %172 = invoke signext i8 %171(%"class.std::ctype"* nonnull %158, i8 signext 10)
+          to label %.noexc28 unwind label %114
 
-.noexc26:                                         ; preds = %.noexc47, %154
-  %.0.i = phi i8 [ %156, %154 ], [ %162, %.noexc47 ]
-  %163 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull %138, i8 signext %.0.i)
-          to label %.noexc27 unwind label %114
+.noexc28:                                         ; preds = %.noexc49, %164
+  %.0.i = phi i8 [ %166, %164 ], [ %172, %.noexc49 ]
+  %173 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull %148, i8 signext %.0.i)
+          to label %.noexc29 unwind label %114
 
-.noexc27:                                         ; preds = %.noexc26
-  %164 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %163)
+.noexc29:                                         ; preds = %.noexc28
+  %174 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %173)
           to label %_ZNSolsEPFRSoS_E.exit unwind label %114
 
-_ZNSolsEPFRSoS_E.exit:                            ; preds = %.noexc27
-  %165 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([7 x i8], [7 x i8]* @.str.27, i64 0, i64 0), i64 6)
-          to label %_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc.exit31 unwind label %114
+_ZNSolsEPFRSoS_E.exit:                            ; preds = %.noexc29
+  %175 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([7 x i8], [7 x i8]* @.str.28, i64 0, i64 0), i64 6)
+          to label %_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc.exit33 unwind label %114
 
-_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc.exit31: ; preds = %_ZNSolsEPFRSoS_E.exit
-  %166 = load i8*, i8** %74, align 8, !tbaa !16
-  %167 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo9_M_insertIPKvEERSoT_(%"class.std::basic_ostream"* nonnull @_ZSt4cout, i8* %166)
-          to label %_ZNSolsEPKv.exit33 unwind label %114
+_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc.exit33: ; preds = %_ZNSolsEPFRSoS_E.exit
+  %176 = load i8*, i8** %74, align 8, !tbaa !16
+  %177 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo9_M_insertIPKvEERSoT_(%"class.std::basic_ostream"* nonnull @_ZSt4cout, i8* %176)
+          to label %_ZNSolsEPKv.exit35 unwind label %114
 
-_ZNSolsEPKv.exit33:                               ; preds = %_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc.exit31
-  %168 = bitcast %"class.std::basic_ostream"* %167 to i8**
-  %169 = load i8*, i8** %168, align 8, !tbaa !17
-  %170 = getelementptr i8, i8* %169, i64 -24
-  %171 = bitcast i8* %170 to i64*
-  %172 = load i64, i64* %171, align 8
-  %173 = bitcast %"class.std::basic_ostream"* %167 to i8*
-  %174 = getelementptr inbounds i8, i8* %173, i64 %172
-  %175 = getelementptr inbounds i8, i8* %174, i64 240
-  %176 = bitcast i8* %175 to %"class.std::ctype"**
-  %177 = load %"class.std::ctype"*, %"class.std::ctype"** %176, align 8, !tbaa !26
-  %178 = icmp eq %"class.std::ctype"* %177, null
-  br i1 %178, label %179, label %.noexc49
+_ZNSolsEPKv.exit35:                               ; preds = %_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc.exit33
+  %178 = bitcast %"class.std::basic_ostream"* %177 to i8**
+  %179 = load i8*, i8** %178, align 8, !tbaa !17
+  %180 = getelementptr i8, i8* %179, i64 -24
+  %181 = bitcast i8* %180 to i64*
+  %182 = load i64, i64* %181, align 8
+  %183 = bitcast %"class.std::basic_ostream"* %177 to i8*
+  %184 = getelementptr inbounds i8, i8* %183, i64 %182
+  %185 = getelementptr inbounds i8, i8* %184, i64 240
+  %186 = bitcast i8* %185 to %"class.std::ctype"**
+  %187 = load %"class.std::ctype"*, %"class.std::ctype"** %186, align 8, !tbaa !26
+  %188 = icmp eq %"class.std::ctype"* %187, null
+  br i1 %188, label %189, label %.noexc51
 
-; <label>:179                                     ; preds = %_ZNSolsEPKv.exit33
+; <label>:189                                     ; preds = %_ZNSolsEPKv.exit35
   invoke void @_ZSt16__throw_bad_castv() #20
-          to label %.noexc57 unwind label %114
+          to label %.noexc59 unwind label %114
 
-.noexc57:                                         ; preds = %179
+.noexc59:                                         ; preds = %189
   unreachable
 
-.noexc49:                                         ; preds = %_ZNSolsEPKv.exit33
-  %180 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %177, i64 0, i32 8
-  %181 = load i8, i8* %180, align 8, !tbaa !29
-  %182 = icmp eq i8 %181, 0
-  br i1 %182, label %186, label %183
+.noexc51:                                         ; preds = %_ZNSolsEPKv.exit35
+  %190 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %187, i64 0, i32 8
+  %191 = load i8, i8* %190, align 8, !tbaa !29
+  %192 = icmp eq i8 %191, 0
+  br i1 %192, label %196, label %193
 
-; <label>:183                                     ; preds = %.noexc49
-  %184 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %177, i64 0, i32 9, i64 10
-  %185 = load i8, i8* %184, align 1, !tbaa !14
-  br label %.noexc36
+; <label>:193                                     ; preds = %.noexc51
+  %194 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %187, i64 0, i32 9, i64 10
+  %195 = load i8, i8* %194, align 1, !tbaa !14
+  br label %.noexc38
 
-; <label>:186                                     ; preds = %.noexc49
-  invoke void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %177)
-          to label %.noexc53 unwind label %114
+; <label>:196                                     ; preds = %.noexc51
+  invoke void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %187)
+          to label %.noexc55 unwind label %114
 
-.noexc53:                                         ; preds = %186
-  %187 = bitcast %"class.std::ctype"* %177 to i8 (%"class.std::ctype"*, i8)***
-  %188 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %187, align 8, !tbaa !17
-  %189 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %188, i64 6
-  %190 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %189, align 8
-  %191 = invoke signext i8 %190(%"class.std::ctype"* nonnull %177, i8 signext 10)
-          to label %.noexc36 unwind label %114
+.noexc55:                                         ; preds = %196
+  %197 = bitcast %"class.std::ctype"* %187 to i8 (%"class.std::ctype"*, i8)***
+  %198 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %197, align 8, !tbaa !17
+  %199 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %198, i64 6
+  %200 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %199, align 8
+  %201 = invoke signext i8 %200(%"class.std::ctype"* nonnull %187, i8 signext 10)
+          to label %.noexc38 unwind label %114
 
-.noexc36:                                         ; preds = %.noexc53, %183
-  %.0.i52 = phi i8 [ %185, %183 ], [ %191, %.noexc53 ]
-  %192 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull %167, i8 signext %.0.i52)
-          to label %.noexc37 unwind label %114
+.noexc38:                                         ; preds = %.noexc55, %193
+  %.0.i54 = phi i8 [ %195, %193 ], [ %201, %.noexc55 ]
+  %202 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull %177, i8 signext %.0.i54)
+          to label %.noexc39 unwind label %114
 
-.noexc37:                                         ; preds = %.noexc36
-  %193 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %192)
-          to label %_ZNSolsEPFRSoS_E.exit35 unwind label %114
+.noexc39:                                         ; preds = %.noexc38
+  %203 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %202)
+          to label %_ZNSolsEPFRSoS_E.exit37 unwind label %114
 
-_ZNSolsEPFRSoS_E.exit35:                          ; preds = %.noexc37
-  %194 = load i8*, i8** %71, align 8, !tbaa !16
-  %195 = invoke i32 @cudaFree(i8* %194)
-          to label %196 unwind label %114
+_ZNSolsEPFRSoS_E.exit37:                          ; preds = %.noexc39
+  %204 = load i8*, i8** %71, align 8, !tbaa !16
+  %205 = invoke i32 @cudaFree(i8* %204)
+          to label %206 unwind label %114
 
-; <label>:196                                     ; preds = %_ZNSolsEPFRSoS_E.exit35
-  %197 = load i8*, i8** %74, align 8, !tbaa !16
-  %198 = invoke i32 @cudaFree(i8* %197)
-          to label %199 unwind label %114
+; <label>:206                                     ; preds = %_ZNSolsEPFRSoS_E.exit37
+  %207 = load i8*, i8** %74, align 8, !tbaa !16
+  %208 = invoke i32 @cudaFree(i8* %207)
+          to label %209 unwind label %114
 
-; <label>:199                                     ; preds = %196
-  %200 = load i8*, i8** %77, align 8, !tbaa !16
-  %201 = invoke i32 @cudaFree(i8* %200)
-          to label %202 unwind label %114
+; <label>:209                                     ; preds = %206
+  %210 = load i8*, i8** %77, align 8, !tbaa !16
+  %211 = invoke i32 @cudaFree(i8* %210)
+          to label %212 unwind label %114
 
-; <label>:202                                     ; preds = %199
-  %203 = getelementptr inbounds %"class.Eigen::CudaStreamDevice", %"class.Eigen::CudaStreamDevice"* %stream, i64 0, i32 0, i32 0
-  store i32 (...)** bitcast (i8** getelementptr inbounds ([10 x i8*], [10 x i8*]* @_ZTVN5Eigen16CudaStreamDeviceE, i64 0, i64 2) to i32 (...)**), i32 (...)*** %203, align 8, !tbaa !17
-  %204 = getelementptr inbounds %"class.Eigen::CudaStreamDevice", %"class.Eigen::CudaStreamDevice"* %stream, i64 0, i32 3
-  %205 = load i8*, i8** %204, align 8, !tbaa !54
-  %206 = icmp eq i8* %205, null
-  br i1 %206, label %_ZN5Eigen16CudaStreamDeviceD2Ev.exit44, label %207
+; <label>:212                                     ; preds = %209
+  %213 = getelementptr inbounds %"class.Eigen::CudaStreamDevice", %"class.Eigen::CudaStreamDevice"* %stream, i64 0, i32 0, i32 0
+  store i32 (...)** bitcast (i8** getelementptr inbounds ([10 x i8*], [10 x i8*]* @_ZTVN5Eigen16CudaStreamDeviceE, i64 0, i64 2) to i32 (...)**), i32 (...)*** %213, align 8, !tbaa !17
+  %214 = getelementptr inbounds %"class.Eigen::CudaStreamDevice", %"class.Eigen::CudaStreamDevice"* %stream, i64 0, i32 3
+  %215 = load i8*, i8** %214, align 8, !tbaa !54
+  %216 = icmp eq i8* %215, null
+  br i1 %216, label %_ZN5Eigen16CudaStreamDeviceD2Ev.exit46, label %217
 
-; <label>:207                                     ; preds = %202
-  %208 = getelementptr inbounds %"class.Eigen::CudaStreamDevice", %"class.Eigen::CudaStreamDevice"* %stream, i64 0, i32 2
-  %209 = load i32, i32* %208, align 8, !tbaa !56
-  %210 = invoke i32 @cudaSetDevice(i32 %209)
-          to label %.noexc.i42 unwind label %217
+; <label>:217                                     ; preds = %212
+  %218 = getelementptr inbounds %"class.Eigen::CudaStreamDevice", %"class.Eigen::CudaStreamDevice"* %stream, i64 0, i32 2
+  %219 = load i32, i32* %218, align 8, !tbaa !56
+  %220 = invoke i32 @cudaSetDevice(i32 %219)
+          to label %.noexc.i44 unwind label %227
 
-.noexc.i42:                                       ; preds = %207
-  %211 = icmp eq i32 %210, 0
-  br i1 %211, label %213, label %212
+.noexc.i44:                                       ; preds = %217
+  %221 = icmp eq i32 %220, 0
+  br i1 %221, label %223, label %222
 
-; <label>:212                                     ; preds = %.noexc.i42
-  call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.35, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 152, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
+; <label>:222                                     ; preds = %.noexc.i44
+  call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.36, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 152, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
   unreachable
 
-; <label>:213                                     ; preds = %.noexc.i42
-  %214 = invoke i32 @cudaFree(i8* nonnull %205)
-          to label %.noexc1.i43 unwind label %217
+; <label>:223                                     ; preds = %.noexc.i44
+  %224 = invoke i32 @cudaFree(i8* nonnull %215)
+          to label %.noexc1.i45 unwind label %227
 
-.noexc1.i43:                                      ; preds = %213
-  %215 = icmp eq i32 %214, 0
-  br i1 %215, label %_ZN5Eigen16CudaStreamDeviceD2Ev.exit44, label %216
+.noexc1.i45:                                      ; preds = %223
+  %225 = icmp eq i32 %224, 0
+  br i1 %225, label %_ZN5Eigen16CudaStreamDeviceD2Ev.exit46, label %226
 
-; <label>:216                                     ; preds = %.noexc1.i43
-  call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.35, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 155, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
+; <label>:226                                     ; preds = %.noexc1.i45
+  call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.36, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 155, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
   unreachable
 
-; <label>:217                                     ; preds = %213, %207
-  %218 = landingpad { i8*, i32 }
+; <label>:227                                     ; preds = %223, %217
+  %228 = landingpad { i8*, i32 }
           catch i8* null
-  %219 = extractvalue { i8*, i32 } %218, 0
-  call void @__clang_call_terminate(i8* %219) #21
+  %229 = extractvalue { i8*, i32 } %228, 0
+  call void @__clang_call_terminate(i8* %229) #21
   unreachable
 
-_ZN5Eigen16CudaStreamDeviceD2Ev.exit44:           ; preds = %202, %.noexc1.i43
+_ZN5Eigen16CudaStreamDeviceD2Ev.exit46:           ; preds = %212, %.noexc1.i45
   call void @llvm.lifetime.end(i64 40, i8* nonnull %88) #2
   call void @llvm.lifetime.end(i64 8, i8* nonnull %70) #2
   call void @llvm.lifetime.end(i64 8, i8* nonnull %69) #2
   call void @llvm.lifetime.end(i64 8, i8* nonnull %68) #2
   call void @free(i8* %16) #2
-  %220 = load i8*, i8** %14, align 8, !tbaa !35
-  call void @free(i8* %220) #2
+  %230 = load i8*, i8** %14, align 8, !tbaa !35
+  call void @free(i8* %230) #2
   call void @llvm.lifetime.end(i64 16, i8* nonnull %10) #2
-  %221 = load i8*, i8** %8, align 8, !tbaa !35
-  call void @free(i8* %221) #2
+  %231 = load i8*, i8** %8, align 8, !tbaa !35
+  call void @free(i8* %231) #2
   call void @llvm.lifetime.end(i64 16, i8* nonnull %4) #2
   ret void
 
@@ -1925,23 +1946,23 @@ _ZN5Eigen16CudaStreamDeviceD2Ev.exit:             ; preds = %.noexc1.i, %114, %1
   %.01 = phi i32 [ %113, %110 ], [ %117, %114 ], [ %117, %.noexc1.i ]
   %.0 = phi i8* [ %112, %110 ], [ %116, %114 ], [ %116, %.noexc1.i ]
   call void @free(i8* %16) #2
-  br label %222
+  br label %232
 
-; <label>:222                                     ; preds = %_ZN5Eigen16CudaStreamDeviceD2Ev.exit, %106
+; <label>:232                                     ; preds = %_ZN5Eigen16CudaStreamDeviceD2Ev.exit, %106
   %.12 = phi i32 [ %.01, %_ZN5Eigen16CudaStreamDeviceD2Ev.exit ], [ %109, %106 ]
   %.1 = phi i8* [ %.0, %_ZN5Eigen16CudaStreamDeviceD2Ev.exit ], [ %108, %106 ]
-  %223 = load i8*, i8** %14, align 8, !tbaa !35
-  call void @free(i8* %223) #2
-  br label %224
+  %233 = load i8*, i8** %14, align 8, !tbaa !35
+  call void @free(i8* %233) #2
+  br label %234
 
-; <label>:224                                     ; preds = %222, %102
-  %.23 = phi i32 [ %.12, %222 ], [ %105, %102 ]
-  %.2 = phi i8* [ %.1, %222 ], [ %104, %102 ]
-  %225 = load i8*, i8** %8, align 8, !tbaa !35
-  call void @free(i8* %225) #2
-  %226 = insertvalue { i8*, i32 } undef, i8* %.2, 0
-  %227 = insertvalue { i8*, i32 } %226, i32 %.23, 1
-  resume { i8*, i32 } %227
+; <label>:234                                     ; preds = %232, %102
+  %.23 = phi i32 [ %.12, %232 ], [ %105, %102 ]
+  %.2 = phi i8* [ %.1, %232 ], [ %104, %102 ]
+  %235 = load i8*, i8** %8, align 8, !tbaa !35
+  call void @free(i8* %235) #2
+  %236 = insertvalue { i8*, i32 } undef, i8* %.2, 0
+  %237 = insertvalue { i8*, i32 } %236, i32 %.23, 1
+  resume { i8*, i32 } %237
 }
 
 declare i32 @cudaMalloc(i8**, i64) #0
@@ -1984,7 +2005,7 @@ define linkonce_odr void @_ZN5Eigen16CudaStreamDeviceC2Ev(%"class.Eigen::CudaStr
   br i1 %13, label %.noexc10, label %.noexc1
 
 .noexc1:                                          ; preds = %.noexc
-  %14 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cerr, i8* nonnull getelementptr inbounds ([43 x i8], [43 x i8]* @.str.30, i64 0, i64 0), i64 42)
+  %14 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cerr, i8* nonnull getelementptr inbounds ([43 x i8], [43 x i8]* @.str.31, i64 0, i64 0), i64 42)
   %15 = call i8* @cudaGetErrorString(i32 %12)
   %16 = icmp eq i8* %15, null
   br i1 %16, label %17, label %28
@@ -2048,7 +2069,7 @@ _ZNKSt5ctypeIcE5widenEc.exit6.i:                  ; preds = %.noexc6, %43
   %.0.i5.i = phi i8 [ %45, %43 ], [ %50, %.noexc6 ]
   %51 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull @_ZSt4cerr, i8 signext %.0.i5.i)
   %52 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %51)
-  call void @__assert_fail(i8* nonnull getelementptr inbounds ([22 x i8], [22 x i8]* @.str.31, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 66, i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @__PRETTY_FUNCTION__._ZN5EigenL20initializeDevicePropEv, i64 0, i64 0)) #21
+  call void @__assert_fail(i8* nonnull getelementptr inbounds ([22 x i8], [22 x i8]* @.str.32, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 66, i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @__PRETTY_FUNCTION__._ZN5EigenL20initializeDevicePropEv, i64 0, i64 0)) #21
   unreachable
 
 .noexc10:                                         ; preds = %.noexc
@@ -2089,9 +2110,9 @@ _ZNKSt5ctypeIcE5widenEc.exit6.i:                  ; preds = %.noexc6, %43
 .noexc12:                                         ; preds = %.noexc12.loopexit, %.lr.ph11.preheader.i
   %.lcssa25 = phi i32 [ %62, %.lr.ph11.preheader.i ], [ %.lcssa38, %.noexc12.loopexit ]
   %.lcssa = phi i32 [ 0, %.lr.ph11.preheader.i ], [ %.lcssa37, %.noexc12.loopexit ]
-  %64 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cerr, i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @.str.33, i64 0, i64 0), i64 34)
+  %64 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cerr, i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @.str.34, i64 0, i64 0), i64 34)
   %65 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSolsEi(%"class.std::basic_ostream"* nonnull @_ZSt4cerr, i32 %.lcssa)
-  %66 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) %65, i8* nonnull getelementptr inbounds ([3 x i8], [3 x i8]* @.str.34, i64 0, i64 0), i64 2)
+  %66 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) %65, i8* nonnull getelementptr inbounds ([3 x i8], [3 x i8]* @.str.35, i64 0, i64 0), i64 2)
   %67 = call i8* @cudaGetErrorString(i32 %.lcssa25)
   %68 = icmp eq i8* %67, null
   br i1 %68, label %69, label %.noexc17
@@ -2161,7 +2182,7 @@ _ZNKSt5ctypeIcE5widenEc.exit.i:                   ; preds = %.noexc19, %96
   %.0.i.i = phi i8 [ %98, %96 ], [ %103, %.noexc19 ]
   %104 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull %65, i8 signext %.0.i.i)
   %105 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %104)
-  call void @__assert_fail(i8* nonnull getelementptr inbounds ([22 x i8], [22 x i8]* @.str.31, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 77, i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @__PRETTY_FUNCTION__._ZN5EigenL20initializeDevicePropEv, i64 0, i64 0)) #21
+  call void @__assert_fail(i8* nonnull getelementptr inbounds ([22 x i8], [22 x i8]* @.str.32, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 77, i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @__PRETTY_FUNCTION__._ZN5EigenL20initializeDevicePropEv, i64 0, i64 0)) #21
   unreachable
 
 .lr.ph:                                           ; preds = %.lr.ph.preheader, %..lr.ph11_crit_edge.i
@@ -2198,6 +2219,8 @@ declare i32 @cudaMemcpyAsync(i8*, i8*, i64, i32, %struct.CUstream_st*) #0
 ; Function Attrs: noreturn nounwind
 declare void @__assert_fail(i8*, i8*, i32, i8*) #9
 
+declare i32 @cudaStreamSynchronize(%struct.CUstream_st*) #0
+
 declare i32 @cudaFree(i8*) #0
 
 ; Function Attrs: nounwind uwtable
@@ -2220,7 +2243,7 @@ define linkonce_odr void @_ZN5Eigen16CudaStreamDeviceD2Ev(%"class.Eigen::CudaStr
   br i1 %9, label %11, label %10
 
 ; <label>:10                                      ; preds = %.noexc
-  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.35, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 152, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
+  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.36, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 152, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:11                                      ; preds = %.noexc
@@ -2232,7 +2255,7 @@ define linkonce_odr void @_ZN5Eigen16CudaStreamDeviceD2Ev(%"class.Eigen::CudaStr
   br i1 %13, label %_ZNK5Eigen16CudaStreamDevice10deallocateEPv.exit, label %14
 
 ; <label>:14                                      ; preds = %.noexc1
-  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.35, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 155, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
+  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.36, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 155, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:15                                      ; preds = %11, %5
@@ -2277,7 +2300,7 @@ define linkonce_odr void @_ZN5Eigen16CudaStreamDeviceD0Ev(%"class.Eigen::CudaStr
   br i1 %9, label %11, label %10
 
 ; <label>:10                                      ; preds = %.noexc.i
-  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.35, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 152, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
+  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.36, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 152, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:11                                      ; preds = %.noexc.i
@@ -2289,7 +2312,7 @@ define linkonce_odr void @_ZN5Eigen16CudaStreamDeviceD0Ev(%"class.Eigen::CudaStr
   br i1 %13, label %_ZN5Eigen16CudaStreamDeviceD2Ev.exit, label %14
 
 ; <label>:14                                      ; preds = %.noexc1.i
-  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.35, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 155, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
+  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.36, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 155, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:15                                      ; preds = %11, %5
@@ -2332,7 +2355,7 @@ define linkonce_odr i8* @_ZNK5Eigen16CudaStreamDevice8allocateEm(%"class.Eigen::
   br i1 %4, label %6, label %5
 
 ; <label>:5                                       ; preds = %0
-  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.35, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 142, i8* nonnull getelementptr inbounds ([62 x i8], [62 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice8allocateEm, i64 0, i64 0)) #21
+  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.36, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 142, i8* nonnull getelementptr inbounds ([62 x i8], [62 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice8allocateEm, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:6                                       ; preds = %0
@@ -2343,7 +2366,7 @@ define linkonce_odr i8* @_ZNK5Eigen16CudaStreamDevice8allocateEm(%"class.Eigen::
   br i1 %9, label %11, label %10
 
 ; <label>:10                                      ; preds = %6
-  call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.35, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 145, i8* nonnull getelementptr inbounds ([62 x i8], [62 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice8allocateEm, i64 0, i64 0)) #21
+  call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.36, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 145, i8* nonnull getelementptr inbounds ([62 x i8], [62 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice8allocateEm, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:11                                      ; preds = %6
@@ -2352,7 +2375,7 @@ define linkonce_odr i8* @_ZNK5Eigen16CudaStreamDevice8allocateEm(%"class.Eigen::
   br i1 %13, label %14, label %15
 
 ; <label>:14                                      ; preds = %11
-  call void @__assert_fail(i8* nonnull getelementptr inbounds ([15 x i8], [15 x i8]* @.str.36, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 146, i8* nonnull getelementptr inbounds ([62 x i8], [62 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice8allocateEm, i64 0, i64 0)) #21
+  call void @__assert_fail(i8* nonnull getelementptr inbounds ([15 x i8], [15 x i8]* @.str.37, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 146, i8* nonnull getelementptr inbounds ([62 x i8], [62 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice8allocateEm, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:15                                      ; preds = %11
@@ -2369,7 +2392,7 @@ define linkonce_odr void @_ZNK5Eigen16CudaStreamDevice10deallocateEPv(%"class.Ei
   br i1 %4, label %6, label %5
 
 ; <label>:5                                       ; preds = %0
-  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.35, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 152, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
+  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.36, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 152, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:6                                       ; preds = %0
@@ -2377,7 +2400,7 @@ define linkonce_odr void @_ZNK5Eigen16CudaStreamDevice10deallocateEPv(%"class.Ei
   br i1 %7, label %8, label %9
 
 ; <label>:8                                       ; preds = %6
-  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([15 x i8], [15 x i8]* @.str.37, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 153, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
+  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([15 x i8], [15 x i8]* @.str.38, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 153, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:9                                       ; preds = %6
@@ -2386,7 +2409,7 @@ define linkonce_odr void @_ZNK5Eigen16CudaStreamDevice10deallocateEPv(%"class.Ei
   br i1 %11, label %13, label %12
 
 ; <label>:12                                      ; preds = %9
-  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.35, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 155, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
+  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.36, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 155, i8* nonnull getelementptr inbounds ([63 x i8], [63 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice10deallocateEPv, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:13                                      ; preds = %9
@@ -2442,7 +2465,7 @@ define linkonce_odr i32* @_ZNK5Eigen16CudaStreamDevice9semaphoreEv(%"class.Eigen
   br label %18
 
 ; <label>:17                                      ; preds = %4
-  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.35, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.32, i64 0, i64 0), i32 171, i8* nonnull getelementptr inbounds ([65 x i8], [65 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice9semaphoreEv, i64 0, i64 0)) #21
+  tail call void @__assert_fail(i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str.36, i64 0, i64 0), i8* nonnull getelementptr inbounds ([71 x i8], [71 x i8]* @.str.33, i64 0, i64 0), i32 171, i8* nonnull getelementptr inbounds ([65 x i8], [65 x i8]* @__PRETTY_FUNCTION__._ZNK5Eigen16CudaStreamDevice9semaphoreEv, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:18                                      ; preds = %._crit_edge, %0

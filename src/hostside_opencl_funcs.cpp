@@ -91,10 +91,17 @@ extern "C" {
     size_t cudaGetDevice (int *device);
     size_t cudaGetDeviceCount (int *count);
     size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t kind, void *stream = 0);
+    size_t cudaStreamSynchronize(void *stream);
+}
+
+size_t cudaStreamSynchronize(void *stream) {
+    cout << "cudaStreamSynchronize stream=" << stream << endl;
+    cl->finish();
+    return 0;
 }
 
 size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t kind, void *stream) {
-    cout << "cudaMemcpyAsync count=" << count << " kind=" << kind << endl;
+    cout << "cudaMemcpyAsync count=" << count << " kind=" << kind << " stream=" << stream << endl;
     return 0;
 }
 
@@ -116,7 +123,7 @@ size_t cudaGetDeviceCount (int *count) {
 }
 
 size_t cudaMemsetAsync(void *devPtr, int value, size_t count, void *stream) {
-    cout << "cudaMemsetAsync stub value=" << value << " count=" << count << endl;
+    cout << "cudaMemsetAsync stub value=" << value << " count=" << count << " stream=" << stream << endl;
     return 0;
 }
 
