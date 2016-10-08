@@ -21,8 +21,8 @@ void test_cuda_elementwise_small() {
   Tensor<float, 1> in1(Eigen::array<Eigen::DenseIndex, 1>(2));
   Tensor<float, 1> in2(Eigen::array<Eigen::DenseIndex, 1>(2));
   Tensor<float, 1> out(Eigen::array<Eigen::DenseIndex, 1>(2));
-  // in1.setRandom();
-  // in2.setRandom();
+  in1.setRandom();
+  in2.setRandom();
 
   std::size_t in1_bytes = in1.size() * sizeof(float);
   std::size_t in2_bytes = in2.size() * sizeof(float);
@@ -35,8 +35,8 @@ void test_cuda_elementwise_small() {
   cudaMalloc((void**)(&d_in2), in2_bytes);
   cudaMalloc((void**)(&d_out), out_bytes);
 
-  // cudaMemcpy(d_in1, in1.data(), in1_bytes, cudaMemcpyHostToDevice);
-  // cudaMemcpy(d_in2, in2.data(), in2_bytes, cudaMemcpyHostToDevice);
+  cudaMemcpy(d_in1, in1.data(), in1_bytes, cudaMemcpyHostToDevice);
+  cudaMemcpy(d_in2, in2.data(), in2_bytes, cudaMemcpyHostToDevice);
 
   // Eigen::CudaStreamDevice stream;
   // Eigen::GpuDevice gpu_device(&stream);
