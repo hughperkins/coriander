@@ -179,7 +179,14 @@ On the host-side, there is code to:
 
 ### Tensorflow
 
-- Get [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_add.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_add.cc) compiling/running on OpenCL
+- Initial tensorflow goal: get [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_add.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_add.cc) compiling/running on OpenCL
+  - this is more or less compileable now.  some errors about address-space for pointers to pointers to struct
+    - this is associated with eigen passing in structs containing pointers...
+    - this is non-trivial to solve, and needs to be solved in conjunction with host-side code
+- Current tensorflow goal, actually is Eigen goal:
+  - get https://bitbucket.org/eigen/eigen/src/97c1ebe6ccc21dc858c1f0ae2ce2e9186f6bac83/unsupported/test/cxx11_tensor_cuda.cu?at=default&fileviewer=file-view-default#cxx11_tensor_cuda.cu-68:114 building/running in OpenCL
+  - initial progress is to extract this single test into a file, [test/eigen/test_cuda_elementwise_small.cu](test/eigen/test_cuda_elementwise_small.cu) in this repo, and create a bash script to compile/run using cuda, on cuda, for cuda, [test/eigen/run-cuda.sh](test/eigen/run-cuda.sh)
+  - next step is to start thinking about how to make this start to work in opencl
 
 #### Current Issues
 
