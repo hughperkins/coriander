@@ -44,7 +44,8 @@ The patched IR code can then be compiled to object code, doesnt need cuda any mo
 
 ### Put these together
 
-```
+*Note that this is being launched on an Intel GPU!*
+```bash
 $ make run-cuda_sample
 
 mkdir -p build
