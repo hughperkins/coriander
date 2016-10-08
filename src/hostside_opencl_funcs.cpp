@@ -128,13 +128,17 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
     cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << endl;
     if(cudaMemcpyKind == 2) {
         // device => host
-        err = clEnqueueReadBuffer(*queue, *(cl_mem*)src, CL_TRUE, 0,
+        int srcidx = idxByAddr[(void *)src];
+        cl_mem srcclmem = clmems[srcidx];
+        err = clEnqueueReadBuffer(*queue, srcclmem, CL_TRUE, 0,
                                          bytes, dst, 0, NULL, NULL);
         cl->checkError(err);
         // cl->finish();
     } else if(cudaMemcpyKind == 1) {
         // host => device
-        err = clEnqueueWriteBuffer(*queue, *(cl_mem*)dst, CL_TRUE, 0,
+        int dstidx = idxByAddr[(void *)dst];
+        cl_mem dstclmem = clmems[dstidx];
+        err = clEnqueueWriteBuffer(*queue, dstclmem, CL_TRUE, 0,
                                           bytes, src, 0, NULL, NULL);
         cl->checkError(err);
     } else {

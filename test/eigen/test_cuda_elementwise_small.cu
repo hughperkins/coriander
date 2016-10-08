@@ -39,7 +39,7 @@ void test_cuda_elementwise_small() {
   cudaMemcpy(d_in2, in2.data(), in2_bytes, cudaMemcpyHostToDevice);
 
   Eigen::CudaStreamDevice stream;
-  // Eigen::GpuDevice gpu_device(&stream);
+  Eigen::GpuDevice gpu_device(&stream);
 
   // Eigen::TensorMap<Eigen::Tensor<float, 1>, Eigen::Aligned> gpu_in1(
   //     d_in1, Eigen::array<Eigen::DenseIndex, 1>(2));
