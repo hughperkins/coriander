@@ -248,9 +248,11 @@ On the host-side, there is code to:
 
 ### Tensorflow
 
+What's done:
+- [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc) can now be written out as compileable OpenCL [https://github.com/hughperkins/cuda-ir-to-opencl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl](https://github.com/hughperkins/cuda-ir-to-opencl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl)
+
+What's next:
 - get https://bitbucket.org/eigen/eigen/src/97c1ebe6ccc21dc858c1f0ae2ce2e9186f6bac83/unsupported/test/cxx11_tensor_cuda.cu?at=default&fileviewer=file-view-default#cxx11_tensor_cuda.cu-68:114 building/running in OpenCL
-  - initial progress is to extract this single test into a file, [test/eigen/test_cuda_elementwise_small.cu](test/eigen/test_cuda_elementwise_small.cu) in this repo, and create a bash script to compile/run using cuda, on cuda, for cuda, [test/eigen/run-cuda.sh](test/eigen/run-cuda.sh)
-  - next step is to start thinking about how to make this start to work in opencl
 
 ### Other points
 
@@ -276,7 +278,7 @@ I dont know :-P
 ## News
 
 - Oct 8:
-  - [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_add.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_add.cc) compiles completely into compileable OpenCL now [https://github.com/hughperkins/cuda-ir-to-opencl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl](https://github.com/hughperkins/cuda-ir-to-opencl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl)
+  - [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc) compiles completely into compileable OpenCL now [https://github.com/hughperkins/cuda-ir-to-opencl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl](https://github.com/hughperkins/cuda-ir-to-opencl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl)
   - added `cudaMalloc`, `cudaMemcpy`, `cudaFree`
   - hostside object now contains generated OpenCL sourcecode
 - Oct 5
