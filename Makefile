@@ -103,4 +103,13 @@ build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp easycl
 build/test_call_cl: build/test_call_cl.o build/testcudakernel1-hostpatched.o build/hostside_opencl_funcs.o test/generated/testcudakernel1-device.cl
 	g++ -o build/test_call_cl build/test_call_cl.o build/hostside_opencl_funcs.o build/testcudakernel1-hostpatched.o -lOpenCL -Lbuild -lEasyCL
 
+build/cuda_sample: build/cuda_sample-hostpatched.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
+	g++ -o build/cuda_sample build/hostside_opencl_funcs.o build/cuda_sample-hostpatched.o -lOpenCL -Lbuild -lEasyCL
+
+run-test_call_cl: build/test_call_cl
+	LD_LIBRARY_PATH=build:$LD_LIBRARY_PATH build/test_call_cl
+
+run-cuda_sample: build/cuda_sample
+	LD_LIBRARY_PATH=build:$LD_LIBRARY_PATH build/cuda_sample
+
 .SECONDARY:

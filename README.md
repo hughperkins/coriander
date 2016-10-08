@@ -30,19 +30,144 @@ In more detail:
 
 ### Device-side
 
-Lets say we have the following cuda file [test/testcudakernel1.cu](test/testcudakernel1.cu):
-- using `clang`, we can can compile into LLVM IR: [test/generated/testcudakernel1.ll](test/generated/testcudakernel1.ll)
-- using [src/ir-to-opencl.cpp](src/ir-to-opencl.cpp), we can write this out as OpenCL: [test/generated/testcudakernel1.cl](test/generated/testcudakernel1.cl)
+Lets say we have the following cuda file [test/cuda_sample.cu](test/cuda_sample.cu):
+- using `clang`, we can can compile into LLVM IR: [test/generated/cuda_sample-device.ll](test/generated/cuda_sample-device.ll)
+- using [src/ir-to-opencl.cpp](src/ir-to-opencl.cpp), we can write this out as OpenCL: [test/generated/cuda_sample-device.cl](test/generated/cuda_sample-device.cl)
 
 ### Host-side
 
-Using the same example file as above, ie [test/testcudakernel1.cu](test/testcudakernel1.cu) :
-- The host-side LLVM IR, output from `clang`, is [test/generated/testcudakernel1-host.ll](test/generated/testcudakernel1-host.ll)
-- After running [src/patch-hostside.cpp](src/patch-hostside.cpp), we get: [test/generated/testcudakernel1-host2.ll](test/generated/testcudakernel1-host2.ll)
+Using the same example file as above, ie [test/cuda_sample.cu](test/cuda_sample.cu) :
+- The host-side LLVM IR, output from `clang`, is [test/generated/cuda_sample-hostraw.ll](test/generated/cuda_sample-hostraw.ll)
+- After running [src/patch-hostside.cpp](src/patch-hostside.cpp), we get: [test/generated/cuda_sample-hostpatched.ll](test/generated/cuda_sample-hostpatched.ll)
 
 The patched IR code can then be compiled to object code, doesnt need cuda any more, just needs clang, and OpenCL.
 
-## Pre-requisites for build and demos
+### Put these together
+
+```
+$ make run-cuda_sample
+
+mkdir -p build
+clang++-3.8 `llvm-config-3.8 --cxxflags` -std=c++11 -fcxx-exceptions -o build/patch-hostside -g -O3 -I/usr/include/llvm-3.8 src/patch-hostside.cpp src/ir-to-opencl-common.cpp `llvm-config-3.8 --ldflags --system-libs --libs all`
+warning: unknown warning option '-Wno-maybe-uninitialized'; did you mean
+      '-Wno-uninitialized'? [-Wunknown-warning-option]
+src/patch-hostside.cpp:171:44: warning: overflow in expression; result is
+      2147483647 with type 'int' [-Winteger-overflow]
+    uint32_t grid_x = grid_xy & ((1 << 31) - 1);
+                                           ^
+src/patch-hostside.cpp:177:46: warning: overflow in expression; result is
+      2147483647 with type 'int' [-Winteger-overflow]
+    uint32_t block_x = block_xy & ((1 << 31) - 1);
+                                             ^
+src/patch-hostside.cpp:250:41: warning: unused variable 'intType'
+      [-Wunused-variable]
+                        if(IntegerType *intType = dyn_cast<IntegerType>(...
+                                        ^
+4 warnings generated.
+warning: unknown warning option '-Wno-maybe-uninitialized'; did you mean
+      '-Wno-uninitialized'? [-Wunknown-warning-option]
+src/ir-to-opencl-common.cpp:111:21: warning: unused variable 'p2'
+      [-Wunused-variable]
+    if(PointerType *p2 = dyn_cast<PointerType>(ptr->getPointerElementType())) {
+                    ^
+2 warnings generated.
+echo building test/generated/cuda_sample-hostpatched.ll from test/generated/cuda_sample-hostraw.ll
+building test/generated/cuda_sample-hostpatched.ll from test/generated/cuda_sample-hostraw.ll
+build/patch-hostside test/generated/cuda_sample-hostraw.ll test/generated/cuda_sample-hostpatched.ll
+getLaunchArgValue 
+getLaunchArgValue 
+getLaunchArgValue 
+patching launch in _Z8setValuePfif
+LaunchCallInfo _Z8setValuePfif<<<dim3(0, 0, 0), dim3(0, 0, 0)>>>(float*, i32, float);
+value float*
+value int
+value float
+
+  %loadCudaArg = load float*, float** %1
+ arg 0 
+got a pointer 
+got a float *
+  %loadCudaArg1 = load i32, i32* %2
+ arg 1 
+got an int
+  %loadCudaArg2 = load float, float* %3
+ arg 2 
+got a float
+getLaunchArgValue 
+getLaunchArgValue 
+getLaunchArgValue 
+patching launch in main
+LaunchCallInfo _Z8setValuePfif<<<dim3(32, 1, 1), dim3(32, 1, 1)>>>(float*, i32, float);
+value float*
+value int
+value float
+
+  %loadCudaArg = load float*, float** %3
+ arg 0 
+got a pointer 
+got a float *
+  %loadCudaArg1 = load i32, i32* %4
+ arg 1 
+got an int
+  %loadCudaArg2 = load float, float* %5
+ arg 2 
+got a float
+getLaunchArgValue 
+getLaunchArgValue 
+getLaunchArgValue 
+patching launch in main
+LaunchCallInfo _Z8setValuePfif<<<dim3(32, 1, 1), dim3(32, 1, 1)>>>(float*, i32, float);
+value float*
+value int
+value float
+
+  %loadCudaArg3 = load float*, float** %0
+ arg 0 
+got a pointer 
+got a float *
+  %loadCudaArg4 = load i32, i32* %1
+ arg 1 
+got an int
+  %loadCudaArg5 = load float, float* %2
+ arg 2 
+got a float
+printing module
+echo building build/cuda_sample-hostpatched.o from test/generated/cuda_sample-hostpatched.ll
+building build/cuda_sample-hostpatched.o from test/generated/cuda_sample-hostpatched.ll
+clang++-3.8 -c test/generated/cuda_sample-hostpatched.ll -O3 -o build/cuda_sample-hostpatched.o
+g++ -o build/cuda_sample build/hostside_opencl_funcs.o build/cuda_sample-hostpatched.o -lOpenCL -Lbuild -lEasyCL
+LD_LIBRARY_PATH=build:D_LIBRARY_PATH build/cuda_sample
+Using Intel , OpenCL platform: Intel Gen OCL Driver
+Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
+cudamalloc N 4096
+*p_mem 0xcb1a70
+cudamalloc valuesback[0] 1.23
+configureKernel(_Z8setValuePfif)
+grid(32, 1, 1)
+block(32, 1, 1)
+setKernelArgFloatStar
+setkernelargint 2
+setkernelargfloat 123
+launching kernel...
+.. kernel finished
+cudamempcy cudaMemcpyKind 2
+hostFloats[2] 123
+configureKernel(_Z8setValuePfif)
+grid(32, 1, 1)
+block(32, 1, 1)
+setKernelArgFloatStar
+setkernelargint 2
+setkernelargfloat 222
+launching kernel...
+.. kernel finished
+cudamempcy cudaMemcpyKind 2
+hostFloats[2] 222
+cudafree
+```
+
+## How to build
+
+### Pre-requisites
 
 You'll need:
 - Ubuntu 16.04
@@ -55,7 +180,7 @@ You'll need:
 
 Other operating systems, and clang/llvm versions, might be supported, but untested.  Your mileage may vary :-)
 
-## How to build
+### Procedure
 
 ```
 git clone --recursive https://github.com/hughperkins/cuda-ir-to-opencl
@@ -63,27 +188,6 @@ cd cuda-ir-to-opencl
 make
 ```
 => `ir-to-opencl`, and `patch-hostside` should be built into `build` subdirectory
-
-## Demos
-
-### Device-side OpenCL Generation
-
-```
-./run-ir-to-opencl-demo.sh
-```
-=> this will run a demonstration of converting the device side code in [test/testcudakernel1.cu](test/testcudakernel1.cu) into OpenCL
-
-### Host-side demonstration
-
-You will need an OpenCL-enabled GPU in order to run this part.
-
-```
-./run-end-to-end-demo.sh
-```
-This will:
-- compile [test/testcudakernel1.cu](test/testcudakernel1.cu) host-side code into IR
-- replace the cuda launch IR commands, with OpenCL kernel launch commands
-- compile the new IR to object code, link with [test/test_call_cl.cpp](test/test_call_cl.cpp) , and run this
 
 ## Test
 
@@ -116,7 +220,10 @@ Tests are at [test](test)
 
 ### Host-side
 
-Run the kernel launch demo, see above.
+No unit tests for host side at this time, though the end-to-end example above serves for now, ie:
+```
+make run-cuda_sample
+```
 
 ## What's working?
 
@@ -167,6 +274,9 @@ On the host-side, there is code to:
 - get hold of the llvm `Value *`s being passed to the kernel call
 - get hold of the `grid` and `block` dimensions being passed to the kernel launch
 - replace the cuda kernel launch calls with opencl kernel launch calls
+- cudaMalloc (beta)
+- cudaFree (doesnt actually free :-P  but doesnt call cuda)
+- cudaMemcpy (in direction device=>host works)
 
 ## Roadmap
 

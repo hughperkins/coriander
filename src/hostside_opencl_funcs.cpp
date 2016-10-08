@@ -34,6 +34,8 @@ static cl_int err;
 
 static vector<cl_mem> clmems;
 
+static string cl_filepath;
+
 /*void hostside_opencl_funcs_setCl(EasyCL *cl, cl_context *ctx, cl_command_queue *queue) {
     ::cl = cl;
     ::ctx = ctx;
@@ -41,12 +43,12 @@ static vector<cl_mem> clmems;
 }
 */
 
-void hostside_opencl_funcs_init() {
+void hostside_opencl_funcs_init(string cl_filepath) {
     cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
     // cl_int err;
     ctx = cl->context;
     queue = cl->queue;
-
+    ::cl_filepath = cl_filepath;
     // hostside_opencl_funcs_setCl(cl.get(), ctx, queue);
 }
 
@@ -123,7 +125,7 @@ void configureKernel(
     block[2] = block_z;
     // lets just read the kernel from file for now, with hardcoded filename
     // kernel.reset(buildKernelFromString("", kernelName, "", "internal"));
-    kernel.reset(cl->buildKernel("test/generated/testcudakernel1-device.cl", kernelName, ""));
+    kernel.reset(cl->buildKernel(cl_filepath, kernelName, ""));
 }
 
 void setKernelArgFloatStar(float *clmem_as_floatstar) {

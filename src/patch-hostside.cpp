@@ -134,16 +134,17 @@ void getLaunchTypes(CallInst *inst, LaunchCallInfo *info) {
 }
 
 void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
-    Instruction *op0 = dyn_cast<Instruction>(inst->getOperand(0));
-    Instruction *op0_0 = dyn_cast<Instruction>(op0->getOperand(0));
-    for(auto it=op0_0->user_begin(); it != op0_0->user_end(); it++) {
-        if(Instruction *useInst = dyn_cast<Instruction>(*it)) {
-            if(StoreInst *store = dyn_cast<StoreInst>(useInst)) {
-                // cout << "store operand 0 type " << dumpType(store->getOperand(0)->getType()) << endl;
-                info->callValues.push_back(store->getOperand(0));
-            }
-        }
-    }
+    // ok, so we have:
+    // - inst is cudaSetupArgument
+    // - the first operand of inst was created as bitcast(i8*)(alloca (type-of-arg))
+    // - the alloca instruction is inst->getOperand(0)->getOperand(0)
+    // - so if we load from the alloca instruction, we should have the value we want?
+    cout << "getLaunchArgValue " << endl;
+    Instruction *bitcast = cast<Instruction>(inst->getOperand(0));
+    Instruction *alloca = cast<Instruction>(bitcast->getOperand(0));
+    Instruction *load = new LoadInst(alloca, "loadCudaArg");
+    load->insertBefore(inst);
+    info->callValues.push_back(load);
 }
 
 uint64_t readIntConstant_uint64(ConstantInt *constant) {
@@ -240,8 +241,12 @@ void patchFunction(Function *F) {
 
                     Instruction *lastInst = callLaunch;
                     // pass args now
+                    int i = 0;
                     for(auto argit=launchCallInfo->callValues.begin(); argit != launchCallInfo->callValues.end(); argit++) {
                         Value *value = *argit;
+                        cout << " arg " << i << " ";
+                        value->dump();
+                        cout << endl;
                         if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
                             cout << "got an int" << endl;
                             Function *setKernelArgInt = cast<Function>(F->getParent()->getOrInsertFunction(
@@ -263,6 +268,7 @@ void patchFunction(Function *F) {
                             call->insertAfter(lastInst);
                             lastInst = call;
                         } else if(value->getType()->isPointerTy()) {
+                            cout << "got a pointer " << endl;
                             Type *elementType = value->getType()->getPointerElementType();
                             if(elementType->isFloatingPointTy()) {
                                 cout << "got a float *" << endl;
@@ -276,6 +282,7 @@ void patchFunction(Function *F) {
                                 lastInst = call;
                             }
                         }
+                        i++;
                     }
                     // trigger the kernel...
                     Function *kernelGo = cast<Function>(F->getParent()->getOrInsertFunction(
@@ -321,12 +328,20 @@ void patchFunction(Function *F) {
 
 void patchModule(Module *M) {
     // int i = 0;
+    vector<Function *> functionsToRemove;
     for(auto it = M->begin(); it != M->end(); it++) {
         // nameByValue.clear();
         // nextNameIdx = 0;
-        string name = it->getName();
-        // cout << "name " << name << endl;
         Function *F = &*it;
+        string name = F->getName();
+        // cout << "name " << name << endl;
+        // if(name.find("cuda") == 0) {
+            // functionsToRemove.push_back(F);
+            // https://groups.google.com/forum/#!topic/llvm-dev/ovvfIe_zU3Y
+            // F->replaceAllUsesWith(UndefValue::get(F->getType()));
+            // F->eraseFromParent();
+            // continue;
+        // }
         // if(name == "_Z14launchSetValuePfif") {
             // cout << "Function " << name << endl;
             patchFunction(F);

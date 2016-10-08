@@ -21,6 +21,7 @@ target triple = "x86_64-pc-linux-gnu"
 %struct.CUstream_st = type opaque
 %struct.MyStruct = type { i32, float }
 %struct.float4 = type { float, float, float, float }
+%struct.hasArray = type { [4 x i32] }
 
 @_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
 @__dso_handle = external global i8
@@ -893,6 +894,40 @@ define void @_Z22testFloat4_insertvalueP6float4Pfi(%struct.float4* %data, float*
   br label %17
 
 ; <label>:17                                      ; preds = %15, %11, %7, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z11useHasArrayP8hasArray(%struct.hasArray* %data) #2 {
+  %1 = alloca %struct.hasArray*, align 8
+  store %struct.hasArray* %data, %struct.hasArray** %1, align 8, !tbaa !1
+  %2 = bitcast %struct.hasArray** %1 to i8*
+  %3 = call i32 @cudaSetupArgument(i8* %2, i64 8, i64 0)
+  %4 = icmp eq i32 %3, 0
+  br i1 %4, label %5, label %7
+
+; <label>:5                                       ; preds = %0
+  %6 = call i32 @cudaLaunch(i8* nonnull bitcast (void (%struct.hasArray*)* @_Z11useHasArrayP8hasArray to i8*))
+  br label %7
+
+; <label>:7                                       ; preds = %5, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z22usesForwardDeclarationPf(float* %data) #2 {
+  %1 = alloca float*, align 8
+  store float* %data, float** %1, align 8, !tbaa !1
+  %2 = bitcast float** %1 to i8*
+  %3 = call i32 @cudaSetupArgument(i8* %2, i64 8, i64 0)
+  %4 = icmp eq i32 %3, 0
+  br i1 %4, label %5, label %7
+
+; <label>:5                                       ; preds = %0
+  %6 = call i32 @cudaLaunch(i8* nonnull bitcast (void (float*)* @_Z22usesForwardDeclarationPf to i8*))
+  br label %7
+
+; <label>:7                                       ; preds = %5, %0
   ret void
 }
 

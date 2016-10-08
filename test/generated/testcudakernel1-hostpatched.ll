@@ -21,6 +21,7 @@ target triple = "x86_64-pc-linux-gnu"
 %struct.CUstream_st = type opaque
 %struct.MyStruct = type { i32, float }
 %struct.float4 = type { float, float, float, float }
+%struct.hasArray = type { [4 x i32] }
 
 @_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
 @__dso_handle = external global i8
@@ -61,6 +62,8 @@ target triple = "x86_64-pc-linux-gnu"
 @s._Z9testArrayPf = global [15 x i8] c"_Z9testArrayPf\00"
 @s._Z10testmemcpyPf = global [17 x i8] c"_Z10testmemcpyPf\00"
 @s._Z22testFloat4_insertvalueP6float4Pfi = global [38 x i8] c"_Z22testFloat4_insertvalueP6float4Pfi\00"
+@s._Z11useHasArrayP8hasArray = global [26 x i8] c"_Z11useHasArrayP8hasArray\00"
+@s._Z22usesForwardDeclarationPf = global [29 x i8] c"_Z22usesForwardDeclarationPf\00"
 
 declare void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"*) #0
 
@@ -72,6 +75,7 @@ declare i32 @__cxa_atexit(void (i8*)*, i8*, i8*) #1
 ; Function Attrs: uwtable
 define void @_Z3fooPf(float* %data) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   store float* %data, float** %1, align 8, !tbaa !1
   %2 = bitcast float** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -80,7 +84,7 @@ define void @_Z3fooPf(float* %data) #2 {
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [9 x i8], [9 x i8]* @s._Z3fooPf, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z8kernelGov()
   br label %6
 
@@ -95,6 +99,7 @@ declare i32 @cudaLaunch(i8*)
 ; Function Attrs: uwtable
 define void @_Z7use_tidPf(float* %data) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   store float* %data, float** %1, align 8, !tbaa !1
   %2 = bitcast float** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -103,7 +108,7 @@ define void @_Z7use_tidPf(float* %data) #2 {
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [13 x i8], [13 x i8]* @s._Z7use_tidPf, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z8kernelGov()
   br label %6
 
@@ -114,6 +119,7 @@ define void @_Z7use_tidPf(float* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z8use_tid2Pi(i32* %data) #2 {
   %1 = alloca i32*, align 8
+  %loadCudaArg = load i32*, i32** %1
   store i32* %data, i32** %1, align 8, !tbaa !1
   %2 = bitcast i32** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -132,6 +138,7 @@ define void @_Z8use_tid2Pi(i32* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z10copy_floatPf(float* %a) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   store float* %a, float** %1, align 8, !tbaa !1
   %2 = bitcast float** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -140,7 +147,7 @@ define void @_Z10copy_floatPf(float* %a) #2 {
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [17 x i8], [17 x i8]* @s._Z10copy_floatPf, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %a)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z8kernelGov()
   br label %6
 
@@ -151,6 +158,7 @@ define void @_Z10copy_floatPf(float* %a) #2 {
 ; Function Attrs: uwtable
 define void @_Z11use_blockidPf(float* %data) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   store float* %data, float** %1, align 8, !tbaa !1
   %2 = bitcast float** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -159,7 +167,7 @@ define void @_Z11use_blockidPf(float* %data) #2 {
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [18 x i8], [18 x i8]* @s._Z11use_blockidPf, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z8kernelGov()
   br label %6
 
@@ -170,6 +178,7 @@ define void @_Z11use_blockidPf(float* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z11use_griddimPf(float* %data) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   store float* %data, float** %1, align 8, !tbaa !1
   %2 = bitcast float** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -178,7 +187,7 @@ define void @_Z11use_griddimPf(float* %data) #2 {
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [18 x i8], [18 x i8]* @s._Z11use_griddimPf, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z8kernelGov()
   br label %6
 
@@ -189,6 +198,7 @@ define void @_Z11use_griddimPf(float* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z12use_blockdimPf(float* %data) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   store float* %data, float** %1, align 8, !tbaa !1
   %2 = bitcast float** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -197,7 +207,7 @@ define void @_Z12use_blockdimPf(float* %data) #2 {
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [19 x i8], [19 x i8]* @s._Z12use_blockdimPf, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z8kernelGov()
   br label %6
 
@@ -208,7 +218,9 @@ define void @_Z12use_blockdimPf(float* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z13use_template1PfPi(float* %data, i32* %intdata) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   %2 = alloca i32*, align 8
+  %loadCudaArg1 = load i32*, i32** %2
   store float* %data, float** %1, align 8, !tbaa !1
   store i32* %intdata, i32** %2, align 8, !tbaa !1
   %3 = bitcast float** %1 to i8*
@@ -223,7 +235,7 @@ define void @_Z13use_template1PfPi(float* %data, i32* %intdata) #2 {
 ; <label>:8                                       ; preds = %5
   %9 = getelementptr inbounds [22 x i8], [22 x i8]* @s._Z13use_template1PfPi, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z8kernelGov()
   br label %10
 
@@ -280,6 +292,7 @@ _ZNKSt5ctypeIcE5widenEc.exit:                     ; preds = %18, %15
 ; Function Attrs: uwtable
 define void @_Z13someops_floatPf(float* %data) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   store float* %data, float** %1, align 8, !tbaa !1
   %2 = bitcast float** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -288,7 +301,7 @@ define void @_Z13someops_floatPf(float* %data) #2 {
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [20 x i8], [20 x i8]* @s._Z13someops_floatPf, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z8kernelGov()
   br label %6
 
@@ -299,6 +312,7 @@ define void @_Z13someops_floatPf(float* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z11someops_intPi(i32* %data) #2 {
   %1 = alloca i32*, align 8
+  %loadCudaArg = load i32*, i32** %1
   store i32* %data, i32** %1, align 8, !tbaa !1
   %2 = bitcast i32** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -317,6 +331,7 @@ define void @_Z11someops_intPi(i32* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z14testbooleanopsPi(i32* %data) #2 {
   %1 = alloca i32*, align 8
+  %loadCudaArg = load i32*, i32** %1
   store i32* %data, i32** %1, align 8, !tbaa !1
   %2 = bitcast i32** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -335,6 +350,7 @@ define void @_Z14testbooleanopsPi(i32* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z26testcomparisons_int_signedPi(i32* %data) #2 {
   %1 = alloca i32*, align 8
+  %loadCudaArg = load i32*, i32** %1
   store i32* %data, i32** %1, align 8, !tbaa !1
   %2 = bitcast i32** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -353,6 +369,7 @@ define void @_Z26testcomparisons_int_signedPi(i32* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z21testcomparisons_floatPf(float* %data) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   store float* %data, float** %1, align 8, !tbaa !1
   %2 = bitcast float** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -361,7 +378,7 @@ define void @_Z21testcomparisons_floatPf(float* %data) #2 {
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [28 x i8], [28 x i8]* @s._Z21testcomparisons_floatPf, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z8kernelGov()
   br label %6
 
@@ -372,6 +389,7 @@ define void @_Z21testcomparisons_floatPf(float* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z15testsyncthreadsPf(float* %data) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   store float* %data, float** %1, align 8, !tbaa !1
   %2 = bitcast float** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -380,7 +398,7 @@ define void @_Z15testsyncthreadsPf(float* %data) #2 {
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [22 x i8], [22 x i8]* @s._Z15testsyncthreadsPf, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z8kernelGov()
   br label %6
 
@@ -391,7 +409,9 @@ define void @_Z15testsyncthreadsPf(float* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z11testDoWhilePii(i32* %data, i32 %N) #2 {
   %1 = alloca i32*, align 8
+  %loadCudaArg = load i32*, i32** %1
   %2 = alloca i32, align 4
+  %loadCudaArg1 = load i32, i32* %2
   store i32* %data, i32** %1, align 8, !tbaa !1
   store i32 %N, i32* %2, align 4, !tbaa !13
   %3 = bitcast i32** %1 to i8*
@@ -406,7 +426,7 @@ define void @_Z11testDoWhilePii(i32* %data, i32 %N) #2 {
 ; <label>:8                                       ; preds = %5
   %9 = getelementptr inbounds [19 x i8], [19 x i8]* @s._Z11testDoWhilePii, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z15setKernelArgInti(i32 %N)
+  call void @_Z15setKernelArgInti(i32 %loadCudaArg1)
   call void @_Z8kernelGov()
   br label %10
 
@@ -417,7 +437,9 @@ define void @_Z11testDoWhilePii(i32* %data, i32 %N) #2 {
 ; Function Attrs: uwtable
 define void @_Z9testWhilePii(i32* %data, i32 %N) #2 {
   %1 = alloca i32*, align 8
+  %loadCudaArg = load i32*, i32** %1
   %2 = alloca i32, align 4
+  %loadCudaArg1 = load i32, i32* %2
   store i32* %data, i32** %1, align 8, !tbaa !1
   store i32 %N, i32* %2, align 4, !tbaa !13
   %3 = bitcast i32** %1 to i8*
@@ -432,7 +454,7 @@ define void @_Z9testWhilePii(i32* %data, i32 %N) #2 {
 ; <label>:8                                       ; preds = %5
   %9 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z9testWhilePii, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z15setKernelArgInti(i32 %N)
+  call void @_Z15setKernelArgInti(i32 %loadCudaArg1)
   call void @_Z8kernelGov()
   br label %10
 
@@ -443,7 +465,9 @@ define void @_Z9testWhilePii(i32* %data, i32 %N) #2 {
 ; Function Attrs: uwtable
 define void @_Z6testIfPii(i32* %data, i32 %N) #2 {
   %1 = alloca i32*, align 8
+  %loadCudaArg = load i32*, i32** %1
   %2 = alloca i32, align 4
+  %loadCudaArg1 = load i32, i32* %2
   store i32* %data, i32** %1, align 8, !tbaa !1
   store i32 %N, i32* %2, align 4, !tbaa !13
   %3 = bitcast i32** %1 to i8*
@@ -458,7 +482,7 @@ define void @_Z6testIfPii(i32* %data, i32 %N) #2 {
 ; <label>:8                                       ; preds = %5
   %9 = getelementptr inbounds [13 x i8], [13 x i8]* @s._Z6testIfPii, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z15setKernelArgInti(i32 %N)
+  call void @_Z15setKernelArgInti(i32 %loadCudaArg1)
   call void @_Z8kernelGov()
   br label %10
 
@@ -469,7 +493,9 @@ define void @_Z6testIfPii(i32* %data, i32 %N) #2 {
 ; Function Attrs: uwtable
 define void @_Z10testIfElsePii(i32* %data, i32 %N) #2 {
   %1 = alloca i32*, align 8
+  %loadCudaArg = load i32*, i32** %1
   %2 = alloca i32, align 4
+  %loadCudaArg1 = load i32, i32* %2
   store i32* %data, i32** %1, align 8, !tbaa !1
   store i32 %N, i32* %2, align 4, !tbaa !13
   %3 = bitcast i32** %1 to i8*
@@ -484,7 +510,7 @@ define void @_Z10testIfElsePii(i32* %data, i32 %N) #2 {
 ; <label>:8                                       ; preds = %5
   %9 = getelementptr inbounds [18 x i8], [18 x i8]* @s._Z10testIfElsePii, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z15setKernelArgInti(i32 %N)
+  call void @_Z15setKernelArgInti(i32 %loadCudaArg1)
   call void @_Z8kernelGov()
   br label %10
 
@@ -495,6 +521,7 @@ define void @_Z10testIfElsePii(i32* %data, i32 %N) #2 {
 ; Function Attrs: uwtable
 define void @_Z11testTernaryPf(float* %data) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   store float* %data, float** %1, align 8, !tbaa !1
   %2 = bitcast float** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -503,7 +530,7 @@ define void @_Z11testTernaryPf(float* %data) #2 {
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [18 x i8], [18 x i8]* @s._Z11testTernaryPf, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z8kernelGov()
   br label %6
 
@@ -514,7 +541,9 @@ define void @_Z11testTernaryPf(float* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z7testForPfi(float* %data, i32 %N) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   %2 = alloca i32, align 4
+  %loadCudaArg1 = load i32, i32* %2
   store float* %data, float** %1, align 8, !tbaa !1
   store i32 %N, i32* %2, align 4, !tbaa !13
   %3 = bitcast float** %1 to i8*
@@ -529,8 +558,8 @@ define void @_Z7testForPfi(float* %data, i32 %N) #2 {
 ; <label>:8                                       ; preds = %5
   %9 = getelementptr inbounds [14 x i8], [14 x i8]* @s._Z7testForPfi, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %9, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
-  call void @_Z15setKernelArgInti(i32 %N)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
+  call void @_Z15setKernelArgInti(i32 %loadCudaArg1)
   call void @_Z8kernelGov()
   br label %10
 
@@ -693,8 +722,11 @@ define void @_Z5mynopv() #3 {
 ; Function Attrs: uwtable
 define void @_Z8setValuePfif(float* %data, i32 %idx, float %value) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   %2 = alloca i32, align 4
+  %loadCudaArg1 = load i32, i32* %2
   %3 = alloca float, align 4
+  %loadCudaArg2 = load float, float* %3
   store float* %data, float** %1, align 8, !tbaa !1
   store i32 %idx, i32* %2, align 4, !tbaa !13
   store float %value, float* %3, align 4, !tbaa !15
@@ -715,9 +747,9 @@ define void @_Z8setValuePfif(float* %data, i32 %idx, float %value) #2 {
 ; <label>:12                                      ; preds = %9
   %13 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z8setValuePfif, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %13, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
-  call void @_Z15setKernelArgInti(i32 %idx)
-  call void @_Z17setKernelArgFloatf(float %value)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
+  call void @_Z15setKernelArgInti(i32 %loadCudaArg1)
+  call void @_Z17setKernelArgFloatf(float %loadCudaArg2)
   call void @_Z8kernelGov()
   br label %14
 
@@ -728,8 +760,11 @@ define void @_Z8setValuePfif(float* %data, i32 %idx, float %value) #2 {
 ; Function Attrs: uwtable
 define void @_Z14launchSetValuePfif(float* %data, i32 %idx, float %value) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   %2 = alloca i32, align 4
+  %loadCudaArg1 = load i32, i32* %2
   %3 = alloca float, align 4
+  %loadCudaArg2 = load float, float* %3
   %4 = icmp eq i32 0, 0
   br i1 %4, label %5, label %16
 
@@ -757,9 +792,9 @@ define void @_Z14launchSetValuePfif(float* %data, i32 %idx, float %value) #2 {
 ; <label>:14                                      ; preds = %12
   %15 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z8setValuePfif, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %15, i32 32, i32 1, i32 1, i32 32, i32 1, i32 1)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
-  call void @_Z15setKernelArgInti(i32 %idx)
-  call void @_Z17setKernelArgFloatf(float %value)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
+  call void @_Z15setKernelArgInti(i32 %loadCudaArg1)
+  call void @_Z17setKernelArgFloatf(float %loadCudaArg2)
   call void @_Z8kernelGov()
   br label %_Z8setValuePfif.exit
 
@@ -778,8 +813,11 @@ declare i32 @cudaConfigureCall(i64, i32, i64, i32, i64, %struct.CUstream_st*) #0
 ; Function Attrs: uwtable
 define void @_Z11testStructsP8MyStructPfPi(%struct.MyStruct* %structs, float* %float_data, i32* %int_data) #2 {
   %1 = alloca %struct.MyStruct*, align 8
+  %loadCudaArg = load %struct.MyStruct*, %struct.MyStruct** %1
   %2 = alloca float*, align 8
+  %loadCudaArg1 = load float*, float** %2
   %3 = alloca i32*, align 8
+  %loadCudaArg2 = load i32*, i32** %3
   store %struct.MyStruct* %structs, %struct.MyStruct** %1, align 8, !tbaa !1
   store float* %float_data, float** %2, align 8, !tbaa !1
   store i32* %int_data, i32** %3, align 8, !tbaa !1
@@ -800,7 +838,7 @@ define void @_Z11testStructsP8MyStructPfPi(%struct.MyStruct* %structs, float* %f
 ; <label>:12                                      ; preds = %9
   %13 = getelementptr inbounds [30 x i8], [30 x i8]* @s._Z11testStructsP8MyStructPfPi, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %13, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %float_data)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg1)
   call void @_Z8kernelGov()
   br label %14
 
@@ -811,6 +849,7 @@ define void @_Z11testStructsP8MyStructPfPi(%struct.MyStruct* %structs, float* %f
 ; Function Attrs: uwtable
 define void @_Z10testFloat4P6float4(%struct.float4* %data) #2 {
   %1 = alloca %struct.float4*, align 8
+  %loadCudaArg = load %struct.float4*, %struct.float4** %1
   store %struct.float4* %data, %struct.float4** %1, align 8, !tbaa !1
   %2 = bitcast %struct.float4** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -829,6 +868,7 @@ define void @_Z10testFloat4P6float4(%struct.float4* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z16testFloat4_test2P6float4(%struct.float4* %data) #2 {
   %1 = alloca %struct.float4*, align 8
+  %loadCudaArg = load %struct.float4*, %struct.float4** %1
   store %struct.float4* %data, %struct.float4** %1, align 8, !tbaa !1
   %2 = bitcast %struct.float4** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -847,6 +887,7 @@ define void @_Z16testFloat4_test2P6float4(%struct.float4* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z16testFloat4_test3P6float4(%struct.float4* %data) #2 {
   %1 = alloca %struct.float4*, align 8
+  %loadCudaArg = load %struct.float4*, %struct.float4** %1
   store %struct.float4* %data, %struct.float4** %1, align 8, !tbaa !1
   %2 = bitcast %struct.float4** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -865,6 +906,7 @@ define void @_Z16testFloat4_test3P6float4(%struct.float4* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z9testLocalPf(float* %data) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   store float* %data, float** %1, align 8, !tbaa !1
   %2 = bitcast float** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -873,7 +915,7 @@ define void @_Z9testLocalPf(float* %data) #2 {
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [15 x i8], [15 x i8]* @s._Z9testLocalPf, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z8kernelGov()
   br label %6
 
@@ -884,6 +926,7 @@ define void @_Z9testLocalPf(float* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z10testLocal2Pf(float* %data) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   store float* %data, float** %1, align 8, !tbaa !1
   %2 = bitcast float** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -892,7 +935,7 @@ define void @_Z10testLocal2Pf(float* %data) #2 {
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [17 x i8], [17 x i8]* @s._Z10testLocal2Pf, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z8kernelGov()
   br label %6
 
@@ -903,6 +946,7 @@ define void @_Z10testLocal2Pf(float* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z9testArrayPf(float* %data) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   store float* %data, float** %1, align 8, !tbaa !1
   %2 = bitcast float** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -911,7 +955,7 @@ define void @_Z9testArrayPf(float* %data) #2 {
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [15 x i8], [15 x i8]* @s._Z9testArrayPf, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z8kernelGov()
   br label %6
 
@@ -922,6 +966,7 @@ define void @_Z9testArrayPf(float* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z10testmemcpyPf(float* %data) #2 {
   %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
   store float* %data, float** %1, align 8, !tbaa !1
   %2 = bitcast float** %1 to i8*
   %3 = icmp eq i32 0, 0
@@ -930,7 +975,7 @@ define void @_Z10testmemcpyPf(float* %data) #2 {
 ; <label>:4                                       ; preds = %0
   %5 = getelementptr inbounds [17 x i8], [17 x i8]* @s._Z10testmemcpyPf, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z8kernelGov()
   br label %6
 
@@ -941,8 +986,11 @@ define void @_Z10testmemcpyPf(float* %data) #2 {
 ; Function Attrs: uwtable
 define void @_Z22testFloat4_insertvalueP6float4Pfi(%struct.float4* %data, float* %data2, i32 %N) #2 {
   %1 = alloca %struct.float4*, align 8
+  %loadCudaArg = load %struct.float4*, %struct.float4** %1
   %2 = alloca float*, align 8
+  %loadCudaArg1 = load float*, float** %2
   %3 = alloca i32, align 4
+  %loadCudaArg2 = load i32, i32* %3
   store %struct.float4* %data, %struct.float4** %1, align 8, !tbaa !1
   store float* %data2, float** %2, align 8, !tbaa !1
   store i32 %N, i32* %3, align 4, !tbaa !13
@@ -963,12 +1011,51 @@ define void @_Z22testFloat4_insertvalueP6float4Pfi(%struct.float4* %data, float*
 ; <label>:12                                      ; preds = %9
   %13 = getelementptr inbounds [38 x i8], [38 x i8]* @s._Z22testFloat4_insertvalueP6float4Pfi, i32 0, i32 0
   call void @_Z15configureKernelPKciiiiii(i8* %13, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
-  call void @_Z21setKernelArgFloatStarPf(float* %data2)
-  call void @_Z15setKernelArgInti(i32 %N)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg1)
+  call void @_Z15setKernelArgInti(i32 %loadCudaArg2)
   call void @_Z8kernelGov()
   br label %14
 
 ; <label>:14                                      ; preds = %12, %9, %6, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z11useHasArrayP8hasArray(%struct.hasArray* %data) #2 {
+  %1 = alloca %struct.hasArray*, align 8
+  %loadCudaArg = load %struct.hasArray*, %struct.hasArray** %1
+  store %struct.hasArray* %data, %struct.hasArray** %1, align 8, !tbaa !1
+  %2 = bitcast %struct.hasArray** %1 to i8*
+  %3 = icmp eq i32 0, 0
+  br i1 %3, label %4, label %6
+
+; <label>:4                                       ; preds = %0
+  %5 = getelementptr inbounds [26 x i8], [26 x i8]* @s._Z11useHasArrayP8hasArray, i32 0, i32 0
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z8kernelGov()
+  br label %6
+
+; <label>:6                                       ; preds = %4, %0
+  ret void
+}
+
+; Function Attrs: uwtable
+define void @_Z22usesForwardDeclarationPf(float* %data) #2 {
+  %1 = alloca float*, align 8
+  %loadCudaArg = load float*, float** %1
+  store float* %data, float** %1, align 8, !tbaa !1
+  %2 = bitcast float** %1 to i8*
+  %3 = icmp eq i32 0, 0
+  br i1 %3, label %4, label %6
+
+; <label>:4                                       ; preds = %0
+  %5 = getelementptr inbounds [29 x i8], [29 x i8]* @s._Z22usesForwardDeclarationPf, i32 0, i32 0
+  call void @_Z15configureKernelPKciiiiii(i8* %5, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
+  call void @_Z8kernelGov()
+  br label %6
+
+; <label>:6                                       ; preds = %4, %0
   ret void
 }
 
