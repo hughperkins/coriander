@@ -280,12 +280,19 @@ On the host-side, there is code to:
 
 ## Roadmap
 
-### Basic c/c++/llvm/CUDA/OpenCL language/concepts
+### Device-side
 
 - `llvm.memmove.p0i8.p0i8.i64`
 - `llvm.lifetime`
 - `@llvm.global_ctors`
 - `_GLOBAL__sub_I_struct_initializer.cu()`
+
+### Host-side
+
+- inject opencl code into the hostside patched code, during hostside patching
+- automatically initialize opencl at start, rather than needing to add function call to `main` to do this
+- `cudaFree` should actually free memory
+- `cudaMemcpy` for direction host => device
 
 ### Tensorflow
 
