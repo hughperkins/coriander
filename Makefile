@@ -54,7 +54,7 @@ test/generated/%-hostpatched.ll: test/generated/%-hostraw.ll build/patch-hostsid
 	echo building $@ from $<
 	build/patch-hostside $< $@
 
-test/eigen/generated/%-hostraw.ll: test/eigen/%.cu
+test/eigen/generated/%-hostraw.ll: test/eigen/%.cu include/fake_funcs.h
 	echo building $@ from $<
 	mkdir -p test/eigen/generated
 	$(CLANG) -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -include include/fake_funcs.h -I$(EIGEN_HOME) -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
@@ -86,6 +86,11 @@ build/%-hostpatched.o: test/generated/%-hostpatched.ll
 	$(CLANG) -c $< -O3 -o $@
 
 ## generic cpp objects, from cpp code
+
+build/test_call_cl.o: test/test_call_cl.cpp easycl
+	echo building $@ from $<
+	$(CLANG) -std=c++11 -Isrc/EasyCL -I$(CUDA_HOME)/include -c $< --cuda-host-only -O3 -o $@
+
 build/%.o: test/%.cpp easycl
 	echo building $@ from $<
 	$(CLANG) -std=c++11 -Isrc/EasyCL -c $< --cuda-host-only -O3 -o $@

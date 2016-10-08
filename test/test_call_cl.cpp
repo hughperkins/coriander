@@ -15,6 +15,9 @@ void hostside_opencl_funcs_setCl(EasyCL *cl);
 
 static unique_ptr<EasyCL> cl;
 
+// #include "cuda.h"
+#include <cuda_runtime.h>
+
 int main(int argc, char *argv[]) {
     cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
     cl_int err;
@@ -36,6 +39,10 @@ int main(int argc, char *argv[]) {
     cl->finish();
 
     cout << "value of float_data[2] after calling kernel: " << float_data[2] << endl;
+
+    float *gpuFloats;
+    cudaMalloc((void**)(&gpuFloats), 1024);
+    cudaFree(gpuFloats);
 
     return 0;
 }

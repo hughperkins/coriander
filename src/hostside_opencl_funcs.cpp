@@ -31,6 +31,21 @@ void hostside_opencl_funcs_setCl(EasyCL *cl) {
     ::cl = cl;
 }
 
+extern "C" {
+    size_t cudaMalloc(void **p_mem, size_t N);
+    size_t cudaFree(void *mem);
+}
+
+size_t cudaMalloc(void **p_mem, size_t N) {
+    cout << "cudamalloc" << endl;
+    return 0;
+}
+
+size_t cudaFree(void *mem) {
+    cout << "cudafree" << endl;
+    return 0;
+}
+
 void configureKernel(
         const char *kernelName,
         int grid_x, int grid_y, int grid_z,
