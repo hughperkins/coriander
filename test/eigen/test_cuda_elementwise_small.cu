@@ -41,12 +41,12 @@ void test_cuda_elementwise_small() {
   Eigen::CudaStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
-  // Eigen::TensorMap<Eigen::Tensor<float, 1>, Eigen::Aligned> gpu_in1(
-  //     d_in1, Eigen::array<Eigen::DenseIndex, 1>(2));
-  // Eigen::TensorMap<Eigen::Tensor<float, 1>, Eigen::Aligned> gpu_in2(
-  //     d_in2, Eigen::array<Eigen::DenseIndex, 1>(2));
-  // Eigen::TensorMap<Eigen::Tensor<float, 1>, Eigen::Aligned> gpu_out(
-  //     d_out, Eigen::array<Eigen::DenseIndex, 1>(2));
+  Eigen::TensorMap<Eigen::Tensor<float, 1>, Eigen::Aligned> gpu_in1(
+       d_in1, Eigen::array<Eigen::DenseIndex, 1>(2));
+  Eigen::TensorMap<Eigen::Tensor<float, 1>, Eigen::Aligned> gpu_in2(
+       d_in2, Eigen::array<Eigen::DenseIndex, 1>(2));
+  Eigen::TensorMap<Eigen::Tensor<float, 1>, Eigen::Aligned> gpu_out(
+       d_out, Eigen::array<Eigen::DenseIndex, 1>(2));
 
   // gpu_out.device(gpu_device) = gpu_in1 + gpu_in2;
 
