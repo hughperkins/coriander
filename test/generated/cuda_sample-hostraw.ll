@@ -236,38 +236,89 @@ _Z8setValuePfif.exit7:                            ; preds = %66, %75, %78, %81
   %98 = bitcast i8* %97 to %"class.std::ctype"**
   %99 = load %"class.std::ctype"*, %"class.std::ctype"** %98, align 8, !tbaa !11
   %100 = icmp eq %"class.std::ctype"* %99, null
-  br i1 %100, label %101, label %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit10
+  br i1 %100, label %101, label %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit13
 
 ; <label>:101                                     ; preds = %83
   call void @_ZSt16__throw_bad_castv() #7
   unreachable
 
-_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit10:  ; preds = %83
+_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit13:  ; preds = %83
   %102 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %99, i64 0, i32 8
   %103 = load i8, i8* %102, align 8, !tbaa !14
   %104 = icmp eq i8 %103, 0
   br i1 %104, label %108, label %105
 
-; <label>:105                                     ; preds = %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit10
+; <label>:105                                     ; preds = %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit13
   %106 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %99, i64 0, i32 9, i64 10
   %107 = load i8, i8* %106, align 1, !tbaa !16
-  br label %_ZNKSt5ctypeIcE5widenEc.exit9
+  br label %_ZNKSt5ctypeIcE5widenEc.exit11
 
-; <label>:108                                     ; preds = %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit10
+; <label>:108                                     ; preds = %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit13
   call void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %99)
   %109 = bitcast %"class.std::ctype"* %99 to i8 (%"class.std::ctype"*, i8)***
   %110 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %109, align 8, !tbaa !9
   %111 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %110, i64 6
   %112 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %111, align 8
   %113 = call signext i8 %112(%"class.std::ctype"* nonnull %99, i8 signext 10)
+  br label %_ZNKSt5ctypeIcE5widenEc.exit11
+
+_ZNKSt5ctypeIcE5widenEc.exit11:                   ; preds = %105, %108
+  %.0.i10 = phi i8 [ %107, %105 ], [ %113, %108 ]
+  %114 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull %89, i8 signext %.0.i10)
+  %115 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %114)
+  store float 4.440000e+02, float* %34, align 8, !tbaa !7
+  %116 = load i8*, i8** %8, align 8, !tbaa !1
+  %117 = call i32 @cudaMemcpy(i8* %116, i8* nonnull %30, i64 16, i32 1)
+  store float 5.550000e+02, float* %34, align 8, !tbaa !7
+  %118 = load i8*, i8** %8, align 8, !tbaa !1
+  %119 = call i32 @cudaMemcpy(i8* nonnull %30, i8* %118, i64 16, i32 2)
+  %120 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([15 x i8], [15 x i8]* @.str, i64 0, i64 0), i64 14)
+  %121 = load float, float* %34, align 8, !tbaa !7
+  %122 = fpext float %121 to double
+  %123 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo9_M_insertIdEERSoT_(%"class.std::basic_ostream"* nonnull @_ZSt4cout, double %122)
+  %124 = bitcast %"class.std::basic_ostream"* %123 to i8**
+  %125 = load i8*, i8** %124, align 8, !tbaa !9
+  %126 = getelementptr i8, i8* %125, i64 -24
+  %127 = bitcast i8* %126 to i64*
+  %128 = load i64, i64* %127, align 8
+  %129 = bitcast %"class.std::basic_ostream"* %123 to i8*
+  %130 = getelementptr inbounds i8, i8* %129, i64 %128
+  %131 = getelementptr inbounds i8, i8* %130, i64 240
+  %132 = bitcast i8* %131 to %"class.std::ctype"**
+  %133 = load %"class.std::ctype"*, %"class.std::ctype"** %132, align 8, !tbaa !11
+  %134 = icmp eq %"class.std::ctype"* %133, null
+  br i1 %134, label %135, label %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit12
+
+; <label>:135                                     ; preds = %_ZNKSt5ctypeIcE5widenEc.exit11
+  call void @_ZSt16__throw_bad_castv() #7
+  unreachable
+
+_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit12:  ; preds = %_ZNKSt5ctypeIcE5widenEc.exit11
+  %136 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %133, i64 0, i32 8
+  %137 = load i8, i8* %136, align 8, !tbaa !14
+  %138 = icmp eq i8 %137, 0
+  br i1 %138, label %142, label %139
+
+; <label>:139                                     ; preds = %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit12
+  %140 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %133, i64 0, i32 9, i64 10
+  %141 = load i8, i8* %140, align 1, !tbaa !16
   br label %_ZNKSt5ctypeIcE5widenEc.exit9
 
-_ZNKSt5ctypeIcE5widenEc.exit9:                    ; preds = %105, %108
-  %.0.i8 = phi i8 [ %107, %105 ], [ %113, %108 ]
-  %114 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull %89, i8 signext %.0.i8)
-  %115 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %114)
-  %116 = load i8*, i8** %8, align 8, !tbaa !1
-  %117 = call i32 @cudaFree(i8* %116)
+; <label>:142                                     ; preds = %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit12
+  call void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %133)
+  %143 = bitcast %"class.std::ctype"* %133 to i8 (%"class.std::ctype"*, i8)***
+  %144 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %143, align 8, !tbaa !9
+  %145 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %144, i64 6
+  %146 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %145, align 8
+  %147 = call signext i8 %146(%"class.std::ctype"* nonnull %133, i8 signext 10)
+  br label %_ZNKSt5ctypeIcE5widenEc.exit9
+
+_ZNKSt5ctypeIcE5widenEc.exit9:                    ; preds = %139, %142
+  %.0.i8 = phi i8 [ %141, %139 ], [ %147, %142 ]
+  %148 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull %123, i8 signext %.0.i8)
+  %149 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %148)
+  %150 = load i8*, i8** %8, align 8, !tbaa !1
+  %151 = call i32 @cudaFree(i8* %150)
   call void @llvm.lifetime.end(i64 16, i8* nonnull %30) #1
   call void @llvm.lifetime.end(i64 8, i8* nonnull %7) #1
   ret i32 0

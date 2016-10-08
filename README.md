@@ -94,28 +94,9 @@ g++ -o build/cuda_sample build/hostside_opencl_funcs.o build/cuda_sample-hostpat
 LD_LIBRARY_PATH=build:D_LIBRARY_PATH build/cuda_sample
 Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
-cudamalloc using opencl N 4096
-configureKernel(_Z8setValuePfif)
-grid(32, 1, 1)
-block(32, 1, 1)
-setKernelArgFloatStar
-setkernelargint 2
-setkernelargfloat 123
-launching kernel, using OpenCL...
-.. kernel finished
-cudamempcy using opencl cudaMemcpyKind 2
 hostFloats[2] 123
-configureKernel(_Z8setValuePfif)
-grid(32, 1, 1)
-block(32, 1, 1)
-setKernelArgFloatStar
-setkernelargint 2
-setkernelargfloat 222
-launching kernel, using OpenCL...
-.. kernel finished
-cudamempcy using opencl cudaMemcpyKind 2
 hostFloats[2] 222
-cudafree using opencl
+hostFloats[2] 444
 ```
 
 ## How to build
@@ -227,9 +208,9 @@ On the host-side, there is code to:
 - get hold of the llvm `Value *`s being passed to the kernel call
 - get hold of the `grid` and `block` dimensions being passed to the kernel launch
 - replace the cuda kernel launch calls with opencl kernel launch calls
-- cudaMalloc (beta)
-- cudaFree (doesnt actually free :-P  but doesnt call cuda)
-- cudaMemcpy (in direction device=>host and host=>device both work)
+- cudaMalloc
+- cudaFree
+- cudaMemcpy (in both directions device=>host and host=>device)
 - inject the generated opencl sourcecode, so it's available at runtime (all in one executable)
 - handle initializing opencl automatically
 
@@ -241,10 +222,11 @@ On the host-side, there is code to:
 - `llvm.lifetime`
 - `@llvm.global_ctors`
 - `_GLOBAL__sub_I_struct_initializer.cu()`
+- sooner or later need to carefully re-evaluate some of the bitwise operators, such as shift and so on, which currently right-now just blindly do `<<` or `>>` without regard to sign extension etc
 
 ### Host-side
 
-- `cudaFree` should actually free memory
+- handle structs containing pointers somehow
 
 ### Tensorflow
 
@@ -279,7 +261,7 @@ I dont know :-P
 
 - Oct 8:
   - [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc) compiles completely into compileable OpenCL now [https://github.com/hughperkins/cuda-ir-to-opencl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl](https://github.com/hughperkins/cuda-ir-to-opencl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl)
-  - added `cudaMalloc`, `cudaMemcpy`, `cudaFree`
+  - implemented `cudaMalloc`, `cudaMemcpy`, `cudaFree` (using opencl)
   - hostside object now contains generated OpenCL sourcecode
 - Oct 5
   - fix float constants to correctly have `.0f` at the end
