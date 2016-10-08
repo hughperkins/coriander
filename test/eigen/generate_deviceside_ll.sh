@@ -4,8 +4,8 @@ set -e
 
 # BASE=${PWD}
 
-# export CUDA_HOME=/usr/local/cuda-7.5
-# export EIGEN_HOME=~/git/eigen
+export CUDA_HOME=/usr/local/cuda-7.5
+export EIGEN_HOME=~/git/eigen
 
 # CLANG=clang++-3.8
 
@@ -20,3 +20,4 @@ set -e
 # ${CUDA_HOME}/bin/nvcc -DGOOGLE_CUDA -DEIGEN_MPL2_ONLY -std=c++11 -c -I. -I${CUDA_HOME}/include -I${EIGEN_HOME} ${TARGET}
 
 make test/eigen/generated/test_cuda_elementwise_small-device.ll
+make test/eigen/generated/test_cuda_elementwise_small-device.cl
