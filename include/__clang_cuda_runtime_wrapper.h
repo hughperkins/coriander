@@ -21,6 +21,9 @@
  *===-----------------------------------------------------------------------===
  */
 
+// this file is copied from clang-3.8, with the only change (so far) being to comment
+// out the check for cuda version
+
 /*
  * WARNING: This header is intended to be directly -include'd by
  * the compiler and is not supposed to be included by users.
@@ -58,8 +61,8 @@
 #include "cuda.h"
 #if !defined(CUDA_VERSION)
 #error "cuda.h did not define CUDA_VERSION"
-#elif CUDA_VERSION < 7000 || CUDA_VERSION > 7050
-#error "Unsupported CUDA version!"
+//#elif CUDA_VERSION < 7000 || CUDA_VERSION > 7050
+//#error "Unsupported CUDA version!"
 #endif
 
 // Make largest subset of device functions available during host

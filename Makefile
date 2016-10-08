@@ -1,7 +1,8 @@
 # In theory we should use eg cmake, but this gives us more control for now,
 # and we only have like ~4 sourcecode files for now anyway
 
-CUDA_HOME=/usr/local/cuda-7.5
+CUDA_HOME=/usr/local/cuda-8.0
+EIGEN_HOME=/usr/local/eigen
 
 CLANG=clang++-3.8
 LLVM_CONFIG=llvm-config-3.8
@@ -36,6 +37,11 @@ test/generated/%-device.ll: test/%.cu include/fake_funcs.h build/ir-to-opencl
 	echo building $@ from $<
 	mkdir -p test/generated
 	$(CLANG) -include include/fake_funcs.h -I$(CUDA_HOME)/include $< --cuda-device-only -emit-llvm -O3 -S -o $@
+
+test/eigen/generated/%-device.ll: test/eigen/%.cu include/fake_funcs.h build/ir-to-opencl
+	echo building $@ from $<
+	mkdir -p test/eigen/generated
+	$(CLANG) -x cuda -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -D__CUDA_ARCH__=300 -include include/fake_funcs.h -Iinclude -I$(EIGEN_HOME) -I$(CUDA_HOME)/include -I/usr/include/x86_64-linux-gnu $< --cuda-device-only -emit-llvm -O3 -S -o $@
 
 # hostside goes from .cu -> -hostraw.ll => -hostpatched.ll
 
