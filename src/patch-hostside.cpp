@@ -139,7 +139,7 @@ void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
     // - the first operand of inst was created as bitcast(i8*)(alloca (type-of-arg))
     // - the alloca instruction is inst->getOperand(0)->getOperand(0)
     // - so if we load from the alloca instruction, we should have the value we want?
-    cout << "getLaunchArgValue " << endl;
+    // cout << "getLaunchArgValue " << endl;
     Instruction *bitcast = cast<Instruction>(inst->getOperand(0));
     Instruction *alloca = cast<Instruction>(bitcast->getOperand(0));
     Instruction *load = new LoadInst(alloca, "loadCudaArg");
@@ -244,11 +244,11 @@ void patchFunction(Function *F) {
                     int i = 0;
                     for(auto argit=launchCallInfo->callValues.begin(); argit != launchCallInfo->callValues.end(); argit++) {
                         Value *value = *argit;
-                        cout << " arg " << i << " ";
-                        value->dump();
-                        cout << endl;
+                        // cout << " arg " << i << " ";
+                        // value->dump();
+                        // cout << endl;
                         if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
-                            cout << "got an int" << endl;
+                            // cout << "got an int" << endl;
                             Function *setKernelArgInt = cast<Function>(F->getParent()->getOrInsertFunction(
                                 "_Z15setKernelArgInti",
                                 Type::getVoidTy(TheContext),
@@ -258,7 +258,7 @@ void patchFunction(Function *F) {
                             call->insertAfter(lastInst);
                             lastInst = call;
                         } else if(value->getType()->isFloatingPointTy()) {
-                            cout << "got a float" << endl;
+                            // cout << "got a float" << endl;
                             Function *setKernelArgFloat = cast<Function>(F->getParent()->getOrInsertFunction(
                                 "_Z17setKernelArgFloatf",
                                 Type::getVoidTy(TheContext),
@@ -268,10 +268,10 @@ void patchFunction(Function *F) {
                             call->insertAfter(lastInst);
                             lastInst = call;
                         } else if(value->getType()->isPointerTy()) {
-                            cout << "got a pointer " << endl;
+                            // cout << "got a pointer " << endl;
                             Type *elementType = value->getType()->getPointerElementType();
                             if(elementType->isFloatingPointTy()) {
-                                cout << "got a float *" << endl;
+                                // cout << "got a float *" << endl;
                                 Function *setKernelArgFloatStar = cast<Function>(F->getParent()->getOrInsertFunction(
                                     "_Z21setKernelArgFloatStarPf",
                                     Type::getVoidTy(TheContext),

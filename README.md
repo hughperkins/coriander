@@ -75,63 +75,24 @@ src/ir-to-opencl-common.cpp:111:21: warning: unused variable 'p2'
 echo building test/generated/cuda_sample-hostpatched.ll from test/generated/cuda_sample-hostraw.ll
 building test/generated/cuda_sample-hostpatched.ll from test/generated/cuda_sample-hostraw.ll
 build/patch-hostside test/generated/cuda_sample-hostraw.ll test/generated/cuda_sample-hostpatched.ll
-getLaunchArgValue 
-getLaunchArgValue 
-getLaunchArgValue 
 patching launch in _Z8setValuePfif
 LaunchCallInfo _Z8setValuePfif<<<dim3(0, 0, 0), dim3(0, 0, 0)>>>(float*, i32, float);
 value float*
 value int
 value float
 
-  %loadCudaArg = load float*, float** %1
- arg 0 
-got a pointer 
-got a float *
-  %loadCudaArg1 = load i32, i32* %2
- arg 1 
-got an int
-  %loadCudaArg2 = load float, float* %3
- arg 2 
-got a float
-getLaunchArgValue 
-getLaunchArgValue 
-getLaunchArgValue 
 patching launch in main
 LaunchCallInfo _Z8setValuePfif<<<dim3(32, 1, 1), dim3(32, 1, 1)>>>(float*, i32, float);
 value float*
 value int
 value float
 
-  %loadCudaArg = load float*, float** %3
- arg 0 
-got a pointer 
-got a float *
-  %loadCudaArg1 = load i32, i32* %4
- arg 1 
-got an int
-  %loadCudaArg2 = load float, float* %5
- arg 2 
-got a float
-getLaunchArgValue 
-getLaunchArgValue 
-getLaunchArgValue 
 patching launch in main
 LaunchCallInfo _Z8setValuePfif<<<dim3(32, 1, 1), dim3(32, 1, 1)>>>(float*, i32, float);
 value float*
 value int
 value float
 
-  %loadCudaArg3 = load float*, float** %0
- arg 0 
-got a pointer 
-got a float *
-  %loadCudaArg4 = load i32, i32* %1
- arg 1 
-got an int
-  %loadCudaArg5 = load float, float* %2
- arg 2 
-got a float
 printing module
 echo building build/cuda_sample-hostpatched.o from test/generated/cuda_sample-hostpatched.ll
 building build/cuda_sample-hostpatched.o from test/generated/cuda_sample-hostpatched.ll
