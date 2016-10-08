@@ -1,7 +1,7 @@
 # In theory we should use eg cmake, but this gives us more control for now,
 # and we only have like ~4 sourcecode files for now anyway
 
-CUDA_HOME=/usr/local/cuda-8.0
+CUDA_HOME=/usr/local/cuda-7.5
 EIGEN_HOME=/usr/local/eigen
 
 CLANG=clang++-3.8
@@ -46,7 +46,7 @@ test/eigen/generated/%-device.ll: test/eigen/%.cu include/fake_funcs.h build/ir-
 # hostside goes from .cu -> -hostraw.ll => -hostpatched.ll
 
 test/generated/%-hostraw.ll: test/%.cu
-	echo building $@ from $<
+	echo building $@ from $< using $(CLANG) CUDA_HOME $(CUDA_HOME)
 	mkdir -p test/generated
 	$(CLANG) -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
 
@@ -90,8 +90,12 @@ build/%.o: test/%.cpp easycl
 	echo building $@ from $<
 	$(CLANG) -std=c++11 -Isrc/EasyCL -c $< --cuda-host-only -O3 -o $@
 
+build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp easycl
+	echo building $@ from $<
+	$(CLANG) -std=c++11 -Isrc/EasyCL -c $< -O3 -o $@
+
 # executables
-build/test_call_cl: build/test_call_cl.o build/testcudakernel1-hostpatched.o test/generated/testcudakernel1-device.cl
-	g++ -o build/test_call_cl build/test_call_cl.o build/testcudakernel1-hostpatched.o -lOpenCL -Lbuild -lEasyCL
+build/test_call_cl: build/test_call_cl.o build/testcudakernel1-hostpatched.o build/hostside_opencl_funcs.o test/generated/testcudakernel1-device.cl
+	g++ -o build/test_call_cl build/test_call_cl.o build/hostside_opencl_funcs.o build/testcudakernel1-hostpatched.o -lOpenCL -Lbuild -lEasyCL
 
 .SECONDARY:
