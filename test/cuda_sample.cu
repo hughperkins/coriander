@@ -7,7 +7,7 @@ using namespace std;
 
 #include <cuda_runtime.h>
 
-void hostside_opencl_funcs_init(string cl_filepath);
+void hostside_opencl_funcs_init();
 
 __global__ void setValue(float *data, int idx, float value) {
     if(threadIdx.x == 0) {
@@ -16,7 +16,7 @@ __global__ void setValue(float *data, int idx, float value) {
 }
 
 int main(int argc, char *argv[]) {
-    hostside_opencl_funcs_init("test/generated/cuda_sample-device.cl");
+    hostside_opencl_funcs_init();
 
     int N = 1024;
 

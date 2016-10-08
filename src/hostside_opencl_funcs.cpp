@@ -34,7 +34,7 @@ static cl_int err;
 
 static vector<cl_mem> clmems;
 
-static string cl_filepath;
+// static string cl_filepath;
 
 /*void hostside_opencl_funcs_setCl(EasyCL *cl, cl_context *ctx, cl_command_queue *queue) {
     ::cl = cl;
@@ -43,12 +43,12 @@ static string cl_filepath;
 }
 */
 
-void hostside_opencl_funcs_init(string cl_filepath) {
+void hostside_opencl_funcs_init() {
     cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
     // cl_int err;
     ctx = cl->context;
     queue = cl->queue;
-    ::cl_filepath = cl_filepath;
+    // ::cl_filepath = cl_filepath;
     // hostside_opencl_funcs_setCl(cl.get(), ctx, queue);
 }
 
