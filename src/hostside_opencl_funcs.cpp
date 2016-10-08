@@ -132,8 +132,59 @@ size_t cudaSetDevice (int device) {
     return 0;
 }
 
+    char name[256];
+    size_t totalGlobalMem;
+    size_t sharedMemPerBlock;
+    int regsPerBlock;
+    int warpSize;
+    size_t memPitch;
+    int maxThreadsPerBlock;
+    int maxThreadsDim[3];
+    int maxGridSize[3];
+    size_t totalConstMem;
+    int major;
+    int minor;
+    int clockRate;
+    size_t textureAlignment;
+    int deviceOverlap;
+    int multiProcessorCount;
+    int kernelExecTimeoutEnabled;
+    int integrated;
+    int canMapHostMemory;
+    int computeMode;
+    int concurrentKernels;
+    int ECCEnabled;
+    int pciBusID;
+    int pciDeviceID;
+    int tccDriver;
+
 size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, int device) {
     cout << "cudaGetDeviceProperties stub device=" << device << endl;
+    prop->totalGlobalMem = 1024 * 1024 * 1024;
+    prop->sharedMemPerBlock = 65536;
+    prop->regsPerBlock = 64;
+    prop->warpSize = 32;
+    prop->memPitch = 4; // whats this?
+    prop->maxThreadsPerBlock = 128;
+    prop->maxThreadsDim[0] = 1024;
+    prop->maxThreadsDim[1] = 1024;
+    prop->maxThreadsDim[2] = 1024;
+    prop->totalConstMem = 16 * 1024;
+    prop->major = 3;
+    prop->minor = 0;
+    prop->clockRate = 900 * 1000 * 1000;
+    prop->textureAlignment = 128;  // whats this?
+    prop->deviceOverlap = 0; // whats this?
+    prop->multiProcessorCount = 3;
+    prop->kernelExecTimeoutEnabled = true;
+    prop->integrated = true;
+    prop->canMapHostMemory = false;
+    prop->computeMode = 0;  //whats this?
+    prop->concurrentKernels = 1;
+    prop->ECCEnabled = false;
+    prop->pciBusID = 0;
+    prop->pciDeviceID = 0;
+    prop->tccDriver = 0; // no idea
     return 0;
 }
 
