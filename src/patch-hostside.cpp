@@ -118,6 +118,7 @@ ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
         my_raw_os_ostream << dumpType(value->getType());
         i ++;
     }
+    // my_raw_os_ostream << "\n";
     return os;
 }
 
