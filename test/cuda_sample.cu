@@ -7,8 +7,6 @@ using namespace std;
 
 #include <cuda_runtime.h>
 
-void hostside_opencl_funcs_init();
-
 __global__ void setValue(float *data, int idx, float value) {
     if(threadIdx.x == 0) {
         data[idx] = value;
@@ -16,8 +14,6 @@ __global__ void setValue(float *data, int idx, float value) {
 }
 
 int main(int argc, char *argv[]) {
-    hostside_opencl_funcs_init();
-
     int N = 1024;
 
     float *gpuFloats;

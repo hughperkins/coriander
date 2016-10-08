@@ -34,6 +34,8 @@ static cl_int err;
 
 static vector<cl_mem> clmems;
 
+static bool initialized = false;
+
 // static string cl_filepath;
 
 /*void hostside_opencl_funcs_setCl(EasyCL *cl, cl_context *ctx, cl_command_queue *queue) {
@@ -50,6 +52,14 @@ void hostside_opencl_funcs_init() {
     queue = cl->queue;
     // ::cl_filepath = cl_filepath;
     // hostside_opencl_funcs_setCl(cl.get(), ctx, queue);
+}
+
+void assure_initialized() {
+    // yes this is not threadsafe.  or anything safe really...
+    if(!initialized) {
+        hostside_opencl_funcs_init();
+        initialized = true;
+    }
 }
 
 extern "C" {
@@ -72,6 +82,8 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
 }
 
 size_t cudaMalloc(void **p_mem, size_t N) {
+    assure_initialized();
+
     cout << "cudamalloc using opencl N " << N << endl;
     cl_mem float_data_gpu = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, N,
                                            NULL, &err);
@@ -105,6 +117,7 @@ void configureKernel(
         const char *kernelName, const char *clSourcecodeString,
         int grid_x, int grid_y, int grid_z,
         int block_x, int block_y, int block_z) {
+    assure_initialized();
     // just a mock for now... can we call this from our modified ir?
     cout << "configureKernel(" << kernelName << ")" << endl;
     cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl;
