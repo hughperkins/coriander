@@ -108,9 +108,15 @@ ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
         i++;
     }
     my_raw_os_ostream << ");\n";
+    my_raw_os_ostream << "value types: ";
+    i = 0;
     for(auto it=info.callValues.begin(); it != info.callValues.end(); it++) {
         Value *value = *it;
-        my_raw_os_ostream << "value " << dumpType(value->getType()) << "\n";
+        if(i > 0) {
+            my_raw_os_ostream << ", ";
+        }
+        my_raw_os_ostream << dumpType(value->getType());
+        i ++;
     }
     return os;
 }
@@ -390,7 +396,7 @@ int main(int argc, char *argv[]) {
     ofile.open(argv[2]);
     raw_os_ostream my_raw_os_ostream(ofile);
     verifyModule(*TheModule);
-    cout << "printing module" << endl;
+    // cout << "printing module" << endl;
     TheModule->print(my_raw_os_ostream, &assemblyAnnotationWriter);
     // my_raw_os_ostream.close();
     ofile.close();

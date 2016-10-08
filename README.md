@@ -77,23 +77,11 @@ building test/generated/cuda_sample-hostpatched.ll from test/generated/cuda_samp
 build/patch-hostside test/generated/cuda_sample-hostraw.ll test/generated/cuda_sample-hostpatched.ll
 patching launch in _Z8setValuePfif
 LaunchCallInfo _Z8setValuePfif<<<dim3(0, 0, 0), dim3(0, 0, 0)>>>(float*, i32, float);
-value float*
-value int
-value float
-
-patching launch in main
+value types: float*, int, floatpatching launch in main
 LaunchCallInfo _Z8setValuePfif<<<dim3(32, 1, 1), dim3(32, 1, 1)>>>(float*, i32, float);
-value float*
-value int
-value float
-
-patching launch in main
+value types: float*, int, floatpatching launch in main
 LaunchCallInfo _Z8setValuePfif<<<dim3(32, 1, 1), dim3(32, 1, 1)>>>(float*, i32, float);
-value float*
-value int
-value float
-
-printing module
+value types: float*, int, float
 echo building build/cuda_sample-hostpatched.o from test/generated/cuda_sample-hostpatched.ll
 building build/cuda_sample-hostpatched.o from test/generated/cuda_sample-hostpatched.ll
 clang++-3.8 -c test/generated/cuda_sample-hostpatched.ll -O3 -o build/cuda_sample-hostpatched.o
