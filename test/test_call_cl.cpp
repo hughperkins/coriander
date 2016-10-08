@@ -44,24 +44,16 @@ int main(int argc, char *argv[]) {
 
     float *gpuFloats;
     cudaMalloc((void**)(&gpuFloats), N * sizeof(float));
-    cout << "gpufloats " << gpuFloats << endl;
-
-
-    float valuesback[1];
-    // err = clEnqueueReadBuffer(*queue, float_data_gpu, CL_TRUE, 0,
-    //                                   1 * sizeof(float), valuesback, 0, NULL, NULL);
-    // cl->finish();
-    // cout << "valuesback[0] " << valuesback[0] << endl;
-
-    // float valuesback[1];
-    err = clEnqueueReadBuffer(*queue, *(cl_mem *)gpuFloats, CL_TRUE, 0,
-                                      1 * sizeof(float), valuesback, 0, NULL, NULL);
-    cl->finish();
-    cout << "valuesback[0] " << valuesback[0] << endl;
-
-    readfoobuffer();
-
     launchSetValue(gpuFloats, 2, 123.0f);
+
+    float hostFloats[4];
+    cudaMemcpy(hostFloats, gpuFloats, 16, cudaMemcpyDeviceToHost);
+    cout << "hostFloats[2] " << hostFloats[2] << endl;
+
+    launchSetValue(gpuFloats, 2, 222.0f);
+    cudaMemcpy(hostFloats, gpuFloats, 16, cudaMemcpyDeviceToHost);
+    cout << "hostFloats[2] " << hostFloats[2] << endl;
+
     cudaFree(gpuFloats);
 
     return 0;

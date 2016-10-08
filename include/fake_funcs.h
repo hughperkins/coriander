@@ -61,9 +61,11 @@ stubout_scope(cta)
 
 #define cudaMalloc fakeCudaMalloc
 #define cudaFree fakeCudaFree
+#define cudaMemcpy fakeCudaMemcpy
 
 cudaError_t fakeCudaMalloc(void **, size_t);
 cudaError_t fakeCudaFree(void *);
+cudaError_t cudaMemcpy(void *dst, const void *, size_t, enum cudaMemcpyKind);
 
 #define tanh our_pretend_tanh
 #define log our_pretend_log

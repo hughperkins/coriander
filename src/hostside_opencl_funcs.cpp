@@ -42,6 +42,7 @@ void hostside_opencl_funcs_setCl(EasyCL *cl, cl_context *ctx, cl_command_queue *
 extern "C" {
     size_t cudaMalloc(void **p_mem, size_t N);
     size_t cudaFree(void *mem);
+    size_t cudaMemcpy(void *dst, const void *, size_t, size_t cudaMemcpyKind);
 }
 
 void readfoobuffer() {
@@ -51,6 +52,14 @@ void readfoobuffer() {
                                       1 * sizeof(float), valuesback, 0, NULL, NULL);
     cl->finish();
     cout << "readfoobuffer valuesback[0] " << valuesback[0] << endl;
+}
+
+size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKind) {
+    cout << "cudamempcy cudaMemcpyKind " << cudaMemcpyKind << endl;
+    err = clEnqueueReadBuffer(*queue, *(cl_mem*)src, CL_TRUE, 0,
+                                     bytes, dst, 0, NULL, NULL);
+    cl->finish();
+    return 0;
 }
 
 size_t cudaMalloc(void **p_mem, size_t N) {
