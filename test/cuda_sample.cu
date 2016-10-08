@@ -28,6 +28,12 @@ int main(int argc, char *argv[]) {
     cudaMemcpy(hostFloats, gpuFloats, 4 * sizeof(float), cudaMemcpyDeviceToHost);
     cout << "hostFloats[2] " << hostFloats[2] << endl;
 
+    hostFloats[2] = 444.0f;
+    cudaMemcpy(gpuFloats, hostFloats, 4 * sizeof(float), cudaMemcpyHostToDevice);
+    hostFloats[2] = 555.0f;
+    cudaMemcpy(hostFloats, gpuFloats, 4 * sizeof(float), cudaMemcpyDeviceToHost);
+    cout << "hostFloats[2] " << hostFloats[2] << endl;
+
     cudaFree(gpuFloats);
 
     return 0;

@@ -71,9 +71,14 @@ extern "C" {
 size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKind) {
     cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << endl;
     if(cudaMemcpyKind == 2) {
+        // device => host
         err = clEnqueueReadBuffer(*queue, *(cl_mem*)src, CL_TRUE, 0,
                                          bytes, dst, 0, NULL, NULL);
-        cl->finish();
+        // cl->finish();
+    } else if(cudaMemcpyKind == 1) {
+        // host => device
+        err = clEnqueueWriteBuffer(*queue, *(cl_mem*)dst, CL_TRUE, 0,
+                                          bytes, src, 0, NULL, NULL);
     } else {
         cout << "cudaMemcpyKind using opencl " << cudaMemcpyKind << endl;
         throw runtime_error("unhandled cudaMemcpyKind");

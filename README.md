@@ -229,7 +229,7 @@ On the host-side, there is code to:
 - replace the cuda kernel launch calls with opencl kernel launch calls
 - cudaMalloc (beta)
 - cudaFree (doesnt actually free :-P  but doesnt call cuda)
-- cudaMemcpy (in direction device=>host works)
+- cudaMemcpy (in direction device=>host and host=>device both work)
 - inject the generated opencl sourcecode, so it's available at runtime (all in one executable)
 - handle initializing opencl automatically
 
@@ -245,7 +245,6 @@ On the host-side, there is code to:
 ### Host-side
 
 - `cudaFree` should actually free memory
-- `cudaMemcpy` for direction host => device
 
 ### Tensorflow
 
