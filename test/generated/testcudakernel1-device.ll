@@ -139,17 +139,17 @@ define void @_Z13someops_floatPf(float* nocapture %data) #4 {
   %8 = fmul float %4, %2
   %9 = fadd float %7, %8
   store float %9, float* %data, align 4, !tbaa !38
-  %10 = tail call float @_Z15our_pretend_logf(float %2)
+  %10 = tail call float @_ZSt15our_pretend_logf(float %2)
   %11 = load float, float* %data, align 4, !tbaa !38
   %12 = fadd float %10, %11
   store float %12, float* %data, align 4, !tbaa !38
   %13 = load float, float* %1, align 4, !tbaa !38
-  %14 = tail call float @_Z15our_pretend_expf(float %13)
+  %14 = tail call float @_ZSt15our_pretend_expf(float %13)
   %15 = load float, float* %data, align 4, !tbaa !38
   %16 = fadd float %14, %15
   store float %16, float* %data, align 4, !tbaa !38
   %17 = load float, float* %1, align 4, !tbaa !38
-  %18 = tail call float @_Z16our_pretend_tanhf(float %17)
+  %18 = tail call float @_ZSt16our_pretend_tanhf(float %17)
   %19 = load float, float* %data, align 4, !tbaa !38
   %20 = fadd float %18, %19
   store float %20, float* %data, align 4, !tbaa !38
@@ -161,11 +161,11 @@ define void @_Z13someops_floatPf(float* nocapture %data) #4 {
   ret void
 }
 
-declare float @_Z15our_pretend_logf(float) #4
+declare float @_ZSt15our_pretend_logf(float) #4
 
-declare float @_Z15our_pretend_expf(float) #4
+declare float @_ZSt15our_pretend_expf(float) #4
 
-declare float @_Z16our_pretend_tanhf(float) #4
+declare float @_ZSt16our_pretend_tanhf(float) #4
 
 declare float @_ZSt4sqrtf(float) #4
 

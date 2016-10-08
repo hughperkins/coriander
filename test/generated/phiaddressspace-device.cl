@@ -5,9 +5,9 @@ struct MyStruct {
 
 
 
-float _Z9sumStructPP8MyStructi(struct MyStruct** p_structs, int N);
+float _Z9sumStructPP8MyStructi(struct MyStruct* * p_structs, int N);
 
-float _Z9sumStructPP8MyStructi(struct MyStruct** p_structs, int N) {
+float _Z9sumStructPP8MyStructi(struct MyStruct* * p_structs, int N) {
     int i_01;
     int i_01_unr;
     float sum_02;
@@ -70,7 +70,7 @@ i_01 = i_01_unr;
     return sum_0_lcssa;
     v_lr_ph:;
     long v21 = i_01;
-    struct MyStruct** v22 = (&p_structs[v21]);
+    struct MyStruct* * v22 = (&p_structs[v21]);
     struct MyStruct* v23 = v22[0];
     float* v24 = (&v23[0].f0);
     float v25 = v24[0];
@@ -82,7 +82,7 @@ i_01 = i_01_unr;
     float v31 = sum_02 + v30;
     int v32 = i_01 + 1;
     long v33 = v32;
-    struct MyStruct** v34 = (&p_structs[v33]);
+    struct MyStruct* * v34 = (&p_structs[v33]);
     struct MyStruct* v35 = v34[0];
     float* v36 = (&v35[0].f0);
     float v37 = v36[0];

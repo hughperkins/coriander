@@ -97,14 +97,22 @@ std::string dumpPointerType(PointerType *ptr) {
     Type *elementType = ptr->getPointerElementType();
     string elementTypeString = dumpType(elementType);
     int addressspace = ptr->getAddressSpace();
+    string addressspacestr = "";
     if(addressspace == 1) {
-        gencode += "global ";
+        addressspacestr = "global";
     }
     if(addressspace == 3) {
-        gencode += "local ";
+        addressspacestr = "local";
     }
     if(addressspace == 4) {
-        gencode += "constant ";
+        addressspacestr = "constant";
+    }
+    // we're just going to hackily assume that anything that is `global **` should be `* global *`
+    if(PointerType *p2 = dyn_cast<PointerType>(ptr->getPointerElementType())) {
+        return elementTypeString + addressspacestr + " *";
+    }
+    if(addressspacestr != "") {
+        gencode += addressspacestr + " ";
     }
     gencode += elementTypeString + "*";
     return gencode;

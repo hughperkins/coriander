@@ -2,88 +2,8 @@ struct union_Eigen__half_impl__FP32 {
     int f0;
 };
 
-struct Eigen__half_impl____half {
-    short f0;
-};
-
-struct Eigen__half_impl__half_base {
-    struct Eigen__half_impl____half f0;
-};
-
-struct Eigen__half {
-    struct Eigen__half_impl__half_base f0;
-};
-
-struct Eigen__internal__scalar_sum_op {
+struct Eigen__internal__scalar_sum_op_64 {
     char f0;
-};
-
-struct class_Eigen__array {
-    int f0[1];
-};
-
-struct Eigen__DSizes {
-    struct class_Eigen__array f0;
-};
-
-struct class_Eigen__StreamInterface {
-};
-
-struct Eigen__GpuDevice {
-    struct class_Eigen__StreamInterface* f0;
-    int f1;
-    char f2[4];
-};
-
-struct Eigen__TensorEvaluator_2 {
-    struct Eigen__half* f0;
-    struct Eigen__DSizes f1;
-    struct Eigen__GpuDevice* f2;
-};
-
-struct class_Eigen__array_5 {
-    long f0[1];
-};
-
-struct Eigen__DSizes_4 {
-    struct class_Eigen__array_5 f0;
-};
-
-struct Eigen__TensorEvaluator_3 {
-    struct Eigen__half* f0;
-    struct Eigen__DSizes_4 f1;
-    struct Eigen__GpuDevice* f2;
-};
-
-struct Eigen__TensorEvaluator_1 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_2 f1;
-    struct Eigen__TensorEvaluator_3 f2;
-};
-
-struct Eigen__TensorEvaluator_12 {
-    struct Eigen__DSizes f0;
-    struct class_Eigen__array f1;
-    struct class_Eigen__array f2;
-    struct Eigen__TensorEvaluator_2 f3;
-};
-
-struct Eigen__TensorEvaluator_11 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_2 f1;
-    struct Eigen__TensorEvaluator_12 f2;
-};
-
-struct Eigen__TensorEvaluator_14 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_12 f1;
-    struct Eigen__TensorEvaluator_2 f2;
-};
-
-struct Eigen__TensorEvaluator_16 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_12 f1;
-    struct Eigen__TensorEvaluator_12 f2;
 };
 
 struct class_Eigen__array_20 {
@@ -94,167 +14,13 @@ struct Eigen__DSizes_19 {
     struct class_Eigen__array_20 f0;
 };
 
-struct Eigen__TensorEvaluator_22 {
-    struct Eigen__half* f0;
-    struct Eigen__DSizes_19 f1;
-    struct Eigen__GpuDevice* f2;
+struct class_Eigen__StreamInterface {
 };
 
-struct Eigen__TensorEvaluator_23 {
-    struct Eigen__DSizes_19 f0;
-    struct class_Eigen__array_20 f1;
-    struct class_Eigen__array_20 f2;
-    struct Eigen__TensorEvaluator_22 f3;
-};
-
-struct Eigen__TensorEvaluator_21 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_22 f1;
-    struct Eigen__TensorEvaluator_23 f2;
-};
-
-struct Eigen__TensorEvaluator_25 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_23 f1;
-    struct Eigen__TensorEvaluator_22 f2;
-};
-
-struct Eigen__TensorEvaluator_27 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_23 f1;
-    struct Eigen__TensorEvaluator_23 f2;
-};
-
-struct class_Eigen__array_31 {
-    int f0[3];
-};
-
-struct Eigen__DSizes_30 {
-    struct class_Eigen__array_31 f0;
-};
-
-struct Eigen__TensorEvaluator_33 {
-    struct Eigen__half* f0;
-    struct Eigen__DSizes_30 f1;
-    struct Eigen__GpuDevice* f2;
-};
-
-struct Eigen__TensorEvaluator_34 {
-    struct Eigen__DSizes_30 f0;
-    struct class_Eigen__array_31 f1;
-    struct class_Eigen__array_31 f2;
-    struct Eigen__TensorEvaluator_33 f3;
-};
-
-struct Eigen__TensorEvaluator_32 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_33 f1;
-    struct Eigen__TensorEvaluator_34 f2;
-};
-
-struct Eigen__TensorEvaluator_29 {
-    struct Eigen__half* f0;
-    struct Eigen__DSizes_30 f1;
-    struct Eigen__GpuDevice* f2;
-};
-
-struct Eigen__TensorEvaluator_36 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_34 f1;
-    struct Eigen__TensorEvaluator_33 f2;
-};
-
-struct Eigen__TensorEvaluator_35 {
-    struct Eigen__TensorEvaluator_29 f0;
-    struct Eigen__TensorEvaluator_36 f1;
-};
-
-struct Eigen__TensorEvaluator_38 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_34 f1;
-    struct Eigen__TensorEvaluator_34 f2;
-};
-
-struct class_Eigen__array_42 {
-    int f0[4];
-};
-
-struct Eigen__DSizes_41 {
-    struct class_Eigen__array_42 f0;
-};
-
-struct Eigen__TensorEvaluator_44 {
-    struct Eigen__half* f0;
-    struct Eigen__DSizes_41 f1;
-    struct Eigen__GpuDevice* f2;
-};
-
-struct Eigen__TensorEvaluator_45 {
-    struct Eigen__DSizes_41 f0;
-    struct class_Eigen__array_42 f1;
-    struct class_Eigen__array_42 f2;
-    struct Eigen__TensorEvaluator_44 f3;
-};
-
-struct Eigen__TensorEvaluator_43 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_44 f1;
-    struct Eigen__TensorEvaluator_45 f2;
-};
-
-struct Eigen__TensorEvaluator_47 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_45 f1;
-    struct Eigen__TensorEvaluator_44 f2;
-};
-
-struct Eigen__TensorEvaluator_49 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_45 f1;
-    struct Eigen__TensorEvaluator_45 f2;
-};
-
-struct class_Eigen__array_53 {
-    int f0[5];
-};
-
-struct Eigen__DSizes_52 {
-    struct class_Eigen__array_53 f0;
-};
-
-struct Eigen__TensorEvaluator_55 {
-    struct Eigen__half* f0;
-    struct Eigen__DSizes_52 f1;
-    struct Eigen__GpuDevice* f2;
-};
-
-struct Eigen__TensorEvaluator_56 {
-    struct Eigen__DSizes_52 f0;
-    struct class_Eigen__array_53 f1;
-    struct class_Eigen__array_53 f2;
-    struct Eigen__TensorEvaluator_55 f3;
-};
-
-struct Eigen__TensorEvaluator_54 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_55 f1;
-    struct Eigen__TensorEvaluator_56 f2;
-};
-
-struct Eigen__TensorEvaluator_58 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_56 f1;
-    struct Eigen__TensorEvaluator_55 f2;
-};
-
-struct Eigen__TensorEvaluator_60 {
-    struct Eigen__internal__scalar_sum_op f0;
-    struct Eigen__TensorEvaluator_56 f1;
-    struct Eigen__TensorEvaluator_56 f2;
-};
-
-struct Eigen__internal__scalar_sum_op_64 {
-    char f0;
+struct Eigen__GpuDevice {
+    struct class_Eigen__StreamInterface* f0;
+    int f1;
+    char f2[4];
 };
 
 struct Eigen__TensorEvaluator_84 {
@@ -276,6 +42,14 @@ struct Eigen__TensorEvaluator_89 {
     struct Eigen__TensorEvaluator_85 f2;
 };
 
+struct class_Eigen__array_31 {
+    int f0[3];
+};
+
+struct Eigen__DSizes_30 {
+    struct class_Eigen__array_31 f0;
+};
+
 struct Eigen__TensorEvaluator_93 {
     float* f0;
     struct Eigen__DSizes_30 f1;
@@ -289,6 +63,14 @@ struct Eigen__TensorEvaluator_94 {
     struct Eigen__TensorEvaluator_93 f3;
 };
 
+struct class_Eigen__array_42 {
+    int f0[4];
+};
+
+struct Eigen__DSizes_41 {
+    struct class_Eigen__array_42 f0;
+};
+
 struct Eigen__TensorEvaluator_102 {
     float* f0;
     struct Eigen__DSizes_41 f1;
@@ -300,6 +82,14 @@ struct Eigen__TensorEvaluator_103 {
     struct class_Eigen__array_42 f1;
     struct class_Eigen__array_42 f2;
     struct Eigen__TensorEvaluator_102 f3;
+};
+
+struct class_Eigen__array_53 {
+    int f0[5];
+};
+
+struct Eigen__DSizes_52 {
+    struct class_Eigen__array_53 f0;
 };
 
 struct Eigen__TensorEvaluator_111 {
@@ -362,131 +152,12 @@ struct Eigen__TensorEvaluator_164 {
     struct Eigen__TensorEvaluator_160 f2;
 };
 
-struct Eigen__TensorEvaluator_0 {
-    struct Eigen__half* f0;
-    struct Eigen__DSizes f1;
-    struct Eigen__GpuDevice* f2;
+struct class_Eigen__array {
+    int f0[1];
 };
 
-struct Eigen__TensorEvaluator {
-    struct Eigen__TensorEvaluator_0 f0;
-    struct Eigen__TensorEvaluator_1 f1;
-};
-
-struct Eigen__internal__scalar_left {
-    struct Eigen__half* f0;
-};
-
-struct Eigen__TensorEvaluator_7 {
-    struct Eigen__internal__scalar_left f0;
-    struct Eigen__TensorEvaluator_2 f1;
-};
-
-struct Eigen__TensorEvaluator_6 {
-    struct Eigen__TensorEvaluator_0 f0;
-    struct Eigen__TensorEvaluator_7 f1;
-};
-
-struct Eigen__internal__scalar_right {
-    struct Eigen__half* f0;
-};
-
-struct Eigen__TensorEvaluator_9 {
-    struct Eigen__internal__scalar_right f0;
-    struct Eigen__TensorEvaluator_2 f1;
-};
-
-struct Eigen__TensorEvaluator_8 {
-    struct Eigen__TensorEvaluator_0 f0;
-    struct Eigen__TensorEvaluator_9 f1;
-};
-
-struct Eigen__TensorEvaluator_10 {
-    struct Eigen__TensorEvaluator_0 f0;
-    struct Eigen__TensorEvaluator_11 f1;
-};
-
-struct Eigen__TensorEvaluator_13 {
-    struct Eigen__TensorEvaluator_0 f0;
-    struct Eigen__TensorEvaluator_14 f1;
-};
-
-struct Eigen__TensorEvaluator_15 {
-    struct Eigen__TensorEvaluator_0 f0;
-    struct Eigen__TensorEvaluator_16 f1;
-};
-
-struct Eigen__TensorEvaluator_18 {
-    struct Eigen__half* f0;
-    struct Eigen__DSizes_19 f1;
-    struct Eigen__GpuDevice* f2;
-};
-
-struct Eigen__TensorEvaluator_17 {
-    struct Eigen__TensorEvaluator_18 f0;
-    struct Eigen__TensorEvaluator_21 f1;
-};
-
-struct Eigen__TensorEvaluator_24 {
-    struct Eigen__TensorEvaluator_18 f0;
-    struct Eigen__TensorEvaluator_25 f1;
-};
-
-struct Eigen__TensorEvaluator_26 {
-    struct Eigen__TensorEvaluator_18 f0;
-    struct Eigen__TensorEvaluator_27 f1;
-};
-
-struct Eigen__TensorEvaluator_28 {
-    struct Eigen__TensorEvaluator_29 f0;
-    struct Eigen__TensorEvaluator_32 f1;
-};
-
-struct Eigen__TensorEvaluator_37 {
-    struct Eigen__TensorEvaluator_29 f0;
-    struct Eigen__TensorEvaluator_38 f1;
-};
-
-struct Eigen__TensorEvaluator_40 {
-    struct Eigen__half* f0;
-    struct Eigen__DSizes_41 f1;
-    struct Eigen__GpuDevice* f2;
-};
-
-struct Eigen__TensorEvaluator_39 {
-    struct Eigen__TensorEvaluator_40 f0;
-    struct Eigen__TensorEvaluator_43 f1;
-};
-
-struct Eigen__TensorEvaluator_46 {
-    struct Eigen__TensorEvaluator_40 f0;
-    struct Eigen__TensorEvaluator_47 f1;
-};
-
-struct Eigen__TensorEvaluator_48 {
-    struct Eigen__TensorEvaluator_40 f0;
-    struct Eigen__TensorEvaluator_49 f1;
-};
-
-struct Eigen__TensorEvaluator_51 {
-    struct Eigen__half* f0;
-    struct Eigen__DSizes_52 f1;
-    struct Eigen__GpuDevice* f2;
-};
-
-struct Eigen__TensorEvaluator_50 {
-    struct Eigen__TensorEvaluator_51 f0;
-    struct Eigen__TensorEvaluator_54 f1;
-};
-
-struct Eigen__TensorEvaluator_57 {
-    struct Eigen__TensorEvaluator_51 f0;
-    struct Eigen__TensorEvaluator_58 f1;
-};
-
-struct Eigen__TensorEvaluator_59 {
-    struct Eigen__TensorEvaluator_51 f0;
-    struct Eigen__TensorEvaluator_60 f1;
+struct Eigen__DSizes {
+    struct class_Eigen__array f0;
 };
 
 struct Eigen__TensorEvaluator_62 {
@@ -499,6 +170,14 @@ struct Eigen__TensorEvaluator_66 {
     float* f0;
     struct Eigen__DSizes f1;
     struct Eigen__GpuDevice* f2;
+};
+
+struct class_Eigen__array_5 {
+    long f0[1];
+};
+
+struct Eigen__DSizes_4 {
+    struct class_Eigen__array_5 f0;
 };
 
 struct Eigen__TensorEvaluator_67 {
@@ -1322,4015 +1001,12 @@ constant struct union_Eigen__half_impl__FP32 _ZZN5Eigen9half_impl18float_to_half
 constant struct union_Eigen__half_impl__FP32 _ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic = {1056964608};
 
 
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEKNS6_INS7_IS8_Li1ELi1ElEELi16EEEEENS_9GpuDeviceEE5coeffEl(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_1* this, long index);
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESB_EEEENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_11* this, int index);
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEEESF_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_14* this, int index);
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEEESH_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_16* this, int index);
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESB_EEEENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_21* this, int index);
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS_9TensorMapINS_6TensorIKS4_Li2ELi1EiEELi16EEEEESF_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_25* this, int index);
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS_9TensorMapINS_6TensorIKS4_Li2ELi1EiEELi16EEEEESH_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_27* this, int index);
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESB_EEEENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_32* this, int index);
-void _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIS4_S4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS2_INS3_IKS4_Li3ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEE10evalScalarEi(struct Eigen__TensorEvaluator_35* this, int i);
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS_9TensorMapINS_6TensorIKS4_Li3ELi1EiEELi16EEEEESH_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_38* this, int index);
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESB_EEEENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_43* this, int index);
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKS4_Li4ELi1EiEELi16EEEEESF_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_47* this, int index);
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKS4_Li4ELi1EiEELi16EEEEESH_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_49* this, int index);
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESB_EEEENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_54* this, int index);
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKS4_Li5ELi1EiEELi16EEEEESF_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_58* this, int index);
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKS4_Li5ELi1EiEELi16EEEEESH_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_60* this, int index);
 float4 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS_9TensorMapINS_6TensorIKfLi2ELi1EiEELi16EEEEESG_EENS_9GpuDeviceEE6packetILi16EEE6float4i(struct Eigen__TensorEvaluator_89* this, int index);
 float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS_9TensorMapINS_6TensorIKfLi3ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE6float4i(struct Eigen__TensorEvaluator_94* this, int index);
 float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKfLi4ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE6float4i(struct Eigen__TensorEvaluator_103* this, int index);
 float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKfLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE6float4i(struct Eigen__TensorEvaluator_112* this, int index);
 struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS_9TensorMapINS_6TensorIKdLi3ELi1EiEELi16EEEEESG_EENS_9GpuDeviceEE6packetILi16EEE7double2i(struct Eigen__TensorEvaluator_155* this, int index);
 struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKdLi4ELi1EiEELi16EEEEESG_EENS_9GpuDeviceEE6packetILi16EEE7double2i(struct Eigen__TensorEvaluator_164* this, int index);
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEKNS4_INS5_ISC_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator* memcopied_eval, long size) {
-    long i_01_i;
-    label0:;
-    struct Eigen__half v1[1];
-    struct Eigen__TensorEvaluator eval[1];
-    int v2 = get_group_id(0);
-    int v3 = get_local_size(0);
-    int v4 = v3 * v2;
-    int v5 = get_global_id(0);
-    int v6 = v4 + v5;
-    long v7 = v6;
-    int v8 = get_num_groups(0);
-    int v9 = v8 * v3;
-    long v10 = v9;
-    char* v11 = ((char*)eval);
-    global char* v13 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 3; __i++) {
-        (( int2 *)v11)[__i] = ((global int2 *)v13)[__i];
-    }
-    struct Eigen__TensorEvaluator_2* v15 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_2* v16 = (&memcopied_eval[0].f1.f1);
-    char* v17 = ((char*)v15);
-    global char* v18 = ((global char*)v16);
-    #pragma unroll
-    for(int __i=0; __i < 6; __i++) {
-        (( int2 *)v17)[__i] = ((global int2 *)v18)[__i];
-    }
-    bool v20 = v7 < size;
-    if(v20) {
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEKNS4_INS5_ISC_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElLb0EE3runERSO_lll_exit;
-    }
-    v_lr_ph_i:;
-    char* v22 = ((char*)v1);
-    struct Eigen__half** v23 = (&eval[0].f0.f0);
-    struct Eigen__TensorEvaluator_1* v24 = (&eval[0].f1);
-    short* v25 = (&v1[0].f0.f0.f0);
-    struct Eigen__half* v_pre = v23[0];
-        i_01_i = v7;
-    goto v27;
-    v27:;
-    long sext_i_i = i_01_i << 32;
-    long v29 = sext_i_i >> 32;
-    _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEKNS6_INS7_IS8_Li1ELi1ElEELi16EEEEENS_9GpuDeviceEE5coeffEl(v1, v24, i_01_i);
-    short v31 = v25[0];
-    short* v32 = (&v_pre[v29].f0.f0.f0);
-    v32[0] = v31;
-    long v35 = i_01_i + v10;
-    bool v36 = v35 < size;
-    if(v36) {
-        i_01_i = v35;
-        goto v27;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEKNS4_INS5_ISC_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElLb0EE3runERSO_lll_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEKNS4_INS5_ISC_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElLb0EE3runERSO_lll_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEKNS4_INS5_ISC_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElLb0EE3runERSO_lll_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEKNS4_INS5_ISC_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElLb0EE3runERSO_lll_exit:;
-}
-
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEKNS6_INS7_IS8_Li1ELi1ElEELi16EEEEENS_9GpuDeviceEE5coeffEl(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_1* this, long index) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    struct Eigen__half** v1 = (&this[0].f1.f0);
-    struct Eigen__half* v2 = v1[0];
-    long sext = index << 32;
-    long v3 = sext >> 32;
-    short* v_idx_i = (&v2[v3].f0.f0.f0);
-    short v_idx_val_i = v_idx_i[0];
-    struct Eigen__half** v4 = (&this[0].f2.f0);
-    struct Eigen__half* v5 = v4[0];
-    short* v_idx_i1 = (&v5[index].f0.f0.f0);
-    short v_idx_val_i2 = v_idx_i1[0];
-    int v6 = v_idx_val_i;
-    int v7 = v6 << 13;
-    int v8 = v7 & 268427264;
-    int v9 = v7 & 260046848;
-    bool v10 = v9 == 260046848;
-    if(v10) {
-        goto v12;
-    } else {
-        goto v13;
-    }
-    v12:;
-    int v14 = v7 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v14;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v13:;
-    int v16 = v8 + 939524096;
-    bool v17 = v9 == 0;
-    if(v17) {
-        goto v19;
-    } else {
-        o_sroa_0_0_i_i_i_i = v16;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v19:;
-    int v20 = v8 + 947912704;
-    float v21 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v22 = ((float)v20);
-    float v23 = v22 - v21;
-    int v24 = ((int)v23);
-        o_sroa_0_0_i_i_i_i = v24;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v26 = v6 << 16;
-    int v27 = v26 & -2147483648;
-    int v28 = o_sroa_0_0_i_i_i_i | v27;
-    float v29 = ((float)v28);
-    int v30 = v_idx_val_i2;
-    int v31 = v30 << 13;
-    int v32 = v31 & 268427264;
-    int v33 = v31 & 260046848;
-    bool v34 = v33 == 260046848;
-    if(v34) {
-        goto v36;
-    } else {
-        goto v37;
-    }
-    v36:;
-    int v38 = v31 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v38;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v37:;
-    int v40 = v32 + 939524096;
-    bool v41 = v33 == 0;
-    if(v41) {
-        goto v43;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v40;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v43:;
-    int v44 = v32 + 947912704;
-    float v45 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v46 = ((float)v44);
-    float v47 = v46 - v45;
-    int v48 = ((int)v47);
-        o_sroa_0_0_i_i1_i_i = v48;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v50 = v30 << 16;
-    int v51 = v50 & -2147483648;
-    int v52 = o_sroa_0_0_i_i1_i_i | v51;
-    float v53 = ((float)v52);
-    float v54 = v29 + v53;
-    int v55 = ((int)v54);
-    int v56 = v55 & -2147483648;
-    int v57 = v56 ^ v55;
-    int v58 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v59 = v57 < v58;
-    if(v59) {
-        goto v61;
-    } else {
-        goto v62;
-    }
-    v62:;
-    int v63 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v64 = v57 > v63;
-    int v65 = v64 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v65;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v61:;
-    bool v67 = v57 < 947912704;
-    if(v67) {
-        goto v69;
-    } else {
-        goto v70;
-    }
-    v69:;
-    float v71 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v72 = ((float)v57);
-    float v73 = v72 + v71;
-    int v74 = ((int)v73);
-    int v_cast_i_i_i_i = ((int)v71);
-    int v75 = v74 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v75;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v70:;
-    int v77 = v55 >> 13;
-    int v78 = v77 & 1;
-    int v79 = v55 + 134221823;
-    int v80 = v79 + v78;
-    int v81 = v80 >> 13;
-        v_sroa_0_0_i_i_i_i = v81;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v83 = v56 >> 16;
-    int v84 = v_sroa_0_0_i_i_i_i | v83;
-    short v85 = (short)v84;
-    short* v86 = (&agg_result[0].f0.f0.f0);
-    v86[0] = v85;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIS6_S6_NS0_13scalar_sum_opIS6_S6_EEEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_6* memcopied_eval, int size) {
-    int i_01_i;
-    int o_sroa_0_0_i_i1_i_i_i_i;
-    int o_sroa_0_0_i_i_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i_i_i;
-    label0:;
-    int v1 = get_group_id(0);
-    int v2 = get_local_size(0);
-    int v3 = v2 * v1;
-    int v4 = get_global_id(0);
-    int v5 = v3 + v4;
-    int v6 = get_num_groups(0);
-    int v7 = v6 * v2;
-    global struct Eigen__half** v8 = (&memcopied_eval[0].f0.f0);
-    struct Eigen__half* v9 = v8[0];
-    global struct Eigen__half** v10 = (&memcopied_eval[0].f1.f1.f0);
-    struct Eigen__half* v11 = v10[0];
-    bool v12 = v5 < size;
-    if(v12) {
-        goto v_lr_ph_i_preheader;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIS6_S6_NS0_13scalar_sum_opIS6_S6_EEEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSN_iii_exit;
-    }
-    v_lr_ph_i_preheader:;
-    global struct Eigen__half** v14 = (&memcopied_eval[0].f1.f0.f0);
-    struct Eigen__half* v15 = v14[0];
-    short* v16 = (&v15[0].f0.f0.f0);
-    int v17 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-        i_01_i = v5;
-    goto v_lr_ph_i;
-    v_lr_ph_i:;
-    long v19 = i_01_i;
-    short* v_idx_i_i = (&v11[v19].f0.f0.f0);
-    short v_idx_val_i_i = v_idx_i_i[0];
-    short v20 = v16[0];
-    int v21 = v20;
-    int v22 = v21 << 13;
-    int v23 = v22 & 268427264;
-    int v24 = v22 & 260046848;
-    bool v25 = v24 == 260046848;
-    if(v25) {
-        goto v27;
-    } else {
-        goto v28;
-    }
-    v27:;
-    int v29 = v22 | 1879048192;
-        o_sroa_0_0_i_i_i_i_i_i = v29;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i_i_i;
-    v28:;
-    int v31 = v23 + 939524096;
-    bool v32 = v24 == 0;
-    if(v32) {
-        goto v34;
-    } else {
-        o_sroa_0_0_i_i_i_i_i_i = v31;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i_i_i;
-    }
-    v34:;
-    int v35 = v23 + 947912704;
-    float v36 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v37 = ((float)v35);
-    float v38 = v37 - v36;
-    int v39 = ((int)v38);
-        o_sroa_0_0_i_i_i_i_i_i = v39;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i_i_i:;
-    int v41 = v21 << 16;
-    int v42 = v41 & -2147483648;
-    int v43 = o_sroa_0_0_i_i_i_i_i_i | v42;
-    float v44 = ((float)v43);
-    int v45 = v_idx_val_i_i;
-    int v46 = v45 << 13;
-    int v47 = v46 & 268427264;
-    int v48 = v46 & 260046848;
-    bool v49 = v48 == 260046848;
-    if(v49) {
-        goto v51;
-    } else {
-        goto v52;
-    }
-    v51:;
-    int v53 = v46 | 1879048192;
-        o_sroa_0_0_i_i1_i_i_i_i = v53;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i_i_i;
-    v52:;
-    int v55 = v47 + 939524096;
-    bool v56 = v48 == 0;
-    if(v56) {
-        goto v58;
-    } else {
-        o_sroa_0_0_i_i1_i_i_i_i = v55;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i_i_i;
-    }
-    v58:;
-    int v59 = v47 + 947912704;
-    float v60 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v61 = ((float)v59);
-    float v62 = v61 - v60;
-    int v63 = ((int)v62);
-        o_sroa_0_0_i_i1_i_i_i_i = v63;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i_i_i:;
-    int v65 = v45 << 16;
-    int v66 = v65 & -2147483648;
-    int v67 = o_sroa_0_0_i_i1_i_i_i_i | v66;
-    float v68 = ((float)v67);
-    float v69 = v44 + v68;
-    int v70 = ((int)v69);
-    int v71 = v70 & -2147483648;
-    int v72 = v71 ^ v70;
-    bool v73 = v72 < v17;
-    if(v73) {
-        goto v75;
-    } else {
-        goto v76;
-    }
-    v76:;
-    int v77 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v78 = v72 > v77;
-    int v79 = v78 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i_i_i = v79;
-    goto _ZNK5Eigen15TensorEvaluatorIKNS_18TensorCwiseUnaryOpINS_8internal11scalar_leftINS_4halfES4_NS2_13scalar_sum_opIS4_S4_EEEEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEEENS_9GpuDeviceEE5coeffEi_exit;
-    v75:;
-    bool v81 = v72 < 947912704;
-    if(v81) {
-        goto v83;
-    } else {
-        goto v84;
-    }
-    v83:;
-    float v85 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v86 = ((float)v72);
-    float v87 = v86 + v85;
-    int v88 = ((int)v87);
-    int v_cast_i_i_i_i_i_i = ((int)v85);
-    int v89 = v88 - v_cast_i_i_i_i_i_i;
-        v_sroa_0_0_i_i_i_i_i_i = v89;
-    goto _ZNK5Eigen15TensorEvaluatorIKNS_18TensorCwiseUnaryOpINS_8internal11scalar_leftINS_4halfES4_NS2_13scalar_sum_opIS4_S4_EEEEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEEENS_9GpuDeviceEE5coeffEi_exit;
-    v84:;
-    int v91 = v70 >> 13;
-    int v92 = v91 & 1;
-    int v93 = v70 + 134221823;
-    int v94 = v93 + v92;
-    int v95 = v94 >> 13;
-        v_sroa_0_0_i_i_i_i_i_i = v95;
-    goto _ZNK5Eigen15TensorEvaluatorIKNS_18TensorCwiseUnaryOpINS_8internal11scalar_leftINS_4halfES4_NS2_13scalar_sum_opIS4_S4_EEEEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEEENS_9GpuDeviceEE5coeffEi_exit;
-    _ZNK5Eigen15TensorEvaluatorIKNS_18TensorCwiseUnaryOpINS_8internal11scalar_leftINS_4halfES4_NS2_13scalar_sum_opIS4_S4_EEEEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEEENS_9GpuDeviceEE5coeffEi_exit:;
-    int v97 = v71 >> 16;
-    int v98 = v_sroa_0_0_i_i_i_i_i_i | v97;
-    short v99 = (short)v98;
-    short* v100 = (&v9[v19].f0.f0.f0);
-    v100[0] = v99;
-    int v102 = i_01_i + v7;
-    bool v103 = v102 < size;
-    if(v103) {
-        i_01_i = v102;
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIS6_S6_NS0_13scalar_sum_opIS6_S6_EEEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSN_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIS6_S6_NS0_13scalar_sum_opIS6_S6_EEEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSN_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIS6_S6_NS0_13scalar_sum_opIS6_S6_EEEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSN_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIS6_S6_NS0_13scalar_sum_opIS6_S6_EEEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSN_iii_exit:;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIS6_S6_NS0_13scalar_sum_opIS6_S6_EEEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_8* memcopied_eval, int size) {
-    int i_01_i;
-    int o_sroa_0_0_i_i1_i_i_i_i;
-    int o_sroa_0_0_i_i_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i_i_i;
-    label0:;
-    int v1 = get_group_id(0);
-    int v2 = get_local_size(0);
-    int v3 = v2 * v1;
-    int v4 = get_global_id(0);
-    int v5 = v3 + v4;
-    int v6 = get_num_groups(0);
-    int v7 = v6 * v2;
-    global struct Eigen__half** v8 = (&memcopied_eval[0].f0.f0);
-    struct Eigen__half* v9 = v8[0];
-    global struct Eigen__half** v10 = (&memcopied_eval[0].f1.f1.f0);
-    struct Eigen__half* v11 = v10[0];
-    bool v12 = v5 < size;
-    if(v12) {
-        goto v_lr_ph_i_preheader;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIS6_S6_NS0_13scalar_sum_opIS6_S6_EEEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSN_iii_exit;
-    }
-    v_lr_ph_i_preheader:;
-    global struct Eigen__half** v14 = (&memcopied_eval[0].f1.f0.f0);
-    struct Eigen__half* v15 = v14[0];
-    short* v16 = (&v15[0].f0.f0.f0);
-    int v17 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-        i_01_i = v5;
-    goto v_lr_ph_i;
-    v_lr_ph_i:;
-    long v19 = i_01_i;
-    short* v_idx_i_i = (&v11[v19].f0.f0.f0);
-    short v_idx_val_i_i = v_idx_i_i[0];
-    int v20 = v_idx_val_i_i;
-    int v21 = v20 << 13;
-    int v22 = v21 & 268427264;
-    int v23 = v21 & 260046848;
-    bool v24 = v23 == 260046848;
-    if(v24) {
-        goto v26;
-    } else {
-        goto v27;
-    }
-    v26:;
-    int v28 = v21 | 1879048192;
-        o_sroa_0_0_i_i_i_i_i_i = v28;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i_i_i;
-    v27:;
-    int v30 = v22 + 939524096;
-    bool v31 = v23 == 0;
-    if(v31) {
-        goto v33;
-    } else {
-        o_sroa_0_0_i_i_i_i_i_i = v30;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i_i_i;
-    }
-    v33:;
-    int v34 = v22 + 947912704;
-    float v35 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v36 = ((float)v34);
-    float v37 = v36 - v35;
-    int v38 = ((int)v37);
-        o_sroa_0_0_i_i_i_i_i_i = v38;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i_i_i:;
-    int v40 = v20 << 16;
-    int v41 = v40 & -2147483648;
-    int v42 = o_sroa_0_0_i_i_i_i_i_i | v41;
-    float v43 = ((float)v42);
-    short v44 = v16[0];
-    int v45 = v44;
-    int v46 = v45 << 13;
-    int v47 = v46 & 268427264;
-    int v48 = v46 & 260046848;
-    bool v49 = v48 == 260046848;
-    if(v49) {
-        goto v51;
-    } else {
-        goto v52;
-    }
-    v51:;
-    int v53 = v46 | 1879048192;
-        o_sroa_0_0_i_i1_i_i_i_i = v53;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i_i_i;
-    v52:;
-    int v55 = v47 + 939524096;
-    bool v56 = v48 == 0;
-    if(v56) {
-        goto v58;
-    } else {
-        o_sroa_0_0_i_i1_i_i_i_i = v55;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i_i_i;
-    }
-    v58:;
-    int v59 = v47 + 947912704;
-    float v60 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v61 = ((float)v59);
-    float v62 = v61 - v60;
-    int v63 = ((int)v62);
-        o_sroa_0_0_i_i1_i_i_i_i = v63;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i_i_i:;
-    int v65 = v45 << 16;
-    int v66 = v65 & -2147483648;
-    int v67 = o_sroa_0_0_i_i1_i_i_i_i | v66;
-    float v68 = ((float)v67);
-    float v69 = v43 + v68;
-    int v70 = ((int)v69);
-    int v71 = v70 & -2147483648;
-    int v72 = v71 ^ v70;
-    bool v73 = v72 < v17;
-    if(v73) {
-        goto v75;
-    } else {
-        goto v76;
-    }
-    v76:;
-    int v77 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v78 = v72 > v77;
-    int v79 = v78 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i_i_i = v79;
-    goto _ZNK5Eigen15TensorEvaluatorIKNS_18TensorCwiseUnaryOpINS_8internal12scalar_rightINS_4halfES4_NS2_13scalar_sum_opIS4_S4_EEEEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEEENS_9GpuDeviceEE5coeffEi_exit;
-    v75:;
-    bool v81 = v72 < 947912704;
-    if(v81) {
-        goto v83;
-    } else {
-        goto v84;
-    }
-    v83:;
-    float v85 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v86 = ((float)v72);
-    float v87 = v86 + v85;
-    int v88 = ((int)v87);
-    int v_cast_i_i_i_i_i_i = ((int)v85);
-    int v89 = v88 - v_cast_i_i_i_i_i_i;
-        v_sroa_0_0_i_i_i_i_i_i = v89;
-    goto _ZNK5Eigen15TensorEvaluatorIKNS_18TensorCwiseUnaryOpINS_8internal12scalar_rightINS_4halfES4_NS2_13scalar_sum_opIS4_S4_EEEEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEEENS_9GpuDeviceEE5coeffEi_exit;
-    v84:;
-    int v91 = v70 >> 13;
-    int v92 = v91 & 1;
-    int v93 = v70 + 134221823;
-    int v94 = v93 + v92;
-    int v95 = v94 >> 13;
-        v_sroa_0_0_i_i_i_i_i_i = v95;
-    goto _ZNK5Eigen15TensorEvaluatorIKNS_18TensorCwiseUnaryOpINS_8internal12scalar_rightINS_4halfES4_NS2_13scalar_sum_opIS4_S4_EEEEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEEENS_9GpuDeviceEE5coeffEi_exit;
-    _ZNK5Eigen15TensorEvaluatorIKNS_18TensorCwiseUnaryOpINS_8internal12scalar_rightINS_4halfES4_NS2_13scalar_sum_opIS4_S4_EEEEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEEENS_9GpuDeviceEE5coeffEi_exit:;
-    int v97 = v71 >> 16;
-    int v98 = v_sroa_0_0_i_i_i_i_i_i | v97;
-    short v99 = (short)v98;
-    short* v100 = (&v9[v19].f0.f0.f0);
-    v100[0] = v99;
-    int v102 = i_01_i + v7;
-    bool v103 = v102 < size;
-    if(v103) {
-        i_01_i = v102;
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIS6_S6_NS0_13scalar_sum_opIS6_S6_EEEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSN_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIS6_S6_NS0_13scalar_sum_opIS6_S6_EEEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSN_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIS6_S6_NS0_13scalar_sum_opIS6_S6_EEEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSN_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIS6_S6_NS0_13scalar_sum_opIS6_S6_EEEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSN_iii_exit:;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESF_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_10* memcopied_eval, int size) {
-    int i_01_i;
-    label0:;
-    struct Eigen__half v1[1];
-    struct Eigen__TensorEvaluator_10 eval[1];
-    int v2 = get_group_id(0);
-    int v3 = get_local_size(0);
-    int v4 = v3 * v2;
-    int v5 = get_global_id(0);
-    int v6 = v4 + v5;
-    int v7 = get_num_groups(0);
-    int v8 = v7 * v3;
-    char* v9 = ((char*)eval);
-    global char* v11 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 3; __i++) {
-        (( int2 *)v9)[__i] = ((global int2 *)v11)[__i];
-    }
-    struct Eigen__TensorEvaluator_2* v13 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_2* v14 = (&memcopied_eval[0].f1.f1);
-    char* v15 = ((char*)v13);
-    global char* v16 = ((global char*)v14);
-    #pragma unroll
-    for(int __i=0; __i < 8; __i++) {
-        (( int2 *)v15)[__i] = ((global int2 *)v16)[__i];
-    }
-    bool v18 = v6 < size;
-    if(v18) {
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    }
-    v_lr_ph_i:;
-    char* v20 = ((char*)v1);
-    struct Eigen__half** v21 = (&eval[0].f0.f0);
-    struct Eigen__TensorEvaluator_11* v22 = (&eval[0].f1);
-    short* v23 = (&v1[0].f0.f0.f0);
-    struct Eigen__half* v_pre = v21[0];
-        i_01_i = v6;
-    goto v25;
-    v25:;
-    long v27 = i_01_i;
-    _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESB_EEEENS_9GpuDeviceEE5coeffEi(v1, v22, i_01_i);
-    short v29 = v23[0];
-    short* v30 = (&v_pre[v27].f0.f0.f0);
-    v30[0] = v29;
-    int v33 = i_01_i + v8;
-    bool v34 = v33 < size;
-    if(v34) {
-        i_01_i = v33;
-        goto v25;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit:;
-}
-
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESB_EEEENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_11* this, int index) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    struct Eigen__half** v1 = (&this[0].f1.f0);
-    struct Eigen__half* v2 = v1[0];
-    long v3 = index;
-    short* v_idx_i = (&v2[v3].f0.f0.f0);
-    short v_idx_val_i = v_idx_i[0];
-    int* v4 = (&this[0].f2.f3.f1.f0.f0[0]);
-    int v5 = v4[0];
-    int v6 = index % v5;
-    struct Eigen__half** v7 = (&this[0].f2.f3.f0);
-    struct Eigen__half* v8 = v7[0];
-    long v9 = v6;
-    short* v_idx_i_i_i = (&v8[v9].f0.f0.f0);
-    short v_idx_val_i_i_i = v_idx_i_i_i[0];
-    int v10 = v_idx_val_i;
-    int v11 = v10 << 13;
-    int v12 = v11 & 268427264;
-    int v13 = v11 & 260046848;
-    bool v14 = v13 == 260046848;
-    if(v14) {
-        goto v16;
-    } else {
-        goto v17;
-    }
-    v16:;
-    int v18 = v11 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v18;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v17:;
-    int v20 = v12 + 939524096;
-    bool v21 = v13 == 0;
-    if(v21) {
-        goto v23;
-    } else {
-        o_sroa_0_0_i_i_i_i = v20;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v23:;
-    int v24 = v12 + 947912704;
-    float v25 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v26 = ((float)v24);
-    float v27 = v26 - v25;
-    int v28 = ((int)v27);
-        o_sroa_0_0_i_i_i_i = v28;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v30 = v10 << 16;
-    int v31 = v30 & -2147483648;
-    int v32 = o_sroa_0_0_i_i_i_i | v31;
-    float v33 = ((float)v32);
-    int v34 = v_idx_val_i_i_i;
-    int v35 = v34 << 13;
-    int v36 = v35 & 268427264;
-    int v37 = v35 & 260046848;
-    bool v38 = v37 == 260046848;
-    if(v38) {
-        goto v40;
-    } else {
-        goto v41;
-    }
-    v40:;
-    int v42 = v35 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v42;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v41:;
-    int v44 = v36 + 939524096;
-    bool v45 = v37 == 0;
-    if(v45) {
-        goto v47;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v44;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v47:;
-    int v48 = v36 + 947912704;
-    float v49 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v50 = ((float)v48);
-    float v51 = v50 - v49;
-    int v52 = ((int)v51);
-        o_sroa_0_0_i_i1_i_i = v52;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v54 = v34 << 16;
-    int v55 = v54 & -2147483648;
-    int v56 = o_sroa_0_0_i_i1_i_i | v55;
-    float v57 = ((float)v56);
-    float v58 = v33 + v57;
-    int v59 = ((int)v58);
-    int v60 = v59 & -2147483648;
-    int v61 = v60 ^ v59;
-    int v62 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v63 = v61 < v62;
-    if(v63) {
-        goto v65;
-    } else {
-        goto v66;
-    }
-    v66:;
-    int v67 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v68 = v61 > v67;
-    int v69 = v68 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v69;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v65:;
-    bool v71 = v61 < 947912704;
-    if(v71) {
-        goto v73;
-    } else {
-        goto v74;
-    }
-    v73:;
-    float v75 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v76 = ((float)v61);
-    float v77 = v76 + v75;
-    int v78 = ((int)v77);
-    int v_cast_i_i_i_i = ((int)v75);
-    int v79 = v78 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v79;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v74:;
-    int v81 = v59 >> 13;
-    int v82 = v81 & 1;
-    int v83 = v59 + 134221823;
-    int v84 = v83 + v82;
-    int v85 = v84 >> 13;
-        v_sroa_0_0_i_i_i_i = v85;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v87 = v60 >> 16;
-    int v88 = v_sroa_0_0_i_i_i_i | v87;
-    short v89 = (short)v88;
-    short* v90 = (&agg_result[0].f0.f0.f0);
-    v90[0] = v89;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_13* memcopied_eval, int size) {
-    int i_01_i;
-    label0:;
-    struct Eigen__half v1[1];
-    struct Eigen__TensorEvaluator_13 eval[1];
-    int v2 = get_group_id(0);
-    int v3 = get_local_size(0);
-    int v4 = v3 * v2;
-    int v5 = get_global_id(0);
-    int v6 = v4 + v5;
-    int v7 = get_num_groups(0);
-    int v8 = v7 * v3;
-    char* v9 = ((char*)eval);
-    global char* v11 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 3; __i++) {
-        (( int2 *)v9)[__i] = ((global int2 *)v11)[__i];
-    }
-    struct Eigen__TensorEvaluator_12* v13 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_12* v14 = (&memcopied_eval[0].f1.f1);
-    char* v15 = ((char*)v13);
-    global char* v16 = ((global char*)v14);
-    #pragma unroll
-    for(int __i=0; __i < 8; __i++) {
-        (( int2 *)v15)[__i] = ((global int2 *)v16)[__i];
-    }
-    bool v18 = v6 < size;
-    if(v18) {
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    }
-    v_lr_ph_i:;
-    char* v20 = ((char*)v1);
-    struct Eigen__half** v21 = (&eval[0].f0.f0);
-    struct Eigen__TensorEvaluator_14* v22 = (&eval[0].f1);
-    short* v23 = (&v1[0].f0.f0.f0);
-    struct Eigen__half* v_pre = v21[0];
-        i_01_i = v6;
-    goto v25;
-    v25:;
-    long v27 = i_01_i;
-    _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEEESF_EENS_9GpuDeviceEE5coeffEi(v1, v22, i_01_i);
-    short v29 = v23[0];
-    short* v30 = (&v_pre[v27].f0.f0.f0);
-    v30[0] = v29;
-    int v33 = i_01_i + v8;
-    bool v34 = v33 < size;
-    if(v34) {
-        i_01_i = v33;
-        goto v25;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit:;
-}
-
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEEESF_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_14* this, int index) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    int* v1 = (&this[0].f1.f3.f1.f0.f0[0]);
-    int v2 = v1[0];
-    int v3 = index % v2;
-    struct Eigen__half** v4 = (&this[0].f1.f3.f0);
-    struct Eigen__half* v5 = v4[0];
-    long v6 = v3;
-    short* v_idx_i_i_i = (&v5[v6].f0.f0.f0);
-    short v_idx_val_i_i_i = v_idx_i_i_i[0];
-    struct Eigen__half** v7 = (&this[0].f2.f0);
-    struct Eigen__half* v8 = v7[0];
-    long v9 = index;
-    short* v_idx_i = (&v8[v9].f0.f0.f0);
-    short v_idx_val_i = v_idx_i[0];
-    int v10 = v_idx_val_i_i_i;
-    int v11 = v10 << 13;
-    int v12 = v11 & 268427264;
-    int v13 = v11 & 260046848;
-    bool v14 = v13 == 260046848;
-    if(v14) {
-        goto v16;
-    } else {
-        goto v17;
-    }
-    v16:;
-    int v18 = v11 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v18;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v17:;
-    int v20 = v12 + 939524096;
-    bool v21 = v13 == 0;
-    if(v21) {
-        goto v23;
-    } else {
-        o_sroa_0_0_i_i_i_i = v20;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v23:;
-    int v24 = v12 + 947912704;
-    float v25 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v26 = ((float)v24);
-    float v27 = v26 - v25;
-    int v28 = ((int)v27);
-        o_sroa_0_0_i_i_i_i = v28;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v30 = v10 << 16;
-    int v31 = v30 & -2147483648;
-    int v32 = o_sroa_0_0_i_i_i_i | v31;
-    float v33 = ((float)v32);
-    int v34 = v_idx_val_i;
-    int v35 = v34 << 13;
-    int v36 = v35 & 268427264;
-    int v37 = v35 & 260046848;
-    bool v38 = v37 == 260046848;
-    if(v38) {
-        goto v40;
-    } else {
-        goto v41;
-    }
-    v40:;
-    int v42 = v35 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v42;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v41:;
-    int v44 = v36 + 939524096;
-    bool v45 = v37 == 0;
-    if(v45) {
-        goto v47;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v44;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v47:;
-    int v48 = v36 + 947912704;
-    float v49 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v50 = ((float)v48);
-    float v51 = v50 - v49;
-    int v52 = ((int)v51);
-        o_sroa_0_0_i_i1_i_i = v52;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v54 = v34 << 16;
-    int v55 = v54 & -2147483648;
-    int v56 = o_sroa_0_0_i_i1_i_i | v55;
-    float v57 = ((float)v56);
-    float v58 = v33 + v57;
-    int v59 = ((int)v58);
-    int v60 = v59 & -2147483648;
-    int v61 = v60 ^ v59;
-    int v62 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v63 = v61 < v62;
-    if(v63) {
-        goto v65;
-    } else {
-        goto v66;
-    }
-    v66:;
-    int v67 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v68 = v61 > v67;
-    int v69 = v68 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v69;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v65:;
-    bool v71 = v61 < 947912704;
-    if(v71) {
-        goto v73;
-    } else {
-        goto v74;
-    }
-    v73:;
-    float v75 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v76 = ((float)v61);
-    float v77 = v76 + v75;
-    int v78 = ((int)v77);
-    int v_cast_i_i_i_i = ((int)v75);
-    int v79 = v78 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v79;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v74:;
-    int v81 = v59 >> 13;
-    int v82 = v81 & 1;
-    int v83 = v59 + 134221823;
-    int v84 = v83 + v82;
-    int v85 = v84 >> 13;
-        v_sroa_0_0_i_i_i_i = v85;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v87 = v60 >> 16;
-    int v88 = v_sroa_0_0_i_i_i_i | v87;
-    short v89 = (short)v88;
-    short* v90 = (&agg_result[0].f0.f0.f0);
-    v90[0] = v89;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_15* memcopied_eval, int size) {
-    int i_01_i;
-    label0:;
-    struct Eigen__half v1[1];
-    struct Eigen__TensorEvaluator_15 eval[1];
-    int v2 = get_group_id(0);
-    int v3 = get_local_size(0);
-    int v4 = v3 * v2;
-    int v5 = get_global_id(0);
-    int v6 = v4 + v5;
-    int v7 = get_num_groups(0);
-    int v8 = v7 * v3;
-    char* v9 = ((char*)eval);
-    global char* v11 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 3; __i++) {
-        (( int2 *)v9)[__i] = ((global int2 *)v11)[__i];
-    }
-    struct Eigen__TensorEvaluator_12* v13 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_12* v14 = (&memcopied_eval[0].f1.f1);
-    char* v15 = ((char*)v13);
-    global char* v16 = ((global char*)v14);
-    #pragma unroll
-    for(int __i=0; __i < 10; __i++) {
-        (( int2 *)v15)[__i] = ((global int2 *)v16)[__i];
-    }
-    bool v18 = v6 < size;
-    if(v18) {
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    }
-    v_lr_ph_i:;
-    char* v20 = ((char*)v1);
-    struct Eigen__half** v21 = (&eval[0].f0.f0);
-    struct Eigen__TensorEvaluator_16* v22 = (&eval[0].f1);
-    short* v23 = (&v1[0].f0.f0.f0);
-    struct Eigen__half* v_pre = v21[0];
-        i_01_i = v6;
-    goto v25;
-    v25:;
-    long v27 = i_01_i;
-    _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEEESH_EENS_9GpuDeviceEE5coeffEi(v1, v22, i_01_i);
-    short v29 = v23[0];
-    short* v30 = (&v_pre[v27].f0.f0.f0);
-    v30[0] = v29;
-    int v33 = i_01_i + v8;
-    bool v34 = v33 < size;
-    if(v34) {
-        i_01_i = v33;
-        goto v25;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKS6_Li1ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit:;
-}
-
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS_9TensorMapINS_6TensorIKS4_Li1ELi1EiEELi16EEEEESH_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_16* this, int index) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    int* v1 = (&this[0].f1.f3.f1.f0.f0[0]);
-    int v2 = v1[0];
-    int v3 = index % v2;
-    struct Eigen__half** v4 = (&this[0].f1.f3.f0);
-    struct Eigen__half* v5 = v4[0];
-    long v6 = v3;
-    short* v_idx_i_i_i = (&v5[v6].f0.f0.f0);
-    short v_idx_val_i_i_i = v_idx_i_i_i[0];
-    int* v7 = (&this[0].f2.f3.f1.f0.f0[0]);
-    int v8 = v7[0];
-    int v9 = index % v8;
-    struct Eigen__half** v10 = (&this[0].f2.f3.f0);
-    struct Eigen__half* v11 = v10[0];
-    long v12 = v9;
-    short* v_idx_i_i_i1 = (&v11[v12].f0.f0.f0);
-    short v_idx_val_i_i_i2 = v_idx_i_i_i1[0];
-    int v13 = v_idx_val_i_i_i;
-    int v14 = v13 << 13;
-    int v15 = v14 & 268427264;
-    int v16 = v14 & 260046848;
-    bool v17 = v16 == 260046848;
-    if(v17) {
-        goto v19;
-    } else {
-        goto v20;
-    }
-    v19:;
-    int v21 = v14 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v21;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v20:;
-    int v23 = v15 + 939524096;
-    bool v24 = v16 == 0;
-    if(v24) {
-        goto v26;
-    } else {
-        o_sroa_0_0_i_i_i_i = v23;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v26:;
-    int v27 = v15 + 947912704;
-    float v28 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v29 = ((float)v27);
-    float v30 = v29 - v28;
-    int v31 = ((int)v30);
-        o_sroa_0_0_i_i_i_i = v31;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v33 = v13 << 16;
-    int v34 = v33 & -2147483648;
-    int v35 = o_sroa_0_0_i_i_i_i | v34;
-    float v36 = ((float)v35);
-    int v37 = v_idx_val_i_i_i2;
-    int v38 = v37 << 13;
-    int v39 = v38 & 268427264;
-    int v40 = v38 & 260046848;
-    bool v41 = v40 == 260046848;
-    if(v41) {
-        goto v43;
-    } else {
-        goto v44;
-    }
-    v43:;
-    int v45 = v38 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v45;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v44:;
-    int v47 = v39 + 939524096;
-    bool v48 = v40 == 0;
-    if(v48) {
-        goto v50;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v47;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v50:;
-    int v51 = v39 + 947912704;
-    float v52 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v53 = ((float)v51);
-    float v54 = v53 - v52;
-    int v55 = ((int)v54);
-        o_sroa_0_0_i_i1_i_i = v55;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v57 = v37 << 16;
-    int v58 = v57 & -2147483648;
-    int v59 = o_sroa_0_0_i_i1_i_i | v58;
-    float v60 = ((float)v59);
-    float v61 = v36 + v60;
-    int v62 = ((int)v61);
-    int v63 = v62 & -2147483648;
-    int v64 = v63 ^ v62;
-    int v65 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v66 = v64 < v65;
-    if(v66) {
-        goto v68;
-    } else {
-        goto v69;
-    }
-    v69:;
-    int v70 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v71 = v64 > v70;
-    int v72 = v71 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v72;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v68:;
-    bool v74 = v64 < 947912704;
-    if(v74) {
-        goto v76;
-    } else {
-        goto v77;
-    }
-    v76:;
-    float v78 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v79 = ((float)v64);
-    float v80 = v79 + v78;
-    int v81 = ((int)v80);
-    int v_cast_i_i_i_i = ((int)v78);
-    int v82 = v81 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v82;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v77:;
-    int v84 = v62 >> 13;
-    int v85 = v84 & 1;
-    int v86 = v62 + 134221823;
-    int v87 = v86 + v85;
-    int v88 = v87 >> 13;
-        v_sroa_0_0_i_i_i_i = v88;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v90 = v63 >> 16;
-    int v91 = v_sroa_0_0_i_i_i_i | v90;
-    short v92 = (short)v91;
-    short* v93 = (&agg_result[0].f0.f0.f0);
-    v93[0] = v92;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESF_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_17* memcopied_eval, int size) {
-    int i_01_i;
-    label0:;
-    struct Eigen__half v1[1];
-    struct Eigen__TensorEvaluator_17 eval[1];
-    int v2 = get_group_id(0);
-    int v3 = get_local_size(0);
-    int v4 = v3 * v2;
-    int v5 = get_global_id(0);
-    int v6 = v4 + v5;
-    int v7 = get_num_groups(0);
-    int v8 = v7 * v3;
-    char* v9 = ((char*)eval);
-    global char* v11 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 3; __i++) {
-        (( int2 *)v9)[__i] = ((global int2 *)v11)[__i];
-    }
-    struct Eigen__TensorEvaluator_22* v13 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_22* v14 = (&memcopied_eval[0].f1.f1);
-    char* v15 = ((char*)v13);
-    global char* v16 = ((global char*)v14);
-    #pragma unroll
-    for(int __i=0; __i < 9; __i++) {
-        (( int2 *)v15)[__i] = ((global int2 *)v16)[__i];
-    }
-    bool v18 = v6 < size;
-    if(v18) {
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    }
-    v_lr_ph_i:;
-    char* v20 = ((char*)v1);
-    struct Eigen__half** v21 = (&eval[0].f0.f0);
-    struct Eigen__TensorEvaluator_21* v22 = (&eval[0].f1);
-    short* v23 = (&v1[0].f0.f0.f0);
-    struct Eigen__half* v_pre = v21[0];
-        i_01_i = v6;
-    goto v25;
-    v25:;
-    long v27 = i_01_i;
-    _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESB_EEEENS_9GpuDeviceEE5coeffEi(v1, v22, i_01_i);
-    short v29 = v23[0];
-    short* v30 = (&v_pre[v27].f0.f0.f0);
-    v30[0] = v29;
-    int v33 = i_01_i + v8;
-    bool v34 = v33 < size;
-    if(v34) {
-        i_01_i = v33;
-        goto v25;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit:;
-}
-
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESB_EEEENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_21* this, int index) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    struct Eigen__half** v1 = (&this[0].f1.f0);
-    struct Eigen__half* v2 = v1[0];
-    long v3 = index;
-    short* v_idx_i = (&v2[v3].f0.f0.f0);
-    short v_idx_val_i = v_idx_i[0];
-    int* v4 = (&this[0].f2.f1.f0[0]);
-    int v5 = v4[0];
-    int v6 = index / v5;
-    int* v7 = (&this[0].f2.f3.f1.f0.f0[0]);
-    int v8 = v7[0];
-    int v9 = v6 % v8;
-    int* v10 = (&this[0].f2.f2.f0[0]);
-    int v11 = v10[0];
-    int v12 = v11 * v9;
-    int v13 = v6 * v5;
-    int v14 = index - v13;
-    int* v15 = (&this[0].f2.f3.f1.f0.f0[1]);
-    int v16 = v15[0];
-    int v17 = v14 % v16;
-    int v18 = v17 + v12;
-    struct Eigen__half** v19 = (&this[0].f2.f3.f0);
-    struct Eigen__half* v20 = v19[0];
-    long v21 = v18;
-    short* v_idx_i_i_i = (&v20[v21].f0.f0.f0);
-    short v_idx_val_i_i_i = v_idx_i_i_i[0];
-    int v22 = v_idx_val_i;
-    int v23 = v22 << 13;
-    int v24 = v23 & 268427264;
-    int v25 = v23 & 260046848;
-    bool v26 = v25 == 260046848;
-    if(v26) {
-        goto v28;
-    } else {
-        goto v29;
-    }
-    v28:;
-    int v30 = v23 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v30;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v29:;
-    int v32 = v24 + 939524096;
-    bool v33 = v25 == 0;
-    if(v33) {
-        goto v35;
-    } else {
-        o_sroa_0_0_i_i_i_i = v32;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v35:;
-    int v36 = v24 + 947912704;
-    float v37 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v38 = ((float)v36);
-    float v39 = v38 - v37;
-    int v40 = ((int)v39);
-        o_sroa_0_0_i_i_i_i = v40;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v42 = v22 << 16;
-    int v43 = v42 & -2147483648;
-    int v44 = o_sroa_0_0_i_i_i_i | v43;
-    float v45 = ((float)v44);
-    int v46 = v_idx_val_i_i_i;
-    int v47 = v46 << 13;
-    int v48 = v47 & 268427264;
-    int v49 = v47 & 260046848;
-    bool v50 = v49 == 260046848;
-    if(v50) {
-        goto v52;
-    } else {
-        goto v53;
-    }
-    v52:;
-    int v54 = v47 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v54;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v53:;
-    int v56 = v48 + 939524096;
-    bool v57 = v49 == 0;
-    if(v57) {
-        goto v59;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v56;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v59:;
-    int v60 = v48 + 947912704;
-    float v61 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v62 = ((float)v60);
-    float v63 = v62 - v61;
-    int v64 = ((int)v63);
-        o_sroa_0_0_i_i1_i_i = v64;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v66 = v46 << 16;
-    int v67 = v66 & -2147483648;
-    int v68 = o_sroa_0_0_i_i1_i_i | v67;
-    float v69 = ((float)v68);
-    float v70 = v45 + v69;
-    int v71 = ((int)v70);
-    int v72 = v71 & -2147483648;
-    int v73 = v72 ^ v71;
-    int v74 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v75 = v73 < v74;
-    if(v75) {
-        goto v77;
-    } else {
-        goto v78;
-    }
-    v78:;
-    int v79 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v80 = v73 > v79;
-    int v81 = v80 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v81;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v77:;
-    bool v83 = v73 < 947912704;
-    if(v83) {
-        goto v85;
-    } else {
-        goto v86;
-    }
-    v85:;
-    float v87 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v88 = ((float)v73);
-    float v89 = v88 + v87;
-    int v90 = ((int)v89);
-    int v_cast_i_i_i_i = ((int)v87);
-    int v91 = v90 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v91;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v86:;
-    int v93 = v71 >> 13;
-    int v94 = v93 & 1;
-    int v95 = v71 + 134221823;
-    int v96 = v95 + v94;
-    int v97 = v96 >> 13;
-        v_sroa_0_0_i_i_i_i = v97;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v99 = v72 >> 16;
-    int v100 = v_sroa_0_0_i_i_i_i | v99;
-    short v101 = (short)v100;
-    short* v102 = (&agg_result[0].f0.f0.f0);
-    v102[0] = v101;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_24* memcopied_eval, int size) {
-    int i_01_i;
-    label0:;
-    struct Eigen__half v1[1];
-    struct Eigen__TensorEvaluator_24 eval[1];
-    int v2 = get_group_id(0);
-    int v3 = get_local_size(0);
-    int v4 = v3 * v2;
-    int v5 = get_global_id(0);
-    int v6 = v4 + v5;
-    int v7 = get_num_groups(0);
-    int v8 = v7 * v3;
-    char* v9 = ((char*)eval);
-    global char* v11 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 3; __i++) {
-        (( int2 *)v9)[__i] = ((global int2 *)v11)[__i];
-    }
-    struct Eigen__TensorEvaluator_23* v13 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_23* v14 = (&memcopied_eval[0].f1.f1);
-    char* v15 = ((char*)v13);
-    global char* v16 = ((global char*)v14);
-    #pragma unroll
-    for(int __i=0; __i < 9; __i++) {
-        (( int2 *)v15)[__i] = ((global int2 *)v16)[__i];
-    }
-    bool v18 = v6 < size;
-    if(v18) {
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    }
-    v_lr_ph_i:;
-    char* v20 = ((char*)v1);
-    struct Eigen__half** v21 = (&eval[0].f0.f0);
-    struct Eigen__TensorEvaluator_25* v22 = (&eval[0].f1);
-    short* v23 = (&v1[0].f0.f0.f0);
-    struct Eigen__half* v_pre = v21[0];
-        i_01_i = v6;
-    goto v25;
-    v25:;
-    long v27 = i_01_i;
-    _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS_9TensorMapINS_6TensorIKS4_Li2ELi1EiEELi16EEEEESF_EENS_9GpuDeviceEE5coeffEi(v1, v22, i_01_i);
-    short v29 = v23[0];
-    short* v30 = (&v_pre[v27].f0.f0.f0);
-    v30[0] = v29;
-    int v33 = i_01_i + v8;
-    bool v34 = v33 < size;
-    if(v34) {
-        i_01_i = v33;
-        goto v25;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit:;
-}
-
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS_9TensorMapINS_6TensorIKS4_Li2ELi1EiEELi16EEEEESF_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_25* this, int index) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    int* v1 = (&this[0].f1.f1.f0[0]);
-    int v2 = v1[0];
-    int v3 = index / v2;
-    int* v4 = (&this[0].f1.f3.f1.f0.f0[0]);
-    int v5 = v4[0];
-    int v6 = v3 % v5;
-    int* v7 = (&this[0].f1.f2.f0[0]);
-    int v8 = v7[0];
-    int v9 = v8 * v6;
-    int v10 = v3 * v2;
-    int v11 = index - v10;
-    int* v12 = (&this[0].f1.f3.f1.f0.f0[1]);
-    int v13 = v12[0];
-    int v14 = v11 % v13;
-    int v15 = v14 + v9;
-    struct Eigen__half** v16 = (&this[0].f1.f3.f0);
-    struct Eigen__half* v17 = v16[0];
-    long v18 = v15;
-    short* v_idx_i_i_i = (&v17[v18].f0.f0.f0);
-    short v_idx_val_i_i_i = v_idx_i_i_i[0];
-    struct Eigen__half** v19 = (&this[0].f2.f0);
-    struct Eigen__half* v20 = v19[0];
-    long v21 = index;
-    short* v_idx_i = (&v20[v21].f0.f0.f0);
-    short v_idx_val_i = v_idx_i[0];
-    int v22 = v_idx_val_i_i_i;
-    int v23 = v22 << 13;
-    int v24 = v23 & 268427264;
-    int v25 = v23 & 260046848;
-    bool v26 = v25 == 260046848;
-    if(v26) {
-        goto v28;
-    } else {
-        goto v29;
-    }
-    v28:;
-    int v30 = v23 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v30;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v29:;
-    int v32 = v24 + 939524096;
-    bool v33 = v25 == 0;
-    if(v33) {
-        goto v35;
-    } else {
-        o_sroa_0_0_i_i_i_i = v32;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v35:;
-    int v36 = v24 + 947912704;
-    float v37 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v38 = ((float)v36);
-    float v39 = v38 - v37;
-    int v40 = ((int)v39);
-        o_sroa_0_0_i_i_i_i = v40;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v42 = v22 << 16;
-    int v43 = v42 & -2147483648;
-    int v44 = o_sroa_0_0_i_i_i_i | v43;
-    float v45 = ((float)v44);
-    int v46 = v_idx_val_i;
-    int v47 = v46 << 13;
-    int v48 = v47 & 268427264;
-    int v49 = v47 & 260046848;
-    bool v50 = v49 == 260046848;
-    if(v50) {
-        goto v52;
-    } else {
-        goto v53;
-    }
-    v52:;
-    int v54 = v47 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v54;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v53:;
-    int v56 = v48 + 939524096;
-    bool v57 = v49 == 0;
-    if(v57) {
-        goto v59;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v56;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v59:;
-    int v60 = v48 + 947912704;
-    float v61 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v62 = ((float)v60);
-    float v63 = v62 - v61;
-    int v64 = ((int)v63);
-        o_sroa_0_0_i_i1_i_i = v64;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v66 = v46 << 16;
-    int v67 = v66 & -2147483648;
-    int v68 = o_sroa_0_0_i_i1_i_i | v67;
-    float v69 = ((float)v68);
-    float v70 = v45 + v69;
-    int v71 = ((int)v70);
-    int v72 = v71 & -2147483648;
-    int v73 = v72 ^ v71;
-    int v74 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v75 = v73 < v74;
-    if(v75) {
-        goto v77;
-    } else {
-        goto v78;
-    }
-    v78:;
-    int v79 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v80 = v73 > v79;
-    int v81 = v80 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v81;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v77:;
-    bool v83 = v73 < 947912704;
-    if(v83) {
-        goto v85;
-    } else {
-        goto v86;
-    }
-    v85:;
-    float v87 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v88 = ((float)v73);
-    float v89 = v88 + v87;
-    int v90 = ((int)v89);
-    int v_cast_i_i_i_i = ((int)v87);
-    int v91 = v90 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v91;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v86:;
-    int v93 = v71 >> 13;
-    int v94 = v93 & 1;
-    int v95 = v71 + 134221823;
-    int v96 = v95 + v94;
-    int v97 = v96 >> 13;
-        v_sroa_0_0_i_i_i_i = v97;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v99 = v72 >> 16;
-    int v100 = v_sroa_0_0_i_i_i_i | v99;
-    short v101 = (short)v100;
-    short* v102 = (&agg_result[0].f0.f0.f0);
-    v102[0] = v101;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_26* memcopied_eval, int size) {
-    int i_01_i;
-    label0:;
-    struct Eigen__half v1[1];
-    struct Eigen__TensorEvaluator_26 eval[1];
-    int v2 = get_group_id(0);
-    int v3 = get_local_size(0);
-    int v4 = v3 * v2;
-    int v5 = get_global_id(0);
-    int v6 = v4 + v5;
-    int v7 = get_num_groups(0);
-    int v8 = v7 * v3;
-    char* v9 = ((char*)eval);
-    global char* v11 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 3; __i++) {
-        (( int2 *)v9)[__i] = ((global int2 *)v11)[__i];
-    }
-    struct Eigen__TensorEvaluator_23* v13 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_23* v14 = (&memcopied_eval[0].f1.f1);
-    char* v15 = ((char*)v13);
-    global char* v16 = ((global char*)v14);
-    #pragma unroll
-    for(int __i=0; __i < 12; __i++) {
-        (( int2 *)v15)[__i] = ((global int2 *)v16)[__i];
-    }
-    bool v18 = v6 < size;
-    if(v18) {
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    }
-    v_lr_ph_i:;
-    char* v20 = ((char*)v1);
-    struct Eigen__half** v21 = (&eval[0].f0.f0);
-    struct Eigen__TensorEvaluator_27* v22 = (&eval[0].f1);
-    short* v23 = (&v1[0].f0.f0.f0);
-    struct Eigen__half* v_pre = v21[0];
-        i_01_i = v6;
-    goto v25;
-    v25:;
-    long v27 = i_01_i;
-    _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS_9TensorMapINS_6TensorIKS4_Li2ELi1EiEELi16EEEEESH_EENS_9GpuDeviceEE5coeffEi(v1, v22, i_01_i);
-    short v29 = v23[0];
-    short* v30 = (&v_pre[v27].f0.f0.f0);
-    v30[0] = v29;
-    int v33 = i_01_i + v8;
-    bool v34 = v33 < size;
-    if(v34) {
-        i_01_i = v33;
-        goto v25;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKS6_Li2ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit:;
-}
-
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS_9TensorMapINS_6TensorIKS4_Li2ELi1EiEELi16EEEEESH_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_27* this, int index) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    int* v1 = (&this[0].f1.f1.f0[0]);
-    int v2 = v1[0];
-    int v3 = index / v2;
-    int* v4 = (&this[0].f1.f3.f1.f0.f0[0]);
-    int v5 = v4[0];
-    int v6 = v3 % v5;
-    int* v7 = (&this[0].f1.f2.f0[0]);
-    int v8 = v7[0];
-    int v9 = v8 * v6;
-    int v10 = v3 * v2;
-    int v11 = index - v10;
-    int* v12 = (&this[0].f1.f3.f1.f0.f0[1]);
-    int v13 = v12[0];
-    int v14 = v11 % v13;
-    int v15 = v14 + v9;
-    struct Eigen__half** v16 = (&this[0].f1.f3.f0);
-    struct Eigen__half* v17 = v16[0];
-    long v18 = v15;
-    short* v_idx_i_i_i = (&v17[v18].f0.f0.f0);
-    short v_idx_val_i_i_i = v_idx_i_i_i[0];
-    int* v19 = (&this[0].f2.f1.f0[0]);
-    int v20 = v19[0];
-    int v21 = index / v20;
-    int* v22 = (&this[0].f2.f3.f1.f0.f0[0]);
-    int v23 = v22[0];
-    int v24 = v21 % v23;
-    int* v25 = (&this[0].f2.f2.f0[0]);
-    int v26 = v25[0];
-    int v27 = v26 * v24;
-    int v28 = v21 * v20;
-    int v29 = index - v28;
-    int* v30 = (&this[0].f2.f3.f1.f0.f0[1]);
-    int v31 = v30[0];
-    int v32 = v29 % v31;
-    int v33 = v32 + v27;
-    struct Eigen__half** v34 = (&this[0].f2.f3.f0);
-    struct Eigen__half* v35 = v34[0];
-    long v36 = v33;
-    short* v_idx_i_i_i1 = (&v35[v36].f0.f0.f0);
-    short v_idx_val_i_i_i2 = v_idx_i_i_i1[0];
-    int v37 = v_idx_val_i_i_i;
-    int v38 = v37 << 13;
-    int v39 = v38 & 268427264;
-    int v40 = v38 & 260046848;
-    bool v41 = v40 == 260046848;
-    if(v41) {
-        goto v43;
-    } else {
-        goto v44;
-    }
-    v43:;
-    int v45 = v38 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v45;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v44:;
-    int v47 = v39 + 939524096;
-    bool v48 = v40 == 0;
-    if(v48) {
-        goto v50;
-    } else {
-        o_sroa_0_0_i_i_i_i = v47;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v50:;
-    int v51 = v39 + 947912704;
-    float v52 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v53 = ((float)v51);
-    float v54 = v53 - v52;
-    int v55 = ((int)v54);
-        o_sroa_0_0_i_i_i_i = v55;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v57 = v37 << 16;
-    int v58 = v57 & -2147483648;
-    int v59 = o_sroa_0_0_i_i_i_i | v58;
-    float v60 = ((float)v59);
-    int v61 = v_idx_val_i_i_i2;
-    int v62 = v61 << 13;
-    int v63 = v62 & 268427264;
-    int v64 = v62 & 260046848;
-    bool v65 = v64 == 260046848;
-    if(v65) {
-        goto v67;
-    } else {
-        goto v68;
-    }
-    v67:;
-    int v69 = v62 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v69;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v68:;
-    int v71 = v63 + 939524096;
-    bool v72 = v64 == 0;
-    if(v72) {
-        goto v74;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v71;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v74:;
-    int v75 = v63 + 947912704;
-    float v76 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v77 = ((float)v75);
-    float v78 = v77 - v76;
-    int v79 = ((int)v78);
-        o_sroa_0_0_i_i1_i_i = v79;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v81 = v61 << 16;
-    int v82 = v81 & -2147483648;
-    int v83 = o_sroa_0_0_i_i1_i_i | v82;
-    float v84 = ((float)v83);
-    float v85 = v60 + v84;
-    int v86 = ((int)v85);
-    int v87 = v86 & -2147483648;
-    int v88 = v87 ^ v86;
-    int v89 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v90 = v88 < v89;
-    if(v90) {
-        goto v92;
-    } else {
-        goto v93;
-    }
-    v93:;
-    int v94 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v95 = v88 > v94;
-    int v96 = v95 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v96;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v92:;
-    bool v98 = v88 < 947912704;
-    if(v98) {
-        goto v100;
-    } else {
-        goto v101;
-    }
-    v100:;
-    float v102 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v103 = ((float)v88);
-    float v104 = v103 + v102;
-    int v105 = ((int)v104);
-    int v_cast_i_i_i_i = ((int)v102);
-    int v106 = v105 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v106;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v101:;
-    int v108 = v86 >> 13;
-    int v109 = v108 & 1;
-    int v110 = v86 + 134221823;
-    int v111 = v110 + v109;
-    int v112 = v111 >> 13;
-        v_sroa_0_0_i_i_i_i = v112;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v114 = v87 >> 16;
-    int v115 = v_sroa_0_0_i_i_i_i | v114;
-    short v116 = (short)v115;
-    short* v117 = (&agg_result[0].f0.f0.f0);
-    v117[0] = v116;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESF_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_28* memcopied_eval, int size) {
-    int i_01_i;
-    label0:;
-    struct Eigen__half v1[1];
-    struct Eigen__TensorEvaluator_28 eval[1];
-    int v2 = get_group_id(0);
-    int v3 = get_local_size(0);
-    int v4 = v3 * v2;
-    int v5 = get_global_id(0);
-    int v6 = v4 + v5;
-    int v7 = get_num_groups(0);
-    int v8 = v7 * v3;
-    char* v9 = ((char*)eval);
-    global char* v11 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 4; __i++) {
-        (( int2 *)v9)[__i] = ((global int2 *)v11)[__i];
-    }
-    struct Eigen__TensorEvaluator_33* v13 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_33* v14 = (&memcopied_eval[0].f1.f1);
-    char* v15 = ((char*)v13);
-    global char* v16 = ((global char*)v14);
-    #pragma unroll
-    for(int __i=0; __i < 13; __i++) {
-        (( int2 *)v15)[__i] = ((global int2 *)v16)[__i];
-    }
-    bool v18 = v6 < size;
-    if(v18) {
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    }
-    v_lr_ph_i:;
-    char* v20 = ((char*)v1);
-    struct Eigen__half** v21 = (&eval[0].f0.f0);
-    struct Eigen__TensorEvaluator_32* v22 = (&eval[0].f1);
-    short* v23 = (&v1[0].f0.f0.f0);
-    struct Eigen__half* v_pre = v21[0];
-        i_01_i = v6;
-    goto v25;
-    v25:;
-    long v27 = i_01_i;
-    _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESB_EEEENS_9GpuDeviceEE5coeffEi(v1, v22, i_01_i);
-    short v29 = v23[0];
-    short* v30 = (&v_pre[v27].f0.f0.f0);
-    v30[0] = v29;
-    int v33 = i_01_i + v8;
-    bool v34 = v33 < size;
-    if(v34) {
-        i_01_i = v33;
-        goto v25;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit:;
-}
-
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESB_EEEENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_32* this, int index) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    struct Eigen__half** v1 = (&this[0].f1.f0);
-    struct Eigen__half* v2 = v1[0];
-    long v3 = index;
-    short* v_idx_i = (&v2[v3].f0.f0.f0);
-    short v_idx_val_i = v_idx_i[0];
-    int* v4 = (&this[0].f2.f1.f0[0]);
-    int v5 = v4[0];
-    int v6 = index / v5;
-    int* v7 = (&this[0].f2.f3.f1.f0.f0[0]);
-    int v8 = v7[0];
-    int v9 = v6 % v8;
-    int* v10 = (&this[0].f2.f2.f0[0]);
-    int v11 = v10[0];
-    int v12 = v11 * v9;
-    int v13 = v6 * v5;
-    int v14 = index - v13;
-    int* v15 = (&this[0].f2.f1.f0[1]);
-    int v16 = v15[0];
-    int v17 = v14 / v16;
-    int* v18 = (&this[0].f2.f3.f1.f0.f0[1]);
-    int v19 = v18[0];
-    int v20 = v17 % v19;
-    int* v21 = (&this[0].f2.f2.f0[1]);
-    int v22 = v21[0];
-    int v23 = v22 * v20;
-    int v24 = v23 + v12;
-    int v25 = v17 * v16;
-    int v26 = v14 - v25;
-    int* v27 = (&this[0].f2.f3.f1.f0.f0[2]);
-    int v28 = v27[0];
-    int v29 = v26 % v28;
-    int v30 = v24 + v29;
-    struct Eigen__half** v31 = (&this[0].f2.f3.f0);
-    struct Eigen__half* v32 = v31[0];
-    long v33 = v30;
-    short* v_idx_i_i_i = (&v32[v33].f0.f0.f0);
-    short v_idx_val_i_i_i = v_idx_i_i_i[0];
-    int v34 = v_idx_val_i;
-    int v35 = v34 << 13;
-    int v36 = v35 & 268427264;
-    int v37 = v35 & 260046848;
-    bool v38 = v37 == 260046848;
-    if(v38) {
-        goto v40;
-    } else {
-        goto v41;
-    }
-    v40:;
-    int v42 = v35 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v42;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v41:;
-    int v44 = v36 + 939524096;
-    bool v45 = v37 == 0;
-    if(v45) {
-        goto v47;
-    } else {
-        o_sroa_0_0_i_i_i_i = v44;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v47:;
-    int v48 = v36 + 947912704;
-    float v49 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v50 = ((float)v48);
-    float v51 = v50 - v49;
-    int v52 = ((int)v51);
-        o_sroa_0_0_i_i_i_i = v52;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v54 = v34 << 16;
-    int v55 = v54 & -2147483648;
-    int v56 = o_sroa_0_0_i_i_i_i | v55;
-    float v57 = ((float)v56);
-    int v58 = v_idx_val_i_i_i;
-    int v59 = v58 << 13;
-    int v60 = v59 & 268427264;
-    int v61 = v59 & 260046848;
-    bool v62 = v61 == 260046848;
-    if(v62) {
-        goto v64;
-    } else {
-        goto v65;
-    }
-    v64:;
-    int v66 = v59 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v66;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v65:;
-    int v68 = v60 + 939524096;
-    bool v69 = v61 == 0;
-    if(v69) {
-        goto v71;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v68;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v71:;
-    int v72 = v60 + 947912704;
-    float v73 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v74 = ((float)v72);
-    float v75 = v74 - v73;
-    int v76 = ((int)v75);
-        o_sroa_0_0_i_i1_i_i = v76;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v78 = v58 << 16;
-    int v79 = v78 & -2147483648;
-    int v80 = o_sroa_0_0_i_i1_i_i | v79;
-    float v81 = ((float)v80);
-    float v82 = v57 + v81;
-    int v83 = ((int)v82);
-    int v84 = v83 & -2147483648;
-    int v85 = v84 ^ v83;
-    int v86 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v87 = v85 < v86;
-    if(v87) {
-        goto v89;
-    } else {
-        goto v90;
-    }
-    v90:;
-    int v91 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v92 = v85 > v91;
-    int v93 = v92 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v93;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v89:;
-    bool v95 = v85 < 947912704;
-    if(v95) {
-        goto v97;
-    } else {
-        goto v98;
-    }
-    v97:;
-    float v99 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v100 = ((float)v85);
-    float v101 = v100 + v99;
-    int v102 = ((int)v101);
-    int v_cast_i_i_i_i = ((int)v99);
-    int v103 = v102 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v103;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v98:;
-    int v105 = v83 >> 13;
-    int v106 = v105 & 1;
-    int v107 = v83 + 134221823;
-    int v108 = v107 + v106;
-    int v109 = v108 >> 13;
-        v_sroa_0_0_i_i_i_i = v109;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v111 = v84 >> 16;
-    int v112 = v_sroa_0_0_i_i_i_i | v111;
-    short v113 = (short)v112;
-    short* v114 = (&agg_result[0].f0.f0.f0);
-    v114[0] = v113;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_35* memcopied_eval, int size) {
-    int i_01_i;
-    label0:;
-    struct Eigen__TensorEvaluator_35 eval[1];
-    int v1 = get_group_id(0);
-    int v2 = get_local_size(0);
-    int v3 = v2 * v1;
-    int v4 = get_global_id(0);
-    int v5 = v3 + v4;
-    int v6 = get_num_groups(0);
-    int v7 = v6 * v2;
-    char* v8 = ((char*)eval);
-    global char* v10 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 4; __i++) {
-        (( int2 *)v8)[__i] = ((global int2 *)v10)[__i];
-    }
-    struct Eigen__TensorEvaluator_34* v12 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_34* v13 = (&memcopied_eval[0].f1.f1);
-    char* v14 = ((char*)v12);
-    global char* v15 = ((global char*)v13);
-    #pragma unroll
-    for(int __i=0; __i < 13; __i++) {
-        (( int2 *)v14)[__i] = ((global int2 *)v15)[__i];
-    }
-    bool v17 = v5 < size;
-    if(v17) {
-        goto v_lr_ph_i_preheader;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    }
-    v_lr_ph_i_preheader:;
-        i_01_i = v5;
-    goto v_lr_ph_i;
-    v_lr_ph_i:;
-    _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIS4_S4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS2_INS3_IKS4_Li3ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEE10evalScalarEi(eval, i_01_i);
-    int v21 = i_01_i + v7;
-    bool v22 = v21 < size;
-    if(v22) {
-        i_01_i = v21;
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit:;
-}
-
-void _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIS4_S4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS2_INS3_IKS4_Li3ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEE10evalScalarEi(struct Eigen__TensorEvaluator_35* this, int i) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    long v1 = i;
-    struct Eigen__half** v2 = (&this[0].f0.f0);
-    struct Eigen__half* v3 = v2[0];
-    int* v4 = (&this[0].f1.f1.f1.f0[0]);
-    int v5 = v4[0];
-    int v6 = i / v5;
-    int* v7 = (&this[0].f1.f1.f3.f1.f0.f0[0]);
-    int v8 = v7[0];
-    int v9 = v6 % v8;
-    int* v10 = (&this[0].f1.f1.f2.f0[0]);
-    int v11 = v10[0];
-    int v12 = v11 * v9;
-    int v13 = v6 * v5;
-    int v14 = i - v13;
-    int* v15 = (&this[0].f1.f1.f1.f0[1]);
-    int v16 = v15[0];
-    int v17 = v14 / v16;
-    int* v18 = (&this[0].f1.f1.f3.f1.f0.f0[1]);
-    int v19 = v18[0];
-    int v20 = v17 % v19;
-    int* v21 = (&this[0].f1.f1.f2.f0[1]);
-    int v22 = v21[0];
-    int v23 = v22 * v20;
-    int v24 = v23 + v12;
-    int v25 = v17 * v16;
-    int v26 = v14 - v25;
-    int* v27 = (&this[0].f1.f1.f3.f1.f0.f0[2]);
-    int v28 = v27[0];
-    int v29 = v26 % v28;
-    int v30 = v24 + v29;
-    struct Eigen__half** v31 = (&this[0].f1.f1.f3.f0);
-    struct Eigen__half* v32 = v31[0];
-    long v33 = v30;
-    short* v_idx_i_i_i_i = (&v32[v33].f0.f0.f0);
-    short v_idx_val_i_i_i_i = v_idx_i_i_i_i[0];
-    struct Eigen__half** v34 = (&this[0].f1.f2.f0);
-    struct Eigen__half* v35 = v34[0];
-    short* v_idx_i_i = (&v35[v1].f0.f0.f0);
-    short v_idx_val_i_i = v_idx_i_i[0];
-    int v36 = v_idx_val_i_i_i_i;
-    int v37 = v36 << 13;
-    int v38 = v37 & 268427264;
-    int v39 = v37 & 260046848;
-    bool v40 = v39 == 260046848;
-    if(v40) {
-        goto v42;
-    } else {
-        goto v43;
-    }
-    v42:;
-    int v44 = v37 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v44;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v43:;
-    int v46 = v38 + 939524096;
-    bool v47 = v39 == 0;
-    if(v47) {
-        goto v49;
-    } else {
-        o_sroa_0_0_i_i_i_i = v46;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v49:;
-    int v50 = v38 + 947912704;
-    float v51 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v52 = ((float)v50);
-    float v53 = v52 - v51;
-    int v54 = ((int)v53);
-        o_sroa_0_0_i_i_i_i = v54;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v56 = v36 << 16;
-    int v57 = v56 & -2147483648;
-    int v58 = o_sroa_0_0_i_i_i_i | v57;
-    float v59 = ((float)v58);
-    int v60 = v_idx_val_i_i;
-    int v61 = v60 << 13;
-    int v62 = v61 & 268427264;
-    int v63 = v61 & 260046848;
-    bool v64 = v63 == 260046848;
-    if(v64) {
-        goto v66;
-    } else {
-        goto v67;
-    }
-    v66:;
-    int v68 = v61 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v68;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v67:;
-    int v70 = v62 + 939524096;
-    bool v71 = v63 == 0;
-    if(v71) {
-        goto v73;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v70;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v73:;
-    int v74 = v62 + 947912704;
-    float v75 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v76 = ((float)v74);
-    float v77 = v76 - v75;
-    int v78 = ((int)v77);
-        o_sroa_0_0_i_i1_i_i = v78;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v80 = v60 << 16;
-    int v81 = v80 & -2147483648;
-    int v82 = o_sroa_0_0_i_i1_i_i | v81;
-    float v83 = ((float)v82);
-    float v84 = v59 + v83;
-    int v85 = ((int)v84);
-    int v86 = v85 & -2147483648;
-    int v87 = v86 ^ v85;
-    int v88 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v89 = v87 < v88;
-    if(v89) {
-        goto v91;
-    } else {
-        goto v92;
-    }
-    v92:;
-    int v93 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v94 = v87 > v93;
-    int v95 = v94 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v95;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v91:;
-    bool v97 = v87 < 947912704;
-    if(v97) {
-        goto v99;
-    } else {
-        goto v100;
-    }
-    v99:;
-    float v101 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v102 = ((float)v87);
-    float v103 = v102 + v101;
-    int v104 = ((int)v103);
-    int v_cast_i_i_i_i = ((int)v101);
-    int v105 = v104 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v105;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v100:;
-    int v107 = v85 >> 13;
-    int v108 = v107 & 1;
-    int v109 = v85 + 134221823;
-    int v110 = v109 + v108;
-    int v111 = v110 >> 13;
-        v_sroa_0_0_i_i_i_i = v111;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v113 = v86 >> 16;
-    int v114 = v_sroa_0_0_i_i_i_i | v113;
-    short v115 = (short)v114;
-    short* v116 = (&v3[v1].f0.f0.f0);
-    v116[0] = v115;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_37* memcopied_eval, int size) {
-    int i_01_i;
-    label0:;
-    struct Eigen__half v1[1];
-    struct Eigen__TensorEvaluator_37 eval[1];
-    int v2 = get_group_id(0);
-    int v3 = get_local_size(0);
-    int v4 = v3 * v2;
-    int v5 = get_global_id(0);
-    int v6 = v4 + v5;
-    int v7 = get_num_groups(0);
-    int v8 = v7 * v3;
-    char* v9 = ((char*)eval);
-    global char* v11 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 4; __i++) {
-        (( int2 *)v9)[__i] = ((global int2 *)v11)[__i];
-    }
-    struct Eigen__TensorEvaluator_34* v13 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_34* v14 = (&memcopied_eval[0].f1.f1);
-    char* v15 = ((char*)v13);
-    global char* v16 = ((global char*)v14);
-    #pragma unroll
-    for(int __i=0; __i < 18; __i++) {
-        (( int2 *)v15)[__i] = ((global int2 *)v16)[__i];
-    }
-    bool v18 = v6 < size;
-    if(v18) {
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    }
-    v_lr_ph_i:;
-    char* v20 = ((char*)v1);
-    struct Eigen__half** v21 = (&eval[0].f0.f0);
-    struct Eigen__TensorEvaluator_38* v22 = (&eval[0].f1);
-    short* v23 = (&v1[0].f0.f0.f0);
-    struct Eigen__half* v_pre = v21[0];
-        i_01_i = v6;
-    goto v25;
-    v25:;
-    long v27 = i_01_i;
-    _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS_9TensorMapINS_6TensorIKS4_Li3ELi1EiEELi16EEEEESH_EENS_9GpuDeviceEE5coeffEi(v1, v22, i_01_i);
-    short v29 = v23[0];
-    short* v30 = (&v_pre[v27].f0.f0.f0);
-    v30[0] = v29;
-    int v33 = i_01_i + v8;
-    bool v34 = v33 < size;
-    if(v34) {
-        i_01_i = v33;
-        goto v25;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKS6_Li3ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit:;
-}
-
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS_9TensorMapINS_6TensorIKS4_Li3ELi1EiEELi16EEEEESH_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_38* this, int index) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    int* v1 = (&this[0].f1.f1.f0[0]);
-    int v2 = v1[0];
-    int v3 = index / v2;
-    int* v4 = (&this[0].f1.f3.f1.f0.f0[0]);
-    int v5 = v4[0];
-    int v6 = v3 % v5;
-    int* v7 = (&this[0].f1.f2.f0[0]);
-    int v8 = v7[0];
-    int v9 = v8 * v6;
-    int v10 = v3 * v2;
-    int v11 = index - v10;
-    int* v12 = (&this[0].f1.f1.f0[1]);
-    int v13 = v12[0];
-    int v14 = v11 / v13;
-    int* v15 = (&this[0].f1.f3.f1.f0.f0[1]);
-    int v16 = v15[0];
-    int v17 = v14 % v16;
-    int* v18 = (&this[0].f1.f2.f0[1]);
-    int v19 = v18[0];
-    int v20 = v19 * v17;
-    int v21 = v20 + v9;
-    int v22 = v14 * v13;
-    int v23 = v11 - v22;
-    int* v24 = (&this[0].f1.f3.f1.f0.f0[2]);
-    int v25 = v24[0];
-    int v26 = v23 % v25;
-    int v27 = v21 + v26;
-    struct Eigen__half** v28 = (&this[0].f1.f3.f0);
-    struct Eigen__half* v29 = v28[0];
-    long v30 = v27;
-    short* v_idx_i_i_i = (&v29[v30].f0.f0.f0);
-    short v_idx_val_i_i_i = v_idx_i_i_i[0];
-    int* v31 = (&this[0].f2.f1.f0[0]);
-    int v32 = v31[0];
-    int v33 = index / v32;
-    int* v34 = (&this[0].f2.f3.f1.f0.f0[0]);
-    int v35 = v34[0];
-    int v36 = v33 % v35;
-    int* v37 = (&this[0].f2.f2.f0[0]);
-    int v38 = v37[0];
-    int v39 = v38 * v36;
-    int v40 = v33 * v32;
-    int v41 = index - v40;
-    int* v42 = (&this[0].f2.f1.f0[1]);
-    int v43 = v42[0];
-    int v44 = v41 / v43;
-    int* v45 = (&this[0].f2.f3.f1.f0.f0[1]);
-    int v46 = v45[0];
-    int v47 = v44 % v46;
-    int* v48 = (&this[0].f2.f2.f0[1]);
-    int v49 = v48[0];
-    int v50 = v49 * v47;
-    int v51 = v50 + v39;
-    int v52 = v44 * v43;
-    int v53 = v41 - v52;
-    int* v54 = (&this[0].f2.f3.f1.f0.f0[2]);
-    int v55 = v54[0];
-    int v56 = v53 % v55;
-    int v57 = v51 + v56;
-    struct Eigen__half** v58 = (&this[0].f2.f3.f0);
-    struct Eigen__half* v59 = v58[0];
-    long v60 = v57;
-    short* v_idx_i_i_i1 = (&v59[v60].f0.f0.f0);
-    short v_idx_val_i_i_i2 = v_idx_i_i_i1[0];
-    int v61 = v_idx_val_i_i_i;
-    int v62 = v61 << 13;
-    int v63 = v62 & 268427264;
-    int v64 = v62 & 260046848;
-    bool v65 = v64 == 260046848;
-    if(v65) {
-        goto v67;
-    } else {
-        goto v68;
-    }
-    v67:;
-    int v69 = v62 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v69;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v68:;
-    int v71 = v63 + 939524096;
-    bool v72 = v64 == 0;
-    if(v72) {
-        goto v74;
-    } else {
-        o_sroa_0_0_i_i_i_i = v71;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v74:;
-    int v75 = v63 + 947912704;
-    float v76 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v77 = ((float)v75);
-    float v78 = v77 - v76;
-    int v79 = ((int)v78);
-        o_sroa_0_0_i_i_i_i = v79;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v81 = v61 << 16;
-    int v82 = v81 & -2147483648;
-    int v83 = o_sroa_0_0_i_i_i_i | v82;
-    float v84 = ((float)v83);
-    int v85 = v_idx_val_i_i_i2;
-    int v86 = v85 << 13;
-    int v87 = v86 & 268427264;
-    int v88 = v86 & 260046848;
-    bool v89 = v88 == 260046848;
-    if(v89) {
-        goto v91;
-    } else {
-        goto v92;
-    }
-    v91:;
-    int v93 = v86 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v93;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v92:;
-    int v95 = v87 + 939524096;
-    bool v96 = v88 == 0;
-    if(v96) {
-        goto v98;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v95;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v98:;
-    int v99 = v87 + 947912704;
-    float v100 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v101 = ((float)v99);
-    float v102 = v101 - v100;
-    int v103 = ((int)v102);
-        o_sroa_0_0_i_i1_i_i = v103;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v105 = v85 << 16;
-    int v106 = v105 & -2147483648;
-    int v107 = o_sroa_0_0_i_i1_i_i | v106;
-    float v108 = ((float)v107);
-    float v109 = v84 + v108;
-    int v110 = ((int)v109);
-    int v111 = v110 & -2147483648;
-    int v112 = v111 ^ v110;
-    int v113 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v114 = v112 < v113;
-    if(v114) {
-        goto v116;
-    } else {
-        goto v117;
-    }
-    v117:;
-    int v118 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v119 = v112 > v118;
-    int v120 = v119 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v120;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v116:;
-    bool v122 = v112 < 947912704;
-    if(v122) {
-        goto v124;
-    } else {
-        goto v125;
-    }
-    v124:;
-    float v126 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v127 = ((float)v112);
-    float v128 = v127 + v126;
-    int v129 = ((int)v128);
-    int v_cast_i_i_i_i = ((int)v126);
-    int v130 = v129 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v130;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v125:;
-    int v132 = v110 >> 13;
-    int v133 = v132 & 1;
-    int v134 = v110 + 134221823;
-    int v135 = v134 + v133;
-    int v136 = v135 >> 13;
-        v_sroa_0_0_i_i_i_i = v136;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v138 = v111 >> 16;
-    int v139 = v_sroa_0_0_i_i_i_i | v138;
-    short v140 = (short)v139;
-    short* v141 = (&agg_result[0].f0.f0.f0);
-    v141[0] = v140;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESF_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_39* memcopied_eval, int size) {
-    int i_01_i;
-    label0:;
-    struct Eigen__half v1[1];
-    struct Eigen__TensorEvaluator_39 eval[1];
-    int v2 = get_group_id(0);
-    int v3 = get_local_size(0);
-    int v4 = v3 * v2;
-    int v5 = get_global_id(0);
-    int v6 = v4 + v5;
-    int v7 = get_num_groups(0);
-    int v8 = v7 * v3;
-    char* v9 = ((char*)eval);
-    global char* v11 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 4; __i++) {
-        (( int2 *)v9)[__i] = ((global int2 *)v11)[__i];
-    }
-    struct Eigen__TensorEvaluator_44* v13 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_44* v14 = (&memcopied_eval[0].f1.f1);
-    char* v15 = ((char*)v13);
-    global char* v16 = ((global char*)v14);
-    #pragma unroll
-    for(int __i=0; __i < 14; __i++) {
-        (( int2 *)v15)[__i] = ((global int2 *)v16)[__i];
-    }
-    bool v18 = v6 < size;
-    if(v18) {
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    }
-    v_lr_ph_i:;
-    char* v20 = ((char*)v1);
-    struct Eigen__half** v21 = (&eval[0].f0.f0);
-    struct Eigen__TensorEvaluator_43* v22 = (&eval[0].f1);
-    short* v23 = (&v1[0].f0.f0.f0);
-    struct Eigen__half* v_pre = v21[0];
-        i_01_i = v6;
-    goto v25;
-    v25:;
-    long v27 = i_01_i;
-    _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESB_EEEENS_9GpuDeviceEE5coeffEi(v1, v22, i_01_i);
-    short v29 = v23[0];
-    short* v30 = (&v_pre[v27].f0.f0.f0);
-    v30[0] = v29;
-    int v33 = i_01_i + v8;
-    bool v34 = v33 < size;
-    if(v34) {
-        i_01_i = v33;
-        goto v25;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit:;
-}
-
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESB_EEEENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_43* this, int index) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    struct Eigen__half** v1 = (&this[0].f1.f0);
-    struct Eigen__half* v2 = v1[0];
-    long v3 = index;
-    short* v_idx_i = (&v2[v3].f0.f0.f0);
-    short v_idx_val_i = v_idx_i[0];
-    int* v4 = (&this[0].f2.f1.f0[0]);
-    int v5 = v4[0];
-    int v6 = index / v5;
-    int* v7 = (&this[0].f2.f3.f1.f0.f0[0]);
-    int v8 = v7[0];
-    int v9 = v6 % v8;
-    int* v10 = (&this[0].f2.f2.f0[0]);
-    int v11 = v10[0];
-    int v12 = v11 * v9;
-    int v13 = v6 * v5;
-    int v14 = index - v13;
-    int* v15 = (&this[0].f2.f1.f0[1]);
-    int v16 = v15[0];
-    int v17 = v14 / v16;
-    int* v18 = (&this[0].f2.f3.f1.f0.f0[1]);
-    int v19 = v18[0];
-    int v20 = v17 % v19;
-    int* v21 = (&this[0].f2.f2.f0[1]);
-    int v22 = v21[0];
-    int v23 = v22 * v20;
-    int v24 = v23 + v12;
-    int v25 = v17 * v16;
-    int v26 = v14 - v25;
-    int* v27 = (&this[0].f2.f1.f0[2]);
-    int v28 = v27[0];
-    int v29 = v26 / v28;
-    int* v30 = (&this[0].f2.f3.f1.f0.f0[2]);
-    int v31 = v30[0];
-    int v32 = v29 % v31;
-    int* v33 = (&this[0].f2.f2.f0[2]);
-    int v34 = v33[0];
-    int v35 = v34 * v32;
-    int v36 = v24 + v35;
-    int v37 = v29 * v28;
-    int v38 = v26 - v37;
-    int* v39 = (&this[0].f2.f3.f1.f0.f0[3]);
-    int v40 = v39[0];
-    int v41 = v38 % v40;
-    int v42 = v36 + v41;
-    struct Eigen__half** v43 = (&this[0].f2.f3.f0);
-    struct Eigen__half* v44 = v43[0];
-    long v45 = v42;
-    short* v_idx_i_i_i = (&v44[v45].f0.f0.f0);
-    short v_idx_val_i_i_i = v_idx_i_i_i[0];
-    int v46 = v_idx_val_i;
-    int v47 = v46 << 13;
-    int v48 = v47 & 268427264;
-    int v49 = v47 & 260046848;
-    bool v50 = v49 == 260046848;
-    if(v50) {
-        goto v52;
-    } else {
-        goto v53;
-    }
-    v52:;
-    int v54 = v47 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v54;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v53:;
-    int v56 = v48 + 939524096;
-    bool v57 = v49 == 0;
-    if(v57) {
-        goto v59;
-    } else {
-        o_sroa_0_0_i_i_i_i = v56;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v59:;
-    int v60 = v48 + 947912704;
-    float v61 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v62 = ((float)v60);
-    float v63 = v62 - v61;
-    int v64 = ((int)v63);
-        o_sroa_0_0_i_i_i_i = v64;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v66 = v46 << 16;
-    int v67 = v66 & -2147483648;
-    int v68 = o_sroa_0_0_i_i_i_i | v67;
-    float v69 = ((float)v68);
-    int v70 = v_idx_val_i_i_i;
-    int v71 = v70 << 13;
-    int v72 = v71 & 268427264;
-    int v73 = v71 & 260046848;
-    bool v74 = v73 == 260046848;
-    if(v74) {
-        goto v76;
-    } else {
-        goto v77;
-    }
-    v76:;
-    int v78 = v71 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v78;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v77:;
-    int v80 = v72 + 939524096;
-    bool v81 = v73 == 0;
-    if(v81) {
-        goto v83;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v80;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v83:;
-    int v84 = v72 + 947912704;
-    float v85 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v86 = ((float)v84);
-    float v87 = v86 - v85;
-    int v88 = ((int)v87);
-        o_sroa_0_0_i_i1_i_i = v88;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v90 = v70 << 16;
-    int v91 = v90 & -2147483648;
-    int v92 = o_sroa_0_0_i_i1_i_i | v91;
-    float v93 = ((float)v92);
-    float v94 = v69 + v93;
-    int v95 = ((int)v94);
-    int v96 = v95 & -2147483648;
-    int v97 = v96 ^ v95;
-    int v98 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v99 = v97 < v98;
-    if(v99) {
-        goto v101;
-    } else {
-        goto v102;
-    }
-    v102:;
-    int v103 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v104 = v97 > v103;
-    int v105 = v104 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v105;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v101:;
-    bool v107 = v97 < 947912704;
-    if(v107) {
-        goto v109;
-    } else {
-        goto v110;
-    }
-    v109:;
-    float v111 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v112 = ((float)v97);
-    float v113 = v112 + v111;
-    int v114 = ((int)v113);
-    int v_cast_i_i_i_i = ((int)v111);
-    int v115 = v114 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v115;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v110:;
-    int v117 = v95 >> 13;
-    int v118 = v117 & 1;
-    int v119 = v95 + 134221823;
-    int v120 = v119 + v118;
-    int v121 = v120 >> 13;
-        v_sroa_0_0_i_i_i_i = v121;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v123 = v96 >> 16;
-    int v124 = v_sroa_0_0_i_i_i_i | v123;
-    short v125 = (short)v124;
-    short* v126 = (&agg_result[0].f0.f0.f0);
-    v126[0] = v125;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_46* memcopied_eval, int size) {
-    int i_01_i;
-    label0:;
-    struct Eigen__half v1[1];
-    struct Eigen__TensorEvaluator_46 eval[1];
-    int v2 = get_group_id(0);
-    int v3 = get_local_size(0);
-    int v4 = v3 * v2;
-    int v5 = get_global_id(0);
-    int v6 = v4 + v5;
-    int v7 = get_num_groups(0);
-    int v8 = v7 * v3;
-    char* v9 = ((char*)eval);
-    global char* v11 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 4; __i++) {
-        (( int2 *)v9)[__i] = ((global int2 *)v11)[__i];
-    }
-    struct Eigen__TensorEvaluator_45* v13 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_45* v14 = (&memcopied_eval[0].f1.f1);
-    char* v15 = ((char*)v13);
-    global char* v16 = ((global char*)v14);
-    #pragma unroll
-    for(int __i=0; __i < 14; __i++) {
-        (( int2 *)v15)[__i] = ((global int2 *)v16)[__i];
-    }
-    bool v18 = v6 < size;
-    if(v18) {
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    }
-    v_lr_ph_i:;
-    char* v20 = ((char*)v1);
-    struct Eigen__half** v21 = (&eval[0].f0.f0);
-    struct Eigen__TensorEvaluator_47* v22 = (&eval[0].f1);
-    short* v23 = (&v1[0].f0.f0.f0);
-    struct Eigen__half* v_pre = v21[0];
-        i_01_i = v6;
-    goto v25;
-    v25:;
-    long v27 = i_01_i;
-    _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKS4_Li4ELi1EiEELi16EEEEESF_EENS_9GpuDeviceEE5coeffEi(v1, v22, i_01_i);
-    short v29 = v23[0];
-    short* v30 = (&v_pre[v27].f0.f0.f0);
-    v30[0] = v29;
-    int v33 = i_01_i + v8;
-    bool v34 = v33 < size;
-    if(v34) {
-        i_01_i = v33;
-        goto v25;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit:;
-}
-
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKS4_Li4ELi1EiEELi16EEEEESF_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_47* this, int index) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    int* v1 = (&this[0].f1.f1.f0[0]);
-    int v2 = v1[0];
-    int v3 = index / v2;
-    int* v4 = (&this[0].f1.f3.f1.f0.f0[0]);
-    int v5 = v4[0];
-    int v6 = v3 % v5;
-    int* v7 = (&this[0].f1.f2.f0[0]);
-    int v8 = v7[0];
-    int v9 = v8 * v6;
-    int v10 = v3 * v2;
-    int v11 = index - v10;
-    int* v12 = (&this[0].f1.f1.f0[1]);
-    int v13 = v12[0];
-    int v14 = v11 / v13;
-    int* v15 = (&this[0].f1.f3.f1.f0.f0[1]);
-    int v16 = v15[0];
-    int v17 = v14 % v16;
-    int* v18 = (&this[0].f1.f2.f0[1]);
-    int v19 = v18[0];
-    int v20 = v19 * v17;
-    int v21 = v20 + v9;
-    int v22 = v14 * v13;
-    int v23 = v11 - v22;
-    int* v24 = (&this[0].f1.f1.f0[2]);
-    int v25 = v24[0];
-    int v26 = v23 / v25;
-    int* v27 = (&this[0].f1.f3.f1.f0.f0[2]);
-    int v28 = v27[0];
-    int v29 = v26 % v28;
-    int* v30 = (&this[0].f1.f2.f0[2]);
-    int v31 = v30[0];
-    int v32 = v31 * v29;
-    int v33 = v21 + v32;
-    int v34 = v26 * v25;
-    int v35 = v23 - v34;
-    int* v36 = (&this[0].f1.f3.f1.f0.f0[3]);
-    int v37 = v36[0];
-    int v38 = v35 % v37;
-    int v39 = v33 + v38;
-    struct Eigen__half** v40 = (&this[0].f1.f3.f0);
-    struct Eigen__half* v41 = v40[0];
-    long v42 = v39;
-    short* v_idx_i_i_i = (&v41[v42].f0.f0.f0);
-    short v_idx_val_i_i_i = v_idx_i_i_i[0];
-    struct Eigen__half** v43 = (&this[0].f2.f0);
-    struct Eigen__half* v44 = v43[0];
-    long v45 = index;
-    short* v_idx_i = (&v44[v45].f0.f0.f0);
-    short v_idx_val_i = v_idx_i[0];
-    int v46 = v_idx_val_i_i_i;
-    int v47 = v46 << 13;
-    int v48 = v47 & 268427264;
-    int v49 = v47 & 260046848;
-    bool v50 = v49 == 260046848;
-    if(v50) {
-        goto v52;
-    } else {
-        goto v53;
-    }
-    v52:;
-    int v54 = v47 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v54;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v53:;
-    int v56 = v48 + 939524096;
-    bool v57 = v49 == 0;
-    if(v57) {
-        goto v59;
-    } else {
-        o_sroa_0_0_i_i_i_i = v56;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v59:;
-    int v60 = v48 + 947912704;
-    float v61 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v62 = ((float)v60);
-    float v63 = v62 - v61;
-    int v64 = ((int)v63);
-        o_sroa_0_0_i_i_i_i = v64;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v66 = v46 << 16;
-    int v67 = v66 & -2147483648;
-    int v68 = o_sroa_0_0_i_i_i_i | v67;
-    float v69 = ((float)v68);
-    int v70 = v_idx_val_i;
-    int v71 = v70 << 13;
-    int v72 = v71 & 268427264;
-    int v73 = v71 & 260046848;
-    bool v74 = v73 == 260046848;
-    if(v74) {
-        goto v76;
-    } else {
-        goto v77;
-    }
-    v76:;
-    int v78 = v71 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v78;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v77:;
-    int v80 = v72 + 939524096;
-    bool v81 = v73 == 0;
-    if(v81) {
-        goto v83;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v80;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v83:;
-    int v84 = v72 + 947912704;
-    float v85 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v86 = ((float)v84);
-    float v87 = v86 - v85;
-    int v88 = ((int)v87);
-        o_sroa_0_0_i_i1_i_i = v88;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v90 = v70 << 16;
-    int v91 = v90 & -2147483648;
-    int v92 = o_sroa_0_0_i_i1_i_i | v91;
-    float v93 = ((float)v92);
-    float v94 = v69 + v93;
-    int v95 = ((int)v94);
-    int v96 = v95 & -2147483648;
-    int v97 = v96 ^ v95;
-    int v98 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v99 = v97 < v98;
-    if(v99) {
-        goto v101;
-    } else {
-        goto v102;
-    }
-    v102:;
-    int v103 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v104 = v97 > v103;
-    int v105 = v104 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v105;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v101:;
-    bool v107 = v97 < 947912704;
-    if(v107) {
-        goto v109;
-    } else {
-        goto v110;
-    }
-    v109:;
-    float v111 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v112 = ((float)v97);
-    float v113 = v112 + v111;
-    int v114 = ((int)v113);
-    int v_cast_i_i_i_i = ((int)v111);
-    int v115 = v114 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v115;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v110:;
-    int v117 = v95 >> 13;
-    int v118 = v117 & 1;
-    int v119 = v95 + 134221823;
-    int v120 = v119 + v118;
-    int v121 = v120 >> 13;
-        v_sroa_0_0_i_i_i_i = v121;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v123 = v96 >> 16;
-    int v124 = v_sroa_0_0_i_i_i_i | v123;
-    short v125 = (short)v124;
-    short* v126 = (&agg_result[0].f0.f0.f0);
-    v126[0] = v125;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_48* memcopied_eval, int size) {
-    int i_01_i;
-    label0:;
-    struct Eigen__half v1[1];
-    struct Eigen__TensorEvaluator_48 eval[1];
-    int v2 = get_group_id(0);
-    int v3 = get_local_size(0);
-    int v4 = v3 * v2;
-    int v5 = get_global_id(0);
-    int v6 = v4 + v5;
-    int v7 = get_num_groups(0);
-    int v8 = v7 * v3;
-    char* v9 = ((char*)eval);
-    global char* v11 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 4; __i++) {
-        (( int2 *)v9)[__i] = ((global int2 *)v11)[__i];
-    }
-    struct Eigen__TensorEvaluator_45* v13 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_45* v14 = (&memcopied_eval[0].f1.f1);
-    char* v15 = ((char*)v13);
-    global char* v16 = ((global char*)v14);
-    #pragma unroll
-    for(int __i=0; __i < 20; __i++) {
-        (( int2 *)v15)[__i] = ((global int2 *)v16)[__i];
-    }
-    bool v18 = v6 < size;
-    if(v18) {
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    }
-    v_lr_ph_i:;
-    char* v20 = ((char*)v1);
-    struct Eigen__half** v21 = (&eval[0].f0.f0);
-    struct Eigen__TensorEvaluator_49* v22 = (&eval[0].f1);
-    short* v23 = (&v1[0].f0.f0.f0);
-    struct Eigen__half* v_pre = v21[0];
-        i_01_i = v6;
-    goto v25;
-    v25:;
-    long v27 = i_01_i;
-    _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKS4_Li4ELi1EiEELi16EEEEESH_EENS_9GpuDeviceEE5coeffEi(v1, v22, i_01_i);
-    short v29 = v23[0];
-    short* v30 = (&v_pre[v27].f0.f0.f0);
-    v30[0] = v29;
-    int v33 = i_01_i + v8;
-    bool v34 = v33 < size;
-    if(v34) {
-        i_01_i = v33;
-        goto v25;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKS6_Li4ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit:;
-}
-
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKS4_Li4ELi1EiEELi16EEEEESH_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_49* this, int index) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    int* v1 = (&this[0].f1.f1.f0[0]);
-    int v2 = v1[0];
-    int v3 = index / v2;
-    int* v4 = (&this[0].f1.f3.f1.f0.f0[0]);
-    int v5 = v4[0];
-    int v6 = v3 % v5;
-    int* v7 = (&this[0].f1.f2.f0[0]);
-    int v8 = v7[0];
-    int v9 = v8 * v6;
-    int v10 = v3 * v2;
-    int v11 = index - v10;
-    int* v12 = (&this[0].f1.f1.f0[1]);
-    int v13 = v12[0];
-    int v14 = v11 / v13;
-    int* v15 = (&this[0].f1.f3.f1.f0.f0[1]);
-    int v16 = v15[0];
-    int v17 = v14 % v16;
-    int* v18 = (&this[0].f1.f2.f0[1]);
-    int v19 = v18[0];
-    int v20 = v19 * v17;
-    int v21 = v20 + v9;
-    int v22 = v14 * v13;
-    int v23 = v11 - v22;
-    int* v24 = (&this[0].f1.f1.f0[2]);
-    int v25 = v24[0];
-    int v26 = v23 / v25;
-    int* v27 = (&this[0].f1.f3.f1.f0.f0[2]);
-    int v28 = v27[0];
-    int v29 = v26 % v28;
-    int* v30 = (&this[0].f1.f2.f0[2]);
-    int v31 = v30[0];
-    int v32 = v31 * v29;
-    int v33 = v21 + v32;
-    int v34 = v26 * v25;
-    int v35 = v23 - v34;
-    int* v36 = (&this[0].f1.f3.f1.f0.f0[3]);
-    int v37 = v36[0];
-    int v38 = v35 % v37;
-    int v39 = v33 + v38;
-    struct Eigen__half** v40 = (&this[0].f1.f3.f0);
-    struct Eigen__half* v41 = v40[0];
-    long v42 = v39;
-    short* v_idx_i_i_i = (&v41[v42].f0.f0.f0);
-    short v_idx_val_i_i_i = v_idx_i_i_i[0];
-    int* v43 = (&this[0].f2.f1.f0[0]);
-    int v44 = v43[0];
-    int v45 = index / v44;
-    int* v46 = (&this[0].f2.f3.f1.f0.f0[0]);
-    int v47 = v46[0];
-    int v48 = v45 % v47;
-    int* v49 = (&this[0].f2.f2.f0[0]);
-    int v50 = v49[0];
-    int v51 = v50 * v48;
-    int v52 = v45 * v44;
-    int v53 = index - v52;
-    int* v54 = (&this[0].f2.f1.f0[1]);
-    int v55 = v54[0];
-    int v56 = v53 / v55;
-    int* v57 = (&this[0].f2.f3.f1.f0.f0[1]);
-    int v58 = v57[0];
-    int v59 = v56 % v58;
-    int* v60 = (&this[0].f2.f2.f0[1]);
-    int v61 = v60[0];
-    int v62 = v61 * v59;
-    int v63 = v62 + v51;
-    int v64 = v56 * v55;
-    int v65 = v53 - v64;
-    int* v66 = (&this[0].f2.f1.f0[2]);
-    int v67 = v66[0];
-    int v68 = v65 / v67;
-    int* v69 = (&this[0].f2.f3.f1.f0.f0[2]);
-    int v70 = v69[0];
-    int v71 = v68 % v70;
-    int* v72 = (&this[0].f2.f2.f0[2]);
-    int v73 = v72[0];
-    int v74 = v73 * v71;
-    int v75 = v63 + v74;
-    int v76 = v68 * v67;
-    int v77 = v65 - v76;
-    int* v78 = (&this[0].f2.f3.f1.f0.f0[3]);
-    int v79 = v78[0];
-    int v80 = v77 % v79;
-    int v81 = v75 + v80;
-    struct Eigen__half** v82 = (&this[0].f2.f3.f0);
-    struct Eigen__half* v83 = v82[0];
-    long v84 = v81;
-    short* v_idx_i_i_i1 = (&v83[v84].f0.f0.f0);
-    short v_idx_val_i_i_i2 = v_idx_i_i_i1[0];
-    int v85 = v_idx_val_i_i_i;
-    int v86 = v85 << 13;
-    int v87 = v86 & 268427264;
-    int v88 = v86 & 260046848;
-    bool v89 = v88 == 260046848;
-    if(v89) {
-        goto v91;
-    } else {
-        goto v92;
-    }
-    v91:;
-    int v93 = v86 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v93;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v92:;
-    int v95 = v87 + 939524096;
-    bool v96 = v88 == 0;
-    if(v96) {
-        goto v98;
-    } else {
-        o_sroa_0_0_i_i_i_i = v95;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v98:;
-    int v99 = v87 + 947912704;
-    float v100 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v101 = ((float)v99);
-    float v102 = v101 - v100;
-    int v103 = ((int)v102);
-        o_sroa_0_0_i_i_i_i = v103;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v105 = v85 << 16;
-    int v106 = v105 & -2147483648;
-    int v107 = o_sroa_0_0_i_i_i_i | v106;
-    float v108 = ((float)v107);
-    int v109 = v_idx_val_i_i_i2;
-    int v110 = v109 << 13;
-    int v111 = v110 & 268427264;
-    int v112 = v110 & 260046848;
-    bool v113 = v112 == 260046848;
-    if(v113) {
-        goto v115;
-    } else {
-        goto v116;
-    }
-    v115:;
-    int v117 = v110 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v117;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v116:;
-    int v119 = v111 + 939524096;
-    bool v120 = v112 == 0;
-    if(v120) {
-        goto v122;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v119;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v122:;
-    int v123 = v111 + 947912704;
-    float v124 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v125 = ((float)v123);
-    float v126 = v125 - v124;
-    int v127 = ((int)v126);
-        o_sroa_0_0_i_i1_i_i = v127;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v129 = v109 << 16;
-    int v130 = v129 & -2147483648;
-    int v131 = o_sroa_0_0_i_i1_i_i | v130;
-    float v132 = ((float)v131);
-    float v133 = v108 + v132;
-    int v134 = ((int)v133);
-    int v135 = v134 & -2147483648;
-    int v136 = v135 ^ v134;
-    int v137 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v138 = v136 < v137;
-    if(v138) {
-        goto v140;
-    } else {
-        goto v141;
-    }
-    v141:;
-    int v142 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v143 = v136 > v142;
-    int v144 = v143 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v144;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v140:;
-    bool v146 = v136 < 947912704;
-    if(v146) {
-        goto v148;
-    } else {
-        goto v149;
-    }
-    v148:;
-    float v150 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v151 = ((float)v136);
-    float v152 = v151 + v150;
-    int v153 = ((int)v152);
-    int v_cast_i_i_i_i = ((int)v150);
-    int v154 = v153 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v154;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v149:;
-    int v156 = v134 >> 13;
-    int v157 = v156 & 1;
-    int v158 = v134 + 134221823;
-    int v159 = v158 + v157;
-    int v160 = v159 >> 13;
-        v_sroa_0_0_i_i_i_i = v160;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v162 = v135 >> 16;
-    int v163 = v_sroa_0_0_i_i_i_i | v162;
-    short v164 = (short)v163;
-    short* v165 = (&agg_result[0].f0.f0.f0);
-    v165[0] = v164;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESF_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_50* memcopied_eval, int size) {
-    int i_01_i;
-    label0:;
-    struct Eigen__half v1[1];
-    struct Eigen__TensorEvaluator_50 eval[1];
-    int v2 = get_group_id(0);
-    int v3 = get_local_size(0);
-    int v4 = v3 * v2;
-    int v5 = get_global_id(0);
-    int v6 = v4 + v5;
-    int v7 = get_num_groups(0);
-    int v8 = v7 * v3;
-    char* v9 = ((char*)eval);
-    global char* v11 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 5; __i++) {
-        (( int2 *)v9)[__i] = ((global int2 *)v11)[__i];
-    }
-    struct Eigen__TensorEvaluator_55* v13 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_55* v14 = (&memcopied_eval[0].f1.f1);
-    char* v15 = ((char*)v13);
-    global char* v16 = ((global char*)v14);
-    #pragma unroll
-    for(int __i=0; __i < 18; __i++) {
-        (( int2 *)v15)[__i] = ((global int2 *)v16)[__i];
-    }
-    bool v18 = v6 < size;
-    if(v18) {
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    }
-    v_lr_ph_i:;
-    char* v20 = ((char*)v1);
-    struct Eigen__half** v21 = (&eval[0].f0.f0);
-    struct Eigen__TensorEvaluator_54* v22 = (&eval[0].f1);
-    short* v23 = (&v1[0].f0.f0.f0);
-    struct Eigen__half* v_pre = v21[0];
-        i_01_i = v6;
-    goto v25;
-    v25:;
-    long v27 = i_01_i;
-    _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESB_EEEENS_9GpuDeviceEE5coeffEi(v1, v22, i_01_i);
-    short v29 = v23[0];
-    short* v30 = (&v_pre[v27].f0.f0.f0);
-    v30[0] = v29;
-    int v33 = i_01_i + v8;
-    bool v34 = v33 < size;
-    if(v34) {
-        i_01_i = v33;
-        goto v25;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESF_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit:;
-}
-
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_9TensorMapINS_6TensorIKS4_Li5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESB_EEEENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_54* this, int index) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    struct Eigen__half** v1 = (&this[0].f1.f0);
-    struct Eigen__half* v2 = v1[0];
-    long v3 = index;
-    short* v_idx_i = (&v2[v3].f0.f0.f0);
-    short v_idx_val_i = v_idx_i[0];
-    int* v4 = (&this[0].f2.f1.f0[0]);
-    int v5 = v4[0];
-    int v6 = index / v5;
-    int* v7 = (&this[0].f2.f3.f1.f0.f0[0]);
-    int v8 = v7[0];
-    int v9 = v6 % v8;
-    int* v10 = (&this[0].f2.f2.f0[0]);
-    int v11 = v10[0];
-    int v12 = v11 * v9;
-    int v13 = v6 * v5;
-    int v14 = index - v13;
-    int* v15 = (&this[0].f2.f1.f0[1]);
-    int v16 = v15[0];
-    int v17 = v14 / v16;
-    int* v18 = (&this[0].f2.f3.f1.f0.f0[1]);
-    int v19 = v18[0];
-    int v20 = v17 % v19;
-    int* v21 = (&this[0].f2.f2.f0[1]);
-    int v22 = v21[0];
-    int v23 = v22 * v20;
-    int v24 = v23 + v12;
-    int v25 = v17 * v16;
-    int v26 = v14 - v25;
-    int* v27 = (&this[0].f2.f1.f0[2]);
-    int v28 = v27[0];
-    int v29 = v26 / v28;
-    int* v30 = (&this[0].f2.f3.f1.f0.f0[2]);
-    int v31 = v30[0];
-    int v32 = v29 % v31;
-    int* v33 = (&this[0].f2.f2.f0[2]);
-    int v34 = v33[0];
-    int v35 = v34 * v32;
-    int v36 = v24 + v35;
-    int v37 = v29 * v28;
-    int v38 = v26 - v37;
-    int* v39 = (&this[0].f2.f1.f0[3]);
-    int v40 = v39[0];
-    int v41 = v38 / v40;
-    int* v42 = (&this[0].f2.f3.f1.f0.f0[3]);
-    int v43 = v42[0];
-    int v44 = v41 % v43;
-    int* v45 = (&this[0].f2.f2.f0[3]);
-    int v46 = v45[0];
-    int v47 = v46 * v44;
-    int v48 = v36 + v47;
-    int v49 = v41 * v40;
-    int v50 = v38 - v49;
-    int* v51 = (&this[0].f2.f3.f1.f0.f0[4]);
-    int v52 = v51[0];
-    int v53 = v50 % v52;
-    int v54 = v48 + v53;
-    struct Eigen__half** v55 = (&this[0].f2.f3.f0);
-    struct Eigen__half* v56 = v55[0];
-    long v57 = v54;
-    short* v_idx_i_i_i = (&v56[v57].f0.f0.f0);
-    short v_idx_val_i_i_i = v_idx_i_i_i[0];
-    int v58 = v_idx_val_i;
-    int v59 = v58 << 13;
-    int v60 = v59 & 268427264;
-    int v61 = v59 & 260046848;
-    bool v62 = v61 == 260046848;
-    if(v62) {
-        goto v64;
-    } else {
-        goto v65;
-    }
-    v64:;
-    int v66 = v59 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v66;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v65:;
-    int v68 = v60 + 939524096;
-    bool v69 = v61 == 0;
-    if(v69) {
-        goto v71;
-    } else {
-        o_sroa_0_0_i_i_i_i = v68;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v71:;
-    int v72 = v60 + 947912704;
-    float v73 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v74 = ((float)v72);
-    float v75 = v74 - v73;
-    int v76 = ((int)v75);
-        o_sroa_0_0_i_i_i_i = v76;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v78 = v58 << 16;
-    int v79 = v78 & -2147483648;
-    int v80 = o_sroa_0_0_i_i_i_i | v79;
-    float v81 = ((float)v80);
-    int v82 = v_idx_val_i_i_i;
-    int v83 = v82 << 13;
-    int v84 = v83 & 268427264;
-    int v85 = v83 & 260046848;
-    bool v86 = v85 == 260046848;
-    if(v86) {
-        goto v88;
-    } else {
-        goto v89;
-    }
-    v88:;
-    int v90 = v83 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v90;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v89:;
-    int v92 = v84 + 939524096;
-    bool v93 = v85 == 0;
-    if(v93) {
-        goto v95;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v92;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v95:;
-    int v96 = v84 + 947912704;
-    float v97 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v98 = ((float)v96);
-    float v99 = v98 - v97;
-    int v100 = ((int)v99);
-        o_sroa_0_0_i_i1_i_i = v100;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v102 = v82 << 16;
-    int v103 = v102 & -2147483648;
-    int v104 = o_sroa_0_0_i_i1_i_i | v103;
-    float v105 = ((float)v104);
-    float v106 = v81 + v105;
-    int v107 = ((int)v106);
-    int v108 = v107 & -2147483648;
-    int v109 = v108 ^ v107;
-    int v110 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v111 = v109 < v110;
-    if(v111) {
-        goto v113;
-    } else {
-        goto v114;
-    }
-    v114:;
-    int v115 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v116 = v109 > v115;
-    int v117 = v116 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v117;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v113:;
-    bool v119 = v109 < 947912704;
-    if(v119) {
-        goto v121;
-    } else {
-        goto v122;
-    }
-    v121:;
-    float v123 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v124 = ((float)v109);
-    float v125 = v124 + v123;
-    int v126 = ((int)v125);
-    int v_cast_i_i_i_i = ((int)v123);
-    int v127 = v126 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v127;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v122:;
-    int v129 = v107 >> 13;
-    int v130 = v129 & 1;
-    int v131 = v107 + 134221823;
-    int v132 = v131 + v130;
-    int v133 = v132 >> 13;
-        v_sroa_0_0_i_i_i_i = v133;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v135 = v108 >> 16;
-    int v136 = v_sroa_0_0_i_i_i_i | v135;
-    short v137 = (short)v136;
-    short* v138 = (&agg_result[0].f0.f0.f0);
-    v138[0] = v137;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_57* memcopied_eval, int size) {
-    int i_01_i;
-    label0:;
-    struct Eigen__half v1[1];
-    struct Eigen__TensorEvaluator_57 eval[1];
-    int v2 = get_group_id(0);
-    int v3 = get_local_size(0);
-    int v4 = v3 * v2;
-    int v5 = get_global_id(0);
-    int v6 = v4 + v5;
-    int v7 = get_num_groups(0);
-    int v8 = v7 * v3;
-    char* v9 = ((char*)eval);
-    global char* v11 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 5; __i++) {
-        (( int2 *)v9)[__i] = ((global int2 *)v11)[__i];
-    }
-    struct Eigen__TensorEvaluator_56* v13 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_56* v14 = (&memcopied_eval[0].f1.f1);
-    char* v15 = ((char*)v13);
-    global char* v16 = ((global char*)v14);
-    #pragma unroll
-    for(int __i=0; __i < 18; __i++) {
-        (( int2 *)v15)[__i] = ((global int2 *)v16)[__i];
-    }
-    bool v18 = v6 < size;
-    if(v18) {
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    }
-    v_lr_ph_i:;
-    char* v20 = ((char*)v1);
-    struct Eigen__half** v21 = (&eval[0].f0.f0);
-    struct Eigen__TensorEvaluator_58* v22 = (&eval[0].f1);
-    short* v23 = (&v1[0].f0.f0.f0);
-    struct Eigen__half* v_pre = v21[0];
-        i_01_i = v6;
-    goto v25;
-    v25:;
-    long v27 = i_01_i;
-    _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKS4_Li5ELi1EiEELi16EEEEESF_EENS_9GpuDeviceEE5coeffEi(v1, v22, i_01_i);
-    short v29 = v23[0];
-    short* v30 = (&v_pre[v27].f0.f0.f0);
-    v30[0] = v29;
-    int v33 = i_01_i + v8;
-    bool v34 = v33 < size;
-    if(v34) {
-        i_01_i = v33;
-        goto v25;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit:;
-}
-
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKS4_Li5ELi1EiEELi16EEEEESF_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_58* this, int index) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    int* v1 = (&this[0].f1.f1.f0[0]);
-    int v2 = v1[0];
-    int v3 = index / v2;
-    int* v4 = (&this[0].f1.f3.f1.f0.f0[0]);
-    int v5 = v4[0];
-    int v6 = v3 % v5;
-    int* v7 = (&this[0].f1.f2.f0[0]);
-    int v8 = v7[0];
-    int v9 = v8 * v6;
-    int v10 = v3 * v2;
-    int v11 = index - v10;
-    int* v12 = (&this[0].f1.f1.f0[1]);
-    int v13 = v12[0];
-    int v14 = v11 / v13;
-    int* v15 = (&this[0].f1.f3.f1.f0.f0[1]);
-    int v16 = v15[0];
-    int v17 = v14 % v16;
-    int* v18 = (&this[0].f1.f2.f0[1]);
-    int v19 = v18[0];
-    int v20 = v19 * v17;
-    int v21 = v20 + v9;
-    int v22 = v14 * v13;
-    int v23 = v11 - v22;
-    int* v24 = (&this[0].f1.f1.f0[2]);
-    int v25 = v24[0];
-    int v26 = v23 / v25;
-    int* v27 = (&this[0].f1.f3.f1.f0.f0[2]);
-    int v28 = v27[0];
-    int v29 = v26 % v28;
-    int* v30 = (&this[0].f1.f2.f0[2]);
-    int v31 = v30[0];
-    int v32 = v31 * v29;
-    int v33 = v21 + v32;
-    int v34 = v26 * v25;
-    int v35 = v23 - v34;
-    int* v36 = (&this[0].f1.f1.f0[3]);
-    int v37 = v36[0];
-    int v38 = v35 / v37;
-    int* v39 = (&this[0].f1.f3.f1.f0.f0[3]);
-    int v40 = v39[0];
-    int v41 = v38 % v40;
-    int* v42 = (&this[0].f1.f2.f0[3]);
-    int v43 = v42[0];
-    int v44 = v43 * v41;
-    int v45 = v33 + v44;
-    int v46 = v38 * v37;
-    int v47 = v35 - v46;
-    int* v48 = (&this[0].f1.f3.f1.f0.f0[4]);
-    int v49 = v48[0];
-    int v50 = v47 % v49;
-    int v51 = v45 + v50;
-    struct Eigen__half** v52 = (&this[0].f1.f3.f0);
-    struct Eigen__half* v53 = v52[0];
-    long v54 = v51;
-    short* v_idx_i_i_i = (&v53[v54].f0.f0.f0);
-    short v_idx_val_i_i_i = v_idx_i_i_i[0];
-    struct Eigen__half** v55 = (&this[0].f2.f0);
-    struct Eigen__half* v56 = v55[0];
-    long v57 = index;
-    short* v_idx_i = (&v56[v57].f0.f0.f0);
-    short v_idx_val_i = v_idx_i[0];
-    int v58 = v_idx_val_i_i_i;
-    int v59 = v58 << 13;
-    int v60 = v59 & 268427264;
-    int v61 = v59 & 260046848;
-    bool v62 = v61 == 260046848;
-    if(v62) {
-        goto v64;
-    } else {
-        goto v65;
-    }
-    v64:;
-    int v66 = v59 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v66;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v65:;
-    int v68 = v60 + 939524096;
-    bool v69 = v61 == 0;
-    if(v69) {
-        goto v71;
-    } else {
-        o_sroa_0_0_i_i_i_i = v68;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v71:;
-    int v72 = v60 + 947912704;
-    float v73 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v74 = ((float)v72);
-    float v75 = v74 - v73;
-    int v76 = ((int)v75);
-        o_sroa_0_0_i_i_i_i = v76;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v78 = v58 << 16;
-    int v79 = v78 & -2147483648;
-    int v80 = o_sroa_0_0_i_i_i_i | v79;
-    float v81 = ((float)v80);
-    int v82 = v_idx_val_i;
-    int v83 = v82 << 13;
-    int v84 = v83 & 268427264;
-    int v85 = v83 & 260046848;
-    bool v86 = v85 == 260046848;
-    if(v86) {
-        goto v88;
-    } else {
-        goto v89;
-    }
-    v88:;
-    int v90 = v83 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v90;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v89:;
-    int v92 = v84 + 939524096;
-    bool v93 = v85 == 0;
-    if(v93) {
-        goto v95;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v92;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v95:;
-    int v96 = v84 + 947912704;
-    float v97 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v98 = ((float)v96);
-    float v99 = v98 - v97;
-    int v100 = ((int)v99);
-        o_sroa_0_0_i_i1_i_i = v100;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v102 = v82 << 16;
-    int v103 = v102 & -2147483648;
-    int v104 = o_sroa_0_0_i_i1_i_i | v103;
-    float v105 = ((float)v104);
-    float v106 = v81 + v105;
-    int v107 = ((int)v106);
-    int v108 = v107 & -2147483648;
-    int v109 = v108 ^ v107;
-    int v110 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v111 = v109 < v110;
-    if(v111) {
-        goto v113;
-    } else {
-        goto v114;
-    }
-    v114:;
-    int v115 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v116 = v109 > v115;
-    int v117 = v116 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v117;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v113:;
-    bool v119 = v109 < 947912704;
-    if(v119) {
-        goto v121;
-    } else {
-        goto v122;
-    }
-    v121:;
-    float v123 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v124 = ((float)v109);
-    float v125 = v124 + v123;
-    int v126 = ((int)v125);
-    int v_cast_i_i_i_i = ((int)v123);
-    int v127 = v126 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v127;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v122:;
-    int v129 = v107 >> 13;
-    int v130 = v129 & 1;
-    int v131 = v107 + 134221823;
-    int v132 = v131 + v130;
-    int v133 = v132 >> 13;
-        v_sroa_0_0_i_i_i_i = v133;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v135 = v108 >> 16;
-    int v136 = v_sroa_0_0_i_i_i_i | v135;
-    short v137 = (short)v136;
-    short* v138 = (&agg_result[0].f0.f0.f0);
-    v138[0] = v137;
-}
-
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_59* memcopied_eval, int size) {
-    int i_01_i;
-    label0:;
-    struct Eigen__half v1[1];
-    struct Eigen__TensorEvaluator_59 eval[1];
-    int v2 = get_group_id(0);
-    int v3 = get_local_size(0);
-    int v4 = v3 * v2;
-    int v5 = get_global_id(0);
-    int v6 = v4 + v5;
-    int v7 = get_num_groups(0);
-    int v8 = v7 * v3;
-    char* v9 = ((char*)eval);
-    global char* v11 = ((global char*)memcopied_eval);
-    #pragma unroll
-    for(int __i=0; __i < 5; __i++) {
-        (( int2 *)v9)[__i] = ((global int2 *)v11)[__i];
-    }
-    struct Eigen__TensorEvaluator_56* v13 = (&eval[0].f1.f1);
-    global struct Eigen__TensorEvaluator_56* v14 = (&memcopied_eval[0].f1.f1);
-    char* v15 = ((char*)v13);
-    global char* v16 = ((global char*)v14);
-    #pragma unroll
-    for(int __i=0; __i < 26; __i++) {
-        (( int2 *)v15)[__i] = ((global int2 *)v16)[__i];
-    }
-    bool v18 = v6 < size;
-    if(v18) {
-        goto v_lr_ph_i;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    }
-    v_lr_ph_i:;
-    char* v20 = ((char*)v1);
-    struct Eigen__half** v21 = (&eval[0].f0.f0);
-    struct Eigen__TensorEvaluator_60* v22 = (&eval[0].f1);
-    short* v23 = (&v1[0].f0.f0.f0);
-    struct Eigen__half* v_pre = v21[0];
-        i_01_i = v6;
-    goto v25;
-    v25:;
-    long v27 = i_01_i;
-    _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKS4_Li5ELi1EiEELi16EEEEESH_EENS_9GpuDeviceEE5coeffEi(v1, v22, i_01_i);
-    short v29 = v23[0];
-    short* v30 = (&v_pre[v27].f0.f0.f0);
-    v30[0] = v29;
-    int v33 = i_01_i + v8;
-    bool v34 = v33 < size;
-    if(v34) {
-        i_01_i = v33;
-        goto v25;
-    } else {
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit;
-    }
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit_loopexit:;
-        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit;
-    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorINS_4halfELi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIS6_S6_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKS6_Li5ELi1EiEELi16EEEEESL_EEEENS_9GpuDeviceEEEiLb0EE3runERSR_iii_exit:;
-}
-
-void _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opINS_4halfES4_EEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKS4_Li5ELi1EiEELi16EEEEESH_EENS_9GpuDeviceEE5coeffEi(struct Eigen__half* agg_result, struct Eigen__TensorEvaluator_60* this, int index) {
-    int o_sroa_0_0_i_i1_i_i;
-    int o_sroa_0_0_i_i_i_i;
-    int v_sroa_0_0_i_i_i_i;
-    label0:;
-    int* v1 = (&this[0].f1.f1.f0[0]);
-    int v2 = v1[0];
-    int v3 = index / v2;
-    int* v4 = (&this[0].f1.f3.f1.f0.f0[0]);
-    int v5 = v4[0];
-    int v6 = v3 % v5;
-    int* v7 = (&this[0].f1.f2.f0[0]);
-    int v8 = v7[0];
-    int v9 = v8 * v6;
-    int v10 = v3 * v2;
-    int v11 = index - v10;
-    int* v12 = (&this[0].f1.f1.f0[1]);
-    int v13 = v12[0];
-    int v14 = v11 / v13;
-    int* v15 = (&this[0].f1.f3.f1.f0.f0[1]);
-    int v16 = v15[0];
-    int v17 = v14 % v16;
-    int* v18 = (&this[0].f1.f2.f0[1]);
-    int v19 = v18[0];
-    int v20 = v19 * v17;
-    int v21 = v20 + v9;
-    int v22 = v14 * v13;
-    int v23 = v11 - v22;
-    int* v24 = (&this[0].f1.f1.f0[2]);
-    int v25 = v24[0];
-    int v26 = v23 / v25;
-    int* v27 = (&this[0].f1.f3.f1.f0.f0[2]);
-    int v28 = v27[0];
-    int v29 = v26 % v28;
-    int* v30 = (&this[0].f1.f2.f0[2]);
-    int v31 = v30[0];
-    int v32 = v31 * v29;
-    int v33 = v21 + v32;
-    int v34 = v26 * v25;
-    int v35 = v23 - v34;
-    int* v36 = (&this[0].f1.f1.f0[3]);
-    int v37 = v36[0];
-    int v38 = v35 / v37;
-    int* v39 = (&this[0].f1.f3.f1.f0.f0[3]);
-    int v40 = v39[0];
-    int v41 = v38 % v40;
-    int* v42 = (&this[0].f1.f2.f0[3]);
-    int v43 = v42[0];
-    int v44 = v43 * v41;
-    int v45 = v33 + v44;
-    int v46 = v38 * v37;
-    int v47 = v35 - v46;
-    int* v48 = (&this[0].f1.f3.f1.f0.f0[4]);
-    int v49 = v48[0];
-    int v50 = v47 % v49;
-    int v51 = v45 + v50;
-    struct Eigen__half** v52 = (&this[0].f1.f3.f0);
-    struct Eigen__half* v53 = v52[0];
-    long v54 = v51;
-    short* v_idx_i_i_i = (&v53[v54].f0.f0.f0);
-    short v_idx_val_i_i_i = v_idx_i_i_i[0];
-    int* v55 = (&this[0].f2.f1.f0[0]);
-    int v56 = v55[0];
-    int v57 = index / v56;
-    int* v58 = (&this[0].f2.f3.f1.f0.f0[0]);
-    int v59 = v58[0];
-    int v60 = v57 % v59;
-    int* v61 = (&this[0].f2.f2.f0[0]);
-    int v62 = v61[0];
-    int v63 = v62 * v60;
-    int v64 = v57 * v56;
-    int v65 = index - v64;
-    int* v66 = (&this[0].f2.f1.f0[1]);
-    int v67 = v66[0];
-    int v68 = v65 / v67;
-    int* v69 = (&this[0].f2.f3.f1.f0.f0[1]);
-    int v70 = v69[0];
-    int v71 = v68 % v70;
-    int* v72 = (&this[0].f2.f2.f0[1]);
-    int v73 = v72[0];
-    int v74 = v73 * v71;
-    int v75 = v74 + v63;
-    int v76 = v68 * v67;
-    int v77 = v65 - v76;
-    int* v78 = (&this[0].f2.f1.f0[2]);
-    int v79 = v78[0];
-    int v80 = v77 / v79;
-    int* v81 = (&this[0].f2.f3.f1.f0.f0[2]);
-    int v82 = v81[0];
-    int v83 = v80 % v82;
-    int* v84 = (&this[0].f2.f2.f0[2]);
-    int v85 = v84[0];
-    int v86 = v85 * v83;
-    int v87 = v75 + v86;
-    int v88 = v80 * v79;
-    int v89 = v77 - v88;
-    int* v90 = (&this[0].f2.f1.f0[3]);
-    int v91 = v90[0];
-    int v92 = v89 / v91;
-    int* v93 = (&this[0].f2.f3.f1.f0.f0[3]);
-    int v94 = v93[0];
-    int v95 = v92 % v94;
-    int* v96 = (&this[0].f2.f2.f0[3]);
-    int v97 = v96[0];
-    int v98 = v97 * v95;
-    int v99 = v87 + v98;
-    int v100 = v92 * v91;
-    int v101 = v89 - v100;
-    int* v102 = (&this[0].f2.f3.f1.f0.f0[4]);
-    int v103 = v102[0];
-    int v104 = v101 % v103;
-    int v105 = v99 + v104;
-    struct Eigen__half** v106 = (&this[0].f2.f3.f0);
-    struct Eigen__half* v107 = v106[0];
-    long v108 = v105;
-    short* v_idx_i_i_i1 = (&v107[v108].f0.f0.f0);
-    short v_idx_val_i_i_i2 = v_idx_i_i_i1[0];
-    int v109 = v_idx_val_i_i_i;
-    int v110 = v109 << 13;
-    int v111 = v110 & 268427264;
-    int v112 = v110 & 260046848;
-    bool v113 = v112 == 260046848;
-    if(v113) {
-        goto v115;
-    } else {
-        goto v116;
-    }
-    v115:;
-    int v117 = v110 | 1879048192;
-        o_sroa_0_0_i_i_i_i = v117;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    v116:;
-    int v119 = v111 + 939524096;
-    bool v120 = v112 == 0;
-    if(v120) {
-        goto v122;
-    } else {
-        o_sroa_0_0_i_i_i_i = v119;
-        goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    }
-    v122:;
-    int v123 = v111 + 947912704;
-    float v124 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v125 = ((float)v123);
-    float v126 = v125 - v124;
-    int v127 = ((int)v126);
-        o_sroa_0_0_i_i_i_i = v127;
-    goto _ZNK5Eigen4halfcvfEv_exit_i_i;
-    _ZNK5Eigen4halfcvfEv_exit_i_i:;
-    int v129 = v109 << 16;
-    int v130 = v129 & -2147483648;
-    int v131 = o_sroa_0_0_i_i_i_i | v130;
-    float v132 = ((float)v131);
-    int v133 = v_idx_val_i_i_i2;
-    int v134 = v133 << 13;
-    int v135 = v134 & 268427264;
-    int v136 = v134 & 260046848;
-    bool v137 = v136 == 260046848;
-    if(v137) {
-        goto v139;
-    } else {
-        goto v140;
-    }
-    v139:;
-    int v141 = v134 | 1879048192;
-        o_sroa_0_0_i_i1_i_i = v141;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    v140:;
-    int v143 = v135 + 939524096;
-    bool v144 = v136 == 0;
-    if(v144) {
-        goto v146;
-    } else {
-        o_sroa_0_0_i_i1_i_i = v143;
-        goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    }
-    v146:;
-    int v147 = v135 + 947912704;
-    float v148 = (((constant float*)(&_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic)))[0];
-    float v149 = ((float)v147);
-    float v150 = v149 - v148;
-    int v151 = ((int)v150);
-        o_sroa_0_0_i_i1_i_i = v151;
-    goto _ZNK5Eigen4halfcvfEv_exit2_i_i;
-    _ZNK5Eigen4halfcvfEv_exit2_i_i:;
-    int v153 = v133 << 16;
-    int v154 = v153 & -2147483648;
-    int v155 = o_sroa_0_0_i_i1_i_i | v154;
-    float v156 = ((float)v155);
-    float v157 = v132 + v156;
-    int v158 = ((int)v157);
-    int v159 = v158 & -2147483648;
-    int v160 = v159 ^ v158;
-    int v161 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE6f16max)[0].f0))[0];
-    bool v162 = v160 < v161;
-    if(v162) {
-        goto v164;
-    } else {
-        goto v165;
-    }
-    v165:;
-    int v166 = ((&(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE8f32infty)[0].f0))[0];
-    bool v167 = v160 > v166;
-    int v168 = v167 ? 32256 : 31744;
-        v_sroa_0_0_i_i_i_i = v168;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v164:;
-    bool v170 = v160 < 947912704;
-    if(v170) {
-        goto v172;
-    } else {
-        goto v173;
-    }
-    v172:;
-    float v174 = (((constant float*)(&_ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic)))[0];
-    float v175 = ((float)v160);
-    float v176 = v175 + v174;
-    int v177 = ((int)v176);
-    int v_cast_i_i_i_i = ((int)v174);
-    int v178 = v177 - v_cast_i_i_i_i;
-        v_sroa_0_0_i_i_i_i = v178;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    v173:;
-    int v180 = v158 >> 13;
-    int v181 = v180 & 1;
-    int v182 = v158 + 134221823;
-    int v183 = v182 + v181;
-    int v184 = v183 >> 13;
-        v_sroa_0_0_i_i_i_i = v184;
-    goto _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit;
-    _ZNK5Eigen8internal13scalar_sum_opINS_4halfES2_EclERKS2_S5__exit:;
-    int v186 = v159 >> 16;
-    int v187 = v_sroa_0_0_i_i_i_i | v186;
-    short v188 = (short)v187;
-    short* v189 = (&agg_result[0].f0.f0.f0);
-    v189[0] = v188;
-}
 
 kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEKNS4_INS5_ISB_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_61* memcopied_eval, long size) {
     long i1_03_i;
@@ -5345,11 +1021,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v7 = get_num_groups(0);
     int v8 = v7 * v2;
     long v9 = v8;
-    global float** v10 = (&memcopied_eval[0].f0.f0);
+    float*global * v10 = (&memcopied_eval[0].f0.f0);
     float* v11 = v10[0];
-    global float** v12 = (&memcopied_eval[0].f1.f1.f0);
+    float*global * v12 = (&memcopied_eval[0].f1.f1.f0);
     float* v13 = v12[0];
-    global float** v14 = (&memcopied_eval[0].f1.f2.f0);
+    float*global * v14 = (&memcopied_eval[0].f1.f2.f0);
     float* v15 = v14[0];
     long v16 = size / 4;
     long v17 = v16 << 2;
@@ -5450,12 +1126,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
     global struct Eigen__TensorEvaluator_69* v10 = (&memcopied_eval[0].f1);
     global long* v11 = ((global long*)v10);
     long v12 = v11[0];
-    global float** v13 = (&memcopied_eval[0].f1.f1.f0);
+    float*global * v13 = (&memcopied_eval[0].f1.f1.f0);
     float* v14 = v13[0];
     int v15 = size / 4;
     int v16 = v15 << 2;
@@ -5548,12 +1224,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
     global struct Eigen__TensorEvaluator_72* v10 = (&memcopied_eval[0].f1);
     global long* v11 = ((global long*)v10);
     long v12 = v11[0];
-    global float** v13 = (&memcopied_eval[0].f1.f1.f0);
+    float*global * v13 = (&memcopied_eval[0].f1.f1.f0);
     float* v14 = v13[0];
     int v15 = size / 4;
     int v16 = v15 << 2;
@@ -5649,11 +1325,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
-    global float** v10 = (&memcopied_eval[0].f1.f1.f0);
+    float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
     float* v11 = v10[0];
-    global float** v12 = (&memcopied_eval[0].f1.f2.f3.f0);
+    float*global * v12 = (&memcopied_eval[0].f1.f2.f3.f0);
     float* v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     int v15 = v14[0];
@@ -5791,13 +1467,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
-    global float** v10 = (&memcopied_eval[0].f1.f1.f3.f0);
+    float*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
     float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     int v13 = v12[0];
-    global float** v14 = (&memcopied_eval[0].f1.f2.f0);
+    float*global * v14 = (&memcopied_eval[0].f1.f2.f0);
     float* v15 = v14[0];
     int v16 = size / 4;
     int v17 = v16 << 2;
@@ -5936,13 +1612,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
-    global float** v10 = (&memcopied_eval[0].f1.f1.f3.f0);
+    float*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
     float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     int v13 = v12[0];
-    global float** v14 = (&memcopied_eval[0].f1.f2.f3.f0);
+    float*global * v14 = (&memcopied_eval[0].f1.f2.f3.f0);
     float* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     int v17 = v16[0];
@@ -6114,15 +1790,15 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
-    global float** v10 = (&memcopied_eval[0].f1.f1.f0);
+    float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
     float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     int v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f2.f0[0]);
     int v15 = v14[0];
-    global float** v16 = (&memcopied_eval[0].f1.f2.f3.f0);
+    float*global * v16 = (&memcopied_eval[0].f1.f2.f3.f0);
     float* v17 = v16[0];
     global int* v18 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v19 = ((global long*)v18);
@@ -6294,13 +1970,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f2.f0[0]);
     int v13 = v12[0];
-    global float** v14 = (&memcopied_eval[0].f1.f1.f3.f0);
+    float*global * v14 = (&memcopied_eval[0].f1.f1.f3.f0);
     float* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v17 = ((global long*)v16);
@@ -6308,7 +1984,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v19 = (int)v18;
     long v20 = v18 >> 32;
     int v21 = (int)v20;
-    global float** v22 = (&memcopied_eval[0].f1.f2.f0);
+    float*global * v22 = (&memcopied_eval[0].f1.f2.f0);
     float* v23 = v22[0];
     int v24 = size / 4;
     int v25 = v24 << 2;
@@ -6498,7 +2174,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph5_i:;
     struct Eigen__TensorEvaluator_89* v23 = (&eval[0].f1);
-    float** v24 = (&eval[0].f0.f0);
+    float* * v24 = (&eval[0].f0.f0);
     float* v_pre = v24[0];
         i_03_i = v20;
     goto v26;
@@ -6523,7 +2199,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v39 = v38[0];
     long v40 = v36 >> 32;
     int v41 = (int)v40;
-    float** v42 = (&eval[0].f1.f1.f3.f0);
+    float* * v42 = (&eval[0].f1.f1.f3.f0);
     float* v43 = v42[0];
     int* v44 = (&eval[0].f1.f2.f1.f0[0]);
     int v45 = v44[0];
@@ -6535,9 +2211,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v51 = v50[0];
     long v52 = v48 >> 32;
     int v53 = (int)v52;
-    float** v54 = (&eval[0].f1.f2.f3.f0);
+    float* * v54 = (&eval[0].f1.f2.f3.f0);
     float* v55 = v54[0];
-    float** v56 = (&eval[0].f0.f0);
+    float* * v56 = (&eval[0].f0.f0);
     float* v57 = v56[0];
         i1_02_i = v29;
     goto v59;
@@ -6627,7 +2303,7 @@ float4 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scala
     int v15 = v14 + v9;
     int v16 = v14 + 4;
     bool v17 = v16 > v13;
-    float** v18 = (&this[0].f1.f3.f0);
+    float* * v18 = (&this[0].f1.f3.f0);
     float* v19 = v18[0];
     long v20 = v15;
     float* v21 = (&v19[v20]);
@@ -6701,7 +2377,7 @@ v_sroa_9_0_in_i_i = v58;
     int v74 = v73 + v68;
     int v75 = v73 + 4;
     bool v76 = v75 > v72;
-    float** v77 = (&this[0].f2.f3.f0);
+    float* * v77 = (&this[0].f2.f3.f0);
     float* v78 = v77[0];
     long v79 = v74;
     float* v80 = (&v78[v79]);
@@ -6810,9 +2486,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    float** v23 = (&eval[0].f1.f1.f0);
+    float* * v23 = (&eval[0].f1.f1.f0);
     struct Eigen__TensorEvaluator_94* v24 = (&eval[0].f1.f2);
-    float** v25 = (&eval[0].f0.f0);
+    float* * v25 = (&eval[0].f0.f0);
     float* v_pre = v23[0];
     float* v_pre1 = v25[0];
         i_03_i = v20;
@@ -6828,7 +2504,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit;
     }
     v_lr_ph_i:;
-    float** v33 = (&eval[0].f1.f1.f0);
+    float* * v33 = (&eval[0].f1.f1.f0);
     float* v34 = v33[0];
     int* v35 = (&eval[0].f1.f2.f1.f0[0]);
     int v36 = v35[0];
@@ -6848,9 +2524,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v50 = (int)v49;
     int* v51 = (&eval[0].f1.f2.f3.f1.f0.f0[2]);
     int v52 = v51[0];
-    float** v53 = (&eval[0].f1.f2.f3.f0);
+    float* * v53 = (&eval[0].f1.f2.f3.f0);
     float* v54 = v53[0];
-    float** v55 = (&eval[0].f0.f0);
+    float* * v55 = (&eval[0].f0.f0);
     float* v56 = v55[0];
         i1_02_i = v30;
     goto v58;
@@ -6959,7 +2635,7 @@ float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEE
     int v27 = v26 + v21;
     int v28 = v26 + 4;
     bool v29 = v28 > v25;
-    float** v30 = (&this[0].f3.f0);
+    float* * v30 = (&this[0].f3.f0);
     float* v31 = v30[0];
     long v32 = v27;
     float* v33 = (&v31[v32]);
@@ -7082,8 +2758,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    float** v23 = (&eval[0].f1.f2.f0);
-    float** v24 = (&eval[0].f0.f0);
+    float* * v23 = (&eval[0].f1.f2.f0);
+    float* * v24 = (&eval[0].f0.f0);
     float* v_pre = v23[0];
     float* v_pre1 = v24[0];
         i_03_i = v20;
@@ -7117,11 +2793,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v47 = (int)v46;
     int* v48 = (&eval[0].f1.f1.f3.f1.f0.f0[2]);
     int v49 = v48[0];
-    float** v50 = (&eval[0].f1.f1.f3.f0);
+    float* * v50 = (&eval[0].f1.f1.f3.f0);
     float* v51 = v50[0];
-    float** v52 = (&eval[0].f1.f2.f0);
+    float* * v52 = (&eval[0].f1.f2.f0);
     float* v53 = v52[0];
-    float** v54 = (&eval[0].f0.f0);
+    float* * v54 = (&eval[0].f0.f0);
     float* v55 = v54[0];
         i1_02_i = v29;
     goto v57;
@@ -7234,7 +2910,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph5_i:;
     struct Eigen__TensorEvaluator_94* v23 = (&eval[0].f1.f2);
-    float** v24 = (&eval[0].f0.f0);
+    float* * v24 = (&eval[0].f0.f0);
         i_03_i = v20;
     goto v26;
     label27:;
@@ -7266,7 +2942,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v47 = (int)v46;
     int* v48 = (&eval[0].f1.f1.f3.f1.f0.f0[2]);
     int v49 = v48[0];
-    float** v50 = (&eval[0].f1.f1.f3.f0);
+    float* * v50 = (&eval[0].f1.f1.f3.f0);
     float* v51 = v50[0];
     int* v52 = (&eval[0].f1.f2.f1.f0[0]);
     int v53 = v52[0];
@@ -7286,9 +2962,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v67 = (int)v66;
     int* v68 = (&eval[0].f1.f2.f3.f1.f0.f0[2]);
     int v69 = v68[0];
-    float** v70 = (&eval[0].f1.f2.f3.f0);
+    float* * v70 = (&eval[0].f1.f2.f3.f0);
     float* v71 = v70[0];
-    float** v72 = (&eval[0].f0.f0);
+    float* * v72 = (&eval[0].f0.f0);
     float* v73 = v72[0];
         i1_02_i = v29;
     goto v75;
@@ -7412,9 +3088,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    float** v23 = (&eval[0].f1.f1.f0);
+    float* * v23 = (&eval[0].f1.f1.f0);
     struct Eigen__TensorEvaluator_103* v24 = (&eval[0].f1.f2);
-    float** v25 = (&eval[0].f0.f0);
+    float* * v25 = (&eval[0].f0.f0);
     float* v_pre = v23[0];
     float* v_pre1 = v25[0];
         i_03_i = v20;
@@ -7430,7 +3106,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit;
     }
     v_lr_ph_i:;
-    float** v33 = (&eval[0].f1.f1.f0);
+    float* * v33 = (&eval[0].f1.f1.f0);
     float* v34 = v33[0];
     int* v35 = (&eval[0].f1.f2.f1.f0[0]);
     long* v36 = ((long*)v35);
@@ -7460,9 +3136,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v60 = v59[0];
     long v61 = v57 >> 32;
     int v62 = (int)v61;
-    float** v63 = (&eval[0].f1.f2.f3.f0);
+    float* * v63 = (&eval[0].f1.f2.f3.f0);
     float* v64 = v63[0];
-    float** v65 = (&eval[0].f0.f0);
+    float* * v65 = (&eval[0].f0.f0);
     float* v66 = v65[0];
         i1_02_i = v30;
     goto v68;
@@ -7589,7 +3265,7 @@ float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEE
     int v39 = v38 + v33;
     int v40 = v38 + 4;
     bool v41 = v40 > v37;
-    float** v42 = (&this[0].f3.f0);
+    float* * v42 = (&this[0].f3.f0);
     float* v43 = v42[0];
     long v44 = v39;
     float* v45 = (&v43[v44]);
@@ -7730,8 +3406,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    float** v23 = (&eval[0].f1.f2.f0);
-    float** v24 = (&eval[0].f0.f0);
+    float* * v23 = (&eval[0].f1.f2.f0);
+    float* * v24 = (&eval[0].f0.f0);
     float* v_pre = v23[0];
     float* v_pre1 = v24[0];
         i_03_i = v20;
@@ -7775,11 +3451,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v57 = v56[0];
     long v58 = v54 >> 32;
     int v59 = (int)v58;
-    float** v60 = (&eval[0].f1.f1.f3.f0);
+    float* * v60 = (&eval[0].f1.f1.f3.f0);
     float* v61 = v60[0];
-    float** v62 = (&eval[0].f1.f2.f0);
+    float* * v62 = (&eval[0].f1.f2.f0);
     float* v63 = v62[0];
-    float** v64 = (&eval[0].f0.f0);
+    float* * v64 = (&eval[0].f0.f0);
     float* v65 = v64[0];
         i1_02_i = v29;
     goto v67;
@@ -7898,7 +3574,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph5_i:;
     struct Eigen__TensorEvaluator_103* v23 = (&eval[0].f1.f2);
-    float** v24 = (&eval[0].f0.f0);
+    float* * v24 = (&eval[0].f0.f0);
         i_03_i = v20;
     goto v26;
     label27:;
@@ -7940,7 +3616,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v57 = v56[0];
     long v58 = v54 >> 32;
     int v59 = (int)v58;
-    float** v60 = (&eval[0].f1.f1.f3.f0);
+    float* * v60 = (&eval[0].f1.f1.f3.f0);
     float* v61 = v60[0];
     int* v62 = (&eval[0].f1.f2.f1.f0[0]);
     long* v63 = ((long*)v62);
@@ -7970,9 +3646,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v87 = v86[0];
     long v88 = v84 >> 32;
     int v89 = (int)v88;
-    float** v90 = (&eval[0].f1.f2.f3.f0);
+    float* * v90 = (&eval[0].f1.f2.f3.f0);
     float* v91 = v90[0];
-    float** v92 = (&eval[0].f0.f0);
+    float* * v92 = (&eval[0].f0.f0);
     float* v93 = v92[0];
         i1_02_i = v29;
     goto v95;
@@ -8108,9 +3784,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    float** v23 = (&eval[0].f1.f1.f0);
+    float* * v23 = (&eval[0].f1.f1.f0);
     struct Eigen__TensorEvaluator_112* v24 = (&eval[0].f1.f2);
-    float** v25 = (&eval[0].f0.f0);
+    float* * v25 = (&eval[0].f0.f0);
         i_03_i = v20;
     goto v27;
     label28:;
@@ -8124,7 +3800,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit;
     }
     v_lr_ph_i:;
-    float** v33 = (&eval[0].f1.f1.f0);
+    float* * v33 = (&eval[0].f1.f1.f0);
     float* v34 = v33[0];
     int* v35 = (&eval[0].f1.f2.f1.f0[0]);
     int v36 = v35[0];
@@ -8160,9 +3836,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v66 = (int)v65;
     int* v67 = (&eval[0].f1.f2.f3.f1.f0.f0[4]);
     int v68 = v67[0];
-    float** v69 = (&eval[0].f1.f2.f3.f0);
+    float* * v69 = (&eval[0].f1.f2.f3.f0);
     float* v70 = v69[0];
-    float** v71 = (&eval[0].f0.f0);
+    float* * v71 = (&eval[0].f0.f0);
     float* v72 = v71[0];
         i1_02_i = v30;
     goto v74;
@@ -8319,7 +3995,7 @@ float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEE
         goto v57;
     }
     v57:;
-    float** v58 = (&v48[0].f0);
+    float* * v58 = (&v48[0].f0);
     float* v59 = v58[0];
     long v60 = v52;
     float* v61 = (&v59[v60]);
@@ -8337,7 +4013,7 @@ v_sroa_9_0 = v68;
     goto v70;
     v56:;
     char* v71 = ((char*)values);
-    float** v73 = (&v48[0].f0);
+    float* * v73 = (&v48[0].f0);
     float* v74 = v73[0];
     long v75 = v52;
     float* v76 = (&v74[v75]);
@@ -8453,8 +4129,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    float** v23 = (&eval[0].f1.f2.f0);
-    float** v24 = (&eval[0].f0.f0);
+    float* * v23 = (&eval[0].f1.f2.f0);
+    float* * v24 = (&eval[0].f0.f0);
     float* v_pre = v23[0];
     float* v_pre1 = v24[0];
         i_03_i = v20;
@@ -8504,11 +4180,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v63 = (int)v62;
     int* v64 = (&eval[0].f1.f1.f3.f1.f0.f0[4]);
     int v65 = v64[0];
-    float** v66 = (&eval[0].f1.f1.f3.f0);
+    float* * v66 = (&eval[0].f1.f1.f3.f0);
     float* v67 = v66[0];
-    float** v68 = (&eval[0].f1.f2.f0);
+    float* * v68 = (&eval[0].f1.f2.f0);
     float* v69 = v68[0];
-    float** v70 = (&eval[0].f0.f0);
+    float* * v70 = (&eval[0].f0.f0);
     float* v71 = v70[0];
         i1_02_i = v29;
     goto v73;
@@ -8633,7 +4309,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph5_i:;
     struct Eigen__TensorEvaluator_112* v23 = (&eval[0].f1.f2);
-    float** v24 = (&eval[0].f0.f0);
+    float* * v24 = (&eval[0].f0.f0);
         i_03_i = v20;
     goto v26;
     label27:;
@@ -8647,7 +4323,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKfLi5ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit;
     }
     v_lr_ph_i:;
-    float** v32 = (&eval[0].f0.f0);
+    float* * v32 = (&eval[0].f0.f0);
     float* v_pre_i = v32[0];
     int* v33 = (&eval[0].f1.f1.f1.f0[0]);
     int v34 = v33[0];
@@ -8683,7 +4359,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v64 = (int)v63;
     int* v65 = (&eval[0].f1.f1.f3.f1.f0.f0[4]);
     int v66 = v65[0];
-    float** v67 = (&eval[0].f1.f1.f3.f0);
+    float* * v67 = (&eval[0].f1.f1.f3.f0);
     float* v68 = v67[0];
     int* v69 = (&eval[0].f1.f2.f1.f0[0]);
     int v70 = v69[0];
@@ -8719,7 +4395,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v100 = (int)v99;
     int* v101 = (&eval[0].f1.f2.f3.f1.f0.f0[4]);
     int v102 = v101[0];
-    float** v103 = (&eval[0].f1.f2.f3.f0);
+    float* * v103 = (&eval[0].f1.f2.f3.f0);
     float* v104 = v103[0];
         i1_02_i = v29;
     goto v106;
@@ -8843,11 +4519,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v7 = get_num_groups(0);
     int v8 = v7 * v2;
     long v9 = v8;
-    global float** v10 = (&memcopied_eval[0].f0.f0);
+    float*global * v10 = (&memcopied_eval[0].f0.f0);
     float* v11 = v10[0];
-    global float** v12 = (&memcopied_eval[0].f1.f1.f0);
+    float*global * v12 = (&memcopied_eval[0].f1.f1.f0);
     float* v13 = v12[0];
-    global float** v14 = (&memcopied_eval[0].f1.f2.f0);
+    float*global * v14 = (&memcopied_eval[0].f1.f2.f0);
     float* v15 = v14[0];
     long v16 = size / 2;
     long v17 = v16 << 1;
@@ -8934,12 +4610,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
     global struct Eigen__TensorEvaluator_126* v10 = (&memcopied_eval[0].f1);
     global long* v11 = ((global long*)v10);
     long v12 = v11[0];
-    global float** v13 = (&memcopied_eval[0].f1.f1.f0);
+    float*global * v13 = (&memcopied_eval[0].f1.f1.f0);
     float* v14 = v13[0];
     int v15 = size / 2;
     int v16 = v15 << 1;
@@ -9022,12 +4698,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
     global struct Eigen__TensorEvaluator_129* v10 = (&memcopied_eval[0].f1);
     global long* v11 = ((global long*)v10);
     long v12 = v11[0];
-    global float** v13 = (&memcopied_eval[0].f1.f1.f0);
+    float*global * v13 = (&memcopied_eval[0].f1.f1.f0);
     float* v14 = v13[0];
     int v15 = size / 2;
     int v16 = v15 << 1;
@@ -9111,11 +4787,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
-    global float** v10 = (&memcopied_eval[0].f1.f1.f0);
+    float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
     float* v11 = v10[0];
-    global float** v12 = (&memcopied_eval[0].f1.f2.f3.f0);
+    float*global * v12 = (&memcopied_eval[0].f1.f2.f3.f0);
     float* v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     int v15 = v14[0];
@@ -9225,13 +4901,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
-    global float** v10 = (&memcopied_eval[0].f1.f1.f3.f0);
+    float*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
     float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     int v13 = v12[0];
-    global float** v14 = (&memcopied_eval[0].f1.f2.f0);
+    float*global * v14 = (&memcopied_eval[0].f1.f2.f0);
     float* v15 = v14[0];
     int v16 = size / 2;
     int v17 = v16 << 1;
@@ -9340,13 +5016,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
-    global float** v10 = (&memcopied_eval[0].f1.f1.f3.f0);
+    float*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
     float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     int v13 = v12[0];
-    global float** v14 = (&memcopied_eval[0].f1.f2.f3.f0);
+    float*global * v14 = (&memcopied_eval[0].f1.f2.f3.f0);
     float* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     int v17 = v16[0];
@@ -9478,15 +5154,15 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
-    global float** v10 = (&memcopied_eval[0].f1.f1.f0);
+    float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
     float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     int v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f2.f0[0]);
     int v15 = v14[0];
-    global float** v16 = (&memcopied_eval[0].f1.f2.f3.f0);
+    float*global * v16 = (&memcopied_eval[0].f1.f2.f3.f0);
     float* v17 = v16[0];
     global int* v18 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v19 = ((global long*)v18);
@@ -9618,13 +5294,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f2.f0[0]);
     int v13 = v12[0];
-    global float** v14 = (&memcopied_eval[0].f1.f1.f3.f0);
+    float*global * v14 = (&memcopied_eval[0].f1.f1.f3.f0);
     float* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v17 = ((global long*)v16);
@@ -9632,7 +5308,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v19 = (int)v18;
     long v20 = v18 >> 32;
     int v21 = (int)v20;
-    global float** v22 = (&memcopied_eval[0].f1.f2.f0);
+    float*global * v22 = (&memcopied_eval[0].f1.f2.f0);
     float* v23 = v22[0];
     int v24 = size / 2;
     int v25 = v24 << 1;
@@ -9759,13 +5435,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f2.f0[0]);
     int v13 = v12[0];
-    global float** v14 = (&memcopied_eval[0].f1.f1.f3.f0);
+    float*global * v14 = (&memcopied_eval[0].f1.f1.f3.f0);
     float* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v17 = ((global long*)v16);
@@ -9777,7 +5453,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v23 = v22[0];
     global int* v24 = (&memcopied_eval[0].f1.f2.f2.f0[0]);
     int v25 = v24[0];
-    global float** v26 = (&memcopied_eval[0].f1.f2.f3.f0);
+    float*global * v26 = (&memcopied_eval[0].f1.f2.f3.f0);
     float* v27 = v26[0];
     global int* v28 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v29 = ((global long*)v28);
@@ -9949,9 +5625,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
-    global float** v10 = (&memcopied_eval[0].f1.f1.f0);
+    float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
     float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     int v13 = v12[0];
@@ -9963,7 +5639,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v19 = (int)v18;
     long v20 = v18 >> 32;
     int v21 = (int)v20;
-    global float** v22 = (&memcopied_eval[0].f1.f2.f3.f0);
+    float*global * v22 = (&memcopied_eval[0].f1.f2.f3.f0);
     float* v23 = v22[0];
     global int* v24 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v25 = ((global long*)v24);
@@ -10115,7 +5791,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
@@ -10127,7 +5803,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v17 = (int)v16;
     long v18 = v16 >> 32;
     int v19 = (int)v18;
-    global float** v20 = (&memcopied_eval[0].f1.f1.f3.f0);
+    float*global * v20 = (&memcopied_eval[0].f1.f1.f3.f0);
     float* v21 = v20[0];
     global int* v22 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v23 = ((global long*)v22);
@@ -10137,7 +5813,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v27 = (int)v26;
     global int* v28 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[2]);
     int v29 = v28[0];
-    global float** v30 = (&memcopied_eval[0].f1.f2.f0);
+    float*global * v30 = (&memcopied_eval[0].f1.f2.f0);
     float* v31 = v30[0];
     int v32 = size / 2;
     int v33 = v32 << 1;
@@ -10307,7 +5983,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph5_i:;
     struct Eigen__TensorEvaluator_155* v23 = (&eval[0].f1);
-    float** v24 = (&eval[0].f0.f0);
+    float* * v24 = (&eval[0].f0.f0);
         i_03_i = v20;
     goto v26;
     label27:;
@@ -10339,7 +6015,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v47 = (int)v46;
     int* v48 = (&eval[0].f1.f1.f3.f1.f0.f0[2]);
     int v49 = v48[0];
-    float** v50 = (&eval[0].f1.f1.f3.f0);
+    float* * v50 = (&eval[0].f1.f1.f3.f0);
     float* v51 = v50[0];
     int* v52 = (&eval[0].f1.f2.f1.f0[0]);
     int v53 = v52[0];
@@ -10359,9 +6035,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v67 = (int)v66;
     int* v68 = (&eval[0].f1.f2.f3.f1.f0.f0[2]);
     int v69 = v68[0];
-    float** v70 = (&eval[0].f1.f2.f3.f0);
+    float* * v70 = (&eval[0].f1.f2.f3.f0);
     float* v71 = v70[0];
-    float** v72 = (&eval[0].f0.f0);
+    float* * v72 = (&eval[0].f0.f0);
     float* v73 = v72[0];
         i1_02_i = v29;
     goto v75;
@@ -10466,7 +6142,7 @@ struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8int
     int v27 = v21 + v26;
     int v28 = v26 + 2;
     bool v29 = v28 > v25;
-    float** v30 = (&this[0].f1.f3.f0);
+    float* * v30 = (&this[0].f1.f3.f0);
     float* v31 = v30[0];
     long v32 = v27;
     float* v33 = (&v31[v32]);
@@ -10530,7 +6206,7 @@ struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8int
     int v82 = v76 + v81;
     int v83 = v81 + 2;
     bool v84 = v83 > v80;
-    float** v85 = (&this[0].f2.f3.f0);
+    float* * v85 = (&this[0].f2.f3.f0);
     float* v86 = v85[0];
     long v87 = v82;
     float* v88 = (&v86[v87]);
@@ -10586,9 +6262,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
-    global float** v10 = (&memcopied_eval[0].f1.f1.f0);
+    float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
     float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     global long* v13 = ((global long*)v12);
@@ -10606,7 +6282,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v25 = (int)v24;
     global int* v26 = (&memcopied_eval[0].f1.f2.f2.f0[2]);
     int v27 = v26[0];
-    global float** v28 = (&memcopied_eval[0].f1.f2.f3.f0);
+    float*global * v28 = (&memcopied_eval[0].f1.f2.f3.f0);
     float* v29 = v28[0];
     global int* v30 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v31 = ((global long*)v30);
@@ -10780,7 +6456,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     global long* v11 = ((global long*)v10);
@@ -10798,7 +6474,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v23 = (int)v22;
     global int* v24 = (&memcopied_eval[0].f1.f1.f2.f0[2]);
     int v25 = v24[0];
-    global float** v26 = (&memcopied_eval[0].f1.f1.f3.f0);
+    float*global * v26 = (&memcopied_eval[0].f1.f1.f3.f0);
     float* v27 = v26[0];
     global int* v28 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v29 = ((global long*)v28);
@@ -10812,7 +6488,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v37 = (int)v36;
     long v38 = v36 >> 32;
     int v39 = (int)v38;
-    global float** v40 = (&memcopied_eval[0].f1.f2.f0);
+    float*global * v40 = (&memcopied_eval[0].f1.f2.f0);
     float* v41 = v40[0];
     int v42 = size / 2;
     int v43 = v42 << 1;
@@ -11000,7 +6676,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph5_i:;
     struct Eigen__TensorEvaluator_164* v23 = (&eval[0].f1);
-    float** v24 = (&eval[0].f0.f0);
+    float* * v24 = (&eval[0].f0.f0);
         i_03_i = v20;
     goto v26;
     label27:;
@@ -11042,7 +6718,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v57 = v56[0];
     long v58 = v54 >> 32;
     int v59 = (int)v58;
-    float** v60 = (&eval[0].f1.f1.f3.f0);
+    float* * v60 = (&eval[0].f1.f1.f3.f0);
     float* v61 = v60[0];
     int* v62 = (&eval[0].f1.f2.f1.f0[0]);
     long* v63 = ((long*)v62);
@@ -11072,9 +6748,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v87 = v86[0];
     long v88 = v84 >> 32;
     int v89 = (int)v88;
-    float** v90 = (&eval[0].f1.f2.f3.f0);
+    float* * v90 = (&eval[0].f1.f2.f3.f0);
     float* v91 = v90[0];
-    float** v92 = (&eval[0].f0.f0);
+    float* * v92 = (&eval[0].f0.f0);
     float* v93 = v92[0];
         i1_02_i = v29;
     goto v95;
@@ -11203,7 +6879,7 @@ struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8int
     int v39 = v33 + v38;
     int v40 = v38 + 2;
     bool v41 = v40 > v37;
-    float** v42 = (&this[0].f1.f3.f0);
+    float* * v42 = (&this[0].f1.f3.f0);
     float* v43 = v42[0];
     long v44 = v39;
     float* v45 = (&v43[v44]);
@@ -11285,7 +6961,7 @@ struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8int
     int v112 = v106 + v111;
     int v113 = v111 + 2;
     bool v114 = v113 > v110;
-    float** v115 = (&this[0].f2.f3.f0);
+    float* * v115 = (&this[0].f2.f3.f0);
     float* v116 = v115[0];
     long v117 = v112;
     float* v118 = (&v116[v117]);
@@ -11347,9 +7023,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
-    global float** v10 = (&memcopied_eval[0].f1.f1.f0);
+    float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
     float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     int v13 = v12[0];
@@ -11373,7 +7049,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v31 = (int)v30;
     long v32 = v30 >> 32;
     int v33 = (int)v32;
-    global float** v34 = (&memcopied_eval[0].f1.f2.f3.f0);
+    float*global * v34 = (&memcopied_eval[0].f1.f2.f3.f0);
     float* v35 = v34[0];
     global int* v36 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v37 = ((global long*)v36);
@@ -11567,7 +7243,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
@@ -11591,7 +7267,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v29 = (int)v28;
     long v30 = v28 >> 32;
     int v31 = (int)v30;
-    global float** v32 = (&memcopied_eval[0].f1.f1.f3.f0);
+    float*global * v32 = (&memcopied_eval[0].f1.f1.f3.f0);
     float* v33 = v32[0];
     global int* v34 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v35 = ((global long*)v34);
@@ -11607,7 +7283,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v45 = (int)v44;
     global int* v46 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[4]);
     int v47 = v46[0];
-    global float** v48 = (&memcopied_eval[0].f1.f2.f0);
+    float*global * v48 = (&memcopied_eval[0].f1.f2.f0);
     float* v49 = v48[0];
     int v50 = size / 2;
     int v51 = v50 << 1;
@@ -11788,7 +7464,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global float** v8 = (&memcopied_eval[0].f0.f0);
+    float*global * v8 = (&memcopied_eval[0].f0.f0);
     float* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
@@ -11812,7 +7488,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v29 = (int)v28;
     long v30 = v28 >> 32;
     int v31 = (int)v30;
-    global float** v32 = (&memcopied_eval[0].f1.f1.f3.f0);
+    float*global * v32 = (&memcopied_eval[0].f1.f1.f3.f0);
     float* v33 = v32[0];
     global int* v34 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v35 = ((global long*)v34);
@@ -11850,7 +7526,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v67 = (int)v66;
     long v68 = v66 >> 32;
     int v69 = (int)v68;
-    global float** v70 = (&memcopied_eval[0].f1.f2.f3.f0);
+    float*global * v70 = (&memcopied_eval[0].f1.f2.f3.f0);
     float* v71 = v70[0];
     global int* v72 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v73 = ((global long*)v72);
@@ -12138,11 +7814,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v7 = get_num_groups(0);
     int v8 = v7 * v2;
     long v9 = v8;
-    global long** v10 = (&memcopied_eval[0].f0.f0);
+    long*global * v10 = (&memcopied_eval[0].f0.f0);
     long* v11 = v10[0];
-    global long** v12 = (&memcopied_eval[0].f1.f1.f0);
+    long*global * v12 = (&memcopied_eval[0].f1.f1.f0);
     long* v13 = v12[0];
-    global long** v14 = (&memcopied_eval[0].f1.f2.f0);
+    long*global * v14 = (&memcopied_eval[0].f1.f2.f0);
     long* v15 = v14[0];
     bool v16 = v6 < size;
     if(v16) {
@@ -12186,9 +7862,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
-    global long** v10 = (&memcopied_eval[0].f1.f1.f0);
+    long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
     long* v11 = v10[0];
     bool v12 = v5 < size;
     if(v12) {
@@ -12197,7 +7873,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIxxNS0_13scalar_sum_opIxxEEEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSM_iii_exit;
     }
     v_lr_ph_i:;
-    global long** v14 = (&memcopied_eval[0].f1.f0.f0);
+    long*global * v14 = (&memcopied_eval[0].f1.f0.f0);
     long* v15 = v14[0];
         i_01_i = v5;
     goto v17;
@@ -12232,9 +7908,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
-    global long** v10 = (&memcopied_eval[0].f1.f1.f0);
+    long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
     long* v11 = v10[0];
     bool v12 = v5 < size;
     if(v12) {
@@ -12243,7 +7919,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIxxNS0_13scalar_sum_opIxxEEEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSM_iii_exit;
     }
     v_lr_ph_i:;
-    global long** v14 = (&memcopied_eval[0].f1.f0.f0);
+    long*global * v14 = (&memcopied_eval[0].f1.f0.f0);
     long* v15 = v14[0];
         i_01_i = v5;
     goto v17;
@@ -12278,11 +7954,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
-    global long** v10 = (&memcopied_eval[0].f1.f1.f0);
+    long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
     long* v11 = v10[0];
-    global long** v12 = (&memcopied_eval[0].f1.f2.f3.f0);
+    long*global * v12 = (&memcopied_eval[0].f1.f2.f3.f0);
     long* v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     int v15 = v14[0];
@@ -12329,13 +8005,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
-    global long** v10 = (&memcopied_eval[0].f1.f1.f3.f0);
+    long*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
     long* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     int v13 = v12[0];
-    global long** v14 = (&memcopied_eval[0].f1.f2.f0);
+    long*global * v14 = (&memcopied_eval[0].f1.f2.f0);
     long* v15 = v14[0];
     bool v16 = v5 < size;
     if(v16) {
@@ -12380,13 +8056,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
-    global long** v10 = (&memcopied_eval[0].f1.f1.f3.f0);
+    long*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
     long* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     int v13 = v12[0];
-    global long** v14 = (&memcopied_eval[0].f1.f2.f3.f0);
+    long*global * v14 = (&memcopied_eval[0].f1.f2.f3.f0);
     long* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     int v17 = v16[0];
@@ -12435,15 +8111,15 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
-    global long** v10 = (&memcopied_eval[0].f1.f1.f0);
+    long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
     long* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     int v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f2.f0[0]);
     int v15 = v14[0];
-    global long** v16 = (&memcopied_eval[0].f1.f2.f3.f0);
+    long*global * v16 = (&memcopied_eval[0].f1.f2.f3.f0);
     long* v17 = v16[0];
     global int* v18 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v19 = ((global long*)v18);
@@ -12500,13 +8176,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f2.f0[0]);
     int v13 = v12[0];
-    global long** v14 = (&memcopied_eval[0].f1.f1.f3.f0);
+    long*global * v14 = (&memcopied_eval[0].f1.f1.f3.f0);
     long* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v17 = ((global long*)v16);
@@ -12514,7 +8190,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v19 = (int)v18;
     long v20 = v18 >> 32;
     int v21 = (int)v20;
-    global long** v22 = (&memcopied_eval[0].f1.f2.f0);
+    long*global * v22 = (&memcopied_eval[0].f1.f2.f0);
     long* v23 = v22[0];
     bool v24 = v5 < size;
     if(v24) {
@@ -12565,13 +8241,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f2.f0[0]);
     int v13 = v12[0];
-    global long** v14 = (&memcopied_eval[0].f1.f1.f3.f0);
+    long*global * v14 = (&memcopied_eval[0].f1.f1.f3.f0);
     long* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v17 = ((global long*)v16);
@@ -12583,7 +8259,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v23 = v22[0];
     global int* v24 = (&memcopied_eval[0].f1.f2.f2.f0[0]);
     int v25 = v24[0];
-    global long** v26 = (&memcopied_eval[0].f1.f2.f3.f0);
+    long*global * v26 = (&memcopied_eval[0].f1.f2.f3.f0);
     long* v27 = v26[0];
     global int* v28 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v29 = ((global long*)v28);
@@ -12648,9 +8324,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
-    global long** v10 = (&memcopied_eval[0].f1.f1.f0);
+    long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
     long* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     int v13 = v12[0];
@@ -12662,7 +8338,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v19 = (int)v18;
     long v20 = v18 >> 32;
     int v21 = (int)v20;
-    global long** v22 = (&memcopied_eval[0].f1.f2.f3.f0);
+    long*global * v22 = (&memcopied_eval[0].f1.f2.f3.f0);
     long* v23 = v22[0];
     global int* v24 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v25 = ((global long*)v24);
@@ -12727,7 +8403,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
@@ -12739,7 +8415,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v17 = (int)v16;
     long v18 = v16 >> 32;
     int v19 = (int)v18;
-    global long** v20 = (&memcopied_eval[0].f1.f1.f3.f0);
+    long*global * v20 = (&memcopied_eval[0].f1.f1.f3.f0);
     long* v21 = v20[0];
     global int* v22 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v23 = ((global long*)v22);
@@ -12749,7 +8425,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v27 = (int)v26;
     global int* v28 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[2]);
     int v29 = v28[0];
-    global long** v30 = (&memcopied_eval[0].f1.f2.f0);
+    long*global * v30 = (&memcopied_eval[0].f1.f2.f0);
     long* v31 = v30[0];
     bool v32 = v5 < size;
     if(v32) {
@@ -12806,7 +8482,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
@@ -12818,7 +8494,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v17 = (int)v16;
     long v18 = v16 >> 32;
     int v19 = (int)v18;
-    global long** v20 = (&memcopied_eval[0].f1.f1.f3.f0);
+    long*global * v20 = (&memcopied_eval[0].f1.f1.f3.f0);
     long* v21 = v20[0];
     global int* v22 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v23 = ((global long*)v22);
@@ -12838,7 +8514,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v37 = (int)v36;
     long v38 = v36 >> 32;
     int v39 = (int)v38;
-    global long** v40 = (&memcopied_eval[0].f1.f2.f3.f0);
+    long*global * v40 = (&memcopied_eval[0].f1.f2.f3.f0);
     long* v41 = v40[0];
     global int* v42 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v43 = ((global long*)v42);
@@ -12917,9 +8593,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
-    global long** v10 = (&memcopied_eval[0].f1.f1.f0);
+    long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
     long* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     global long* v13 = ((global long*)v12);
@@ -12937,7 +8613,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v25 = (int)v24;
     global int* v26 = (&memcopied_eval[0].f1.f2.f2.f0[2]);
     int v27 = v26[0];
-    global long** v28 = (&memcopied_eval[0].f1.f2.f3.f0);
+    long*global * v28 = (&memcopied_eval[0].f1.f2.f3.f0);
     long* v29 = v28[0];
     global int* v30 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v31 = ((global long*)v30);
@@ -13012,7 +8688,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     global long* v11 = ((global long*)v10);
@@ -13030,7 +8706,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v23 = (int)v22;
     global int* v24 = (&memcopied_eval[0].f1.f1.f2.f0[2]);
     int v25 = v24[0];
-    global long** v26 = (&memcopied_eval[0].f1.f1.f3.f0);
+    long*global * v26 = (&memcopied_eval[0].f1.f1.f3.f0);
     long* v27 = v26[0];
     global int* v28 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v29 = ((global long*)v28);
@@ -13044,7 +8720,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v37 = (int)v36;
     long v38 = v36 >> 32;
     int v39 = (int)v38;
-    global long** v40 = (&memcopied_eval[0].f1.f2.f0);
+    long*global * v40 = (&memcopied_eval[0].f1.f2.f0);
     long* v41 = v40[0];
     bool v42 = v5 < size;
     if(v42) {
@@ -13107,7 +8783,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     global long* v11 = ((global long*)v10);
@@ -13125,7 +8801,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v23 = (int)v22;
     global int* v24 = (&memcopied_eval[0].f1.f1.f2.f0[2]);
     int v25 = v24[0];
-    global long** v26 = (&memcopied_eval[0].f1.f1.f3.f0);
+    long*global * v26 = (&memcopied_eval[0].f1.f1.f3.f0);
     long* v27 = v26[0];
     global int* v28 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v29 = ((global long*)v28);
@@ -13155,7 +8831,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v53 = (int)v52;
     global int* v54 = (&memcopied_eval[0].f1.f2.f2.f0[2]);
     int v55 = v54[0];
-    global long** v56 = (&memcopied_eval[0].f1.f2.f3.f0);
+    long*global * v56 = (&memcopied_eval[0].f1.f2.f3.f0);
     long* v57 = v56[0];
     global int* v58 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v59 = ((global long*)v58);
@@ -13250,9 +8926,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
-    global long** v10 = (&memcopied_eval[0].f1.f1.f0);
+    long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
     long* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     int v13 = v12[0];
@@ -13276,7 +8952,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v31 = (int)v30;
     long v32 = v30 >> 32;
     int v33 = (int)v32;
-    global long** v34 = (&memcopied_eval[0].f1.f2.f3.f0);
+    long*global * v34 = (&memcopied_eval[0].f1.f2.f3.f0);
     long* v35 = v34[0];
     global int* v36 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v37 = ((global long*)v36);
@@ -13359,7 +9035,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
@@ -13383,7 +9059,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v29 = (int)v28;
     long v30 = v28 >> 32;
     int v31 = (int)v30;
-    global long** v32 = (&memcopied_eval[0].f1.f1.f3.f0);
+    long*global * v32 = (&memcopied_eval[0].f1.f1.f3.f0);
     long* v33 = v32[0];
     global int* v34 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v35 = ((global long*)v34);
@@ -13399,7 +9075,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v45 = (int)v44;
     global int* v46 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[4]);
     int v47 = v46[0];
-    global long** v48 = (&memcopied_eval[0].f1.f2.f0);
+    long*global * v48 = (&memcopied_eval[0].f1.f2.f0);
     long* v49 = v48[0];
     bool v50 = v5 < size;
     if(v50) {
@@ -13468,7 +9144,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    global long** v8 = (&memcopied_eval[0].f0.f0);
+    long*global * v8 = (&memcopied_eval[0].f0.f0);
     long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
@@ -13492,7 +9168,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v29 = (int)v28;
     long v30 = v28 >> 32;
     int v31 = (int)v30;
-    global long** v32 = (&memcopied_eval[0].f1.f1.f3.f0);
+    long*global * v32 = (&memcopied_eval[0].f1.f1.f3.f0);
     long* v33 = v32[0];
     global int* v34 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v35 = ((global long*)v34);
@@ -13530,7 +9206,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v67 = (int)v66;
     long v68 = v66 >> 32;
     int v69 = (int)v68;
-    global long** v70 = (&memcopied_eval[0].f1.f2.f3.f0);
+    long*global * v70 = (&memcopied_eval[0].f1.f2.f3.f0);
     long* v71 = v70[0];
     global int* v72 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v73 = ((global long*)v72);

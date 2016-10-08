@@ -235,9 +235,9 @@ _Z9sumStructPP8MyStructi.exit6:                   ; preds = %.lr.ph.i5
 }
 
 ; Function Attrs: norecurse nounwind readonly
-define float @_Z12getHalfValueP4Halfi(%class.Half* nocapture readonly %half, i32 %a) #1 {
+define float @_Z12getHalfValueP4Halfi(%class.Half* nocapture readonly %half_, i32 %a) #1 {
   %1 = sext i32 %a to i64
-  %2 = getelementptr inbounds %class.Half, %class.Half* %half, i64 %1, i32 0, i32 0, i32 0
+  %2 = getelementptr inbounds %class.Half, %class.Half* %half_, i64 %1, i32 0, i32 0, i32 0
   %3 = load i16, i16* %2, align 2, !tbaa !20
   %4 = sext i16 %3 to i32
   %5 = add nsw i32 %4, 123

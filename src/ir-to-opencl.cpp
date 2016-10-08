@@ -393,7 +393,7 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
     string rhs = "";
     rhs += "" + dumpOperand(instr->getOperand(0));
     Type *currentType = instr->getOperand(0)->getType();
-    copyAddressSpace(instr->getOperand(0), instr);
+    // copyAddressSpace(instr->getOperand(0), instr);
     PointerType *op0typeptr = dyn_cast<PointerType>(instr->getOperand(0)->getType());
     if(op0typeptr == 0) {
         throw runtime_error("dumpgetelementptrrhs op0typeptr is 0");
@@ -403,7 +403,9 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
         // pointer into shared memory.
         addSharedDeclaration(instr->getOperand(0));
     }
+    copyAddressSpace(instr->getOperand(0), instr);
     for(int d=0; d < numOperands - 1; d++) {
+        // cout << "d " << d << " currenttype " << dumpType(currentType) << endl;
         Type *newType = 0;
         if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
             if(d == 0) {
@@ -442,8 +444,30 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
 string dumpGetElementPtr(GetElementPtrInst *instr) {
     string gencode = "";
     string rhs = dumpGetElementPtrRhs(instr);
+    // we're going to hackily assume that anything that is a global ** should be
+    // a * global *   Its true more often than its not, for now
+    // if(PointerType *p1 = dyn_cast<PointerType>(instr->getType())) {
+    //     cout << "gep p1 " << dumpType(p1) << endl;
+    //     Type *p1e = p1->getPointerElementType();
+    //     if(PointerType *p2 = dyn_cast<PointerType>(p1e)) {
+    //         cout << "gep p2 " << dumpType(p2) << endl;
+    //         int addressspace = p1->getAddressSpace();
+    //         cout << "p1 addressspace " << addressspace << endl;
+    //         // updateAddressSpace(instr, 0);
+    //         PointerType *p2new = PointerType::get(p2->getPointerElementType(), addressspace);
+    //         PointerType *p1new = PointerType::get(p2new, 0);
+    //         cout << " p2new " << dumpType(p2new) << endl;
+    //         cout << " p1new " << dumpType(p1new) << endl;
+    //         p1new->dump();
+    //         cout << endl;
+    //         instr->mutateType(p1new);
+    //         // copyAddressSpace()
+    //         // Type *p1e = p1->getPointerElementType();
+    //     }
+    // }
     gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + rhs;
     gencode += ";\n";
+    cout << gencode << endl;
     return gencode;
 }
 
@@ -1276,6 +1300,11 @@ std::string dumpModule(Module *M) {
         if(iskernel_by_name[name]) {
             continue;  // no point in declaring kernels I think
         }
+        // hack for tensorflow: remove anything with 4Half in it, which one we dont use and two copies pointers inside
+        // pointers to structs, as kernel parameters...
+        if(name.find("_4half") != string::npos) {
+            continue;
+        }
         if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
                 knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
             string declaration = dumpFunctionDeclaration(F) + ";";
@@ -1305,6 +1334,11 @@ std::string dumpModule(Module *M) {
         nextNameIdx = 0;
         Function *F = &*it;
         string name = getName(F);
+        // hack for tensorflow: remove anything with 4Half in it, which one we dont use and two copies pointers inside
+        // pointers to structs, as kernel parameters...
+        if(name.find("_4half") != string::npos) {
+            continue;
+        }
         if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
                 knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
             if(i > 0) {
@@ -1368,6 +1402,10 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["_Z16our_pretend_tanhf"] = "tanh";
     knownFunctionsMap["_Z15our_pretend_logf"] = "log";
     knownFunctionsMap["_Z15our_pretend_expf"] = "exp";
+
+    knownFunctionsMap["_ZSt16our_pretend_tanhf"] = "tanh";
+    knownFunctionsMap["_ZSt15our_pretend_logf"] = "log";
+    knownFunctionsMap["_ZSt15our_pretend_expf"] = "exp";
 
     try {
         string gencode = dumpModule(TheModule.get());

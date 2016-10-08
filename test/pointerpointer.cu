@@ -97,8 +97,8 @@ public:
 //     return sum;
 // }
 
-__device__ __host__ float getHalfValue(Half *half, int a) {
-    return (float)(half[a].myshort + 123);
+__device__ __host__ float getHalfValue(Half *half_, int a) {
+    return (float)(half_[a].myshort + 123);
 }
 
 __global__ void myte6kernel(TensorEvaluator6 *structs, float *data, GpuDevice *gpudevices, int a, int b, int c) {

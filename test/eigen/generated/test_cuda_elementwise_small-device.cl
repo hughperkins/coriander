@@ -69,9 +69,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    global float** v16 = (&eval[0].f1.f1.f0);
-    global float** v17 = (&eval[0].f1.f2.f0);
-    global float** v18 = (&eval[0].f0.f0);
+    float*global * v16 = (&eval[0].f1.f1.f0);
+    float*global * v17 = (&eval[0].f1.f2.f0);
+    float*global * v18 = (&eval[0].f0.f0);
     float* v19 = v16[0];
     float* v20 = v17[0];
     float* v21 = v18[0];
@@ -88,11 +88,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElLb1EE3runERSH_lll_exit;
     }
     v_lr_ph_i:;
-    global float** v29 = (&eval[0].f1.f1.f0);
+    float*global * v29 = (&eval[0].f1.f1.f0);
     float* v30 = v29[0];
-    global float** v31 = (&eval[0].f1.f2.f0);
+    float*global * v31 = (&eval[0].f1.f2.f0);
     float* v32 = v31[0];
-    global float** v33 = (&eval[0].f0.f0);
+    float*global * v33 = (&eval[0].f0.f0);
     float* v34 = v33[0];
         i1_02_i = v26;
     goto v36;
