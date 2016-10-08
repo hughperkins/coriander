@@ -26,17 +26,28 @@ static size_t grid[3];
 static size_t block[3];
 static unique_ptr<CLKernel> kernel;
 
-static EasyCL *cl; // not ours
+// static EasyCL *cl; // not ours
+unique_ptr<EasyCL> cl;
 static cl_context *ctx;
 static cl_command_queue *queue;
 static cl_int err;
 
 static vector<cl_mem> clmems;
 
-void hostside_opencl_funcs_setCl(EasyCL *cl, cl_context *ctx, cl_command_queue *queue) {
+/*void hostside_opencl_funcs_setCl(EasyCL *cl, cl_context *ctx, cl_command_queue *queue) {
     ::cl = cl;
     ::ctx = ctx;
     ::queue = queue;
+}
+*/
+
+void hostside_opencl_funcs_init() {
+    cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
+    // cl_int err;
+    ctx = cl->context;
+    queue = cl->queue;
+
+    // hostside_opencl_funcs_setCl(cl.get(), ctx, queue);
 }
 
 extern "C" {
@@ -56,9 +67,14 @@ void readfoobuffer() {
 
 size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKind) {
     cout << "cudamempcy cudaMemcpyKind " << cudaMemcpyKind << endl;
-    err = clEnqueueReadBuffer(*queue, *(cl_mem*)src, CL_TRUE, 0,
-                                     bytes, dst, 0, NULL, NULL);
-    cl->finish();
+    if(cudaMemcpyKind == 2) {
+        err = clEnqueueReadBuffer(*queue, *(cl_mem*)src, CL_TRUE, 0,
+                                         bytes, dst, 0, NULL, NULL);
+        cl->finish();
+    } else {
+        cout << "cudaMemcpyKind " << cudaMemcpyKind << endl;
+        throw runtime_error("unhandled cudaMemcpyKind");
+    }
     return 0;
 }
 
