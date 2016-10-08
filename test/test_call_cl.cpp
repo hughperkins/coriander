@@ -11,12 +11,14 @@
 using namespace std;
 
 void launchSetValue(float *data, int idx, float value);
-void hostside_opencl_funcs_setCl(EasyCL *cl);
+void hostside_opencl_funcs_setCl(EasyCL *cl, cl_context *ctx, cl_command_queue *queue);
 
 static unique_ptr<EasyCL> cl;
 
 // #include "cuda.h"
 #include <cuda_runtime.h>
+
+void readfoobuffer();
 
 int main(int argc, char *argv[]) {
     cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
@@ -24,7 +26,7 @@ int main(int argc, char *argv[]) {
     cl_context *ctx = cl->context;
     cl_command_queue *queue = cl->queue;
 
-    hostside_opencl_funcs_setCl(cl.get());
+    hostside_opencl_funcs_setCl(cl.get(), ctx, queue);
 
     int N = 1024;
     float *float_data = new float[N];
@@ -41,7 +43,25 @@ int main(int argc, char *argv[]) {
     cout << "value of float_data[2] after calling kernel: " << float_data[2] << endl;
 
     float *gpuFloats;
-    cudaMalloc((void**)(&gpuFloats), 1024);
+    cudaMalloc((void**)(&gpuFloats), N * sizeof(float));
+    cout << "gpufloats " << gpuFloats << endl;
+
+
+    float valuesback[1];
+    // err = clEnqueueReadBuffer(*queue, float_data_gpu, CL_TRUE, 0,
+    //                                   1 * sizeof(float), valuesback, 0, NULL, NULL);
+    // cl->finish();
+    // cout << "valuesback[0] " << valuesback[0] << endl;
+
+    // float valuesback[1];
+    err = clEnqueueReadBuffer(*queue, *(cl_mem *)gpuFloats, CL_TRUE, 0,
+                                      1 * sizeof(float), valuesback, 0, NULL, NULL);
+    cl->finish();
+    cout << "valuesback[0] " << valuesback[0] << endl;
+
+    readfoobuffer();
+
+    launchSetValue(gpuFloats, 2, 123.0f);
     cudaFree(gpuFloats);
 
     return 0;

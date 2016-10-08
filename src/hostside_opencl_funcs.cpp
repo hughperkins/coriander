@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <memory>
+#include <vector>
 
 #include "EasyCL.h"
 
@@ -26,9 +27,16 @@ static size_t block[3];
 static unique_ptr<CLKernel> kernel;
 
 static EasyCL *cl; // not ours
+static cl_context *ctx;
+static cl_command_queue *queue;
+static cl_int err;
 
-void hostside_opencl_funcs_setCl(EasyCL *cl) {
+static vector<cl_mem> clmems;
+
+void hostside_opencl_funcs_setCl(EasyCL *cl, cl_context *ctx, cl_command_queue *queue) {
     ::cl = cl;
+    ::ctx = ctx;
+    ::queue = queue;
 }
 
 extern "C" {
@@ -36,8 +44,36 @@ extern "C" {
     size_t cudaFree(void *mem);
 }
 
+void readfoobuffer() {
+    float valuesback[1];
+    cout << "&clmems[0] " << (&clmems[0]) << endl;
+    err = clEnqueueReadBuffer(*queue, clmems[0], CL_TRUE, 0,
+                                      1 * sizeof(float), valuesback, 0, NULL, NULL);
+    cl->finish();
+    cout << "readfoobuffer valuesback[0] " << valuesback[0] << endl;
+}
+
 size_t cudaMalloc(void **p_mem, size_t N) {
-    cout << "cudamalloc" << endl;
+    cout << "cudamalloc N " << N << endl;
+    cl_mem float_data_gpu = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, N,
+                                           NULL, &err);
+    clmems.push_back(float_data_gpu);
+    cl_mem f2 = float_data_gpu;
+
+    float values[1];
+    values[0] = 1.23f;
+    err = clEnqueueWriteBuffer(*queue, float_data_gpu, CL_TRUE, 0,
+                                      1 * sizeof(float), values, 0, NULL, NULL);
+    float valuesback[1];
+
+    *p_mem = (float *)&clmems[0];
+    cout << "*p_mem " << (*p_mem) << endl;
+
+    err = clEnqueueReadBuffer(*queue, *(cl_mem*)*p_mem, CL_TRUE, 0,
+                                      1 * sizeof(float), valuesback, 0, NULL, NULL);
+    cl->finish();
+    cout << "cudamalloc valuesback[0] " << valuesback[0] << endl;
+
     return 0;
 }
 
