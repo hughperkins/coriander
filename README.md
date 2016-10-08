@@ -93,6 +93,8 @@ The tests will compile the OpenCL code, and run it on the GPU, testing the retur
 
 To run tests, you will need:
 - python 3.5
+- CUDA toolkit 7.5, at /usr/local/cuda-7.5
+- clang 3.8, llvm 3.8
 - an OpenCL enabled GPU, with an OpenCL-enabled driver installed
 
 Setup python:
