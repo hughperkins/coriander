@@ -58,54 +58,46 @@ extern "C" {
     size_t cudaMemcpy(void *dst, const void *, size_t, size_t cudaMemcpyKind);
 }
 
-void readfoobuffer() {
-    float valuesback[1];
-    cout << "&clmems[0] " << (&clmems[0]) << endl;
-    err = clEnqueueReadBuffer(*queue, clmems[0], CL_TRUE, 0,
-                                      1 * sizeof(float), valuesback, 0, NULL, NULL);
-    cl->finish();
-    cout << "readfoobuffer valuesback[0] " << valuesback[0] << endl;
-}
-
 size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKind) {
-    cout << "cudamempcy cudaMemcpyKind " << cudaMemcpyKind << endl;
+    cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << endl;
     if(cudaMemcpyKind == 2) {
         err = clEnqueueReadBuffer(*queue, *(cl_mem*)src, CL_TRUE, 0,
                                          bytes, dst, 0, NULL, NULL);
         cl->finish();
     } else {
-        cout << "cudaMemcpyKind " << cudaMemcpyKind << endl;
+        cout << "cudaMemcpyKind using opencl " << cudaMemcpyKind << endl;
         throw runtime_error("unhandled cudaMemcpyKind");
     }
     return 0;
 }
 
 size_t cudaMalloc(void **p_mem, size_t N) {
-    cout << "cudamalloc N " << N << endl;
+    cout << "cudamalloc using opencl N " << N << endl;
     cl_mem float_data_gpu = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, N,
                                            NULL, &err);
     clmems.push_back(float_data_gpu);
-    cl_mem f2 = float_data_gpu;
-
-    float values[1];
-    values[0] = 1.23f;
-    err = clEnqueueWriteBuffer(*queue, float_data_gpu, CL_TRUE, 0,
-                                      1 * sizeof(float), values, 0, NULL, NULL);
-    float valuesback[1];
-
     *p_mem = (float *)&clmems[0];
-    cout << "*p_mem " << (*p_mem) << endl;
 
-    err = clEnqueueReadBuffer(*queue, *(cl_mem*)*p_mem, CL_TRUE, 0,
-                                      1 * sizeof(float), valuesback, 0, NULL, NULL);
-    cl->finish();
-    cout << "cudamalloc valuesback[0] " << valuesback[0] << endl;
+    // cl_mem f2 = float_data_gpu;
+
+    // float values[1];
+    // values[0] = 1.23f;
+    // err = clEnqueueWriteBuffer(*queue, float_data_gpu, CL_TRUE, 0,
+    //                                   1 * sizeof(float), values, 0, NULL, NULL);
+    // float valuesback[1];
+
+    // cout << "*p_mem " << (*p_mem) << endl;
+
+    // err = clEnqueueReadBuffer(*queue, *(cl_mem*)*p_mem, CL_TRUE, 0,
+    //                                   1 * sizeof(float), valuesback, 0, NULL, NULL);
+    // cl->finish();
+    // cout << "cudamalloc using opencl valuesback[0] " << valuesback[0] << endl;
 
     return 0;
 }
 
 size_t cudaFree(void *mem) {
-    cout << "cudafree" << endl;
+    cout << "cudafree using opencl" << endl;
     return 0;
 }
 
@@ -151,7 +143,7 @@ void kernelGo() {
     for(int i = 0; i < 3; i++) {
         global[i] = grid[i] * block[i];
     }
-    cout << "launching kernel..." << endl;
+    cout << "launching kernel, using OpenCL..." << endl;
     kernel->run(3, global, block);
     cout << ".. kernel finished" << endl;
 }

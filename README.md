@@ -104,18 +104,16 @@ g++ -o build/cuda_sample build/hostside_opencl_funcs.o build/cuda_sample-hostpat
 LD_LIBRARY_PATH=build:D_LIBRARY_PATH build/cuda_sample
 Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
-cudamalloc N 4096
-*p_mem 0xcb1a70
-cudamalloc valuesback[0] 1.23
+cudamalloc using opencl N 4096
 configureKernel(_Z8setValuePfif)
 grid(32, 1, 1)
 block(32, 1, 1)
 setKernelArgFloatStar
 setkernelargint 2
 setkernelargfloat 123
-launching kernel...
+launching kernel, using OpenCL...
 .. kernel finished
-cudamempcy cudaMemcpyKind 2
+cudamempcy using opencl cudaMemcpyKind 2
 hostFloats[2] 123
 configureKernel(_Z8setValuePfif)
 grid(32, 1, 1)
@@ -123,11 +121,11 @@ block(32, 1, 1)
 setKernelArgFloatStar
 setkernelargint 2
 setkernelargfloat 222
-launching kernel...
+launching kernel, using OpenCL...
 .. kernel finished
-cudamempcy cudaMemcpyKind 2
+cudamempcy using opencl cudaMemcpyKind 2
 hostFloats[2] 222
-cudafree
+cudafree using opencl
 ```
 
 ## How to build
