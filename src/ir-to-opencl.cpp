@@ -260,7 +260,7 @@ string dumpOperand(Value *value) {
     cout << "isa phi " << isa<PHINode>(value) << endl;
     cout << "isa basicblock " << isa<BasicBlock>(value) << endl;
     // cout << "isa label " << isa<LabelNode>(value) << endl;
-    if(BasicBlock *basicBlock = dyn_cast<BasicBlock>(value)) {
+    if(isa<BasicBlock>(value)) {
         cout << "dumpoperand basicblock" << endl;
         storeValueName(value);
         return nameByValue[value];
@@ -1172,7 +1172,7 @@ std::string dumpFunction(Function *F) {
     // also dump phi declarations
     // prename phis
     string body = "";
-    int i = 0;
+    // int i = 0;
     // for(auto it=F->begin(); it != F->end(); it++) {
     //     BasicBlock *basicBlock = &*it;
     //     ostringstream oss;

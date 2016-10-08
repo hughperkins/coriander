@@ -175,13 +175,13 @@ void getBlockGridDimensions(CallInst *inst, LaunchCallInfo *info) {
     // 5 stream must be null, for now
 
     uint64_t grid_xy = readIntConstant_uint64(cast<ConstantInt>(inst->getArgOperand(0)));
-    uint32_t grid_x = grid_xy & ((1 << 31) - 1);
+    uint32_t grid_x = grid_xy & ((1l << 31) - 1);
     uint32_t grid_y = grid_xy >> 32;
     uint32_t grid_z = readIntConstant_uint32(cast<ConstantInt>(inst->getArgOperand(1)));
     // cout << "grid " << grid_x << " " << grid_y << " " << grid_z << endl;
 
     uint64_t block_xy = readIntConstant_uint64(cast<ConstantInt>(inst->getArgOperand(2)));
-    uint32_t block_x = block_xy & ((1 << 31) - 1);
+    uint32_t block_x = block_xy & ((1l << 31) - 1);
     uint32_t block_y = block_xy >> 32;
     uint32_t block_z = readIntConstant_uint32(cast<ConstantInt>(inst->getArgOperand(3)));
     // cout << "block " << block_x << " " << block_y << " " << block_z << endl;
@@ -261,7 +261,7 @@ void patchFunction(Function *F) {
                         // cout << " arg " << i << " ";
                         // value->dump();
                         // cout << endl;
-                        if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
+                        if(isa<IntegerType>(value->getType())) {
                             // cout << "got an int" << endl;
                             Function *setKernelArgInt = cast<Function>(F->getParent()->getOrInsertFunction(
                                 "_Z15setKernelArgInti",

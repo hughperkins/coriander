@@ -52,26 +52,10 @@ mkdir -p build
 clang++-3.8 `llvm-config-3.8 --cxxflags` -std=c++11 -fcxx-exceptions -o build/patch-hostside -g -O3 -I/usr/include/llvm-3.8 src/patch-hostside.cpp src/ir-to-opencl-common.cpp `llvm-config-3.8 --ldflags --system-libs --libs all`
 warning: unknown warning option '-Wno-maybe-uninitialized'; did you mean
       '-Wno-uninitialized'? [-Wunknown-warning-option]
-src/patch-hostside.cpp:171:44: warning: overflow in expression; result is
-      2147483647 with type 'int' [-Winteger-overflow]
-    uint32_t grid_x = grid_xy & ((1 << 31) - 1);
-                                           ^
-src/patch-hostside.cpp:177:46: warning: overflow in expression; result is
-      2147483647 with type 'int' [-Winteger-overflow]
-    uint32_t block_x = block_xy & ((1 << 31) - 1);
-                                             ^
-src/patch-hostside.cpp:250:41: warning: unused variable 'intType'
-      [-Wunused-variable]
-                        if(IntegerType *intType = dyn_cast<IntegerType>(...
-                                        ^
-4 warnings generated.
+1 warning generated.
 warning: unknown warning option '-Wno-maybe-uninitialized'; did you mean
       '-Wno-uninitialized'? [-Wunknown-warning-option]
-src/ir-to-opencl-common.cpp:111:21: warning: unused variable 'p2'
-      [-Wunused-variable]
-    if(PointerType *p2 = dyn_cast<PointerType>(ptr->getPointerElementType())) {
-                    ^
-2 warnings generated.
+1 warning generated.
 echo building test/generated/cuda_sample-hostpatched.ll from test/generated/cuda_sample-hostraw.ll
 building test/generated/cuda_sample-hostpatched.ll from test/generated/cuda_sample-hostraw.ll
 build/patch-hostside test/generated/cuda_sample-hostraw.ll test/generated/cuda_sample-hostpatched.ll

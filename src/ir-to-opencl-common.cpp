@@ -132,7 +132,7 @@ std::string dumpPointerType(PointerType *ptr) {
         addressspacestr = "constant";
     }
     // we're just going to hackily assume that anything that is `global **` should be `* global *`
-    if(PointerType *p2 = dyn_cast<PointerType>(ptr->getPointerElementType())) {
+    if(isa<PointerType>(ptr->getPointerElementType())) {
         return elementTypeString + addressspacestr + " *";
     }
     if(addressspacestr != "") {
