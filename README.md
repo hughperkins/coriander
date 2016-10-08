@@ -102,12 +102,15 @@ pip -install -r test/requirements.txt
 
 To run tests:
 ```
-test/test.sh
+py.test -sv
 ```
 
-Tests are at [test/test_cloutput.py](test/test_cloutput.py).  They test the generated OpenCL kernels at [test/generated/testcudakernel1.cl](test/generated/testcudakernel1.cl), which were generated from [test/testcudakernel.cu](test/testcudakernel.cu)
+To run the xfailing tests too:
+```
+py.test -sv --runxfail
+```
 
-More info: [test/README.md](test/README.md)
+Tests are at [test](test)
 
 ### Host-side
 
