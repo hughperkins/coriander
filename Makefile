@@ -112,12 +112,12 @@ run-test_call_cl: build/test_call_cl
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=build:$LD_LIBRARY_PATH build/test_call_cl
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/test_call_cl
 
 run-cuda_sample: build/cuda_sample
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=build:$LD_LIBRARY_PATH build/cuda_sample
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/cuda_sample
 
 .SECONDARY:

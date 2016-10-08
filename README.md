@@ -75,7 +75,7 @@ g++ -o build/cuda_sample build/hostside_opencl_funcs.o build/cuda_sample-hostpat
 ################################
 # running:
 ################################
-LD_LIBRARY_PATH=build:D_LIBRARY_PATH build/cuda_sample
+LD_LIBRARY_PATH=build: build/cuda_sample
 Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 hostFloats[2] 123
