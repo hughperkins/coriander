@@ -188,17 +188,12 @@ On the host-side, there is code to:
   - initial progress is to extract this single test into a file, [test/eigen/test_cuda_elementwise_small.cu](test/eigen/test_cuda_elementwise_small.cu) in this repo, and create a bash script to compile/run using cuda, on cuda, for cuda, [test/eigen/run-cuda.sh](test/eigen/run-cuda.sh)
   - next step is to start thinking about how to make this start to work in opencl
 
-#### Current Issues
+### Other points
 
-- `  %18 = load float, float* addrspacecast (float addrspace(1)* bitcast (%"union.Eigen::half_impl::FP32" addrspace(1)* @_ZZN5Eigen9half_impl13half_to_floatENS0_6__halfEE5magic to float addrspace(1)*) to float*), align 4, !tbaa !171, !noalias !173` => generates opencl `float v17 = [0];`
-
-### Things we *need* to be working for tensorflow
-
-- tanh, exp, log (for sigmoid etc) (done)
-- basic per-element add, subtract, sqrt, etc; so we can create cost functions (done)
-- blas stuff (matrix mul, and convolutions):
-   - lets use CLblast for blas stuff
-   - use im2col for convolution for now
+- blas?
+   - current vision is to use CLblast for blas, since it's clean, compact, supported, looks like it might give good performance
+- convolutions?
+  - use im2col for convolutions initially (not set in stone)
 
 ## FAQ
 
