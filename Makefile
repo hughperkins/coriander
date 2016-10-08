@@ -59,6 +59,10 @@ test/eigen/generated/%-hostraw.ll: test/eigen/%.cu
 	mkdir -p test/eigen/generated
 	$(CLANG) -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -include include/fake_funcs.h -I$(EIGEN_HOME) -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
 
+test/eigen/generated/%-hostpatched.ll: test/eigen/generated/%-hostraw.ll build/patch-hostside
+	echo building $@ from $<
+	build/patch-hostside $< $@
+
 # opencl (from the -device.ll)
 
 %-device.cl: %-device.ll build/ir-to-opencl
