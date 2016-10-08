@@ -231,6 +231,7 @@ On the host-side, there is code to:
 - cudaFree (doesnt actually free :-P  but doesnt call cuda)
 - cudaMemcpy (in direction device=>host works)
 - inject the generated opencl sourcecode, so it's available at runtime (all in one executable)
+- handle initializing opencl automatically
 
 ## Roadmap
 
@@ -243,7 +244,6 @@ On the host-side, there is code to:
 
 ### Host-side
 
-- automatically initialize opencl at start, rather than needing to add function call to `main` to do this
 - `cudaFree` should actually free memory
 - `cudaMemcpy` for direction host => device
 
