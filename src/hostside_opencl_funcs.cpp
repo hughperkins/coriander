@@ -52,10 +52,76 @@ void assure_initialized() {
     }
 }
 
+struct cudaDeviceProp {
+    char name[256];
+    size_t totalGlobalMem;
+    size_t sharedMemPerBlock;
+    int regsPerBlock;
+    int warpSize;
+    size_t memPitch;
+    int maxThreadsPerBlock;
+    int maxThreadsDim[3];
+    int maxGridSize[3];
+    size_t totalConstMem;
+    int major;
+    int minor;
+    int clockRate;
+    size_t textureAlignment;
+    int deviceOverlap;
+    int multiProcessorCount;
+    int kernelExecTimeoutEnabled;
+    int integrated;
+    int canMapHostMemory;
+    int computeMode;
+    int concurrentKernels;
+    int ECCEnabled;
+    int pciBusID;
+    int pciDeviceID;
+    int tccDriver;
+};
+
 extern "C" {
     size_t cudaMalloc(void **p_mem, size_t N);
     size_t cudaFree(void *mem);
     size_t cudaMemcpy(void *dst, const void *, size_t, size_t cudaMemcpyKind);
+    size_t cudaSetDevice (int device);
+    size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, int device);
+    size_t cudaMemsetAsync(void *devPtr, int value, size_t count, void *stream = 0);
+    const char *cudaGetErrorString (size_t error);
+    size_t cudaGetDevice (int *device);
+    size_t cudaGetDeviceCount (int *count);
+}
+
+const char *cudaGetErrorString (size_t error) {
+    cout << "cudaGetErrorString error=" << error << endl;
+    return "all was ok?";
+}
+
+size_t cudaGetDevice (int *device) {
+    cout << "cudaGetDevice" << endl;
+    *device = 0;
+    return 0;
+}
+
+size_t cudaGetDeviceCount (int *count) {
+    cout << "cudaGetDeviceCount" << endl;
+    *count = 1;
+    return 0;
+}
+
+size_t cudaMemsetAsync(void *devPtr, int value, size_t count, void *stream) {
+    cout << "cudaMemsetAsync stub value=" << value << " count=" << count << endl;
+    return 0;
+}
+
+size_t cudaSetDevice (int device) {
+    cout << "cudaSetDevice stub device=" << device << endl;
+    return 0;
+}
+
+size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, int device) {
+    cout << "cudaGetDeviceProperties stub device=" << device << endl;
+    return 0;
 }
 
 size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKind) {
