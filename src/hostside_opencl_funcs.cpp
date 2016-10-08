@@ -15,6 +15,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <map>
 
 #include "EasyCL.h"
 
@@ -32,10 +33,12 @@ static cl_command_queue *queue;
 static cl_int err;
 
 static vector<cl_mem> clmems;
+static map<void *, int> idxByAddr;
 
 static bool initialized = false;
 
 void hostside_opencl_funcs_init() {
+    cout << "initialize cl context" << endl;
     cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
     ctx = cl->context;
     queue = cl->queue;
@@ -56,7 +59,7 @@ extern "C" {
 }
 
 size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKind) {
-    // cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << endl;
+    cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << endl;
     if(cudaMemcpyKind == 2) {
         // device => host
         err = clEnqueueReadBuffer(*queue, *(cl_mem*)src, CL_TRUE, 0,
@@ -77,18 +80,33 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
 
 size_t cudaMalloc(void **p_mem, size_t N) {
     assure_initialized();
+    cout << "cudaMalloc using cl, size " << N << endl;
     cl_mem float_data_gpu = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, N,
                                            NULL, &err);
     cl->checkError(err);
     clmems.push_back(float_data_gpu);
-    *p_mem = (float *)&clmems[0];
+    int idx = clmems.size() - 1;
+    *p_mem = (float *)&clmems[idx];
+    idxByAddr[*p_mem] = idx;
+    cout << "clmems.size() " << clmems.size() << " ptr " << *p_mem << endl;
 
     return 0;
 }
 
 size_t cudaFree(void *mem) {
-    // cout << "cudafree using opencl" << endl;
-    err = clReleaseMemObject(*(cl_mem *)mem);
+    // for(int i = 0 ; i < clmems.size(); i++) {
+    //     cout << "cuda free i " << i << " " << &clmems[i] << endl;
+    //     // err = clReleaseMemObject(clmems[i]);
+    //     // cl->checkError(err);
+    // }
+    // err = clReleaseMemObject(*(cl_mem *)(*p_mem));
+    // cl->checkError(err);
+
+    int idx = idxByAddr[mem];
+
+    cout << "cudafree using opencl idx " << idx << endl;
+    err = clReleaseMemObject(clmems[idx]);
+    // err = clReleaseMemObject(*(cl_mem *)mem);
     cl->checkError(err);
     return 0;
 }

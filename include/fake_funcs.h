@@ -59,13 +59,13 @@ stubout_scope(cta)
 
 #include "__clang_cuda_runtime_wrapper.h"
 
-#define cudaMalloc fakeCudaMalloc
-#define cudaFree fakeCudaFree
-#define cudaMemcpy fakeCudaMemcpy
+// #define cudaMalloc fakeCudaMalloc
+// #define cudaFree fakeCudaFree
+// #define cudaMemcpy fakeCudaMemcpy
 
-cudaError_t fakeCudaMalloc(void **, size_t);
-cudaError_t fakeCudaFree(void *);
-cudaError_t cudaMemcpy(void *dst, const void *, size_t, enum cudaMemcpyKind);
+// cudaError_t fakeCudaMalloc(void **, size_t);
+// cudaError_t fakeCudaFree(void *);
+// cudaError_t cudaMemcpy(void *dst, const void *, size_t, enum cudaMemcpyKind);
 
 #define tanh our_pretend_tanh
 #define log our_pretend_log

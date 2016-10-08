@@ -87,6 +87,10 @@ build/%-hostpatched.o: test/generated/%-hostpatched.ll
 	echo building $@ from $<
 	$(CLANG) -c $< -O3 -o $@
 
+build/%-hostpatched.o: test/eigen/generated/%-hostpatched.ll
+	echo building $@ from $<
+	$(CLANG) -c $< -O3 -o $@
+
 ## generic cpp objects, from cpp code
 
 build/test_call_cl.o: test/test_call_cl.cpp easycl
@@ -108,6 +112,9 @@ build/test_call_cl: build/test_call_cl.o build/testcudakernel1-hostpatched.o bui
 build/cuda_sample: build/cuda_sample-hostpatched.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
 	g++ -o build/cuda_sample build/hostside_opencl_funcs.o build/cuda_sample-hostpatched.o -lOpenCL -Lbuild -lEasyCL
 
+build/test_cuda_elementwise_small: build/test_cuda_elementwise_small-hostpatched.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
+	g++ -o build/test_cuda_elementwise_small build/test_cuda_elementwise_small-hostpatched.o build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
+
 run-test_call_cl: build/test_call_cl
 	################################
 	# running:
@@ -119,5 +126,11 @@ run-cuda_sample: build/cuda_sample
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/cuda_sample
+
+run-test_cuda_elementwise_small: build/test_cuda_elementwise_small
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/test_cuda_elementwise_small
 
 .SECONDARY:
