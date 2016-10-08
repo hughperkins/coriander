@@ -230,6 +230,7 @@ On the host-side, there is code to:
 - cudaMalloc (beta)
 - cudaFree (doesnt actually free :-P  but doesnt call cuda)
 - cudaMemcpy (in direction device=>host works)
+- inject the generated opencl sourcecode, so it's available at runtime (all in one executable)
 
 ## Roadmap
 
@@ -242,7 +243,6 @@ On the host-side, there is code to:
 
 ### Host-side
 
-- inject opencl code into the hostside patched code, during hostside patching
 - automatically initialize opencl at start, rather than needing to add function call to `main` to do this
 - `cudaFree` should actually free memory
 - `cudaMemcpy` for direction host => device
@@ -278,6 +278,8 @@ I dont know :-P
 
 - Oct 8:
   - [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_add.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_add.cc) compiles completely into compileable OpenCL now [https://github.com/hughperkins/cuda-ir-to-opencl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl](https://github.com/hughperkins/cuda-ir-to-opencl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl)
+  - added `cudaMalloc`, `cudaMemcpy`, `cudaFree`
+  - hostside object now contains generated OpenCL sourcecode
 - Oct 5
   - fix float constants to correctly have `.0f` at the end
   - added `extractvalue`
