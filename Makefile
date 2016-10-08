@@ -107,9 +107,15 @@ build/cuda_sample: build/cuda_sample-hostpatched.o build/hostside_opencl_funcs.o
 	g++ -o build/cuda_sample build/hostside_opencl_funcs.o build/cuda_sample-hostpatched.o -lOpenCL -Lbuild -lEasyCL
 
 run-test_call_cl: build/test_call_cl
+	################################
+	# running:
+	################################
 	LD_LIBRARY_PATH=build:$LD_LIBRARY_PATH build/test_call_cl
 
 run-cuda_sample: build/cuda_sample
+	################################
+	# running:
+	################################
 	LD_LIBRARY_PATH=build:$LD_LIBRARY_PATH build/cuda_sample
 
 .SECONDARY:

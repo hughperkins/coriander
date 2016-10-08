@@ -137,6 +137,9 @@ echo building build/cuda_sample-hostpatched.o from test/generated/cuda_sample-ho
 building build/cuda_sample-hostpatched.o from test/generated/cuda_sample-hostpatched.ll
 clang++-3.8 -c test/generated/cuda_sample-hostpatched.ll -O3 -o build/cuda_sample-hostpatched.o
 g++ -o build/cuda_sample build/hostside_opencl_funcs.o build/cuda_sample-hostpatched.o -lOpenCL -Lbuild -lEasyCL
+################################
+# running:
+################################
 LD_LIBRARY_PATH=build:D_LIBRARY_PATH build/cuda_sample
 Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
