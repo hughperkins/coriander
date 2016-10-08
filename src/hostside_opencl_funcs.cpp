@@ -90,6 +90,12 @@ extern "C" {
     const char *cudaGetErrorString (size_t error);
     size_t cudaGetDevice (int *device);
     size_t cudaGetDeviceCount (int *count);
+    size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t kind, void *stream = 0);
+}
+
+size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t kind, void *stream) {
+    cout << "cudaMemcpyAsync count=" << count << " kind=" << kind << endl;
+    return 0;
 }
 
 const char *cudaGetErrorString (size_t error) {

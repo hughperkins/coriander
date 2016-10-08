@@ -50,8 +50,8 @@ void test_cuda_elementwise_small() {
 
   // gpu_out.device(gpu_device) = gpu_in1 + gpu_in2;
 
-  // assert(cudaMemcpyAsync(out.data(), d_out, out_bytes, cudaMemcpyDeviceToHost,
-  //                        gpu_device.stream()) == cudaSuccess);
+  assert(cudaMemcpyAsync(out.data(), d_out, out_bytes, cudaMemcpyDeviceToHost,
+                         gpu_device.stream()) == cudaSuccess);
   // assert(cudaStreamSynchronize(gpu_device.stream()) == cudaSuccess);
 
   // for (int i = 0; i < 2; ++i) {
