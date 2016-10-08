@@ -222,11 +222,17 @@ void patchFunction(Function *F) {
                     to_erase.push_back(inst);
                     cout << "patching launch in " << string(F->getName()) << endl;
                     cout << *launchCallInfo << endl;
+
                     Instruction *stringInstr = addStringInstr(F->getParent(), "s." + launchCallInfo->kernelName, launchCallInfo->kernelName);
                     stringInstr->insertBefore(inst);
+
+                    Instruction *clSourcecodeInstr = addStringInstrExistingGlobal(F->getParent(), "__opencl_sourcecode");
+                    clSourcecodeInstr->insertBefore(inst);
+
                     Function *configureKernel = cast<Function>(F->getParent()->getOrInsertFunction(
-                        "_Z15configureKernelPKciiiiii",
+                        "_Z15configureKernelPKcS0_iiiiii",
                         Type::getVoidTy(TheContext),
+                        PointerType::get(IntegerType::get(TheContext, 8), 0),
                         PointerType::get(IntegerType::get(TheContext, 8), 0),
                         IntegerType::get(TheContext, 32),
                         IntegerType::get(TheContext, 32),
@@ -235,14 +241,15 @@ void patchFunction(Function *F) {
                         IntegerType::get(TheContext, 32),
                         IntegerType::get(TheContext, 32),
                         NULL));
-                    Value *args[7];
+                    Value *args[8];
                     args[0] = stringInstr;
-                    args[1] = createInt32Constant(&TheContext, launchCallInfo->grid[0]);
-                    args[2] = createInt32Constant(&TheContext, launchCallInfo->grid[1]);
-                    args[3] = createInt32Constant(&TheContext, launchCallInfo->grid[2]);
-                    args[4] = createInt32Constant(&TheContext, launchCallInfo->block[0]);
-                    args[5] = createInt32Constant(&TheContext, launchCallInfo->block[1]);
-                    args[6] = createInt32Constant(&TheContext, launchCallInfo->block[2]);
+                    args[1] = clSourcecodeInstr;
+                    args[2] = createInt32Constant(&TheContext, launchCallInfo->grid[0]);
+                    args[3] = createInt32Constant(&TheContext, launchCallInfo->grid[1]);
+                    args[4] = createInt32Constant(&TheContext, launchCallInfo->grid[2]);
+                    args[5] = createInt32Constant(&TheContext, launchCallInfo->block[0]);
+                    args[6] = createInt32Constant(&TheContext, launchCallInfo->block[1]);
+                    args[7] = createInt32Constant(&TheContext, launchCallInfo->block[2]);
                     CallInst *callLaunch = CallInst::Create(configureKernel, ArrayRef<Value *>(args));
                     callLaunch->insertAfter(stringInstr);
 

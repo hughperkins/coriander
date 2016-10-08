@@ -51,30 +51,31 @@ define void @_Z8setValuePfif(float* %data, i32 %idx, float %value) #2 {
   %4 = bitcast float** %1 to i8*
   %loadCudaArg = load float*, float** %1
   %5 = icmp eq i32 0, 0
-  br i1 %5, label %6, label %14
+  br i1 %5, label %6, label %15
 
 ; <label>:6                                       ; preds = %0
   %7 = bitcast i32* %2 to i8*
   %loadCudaArg1 = load i32, i32* %2
   %8 = icmp eq i32 0, 0
-  br i1 %8, label %9, label %14
+  br i1 %8, label %9, label %15
 
 ; <label>:9                                       ; preds = %6
   %10 = bitcast float* %3 to i8*
   %loadCudaArg2 = load float, float* %3
   %11 = icmp eq i32 0, 0
-  br i1 %11, label %12, label %14
+  br i1 %11, label %12, label %15
 
 ; <label>:12                                      ; preds = %9
   %13 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z8setValuePfif, i32 0, i32 0
-  call void @_Z15configureKernelPKciiiiii(i8* %13, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
+  call void @_Z15configureKernelPKcS0_iiiiii(i8* %13, i8* %14, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z15setKernelArgInti(i32 %loadCudaArg1)
   call void @_Z17setKernelArgFloatf(float %loadCudaArg2)
   call void @_Z8kernelGov()
-  br label %14
+  %14 = getelementptr inbounds [320 x i8], [320 x i8]* @__opencl_sourcecode, i32 0, i32 0
+  br label %15
 
-; <label>:14                                      ; preds = %12, %9, %6, %0
+; <label>:15                                      ; preds = %12, %9, %6, %0
   ret void
 }
 
@@ -103,7 +104,7 @@ define i32 @main(i32 %argc, i8** nocapture readnone %argv) #3 personality i8* bi
   call void @llvm.lifetime.start(i64 8, i8* %10) #1
   store i64 36, i64* %__dnew.i.i.i.i, align 8, !tbaa !11
   %11 = invoke i8* @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE9_M_createERmm(%"class.std::__cxx11::basic_string"* nonnull %6, i64* nonnull dereferenceable(8) %__dnew.i.i.i.i, i64 0)
-          to label %.noexc unwind label %39
+          to label %.noexc unwind label %40
 
 .noexc:                                           ; preds = %.noexc1.i
   %12 = getelementptr inbounds %"class.std::__cxx11::basic_string", %"class.std::__cxx11::basic_string"* %6, i64 0, i32 0, i32 0
@@ -118,7 +119,7 @@ define i32 @main(i32 %argc, i8** nocapture readnone %argv) #3 personality i8* bi
   store i8 0, i8* %16, align 1, !tbaa !16
   call void @llvm.lifetime.end(i64 8, i8* %10) #1
   invoke void @_Z26hostside_opencl_funcs_initNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE(%"class.std::__cxx11::basic_string"* nonnull %6)
-          to label %17 unwind label %43
+          to label %17 unwind label %44
 
 ; <label>:17                                      ; preds = %.noexc
   %18 = load i8*, i8** %12, align 8, !tbaa !13
@@ -135,7 +136,7 @@ _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED2Ev.exit: ; preds = %20, %
   %22 = bitcast float** %gpuFloats to i8**
   %23 = call i32 @cudaMalloc(i8** %22, i64 4096)
   %24 = icmp eq i32 0, 0
-  br i1 %24, label %25, label %52
+  br i1 %24, label %25, label %53
 
 ; <label>:25                                      ; preds = %_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED2Ev.exit
   %26 = bitcast float** %gpuFloats to i64*
@@ -166,193 +167,195 @@ _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED2Ev.exit: ; preds = %20, %
 
 ; <label>:37                                      ; preds = %35
   %38 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z8setValuePfif, i32 0, i32 0
-  call void @_Z15configureKernelPKciiiiii(i8* %38, i32 32, i32 1, i32 1, i32 32, i32 1, i32 1)
+  call void @_Z15configureKernelPKcS0_iiiiii(i8* %38, i8* %39, i32 32, i32 1, i32 1, i32 32, i32 1, i32 1)
   call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z15setKernelArgInti(i32 %loadCudaArg1)
   call void @_Z17setKernelArgFloatf(float %loadCudaArg2)
   call void @_Z8kernelGov()
+  %39 = getelementptr inbounds [320 x i8], [320 x i8]* @__opencl_sourcecode, i32 0, i32 0
   br label %_Z8setValuePfif.exit
 
 _Z8setValuePfif.exit:                             ; preds = %37, %35, %33, %25
   call void @llvm.lifetime.end(i64 8, i8* %28)
   call void @llvm.lifetime.end(i64 4, i8* %29)
   call void @llvm.lifetime.end(i64 4, i8* %30)
-  br label %52
+  br label %53
 
-; <label>:39                                      ; preds = %.noexc1.i
-  %40 = landingpad { i8*, i32 }
+; <label>:40                                      ; preds = %.noexc1.i
+  %41 = landingpad { i8*, i32 }
           cleanup
-  %41 = extractvalue { i8*, i32 } %40, 0
-  %42 = extractvalue { i8*, i32 } %40, 1
+  %42 = extractvalue { i8*, i32 } %41, 0
+  %43 = extractvalue { i8*, i32 } %41, 1
   br label %_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED2Ev.exit8
 
-; <label>:43                                      ; preds = %.noexc
-  %44 = landingpad { i8*, i32 }
+; <label>:44                                      ; preds = %.noexc
+  %45 = landingpad { i8*, i32 }
           cleanup
-  %45 = extractvalue { i8*, i32 } %44, 0
-  %46 = extractvalue { i8*, i32 } %44, 1
-  %47 = load i8*, i8** %12, align 8, !tbaa !13
-  %48 = icmp eq i8* %47, %9
-  br i1 %48, label %_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED2Ev.exit8, label %49
+  %46 = extractvalue { i8*, i32 } %45, 0
+  %47 = extractvalue { i8*, i32 } %45, 1
+  %48 = load i8*, i8** %12, align 8, !tbaa !13
+  %49 = icmp eq i8* %48, %9
+  br i1 %49, label %_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED2Ev.exit8, label %50
 
-; <label>:49                                      ; preds = %43
-  call void @_ZdlPv(i8* %47) #1
+; <label>:50                                      ; preds = %44
+  call void @_ZdlPv(i8* %48) #1
   br label %_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED2Ev.exit8
 
-_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED2Ev.exit8: ; preds = %49, %43, %39
-  %.07 = phi i32 [ %42, %39 ], [ %46, %43 ], [ %46, %49 ]
-  %.0 = phi i8* [ %41, %39 ], [ %45, %43 ], [ %45, %49 ]
-  %50 = insertvalue { i8*, i32 } undef, i8* %.0, 0
-  %51 = insertvalue { i8*, i32 } %50, i32 %.07, 1
-  resume { i8*, i32 } %51
+_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED2Ev.exit8: ; preds = %50, %44, %40
+  %.07 = phi i32 [ %43, %40 ], [ %47, %44 ], [ %47, %50 ]
+  %.0 = phi i8* [ %42, %40 ], [ %46, %44 ], [ %46, %50 ]
+  %51 = insertvalue { i8*, i32 } undef, i8* %.0, 0
+  %52 = insertvalue { i8*, i32 } %51, i32 %.07, 1
+  resume { i8*, i32 } %52
 
-; <label>:52                                      ; preds = %_Z8setValuePfif.exit, %_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED2Ev.exit
-  %53 = bitcast [4 x float]* %hostFloats to i8*
-  call void @llvm.lifetime.start(i64 16, i8* %53) #1
-  %54 = load i8*, i8** %22, align 8, !tbaa !1
-  %55 = call i32 @cudaMemcpy(i8* %53, i8* %54, i64 16, i32 2)
-  %56 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([15 x i8], [15 x i8]* @.str.1, i64 0, i64 0), i64 14)
-  %57 = getelementptr inbounds [4 x float], [4 x float]* %hostFloats, i64 0, i64 2
-  %58 = load float, float* %57, align 8, !tbaa !7
-  %59 = fpext float %58 to double
-  %60 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo9_M_insertIdEERSoT_(%"class.std::basic_ostream"* nonnull @_ZSt4cout, double %59)
-  %61 = bitcast %"class.std::basic_ostream"* %60 to i8**
-  %62 = load i8*, i8** %61, align 8, !tbaa !17
-  %63 = getelementptr i8, i8* %62, i64 -24
-  %64 = bitcast i8* %63 to i64*
-  %65 = load i64, i64* %64, align 8
-  %66 = bitcast %"class.std::basic_ostream"* %60 to i8*
-  %67 = getelementptr inbounds i8, i8* %66, i64 %65
-  %68 = getelementptr inbounds i8, i8* %67, i64 240
-  %69 = bitcast i8* %68 to %"class.std::ctype"**
-  %70 = load %"class.std::ctype"*, %"class.std::ctype"** %69, align 8, !tbaa !19
-  %71 = icmp eq %"class.std::ctype"* %70, null
-  br i1 %71, label %72, label %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit12
+; <label>:53                                      ; preds = %_Z8setValuePfif.exit, %_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED2Ev.exit
+  %54 = bitcast [4 x float]* %hostFloats to i8*
+  call void @llvm.lifetime.start(i64 16, i8* %54) #1
+  %55 = load i8*, i8** %22, align 8, !tbaa !1
+  %56 = call i32 @cudaMemcpy(i8* %54, i8* %55, i64 16, i32 2)
+  %57 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([15 x i8], [15 x i8]* @.str.1, i64 0, i64 0), i64 14)
+  %58 = getelementptr inbounds [4 x float], [4 x float]* %hostFloats, i64 0, i64 2
+  %59 = load float, float* %58, align 8, !tbaa !7
+  %60 = fpext float %59 to double
+  %61 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo9_M_insertIdEERSoT_(%"class.std::basic_ostream"* nonnull @_ZSt4cout, double %60)
+  %62 = bitcast %"class.std::basic_ostream"* %61 to i8**
+  %63 = load i8*, i8** %62, align 8, !tbaa !17
+  %64 = getelementptr i8, i8* %63, i64 -24
+  %65 = bitcast i8* %64 to i64*
+  %66 = load i64, i64* %65, align 8
+  %67 = bitcast %"class.std::basic_ostream"* %61 to i8*
+  %68 = getelementptr inbounds i8, i8* %67, i64 %66
+  %69 = getelementptr inbounds i8, i8* %68, i64 240
+  %70 = bitcast i8* %69 to %"class.std::ctype"**
+  %71 = load %"class.std::ctype"*, %"class.std::ctype"** %70, align 8, !tbaa !19
+  %72 = icmp eq %"class.std::ctype"* %71, null
+  br i1 %72, label %73, label %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit12
 
-; <label>:72                                      ; preds = %52
+; <label>:73                                      ; preds = %53
   call void @_ZSt16__throw_bad_castv() #8
   unreachable
 
-_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit12:  ; preds = %52
-  %73 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %70, i64 0, i32 8
-  %74 = load i8, i8* %73, align 8, !tbaa !22
-  %75 = icmp eq i8 %74, 0
-  br i1 %75, label %79, label %76
+_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit12:  ; preds = %53
+  %74 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %71, i64 0, i32 8
+  %75 = load i8, i8* %74, align 8, !tbaa !22
+  %76 = icmp eq i8 %75, 0
+  br i1 %76, label %80, label %77
 
-; <label>:76                                      ; preds = %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit12
-  %77 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %70, i64 0, i32 9, i64 10
-  %78 = load i8, i8* %77, align 1, !tbaa !16
+; <label>:77                                      ; preds = %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit12
+  %78 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %71, i64 0, i32 9, i64 10
+  %79 = load i8, i8* %78, align 1, !tbaa !16
   br label %_ZNKSt5ctypeIcE5widenEc.exit10
 
-; <label>:79                                      ; preds = %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit12
-  call void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %70)
-  %80 = bitcast %"class.std::ctype"* %70 to i8 (%"class.std::ctype"*, i8)***
-  %81 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %80, align 8, !tbaa !17
-  %82 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %81, i64 6
-  %83 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %82, align 8
-  %84 = call signext i8 %83(%"class.std::ctype"* nonnull %70, i8 signext 10)
+; <label>:80                                      ; preds = %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit12
+  call void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %71)
+  %81 = bitcast %"class.std::ctype"* %71 to i8 (%"class.std::ctype"*, i8)***
+  %82 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %81, align 8, !tbaa !17
+  %83 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %82, i64 6
+  %84 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %83, align 8
+  %85 = call signext i8 %84(%"class.std::ctype"* nonnull %71, i8 signext 10)
   br label %_ZNKSt5ctypeIcE5widenEc.exit10
 
-_ZNKSt5ctypeIcE5widenEc.exit10:                   ; preds = %79, %76
-  %.0.i9 = phi i8 [ %78, %76 ], [ %84, %79 ]
-  %85 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull %60, i8 signext %.0.i9)
-  %86 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %85)
-  %87 = icmp eq i32 0, 0
-  br i1 %87, label %88, label %102
+_ZNKSt5ctypeIcE5widenEc.exit10:                   ; preds = %80, %77
+  %.0.i9 = phi i8 [ %79, %77 ], [ %85, %80 ]
+  %86 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull %61, i8 signext %.0.i9)
+  %87 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %86)
+  %88 = icmp eq i32 0, 0
+  br i1 %88, label %89, label %104
 
-; <label>:88                                      ; preds = %_ZNKSt5ctypeIcE5widenEc.exit10
-  %89 = bitcast float** %gpuFloats to i64*
-  %90 = load i64, i64* %89, align 8, !tbaa !1
-  %91 = bitcast float** %0 to i8*
-  call void @llvm.lifetime.start(i64 8, i8* %91)
-  %92 = bitcast i32* %1 to i8*
-  call void @llvm.lifetime.start(i64 4, i8* %92)
-  %93 = bitcast float* %2 to i8*
+; <label>:89                                      ; preds = %_ZNKSt5ctypeIcE5widenEc.exit10
+  %90 = bitcast float** %gpuFloats to i64*
+  %91 = load i64, i64* %90, align 8, !tbaa !1
+  %92 = bitcast float** %0 to i8*
+  call void @llvm.lifetime.start(i64 8, i8* %92)
+  %93 = bitcast i32* %1 to i8*
   call void @llvm.lifetime.start(i64 4, i8* %93)
-  %94 = bitcast float** %0 to i64*
-  store i64 %90, i64* %94, align 8, !tbaa !1
+  %94 = bitcast float* %2 to i8*
+  call void @llvm.lifetime.start(i64 4, i8* %94)
+  %95 = bitcast float** %0 to i64*
+  store i64 %91, i64* %95, align 8, !tbaa !1
   store i32 2, i32* %1, align 4, !tbaa !5
   store float 2.220000e+02, float* %2, align 4, !tbaa !7
   %loadCudaArg3 = load float*, float** %0
-  %95 = icmp eq i32 0, 0
-  br i1 %95, label %96, label %_Z8setValuePfif.exit11
+  %96 = icmp eq i32 0, 0
+  br i1 %96, label %97, label %_Z8setValuePfif.exit11
 
-; <label>:96                                      ; preds = %88
+; <label>:97                                      ; preds = %89
   %loadCudaArg4 = load i32, i32* %1
-  %97 = icmp eq i32 0, 0
-  br i1 %97, label %98, label %_Z8setValuePfif.exit11
+  %98 = icmp eq i32 0, 0
+  br i1 %98, label %99, label %_Z8setValuePfif.exit11
 
-; <label>:98                                      ; preds = %96
+; <label>:99                                      ; preds = %97
   %loadCudaArg5 = load float, float* %2
-  %99 = icmp eq i32 0, 0
-  br i1 %99, label %100, label %_Z8setValuePfif.exit11
+  %100 = icmp eq i32 0, 0
+  br i1 %100, label %101, label %_Z8setValuePfif.exit11
 
-; <label>:100                                     ; preds = %98
-  %101 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z8setValuePfif, i32 0, i32 0
-  call void @_Z15configureKernelPKciiiiii(i8* %101, i32 32, i32 1, i32 1, i32 32, i32 1, i32 1)
+; <label>:101                                     ; preds = %99
+  %102 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z8setValuePfif, i32 0, i32 0
+  call void @_Z15configureKernelPKcS0_iiiiii(i8* %102, i8* %103, i32 32, i32 1, i32 1, i32 32, i32 1, i32 1)
   call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg3)
   call void @_Z15setKernelArgInti(i32 %loadCudaArg4)
   call void @_Z17setKernelArgFloatf(float %loadCudaArg5)
   call void @_Z8kernelGov()
+  %103 = getelementptr inbounds [320 x i8], [320 x i8]* @__opencl_sourcecode, i32 0, i32 0
   br label %_Z8setValuePfif.exit11
 
-_Z8setValuePfif.exit11:                           ; preds = %100, %98, %96, %88
-  call void @llvm.lifetime.end(i64 8, i8* %91)
-  call void @llvm.lifetime.end(i64 4, i8* %92)
+_Z8setValuePfif.exit11:                           ; preds = %101, %99, %97, %89
+  call void @llvm.lifetime.end(i64 8, i8* %92)
   call void @llvm.lifetime.end(i64 4, i8* %93)
-  br label %102
+  call void @llvm.lifetime.end(i64 4, i8* %94)
+  br label %104
 
-; <label>:102                                     ; preds = %_Z8setValuePfif.exit11, %_ZNKSt5ctypeIcE5widenEc.exit10
-  %103 = load i8*, i8** %22, align 8, !tbaa !1
-  %104 = call i32 @cudaMemcpy(i8* %53, i8* %103, i64 16, i32 2)
-  %105 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([15 x i8], [15 x i8]* @.str.1, i64 0, i64 0), i64 14)
-  %106 = load float, float* %57, align 8, !tbaa !7
-  %107 = fpext float %106 to double
-  %108 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo9_M_insertIdEERSoT_(%"class.std::basic_ostream"* nonnull @_ZSt4cout, double %107)
-  %109 = bitcast %"class.std::basic_ostream"* %108 to i8**
-  %110 = load i8*, i8** %109, align 8, !tbaa !17
-  %111 = getelementptr i8, i8* %110, i64 -24
-  %112 = bitcast i8* %111 to i64*
-  %113 = load i64, i64* %112, align 8
-  %114 = bitcast %"class.std::basic_ostream"* %108 to i8*
-  %115 = getelementptr inbounds i8, i8* %114, i64 %113
-  %116 = getelementptr inbounds i8, i8* %115, i64 240
-  %117 = bitcast i8* %116 to %"class.std::ctype"**
-  %118 = load %"class.std::ctype"*, %"class.std::ctype"** %117, align 8, !tbaa !19
-  %119 = icmp eq %"class.std::ctype"* %118, null
-  br i1 %119, label %120, label %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit
+; <label>:104                                     ; preds = %_Z8setValuePfif.exit11, %_ZNKSt5ctypeIcE5widenEc.exit10
+  %105 = load i8*, i8** %22, align 8, !tbaa !1
+  %106 = call i32 @cudaMemcpy(i8* %54, i8* %105, i64 16, i32 2)
+  %107 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([15 x i8], [15 x i8]* @.str.1, i64 0, i64 0), i64 14)
+  %108 = load float, float* %58, align 8, !tbaa !7
+  %109 = fpext float %108 to double
+  %110 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo9_M_insertIdEERSoT_(%"class.std::basic_ostream"* nonnull @_ZSt4cout, double %109)
+  %111 = bitcast %"class.std::basic_ostream"* %110 to i8**
+  %112 = load i8*, i8** %111, align 8, !tbaa !17
+  %113 = getelementptr i8, i8* %112, i64 -24
+  %114 = bitcast i8* %113 to i64*
+  %115 = load i64, i64* %114, align 8
+  %116 = bitcast %"class.std::basic_ostream"* %110 to i8*
+  %117 = getelementptr inbounds i8, i8* %116, i64 %115
+  %118 = getelementptr inbounds i8, i8* %117, i64 240
+  %119 = bitcast i8* %118 to %"class.std::ctype"**
+  %120 = load %"class.std::ctype"*, %"class.std::ctype"** %119, align 8, !tbaa !19
+  %121 = icmp eq %"class.std::ctype"* %120, null
+  br i1 %121, label %122, label %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit
 
-; <label>:120                                     ; preds = %102
+; <label>:122                                     ; preds = %104
   call void @_ZSt16__throw_bad_castv() #8
   unreachable
 
-_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit:    ; preds = %102
-  %121 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %118, i64 0, i32 8
-  %122 = load i8, i8* %121, align 8, !tbaa !22
-  %123 = icmp eq i8 %122, 0
-  br i1 %123, label %127, label %124
+_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit:    ; preds = %104
+  %123 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %120, i64 0, i32 8
+  %124 = load i8, i8* %123, align 8, !tbaa !22
+  %125 = icmp eq i8 %124, 0
+  br i1 %125, label %129, label %126
 
-; <label>:124                                     ; preds = %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit
-  %125 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %118, i64 0, i32 9, i64 10
-  %126 = load i8, i8* %125, align 1, !tbaa !16
+; <label>:126                                     ; preds = %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit
+  %127 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %120, i64 0, i32 9, i64 10
+  %128 = load i8, i8* %127, align 1, !tbaa !16
   br label %_ZNKSt5ctypeIcE5widenEc.exit
 
-; <label>:127                                     ; preds = %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit
-  call void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %118)
-  %128 = bitcast %"class.std::ctype"* %118 to i8 (%"class.std::ctype"*, i8)***
-  %129 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %128, align 8, !tbaa !17
-  %130 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %129, i64 6
-  %131 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %130, align 8
-  %132 = call signext i8 %131(%"class.std::ctype"* nonnull %118, i8 signext 10)
+; <label>:129                                     ; preds = %_ZSt13__check_facetISt5ctypeIcEERKT_PS3_.exit
+  call void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %120)
+  %130 = bitcast %"class.std::ctype"* %120 to i8 (%"class.std::ctype"*, i8)***
+  %131 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %130, align 8, !tbaa !17
+  %132 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %131, i64 6
+  %133 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %132, align 8
+  %134 = call signext i8 %133(%"class.std::ctype"* nonnull %120, i8 signext 10)
   br label %_ZNKSt5ctypeIcE5widenEc.exit
 
-_ZNKSt5ctypeIcE5widenEc.exit:                     ; preds = %127, %124
-  %.0.i = phi i8 [ %126, %124 ], [ %132, %127 ]
-  %133 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull %108, i8 signext %.0.i)
-  %134 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %133)
-  %135 = load i8*, i8** %22, align 8, !tbaa !1
-  %136 = call i32 @cudaFree(i8* %135)
-  call void @llvm.lifetime.end(i64 16, i8* nonnull %53) #1
+_ZNKSt5ctypeIcE5widenEc.exit:                     ; preds = %129, %126
+  %.0.i = phi i8 [ %128, %126 ], [ %134, %129 ]
+  %135 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull %110, i8 signext %.0.i)
+  %136 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %135)
+  %137 = load i8*, i8** %22, align 8, !tbaa !1
+  %138 = call i32 @cudaFree(i8* %137)
+  call void @llvm.lifetime.end(i64 16, i8* nonnull %54) #1
   call void @llvm.lifetime.end(i64 8, i8* nonnull %21) #1
   ret i32 0
 }
@@ -415,7 +418,7 @@ entry:
   ret void
 }
 
-declare void @_Z15configureKernelPKciiiiii(i8*, i32, i32, i32, i32, i32, i32)
+declare void @_Z15configureKernelPKcS0_iiiiii(i8*, i8*, i32, i32, i32, i32, i32, i32)
 
 declare void @_Z21setKernelArgFloatStarPf(float*)
 

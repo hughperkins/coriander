@@ -76,13 +76,23 @@ Instruction *addStringInstr(Module *M, string name, string value) {
     return elem;
 }
 
-Instruction *addStringInstrExistingGlobal(Module *M, string name, string value) {
+Instruction *addStringInstrExistingGlobal(Module *M, string name) {
     // GlobalVariable *var = addGlobalVariable(M, name, value);
     GlobalVariable *var = M->getNamedGlobal(name);
 
-    int N = value.size() + 1;
+    Type *varType = var->getType();
+    ArrayType *arrayType1 = cast<ArrayType>(varType->getPointerElementType());
+    int N = arrayType1->getNumElements();
+
     LLVMContext &context = M->getContext();
     ArrayType *arrayType = ArrayType::get(IntegerType::get(context, 8), N);
+    // Type *varType = var->getType();
+    // cout << "arrayType->dump()" << endl;
+    // ArrayType *elemType = cast<ArrayType>(varType->getPointerElementType());
+    // elemType->dump();
+    // cout << endl;
+    // cout << "numelements " << elemType->getNumElements() << endl;
+    // return 0;
     Value * indices[2];
     indices[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
     indices[1] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);

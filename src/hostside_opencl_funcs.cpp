@@ -102,7 +102,7 @@ size_t cudaFree(void *mem) {
 }
 
 void configureKernel(
-        const char *kernelName,
+        const char *kernelName, const char *clSourcecodeString,
         int grid_x, int grid_y, int grid_z,
         int block_x, int block_y, int block_z) {
     // just a mock for now... can we call this from our modified ir?
@@ -117,7 +117,8 @@ void configureKernel(
     block[2] = block_z;
     // lets just read the kernel from file for now, with hardcoded filename
     // kernel.reset(buildKernelFromString("", kernelName, "", "internal"));
-    kernel.reset(cl->buildKernel(cl_filepath, kernelName, ""));
+    // kernel.reset(cl->buildKernel(cl_filepath, kernelName, ""));
+    kernel.reset(cl->buildKernelFromString(clSourcecodeString, kernelName, "", "__internal__"));
 }
 
 void setKernelArgFloatStar(float *clmem_as_floatstar) {
