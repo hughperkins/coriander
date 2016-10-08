@@ -333,8 +333,17 @@ void patchFunction(Function *F) {
 }
 
 
-void patchModule(Module *M) {
+void patchModule(string deviceclfilename, Module *M) {
     // int i = 0;
+
+    // add in opencl sourcecode
+    ifstream f_in(deviceclfilename);
+    string cl_sourcecode(
+        (std::istreambuf_iterator<char>(f_in)),
+        (std::istreambuf_iterator<char>()));
+
+    addGlobalVariable(M, "__opencl_sourcecode", cl_sourcecode);
+
     vector<Function *> functionsToRemove;
     for(auto it = M->begin(); it != M->end(); it++) {
         // nameByValue.clear();
@@ -370,11 +379,18 @@ void patchModule(Module *M) {
 
 int main(int argc, char *argv[]) {
     SMDiagnostic Err;
-    if(argc != 3) {
-        cout << "Usage: " << argv[0] << " infile.ll outfile.o" << endl;
+    if(argc != 4) {
+        cout << "Usage: " << argv[0] << " infile-rawhost.ll infile-device.cl outfile-patchedhost.ll" << endl;
         return 1;
     }
-    string infile = argv[1];
+
+    string rawhostfilename = argv[1];
+    string deviceclfilename = argv[2];
+    string patchedhostfilename = argv[3];
+    cout << "reading rawhost ll file " << rawhostfilename << endl;
+    cout << "reading device cl file " << deviceclfilename << endl;
+    cout << "outputing to patchedhost file " << patchedhostfilename << endl;
+
     // debug = false;
     // if(argc == 3) {
     //     if(string(argv[1]) != "--debug") {
@@ -384,17 +400,17 @@ int main(int argc, char *argv[]) {
     //         debug = true;
     //     }
     // }
-    TheModule = parseIRFile(infile, Err, TheContext);
+    TheModule = parseIRFile(rawhostfilename, Err, TheContext);
     if(!TheModule) {
         Err.print(argv[0], errs());
         return 1;
     }
 
-    patchModule(TheModule.get());
+    patchModule(deviceclfilename, TheModule.get());
 
     AssemblyAnnotationWriter assemblyAnnotationWriter;
     ofstream ofile;
-    ofile.open(argv[2]);
+    ofile.open(patchedhostfilename);
     raw_os_ostream my_raw_os_ostream(ofile);
     verifyModule(*TheModule);
     // cout << "printing module" << endl;

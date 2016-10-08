@@ -43,25 +43,27 @@ test/eigen/generated/%-device.ll: test/eigen/%.cu include/fake_funcs.h build/ir-
 	mkdir -p test/eigen/generated
 	$(CLANG) -x cuda -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -D__CUDA_ARCH__=300 -include include/fake_funcs.h -Iinclude -I$(EIGEN_HOME) -I$(CUDA_HOME)/include -I/usr/include/x86_64-linux-gnu $< --cuda-device-only -emit-llvm -O3 -S -o $@
 
-# hostside goes from .cu -> -hostraw.ll => -hostpatched.ll
+# hostside goes from .cu -> -hostraw.ll
 
 test/generated/%-hostraw.ll: test/%.cu
 	echo building $@ from $< using $(CLANG) CUDA_HOME $(CUDA_HOME)
 	mkdir -p test/generated
 	$(CLANG) -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
 
-test/generated/%-hostpatched.ll: test/generated/%-hostraw.ll build/patch-hostside
-	echo building $@ from $<
-	build/patch-hostside $< $@
-
 test/eigen/generated/%-hostraw.ll: test/eigen/%.cu include/fake_funcs.h
 	echo building $@ from $<
 	mkdir -p test/eigen/generated
 	$(CLANG) -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -include include/fake_funcs.h -I$(EIGEN_HOME) -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
 
-test/eigen/generated/%-hostpatched.ll: test/eigen/generated/%-hostraw.ll build/patch-hostside
+# .hostraw.ll => .hostpatched.ll
+
+test/generated/%-hostpatched.ll: test/generated/%-hostraw.ll test/generated/%-device.cl build/patch-hostside
 	echo building $@ from $<
-	build/patch-hostside $< $@
+	build/patch-hostside $< $(word 2,$^) $@
+
+test/eigen/generated/%-hostpatched.ll: test/eigen/generated/%-hostraw.ll test/eigen/generated/%-device.cl build/patch-hostside
+	echo building $@ from $<
+	build/patch-hostside $< $(word 2,$^) $@
 
 # opencl (from the -device.ll)
 

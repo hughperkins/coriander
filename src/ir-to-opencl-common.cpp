@@ -76,6 +76,20 @@ Instruction *addStringInstr(Module *M, string name, string value) {
     return elem;
 }
 
+Instruction *addStringInstrExistingGlobal(Module *M, string name, string value) {
+    // GlobalVariable *var = addGlobalVariable(M, name, value);
+    GlobalVariable *var = M->getNamedGlobal(name);
+
+    int N = value.size() + 1;
+    LLVMContext &context = M->getContext();
+    ArrayType *arrayType = ArrayType::get(IntegerType::get(context, 8), N);
+    Value * indices[2];
+    indices[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
+    indices[1] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
+    GetElementPtrInst *elem = GetElementPtrInst::CreateInBounds(arrayType, var, ArrayRef<Value *>(indices, 2));
+    return elem;
+}
+
 std::string dumpFunctionType(FunctionType *fn) {
     cout << "function" << endl;
     std::string params_str = "";
