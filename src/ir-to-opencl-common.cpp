@@ -349,6 +349,9 @@ void walkType(Module *M, StructInfo *structInfo, int level, int offset, vector<i
     } else if(IntegerType *intType = dyn_cast<IntegerType>(type)) {
         int bitwidth = intType->getBitWidth();
         outs() << getIndent(level) << "int" << bitwidth << " offset=" << offset << "\n";
+    } else if(type->getPrimitiveSizeInBits() != 0) {
+        // int bitwidth = intType->getBitWidth();
+        outs() << getIndent(level) << " someprimitive " << " offset=" << offset << "\n";
     } else {
         throw runtime_error("walktype type not handled: " + dumpType(type));
     }
