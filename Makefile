@@ -79,6 +79,10 @@ test/generated/%-device.cl: test/%-device.ll build/ir-to-opencl
 	echo building $@ from $<
 	build/ir-to-opencl $(DEBUG) $< $@
 
+%-device.cl-lldb: %-device.ll build/ir-to-opencl
+	echo building $@ from $<
+	lldb-3.8 build/ir-to-opencl $(DEBUG) $< $@
+
 # objects
 
 ## objects from hostside patched ll

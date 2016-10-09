@@ -256,12 +256,10 @@ void configureKernel(
         const char *kernelName, const char *clSourcecodeString,
         int grid_x, int grid_y, int grid_z,
         int block_x, int block_y, int block_z) {
-    cout << "configureKernel" << endl;
     assure_initialized();
-    // just a mock for now... can we call this from our modified ir?
-    // cout << "configureKernel(" << kernelName << ")" << endl;
-    // cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl;
-    // cout << "block(" << block_x << ", " << block_y << ", " << block_z << ")" << endl;
+    cout << "configureKernel(" << kernelName << ")" << endl;
+    cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl;
+    cout << "block(" << block_x << ", " << block_y << ", " << block_z << ")" << endl;
     grid[0] = grid_x;
     grid[1] = grid_y;
     grid[2] = grid_z;
@@ -280,7 +278,8 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     // we should also:
     // deallocate the cl_mem after calling the kernel
     // (we assume hte struct is passed by-value, so we dont have to actually copy it back afterwards)
-
+    cout << "setKernelArgStruct structsize=" << structAllocateSize << endl;
+    // int idx = 
     cl_mem gpu_struct = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, structAllocateSize,
                                            NULL, &err);
     cl->checkError(err);

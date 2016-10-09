@@ -67,7 +67,8 @@ public:
     std::string kernelName = "";
     // CallInst *launchInstruction;
     vector<Type *> callTypes;
-    vector<Value *> callValues;
+    vector<Value *> callValuesByValue;
+    vector<Value *> callValuesAsPointers;
     int grid[3];
     int block[3];
 };
@@ -110,7 +111,7 @@ ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
     my_raw_os_ostream << ");\n";
     my_raw_os_ostream << "value types: ";
     i = 0;
-    for(auto it=info.callValues.begin(); it != info.callValues.end(); it++) {
+    for(auto it=info.callValuesByValue.begin(); it != info.callValuesByValue.end(); it++) {
         Value *value = *it;
         if(i > 0) {
             my_raw_os_ostream << ", ";
@@ -123,7 +124,10 @@ ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
 }
 
 void getLaunchTypes(CallInst *inst, LaunchCallInfo *info) {
-    // unique_ptr<LaunchCallInfo> launchCallInfo(new LaunchCallInfo);
+    // input to this is a cudaLaunch instruction
+    // output is:
+    // - name of the kernel
+    // - type of each of the kernel parameters (without the actual Value's)
     Value *argOperand = inst->getArgOperand(0);
     if(ConstantExpr *expr = dyn_cast<ConstantExpr>(argOperand)) {
         Instruction *instr = expr->getAsInstruction();
@@ -141,8 +145,14 @@ void getLaunchTypes(CallInst *inst, LaunchCallInfo *info) {
 }
 
 void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
-    // ok, so we have:
-    // - inst is cudaSetupArgument
+    // input to this is:
+    // - inst is cudaSetupArgument instruction, with:
+    //   - first operand is a value pointing to the value we want to send to the kernel
+    //
+    // - output of this method is
+    //    populate info with a Value holding the actual concrete value w ewant to send to the kernel
+    //    (note a pointer to it, since we Load the pointer)
+    // Notes:
     // - the first operand of inst was created as bitcast(i8*)(alloca (type-of-arg))
     // - the alloca instruction is inst->getOperand(0)->getOperand(0)
     // - so if we load from the alloca instruction, we should have the value we want?
@@ -151,7 +161,8 @@ void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
     Instruction *alloca = cast<Instruction>(bitcast->getOperand(0));
     Instruction *load = new LoadInst(alloca, "loadCudaArg");
     load->insertBefore(inst);
-    info->callValues.push_back(load);
+    info->callValuesByValue.push_back(load);
+    info->callValuesAsPointers.push_back(alloca);
 }
 
 uint64_t readIntConstant_uint64(ConstantInt *constant) {
@@ -355,8 +366,9 @@ void patchFunction(Function *F) {
                     Instruction *lastInst = callLaunch;
                     // pass args now
                     int i = 0;
-                    for(auto argit=launchCallInfo->callValues.begin(); argit != launchCallInfo->callValues.end(); argit++) {
+                    for(auto argit=launchCallInfo->callValuesByValue.begin(); argit != launchCallInfo->callValuesByValue.end(); argit++) {
                         Value *value = *argit;
+                        Value *valueAsPointerInstr = launchCallInfo->callValuesAsPointers[i];
                         // cout << " arg " << i << " ";
                         // value->dump();
                         // cout << endl;
@@ -443,7 +455,8 @@ void patchFunction(Function *F) {
 
                             Module *M = F->getParent();
                             const DataLayout *dataLayout = &M->getDataLayout();
-                            cout << "typeallocsize " << dataLayout->getTypeAllocSize(value->getType()) << endl;
+                            int allocSize = dataLayout->getTypeAllocSize(value->getType());
+                            cout << "typeallocsize " << allocSize << endl;
                             // we could just naively allocate this, and copy it to the kernel, but superficial inspection
                             // of the target for eigen shows it contains a float *.  that probably points into gpu
                             // memory already.  We'd probably better scan for that.
@@ -466,18 +479,30 @@ void patchFunction(Function *F) {
                             // So, for the struct, at patch time, we probalby need to call a function like:
                             // - setKernelArgStruct(char *pCpuStruct, int structAllocateSize);
 
-                            // Function *setKernelArgStruct = cast<Function>(F->getParent()->getOrInsertFunction(
-                            //     "_Z18setKernelArgStructv",
-                            //     Type::getVoidTy(TheContext),
-                            //     // PointerType::get(IntegerType::get(TheContext, 8), 0),
-                            //     NULL));
+                            Function *setKernelArgStruct = cast<Function>(F->getParent()->getOrInsertFunction(
+                                "_Z18setKernelArgStructPci",
+                                Type::getVoidTy(TheContext),
+                                PointerType::get(IntegerType::get(TheContext, 8), 0),
+                                IntegerType::get(TheContext, 32),
+                                NULL));
 
-                            // BitCastInst *bitcast = new BitCastInst(value, PointerType::get(IntegerType::get(TheContext, 8), 0));
-                            // bitcast->insertAfter(lastInst);
-                            // lastInst = bitcast;
-                            // CallInst *call = CallInst::Create(setKernelArgStruct);
-                            // call->insertAfter(lastInst);
-                            // lastInst = call;
+                            // Value * indices[1];
+                            // indices[0] = createInt32Constant(&TheContext, 0);
+                            // GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(value->getType(), value, ArrayRef<Value *>(&indices[0], &indices[1]));
+                            // gep->insertAfter(lastInst);
+                            // lastInst = gep;
+
+                            BitCastInst *bitcast = new BitCastInst(valueAsPointerInstr, PointerType::get(IntegerType::get(TheContext, 8), 0));
+                            bitcast->insertAfter(lastInst);
+                            lastInst = bitcast;
+
+                            Value *args[2];
+                            args[0] = bitcast;
+                            args[1] = createInt32Constant(&TheContext, allocSize);
+
+                            CallInst *call = CallInst::Create(setKernelArgStruct, ArrayRef<Value *>(args));
+                            call->insertAfter(lastInst);
+                            lastInst = call;
 
                             // Type *elementType = value->getType()->getPointerElementType();
                             // // if(elementType->isFloatingPointTy()) {
@@ -494,7 +519,7 @@ void patchFunction(Function *F) {
                             //     call->insertAfter(lastInst);
                             //     lastInst = call;
                             // // }
-                            throw runtime_error("type struct not implemented");
+                            // throw runtime_error("type struct not implemented");
                         } else {
                             throw runtime_error("type not implemented " + dumpType(value->getType()));
                         }

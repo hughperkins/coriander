@@ -342,17 +342,21 @@ void copyAddressSpace(Value *src, Value *dest) {
         return;
     }
     if(PointerType *srcType = dyn_cast<PointerType>(src->getType())) {
-        int addressspace = srcType->getAddressSpace();
-        if(addressspace != 0) {
-            updateAddressSpace(dest, addressspace);
+        if(isa<PointerType>(dest->getType())) {
+            int addressspace = srcType->getAddressSpace();
+            if(addressspace != 0) {
+                updateAddressSpace(dest, addressspace);
+            }
         }
     }
 }
 
 string dumpLoad(LoadInst *instr) {
     string gencode = "";
+    string rhs = dumpOperand(instr->getOperand(0)) + "[0]";
+    copyAddressSpace(instr->getOperand(0), instr);
     string typestr = dumpType(instr->getType());
-    gencode += typestr + " " + dumpOperand(instr) + " = " + dumpOperand(instr->getOperand(0)) + "[0];\n";
+    gencode += typestr + " " + dumpOperand(instr) + " = " + rhs + ";\n";
     return gencode;
 }
 
