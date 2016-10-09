@@ -1149,16 +1149,68 @@ std::string dumpFunctionDeclaration(Function *F) {
                 arg->mutateType(newtype);
             }
         }
-        string argname = dumpType(arg->getType()) + " " + dumpOperand(arg);
+        string argName = dumpOperand(arg);
+        string argdeclaration = dumpType(arg->getType()) + " " + argName;
         if(i > 0) {
             declaration += ", ";
         }
-        declaration += argname;
+        declaration += argdeclaration;
+        // if this is a kernel method, check for any structs containing pointers,
+        // and add those pointers t othe argument list, with some appropriate shimcode
+        // to copy those pointers into the struct, at the start of the kernel
+        int j = 0;
+        if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
+            Type *elemType = ptrType->getPointerElementType();
+            if(StructType *structType = dyn_cast<StructType>(elemType)) {
+                outs() << "got a structtype\n";
+                unique_ptr<StructInfo> structInfo(new StructInfo());
+                walkStructType(TheModule.get(), structInfo.get(), 0, 0, std::vector<int>(), structType);
+                for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
+                    PointerInfo *pointerInfo = pointerit->get();
+                    int offset = pointerInfo->offset;
+                    // Type *type = pointerInfo->type;
+                    declaration += ", " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
+                    j++;
+                }
+            }
+        }
         i++;
     }
     declaration += ")";
     return declaration;
 }
+
+// this is going to walk over struct args, and look for float *s (for now), and add those as
+// additional kernel arguments, with some shim-type code to hook those into the incoming struct arg
+// the shim code will be returned as the string return from this function
+// the additional arguments will be patched directly into F (maybe)
+// std::string augmentStructArgs(Function *F) {
+//     string shimcode = "";
+//     outs() << "augmentStructArgs\n";
+//     int i = 0;
+//     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+//         Argument *arg = &*it;
+//         // storeValueName(arg);
+//         Type *argType = arg->getType();
+//         outs() << "arg " << i << " " << dumpType(argType) << "\n";
+//         if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
+//             Type *elemType = ptrType->getPointerElementType();
+//             if(StructType *structType = dyn_cast<StructType>(elemType)) {
+//                 outs() << "got a structtype\n";
+//                 unique_ptr<StructInfo> structInfo(new StructInfo());
+//                 walkStructType(TheModule.get(), structInfo.get(), 0, 0, std::vector<int>(), structType);
+//                 for(auto float4it=structInfo->pointerInfos.begin(); float4it != structInfo->pointerInfos.end(); float4it++) {
+//                     PointerInfo *pointerInfo = pointerit->get();
+//                     int offset = pointerInfo->offset;
+//                     Type *type = pointerInfo->type;
+
+//                 }
+//             }
+//         }
+//         i++;
+//     }
+//     return shimcode;
+// }
 
 std::string dumpFunction(Function *F) {
     currentFunctionSharedDeclarations = "";
@@ -1263,6 +1315,20 @@ std::string dumpModule(Module *M) {
             }
         }
     }
+
+    // augment functions for struct args contianing pointers
+    // only do this for kernel calls
+    // map<Function *, string> structShimCodeByFunction;
+    // for(auto it = M->begin(); it != M->end(); it++) {
+    //     Function *F = &*it;
+    //     string name = getName(F);
+    //     if(!iskernel_by_name[name]) {
+    //         continue;
+    //     }
+    //     outs() << "function " << name << "\n";
+    //     string structshimcode = augmentStructArgs(F);
+    //     structShimCodeByFunction[F] = structshimcode;
+    // }
 
     // dump function declarations
     cout << "beginning function declarations" << endl;

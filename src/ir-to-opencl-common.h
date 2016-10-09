@@ -33,3 +33,24 @@ std::string replace(std::string target, char old_char, char new_char);
 
 int readInt32Constant(llvm::Value *value);
 float readFloatConstant(llvm::Value *value);
+
+class PointerInfo {
+public:
+    PointerInfo(int offset, llvm::Type *type, std::vector<int> indices) :
+        offset(offset), type(type), indices(indices) {
+    }
+    int offset;
+    llvm::Type *type;
+    std::vector<int> indices;
+};
+
+class StructInfo {
+public:
+    std::vector<std::unique_ptr<PointerInfo> > pointerInfos;
+};
+
+// offset: since we're walking a tree, over a base type, what is our offset into
+// the base type?
+void walkStructType(llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices, llvm::StructType *type);
+void walkType(llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices, llvm::Type *type);
+std::string getIndent(int level);
