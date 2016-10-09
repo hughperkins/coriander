@@ -59,18 +59,22 @@ public:
     LaunchCallInfo() {
         // launchInstruction = 0;
         // kernelName = "";
-        for(int i = 0; i < 3; i++) {
-            grid[i] = 0;
-            block[i] = 0;
-        }
+        // for(int i = 0; i < 3; i++) {
+        //     grid[i] = 0;
+        //     block[i] = 0;
+        // }
     }
     std::string kernelName = "";
     // CallInst *launchInstruction;
     vector<Type *> callTypes;
     vector<Value *> callValuesByValue;
     vector<Value *> callValuesAsPointers;
-    int grid[3];
-    int block[3];
+    Value *grid_xy_value;
+    Value *grid_z_value;
+    Value *block_xy_value;
+    Value *block_z_value;
+    // int grid[3];
+    // int block[3];
 };
 
 ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
@@ -78,24 +82,24 @@ ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
     my_raw_os_ostream << "LaunchCallInfo " << info.kernelName;
     my_raw_os_ostream << "<<<";
 
-    my_raw_os_ostream << "dim3(";
-    for(int j = 0; j < 3; j++) {
-        if(j > 0) {
-            my_raw_os_ostream << ", ";
-        }
-        my_raw_os_ostream << info.grid[j];
-    }
-    my_raw_os_ostream << ")";
-    my_raw_os_ostream << ", ";
+    // my_raw_os_ostream << "dim3(";
+    // for(int j = 0; j < 3; j++) {
+    //     if(j > 0) {
+    //         my_raw_os_ostream << ", ";
+    //     }
+    //     my_raw_os_ostream << info.grid[j];
+    // }
+    // my_raw_os_ostream << ")";
+    // my_raw_os_ostream << ", ";
 
-    my_raw_os_ostream << "dim3(";
-    for(int j = 0; j < 3; j++) {
-        if(j > 0) {
-            my_raw_os_ostream << ", ";
-        }
-        my_raw_os_ostream << info.block[j];
-    }
-    my_raw_os_ostream << ")";
+    // my_raw_os_ostream << "dim3(";
+    // for(int j = 0; j < 3; j++) {
+    //     if(j > 0) {
+    //         my_raw_os_ostream << ", ";
+    //     }
+    //     my_raw_os_ostream << info.block[j];
+    // }
+    // my_raw_os_ostream << ")";
 
     my_raw_os_ostream << ">>>";
     my_raw_os_ostream << "(";
@@ -284,27 +288,45 @@ void getBlockGridDimensions(CallInst *inst, LaunchCallInfo *info) {
     // 4 shared memory.  since we're not handling it right now, must be 0
     // 5 stream must be null, for now
 
-    uint64_t grid_xy = readIntConstant_uint64(cast<ConstantInt>(inst->getArgOperand(0)));
-    uint32_t grid_x = grid_xy & ((1l << 31) - 1);
-    uint32_t grid_y = grid_xy >> 32;
-    uint32_t grid_z = readIntConstant_uint32(cast<ConstantInt>(inst->getArgOperand(1)));
-    // cout << "grid " << grid_x << " " << grid_y << " " << grid_z << endl;
+    cout << "launch inst:" << endl;
+    // inst->dump();
+    // cout << endl;
+    info->grid_xy_value = inst->getArgOperand(0);
+    info->grid_z_value = inst->getArgOperand(1);
+    info->block_xy_value = inst->getArgOperand(2);
+    info->block_z_value = inst->getArgOperand(3);
 
-    uint64_t block_xy = readIntConstant_uint64(cast<ConstantInt>(inst->getArgOperand(2)));
-    uint32_t block_x = block_xy & ((1l << 31) - 1);
-    uint32_t block_y = block_xy >> 32;
-    uint32_t block_z = readIntConstant_uint32(cast<ConstantInt>(inst->getArgOperand(3)));
-    // cout << "block " << block_x << " " << block_y << " " << block_z << endl;
+    // cout << "gxy type " << dumpType(info->grid_xy_value->getType());
+    // cout << "gz type " << dumpType(info->grid_z_value->getType());
+    // cout << "bxy type " << dumpType(info->block_xy_value->getType());
+    // cout << "bz type " << dumpType(info->block_z_value->getType());
 
-    info->grid[0] = grid_x;
-    info->grid[1] = grid_y;
-    info->grid[2] = grid_z;
+    // uint64_t grid_xy = readIntConstant_uint64(cast<ConstantInt>(inst->getArgOperand(0)));
+    // cout << "grid_xy " << grid_xy << endl;
+    // uint32_t grid_x = grid_xy & ((1ul << 31) - 1);
+    // uint32_t grid_y = grid_xy >> 32;
+    // uint32_t grid_z = readIntConstant_uint32(cast<ConstantInt>(inst->getArgOperand(1)));
+    // // cout << "grid " << grid_x << " " << grid_y << " " << grid_z << endl;
 
-    info->block[0] = block_x;
-    info->block[1] = block_y;
-    info->block[2] = block_z;
+    // uint64_t block_xy = readIntConstant_uint64(cast<ConstantInt>(inst->getArgOperand(2)));
+    // cout << "block_xy " << block_xy << endl;
+    // uint32_t block_x = block_xy & ((1ul << 31) - 1);
+    // uint32_t block_y = block_xy >> 32;
+    // uint32_t block_z = readIntConstant_uint32(cast<ConstantInt>(inst->getArgOperand(3)));
+    // // cout << "block " << block_x << " " << block_y << " " << block_z << endl;
 
-    assert(readIntConstant_uint64(inst->getArgOperand(4)) == 0);
+    // info->grid[0] = grid_x;
+    // info->grid[1] = grid_y;
+    // info->grid[2] = grid_z;
+
+    // info->block[0] = block_x;
+    // info->block[1] = block_y;
+    // info->block[2] = block_z;
+
+    // if(readIntConstant_uint64(inst->getArgOperand(4)) != 0) {
+    //     cout << "stream wasnt zero";
+    //     throw runtime_error("stream in getBlockGridDimensions should be 0");
+    // }
     // we should assert on the stream too really TODO: FIXME:
     // assert(readIntConstant_uint64(inst->getArgOperand(5)) == 0);
 }
@@ -340,28 +362,45 @@ void patchFunction(Function *F) {
                     clSourcecodeInstr->insertBefore(inst);
 
                     Function *configureKernel = cast<Function>(F->getParent()->getOrInsertFunction(
-                        "_Z15configureKernelPKcS0_iiiiii",
+                        "_Z15configureKernelPKcS0_uluiuli",
                         Type::getVoidTy(TheContext),
                         PointerType::get(IntegerType::get(TheContext, 8), 0),
                         PointerType::get(IntegerType::get(TheContext, 8), 0),
+                        IntegerType::get(TheContext, 64),
                         IntegerType::get(TheContext, 32),
+                        IntegerType::get(TheContext, 64),
                         IntegerType::get(TheContext, 32),
-                        IntegerType::get(TheContext, 32),
-                        IntegerType::get(TheContext, 32),
-                        IntegerType::get(TheContext, 32),
-                        IntegerType::get(TheContext, 32),
+                        // IntegerType::get(TheContext, 32),
+                        // IntegerType::get(TheContext, 32),
                         NULL));
-                    Value *args[8];
+                    Value *args[6];
                     args[0] = stringInstr;
                     args[1] = clSourcecodeInstr;
-                    args[2] = createInt32Constant(&TheContext, launchCallInfo->grid[0]);
-                    args[3] = createInt32Constant(&TheContext, launchCallInfo->grid[1]);
-                    args[4] = createInt32Constant(&TheContext, launchCallInfo->grid[2]);
-                    args[5] = createInt32Constant(&TheContext, launchCallInfo->block[0]);
-                    args[6] = createInt32Constant(&TheContext, launchCallInfo->block[1]);
-                    args[7] = createInt32Constant(&TheContext, launchCallInfo->block[2]);
-                    CallInst *callLaunch = CallInst::Create(configureKernel, ArrayRef<Value *>(args));
-                    callLaunch->insertAfter(stringInstr);
+                    args[2] = launchCallInfo->grid_xy_value;
+                    args[3] = launchCallInfo->grid_z_value;
+                    args[4] = launchCallInfo->block_xy_value;
+                    args[5] = launchCallInfo->block_z_value;
+                    // launchCallInfo->grid_xy_value->dump();
+                    // cout << endl;
+                    // launchCallInfo->grid_z_value->dump();
+                    // cout << endl;
+                    // launchCallInfo->block_xy_value->dump();
+                    // cout << endl;
+                    // launchCallInfo->block_z_value->dump();
+                    // cout << endl;
+
+                    // for(int i = 0; i < 6; i++) {
+                    //     cout << "configure arg " << i << " type " << dumpType(args[i]->getType()) << endl;
+                    // }
+                    // args[2] = createInt32Constant(&TheContext, launchCallInfo->grid[0]);
+                    // args[3] = createInt32Constant(&TheContext, launchCallInfo->grid[1]);
+                    // args[4] = createInt32Constant(&TheContext, launchCallInfo->grid[2]);
+                    // args[5] = createInt32Constant(&TheContext, launchCallInfo->block[0]);
+                    // args[6] = createInt32Constant(&TheContext, launchCallInfo->block[1]);
+                    // args[7] = createInt32Constant(&TheContext, launchCallInfo->block[2]);
+                    CallInst *callLaunch = CallInst::Create(configureKernel, ArrayRef<Value *>(&args[0], &args[6]));
+                    // callLaunch->insertAfter(clSourcecodeInstr);
+                    callLaunch->insertBefore(inst);
 
                     Instruction *lastInst = callLaunch;
                     // pass args now
@@ -421,7 +460,7 @@ void patchFunction(Function *F) {
                             }
                         } else if(isa<StructType>(value->getType())) {
                             cout << "got a struct" << endl;
-
+if(false){
                             // lets just statically analyse the struct for now, without thinking how we're going to
                             // actually deal with it
                             // we want to know things like:
@@ -503,7 +542,7 @@ void patchFunction(Function *F) {
                             CallInst *call = CallInst::Create(setKernelArgStruct, ArrayRef<Value *>(args));
                             call->insertAfter(lastInst);
                             lastInst = call;
-
+}
                             // Type *elementType = value->getType()->getPointerElementType();
                             // // if(elementType->isFloatingPointTy()) {
                             //     // cout << "got a float *" << endl;

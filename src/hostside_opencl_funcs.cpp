@@ -254,10 +254,16 @@ size_t cudaFree(void *mem) {
 
 void configureKernel(
         const char *kernelName, const char *clSourcecodeString,
-        int grid_x, int grid_y, int grid_z,
-        int block_x, int block_y, int block_z) {
+        unsigned long long grid_xy, unsigned int grid_z,
+        unsigned long long block_xy, unsigned int block_z) {
     assure_initialized();
     cout << "configureKernel(" << kernelName << ")" << endl;
+    cout << "grid_xy " << grid_xy << " grid_z " << grid_z << endl;
+    cout << "block_xy " << block_xy << " grid_z " << block_z << endl;
+    int grid_x = 0; // placeholders
+    int grid_y = 0;
+    int block_x = 0; // placeholders
+    int block_y = 0;
     cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl;
     cout << "block(" << block_x << ", " << block_y << ", " << block_z << ")" << endl;
     grid[0] = grid_x;

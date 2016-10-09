@@ -65,6 +65,10 @@ test/eigen/generated/%-hostpatched.ll: test/eigen/generated/%-hostraw.ll test/ei
 	echo building $@ from $<
 	build/patch-hostside $< $(word 2,$^) $@
 
+test/eigen/generated/%-hostpatched.ll-lldb: test/eigen/generated/%-hostraw.ll test/eigen/generated/%-device.cl build/patch-hostside
+	echo building $@ from $<
+	lldb-3.8 build/patch-hostside $< $(word 2,$^) $@
+
 # opencl (from the -device.ll)
 
 %-device.cl: %-device.ll build/ir-to-opencl
