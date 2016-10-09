@@ -108,12 +108,39 @@ size_t cudaGetLastError() {
 
 size_t cudaStreamSynchronize(void *stream) {
     cout << "cudaStreamSynchronize stream=" << stream << endl;
+
+    assert(stream == 0);
+
     cl->finish();
     return 0;
 }
 
-size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t kind, void *stream) {
-    cout << "cudaMemcpyAsync count=" << count << " kind=" << kind << " stream=" << stream << endl;
+size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMemcpyKind, void *stream) {
+    cout << "cudaMemcpyAsync count=" << count << " cudaMemcpyKind=" << cudaMemcpyKind << " stream=" << stream << endl;
+
+    assert(stream == 0);
+
+    cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << " count=" << count << endl;
+    if(cudaMemcpyKind == 2) {
+        // device => host
+        int srcidx = idxByAddr[(void *)src];
+        cl_mem srcclmem = clmems[srcidx];
+        err = clEnqueueReadBuffer(*queue, srcclmem, CL_TRUE, 0,
+                                         count, dst, 0, NULL, NULL);
+        cl->checkError(err);
+        // cl->finish();
+    } else if(cudaMemcpyKind == 1) {
+        // host => device
+        int dstidx = idxByAddr[(void *)dst];
+        cl_mem dstclmem = clmems[dstidx];
+        err = clEnqueueWriteBuffer(*queue, dstclmem, CL_TRUE, 0,
+                                          count, src, 0, NULL, NULL);
+        cl->checkError(err);
+    } else {
+        cout << "cudaMemcpyKind using opencl " << cudaMemcpyKind << endl;
+        throw runtime_error("unhandled cudaMemcpyKind");
+    }
+
     return 0;
 }
 
@@ -136,6 +163,8 @@ size_t cudaGetDeviceCount (int *count) {
 
 size_t cudaMemsetAsync(void *devPtr, int value, size_t count, void *stream) {
     cout << "cudaMemsetAsync stub value=" << value << " count=" << count << " stream=" << stream << endl;
+    assert(stream == 0);
+
     return 0;
 }
 
