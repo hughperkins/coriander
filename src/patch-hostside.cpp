@@ -304,81 +304,7 @@ void walkStructType(StructInfo *structInfo, int level, int offset, vector<int> i
     // }
 }
 
-void dumpLaunchCallInfo(LaunchCallInfo *launchCallInfo) {
-    // outs() << "dumping grid\n";
-    // launchCallInfo->grid_xy_value->dump();
-    // launchCallInfo->grid_z_value->dump();
-    // launchCallInfo->block_xy_value->dump();
-    // launchCallInfo->block_z_value->dump();
-    // outs() << "dumping block done\n";
-}
-
-void getBlockGridDimensions(CallInst *inst, LaunchCallInfo *info) {
-    // there are 6 args:
-    // grid:
-    // 0 i64: x, y, as 32-bit ints
-    // 1 i32: z
-    // block:
-    // 2 i64: x, y, as 32-bit ints
-    // 3 i32: z
-    // 4 shared memory.  since we're not handling it right now, must be 0
-    // 5 stream must be null, for now
-
-    outs() << "launch inst:" << "\n";
-    // inst->dump();
-    // outs() << "\n";
-
-    outs() << "dumping grid\n";
-    inst->getArgOperand(0)->dump();
-    inst->getArgOperand(1)->dump();
-    inst->getArgOperand(2)->dump();
-    inst->getArgOperand(3)->dump();
-    outs() << "dumping block done\n";
-
-    info->grid_xy_value = inst->getArgOperand(0);
-    info->grid_z_value = inst->getArgOperand(1);
-    info->block_xy_value = inst->getArgOperand(2);
-    info->block_z_value = inst->getArgOperand(3);
-
-    dumpLaunchCallInfo(info);
-
-    // outs() << "gxy type " << dumpType(info->grid_xy_value->getType());
-    // outs() << "gz type " << dumpType(info->grid_z_value->getType());
-    // outs() << "bxy type " << dumpType(info->block_xy_value->getType());
-    // outs() << "bz type " << dumpType(info->block_z_value->getType());
-
-    // uint64_t grid_xy = readIntConstant_uint64(cast<ConstantInt>(inst->getArgOperand(0)));
-    // outs() << "grid_xy " << grid_xy << "\n";
-    // uint32_t grid_x = grid_xy & ((1ul << 31) - 1);
-    // uint32_t grid_y = grid_xy >> 32;
-    // uint32_t grid_z = readIntConstant_uint32(cast<ConstantInt>(inst->getArgOperand(1)));
-    // // outs() << "grid " << grid_x << " " << grid_y << " " << grid_z << "\n";
-
-    // uint64_t block_xy = readIntConstant_uint64(cast<ConstantInt>(inst->getArgOperand(2)));
-    // outs() << "block_xy " << block_xy << "\n";
-    // uint32_t block_x = block_xy & ((1ul << 31) - 1);
-    // uint32_t block_y = block_xy >> 32;
-    // uint32_t block_z = readIntConstant_uint32(cast<ConstantInt>(inst->getArgOperand(3)));
-    // // outs() << "block " << block_x << " " << block_y << " " << block_z << "\n";
-
-    // info->grid[0] = grid_x;
-    // info->grid[1] = grid_y;
-    // info->grid[2] = grid_z;
-
-    // info->block[0] = block_x;
-    // info->block[1] = block_y;
-    // info->block[2] = block_z;
-
-    // if(readIntConstant_uint64(inst->getArgOperand(4)) != 0) {
-    //     outs() << "stream wasnt zero";
-    //     throw runtime_error("stream in getBlockGridDimensions should be 0");
-    // }
-    // we should assert on the stream too really TODO: FIXME:
-    // assert(readIntConstant_uint64(inst->getArgOperand(5)) == 0);
-}
-
 void patchFunction(Function *F) {
-    // vector<Instruction *> to_erase;
     vector<Instruction *> to_replace_with_zero;
     IntegerType *inttype = IntegerType::get(TheContext, 32);
     ConstantInt *constzero = ConstantInt::getSigned(inttype, 0);
@@ -397,11 +323,8 @@ void patchFunction(Function *F) {
                 if(calledFunctionName == "cudaLaunch") {
                     outs() << "cudaLaunch\n";
                     getLaunchTypes(inst, launchCallInfo.get());
-                    dumpLaunchCallInfo(launchCallInfo.get());
-                    // to_erase.push_back(inst);
                     to_replace_with_zero.push_back(inst);
                     outs() << "patching launch in " << string(F->getName()) << "\n";
-                    // outs() << *launchCallInfo << "\n";
 
                     outs() << "cudalaunch kernelanem " << launchCallInfo->kernelName << "\n";
                     Instruction *stringInstr = addStringInstr(F->getParent(), "s." + launchCallInfo->kernelName, launchCallInfo->kernelName);
@@ -410,50 +333,16 @@ void patchFunction(Function *F) {
                     Instruction *clSourcecodeInstr = addStringInstrExistingGlobal(F->getParent(), "__opencl_sourcecode");
                     clSourcecodeInstr->insertBefore(inst);
 
-                    dumpLaunchCallInfo(launchCallInfo.get());
                     Function *configureKernel = cast<Function>(F->getParent()->getOrInsertFunction(
-                        // "_Z15configureKernelPKcS0_",
                         "configureKernel",
                         Type::getVoidTy(TheContext),
                         PointerType::get(IntegerType::get(TheContext, 8), 0),
                         PointerType::get(IntegerType::get(TheContext, 8), 0),
-                        // IntegerType::get(TheContext, 64),
-                        // IntegerType::get(TheContext, 32),
-                        // IntegerType::get(TheContext, 64),
-                        // IntegerType::get(TheContext, 32),
-                        // IntegerType::get(TheContext, 32),
-                        // IntegerType::get(TheContext, 32),
                         NULL));
                     Value *args[2];
                     args[0] = stringInstr;
                     args[1] = clSourcecodeInstr;
-                    // args[2] = launchCallInfo->grid_xy_value;
-                    // args[3] = launchCallInfo->grid_z_value;
-                    // args[4] = launchCallInfo->block_xy_value;
-                    // args[5] = launchCallInfo->block_z_value;
-                    // launchCallInfo->grid_xy_value->dump();
-                    // outs() << "\n";
-                    // launchCallInfo->grid_z_value->dump();
-                    // outs() << "\n";
-                    // launchCallInfo->block_xy_value->dump();
-                    // outs() << "\n";
-                    // launchCallInfo->block_z_value->dump();
-                    // outs() << "\n";
-
-                    // dumpLaunchCallInfo(launchCallInfo.get());
-                    // for(int i = 0; i < 6; i++) {
-                    //     outs() << "dumping args[" << i << "]\n";
-                    //     args[i]->dump();
-                    //     outs() << "configure arg " << i << " type " << dumpType(args[i]->getType()) << "\n";
-                    // }
-                    // args[2] = createInt32Constant(&TheContext, launchCallInfo->grid[0]);
-                    // args[3] = createInt32Constant(&TheContext, launchCallInfo->grid[1]);
-                    // args[4] = createInt32Constant(&TheContext, launchCallInfo->grid[2]);
-                    // args[5] = createInt32Constant(&TheContext, launchCallInfo->block[0]);
-                    // args[6] = createInt32Constant(&TheContext, launchCallInfo->block[1]);
-                    // args[7] = createInt32Constant(&TheContext, launchCallInfo->block[2]);
                     CallInst *callLaunch = CallInst::Create(configureKernel, ArrayRef<Value *>(&args[0], &args[2]));
-                    // callLaunch->insertAfter(clSourcecodeInstr);
                     callLaunch->insertBefore(inst);
 
                     Instruction *lastInst = callLaunch;
@@ -462,14 +351,9 @@ void patchFunction(Function *F) {
                     for(auto argit=launchCallInfo->callValuesByValue.begin(); argit != launchCallInfo->callValuesByValue.end(); argit++) {
                         Value *value = *argit;
                         Value *valueAsPointerInstr = launchCallInfo->callValuesAsPointers[i];
-                        // outs() << " arg " << i << " ";
-                        // value->dump();
-                        // outs() << "\n";
                         if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
-                            // outs() << "got an int" << "\n";
                             int bitLength = intType->getBitWidth();
                             outs() << "bitLength " << bitLength << "\n";
-                            // string typeabbrev = "";
                             string mangledName = "";
                             if(bitLength == 32) {
                                 // typeabbrev = "i";
@@ -514,7 +398,7 @@ void patchFunction(Function *F) {
                             }
                         } else if(isa<StructType>(value->getType())) {
                             outs() << "got a struct" << "\n";
-if(true){
+
                             // lets just statically analyse the struct for now, without thinking how we're going to
                             // actually deal with it
                             // we want to know things like:
@@ -596,7 +480,7 @@ if(true){
                             CallInst *call = CallInst::Create(setKernelArgStruct, ArrayRef<Value *>(args));
                             call->insertAfter(lastInst);
                             lastInst = call;
-}
+
                             // Type *elementType = value->getType()->getPointerElementType();
                             // // if(elementType->isFloatingPointTy()) {
                             //     // outs() << "got a float *" << "\n";
@@ -632,9 +516,7 @@ if(true){
                     // launchCallInfo.reset(new LaunchCallInfo);
                 } else if(calledFunctionName == "cudaSetupArgument") {
                     outs() << "cudaSetupArgument\n";
-                    dumpLaunchCallInfo(launchCallInfo.get());
                     getLaunchArgValue(inst, launchCallInfo.get());
-                    dumpLaunchCallInfo(launchCallInfo.get());
                     to_replace_with_zero.push_back(inst);
                 }
                 // } else if(calledFunctionName == "cudaConfigureCall") {
@@ -647,27 +529,12 @@ if(true){
             }
         }
     }
-    // outs() << *launchCallInfo << "\n";
-    // for(auto it=to_erase.begin(); it != to_erase.end(); it++) {
-    //     Instruction *inst = *it;
-    //     if(!inst->use_empty()) {
-    //         throw runtime_error("cannot erase used instructions");
-    //     }
-    //     inst->eraseFromParent();
-    // }
     for(auto it=to_replace_with_zero.begin(); it != to_replace_with_zero.end(); it++) {
-        if(true) {
-            Instruction *inst = *it;
-            BasicBlock::iterator ii(inst);
-            ReplaceInstWithValue(inst->getParent()->getInstList(), ii, constzero);
-        }
+        Instruction *inst = *it;
+        BasicBlock::iterator ii(inst);
+        ReplaceInstWithValue(inst->getParent()->getInstList(), ii, constzero);
         // outs() << "after replacevalue" << "\n";
     }
-
-    // if(launchCallInfo != 0 && launchCallInfo->launchInstruction != 0) {
-    //     outs() << "erasing" << "\n";
-    //     launchCallInfo->launchInstruction->eraseFromParent();
-    // }
 }
 
 
