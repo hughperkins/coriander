@@ -178,6 +178,7 @@ void declareStruct(string name, StructType *type) {
             }
         }
         if(isPtrPtrFunction) {
+            // we can ignore functions, whilst dumping structs
             continue;
         }
         std::string memberName = "f" + toString(i);
@@ -190,7 +191,12 @@ void declareStruct(string name, StructType *type) {
             declaration += memberName + "[" + toString(numElements) + "];\n";
             // throw runtime_error("not implemented declarestruct for arraytype elements");
         } else {
-            declaration += "    " + dumpType(elementType) + " " + memberName + ";\n";
+            declaration += "    ";
+            // if its a pointer, lets assume its global, for now
+            if(PointerType *ptr = dyn_cast<PointerType>(elementType)) {
+                declaration += "global ";
+            }
+            declaration += dumpType(elementType) + " " + memberName + ";\n";
         }
         i++;
     }

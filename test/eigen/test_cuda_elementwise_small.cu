@@ -48,7 +48,7 @@ void test_cuda_elementwise_small() {
   Eigen::TensorMap<Eigen::Tensor<float, 1>, Eigen::Aligned> gpu_out(
        d_out, Eigen::array<Eigen::DenseIndex, 1>(2));
 
-  // gpu_out.device(gpu_device) = gpu_in1 + gpu_in2;
+  gpu_out.device(gpu_device) = gpu_in1 + gpu_in2;
 
   assert(cudaMemcpyAsync(out.data(), d_out, out_bytes, cudaMemcpyDeviceToHost,
                          gpu_device.stream()) == cudaSuccess);

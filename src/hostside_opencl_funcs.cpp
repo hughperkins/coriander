@@ -33,6 +33,7 @@ static cl_command_queue *queue;
 static cl_int err;
 
 static vector<cl_mem> clmems;
+static vector<cl_mem> kernelArgsToBeReleased;
 static map<void *, int> idxByAddr;
 
 static bool initialized = false;
@@ -270,6 +271,26 @@ void configureKernel(
     kernel.reset(cl->buildKernelFromString(clSourcecodeString, kernelName, "", "__internal__"));
 }
 
+void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
+    // we're going to:
+    // allocate a cl_mem for the struct
+    // copy the cpu struct to the cl_mem
+    // pass the cl_mem into the kernel
+
+    // we should also:
+    // deallocate the cl_mem after calling the kernel
+    // (we assume hte struct is passed by-value, so we dont have to actually copy it back afterwards)
+
+    cl_mem gpu_struct = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, structAllocateSize,
+                                           NULL, &err);
+    cl->checkError(err);
+    err = clEnqueueWriteBuffer(*queue, gpu_struct, CL_TRUE, 0,
+                                      structAllocateSize, pCpuStruct, 0, NULL, NULL);
+    cl->checkError(err);
+    kernelArgsToBeReleased.push_back(gpu_struct);
+    kernel->in(&kernelArgsToBeReleased[kernelArgsToBeReleased.size() - 1]);
+}
+
 void setKernelArgFloatStar(float *clmem_as_floatstar) {
     cout << "setKernelArgFloatStar" << endl;
     cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
@@ -320,4 +341,10 @@ void kernelGo() {
     // cout << "launching kernel, using OpenCL..." << endl;
     kernel->run(3, global, block);
     // cout << ".. kernel finished" << endl;
+    for(auto it=kernelArgsToBeReleased.begin(); it != kernelArgsToBeReleased.end(); it++) {
+        cl_mem memObject = *it;
+        err = clReleaseMemObject(memObject);
+        cl->checkError(err);
+    }
+    kernelArgsToBeReleased.clear();
 }

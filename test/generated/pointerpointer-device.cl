@@ -21,21 +21,21 @@ struct class_StreamInterface {
 
 struct class_GpuDevice {
     int f0;
-    struct class_StreamInterface* f1;
+    global struct class_StreamInterface* f1;
 };
 
 struct class_TensorEvaluator0 {
-    struct class_Half* f0;
+    global struct class_Half* f0;
     struct class_GpuDevice f1;
 };
 
 struct class_TensorEvaluator2 {
-    struct class_Half* f0;
+    global struct class_Half* f0;
     struct class_GpuDevice f1;
 };
 
 struct class_TensorEvaluator7 {
-    struct class_Half* f0;
+    global struct class_Half* f0;
     struct class_TensorEvaluator2 f1;
 };
 

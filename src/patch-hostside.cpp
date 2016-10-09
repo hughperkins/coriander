@@ -454,6 +454,17 @@ void patchFunction(Function *F) {
                                 PointerInfo *pointerInfo = pointerit->get();
                                 cout << "pointer: " << *pointerInfo << endl;
                             }
+                            // now we need to set up instructions to pass in:
+                            // - the struct itself
+                            // - each of the float arrays
+                            // 
+                            // For the struct itself, at runtime, we're going to have to:
+                            // - allocate a cl_mem for it
+                            // - copy the struct cpu memory to the cl_mem
+                            // - pass the cl_mem into the kernel, as an argument
+                            //
+                            // So, for the struct, at patch time, we probalby need to call a function like:
+                            // - setKernelArgStruct(char *pCpuStruct, int structAllocateSize);
 
                             // Function *setKernelArgStruct = cast<Function>(F->getParent()->getOrInsertFunction(
                             //     "_Z18setKernelArgStructv",

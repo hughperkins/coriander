@@ -5,8 +5,6 @@ For now, test it compiles (which it wont...)
 import subprocess
 import pyopencl as cl
 import pytest
-import os
-from os import path
 
 
 @pytest.fixture(scope='module')
@@ -39,5 +37,6 @@ def cwise_op_gpu_add(context, extract_value_cl):
     return prog
 
 
+@pytest.mark.xfail
 def test_program_compiles(cwise_op_gpu_add):
     pass
