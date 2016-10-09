@@ -301,12 +301,12 @@ void walkStructType(StructInfo *structInfo, int level, int offset, vector<int> i
 }
 
 void dumpLaunchCallInfo(LaunchCallInfo *launchCallInfo) {
-    outs() << "dumping grid\n";
-    launchCallInfo->grid_xy_value->dump();
-    launchCallInfo->grid_z_value->dump();
-    launchCallInfo->block_xy_value->dump();
-    launchCallInfo->block_z_value->dump();
-    outs() << "dumping block done\n";
+    // outs() << "dumping grid\n";
+    // launchCallInfo->grid_xy_value->dump();
+    // launchCallInfo->grid_z_value->dump();
+    // launchCallInfo->block_xy_value->dump();
+    // launchCallInfo->block_z_value->dump();
+    // outs() << "dumping block done\n";
 }
 
 void getBlockGridDimensions(CallInst *inst, LaunchCallInfo *info) {
@@ -407,24 +407,24 @@ void patchFunction(Function *F) {
 
                     dumpLaunchCallInfo(launchCallInfo.get());
                     Function *configureKernel = cast<Function>(F->getParent()->getOrInsertFunction(
-                        "_Z15configureKernelPKcS0_uluiuli",
+                        "_Z15configureKernelPKcS0_",
                         Type::getVoidTy(TheContext),
                         PointerType::get(IntegerType::get(TheContext, 8), 0),
                         PointerType::get(IntegerType::get(TheContext, 8), 0),
-                        IntegerType::get(TheContext, 64),
-                        IntegerType::get(TheContext, 32),
-                        IntegerType::get(TheContext, 64),
-                        IntegerType::get(TheContext, 32),
+                        // IntegerType::get(TheContext, 64),
+                        // IntegerType::get(TheContext, 32),
+                        // IntegerType::get(TheContext, 64),
+                        // IntegerType::get(TheContext, 32),
                         // IntegerType::get(TheContext, 32),
                         // IntegerType::get(TheContext, 32),
                         NULL));
-                    Value *args[6];
+                    Value *args[2];
                     args[0] = stringInstr;
                     args[1] = clSourcecodeInstr;
-                    args[2] = launchCallInfo->grid_xy_value;
-                    args[3] = launchCallInfo->grid_z_value;
-                    args[4] = launchCallInfo->block_xy_value;
-                    args[5] = launchCallInfo->block_z_value;
+                    // args[2] = launchCallInfo->grid_xy_value;
+                    // args[3] = launchCallInfo->grid_z_value;
+                    // args[4] = launchCallInfo->block_xy_value;
+                    // args[5] = launchCallInfo->block_z_value;
                     // launchCallInfo->grid_xy_value->dump();
                     // outs() << "\n";
                     // launchCallInfo->grid_z_value->dump();
@@ -434,19 +434,19 @@ void patchFunction(Function *F) {
                     // launchCallInfo->block_z_value->dump();
                     // outs() << "\n";
 
-                    dumpLaunchCallInfo(launchCallInfo.get());
-                    for(int i = 0; i < 6; i++) {
-                        outs() << "dumping args[" << i << "]\n";
-                        args[i]->dump();
-                        outs() << "configure arg " << i << " type " << dumpType(args[i]->getType()) << "\n";
-                    }
+                    // dumpLaunchCallInfo(launchCallInfo.get());
+                    // for(int i = 0; i < 6; i++) {
+                    //     outs() << "dumping args[" << i << "]\n";
+                    //     args[i]->dump();
+                    //     outs() << "configure arg " << i << " type " << dumpType(args[i]->getType()) << "\n";
+                    // }
                     // args[2] = createInt32Constant(&TheContext, launchCallInfo->grid[0]);
                     // args[3] = createInt32Constant(&TheContext, launchCallInfo->grid[1]);
                     // args[4] = createInt32Constant(&TheContext, launchCallInfo->grid[2]);
                     // args[5] = createInt32Constant(&TheContext, launchCallInfo->block[0]);
                     // args[6] = createInt32Constant(&TheContext, launchCallInfo->block[1]);
                     // args[7] = createInt32Constant(&TheContext, launchCallInfo->block[2]);
-                    CallInst *callLaunch = CallInst::Create(configureKernel, ArrayRef<Value *>(&args[0], &args[6]));
+                    CallInst *callLaunch = CallInst::Create(configureKernel, ArrayRef<Value *>(&args[0], &args[2]));
                     // callLaunch->insertAfter(clSourcecodeInstr);
                     callLaunch->insertBefore(inst);
 
@@ -630,13 +630,14 @@ if(false){
                     getLaunchArgValue(inst, launchCallInfo.get());
                     dumpLaunchCallInfo(launchCallInfo.get());
                     to_replace_with_zero.push_back(inst);
-                } else if(calledFunctionName == "cudaConfigureCall") {
-                    outs() << "cudaConfigureCall\n";
-                    launchCallInfo.reset(new LaunchCallInfo);
-                    getBlockGridDimensions(inst, launchCallInfo.get());
-                    dumpLaunchCallInfo(launchCallInfo.get());
-                    to_replace_with_zero.push_back(inst);
                 }
+                // } else if(calledFunctionName == "cudaConfigureCall") {
+                //     outs() << "cudaConfigureCall\n";
+                //     launchCallInfo.reset(new LaunchCallInfo);
+                //     getBlockGridDimensions(inst, launchCallInfo.get());
+                //     dumpLaunchCallInfo(launchCallInfo.get());
+                //     to_replace_with_zero.push_back(inst);
+                // }
             }
         }
     }
@@ -649,11 +650,11 @@ if(false){
     //     inst->eraseFromParent();
     // }
     for(auto it=to_replace_with_zero.begin(); it != to_replace_with_zero.end(); it++) {
-        if(false) {
-        Instruction *inst = *it;
-        BasicBlock::iterator ii(inst);
-        ReplaceInstWithValue(inst->getParent()->getInstList(), ii, constzero);
-    }
+        if(true) {
+            Instruction *inst = *it;
+            BasicBlock::iterator ii(inst);
+            ReplaceInstWithValue(inst->getParent()->getInstList(), ii, constzero);
+        }
         // outs() << "after replacevalue" << "\n";
     }
 
