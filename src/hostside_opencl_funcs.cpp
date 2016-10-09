@@ -263,10 +263,10 @@ size_t cudaConfigureCall(
     cout << "cudaConfigureCall" << endl;
     cout << "grid_xy " << grid_xy << " grid_z " << grid_z << endl;
     cout << "block_xy " << block_xy << " grid_z " << block_z << endl;
-    int grid_x = 0; // placeholders
-    int grid_y = 0;
-    int block_x = 0; // placeholders
-    int block_y = 0;
+    int grid_x = grid_xy & ((1ul << 31) - 1);
+    int grid_y = grid_xy >> 32;
+    int block_x = block_xy & ((1ul << 31) - 1);
+    int block_y = block_xy >> 32;
     cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl;
     cout << "block(" << block_x << ", " << block_y << ", " << block_z << ")" << endl;
     grid[0] = grid_x;
@@ -278,9 +278,12 @@ size_t cudaConfigureCall(
     return 0;
 }
 
+    // uint32_t block_x = block_xy & ((1ul << 31) - 1);
+    // uint32_t block_y = block_xy >> 32;
+
 void configureKernel(
         const char *kernelName, const char *clSourcecodeString) {
-    cout << "configureKernel (name=" << kernelName << ", source=" << clSourcecodeString << ")" << endl;
+    // cout << "configureKernel (name=" << kernelName << ", source=" << clSourcecodeString << ")" << endl;
     assure_initialized();
     kernel.reset(cl->buildKernelFromString(clSourcecodeString, kernelName, "", "__internal__"));
 }
