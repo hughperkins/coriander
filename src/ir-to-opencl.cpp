@@ -1169,7 +1169,7 @@ std::string dumpFunctionDeclaration(Function *F) {
                     PointerInfo *pointerInfo = pointerit->get();
                     int offset = pointerInfo->offset;
                     // Type *type = pointerInfo->type;
-                    declaration += ", " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
+                    declaration += ", global " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
                     j++;
                 }
             }
