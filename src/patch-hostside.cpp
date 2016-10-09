@@ -165,15 +165,26 @@ uint32_t readIntConstant_uint32(ConstantInt *constant) {
 
 class PointerInfo {
 public:
-    PointerInfo(int offset, Type *type) :
-        offset(offset), type(type) {
+    PointerInfo(int offset, Type *type, vector<int> indices) :
+        offset(offset), type(type), indices(indices) {
     }
     int offset;
     Type *type;
+    vector<int> indices;
 };
 
 ostream &operator<<(ostream &os, const PointerInfo &pointerInfo) {
-    os << "PointerInfo(offset=" << pointerInfo.offset << ", type=" << dumpType(pointerInfo.type) << ")";
+    os << "PointerInfo(offset=" << pointerInfo.offset << ", type=" << dumpType(pointerInfo.type);
+    os << " indices=";
+    int i = 0;
+    for(auto it=pointerInfo.indices.begin(); it != pointerInfo.indices.end(); it++) {
+        if(i > 0) {
+            os << ",";
+        }
+        os << *it;
+        i++;
+    }
+    os << ")";
     return os;
 }
 
@@ -184,8 +195,8 @@ public:
 
 // offset: since we're walking a tree, over a base type, what is our offset into
 // the base type?
-void walkStructType(StructInfo *structInfo, int level, int offset, StructType *type);
-void walkType(StructInfo *structInfo, int level, int offset, Type *type);
+void walkStructType(StructInfo *structInfo, int level, int offset, vector<int> indices, StructType *type);
+void walkType(StructInfo *structInfo, int level, int offset, vector<int> indices, Type *type);
 string getIndent(int level);
 
 string getIndent(int level) {
@@ -196,9 +207,9 @@ string getIndent(int level) {
     return oss.str();
 }
 
-void walkType(StructInfo *structInfo, int level, int offset, Type *type) {
+void walkType(StructInfo *structInfo, int level, int offset, vector<int> indices, Type *type) {
     if(StructType *structtype = dyn_cast<StructType>(type)) {
-        walkStructType(structInfo, level, offset, structtype);
+        walkStructType(structInfo, level, offset, indices, structtype);
     } else if(PointerType *pointerType = dyn_cast<PointerType>(type)) {
         Type *elementType = pointerType->getPointerElementType();
         int addressspace = pointerType->getAddressSpace();
@@ -209,7 +220,7 @@ void walkType(StructInfo *structInfo, int level, int offset, Type *type) {
         // we can figure out how to generalize this later...
         // actually, anything except float *s, we're just going to leave as-is (or set to zero), for now
         if(elementType->getPrimitiveSizeInBits() != 0) {
-            structInfo->pointerInfos.push_back(unique_ptr<PointerInfo>(new PointerInfo(offset, pointerType)));
+            structInfo->pointerInfos.push_back(unique_ptr<PointerInfo>(new PointerInfo(offset, pointerType, indices)));
         }
     } else if(ArrayType *arrayType = dyn_cast<ArrayType>(type)) {
         Type *elemType = arrayType->getElementType();
@@ -223,7 +234,7 @@ void walkType(StructInfo *structInfo, int level, int offset, Type *type) {
     }
 }
 
-void walkStructType(StructInfo *structInfo, int level, int offset, StructType *type) {
+void walkStructType(StructInfo *structInfo, int level, int offset, vector<int> indices, StructType *type) {
     // Type *type = value->getType();
     // if(isa<StructType>(type)) {
         // cout << "walkvalue type is struct" << endl;
@@ -232,12 +243,16 @@ void walkStructType(StructInfo *structInfo, int level, int offset, StructType *t
     cout << getIndent(level) << string(type->getName());
     cout << " offset=" << offset << " allocsize=" << TheModule->getDataLayout().getTypeAllocSize(type) << endl;
     int childoffset = offset;
+    int i = 0;
     for(auto it=type->element_begin(); it != type->element_end(); it++) {
         Type *child = *it;
         // printIndent(level);
         // cout << getIndent(level) + "child type " << dumpType(child) << endl;
-        walkType(structInfo, level + 1, childoffset, child);
+        vector<int> childindices(indices);
+        childindices.push_back(i);
+        walkType(structInfo, level + 1, childoffset, childindices, child);
         childoffset += TheModule->getDataLayout().getTypeAllocSize(child);
+        i++;
     }
 
     // } else {
@@ -433,7 +448,7 @@ void patchFunction(Function *F) {
                             // of the target for eigen shows it contains a float *.  that probably points into gpu
                             // memory already.  We'd probably better scan for that.
                             unique_ptr<StructInfo> structInfo(new StructInfo());
-                            walkStructType(structInfo.get(), 0, 0, cast<StructType>(value->getType()));
+                            walkStructType(structInfo.get(), 0, 0, vector<int>(), cast<StructType>(value->getType()));
                             cout << "pointers in struct:" << endl;
                             for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
                                 PointerInfo *pointerInfo = pointerit->get();
