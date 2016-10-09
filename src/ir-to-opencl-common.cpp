@@ -64,6 +64,14 @@ std::string dumpAddressSpace(llvm::Type *type) {
 }
 
 Instruction *addStringInstr(Module *M, string name, string value) {
+    // check if already exists first
+    GlobalVariable *probe = M->getNamedGlobal(name);
+    cout << "addStringInstr probe=" << probe << endl;
+    if(probe != 0) {
+        cout << "string aleady exists, reusing  " << endl;
+        return addStringInstrExistingGlobal(M, name);
+    }
+
     GlobalVariable *var = addGlobalVariable(M, name, value);
 
     int N = value.size() + 1;
@@ -81,23 +89,26 @@ Instruction *addStringInstrExistingGlobal(Module *M, string name) {
     GlobalVariable *var = M->getNamedGlobal(name);
 
     Type *varType = var->getType();
-    ArrayType *arrayType1 = cast<ArrayType>(varType->getPointerElementType());
-    int N = arrayType1->getNumElements();
+    if(ArrayType *arrayType1 = dyn_cast<ArrayType>(varType->getPointerElementType())) {
+        int N = arrayType1->getNumElements();
 
-    LLVMContext &context = M->getContext();
-    ArrayType *arrayType = ArrayType::get(IntegerType::get(context, 8), N);
-    // Type *varType = var->getType();
-    // cout << "arrayType->dump()" << endl;
-    // ArrayType *elemType = cast<ArrayType>(varType->getPointerElementType());
-    // elemType->dump();
-    // cout << endl;
-    // cout << "numelements " << elemType->getNumElements() << endl;
-    // return 0;
-    Value * indices[2];
-    indices[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
-    indices[1] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
-    GetElementPtrInst *elem = GetElementPtrInst::CreateInBounds(arrayType, var, ArrayRef<Value *>(indices, 2));
-    return elem;
+        LLVMContext &context = M->getContext();
+        ArrayType *arrayType = ArrayType::get(IntegerType::get(context, 8), N);
+        // Type *varType = var->getType();
+        // cout << "arrayType->dump()" << endl;
+        // ArrayType *elemType = cast<ArrayType>(varType->getPointerElementType());
+        // elemType->dump();
+        // cout << endl;
+        // cout << "numelements " << elemType->getNumElements() << endl;
+        // return 0;
+        Value * indices[2];
+        indices[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
+        indices[1] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
+        GetElementPtrInst *elem = GetElementPtrInst::CreateInBounds(arrayType, var, ArrayRef<Value *>(indices, 2));
+        return elem;
+    } else {
+        throw runtime_error("unexpected type at addStringInstrExistingGlobal, not an arraytype");
+    }
 }
 
 std::string dumpFunctionType(FunctionType *fn) {

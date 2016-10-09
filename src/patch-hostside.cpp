@@ -161,8 +161,24 @@ void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
     // - the alloca instruction is inst->getOperand(0)->getOperand(0)
     // - so if we load from the alloca instruction, we should have the value we want?
     // cout << "getLaunchArgValue " << endl;
+    if(!isa<Instruction>(inst->getOperand(0))) {
+        cout << "getlaunchvalue, first operatnd of inst is not an instruction..." << endl;
+        inst->dump();
+        cout << endl;
+        inst->getOperand(0)->dump();
+        cout << endl;
+        throw runtime_error("getlaunchvalue, first operatnd of inst is not an instruction...");
+    }
     Instruction *bitcast = cast<Instruction>(inst->getOperand(0));
-    Instruction *alloca = cast<Instruction>(bitcast->getOperand(0));
+    // if(!isa<Instruction>(bitcast->getOperand(0))) {
+    //     cout << "getlaunchvalue, bitcast first operatnd of inst is not an instruction..." << endl;
+    //     bitcast->dump();
+    //     cout << endl;
+    //     bitcast->getOperand(0)->dump();
+    //     cout << endl;
+    //     throw runtime_error("getlaunchvalue, bitcast first operatnd of inst is not an instruction...");
+    // }
+    Value *alloca = bitcast->getOperand(0);
     Instruction *load = new LoadInst(alloca, "loadCudaArg");
     load->insertBefore(inst);
     info->callValuesByValue.push_back(load);
@@ -174,7 +190,7 @@ uint64_t readIntConstant_uint64(ConstantInt *constant) {
 }
 
 uint32_t readIntConstant_uint32(ConstantInt *constant) {
-    assert(contant->getBitWidth() <= 32);
+    assert(constant->getBitWidth() <= 32);
     return (uint32_t)constant->getZExtValue();
 }
 
