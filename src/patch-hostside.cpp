@@ -439,11 +439,7 @@ void patchFunction(Function *F) {
                             // memory already.  We'd probably better scan for that.
                             unique_ptr<StructInfo> structInfo(new StructInfo());
                             walkStructType(structInfo.get(), 0, 0, vector<int>(), cast<StructType>(value->getType()));
-                            outs() << "pointers in struct:" << "\n";
-                            for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
-                                PointerInfo *pointerInfo = pointerit->get();
-                                // outs() << "pointer: " << *pointerInfo << "\n";
-                            }
+
                             // now we need to set up instructions to pass in:
                             // - the struct itself
                             // - each of the float arrays
@@ -480,6 +476,50 @@ void patchFunction(Function *F) {
                             CallInst *call = CallInst::Create(setKernelArgStruct, ArrayRef<Value *>(args));
                             call->insertAfter(lastInst);
                             lastInst = call;
+
+                            // pass in all the float stars:
+                            outs() << "pointers in struct:" << "\n";
+                            for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
+                                PointerInfo *pointerInfo = pointerit->get();
+                                // outs() << "pointer: " << *pointerInfo << "\n";
+                                int offset = pointerInfo->offset;
+                                Type *type = pointerInfo->type;
+                                // vector<int> indicesvect = pointerInfo->indices;
+                                // create a GetElementPtr instruction?
+                                vector<Value *> indices;
+                                // add a leading 0:
+                                indices.push_back(createInt32Constant(&TheContext, 0));
+                                for(auto idxit = pointerInfo->indices.begin(); idxit != pointerInfo->indices.end(); idxit++) {
+                                    int idx = *idxit;
+                                    outs() << "idx " << idx << "\n";
+                                    indices.push_back(createInt32Constant(&TheContext, idx));
+                                }
+                                // // add a trailing 0 ... :
+                                // indices.push_back(createInt32Constant(&TheContext, 0));
+                                // value->getType()->dump();
+                                // valueAsPointerInstr->dump();
+                                GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(value->getType(), valueAsPointerInstr, ArrayRef<Value *>(&indices[0], &indices[indices.size()]), "getfloatstaraddr");
+                                outs() << "gep type " << dumpType(gep->getType()) << "\n";
+                                gep->insertAfter(lastInst);
+                                lastInst = gep;
+
+                                // I guess we need to load the value from that gep address now?
+                                LoadInst *loadgep = new LoadInst(gep, "loadgep");
+                                loadgep->insertAfter(lastInst);
+                                lastInst = loadgep;
+
+                                outs() << "loadgep type " << dumpType(loadgep->getType()) << "\n";
+
+                                // we're just going to assume everything is a float* for now
+                                Function *setKernelArgFloatStar = cast<Function>(F->getParent()->getOrInsertFunction(
+                                    "_Z21setKernelArgFloatStarPf",
+                                    Type::getVoidTy(TheContext),
+                                    PointerType::get(Type::getFloatTy(TheContext), 0),
+                                    NULL));
+                                CallInst *call = CallInst::Create(setKernelArgFloatStar, loadgep);
+                                call->insertAfter(lastInst);
+                                lastInst = call;
+                            }
 
                             // Type *elementType = value->getType()->getPointerElementType();
                             // // if(elementType->isFloatingPointTy()) {
