@@ -32,13 +32,13 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_os_ostream.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
-#include <iostream>
+// #include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
 #include <map>
 #include <set>
-#include <iostream>
+// #include <iostream>
 #include <stdexcept>
 #include <sstream>
 #include <fstream>
@@ -63,6 +63,10 @@ public:
         //     grid[i] = 0;
         //     block[i] = 0;
         // }
+        grid_xy_value = 0;
+        grid_z_value = 0;
+        block_xy_value = 0;
+        block_z_value = 0;
     }
     std::string kernelName = "";
     // CallInst *launchInstruction;
@@ -76,6 +80,8 @@ public:
     // int grid[3];
     // int block[3];
 };
+
+static unique_ptr<LaunchCallInfo> launchCallInfo(new LaunchCallInfo);
 
 ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
     raw_os_ostream my_raw_os_ostream(os);
@@ -132,6 +138,7 @@ void getLaunchTypes(CallInst *inst, LaunchCallInfo *info) {
     // output is:
     // - name of the kernel
     // - type of each of the kernel parameters (without the actual Value's)
+    info->callTypes.clear();
     Value *argOperand = inst->getArgOperand(0);
     if(ConstantExpr *expr = dyn_cast<ConstantExpr>(argOperand)) {
         Instruction *instr = expr->getAsInstruction();
@@ -160,22 +167,22 @@ void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
     // - the first operand of inst was created as bitcast(i8*)(alloca (type-of-arg))
     // - the alloca instruction is inst->getOperand(0)->getOperand(0)
     // - so if we load from the alloca instruction, we should have the value we want?
-    // cout << "getLaunchArgValue " << endl;
+    // outs() << "getLaunchArgValue " << "\n";
     if(!isa<Instruction>(inst->getOperand(0))) {
-        cout << "getlaunchvalue, first operatnd of inst is not an instruction..." << endl;
+        outs() << "getlaunchvalue, first operatnd of inst is not an instruction..." << "\n";
         inst->dump();
-        cout << endl;
+        outs() << "\n";
         inst->getOperand(0)->dump();
-        cout << endl;
+        outs() << "\n";
         throw runtime_error("getlaunchvalue, first operatnd of inst is not an instruction...");
     }
     Instruction *bitcast = cast<Instruction>(inst->getOperand(0));
     // if(!isa<Instruction>(bitcast->getOperand(0))) {
-    //     cout << "getlaunchvalue, bitcast first operatnd of inst is not an instruction..." << endl;
+    //     outs() << "getlaunchvalue, bitcast first operatnd of inst is not an instruction..." << "\n";
     //     bitcast->dump();
-    //     cout << endl;
+    //     outs() << "\n";
     //     bitcast->getOperand(0)->dump();
-    //     cout << endl;
+    //     outs() << "\n";
     //     throw runtime_error("getlaunchvalue, bitcast first operatnd of inst is not an instruction...");
     // }
     Value *alloca = bitcast->getOperand(0);
@@ -244,7 +251,7 @@ void walkType(StructInfo *structInfo, int level, int offset, vector<int> indices
     } else if(PointerType *pointerType = dyn_cast<PointerType>(type)) {
         Type *elementType = pointerType->getPointerElementType();
         int addressspace = pointerType->getAddressSpace();
-        cout << getIndent(level) << "pointer type " << dumpType(elementType) << " addressspace " << addressspace << " offset=" << offset << endl;
+        outs() << getIndent(level) << "pointer type " << dumpType(elementType) << " addressspace " << addressspace << " offset=" << offset << "\n";
         // how to find out if this is gpu allocated or not?
         // let's just heuristically assume that all primitive*s are gpu allocated for now?
         // and lets assume that structs are just sent one at a time now, and any contained structs are one at a time
@@ -256,10 +263,10 @@ void walkType(StructInfo *structInfo, int level, int offset, vector<int> indices
     } else if(ArrayType *arrayType = dyn_cast<ArrayType>(type)) {
         Type *elemType = arrayType->getElementType();
         int count = arrayType->getNumElements();
-        cout << getIndent(level) << dumpType(elemType) << "[" << count << "] offset=" << offset << endl;
+        outs() << getIndent(level) << dumpType(elemType) << "[" << count << "] offset=" << offset << "\n";
     } else if(IntegerType *intType = dyn_cast<IntegerType>(type)) {
         int bitwidth = intType->getBitWidth();
-        cout << getIndent(level) << "int" << bitwidth << " offset=" << offset << endl;
+        outs() << getIndent(level) << "int" << bitwidth << " offset=" << offset << "\n";
     } else {
         throw runtime_error("walktype type not handled: " + dumpType(type));
     }
@@ -268,17 +275,17 @@ void walkType(StructInfo *structInfo, int level, int offset, vector<int> indices
 void walkStructType(StructInfo *structInfo, int level, int offset, vector<int> indices, StructType *type) {
     // Type *type = value->getType();
     // if(isa<StructType>(type)) {
-        // cout << "walkvalue type is struct" << endl;
+        // outs() << "walkvalue type is struct" << "\n";
         // walk each member of the struct
 
-    cout << getIndent(level) << string(type->getName());
-    cout << " offset=" << offset << " allocsize=" << TheModule->getDataLayout().getTypeAllocSize(type) << endl;
+    outs() << getIndent(level) << string(type->getName());
+    outs() << " offset=" << offset << " allocsize=" << TheModule->getDataLayout().getTypeAllocSize(type) << "\n";
     int childoffset = offset;
     int i = 0;
     for(auto it=type->element_begin(); it != type->element_end(); it++) {
         Type *child = *it;
         // printIndent(level);
-        // cout << getIndent(level) + "child type " << dumpType(child) << endl;
+        // outs() << getIndent(level) + "child type " << dumpType(child) << "\n";
         vector<int> childindices(indices);
         childindices.push_back(i);
         walkType(structInfo, level + 1, childoffset, childindices, child);
@@ -293,6 +300,15 @@ void walkStructType(StructInfo *structInfo, int level, int offset, vector<int> i
     // }
 }
 
+void dumpLaunchCallInfo(LaunchCallInfo *launchCallInfo) {
+    outs() << "dumping grid\n";
+    launchCallInfo->grid_xy_value->dump();
+    launchCallInfo->grid_z_value->dump();
+    launchCallInfo->block_xy_value->dump();
+    launchCallInfo->block_z_value->dump();
+    outs() << "dumping block done\n";
+}
+
 void getBlockGridDimensions(CallInst *inst, LaunchCallInfo *info) {
     // there are 6 args:
     // grid:
@@ -304,32 +320,42 @@ void getBlockGridDimensions(CallInst *inst, LaunchCallInfo *info) {
     // 4 shared memory.  since we're not handling it right now, must be 0
     // 5 stream must be null, for now
 
-    cout << "launch inst:" << endl;
+    outs() << "launch inst:" << "\n";
     // inst->dump();
-    // cout << endl;
+    // outs() << "\n";
+
+    outs() << "dumping grid\n";
+    inst->getArgOperand(0)->dump();
+    inst->getArgOperand(1)->dump();
+    inst->getArgOperand(2)->dump();
+    inst->getArgOperand(3)->dump();
+    outs() << "dumping block done\n";
+
     info->grid_xy_value = inst->getArgOperand(0);
     info->grid_z_value = inst->getArgOperand(1);
     info->block_xy_value = inst->getArgOperand(2);
     info->block_z_value = inst->getArgOperand(3);
 
-    // cout << "gxy type " << dumpType(info->grid_xy_value->getType());
-    // cout << "gz type " << dumpType(info->grid_z_value->getType());
-    // cout << "bxy type " << dumpType(info->block_xy_value->getType());
-    // cout << "bz type " << dumpType(info->block_z_value->getType());
+    dumpLaunchCallInfo(info);
+
+    // outs() << "gxy type " << dumpType(info->grid_xy_value->getType());
+    // outs() << "gz type " << dumpType(info->grid_z_value->getType());
+    // outs() << "bxy type " << dumpType(info->block_xy_value->getType());
+    // outs() << "bz type " << dumpType(info->block_z_value->getType());
 
     // uint64_t grid_xy = readIntConstant_uint64(cast<ConstantInt>(inst->getArgOperand(0)));
-    // cout << "grid_xy " << grid_xy << endl;
+    // outs() << "grid_xy " << grid_xy << "\n";
     // uint32_t grid_x = grid_xy & ((1ul << 31) - 1);
     // uint32_t grid_y = grid_xy >> 32;
     // uint32_t grid_z = readIntConstant_uint32(cast<ConstantInt>(inst->getArgOperand(1)));
-    // // cout << "grid " << grid_x << " " << grid_y << " " << grid_z << endl;
+    // // outs() << "grid " << grid_x << " " << grid_y << " " << grid_z << "\n";
 
     // uint64_t block_xy = readIntConstant_uint64(cast<ConstantInt>(inst->getArgOperand(2)));
-    // cout << "block_xy " << block_xy << endl;
+    // outs() << "block_xy " << block_xy << "\n";
     // uint32_t block_x = block_xy & ((1ul << 31) - 1);
     // uint32_t block_y = block_xy >> 32;
     // uint32_t block_z = readIntConstant_uint32(cast<ConstantInt>(inst->getArgOperand(3)));
-    // // cout << "block " << block_x << " " << block_y << " " << block_z << endl;
+    // // outs() << "block " << block_x << " " << block_y << " " << block_z << "\n";
 
     // info->grid[0] = grid_x;
     // info->grid[1] = grid_y;
@@ -340,7 +366,7 @@ void getBlockGridDimensions(CallInst *inst, LaunchCallInfo *info) {
     // info->block[2] = block_z;
 
     // if(readIntConstant_uint64(inst->getArgOperand(4)) != 0) {
-    //     cout << "stream wasnt zero";
+    //     outs() << "stream wasnt zero";
     //     throw runtime_error("stream in getBlockGridDimensions should be 0");
     // }
     // we should assert on the stream too really TODO: FIXME:
@@ -348,8 +374,7 @@ void getBlockGridDimensions(CallInst *inst, LaunchCallInfo *info) {
 }
 
 void patchFunction(Function *F) {
-    vector<Instruction *> to_erase;
-    unique_ptr<LaunchCallInfo> launchCallInfo(new LaunchCallInfo);
+    // vector<Instruction *> to_erase;
     vector<Instruction *> to_replace_with_zero;
     IntegerType *inttype = IntegerType::get(TheContext, 32);
     ConstantInt *constzero = ConstantInt::getSigned(inttype, 0);
@@ -366,10 +391,13 @@ void patchFunction(Function *F) {
                 }
                 string calledFunctionName = called->getName();
                 if(calledFunctionName == "cudaLaunch") {
+                    outs() << "cudaLaunch\n";
                     getLaunchTypes(inst, launchCallInfo.get());
-                    to_erase.push_back(inst);
-                    cout << "patching launch in " << string(F->getName()) << endl;
-                    cout << *launchCallInfo << endl;
+                    dumpLaunchCallInfo(launchCallInfo.get());
+                    // to_erase.push_back(inst);
+                    to_replace_with_zero.push_back(inst);
+                    outs() << "patching launch in " << string(F->getName()) << "\n";
+                    // outs() << *launchCallInfo << "\n";
 
                     Instruction *stringInstr = addStringInstr(F->getParent(), "s." + launchCallInfo->kernelName, launchCallInfo->kernelName);
                     stringInstr->insertBefore(inst);
@@ -377,6 +405,7 @@ void patchFunction(Function *F) {
                     Instruction *clSourcecodeInstr = addStringInstrExistingGlobal(F->getParent(), "__opencl_sourcecode");
                     clSourcecodeInstr->insertBefore(inst);
 
+                    dumpLaunchCallInfo(launchCallInfo.get());
                     Function *configureKernel = cast<Function>(F->getParent()->getOrInsertFunction(
                         "_Z15configureKernelPKcS0_uluiuli",
                         Type::getVoidTy(TheContext),
@@ -397,17 +426,20 @@ void patchFunction(Function *F) {
                     args[4] = launchCallInfo->block_xy_value;
                     args[5] = launchCallInfo->block_z_value;
                     // launchCallInfo->grid_xy_value->dump();
-                    // cout << endl;
+                    // outs() << "\n";
                     // launchCallInfo->grid_z_value->dump();
-                    // cout << endl;
+                    // outs() << "\n";
                     // launchCallInfo->block_xy_value->dump();
-                    // cout << endl;
+                    // outs() << "\n";
                     // launchCallInfo->block_z_value->dump();
-                    // cout << endl;
+                    // outs() << "\n";
 
-                    // for(int i = 0; i < 6; i++) {
-                    //     cout << "configure arg " << i << " type " << dumpType(args[i]->getType()) << endl;
-                    // }
+                    dumpLaunchCallInfo(launchCallInfo.get());
+                    for(int i = 0; i < 6; i++) {
+                        outs() << "dumping args[" << i << "]\n";
+                        args[i]->dump();
+                        outs() << "configure arg " << i << " type " << dumpType(args[i]->getType()) << "\n";
+                    }
                     // args[2] = createInt32Constant(&TheContext, launchCallInfo->grid[0]);
                     // args[3] = createInt32Constant(&TheContext, launchCallInfo->grid[1]);
                     // args[4] = createInt32Constant(&TheContext, launchCallInfo->grid[2]);
@@ -424,13 +456,13 @@ void patchFunction(Function *F) {
                     for(auto argit=launchCallInfo->callValuesByValue.begin(); argit != launchCallInfo->callValuesByValue.end(); argit++) {
                         Value *value = *argit;
                         Value *valueAsPointerInstr = launchCallInfo->callValuesAsPointers[i];
-                        // cout << " arg " << i << " ";
+                        // outs() << " arg " << i << " ";
                         // value->dump();
-                        // cout << endl;
+                        // outs() << "\n";
                         if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
-                            // cout << "got an int" << endl;
+                            // outs() << "got an int" << "\n";
                             int bitLength = intType->getBitWidth();
-                            cout << "bitLength " << bitLength << endl;
+                            outs() << "bitLength " << bitLength << "\n";
                             // string typeabbrev = "";
                             string mangledName = "";
                             if(bitLength == 32) {
@@ -451,7 +483,7 @@ void patchFunction(Function *F) {
                             call->insertAfter(lastInst);
                             lastInst = call;
                         } else if(value->getType()->isFloatingPointTy()) {
-                            // cout << "got a float" << endl;
+                            // outs() << "got a float" << "\n";
                             Function *setKernelArgFloat = cast<Function>(F->getParent()->getOrInsertFunction(
                                 "_Z17setKernelArgFloatf",
                                 Type::getVoidTy(TheContext),
@@ -461,10 +493,10 @@ void patchFunction(Function *F) {
                             call->insertAfter(lastInst);
                             lastInst = call;
                         } else if(value->getType()->isPointerTy()) {
-                            // cout << "got a pointer " << endl;
+                            // outs() << "got a pointer " << "\n";
                             Type *elementType = value->getType()->getPointerElementType();
                             if(elementType->isFloatingPointTy()) {
-                                // cout << "got a float *" << endl;
+                                // outs() << "got a float *" << "\n";
                                 Function *setKernelArgFloatStar = cast<Function>(F->getParent()->getOrInsertFunction(
                                     "_Z21setKernelArgFloatStarPf",
                                     Type::getVoidTy(TheContext),
@@ -475,7 +507,7 @@ void patchFunction(Function *F) {
                                 lastInst = call;
                             }
                         } else if(isa<StructType>(value->getType())) {
-                            cout << "got a struct" << endl;
+                            outs() << "got a struct" << "\n";
 if(false){
                             // lets just statically analyse the struct for now, without thinking how we're going to
                             // actually deal with it
@@ -511,16 +543,16 @@ if(false){
                             Module *M = F->getParent();
                             const DataLayout *dataLayout = &M->getDataLayout();
                             int allocSize = dataLayout->getTypeAllocSize(value->getType());
-                            cout << "typeallocsize " << allocSize << endl;
+                            outs() << "typeallocsize " << allocSize << "\n";
                             // we could just naively allocate this, and copy it to the kernel, but superficial inspection
                             // of the target for eigen shows it contains a float *.  that probably points into gpu
                             // memory already.  We'd probably better scan for that.
                             unique_ptr<StructInfo> structInfo(new StructInfo());
                             walkStructType(structInfo.get(), 0, 0, vector<int>(), cast<StructType>(value->getType()));
-                            cout << "pointers in struct:" << endl;
+                            outs() << "pointers in struct:" << "\n";
                             for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
                                 PointerInfo *pointerInfo = pointerit->get();
-                                cout << "pointer: " << *pointerInfo << endl;
+                                // outs() << "pointer: " << *pointerInfo << "\n";
                             }
                             // now we need to set up instructions to pass in:
                             // - the struct itself
@@ -561,7 +593,7 @@ if(false){
 }
                             // Type *elementType = value->getType()->getPointerElementType();
                             // // if(elementType->isFloatingPointTy()) {
-                            //     // cout << "got a float *" << endl;
+                            //     // outs() << "got a float *" << "\n";
                             //     Function *setKernelArgCharStar = cast<Function>(F->getParent()->getOrInsertFunction(
                             //         "_Z20setKernelArgCharStarPf",
                             //         Type::getVoidTy(TheContext),
@@ -589,34 +621,44 @@ if(false){
                     kernelGoInst->insertAfter(lastInst);
                     lastInst = kernelGoInst;
 
-                    launchCallInfo.reset(new LaunchCallInfo);
+                    launchCallInfo->callValuesByValue.clear();
+                    launchCallInfo->callValuesAsPointers.clear();
+                    // launchCallInfo.reset(new LaunchCallInfo);
                 } else if(calledFunctionName == "cudaSetupArgument") {
+                    outs() << "cudaSetupArgument\n";
+                    dumpLaunchCallInfo(launchCallInfo.get());
                     getLaunchArgValue(inst, launchCallInfo.get());
+                    dumpLaunchCallInfo(launchCallInfo.get());
                     to_replace_with_zero.push_back(inst);
                 } else if(calledFunctionName == "cudaConfigureCall") {
+                    outs() << "cudaConfigureCall\n";
+                    launchCallInfo.reset(new LaunchCallInfo);
                     getBlockGridDimensions(inst, launchCallInfo.get());
+                    dumpLaunchCallInfo(launchCallInfo.get());
                     to_replace_with_zero.push_back(inst);
                 }
             }
         }
     }
-    // cout << *launchCallInfo << endl;
-    for(auto it=to_erase.begin(); it != to_erase.end(); it++) {
-        Instruction *inst = *it;
-        if(!inst->use_empty()) {
-            throw runtime_error("cannot erase used instructions");
-        }
-        inst->eraseFromParent();
-    }
+    // outs() << *launchCallInfo << "\n";
+    // for(auto it=to_erase.begin(); it != to_erase.end(); it++) {
+    //     Instruction *inst = *it;
+    //     if(!inst->use_empty()) {
+    //         throw runtime_error("cannot erase used instructions");
+    //     }
+    //     inst->eraseFromParent();
+    // }
     for(auto it=to_replace_with_zero.begin(); it != to_replace_with_zero.end(); it++) {
+        if(false) {
         Instruction *inst = *it;
         BasicBlock::iterator ii(inst);
         ReplaceInstWithValue(inst->getParent()->getInstList(), ii, constzero);
-        // cout << "after replacevalue" << endl;
+    }
+        // outs() << "after replacevalue" << "\n";
     }
 
     // if(launchCallInfo != 0 && launchCallInfo->launchInstruction != 0) {
-    //     cout << "erasing" << endl;
+    //     outs() << "erasing" << "\n";
     //     launchCallInfo->launchInstruction->eraseFromParent();
     // }
 }
@@ -639,7 +681,7 @@ void patchModule(string deviceclfilename, Module *M) {
         // nextNameIdx = 0;
         Function *F = &*it;
         string name = F->getName();
-        // cout << "name " << name << endl;
+        // outs() << "name " << name << "\n";
         // if(name.find("cuda") == 0) {
             // functionsToRemove.push_back(F);
             // https://groups.google.com/forum/#!topic/llvm-dev/ovvfIe_zU3Y
@@ -648,17 +690,17 @@ void patchModule(string deviceclfilename, Module *M) {
             // continue;
         // }
         // if(name == "_Z14launchSetValuePfif") {
-            // cout << "Function " << name << endl;
+            // outs() << "Function " << name << "\n";
             patchFunction(F);
-            // cout << "verifying function..." << endl;
+            // outs() << "verifying function..." << "\n";
             verifyFunction(*F);
-            // cout << "function verified" << endl;
+            // outs() << "function verified" << "\n";
         // }
         // if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
         //         knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
         //     Function *F = &*it;
         //     if(i > 0) {
-        //         cout << endl;
+        //         outs() << "\n";
         //     }
         //     dumpFunction(F);
         //     i++;
@@ -669,21 +711,21 @@ void patchModule(string deviceclfilename, Module *M) {
 int main(int argc, char *argv[]) {
     SMDiagnostic Err;
     if(argc != 4) {
-        cout << "Usage: " << argv[0] << " infile-rawhost.ll infile-device.cl outfile-patchedhost.ll" << endl;
+        outs() << "Usage: " << argv[0] << " infile-rawhost.ll infile-device.cl outfile-patchedhost.ll" << "\n";
         return 1;
     }
 
     string rawhostfilename = argv[1];
     string deviceclfilename = argv[2];
     string patchedhostfilename = argv[3];
-    cout << "reading rawhost ll file " << rawhostfilename << endl;
-    cout << "reading device cl file " << deviceclfilename << endl;
-    cout << "outputing to patchedhost file " << patchedhostfilename << endl;
+    outs() << "reading rawhost ll file " << rawhostfilename << "\n";
+    outs() << "reading device cl file " << deviceclfilename << "\n";
+    outs() << "outputing to patchedhost file " << patchedhostfilename << "\n";
 
     // debug = false;
     // if(argc == 3) {
     //     if(string(argv[1]) != "--debug") {
-    //         cout << "Usage: " << argv[0] << " [--debug] target.ll" << endl;
+    //         outs() << "Usage: " << argv[0] << " [--debug] target.ll" << "\n";
     //         return 1;
     //     } else {
     //         debug = true;
@@ -702,7 +744,7 @@ int main(int argc, char *argv[]) {
     ofile.open(patchedhostfilename);
     raw_os_ostream my_raw_os_ostream(ofile);
     verifyModule(*TheModule);
-    // cout << "printing module" << endl;
+    // outs() << "printing module" << "\n";
     TheModule->print(my_raw_os_ostream, &assemblyAnnotationWriter);
     // my_raw_os_ostream.close();
     ofile.close();

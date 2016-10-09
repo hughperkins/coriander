@@ -1,4 +1,4 @@
-#include <iostream>
+// #include <iostream>
 #include <sstream>
 #include <set>
 
@@ -17,6 +17,7 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_os_ostream.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
+#include "llvm/Support/raw_os_ostream.h"
 
 #include "ir-to-opencl-common.h"
 
@@ -66,9 +67,9 @@ std::string dumpAddressSpace(llvm::Type *type) {
 Instruction *addStringInstr(Module *M, string name, string value) {
     // check if already exists first
     GlobalVariable *probe = M->getNamedGlobal(name);
-    cout << "addStringInstr probe=" << probe << endl;
+    outs() << "addStringInstr probe=" << probe << "\n";
     if(probe != 0) {
-        cout << "string aleady exists, reusing  " << endl;
+        outs() << "string aleady exists, reusing  " << "\n";
         return addStringInstrExistingGlobal(M, name);
     }
 
@@ -95,11 +96,11 @@ Instruction *addStringInstrExistingGlobal(Module *M, string name) {
         LLVMContext &context = M->getContext();
         ArrayType *arrayType = ArrayType::get(IntegerType::get(context, 8), N);
         // Type *varType = var->getType();
-        // cout << "arrayType->dump()" << endl;
+        // outs() << "arrayType->dump()" << "\n";
         // ArrayType *elemType = cast<ArrayType>(varType->getPointerElementType());
         // elemType->dump();
-        // cout << endl;
-        // cout << "numelements " << elemType->getNumElements() << endl;
+        // outs() << "\n";
+        // outs() << "numelements " << elemType->getNumElements() << "\n";
         // return 0;
         Value * indices[2];
         indices[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
@@ -112,7 +113,7 @@ Instruction *addStringInstrExistingGlobal(Module *M, string name) {
 }
 
 std::string dumpFunctionType(FunctionType *fn) {
-    cout << "function" << endl;
+    outs() << "function" << "\n";
     std::string params_str = "";
     int i = 0;
     for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
@@ -123,7 +124,7 @@ std::string dumpFunctionType(FunctionType *fn) {
         params_str += dumpType(paramType);
         i++;
     }
-    cout << "params_str " << params_str << endl;
+    outs() << "params_str " << params_str << "\n";
     return params_str;
 }
 
@@ -166,7 +167,7 @@ std::string dumpIntegerType(IntegerType *type) {
         case 1:
             return "bool";
         default:
-            cout << "integer size " << type->getPrimitiveSizeInBits() << endl;
+            outs() << "integer size " << type->getPrimitiveSizeInBits() << "\n";
             throw runtime_error("unrecognized size");
     }
 }
@@ -195,9 +196,9 @@ void declareStruct(string name, StructType *type) {
         std::string memberName = "f" + toString(i);
         if(ArrayType *arraytype = dyn_cast<ArrayType>(elementType)) {
             Type *arrayelementtype = arraytype->getPointerElementType();
-            // cout << "arrayelementtype " << dumpType(arrayelementtype) << endl;
+            // outs() << "arrayelementtype " << dumpType(arrayelementtype) << "\n";
             int numElements = arraytype->getNumElements();
-            // cout << "numelements " << numElements << endl;
+            // outs() << "numelements " << numElements << "\n";
             declaration += "    " + dumpType(arrayelementtype) + " ";
             declaration += memberName + "[" + toString(numElements) + "];\n";
             // throw runtime_error("not implemented declarestruct for arraytype elements");
@@ -213,7 +214,7 @@ void declareStruct(string name, StructType *type) {
     }
     declaration += "};\n";
     declarations_to_write += declaration + "\n";
-    // cout << "declarations_to_write " << declarations_to_write << endl;
+    // outs() << "declarations_to_write " << declarations_to_write << "\n";
 }
 
 std::string replace(std::string target, char old_char, char new_char) {
@@ -226,10 +227,10 @@ std::string replace(std::string target, char old_char, char new_char) {
 }
 
 std::string dumpStructType(StructType *type) {
-    // cout << "dumpstructtype" << endl;
+    // outs() << "dumpstructtype" << "\n";
     if(type->hasName()) {
         string name = type->getName();
-        // cout << "name " << name << endl;
+        // outs() << "name " << name << "\n";
         name = replace(name, '.', '_');
                 name = replace(name, ':', '_');
         if(name == "struct_float4") {
@@ -257,7 +258,7 @@ std::string dumpStructType(StructType *type) {
                     declareStruct(name, type);
                 }
                 return name;
-                // cout << "struct name: " << name << endl;
+                // outs() << "struct name: " << name << "\n";
                 // throw runtime_error("dumpStructType() not implemented: struct name " + name);
             }
         }
@@ -300,7 +301,7 @@ std::string dumpType(Type *type) {
         case Type::IntegerTyID:
             return dumpIntegerType(cast<IntegerType>(type));
         default:
-            cout << "type id " << typeID << endl;
+            outs() << "type id " << typeID << "\n";
             throw runtime_error("unrecognized type");
     }
 }
