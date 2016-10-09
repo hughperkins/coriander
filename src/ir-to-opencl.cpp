@@ -1163,41 +1163,10 @@ std::string dumpFunctionDeclaration(Function *F) {
 std::string dumpFunction(Function *F) {
     currentFunctionSharedDeclarations = "";
     currentFunctionPhiDeclarationsByName.clear();
-    // currentFunctionDeclaredShareds.clear();
-    // Type *retType = F->getReturnType();
-    // std::string retTypeString = dumpType(retType);
-    // string fname = F->getName();
     string gencode = "";
-    // string declaration = "";
     string declaration = dumpFunctionDeclaration(F);
     cout << declaration << endl;
-    // cout << "finished getting arg types" << endl;
-    // label the blocks first
-    // also dump phi declarations
-    // prename phis
     string body = "";
-    // int i = 0;
-    // for(auto it=F->begin(); it != F->end(); it++) {
-    //     BasicBlock *basicBlock = &*it;
-    //     ostringstream oss;
-    //     oss << "label" << i;
-    //     string label = oss.str();
-    //     nameByValue[basicBlock] = label;
-    //     // write out phi declarations
-    //     for(auto instructionIt = basicBlock->begin(); instructionIt != basicBlock->end(); instructionIt++) {
-    //         Instruction *instr = &*instructionIt;
-    //         if(!PHINode::classof(instr)) {
-    //             break;
-    //         }
-    //         PHINode *phi = cast<PHINode>(instr);
-    //         storeValueName(phi);
-    //         body += dumpType(phi->getType()) + " " + dumpOperand(phi) + ";\n";
-    //     }
-    //     i++;
-    // }
-    // if(debug) {
-    //     cout << "function code so far " << gencode << endl;
-    // }
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
         body += dumpBasicBlock(basicBlock);
@@ -1205,7 +1174,6 @@ std::string dumpFunction(Function *F) {
     gencode =
         declaration + " {\n" +
         currentFunctionSharedDeclarations;
-    // dump phis
     for(auto it=currentFunctionPhiDeclarationsByName.begin(); it != currentFunctionPhiDeclarationsByName.end(); it++){
         gencode += "    " + it->second + ";\n";
     }
