@@ -514,7 +514,7 @@ void patchFunction(Function *F) {
                             }
                         } else if(isa<StructType>(value->getType())) {
                             outs() << "got a struct" << "\n";
-if(false){
+if(true){
                             // lets just statically analyse the struct for now, without thinking how we're going to
                             // actually deal with it
                             // we want to know things like:
