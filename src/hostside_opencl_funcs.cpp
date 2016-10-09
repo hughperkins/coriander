@@ -288,7 +288,7 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
                                       structAllocateSize, pCpuStruct, 0, NULL, NULL);
     cl->checkError(err);
     kernelArgsToBeReleased.push_back(gpu_struct);
-    kernel->in(&kernelArgsToBeReleased[kernelArgsToBeReleased.size() - 1]);
+    kernel->inout(&kernelArgsToBeReleased[kernelArgsToBeReleased.size() - 1]);
 }
 
 void setKernelArgFloatStar(float *clmem_as_floatstar) {

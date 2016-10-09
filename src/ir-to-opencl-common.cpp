@@ -131,9 +131,9 @@ std::string dumpPointerType(PointerType *ptr) {
     if(addressspace == 4) {
         addressspacestr = "constant";
     }
-    // we're just going to hackily assume that anything that is `global **` should be `* global *`
+    // we're just going to hackily assume that anything that is `global **` should be `global * global *`
     if(isa<PointerType>(ptr->getPointerElementType())) {
-        return elementTypeString + addressspacestr + " *";
+        return "global " + elementTypeString + addressspacestr + " *";
     }
     if(addressspacestr != "") {
         gencode += addressspacestr + " ";
