@@ -96,7 +96,9 @@ extern "C" {
     size_t cudaGetLastError();
     size_t cudaConfigureCall(
         unsigned long long grid_xy, unsigned int grid_z,
-        unsigned long long block_xy, unsigned int block_z, void *stream);
+        unsigned long long block_xy, unsigned int block_z, size_t sharedMem=0, void *stream=0);
+    void configureKernel(
+        const char *kernelName, const char *clSourcecodeString);
 }
 
 size_t cudaGetLastError() {
@@ -257,7 +259,7 @@ size_t cudaFree(void *mem) {
 
 size_t cudaConfigureCall(
         unsigned long long grid_xy, unsigned int grid_z,
-        unsigned long long block_xy, unsigned int block_z, void *stream) {
+        unsigned long long block_xy, unsigned int block_z, size_t sharedMem, void *stream) {
     cout << "cudaConfigureCall" << endl;
     cout << "grid_xy " << grid_xy << " grid_z " << grid_z << endl;
     cout << "block_xy " << block_xy << " grid_z " << block_z << endl;
@@ -273,12 +275,13 @@ size_t cudaConfigureCall(
     block[0] = block_x;
     block[1] = block_y;
     block[2] = block_z;
+    return 0;
 }
 
 void configureKernel(
         const char *kernelName, const char *clSourcecodeString) {
+    cout << "configureKernel (name=" << kernelName << ", source=" << clSourcecodeString << ")" << endl;
     assure_initialized();
-    cout << "configureKernel(" << kernelName << ")" << endl;
     kernel.reset(cl->buildKernelFromString(clSourcecodeString, kernelName, "", "__internal__"));
 }
 

@@ -139,6 +139,7 @@ void getLaunchTypes(CallInst *inst, LaunchCallInfo *info) {
     // - name of the kernel
     // - type of each of the kernel parameters (without the actual Value's)
     info->callTypes.clear();
+    outs() << "getLaunchTypes()\n";
     Value *argOperand = inst->getArgOperand(0);
     if(ConstantExpr *expr = dyn_cast<ConstantExpr>(argOperand)) {
         Instruction *instr = expr->getAsInstruction();
@@ -151,6 +152,9 @@ void getLaunchTypes(CallInst *inst, LaunchCallInfo *info) {
             }
         }
         info->kernelName = instr->getOperand(0)->getName();
+        outs() << "got kernel name " << info->kernelName << "\n";
+    } else {
+        throw runtime_error("getlaunchtypes, didnt get ConstantExpr");
     }
     // return launchCallInfo;
 }
@@ -399,6 +403,7 @@ void patchFunction(Function *F) {
                     outs() << "patching launch in " << string(F->getName()) << "\n";
                     // outs() << *launchCallInfo << "\n";
 
+                    outs() << "cudalaunch kernelanem " << launchCallInfo->kernelName << "\n";
                     Instruction *stringInstr = addStringInstr(F->getParent(), "s." + launchCallInfo->kernelName, launchCallInfo->kernelName);
                     stringInstr->insertBefore(inst);
 
@@ -407,7 +412,8 @@ void patchFunction(Function *F) {
 
                     dumpLaunchCallInfo(launchCallInfo.get());
                     Function *configureKernel = cast<Function>(F->getParent()->getOrInsertFunction(
-                        "_Z15configureKernelPKcS0_",
+                        // "_Z15configureKernelPKcS0_",
+                        "configureKernel",
                         Type::getVoidTy(TheContext),
                         PointerType::get(IntegerType::get(TheContext, 8), 0),
                         PointerType::get(IntegerType::get(TheContext, 8), 0),
