@@ -163,6 +163,90 @@ uint32_t readIntConstant_uint32(ConstantInt *constant) {
     return (uint32_t)constant->getZExtValue();
 }
 
+class PointerInfo {
+public:
+    PointerInfo(int offset, Type *type) :
+        offset(offset), type(type) {
+    }
+    int offset;
+    Type *type;
+};
+
+ostream &operator<<(ostream &os, const PointerInfo &pointerInfo) {
+    os << "PointerInfo(offset=" << pointerInfo.offset << ", type=" << dumpType(pointerInfo.type) << ")";
+    return os;
+}
+
+class StructInfo {
+public:
+    vector<unique_ptr<PointerInfo> > pointerInfos;
+};
+
+// offset: since we're walking a tree, over a base type, what is our offset into
+// the base type?
+void walkStructType(StructInfo *structInfo, int level, int offset, StructType *type);
+void walkType(StructInfo *structInfo, int level, int offset, Type *type);
+string getIndent(int level);
+
+string getIndent(int level) {
+    ostringstream oss;
+    for(int i = 0; i < level; i++) {
+        oss << "  ";
+    }
+    return oss.str();
+}
+
+void walkType(StructInfo *structInfo, int level, int offset, Type *type) {
+    if(StructType *structtype = dyn_cast<StructType>(type)) {
+        walkStructType(structInfo, level, offset, structtype);
+    } else if(PointerType *pointerType = dyn_cast<PointerType>(type)) {
+        Type *elementType = pointerType->getPointerElementType();
+        int addressspace = pointerType->getAddressSpace();
+        cout << getIndent(level) << "pointer type " << dumpType(elementType) << " addressspace " << addressspace << " offset=" << offset << endl;
+        // how to find out if this is gpu allocated or not?
+        // let's just heuristically assume that all primitive*s are gpu allocated for now?
+        // and lets assume that structs are just sent one at a time now, and any contained structs are one at a time
+        // we can figure out how to generalize this later...
+        // actually, anything except float *s, we're just going to leave as-is (or set to zero), for now
+        if(elementType->getPrimitiveSizeInBits() != 0) {
+            structInfo->pointerInfos.push_back(unique_ptr<PointerInfo>(new PointerInfo(offset, pointerType)));
+        }
+    } else if(ArrayType *arrayType = dyn_cast<ArrayType>(type)) {
+        Type *elemType = arrayType->getElementType();
+        int count = arrayType->getNumElements();
+        cout << getIndent(level) << dumpType(elemType) << "[" << count << "] offset=" << offset << endl;
+    } else if(IntegerType *intType = dyn_cast<IntegerType>(type)) {
+        int bitwidth = intType->getBitWidth();
+        cout << getIndent(level) << "int" << bitwidth << " offset=" << offset << endl;
+    } else {
+        throw runtime_error("walktype type not handled: " + dumpType(type));
+    }
+}
+
+void walkStructType(StructInfo *structInfo, int level, int offset, StructType *type) {
+    // Type *type = value->getType();
+    // if(isa<StructType>(type)) {
+        // cout << "walkvalue type is struct" << endl;
+        // walk each member of the struct
+
+    cout << getIndent(level) << string(type->getName());
+    cout << " offset=" << offset << " allocsize=" << TheModule->getDataLayout().getTypeAllocSize(type) << endl;
+    int childoffset = offset;
+    for(auto it=type->element_begin(); it != type->element_end(); it++) {
+        Type *child = *it;
+        // printIndent(level);
+        // cout << getIndent(level) + "child type " << dumpType(child) << endl;
+        walkType(structInfo, level + 1, childoffset, child);
+        childoffset += TheModule->getDataLayout().getTypeAllocSize(child);
+    }
+
+    // } else {
+    //     throw runtime_error("walkvalue unhandled type " + dumpType(type));
+    // }
+    //     throw runtime_error("walkvalue unhandled type " + dumpType(type));
+    // }
+}
+
 void getBlockGridDimensions(CallInst *inst, LaunchCallInfo *info) {
     // there are 6 args:
     // grid:
@@ -261,12 +345,25 @@ void patchFunction(Function *F) {
                         // cout << " arg " << i << " ";
                         // value->dump();
                         // cout << endl;
-                        if(isa<IntegerType>(value->getType())) {
+                        if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
                             // cout << "got an int" << endl;
+                            int bitLength = intType->getBitWidth();
+                            cout << "bitLength " << bitLength << endl;
+                            // string typeabbrev = "";
+                            string mangledName = "";
+                            if(bitLength == 32) {
+                                // typeabbrev = "i";
+                                mangledName = "_Z17setKernelArgInt32i";
+                            } else if(bitLength == 64) {
+                                // typeabbrev = "l";
+                                mangledName = "_Z17setKernelArgInt64l";
+                            } else {
+                                throw runtime_error("bitlength " + toString(bitLength) + " not implemented");
+                            }
                             Function *setKernelArgInt = cast<Function>(F->getParent()->getOrInsertFunction(
-                                "_Z15setKernelArgInti",
+                                mangledName,
                                 Type::getVoidTy(TheContext),
-                                IntegerType::get(TheContext, 32),
+                                IntegerType::get(TheContext, bitLength),
                                 NULL));
                             CallInst *call = CallInst::Create(setKernelArgInt, value);
                             call->insertAfter(lastInst);
@@ -295,6 +392,85 @@ void patchFunction(Function *F) {
                                 call->insertAfter(lastInst);
                                 lastInst = call;
                             }
+                        } else if(isa<StructType>(value->getType())) {
+                            cout << "got a struct" << endl;
+
+                            // lets just statically analyse the struct for now, without thinking how we're going to
+                            // actually deal with it
+                            // we want to know things like:
+                            // - how big it is?
+                            // - does it contain any pointers?  to what?  cpu memory? gpu memory? floats? structs?
+
+                            // what we're going to do with this information:
+                            // - at runtime, allocate a cl_mem suffiicnelty large to hold any cpu memory we want to send
+                            //   (assuming we're going to send this struct by-value basically)
+                            // - copy the struct to this buffer
+                            // - send this buffer into the kernel, as an argument
+                            //
+                            // after running the kernel, presuambly we'll need to clean up this memory
+                            // actually easycl sort of handles some of this stuff already..
+                            // anyway, the hard bit will be:
+                            // - getting hold of infomration about the struct
+                            // - dealing with pointers insdie the struct
+
+                            // lets start by getting the size of the struct
+                            // from https://stackoverflow.com/questions/14608250/how-can-i-find-the-size-of-a-type/30830445#30830445 ,
+                            // we can get this size like this:
+                            // %Size = getelementptr %T* null, i32 1
+                            // %SizeI = ptrtoint %T* %Size to i32
+                            // ... so let's do that
+
+                            // ... hmmmm.... thats at runtime, but we are not at runtime now, so ...
+                            // https://stackoverflow.com/questions/14608250/how-can-i-find-the-size-of-a-type/14608251#14608251
+                            // (same thread as the other) seems to apply whilst statically analyzing llvm code
+                            // getTypeAllocSize getTypeAllocSizeInBits
+                            // In LLVM versions 3.2 and above, the DataLayout type replaces TargetData
+
+                            Module *M = F->getParent();
+                            const DataLayout *dataLayout = &M->getDataLayout();
+                            cout << "typeallocsize " << dataLayout->getTypeAllocSize(value->getType()) << endl;
+                            // we could just naively allocate this, and copy it to the kernel, but superficial inspection
+                            // of the target for eigen shows it contains a float *.  that probably points into gpu
+                            // memory already.  We'd probably better scan for that.
+                            unique_ptr<StructInfo> structInfo(new StructInfo());
+                            walkStructType(structInfo.get(), 0, 0, cast<StructType>(value->getType()));
+                            cout << "pointers in struct:" << endl;
+                            for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
+                                PointerInfo *pointerInfo = pointerit->get();
+                                cout << "pointer: " << *pointerInfo << endl;
+                            }
+
+                            // Function *setKernelArgStruct = cast<Function>(F->getParent()->getOrInsertFunction(
+                            //     "_Z18setKernelArgStructv",
+                            //     Type::getVoidTy(TheContext),
+                            //     // PointerType::get(IntegerType::get(TheContext, 8), 0),
+                            //     NULL));
+
+                            // BitCastInst *bitcast = new BitCastInst(value, PointerType::get(IntegerType::get(TheContext, 8), 0));
+                            // bitcast->insertAfter(lastInst);
+                            // lastInst = bitcast;
+                            // CallInst *call = CallInst::Create(setKernelArgStruct);
+                            // call->insertAfter(lastInst);
+                            // lastInst = call;
+
+                            // Type *elementType = value->getType()->getPointerElementType();
+                            // // if(elementType->isFloatingPointTy()) {
+                            //     // cout << "got a float *" << endl;
+                            //     Function *setKernelArgCharStar = cast<Function>(F->getParent()->getOrInsertFunction(
+                            //         "_Z20setKernelArgCharStarPf",
+                            //         Type::getVoidTy(TheContext),
+                            //         PointerType::get(IntegerType::get(TheContext, 8), 0),
+                            //         NULL));
+                            //     BitCastInst *bitcast = new BitCastInst(value, PointerType::get(IntegerType::get(TheContext, 8), 0));
+                            //     bitcast->insertAfter(lastInst);
+                            //     lastInst = bitcast;
+                            //     CallInst *call = CallInst::Create(setKernelArgCharStar, bitcast);
+                            //     call->insertAfter(lastInst);
+                            //     lastInst = call;
+                            // // }
+                            throw runtime_error("type struct not implemented");
+                        } else {
+                            throw runtime_error("type not implemented " + dumpType(value->getType()));
                         }
                         i++;
                     }

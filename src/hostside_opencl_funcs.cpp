@@ -92,6 +92,12 @@ extern "C" {
     size_t cudaGetDeviceCount (int *count);
     size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t kind, void *stream = 0);
     size_t cudaStreamSynchronize(void *stream);
+    size_t cudaGetLastError();
+}
+
+size_t cudaGetLastError() {
+    cout << "cudaGetLastError" << endl;
+    return 0;
 }
 
 size_t cudaStreamSynchronize(void *stream) {
@@ -189,7 +195,7 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, int device) {
 }
 
 size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKind) {
-    cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << endl;
+    cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << " count=" << bytes << endl;
     if(cudaMemcpyKind == 2) {
         // device => host
         int srcidx = idxByAddr[(void *)src];
@@ -249,6 +255,7 @@ void configureKernel(
         const char *kernelName, const char *clSourcecodeString,
         int grid_x, int grid_y, int grid_z,
         int block_x, int block_y, int block_z) {
+    cout << "configureKernel" << endl;
     assure_initialized();
     // just a mock for now... can we call this from our modified ir?
     // cout << "configureKernel(" << kernelName << ")" << endl;
@@ -264,23 +271,48 @@ void configureKernel(
 }
 
 void setKernelArgFloatStar(float *clmem_as_floatstar) {
+    cout << "setKernelArgFloatStar" << endl;
     cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
     // cout << "setKernelArgFloatStar" << endl;
     kernel->inout(p_mem);
 }
 
-void setKernelArgInt(int value) {
+// void setKernelArgCharStar(char *clmem_as_charstar) {
+//     cout << "setKernelArgCharStar" << endl;
+//     cl_mem *p_mem = (cl_mem *)clmem_as_charstar;
+//     // cout << "setKernelArgFloatStar" << endl;
+//     kernel->inout(p_mem);
+// }
+
+void setKernelArgStruct() {
+    cout << "setKernelArgStruct" << endl;
+    // cl_mem *p_mem = (cl_mem *)clmem_as_charstar;
+    // cout << "setKernelArgFloatStar" << endl;
+    // kernel->inout(p_mem);
+}
+
+void setKernelArgInt64(int64_t value) {
+    cout << "setKernelArgInt64 " << value << endl;
+    // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
+    // cout << "setkernelargint " << value << endl;
+    kernel->in(value);
+}
+
+void setKernelArgInt32(int value) {
+    cout << "setKernelArgInt32 " << value << endl;
     // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
     // cout << "setkernelargint " << value << endl;
     kernel->in(value);
 }
 
 void setKernelArgFloat(float value) {
+    cout << "setKernelArgFloat " << value << endl;
     // cout << "setkernelargfloat " << value << endl;
     kernel->in(value);
 }
 
 void kernelGo() {
+    cout << "kernelGo " << endl;
     size_t global[3];
     for(int i = 0; i < 3; i++) {
         global[i] = grid[i] * block[i];

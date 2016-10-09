@@ -115,12 +115,6 @@ build/cuda_sample: build/cuda_sample-hostpatched.o build/hostside_opencl_funcs.o
 build/test_cuda_elementwise_small: build/test_cuda_elementwise_small-hostpatched.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
 	g++ -o build/test_cuda_elementwise_small build/test_cuda_elementwise_small-hostpatched.o build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
 
-run-test_call_cl: build/test_call_cl
-	################################
-	# running:
-	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/test_call_cl
-
 run-cuda_sample: build/cuda_sample
 	################################
 	# running:

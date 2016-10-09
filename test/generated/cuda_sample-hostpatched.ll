@@ -65,7 +65,7 @@ define void @_Z8setValuePfif(float* %data, i32 %idx, float %value) #2 {
   %13 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z8setValuePfif, i32 0, i32 0
   call void @_Z15configureKernelPKcS0_iiiiii(i8* %13, i8* %14, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0)
   call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
-  call void @_Z15setKernelArgInti(i32 %loadCudaArg1)
+  call void @_Z17setKernelArgInt32i(i32 %loadCudaArg1)
   call void @_Z17setKernelArgFloatf(float %loadCudaArg2)
   call void @_Z8kernelGov()
   %14 = getelementptr inbounds [320 x i8], [320 x i8]* @__opencl_sourcecode, i32 0, i32 0
@@ -127,7 +127,7 @@ define i32 @main(i32 %argc, i8** nocapture readnone %argv) #3 {
   %24 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z8setValuePfif, i32 0, i32 0
   call void @_Z15configureKernelPKcS0_iiiiii(i8* %24, i8* %25, i32 32, i32 1, i32 1, i32 32, i32 1, i32 1)
   call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
-  call void @_Z15setKernelArgInti(i32 %loadCudaArg1)
+  call void @_Z17setKernelArgInt32i(i32 %loadCudaArg1)
   call void @_Z17setKernelArgFloatf(float %loadCudaArg2)
   call void @_Z8kernelGov()
   %25 = getelementptr inbounds [320 x i8], [320 x i8]* @__opencl_sourcecode, i32 0, i32 0
@@ -224,7 +224,7 @@ _ZNKSt5ctypeIcE5widenEc.exit:                     ; preds = %53, %50
   %75 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z8setValuePfif, i32 0, i32 0
   call void @_Z15configureKernelPKcS0_iiiiii(i8* %75, i8* %76, i32 32, i32 1, i32 1, i32 32, i32 1, i32 1)
   call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg3)
-  call void @_Z15setKernelArgInti(i32 %loadCudaArg4)
+  call void @_Z17setKernelArgInt32i(i32 %loadCudaArg4)
   call void @_Z17setKernelArgFloatf(float %loadCudaArg5)
   call void @_Z8kernelGov()
   %76 = getelementptr inbounds [320 x i8], [320 x i8]* @__opencl_sourcecode, i32 0, i32 0
@@ -392,7 +392,7 @@ declare void @_Z15configureKernelPKcS0_iiiiii(i8*, i8*, i32, i32, i32, i32, i32,
 
 declare void @_Z21setKernelArgFloatStarPf(float*)
 
-declare void @_Z15setKernelArgInti(i32)
+declare void @_Z17setKernelArgInt32i(i32)
 
 declare void @_Z17setKernelArgFloatf(float)
 
