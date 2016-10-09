@@ -340,9 +340,11 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
 
 void setKernelArgFloatStar(float *clmem_as_floatstar) {
     cout << "setKernelArgFloatStar" << endl;
-    cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
+    int idx = idxByAddr[(void *)clmem_as_floatstar];
+    cl_mem clmem = clmems[idx];
+    // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
     // cout << "setKernelArgFloatStar" << endl;
-    kernel->inout(p_mem);
+    kernel->inout(&clmem);
 }
 
 // void setKernelArgCharStar(char *clmem_as_charstar) {
@@ -352,12 +354,12 @@ void setKernelArgFloatStar(float *clmem_as_floatstar) {
 //     kernel->inout(p_mem);
 // }
 
-void setKernelArgStruct() {
-    cout << "setKernelArgStruct" << endl;
-    // cl_mem *p_mem = (cl_mem *)clmem_as_charstar;
-    // cout << "setKernelArgFloatStar" << endl;
-    // kernel->inout(p_mem);
-}
+// void setKernelArgStruct() {
+//     cout << "setKernelArgStruct" << endl;
+//     // cl_mem *p_mem = (cl_mem *)clmem_as_charstar;
+//     // cout << "setKernelArgFloatStar" << endl;
+//     // kernel->inout(p_mem);
+// }
 
 void setKernelArgInt64(int64_t value) {
     cout << "setKernelArgInt64 " << value << endl;
