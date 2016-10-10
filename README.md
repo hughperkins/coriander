@@ -194,26 +194,4 @@ Tests are at [test](test)
 
 - Oct 10:
   - [test/eigen/test_cuda_elementwise_small.cu](https://github.com/hughperkins/cuda-on-cl/blob/a8f6aa55eb678e534cc7d17a3db26c6b8762d683/test/eigen/test_cuda_elementwise_small.cu) builds and runs ok now, on OpenCL :-)
-- Oct 8:
-  - [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc) compiles completely into compileable OpenCL now [https://github.com/hughperkins/cuda-on-cl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl](https://github.com/hughperkins/cuda-on-cl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl)
-  - implemented `cudaMalloc`, `cudaMemcpy`, `cudaFree` (using opencl)
-  - hostside object now contains generated OpenCL sourcecode
-- Oct 5
-  - fix float constants to correctly have `.0f` at the end
-  - added `extractvalue`
-  - conversion of [tensorflow/generated/cwise_op_gpu_add-deviceside.ll](tensorflow/generated/cwise_op_gpu_add-deviceside.ll) to [tensorflow/generated/cwise_op_gpu_add-deviceside.cl](tensorflow/generated/cwise_op_gpu_add-deviceside.cl) runs to completion now, though a "bit" buggy :-P
-- Oct 4:
-  - added `llvm.memcpy`
-  - added `insertvalue`
-  - added `dumpinttoptr`, `trunc`, `srem` (beta)
-- Oct 3
-  - added `float4` (beta)
-  - added `local` memory (beta)
-- Oct 2:
-  - added structs
-- Oct 1:
-  - first working end-to-end kernel launch, using both host-side and device-side code :-)
-- Sept 30:
-  - added initial unit tests, that use pyopencl to compile the generated OpenCL code, and run tests against it
-- Sept 27:
-  - first created
+- [Older news](doc/news.md)
