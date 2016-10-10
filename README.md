@@ -1,6 +1,6 @@
 # cuda-on-cl
 
-Build applications written in NVIDIA .r CUDA .tm code for OpenCL devices.
+Build applications written in NVIDIA® CUDA™ code for OpenCL devices.
 
 ## How to use
 
