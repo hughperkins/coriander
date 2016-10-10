@@ -11,17 +11,17 @@ LLVM_INCLUDE=/usr/include/llvm-3.8
 # COMPILE_FLAGS=`$(LLVM_CONFIG) --cxxflags` -std=c++11
 LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
 # the llvm-config compile flags suppresses asserts
-COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -O2 -g -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++11
+COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -g -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++11
 
 all: build/ir-to-opencl build/patch-hostside build/hostside_opencl_funcs.o
 
 build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h
 	mkdir -p build
-	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/ir-to-opencl -g -O3 -I$(LLVM_INCLUDE) src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp $(LINK_FLAGS)
+	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/ir-to-opencl -g -I$(LLVM_INCLUDE) src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp $(LINK_FLAGS)
 
 build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h
 	mkdir -p build
-	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/patch-hostside -g -O3 -I$(LLVM_INCLUDE) src/patch-hostside.cpp src/ir-to-opencl-common.cpp $(LINK_FLAGS)
+	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/patch-hostside -g -I$(LLVM_INCLUDE) src/patch-hostside.cpp src/ir-to-opencl-common.cpp $(LINK_FLAGS)
 
 easycl:
 	git submodule update --init --recursive
@@ -103,36 +103,32 @@ build/eigen-%-hostpatched.o: test/eigen/generated/%-hostpatched.ll
 
 ## generic cpp objects, from cpp code
 
-build/test_call_cl.o: test/test_call_cl.cpp easycl
-	echo building $@ from $<
-	$(CLANG) -std=c++11 -Isrc/EasyCL -I$(CUDA_HOME)/include -c $< --cuda-host-only -O3 -o $@
-
 build/%.o: test/%.cpp easycl
 	echo building $@ from $<
-	$(CLANG) -std=c++11 -Isrc/EasyCL -c $< --cuda-host-only -O3 -o $@
+	$(CLANG) -std=c++11 -O2 -Isrc/EasyCL -c $< --cuda-host-only -O3 -o $@
 
 build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp easycl
 	echo building $@ from $<
-	$(CLANG) -std=c++11 -Isrc/EasyCL -c $< -O3 -o $@
+	$(CLANG) -std=c++11 -O2 -Isrc/EasyCL -c $< -O3 -o $@
 
 # executables
 build/test_call_cl: build/test_call_cl.o build/testcudakernel1-hostpatched.o build/hostside_opencl_funcs.o test/generated/testcudakernel1-device.cl
-	g++ -o build/test_call_cl build/test_call_cl.o build/hostside_opencl_funcs.o build/testcudakernel1-hostpatched.o -lOpenCL -Lbuild -lEasyCL
+	g++ -o build/test_call_cl -O2 build/test_call_cl.o build/hostside_opencl_funcs.o build/testcudakernel1-hostpatched.o -lOpenCL -Lbuild -lEasyCL
 
 build/cuda_sample: build/cuda_sample-hostpatched.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
-	g++ -o build/cuda_sample build/hostside_opencl_funcs.o build/cuda_sample-hostpatched.o -lOpenCL -Lbuild -lEasyCL
+	g++ -o build/cuda_sample -O2 build/hostside_opencl_funcs.o build/cuda_sample-hostpatched.o -lOpenCL -Lbuild -lEasyCL
 
 build/test_cuda_elementwise_small: build/test_cuda_elementwise_small-hostpatched.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
-	g++ -o build/test_cuda_elementwise_small build/test_cuda_elementwise_small-hostpatched.o build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
+	g++ -o build/test_cuda_elementwise_small -O2 build/test_cuda_elementwise_small-hostpatched.o build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
 
 build/eigen-test_cuda_nullary: build/eigen-test_cuda_nullary-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/test_cuda_nullary-device.cl
-	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
+	g++ -o $@ $< build/hostside_opencl_funcs.o -O2 -lOpenCL -Lbuild -lEasyCL
 
 build/eigen-test_cuda_elementwise: build/eigen-test_cuda_elementwise-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/test_cuda_elementwise-device.cl
-	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
+	g++ -o $@ $< build/hostside_opencl_funcs.o -O2 -lOpenCL -Lbuild -lEasyCL
 
 build/eigen-test-cxx11_tensor_cuda: build/eigen-cxx11_tensor_cuda-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/cxx11_tensor_cuda-device.cl
-	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
+	g++ -o $@ $< build/hostside_opencl_funcs.o -O2 -lOpenCL -Lbuild -lEasyCL
 
 run-cuda_sample: build/cuda_sample
 	################################

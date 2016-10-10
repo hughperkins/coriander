@@ -96,7 +96,9 @@ std::string dumpValue(Value *value) {
 void declareGlobal(GlobalValue *global) {
     string gencode = "";
     if(GlobalVariable *var = dyn_cast<GlobalVariable>(global)) {
-        Constant *initializer = var->getInitializer();
+        cout << "hasinitializer() " << var->hasInitializer() << endl;
+        cout << "name " << getName(global) << endl;
+        gencode += "constant " + dumpType(global->getType()->getPointerElementType()) + " " + getName(global);
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
             int addressspace = pointerType->getAddressSpace();
             if(addressspace == 3) { // shared/local => skip
@@ -106,22 +108,24 @@ void declareGlobal(GlobalValue *global) {
                 updateAddressSpace(var, 4);
             }
         }
-        gencode += "constant " + dumpType(global->getType()->getPointerElementType()) + " " + getName(global);
-        gencode += " = {";
-        if(ConstantStruct *constStruct = dyn_cast<ConstantStruct>(initializer)) {
-            int i = 0;
-            while(Value *aggel = constStruct->getAggregateElement(i)) {
-                if(i == 0) {
-                } else {
-                    gencode += ", ";
+        if(var->hasInitializer()) {
+            Constant *initializer = var->getInitializer();
+            gencode += " = {";
+            if(ConstantStruct *constStruct = dyn_cast<ConstantStruct>(initializer)) {
+                int i = 0;
+                while(Value *aggel = constStruct->getAggregateElement(i)) {
+                    if(i == 0) {
+                    } else {
+                        gencode += ", ";
+                    }
+                    gencode += dumpOperand(aggel);
+                    i++;
                 }
-                gencode += dumpOperand(aggel);
-                i++;
+                if(i > 0) {
+                }
             }
-            if(i > 0) {
-            }
+            gencode += "}";
         }
-        gencode += "}";
     } else {
         global->dump();
         throw runtime_error("unimplemented declareglobalvalue for this type");
@@ -716,6 +720,9 @@ std::string dumpCall(CallInst *instr) {
     if(functionName == "_GLOBAL__sub_I_struct_initializer.cu") {
         cerr << "WARNING: skipping _GLOBAL__sub_I_struct_initializer.cu" << endl;
         return "";
+    }
+    if(functionName == "__nvvm_reflect") {
+        return ""; //ignore
     }
     if(functionName == "llvm.memcpy.p0i8.p0i8.i64") {
         return dumpMemcpyCharCharLong(instr);  // just ignore for now
@@ -1443,6 +1450,8 @@ int main(int argc, char *argv[]) {
 
     knownFunctionsMap["_ZSt4sqrtf"] = "sqrt";
     knownFunctionsMap["llvm.nvvm.sqrt.rn.d"] = "sqrt";
+    knownFunctionsMap["llvm.nvvm.fabs.f"] = "fabs";
+    knownFunctionsMap["llvm.nvvm.fabs.ftz.f"] = "fabs";
     knownFunctionsMap["_Z16our_pretend_tanhf"] = "tanh";
     knownFunctionsMap["_Z15our_pretend_logf"] = "log";
     knownFunctionsMap["_Z15our_pretend_expf"] = "exp";
