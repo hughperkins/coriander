@@ -26,7 +26,7 @@ target triple = "x86_64-pc-linux-gnu"
 @.str = private unnamed_addr constant [15 x i8] c"hostFloats[2] \00", align 1
 @llvm.global_ctors = appending global [2 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* @_GLOBAL__sub_I_cuda_sample.cu, i8* null }, { i32, void ()*, i8* } { i32 65535, void ()* bitcast (void (i8*)* @__cuda_module_ctor to void ()*), i8* null }]
 @llvm.global_dtors = appending global [1 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* bitcast (void (i8*)* @__cuda_module_dtor to void ()*), i8* null }]
-@__opencl_sourcecode = global [321 x i8] c"\0A\0A\0Akernel void _Z8setValuePfif(global float* data, int idx, float value) {\0A\0A    label0:;\0A    int v1 = get_global_id(0);\0A    bool v2 = v1 == 0;\0A    if(v2) {\0A        goto v4;\0A    } else {\0A        goto v5;\0A    }\0A    v4:;\0A    long v6 = idx;\0A    global float* v7 = (&data[v6]);\0A    v7[0] = value;\0A        goto v5;\0A    v5:;\0A}\0A\00"
+@__opencl_sourcecode = global [320 x i8] c"\0A\0A\0Akernel void _Z8setValuePfif(global float* data, int idx, float value) {\0A    label0:;\0A    int v1 = get_global_id(0);\0A    bool v2 = v1 == 0;\0A    if(v2) {\0A        goto v4;\0A    } else {\0A        goto v5;\0A    }\0A    v4:;\0A    long v6 = idx;\0A    global float* v7 = (&data[v6]);\0A    v7[0] = value;\0A        goto v5;\0A    v5:;\0A}\0A\00"
 @s._Z8setValuePfif = global [16 x i8] c"_Z8setValuePfif\00"
 
 declare void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"*) #0
@@ -63,7 +63,7 @@ define void @_Z8setValuePfif(float* %data, i32 %idx, float %value) #2 {
 
 ; <label>:12                                      ; preds = %9
   %13 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z8setValuePfif, i32 0, i32 0
-  %14 = getelementptr inbounds [321 x i8], [321 x i8]* @__opencl_sourcecode, i32 0, i32 0
+  %14 = getelementptr inbounds [320 x i8], [320 x i8]* @__opencl_sourcecode, i32 0, i32 0
   call void @configureKernel(i8* %13, i8* %14)
   call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z17setKernelArgInt32i(i32 %loadCudaArg1)
@@ -126,7 +126,7 @@ define i32 @main(i32 %argc, i8** nocapture readnone %argv) #3 {
 
 ; <label>:24                                      ; preds = %22
   %25 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z8setValuePfif, i32 0, i32 0
-  %26 = getelementptr inbounds [321 x i8], [321 x i8]* @__opencl_sourcecode, i32 0, i32 0
+  %26 = getelementptr inbounds [320 x i8], [320 x i8]* @__opencl_sourcecode, i32 0, i32 0
   call void @configureKernel(i8* %25, i8* %26)
   call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg)
   call void @_Z17setKernelArgInt32i(i32 %loadCudaArg1)
@@ -224,7 +224,7 @@ _ZNKSt5ctypeIcE5widenEc.exit:                     ; preds = %54, %51
 
 ; <label>:76                                      ; preds = %74
   %77 = getelementptr inbounds [16 x i8], [16 x i8]* @s._Z8setValuePfif, i32 0, i32 0
-  %78 = getelementptr inbounds [321 x i8], [321 x i8]* @__opencl_sourcecode, i32 0, i32 0
+  %78 = getelementptr inbounds [320 x i8], [320 x i8]* @__opencl_sourcecode, i32 0, i32 0
   call void @configureKernel(i8* %77, i8* %78)
   call void @_Z21setKernelArgFloatStarPf(float* %loadCudaArg3)
   call void @_Z17setKernelArgInt32i(i32 %loadCudaArg4)

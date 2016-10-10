@@ -3,11 +3,16 @@ struct MyStruct {
     int f1;
 };
 
+struct MyStruct_nopointers {
+    float f0;
+    int f1;
+};
 
 
-float _Z9sumStructPP8MyStructi(global struct MyStruct* * p_structs, int N);
 
-float _Z9sumStructPP8MyStructi(global struct MyStruct* * p_structs, int N) {
+float _Z9sumStructPP8MyStructi(struct MyStruct** p_structs, int N);
+
+float _Z9sumStructPP8MyStructi(struct MyStruct** p_structs, int N) {
     int i_01;
     int i_01_unr;
     float sum_02;
@@ -70,7 +75,7 @@ i_01 = i_01_unr;
     return sum_0_lcssa;
     v_lr_ph:;
     long v21 = i_01;
-    global struct MyStruct* * v22 = (&p_structs[v21]);
+    struct MyStruct** v22 = (&p_structs[v21]);
     struct MyStruct* v23 = v22[0];
     float* v24 = (&v23[0].f0);
     float v25 = v24[0];
@@ -82,7 +87,7 @@ i_01 = i_01_unr;
     float v31 = sum_02 + v30;
     int v32 = i_01 + 1;
     long v33 = v32;
-    global struct MyStruct* * v34 = (&p_structs[v33]);
+    struct MyStruct** v34 = (&p_structs[v33]);
     struct MyStruct* v35 = v34[0];
     float* v36 = (&v35[0].f0);
     float v37 = v36[0];
@@ -104,7 +109,7 @@ i_01 = v44;
     }
 }
 
-kernel void _Z8mykernelPfP8MyStructi(global float* data, global struct MyStruct* structs, int N) {
+kernel void _Z8mykernelPfP8MyStructi(global float* data, global struct MyStruct_nopointers* structs_nopointers, int N) {
     int i_01_i;
     int i_01_i3;
     int i_01_i9;
@@ -124,23 +129,27 @@ kernel void _Z8mykernelPfP8MyStructi(global float* data, global struct MyStruct*
     float v_lcssa26;
     float v_lcssa27;
     int v_lcssa28;
-    global int* v_pre_phi18;
+    int* v_pre_phi18;
+struct MyStruct structs[1];
+structs[0].f0 = structs_nopointers[0].f0;
+structs[0].f1 = structs_nopointers[0].f1;
+
     label0:;
     bool v1 = N > 0;
-    global float* v2 = (&structs[0].f0);
+    float* v2 = (&structs[0].f0);
     if(v1) {
         goto v_lr_ph_i_preheader;
     } else {
         goto v__Z9sumStructPP8MyStructi_exit_crit_edge;
     }
     v__Z9sumStructPP8MyStructi_exit_crit_edge:;
-    global int* v_pre17 = (&structs[0].f1);
+    int* v_pre17 = (&structs[0].f1);
         v_pre_phi18 = v_pre17;
 sum_0_lcssa_i = 0.0f;
     goto _Z9sumStructPP8MyStructi_exit;
     v_lr_ph_i_preheader:;
     float v5 = v2[0];
-    global int* v6 = (&structs[0].f1);
+    int* v6 = (&structs[0].f1);
     int v7 = v6[0];
     float v8 = v7;
     float v9 = v8 * 3.5f;

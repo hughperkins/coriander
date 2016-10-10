@@ -11,6 +11,15 @@ struct Bar {
     float f0;
 };
 
+struct Foo_nopointers {
+    int f0;
+    float f1;
+};
+
+struct class_SomeClass_nopointers {
+    struct Foo_nopointers f0;
+};
+
 
 constant struct class_SomeClass myg1 = {};
 
@@ -21,17 +30,28 @@ constant struct Foo foo = {777, 11.0f};
 constant struct Bar bar = {12.0f};
 
 
-float _Z11getFooValue3Foo(struct Foo* foo);
-float _Z17getSomeClassValue9SomeClassS_(struct class_SomeClass* someclass, struct class_SomeClass* c2);
+float _Z11getFooValue3Foo(global struct Foo_nopointers* foo_nopointers);
+float _Z17getSomeClassValue9SomeClassS_(global struct class_SomeClass_nopointers* someclass_nopointers, global struct class_SomeClass_nopointers* c2_nopointers);
 
-float _Z11getFooValue3Foo(struct Foo* foo) {
+float _Z11getFooValue3Foo(global struct Foo_nopointers* foo_nopointers) {
+struct Foo foo[1];
+foo[0].f0 = foo_nopointers[0].f0;
+foo[0].f1 = foo_nopointers[0].f1;
+
     label0:;
     float* v1 = (&foo[0].f1);
     float v2 = v1[0];
     return v2;
 }
 
-float _Z17getSomeClassValue9SomeClassS_(struct class_SomeClass* someclass, struct class_SomeClass* c2) {
+float _Z17getSomeClassValue9SomeClassS_(global struct class_SomeClass_nopointers* someclass_nopointers, global struct class_SomeClass_nopointers* c2_nopointers) {
+struct class_SomeClass someclass[1];
+someclass[0].f0.f0 = someclass_nopointers[0].f0.f0;
+someclass[0].f0.f1 = someclass_nopointers[0].f0.f1;
+struct class_SomeClass c2[1];
+c2[0].f0.f0 = c2_nopointers[0].f0.f0;
+c2[0].f0.f1 = c2_nopointers[0].f0.f1;
+
     label0:;
     float* v1 = (&someclass[0].f0.f1);
     float v2 = v1[0];
