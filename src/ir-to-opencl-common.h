@@ -72,3 +72,5 @@ std::string getIndent(int level);
 
 std::string getName(llvm::StructType *type);
 std::string getName(llvm::Function *type);
+
+std::string dumpTypeNoPointers(llvm::Type *type);

@@ -1136,7 +1136,18 @@ std::string dumpFunctionDeclaration(Function *F) {
             }
         }
         string argName = dumpOperand(arg);
-        string argdeclaration = dumpType(arg->getType()) + " " + argName;
+        bool isstruct = false;
+        string argdeclaration = "";
+        if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
+            Type *elemType = ptrType->getPointerElementType();
+            if(StructType *structType = dyn_cast<StructType>(elemType)) {
+                isstruct = true;
+                argdeclaration = "global " + dumpTypeNoPointers(structType) + "* " + argName;
+            }
+        }
+        if(!isstruct) {
+            argdeclaration = dumpType(arg->getType()) + " " + argName;
+        }
         if(i > 0) {
             declaration += ", ";
         }

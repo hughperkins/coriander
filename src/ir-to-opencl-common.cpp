@@ -247,6 +247,50 @@ void declareStruct(string name, StructType *type) {
     // outs() << "declarations_to_write " << declarations_to_write << "\n";
 }
 
+void declareStructNoPointers(string name, StructType *type) {
+    // writes out the declaration to declarations_to_write
+    // its not hte only way of doing this, nor necessarily the best, but seems easier than
+    // eg querying global vraibales by hand
+    std::string declaration = "";
+    declaration += name + " {\n";
+    int i = 0;
+    for(auto it=type->element_begin(); it != type->element_end(); it++) {
+        Type *elementType = *it;
+        // bool isPtrPtrFunction = false;
+        // if(PointerType *ptr = dyn_cast<PointerType>(elementType)) {
+        //     Type *ptrElementType = ptr->getPointerElementType();
+        //     if(PointerType *ptrptr = dyn_cast<PointerType>(ptrElementType)) {
+        //         Type *ptrptrElementType = ptrptr->getPointerElementType();
+        //         isPtrPtrFunction = isa<FunctionType>(ptrptrElementType);
+        //     }
+        // }
+        // if(isPtrPtrFunction) {
+        //     // we can ignore functions, whilst dumping structs
+        //     continue;
+        // }
+        std::string memberName = "f" + toString(i);
+        if(ArrayType *arraytype = dyn_cast<ArrayType>(elementType)) {
+            // Type *arrayelementtype = arraytype->getPointerElementType();
+            // // outs() << "arrayelementtype " << dumpType(arrayelementtype) << "\n";
+            // int numElements = arraytype->getNumElements();
+            // // outs() << "numelements " << numElements << "\n";
+            // declaration += "    " + dumpType(arrayelementtype) + " ";
+            // declaration += memberName + "[" + toString(numElements) + "];\n";
+            // // throw runtime_error("not implemented declarestruct for arraytype elements");
+        } else {
+            declaration += "    ";
+            // if its a pointer, we skip it, otherwise we handle it
+            if(!isa<PointerType>(elementType)) {
+                declaration += dumpTypeNoPointers(elementType) + " " + memberName + ";\n";
+            }
+        }
+        i++;
+    }
+    declaration += "};\n";
+    declarations_to_write += declaration + "\n";
+    // outs() << "declarations_to_write " << declarations_to_write << "\n";
+}
+
 std::string replace(std::string target, char old_char, char new_char) {
     size_t pos = target.find(old_char);
     while(pos != string::npos) {
@@ -297,6 +341,50 @@ std::string dumpStructType(StructType *type) {
     }
 }
 
+std::string dumpStructTypeNoPointers(StructType *type) {
+    // outs() << "dumpstructtype" << "\n";
+    if(type->hasName()) {
+        string name = type->getName();
+        // outs() << "name " << name << "\n";
+        name = replace(name, '.', '_');
+                name = replace(name, ':', '_');
+        if(name == "struct_float4") {
+            return "float4";
+        } else {
+            if(name.find("struct_") == 0) {
+                name[6] = ' ';
+                name += "_nopointers";
+                if(declaredStructs.find(name) == declaredStructs.end()) {
+                    declaredStructs.insert(name);
+                    declareStructNoPointers(name, type);
+                }
+                return name;
+            } else if(name.find("class_") != string::npos) {
+                // name[5] = '_';
+                name = "struct " + name;
+                name += "_nopointers";
+                if(declaredStructs.find(name) == declaredStructs.end()) {
+                    declaredStructs.insert(name);
+                    declareStructNoPointers(name, type);
+                }
+                return name;
+            } else {
+                name = "struct " + name;
+                name += "_nopointers";
+                if(declaredStructs.find(name) == declaredStructs.end()) {
+                    declaredStructs.insert(name);
+                    declareStructNoPointers(name, type);
+                }
+                return name;
+                // outs() << "struct name: " << name << "\n";
+                // throw runtime_error("dumpStructType() not implemented: struct name " + name);
+            }
+        }
+    } else {
+        throw runtime_error("not implemented: anonymous struct types");
+    }
+}
+
 std::string dumpArrayType(ArrayType *type) {
     int length = type->getNumElements();
     Type *elementType = type->getElementType();
@@ -333,6 +421,39 @@ std::string dumpType(Type *type) {
         default:
             outs() << "type id " << typeID << "\n";
             throw runtime_error("unrecognized type");
+    }
+}
+
+std::string dumpTypeNoPointers(Type *type) {
+    Type::TypeID typeID = type->getTypeID();
+    switch(typeID) {
+        case Type::VoidTyID:
+            return "void";
+        case Type::FloatTyID:
+            return "float";
+        // case Type::UnionTyID:
+        //     throw runtime_error("not implemented: union type");
+        case Type::StructTyID:
+            return dumpStructTypeNoPointers(cast<StructType>(type));
+        case Type::VectorTyID:
+            throw runtime_error("not implemented: vector type");
+        // case Type::ArrayTyID:
+        //     return dumpArrayType(cast<ArrayType>(type));
+        case Type::DoubleTyID:
+            if(single_precision) {
+                return "float";
+            } else {
+                return "double";
+            }
+        // case Type::FunctionTyID:
+        //     return dumpFunctionType(cast<FunctionType>(type));
+        // case Type::PointerTyID:
+        //     return dumpPointerType(cast<PointerType>(type));
+        case Type::IntegerTyID:
+            return dumpIntegerType(cast<IntegerType>(type));
+        // default:
+        //     outs() << "type id " << typeID << "\n";
+        //     throw runtime_error("unrecognized type");
     }
 }
 
