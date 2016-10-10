@@ -35,50 +35,36 @@ stubout_types(SCOPE, xor) \
 stubout_types(SCOPE, and) \
 stubout_types(SCOPE, xchg)
 
-// stubout_types(SCOPE, cas) \
-
-// stubout_gen(SCOPE, add, d, double) \
-// stubout_gen(SCOPE, add, f, float) \
-// stubout_gen(SCOPE, add, i, int) \
-// stubout_gen(SCOPE, add, ll, long long) \
-// stubout_gen(SCOPE, min, i, int) \
-// stubout_gen(SCOPE, max, ui, unsigned int) \
-// stubout_gen(SCOPE, xchg, d, double) \
-// stubout_gen(SCOPE, xchg, i, int) \
-
 stubout_scope(sys)
 stubout_scope(cta)
 
-// stubout_gen(sys, xchg, i, int)
-// stubout_gen(sys, add, i, int)
-// stubout_gen(sys, max, i, int)
-// stubout_gen(sys, min, i, int)
-// stubout_gen(sys, min, ull, unsigned long long)
-// stubout_gen(sys, add, ll, long long)
-// stubout_gen(sys, max, ll, long long)
-
 #include "__clang_cuda_runtime_wrapper.h"
-
-// #define cudaMalloc fakeCudaMalloc
-// #define cudaFree fakeCudaFree
-// #define cudaMemcpy fakeCudaMemcpy
-
-// cudaError_t fakeCudaMalloc(void **, size_t);
-// cudaError_t fakeCudaFree(void *);
-// cudaError_t cudaMemcpy(void *dst, const void *, size_t, enum cudaMemcpyKind);
 
 #define tanh our_pretend_tanh
 #define log our_pretend_log
 #define exp our_pretend_exp
 
+// this is for eigen (which calls like:  ::tanh)
+//namespace std {
+float our_pretend_tanh(float in);
+float our_pretend_log(float in);
+float our_pretend_exp(float in);
+//}
+
+// this is for std library:  (which calls like:   tanh)
 namespace std {
 float our_pretend_tanh(float in);
 float our_pretend_log(float in);
 float our_pretend_exp(float in);
-
-// long long our_pretend_log(long long in);
-// long our_pretend_log(long in);
-// double our_pretend_log(double in);
 }
 
-using namespace std;  // trying to fix error about arg
+// using namespace std;  // trying to fix error about arg
+
+// #define arg std::arg
+
+// #define EIGEN_USING_STD_MATH(FUNC) using std::FUNC;
+
+#include <complex>
+template<class T> T arg (const std::complex<T>& x) {
+    return std::arg(x);
+}

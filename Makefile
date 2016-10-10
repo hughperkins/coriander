@@ -43,7 +43,7 @@ test/generated/%-device.ll: test/%.cu include/fake_funcs.h build/ir-to-opencl
 test/eigen/generated/%-device.ll: test/eigen/%.cu include/fake_funcs.h build/ir-to-opencl
 	echo building $@ from $<
 	mkdir -p test/eigen/generated
-	$(CLANG) -x cuda -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -D__CUDA_ARCH__=300 -include include/fake_funcs.h -Iinclude -I$(EIGEN_HOME) -I$(CUDA_HOME)/include -I/usr/include/x86_64-linux-gnu $< --cuda-device-only -emit-llvm -O3 -S -o $@
+	$(CLANG) -x cuda -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -D__CUDA_ARCH__=300 -include include/fake_funcs.h -Iinclude -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -Itest/eigen -I$(CUDA_HOME)/include -I/usr/include/x86_64-linux-gnu $< --cuda-device-only -emit-llvm -O3 -S -o $@
 
 # hostside goes from .cu -> -hostraw.ll
 
@@ -55,7 +55,7 @@ test/generated/%-hostraw.ll: test/%.cu
 test/eigen/generated/%-hostraw.ll: test/eigen/%.cu include/fake_funcs.h
 	echo building $@ from $<
 	mkdir -p test/eigen/generated
-	$(CLANG) -std=c++11 -include include/fake_funcs.h -I$(EIGEN_HOME) -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
+	$(CLANG) -std=c++11 -include include/fake_funcs.h -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -Itest/eigen -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
 
 # .hostraw.ll => .hostpatched.ll
 
@@ -131,6 +131,9 @@ build/eigen-test_cuda_nullary: build/eigen-test_cuda_nullary-hostpatched.o build
 build/eigen-test_cuda_elementwise: build/eigen-test_cuda_elementwise-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/test_cuda_elementwise-device.cl
 	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
 
+build/eigen-test-cxx11_tensor_cuda: build/eigen-cxx11_tensor_cuda-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/cxx11_tensor_cuda-device.cl
+	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
+
 run-cuda_sample: build/cuda_sample
 	################################
 	# running:
@@ -154,5 +157,11 @@ run-eigen-test_cuda_elementwise: build/eigen-test_cuda_elementwise
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-test_cuda_elementwise
+
+run-eigen-test-cxx11_tensor_cuda: build/eigen-test-cxx11_tensor_cuda
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-test-cxx11_tensor_cuda
 
 .SECONDARY:
