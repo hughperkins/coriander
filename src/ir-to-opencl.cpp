@@ -314,28 +314,6 @@ std::string dumpAlloca(Instruction *alloca) {
     }
 }
 
-void updateAddressSpace(Value *value, int newSpace) {
-    Type *elementType = value->getType()->getPointerElementType();
-    Type *newType = PointerType::get(elementType, newSpace);
-    value->mutateType(newType);
-}
-
-void copyAddressSpace(Value *src, Value *dest) {
-    // copies address space from src value to dest value
-    int srcTypeID = src->getType()->getTypeID();
-    if(srcTypeID != Type::PointerTyID) { // not a pointer, so skipe
-        return;
-    }
-    if(PointerType *srcType = dyn_cast<PointerType>(src->getType())) {
-        if(isa<PointerType>(dest->getType())) {
-            int addressspace = srcType->getAddressSpace();
-            if(addressspace != 0) {
-                updateAddressSpace(dest, addressspace);
-            }
-        }
-    }
-}
-
 string dumpLoad(LoadInst *instr) {
     string gencode = "";
     string rhs = dumpOperand(instr->getOperand(0)) + "[0]";
@@ -392,10 +370,13 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
         // pointer into shared memory.
         addSharedDeclaration(instr->getOperand(0));
     }
-    copyAddressSpace(instr->getOperand(0), instr);
+    // copyAddressSpace(instr->getOperand(0), instr);
+    // int addressspace = 
     for(int d=0; d < numOperands - 1; d++) {
-        // cout << "d " << d << " currenttype " << dumpType(currentType) << endl;
         Type *newType = 0;
+        if(PointerType *ptrtype = dyn_cast<PointerType>(currentType)) {
+            outs() << "d " << d << " currenttype " << dumpType(currentType) << " addressspace " << ptrtype->getAddressSpace() << "\n";
+        }
         if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
             if(d == 0) {
                 if(isa<ArrayType>(currentType->getPointerElementType())) {
@@ -424,8 +405,14 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
             currentType->dump();
             throw runtime_error("type not implemented in gpe");
         }
+        // if new type is a pointer, and old type was a struct, then we assume its a global pointer, and therefore
+        // update the addressspace to be global, ie 1.  This is a bit hacky I know
+        if(isa<PointerType>(newType) && isa<StructType>(currentType)) {
+            addressspace = 1;
+        }
         currentType = newType;
     }
+    updateAddressSpace(instr, addressspace);
     rhs = "(&" + rhs + ")";
     return rhs;
 }

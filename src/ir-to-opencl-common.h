@@ -74,3 +74,6 @@ std::string getName(llvm::StructType *type);
 std::string getName(llvm::Function *type);
 
 std::string dumpTypeNoPointers(llvm::Type *type);
+
+void updateAddressSpace(llvm::Value *value, int newSpace);
+void copyAddressSpace(llvm::Value *src, llvm::Value *dest);

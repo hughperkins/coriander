@@ -174,10 +174,11 @@ std::string dumpPointerType(PointerType *ptr) {
         addressspacestr = "constant";
     }
     // we're just going to hackily assume that anything that is `global **` should be `global * global *`
-    if(isa<PointerType>(ptr->getPointerElementType())) {
+    // if(isa<PointerType>(ptr->getPointerElementType())) {
         // return "global " + elementTypeString + addressspacestr + " *";
-        return elementTypeString + addressspacestr + " *";
-    }
+        // return elementTypeString + addressspacestr + " *";
+        // return "global " + elementTypeString + addressspacestr + " *";
+    // }
     if(addressspacestr != "") {
         gencode += addressspacestr + " ";
     }
@@ -200,6 +201,28 @@ std::string dumpIntegerType(IntegerType *type) {
         default:
             outs() << "integer size " << type->getPrimitiveSizeInBits() << "\n";
             throw runtime_error("unrecognized size");
+    }
+}
+
+void updateAddressSpace(Value *value, int newSpace) {
+    Type *elementType = value->getType()->getPointerElementType();
+    Type *newType = PointerType::get(elementType, newSpace);
+    value->mutateType(newType);
+}
+
+void copyAddressSpace(Value *src, Value *dest) {
+    // copies address space from src value to dest value
+    int srcTypeID = src->getType()->getTypeID();
+    if(srcTypeID != Type::PointerTyID) { // not a pointer, so skipe
+        return;
+    }
+    if(PointerType *srcType = dyn_cast<PointerType>(src->getType())) {
+        if(isa<PointerType>(dest->getType())) {
+            int addressspace = srcType->getAddressSpace();
+            if(addressspace != 0) {
+                updateAddressSpace(dest, addressspace);
+            }
+        }
     }
 }
 
@@ -237,7 +260,9 @@ void declareStruct(string name, StructType *type) {
             declaration += "    ";
             // if its a pointer, lets assume its global, for now
             if(PointerType *ptr = dyn_cast<PointerType>(elementType)) {
+                // updateAddressSpace(ptr, 1);
                 declaration += "global ";
+
             }
             declaration += dumpType(elementType) + " " + memberName + ";\n";
         }
