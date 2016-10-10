@@ -1232,8 +1232,10 @@ std::string dumpFunction(Function *F) {
     for(auto it=currentFunctionPhiDeclarationsByName.begin(); it != currentFunctionPhiDeclarationsByName.end(); it++){
         gencode += "    " + it->second + ";\n";
     }
+    if(structpointershimcode != "") {
+        gencode += structpointershimcode + "\n";
+    }
     gencode +=
-        structpointershimcode + "\n" +
         body +
     "}\n";
     cout << gencode;

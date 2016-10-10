@@ -16,7 +16,6 @@ float _Z9sumStructPP8MyStructi(global struct MyStruct* * p_structs, int N) {
     float v_lcssa;
     float v_lcssa3;
     float v_lcssa_unr;
-
     label0:;
     bool v1 = N > 0;
     if(v1) {
@@ -126,7 +125,6 @@ kernel void _Z8mykernelPfP8MyStructi(global float* data, global struct MyStruct*
     float v_lcssa27;
     int v_lcssa28;
     global int* v_pre_phi18;
-
     label0:;
     bool v1 = N > 0;
     global float* v2 = (&structs[0].f0);
