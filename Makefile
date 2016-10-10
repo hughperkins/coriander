@@ -116,23 +116,11 @@ build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp easycl
 	$(CLANG) -std=c++11 -Isrc/EasyCL -c $< -O3 -o $@
 
 # executables
-build/test_call_cl: build/test_call_cl.o build/testcudakernel1-hostpatched.o build/hostside_opencl_funcs.o test/generated/testcudakernel1-device.cl
-	g++ -o build/test_call_cl build/test_call_cl.o build/hostside_opencl_funcs.o build/testcudakernel1-hostpatched.o -lOpenCL -Lbuild -lEasyCL
-
 build/cuda_sample: build/cuda_sample-hostpatched.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
 	g++ -o build/cuda_sample build/hostside_opencl_funcs.o build/cuda_sample-hostpatched.o -lOpenCL -Lbuild -lEasyCL
 
 build/eigen-%i: build/eigen-%i-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/%i-device.cl
 	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
-
-# build/test_cuda_elementwise_small: build/eigen-test_cuda_elementwise_small-hostpatched.o build/hostside_opencl_funcs.o test/generated/test_cuda_elementwise_small-device.cl
-# 	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
-
-# build/eigen-test_cuda_nullary: build/eigen-test_cuda_nullary-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/test_cuda_nullary-device.cl
-# 	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
-
-# build/eigen-test_cuda_elementwise: build/eigen-test_cuda_elementwise-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/test_cuda_elementwise-device.cl
-# 	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
 
 run-cuda_sample: build/cuda_sample
 	################################
