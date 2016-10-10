@@ -466,6 +466,9 @@ void patchFunction(Function *F) {
                             unique_ptr<StructInfo> structInfo(new StructInfo());
                             walkStructType(TheModule.get(), structInfo.get(), 0, 0, vector<int>(), "", cast<StructType>(value->getType()));
 
+                            bool structHasPointers = structInfo->pointerInfos.size() > 0;
+                            outs() << "struct has pointers? " << structHasPointers << "\n";
+
                             // now we need to set up instructions to pass in:
                             // - the struct itself
                             // - each of the float arrays

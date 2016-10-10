@@ -7,8 +7,8 @@ import pytest
 
 @pytest.mark.parametrize("cl_filepath", [
     "test/generated/struct_initializer-device.cl",
-    pytest.mark.xfail("test/generated/phiaddressspace-device.cl"),
-    pytest.mark.xfail("test/generated/pointerpointer-device.cl"),
+    "test/generated/phiaddressspace-device.cl",
+    # pytest.mark.xfail("test/generated/pointerpointer-device.cl"),
     "test/eigen/generated/test_cuda_elementwise_small-device.cl",
     "test/eigen/generated/test_cuda_nullary-device.cl"
 ])
