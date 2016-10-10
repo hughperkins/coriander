@@ -1,4 +1,4 @@
-# cuda-ir-to-opencl
+# cuda-on-cl
 
 This lets you compile CUDA code for use on non-CUDA OpenCL devices.
 
