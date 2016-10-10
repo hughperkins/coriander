@@ -24,6 +24,9 @@ void test_cuda_elementwise_small() {
   in1.setRandom();
   in2.setRandom();
 
+  cout << "in1 " << in1 << endl;
+  cout << "in2 " << in1 << endl;
+
   std::size_t in1_bytes = in1.size() * sizeof(float);
   std::size_t in2_bytes = in2.size() * sizeof(float);
   std::size_t out_bytes = out.size() * sizeof(float);
@@ -54,14 +57,13 @@ void test_cuda_elementwise_small() {
                          gpu_device.stream()) == cudaSuccess);
   assert(cudaStreamSynchronize(gpu_device.stream()) == cudaSuccess);
 
-  // for (int i = 0; i < 2; ++i) {
-  //   VERIFY_IS_APPROX(
-  //       out(Eigen::array<Eigen::DenseIndex, 1>(i)),
-  //       in1(Eigen::array<Eigen::DenseIndex, 1>(i)) + in2(Eigen::array<Eigen::DenseIndex, 1>(i)));
-  // }
+  cout << "out " << out << endl;
 
-  cout << "d_out " << d_out << endl;
-  cout << "d_in2 " << d_in2 << endl;
+  for (int i = 0; i < 2; ++i) {
+    VERIFY_IS_APPROX(
+        out(Eigen::array<Eigen::DenseIndex, 1>(i)),
+        in1(Eigen::array<Eigen::DenseIndex, 1>(i)) + in2(Eigen::array<Eigen::DenseIndex, 1>(i)));
+  }
 
   cudaFree(d_in1);
   cudaFree(d_in2);

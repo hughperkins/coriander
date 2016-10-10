@@ -36,12 +36,13 @@ float readFloatConstant(llvm::Value *value);
 
 class PointerInfo {
 public:
-    PointerInfo(int offset, llvm::Type *type, std::vector<int> indices) :
-        offset(offset), type(type), indices(indices) {
+    PointerInfo(int offset, llvm::Type *type, std::vector<int> indices, std::string path) :
+        offset(offset), type(type), indices(indices), path(path) {
     }
     int offset;
     llvm::Type *type;
     std::vector<int> indices;
+    std::string path;
 };
 
 class StructInfo {
@@ -51,6 +52,6 @@ public:
 
 // offset: since we're walking a tree, over a base type, what is our offset into
 // the base type?
-void walkStructType(llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices, llvm::StructType *type);
-void walkType(llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices, llvm::Type *type);
+void walkStructType(llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices, std::string path, llvm::StructType *type);
+void walkType(llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices, std::string path, llvm::Type *type);
 std::string getIndent(int level);

@@ -18,15 +18,15 @@ struct class_Eigen__StreamInterface {
 };
 
 struct Eigen__GpuDevice {
-    struct class_Eigen__StreamInterface* f0;
+    global struct class_Eigen__StreamInterface* f0;
     int f1;
     char f2[4];
 };
 
 struct Eigen__TensorEvaluator_84 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_19 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_85 {
@@ -51,9 +51,9 @@ struct Eigen__DSizes_30 {
 };
 
 struct Eigen__TensorEvaluator_93 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_30 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_94 {
@@ -72,9 +72,9 @@ struct Eigen__DSizes_41 {
 };
 
 struct Eigen__TensorEvaluator_102 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_41 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_103 {
@@ -93,9 +93,9 @@ struct Eigen__DSizes_52 {
 };
 
 struct Eigen__TensorEvaluator_111 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_52 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_112 {
@@ -115,9 +115,9 @@ struct Eigen__internal__scalar_sum_op_120 {
 };
 
 struct Eigen__TensorEvaluator_150 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_30 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_151 {
@@ -134,9 +134,9 @@ struct Eigen__TensorEvaluator_155 {
 };
 
 struct Eigen__TensorEvaluator_159 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_41 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_160 {
@@ -161,15 +161,15 @@ struct Eigen__DSizes {
 };
 
 struct Eigen__TensorEvaluator_62 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_66 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct class_Eigen__array_5 {
@@ -181,9 +181,9 @@ struct Eigen__DSizes_4 {
 };
 
 struct Eigen__TensorEvaluator_67 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_4 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_63 {
@@ -198,7 +198,7 @@ struct Eigen__TensorEvaluator_61 {
 };
 
 struct Eigen__internal__scalar_left_70 {
-    float* f0;
+    global float* f0;
 };
 
 struct Eigen__TensorEvaluator_69 {
@@ -212,7 +212,7 @@ struct Eigen__TensorEvaluator_68 {
 };
 
 struct Eigen__internal__scalar_right_73 {
-    float* f0;
+    global float* f0;
 };
 
 struct Eigen__TensorEvaluator_72 {
@@ -266,9 +266,9 @@ struct Eigen__TensorEvaluator_79 {
 };
 
 struct Eigen__TensorEvaluator_82 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_19 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_83 {
@@ -299,9 +299,9 @@ struct Eigen__TensorEvaluator_88 {
 };
 
 struct Eigen__TensorEvaluator_91 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_30 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_92 {
@@ -338,9 +338,9 @@ struct Eigen__TensorEvaluator_97 {
 };
 
 struct Eigen__TensorEvaluator_100 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_41 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_101 {
@@ -377,9 +377,9 @@ struct Eigen__TensorEvaluator_106 {
 };
 
 struct Eigen__TensorEvaluator_109 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_52 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_110 {
@@ -416,21 +416,21 @@ struct Eigen__TensorEvaluator_115 {
 };
 
 struct Eigen__TensorEvaluator_118 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_122 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_123 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_4 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_119 {
@@ -445,7 +445,7 @@ struct Eigen__TensorEvaluator_117 {
 };
 
 struct Eigen__internal__scalar_left_127 {
-    float* f0;
+    global float* f0;
 };
 
 struct Eigen__TensorEvaluator_126 {
@@ -459,7 +459,7 @@ struct Eigen__TensorEvaluator_125 {
 };
 
 struct Eigen__internal__scalar_right_130 {
-    float* f0;
+    global float* f0;
 };
 
 struct Eigen__TensorEvaluator_129 {
@@ -513,15 +513,15 @@ struct Eigen__TensorEvaluator_136 {
 };
 
 struct Eigen__TensorEvaluator_139 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_19 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_141 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_19 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_142 {
@@ -565,9 +565,9 @@ struct Eigen__TensorEvaluator_145 {
 };
 
 struct Eigen__TensorEvaluator_148 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_30 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_149 {
@@ -598,9 +598,9 @@ struct Eigen__TensorEvaluator_154 {
 };
 
 struct Eigen__TensorEvaluator_157 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_41 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_158 {
@@ -631,15 +631,15 @@ struct Eigen__TensorEvaluator_163 {
 };
 
 struct Eigen__TensorEvaluator_166 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_52 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_168 {
-    float* f0;
+    global float* f0;
     struct Eigen__DSizes_52 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_169 {
@@ -683,9 +683,9 @@ struct Eigen__TensorEvaluator_172 {
 };
 
 struct Eigen__TensorEvaluator_175 {
-    long* f0;
+    global long* f0;
     struct Eigen__DSizes f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__internal__scalar_sum_op_177 {
@@ -693,15 +693,15 @@ struct Eigen__internal__scalar_sum_op_177 {
 };
 
 struct Eigen__TensorEvaluator_179 {
-    long* f0;
+    global long* f0;
     struct Eigen__DSizes f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_180 {
-    long* f0;
+    global long* f0;
     struct Eigen__DSizes_4 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_176 {
@@ -716,7 +716,7 @@ struct Eigen__TensorEvaluator_174 {
 };
 
 struct Eigen__internal__scalar_left_183 {
-    long* f0;
+    global long* f0;
 };
 
 struct Eigen__TensorEvaluator_182 {
@@ -730,7 +730,7 @@ struct Eigen__TensorEvaluator_181 {
 };
 
 struct Eigen__internal__scalar_right_186 {
-    long* f0;
+    global long* f0;
 };
 
 struct Eigen__TensorEvaluator_185 {
@@ -784,15 +784,15 @@ struct Eigen__TensorEvaluator_192 {
 };
 
 struct Eigen__TensorEvaluator_195 {
-    long* f0;
+    global long* f0;
     struct Eigen__DSizes_19 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_197 {
-    long* f0;
+    global long* f0;
     struct Eigen__DSizes_19 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_198 {
@@ -836,15 +836,15 @@ struct Eigen__TensorEvaluator_201 {
 };
 
 struct Eigen__TensorEvaluator_204 {
-    long* f0;
+    global long* f0;
     struct Eigen__DSizes_30 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_206 {
-    long* f0;
+    global long* f0;
     struct Eigen__DSizes_30 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_207 {
@@ -888,15 +888,15 @@ struct Eigen__TensorEvaluator_210 {
 };
 
 struct Eigen__TensorEvaluator_213 {
-    long* f0;
+    global long* f0;
     struct Eigen__DSizes_41 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_215 {
-    long* f0;
+    global long* f0;
     struct Eigen__DSizes_41 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_216 {
@@ -940,15 +940,15 @@ struct Eigen__TensorEvaluator_219 {
 };
 
 struct Eigen__TensorEvaluator_222 {
-    long* f0;
+    global long* f0;
     struct Eigen__DSizes_52 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_224 {
-    long* f0;
+    global long* f0;
     struct Eigen__DSizes_52 f1;
-    struct Eigen__GpuDevice* f2;
+    global struct Eigen__GpuDevice* f2;
 };
 
 struct Eigen__TensorEvaluator_225 {
@@ -1001,16 +1001,20 @@ constant struct union_Eigen__half_impl__FP32 _ZZN5Eigen9half_impl18float_to_half
 constant struct union_Eigen__half_impl__FP32 _ZZN5Eigen9half_impl18float_to_half_rtneEfE12denorm_magic = {1056964608};
 
 
-float4 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS_9TensorMapINS_6TensorIKfLi2ELi1EiEELi16EEEEESG_EENS_9GpuDeviceEE6packetILi16EEE6float4i(struct Eigen__TensorEvaluator_89* this, int index);
-float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS_9TensorMapINS_6TensorIKfLi3ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE6float4i(struct Eigen__TensorEvaluator_94* this, int index);
-float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKfLi4ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE6float4i(struct Eigen__TensorEvaluator_103* this, int index);
-float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKfLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE6float4i(struct Eigen__TensorEvaluator_112* this, int index);
-struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS_9TensorMapINS_6TensorIKdLi3ELi1EiEELi16EEEEESG_EENS_9GpuDeviceEE6packetILi16EEE7double2i(struct Eigen__TensorEvaluator_155* this, int index);
-struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKdLi4ELi1EiEELi16EEEEESG_EENS_9GpuDeviceEE6packetILi16EEE7double2i(struct Eigen__TensorEvaluator_164* this, int index);
+float4 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS_9TensorMapINS_6TensorIKfLi2ELi1EiEELi16EEEEESG_EENS_9GpuDeviceEE6packetILi16EEE6float4i(struct Eigen__TensorEvaluator_89* this, global float* this_ptr0, global float* this_ptr1, int index);
+float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS_9TensorMapINS_6TensorIKfLi3ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE6float4i(struct Eigen__TensorEvaluator_94* this, global float* this_ptr0, int index);
+float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKfLi4ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE6float4i(struct Eigen__TensorEvaluator_103* this, global float* this_ptr0, int index);
+float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKfLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE6float4i(struct Eigen__TensorEvaluator_112* this, global float* this_ptr0, int index);
+struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS_9TensorMapINS_6TensorIKdLi3ELi1EiEELi16EEEEESG_EENS_9GpuDeviceEE6packetILi16EEE7double2i(struct Eigen__TensorEvaluator_155* this, global float* this_ptr0, global float* this_ptr1, int index);
+struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKdLi4ELi1EiEELi16EEEEESG_EENS_9GpuDeviceEE6packetILi16EEE7double2i(struct Eigen__TensorEvaluator_164* this, global float* this_ptr0, global float* this_ptr1, int index);
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEKNS4_INS5_ISB_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_61* memcopied_eval, long size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEKNS4_INS5_ISB_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_61* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, long size) {
     long i1_03_i;
     long i_04_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -1021,12 +1025,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v7 = get_num_groups(0);
     int v8 = v7 * v2;
     long v9 = v8;
-    float*global * v10 = (&memcopied_eval[0].f0.f0);
-    float* v11 = v10[0];
-    float*global * v12 = (&memcopied_eval[0].f1.f1.f0);
-    float* v13 = v12[0];
-    float*global * v14 = (&memcopied_eval[0].f1.f2.f0);
-    float* v15 = v14[0];
+    global float*global * v10 = (&memcopied_eval[0].f0.f0);
+    global float* v11 = v10[0];
+    global float*global * v12 = (&memcopied_eval[0].f1.f1.f0);
+    global float* v13 = v12[0];
+    global float*global * v14 = (&memcopied_eval[0].f1.f2.f0);
+    global float* v15 = v14[0];
     long v16 = size / 4;
     long v17 = v16 << 2;
     long v18 = v9 << 2;
@@ -1056,33 +1060,33 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     v_lr_ph6_i:;
     long sext_i_i_i = i_04_i << 32;
     long v29 = sext_i_i_i >> 32;
-    float* v30 = (&v13[v29]);
+    global float* v30 = (&v13[v29]);
     float v31 = v30[0];
-    float* v32 = (&v30[1]);
+    global float* v32 = (&v30[1]);
     float v33 = v32[0];
-    float* v34 = (&v30[2]);
+    global float* v34 = (&v30[2]);
     float v35 = v34[0];
-    float* v36 = (&v30[3]);
+    global float* v36 = (&v30[3]);
     float v37 = v36[0];
-    float* v38 = (&v15[i_04_i]);
+    global float* v38 = (&v15[i_04_i]);
     float v39 = v38[0];
-    float* v40 = (&v38[1]);
+    global float* v40 = (&v38[1]);
     float v41 = v40[0];
-    float* v42 = (&v38[2]);
+    global float* v42 = (&v38[2]);
     float v43 = v42[0];
-    float* v44 = (&v38[3]);
+    global float* v44 = (&v38[3]);
     float v45 = v44[0];
     float v46 = v31 + v39;
     float v47 = v33 + v41;
     float v48 = v35 + v43;
     float v49 = v37 + v45;
-    float* v50 = (&v11[v29]);
+    global float* v50 = (&v11[v29]);
     v50[0] = v46;
-    float* v52 = (&v50[1]);
+    global float* v52 = (&v50[1]);
     v52[0] = v47;
-    float* v54 = (&v50[2]);
+    global float* v54 = (&v50[2]);
     v54[0] = v48;
-    float* v56 = (&v50[3]);
+    global float* v56 = (&v50[3]);
     v56[0] = v49;
     long v58 = i_04_i + v18;
     bool v59 = v58 < v17;
@@ -1095,12 +1099,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     v_lr_ph_i:;
     long sext_i_i2_i = i1_03_i << 32;
     long v61 = sext_i_i2_i >> 32;
-    float* v62 = (&v13[v61]);
+    global float* v62 = (&v13[v61]);
     float v_val_i_i_i_i = v62[0];
-    float* v63 = (&v15[i1_03_i]);
+    global float* v63 = (&v15[i1_03_i]);
     float v_val_i1_i_i_i = v63[0];
     float v64 = v_val_i_i_i_i + v_val_i1_i_i_i;
-    float* v65 = (&v11[v61]);
+    global float* v65 = (&v11[v61]);
     v65[0] = v64;
     long v67 = i1_03_i + v9;
     bool v68 = v67 < size;
@@ -1115,9 +1119,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEKNS4_INS5_ISB_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElLb1EE3runERSN_lll_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIffNS0_13scalar_sum_opIffEEEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_68* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIffNS0_13scalar_sum_opIffEEEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_68* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f0.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -1126,13 +1134,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
     global struct Eigen__TensorEvaluator_69* v10 = (&memcopied_eval[0].f1);
     global long* v11 = ((global long*)v10);
     long v12 = v11[0];
-    float*global * v13 = (&memcopied_eval[0].f1.f1.f0);
-    float* v14 = v13[0];
+    global float*global * v13 = (&memcopied_eval[0].f1.f1.f0);
+    global float* v14 = v13[0];
     int v15 = size / 4;
     int v16 = v15 << 2;
     int v17 = v7 << 2;
@@ -1163,26 +1171,26 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v30;
     v_lr_ph5_i:;
     long v31 = i_03_i;
-    float* v32 = (&v14[v31]);
+    global float* v32 = (&v14[v31]);
     float v33 = v32[0];
-    float* v34 = (&v32[1]);
+    global float* v34 = (&v32[1]);
     float v35 = v34[0];
-    float* v36 = (&v32[2]);
+    global float* v36 = (&v32[2]);
     float v37 = v36[0];
-    float* v38 = (&v32[3]);
+    global float* v38 = (&v32[3]);
     float v39 = v38[0];
     float v40 = v21[0];
     float v41 = v33 + v40;
     float v42 = v35 + v40;
     float v43 = v37 + v40;
     float v44 = v39 + v40;
-    float* v45 = (&v9[v31]);
+    global float* v45 = (&v9[v31]);
     v45[0] = v41;
-    float* v47 = (&v45[1]);
+    global float* v47 = (&v45[1]);
     v47[0] = v42;
-    float* v49 = (&v45[2]);
+    global float* v49 = (&v45[2]);
     v49[0] = v43;
-    float* v51 = (&v45[3]);
+    global float* v51 = (&v45[3]);
     v51[0] = v44;
     int v53 = i_03_i + v17;
     bool v54 = v53 < v16;
@@ -1194,11 +1202,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v30:;
     long v56 = i1_02_i;
-    float* v57 = (&v14[v56]);
+    global float* v57 = (&v14[v56]);
     float v_val_i_i_i_i = v57[0];
     float v58 = v28[0];
     float v59 = v_val_i_i_i_i + v58;
-    float* v60 = (&v9[v56]);
+    global float* v60 = (&v9[v56]);
     v60[0] = v59;
     int v62 = i1_02_i + v7;
     bool v63 = v62 < size;
@@ -1213,9 +1221,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIffNS0_13scalar_sum_opIffEEEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb1EE3runERSM_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIffNS0_13scalar_sum_opIffEEEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_71* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIffNS0_13scalar_sum_opIffEEEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_71* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f0.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -1224,13 +1236,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
     global struct Eigen__TensorEvaluator_72* v10 = (&memcopied_eval[0].f1);
     global long* v11 = ((global long*)v10);
     long v12 = v11[0];
-    float*global * v13 = (&memcopied_eval[0].f1.f1.f0);
-    float* v14 = v13[0];
+    global float*global * v13 = (&memcopied_eval[0].f1.f1.f0);
+    global float* v14 = v13[0];
     int v15 = size / 4;
     int v16 = v15 << 2;
     int v17 = v7 << 2;
@@ -1261,26 +1273,26 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v30;
     v_lr_ph5_i:;
     long v31 = i_03_i;
-    float* v32 = (&v14[v31]);
+    global float* v32 = (&v14[v31]);
     float v33 = v32[0];
-    float* v34 = (&v32[1]);
+    global float* v34 = (&v32[1]);
     float v35 = v34[0];
-    float* v36 = (&v32[2]);
+    global float* v36 = (&v32[2]);
     float v37 = v36[0];
-    float* v38 = (&v32[3]);
+    global float* v38 = (&v32[3]);
     float v39 = v38[0];
     float v40 = v21[0];
     float v41 = v33 + v40;
     float v42 = v35 + v40;
     float v43 = v37 + v40;
     float v44 = v39 + v40;
-    float* v45 = (&v9[v31]);
+    global float* v45 = (&v9[v31]);
     v45[0] = v41;
-    float* v47 = (&v45[1]);
+    global float* v47 = (&v45[1]);
     v47[0] = v42;
-    float* v49 = (&v45[2]);
+    global float* v49 = (&v45[2]);
     v49[0] = v43;
-    float* v51 = (&v45[3]);
+    global float* v51 = (&v45[3]);
     v51[0] = v44;
     int v53 = i_03_i + v17;
     bool v54 = v53 < v16;
@@ -1292,11 +1304,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v30:;
     long v56 = i1_02_i;
-    float* v57 = (&v14[v56]);
+    global float* v57 = (&v14[v56]);
     float v_val_i_i_i_i = v57[0];
     float v58 = v28[0];
     float v59 = v_val_i_i_i_i + v58;
-    float* v60 = (&v9[v56]);
+    global float* v60 = (&v9[v56]);
     v60[0] = v59;
     int v62 = i1_02_i + v7;
     bool v63 = v62 < size;
@@ -1311,12 +1323,16 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIffNS0_13scalar_sum_opIffEEEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb1EE3runERSM_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_74* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_74* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i_i_i_i_i;
-    float* v_sroa_6_0_in_i_i_i_i_i;
-    float* v_sroa_9_0_in_i_i_i_i_i;
+    global float* v_sroa_3_0_in_i_i_i_i_i;
+    global float* v_sroa_6_0_in_i_i_i_i_i;
+    global float* v_sroa_9_0_in_i_i_i_i_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -1325,12 +1341,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
-    float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
-    float* v11 = v10[0];
-    float*global * v12 = (&memcopied_eval[0].f1.f2.f3.f0);
-    float* v13 = v12[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
+    global float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
+    global float* v11 = v10[0];
+    global float*global * v12 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global float* v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     int v15 = v14[0];
     int v16 = size / 4;
@@ -1361,28 +1377,28 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v_lr_ph_i;
     v_lr_ph5_i:;
     long v29 = i_03_i;
-    float* v30 = (&v11[v29]);
+    global float* v30 = (&v11[v29]);
     float v31 = v30[0];
-    float* v32 = (&v30[1]);
+    global float* v32 = (&v30[1]);
     float v33 = v32[0];
-    float* v34 = (&v30[2]);
+    global float* v34 = (&v30[2]);
     float v35 = v34[0];
-    float* v36 = (&v30[3]);
+    global float* v36 = (&v30[3]);
     float v37 = v36[0];
     int v38 = i_03_i % v15;
     int v39 = v38 + 4;
     bool v40 = v39 > v15;
     long v41 = v38;
-    float* v42 = (&v13[v41]);
+    global float* v42 = (&v13[v41]);
     if(v40) {
         goto v44;
     } else {
         goto v45;
     }
     v45:;
-    float* v46 = (&v42[1]);
-    float* v47 = (&v42[2]);
-    float* v48 = (&v42[3]);
+    global float* v46 = (&v42[1]);
+    global float* v47 = (&v42[2]);
+    global float* v48 = (&v42[3]);
         v_sroa_3_0_in_i_i_i_i_i = v46;
 v_sroa_6_0_in_i_i_i_i_i = v47;
 v_sroa_9_0_in_i_i_i_i_i = v48;
@@ -1391,15 +1407,15 @@ v_sroa_9_0_in_i_i_i_i_i = v48;
     int v50 = i_03_i | 1;
     int v51 = v50 % v15;
     long v52 = v51;
-    float* v53 = (&v13[v52]);
+    global float* v53 = (&v13[v52]);
     int v54 = i_03_i | 2;
     int v55 = v54 % v15;
     long v56 = v55;
-    float* v57 = (&v13[v56]);
+    global float* v57 = (&v13[v56]);
     int v58 = i_03_i | 3;
     int v59 = v58 % v15;
     long v60 = v59;
-    float* v61 = (&v13[v60]);
+    global float* v61 = (&v13[v60]);
         v_sroa_3_0_in_i_i_i_i_i = v53;
 v_sroa_6_0_in_i_i_i_i_i = v57;
 v_sroa_9_0_in_i_i_i_i_i = v61;
@@ -1413,13 +1429,13 @@ v_sroa_9_0_in_i_i_i_i_i = v61;
     float v64 = v33 + v_sroa_3_0_i_i_i_i_i;
     float v65 = v35 + v_sroa_6_0_i_i_i_i_i;
     float v66 = v37 + v_sroa_9_0_i_i_i_i_i;
-    float* v67 = (&v9[v29]);
+    global float* v67 = (&v9[v29]);
     v67[0] = v63;
-    float* v69 = (&v67[1]);
+    global float* v69 = (&v67[1]);
     v69[0] = v64;
-    float* v71 = (&v67[2]);
+    global float* v71 = (&v67[2]);
     v71[0] = v65;
-    float* v73 = (&v67[3]);
+    global float* v73 = (&v67[3]);
     v73[0] = v66;
     int v75 = i_03_i + v18;
     bool v76 = v75 < v17;
@@ -1431,14 +1447,14 @@ v_sroa_9_0_in_i_i_i_i_i = v61;
     }
     v_lr_ph_i:;
     long v78 = i1_02_i;
-    float* v79 = (&v11[v78]);
+    global float* v79 = (&v11[v78]);
     float v_val_i_i_i_i = v79[0];
     int v80 = i1_02_i % v15;
     long v81 = v80;
-    float* v82 = (&v13[v81]);
+    global float* v82 = (&v13[v81]);
     float v_val_i_i_i_i_i_i = v82[0];
     float v83 = v_val_i_i_i_i + v_val_i_i_i_i_i_i;
-    float* v84 = (&v9[v78]);
+    global float* v84 = (&v9[v78]);
     v84[0] = v83;
     int v86 = i1_02_i + v7;
     bool v87 = v86 < size;
@@ -1453,12 +1469,16 @@ v_sroa_9_0_in_i_i_i_i_i = v61;
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_77* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_77* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i_i_i_i_i;
-    float* v_sroa_6_0_in_i_i_i_i_i;
-    float* v_sroa_9_0_in_i_i_i_i_i;
+    global float* v_sroa_3_0_in_i_i_i_i_i;
+    global float* v_sroa_6_0_in_i_i_i_i_i;
+    global float* v_sroa_9_0_in_i_i_i_i_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -1467,14 +1487,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
-    float*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
-    float* v11 = v10[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
+    global float*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     int v13 = v12[0];
-    float*global * v14 = (&memcopied_eval[0].f1.f2.f0);
-    float* v15 = v14[0];
+    global float*global * v14 = (&memcopied_eval[0].f1.f2.f0);
+    global float* v15 = v14[0];
     int v16 = size / 4;
     int v17 = v16 << 2;
     int v18 = v7 << 2;
@@ -1506,16 +1526,16 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v30 = v29 + 4;
     bool v31 = v30 > v13;
     long v32 = v29;
-    float* v33 = (&v11[v32]);
+    global float* v33 = (&v11[v32]);
     if(v31) {
         goto v35;
     } else {
         goto v36;
     }
     v36:;
-    float* v37 = (&v33[1]);
-    float* v38 = (&v33[2]);
-    float* v39 = (&v33[3]);
+    global float* v37 = (&v33[1]);
+    global float* v38 = (&v33[2]);
+    global float* v39 = (&v33[3]);
         v_sroa_3_0_in_i_i_i_i_i = v37;
 v_sroa_6_0_in_i_i_i_i_i = v38;
 v_sroa_9_0_in_i_i_i_i_i = v39;
@@ -1524,15 +1544,15 @@ v_sroa_9_0_in_i_i_i_i_i = v39;
     int v41 = i_03_i | 1;
     int v42 = v41 % v13;
     long v43 = v42;
-    float* v44 = (&v11[v43]);
+    global float* v44 = (&v11[v43]);
     int v45 = i_03_i | 2;
     int v46 = v45 % v13;
     long v47 = v46;
-    float* v48 = (&v11[v47]);
+    global float* v48 = (&v11[v47]);
     int v49 = i_03_i | 3;
     int v50 = v49 % v13;
     long v51 = v50;
-    float* v52 = (&v11[v51]);
+    global float* v52 = (&v11[v51]);
         v_sroa_3_0_in_i_i_i_i_i = v44;
 v_sroa_6_0_in_i_i_i_i_i = v48;
 v_sroa_9_0_in_i_i_i_i_i = v52;
@@ -1543,25 +1563,25 @@ v_sroa_9_0_in_i_i_i_i_i = v52;
     float v_sroa_3_0_i_i_i_i_i = v_sroa_3_0_in_i_i_i_i_i[0];
     float v_sroa_0_0_i_i_i_i_i = v33[0];
     long v54 = i_03_i;
-    float* v55 = (&v15[v54]);
+    global float* v55 = (&v15[v54]);
     float v56 = v55[0];
-    float* v57 = (&v55[1]);
+    global float* v57 = (&v55[1]);
     float v58 = v57[0];
-    float* v59 = (&v55[2]);
+    global float* v59 = (&v55[2]);
     float v60 = v59[0];
-    float* v61 = (&v55[3]);
+    global float* v61 = (&v55[3]);
     float v62 = v61[0];
     float v63 = v_sroa_0_0_i_i_i_i_i + v56;
     float v64 = v_sroa_3_0_i_i_i_i_i + v58;
     float v65 = v_sroa_6_0_i_i_i_i_i + v60;
     float v66 = v_sroa_9_0_i_i_i_i_i + v62;
-    float* v67 = (&v9[v54]);
+    global float* v67 = (&v9[v54]);
     v67[0] = v63;
-    float* v69 = (&v67[1]);
+    global float* v69 = (&v67[1]);
     v69[0] = v64;
-    float* v71 = (&v67[2]);
+    global float* v71 = (&v67[2]);
     v71[0] = v65;
-    float* v73 = (&v67[3]);
+    global float* v73 = (&v67[3]);
     v73[0] = v66;
     int v75 = i_03_i + v18;
     bool v76 = v75 < v17;
@@ -1574,13 +1594,13 @@ v_sroa_9_0_in_i_i_i_i_i = v52;
     v_lr_ph_i:;
     int v78 = i1_02_i % v13;
     long v79 = v78;
-    float* v80 = (&v11[v79]);
+    global float* v80 = (&v11[v79]);
     float v_val_i_i_i_i_i_i = v80[0];
     long v81 = i1_02_i;
-    float* v82 = (&v15[v81]);
+    global float* v82 = (&v15[v81]);
     float v_val_i_i_i_i = v82[0];
     float v83 = v_val_i_i_i_i_i_i + v_val_i_i_i_i;
-    float* v84 = (&v9[v81]);
+    global float* v84 = (&v9[v81]);
     v84[0] = v83;
     int v86 = i1_02_i + v7;
     bool v87 = v86 < size;
@@ -1595,15 +1615,19 @@ v_sroa_9_0_in_i_i_i_i_i = v52;
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_79* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_79* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i_i1_i_i_i;
-    float* v_sroa_3_0_in_i_i_i_i_i;
-    float* v_sroa_6_0_in_i_i2_i_i_i;
-    float* v_sroa_6_0_in_i_i_i_i_i;
-    float* v_sroa_9_0_in_i_i3_i_i_i;
-    float* v_sroa_9_0_in_i_i_i_i_i;
+    global float* v_sroa_3_0_in_i_i1_i_i_i;
+    global float* v_sroa_3_0_in_i_i_i_i_i;
+    global float* v_sroa_6_0_in_i_i2_i_i_i;
+    global float* v_sroa_6_0_in_i_i_i_i_i;
+    global float* v_sroa_9_0_in_i_i3_i_i_i;
+    global float* v_sroa_9_0_in_i_i_i_i_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -1612,14 +1636,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
-    float*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
-    float* v11 = v10[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
+    global float*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     int v13 = v12[0];
-    float*global * v14 = (&memcopied_eval[0].f1.f2.f3.f0);
-    float* v15 = v14[0];
+    global float*global * v14 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global float* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     int v17 = v16[0];
     int v18 = size / 4;
@@ -1653,16 +1677,16 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v32 = v31 + 4;
     bool v33 = v32 > v13;
     long v34 = v31;
-    float* v35 = (&v11[v34]);
+    global float* v35 = (&v11[v34]);
     if(v33) {
         goto v37;
     } else {
         goto v38;
     }
     v38:;
-    float* v39 = (&v35[1]);
-    float* v40 = (&v35[2]);
-    float* v41 = (&v35[3]);
+    global float* v39 = (&v35[1]);
+    global float* v40 = (&v35[2]);
+    global float* v41 = (&v35[3]);
         v_sroa_3_0_in_i_i_i_i_i = v39;
 v_sroa_6_0_in_i_i_i_i_i = v40;
 v_sroa_9_0_in_i_i_i_i_i = v41;
@@ -1671,15 +1695,15 @@ v_sroa_9_0_in_i_i_i_i_i = v41;
     int v43 = i_03_i | 1;
     int v44 = v43 % v13;
     long v45 = v44;
-    float* v46 = (&v11[v45]);
+    global float* v46 = (&v11[v45]);
     int v47 = i_03_i | 2;
     int v48 = v47 % v13;
     long v49 = v48;
-    float* v50 = (&v11[v49]);
+    global float* v50 = (&v11[v49]);
     int v51 = i_03_i | 3;
     int v52 = v51 % v13;
     long v53 = v52;
-    float* v54 = (&v11[v53]);
+    global float* v54 = (&v11[v53]);
         v_sroa_3_0_in_i_i_i_i_i = v46;
 v_sroa_6_0_in_i_i_i_i_i = v50;
 v_sroa_9_0_in_i_i_i_i_i = v54;
@@ -1693,16 +1717,16 @@ v_sroa_9_0_in_i_i_i_i_i = v54;
     int v57 = v56 + 4;
     bool v58 = v57 > v17;
     long v59 = v56;
-    float* v60 = (&v15[v59]);
+    global float* v60 = (&v15[v59]);
     if(v58) {
         goto v62;
     } else {
         goto v63;
     }
     v63:;
-    float* v64 = (&v60[1]);
-    float* v65 = (&v60[2]);
-    float* v66 = (&v60[3]);
+    global float* v64 = (&v60[1]);
+    global float* v65 = (&v60[2]);
+    global float* v66 = (&v60[3]);
         v_sroa_3_0_in_i_i1_i_i_i = v64;
 v_sroa_6_0_in_i_i2_i_i_i = v65;
 v_sroa_9_0_in_i_i3_i_i_i = v66;
@@ -1711,15 +1735,15 @@ v_sroa_9_0_in_i_i3_i_i_i = v66;
     int v68 = i_03_i | 1;
     int v69 = v68 % v17;
     long v70 = v69;
-    float* v71 = (&v15[v70]);
+    global float* v71 = (&v15[v70]);
     int v72 = i_03_i | 2;
     int v73 = v72 % v17;
     long v74 = v73;
-    float* v75 = (&v15[v74]);
+    global float* v75 = (&v15[v74]);
     int v76 = i_03_i | 3;
     int v77 = v76 % v17;
     long v78 = v77;
-    float* v79 = (&v15[v78]);
+    global float* v79 = (&v15[v78]);
         v_sroa_3_0_in_i_i1_i_i_i = v71;
 v_sroa_6_0_in_i_i2_i_i_i = v75;
 v_sroa_9_0_in_i_i3_i_i_i = v79;
@@ -1734,13 +1758,13 @@ v_sroa_9_0_in_i_i3_i_i_i = v79;
     float v83 = v_sroa_6_0_i_i_i_i_i + v_sroa_6_0_i_i5_i_i_i;
     float v84 = v_sroa_9_0_i_i_i_i_i + v_sroa_9_0_i_i4_i_i_i;
     long v85 = i_03_i;
-    float* v86 = (&v9[v85]);
+    global float* v86 = (&v9[v85]);
     v86[0] = v81;
-    float* v88 = (&v86[1]);
+    global float* v88 = (&v86[1]);
     v88[0] = v82;
-    float* v90 = (&v86[2]);
+    global float* v90 = (&v86[2]);
     v90[0] = v83;
-    float* v92 = (&v86[3]);
+    global float* v92 = (&v86[3]);
     v92[0] = v84;
     int v94 = i_03_i + v20;
     bool v95 = v94 < v19;
@@ -1753,15 +1777,15 @@ v_sroa_9_0_in_i_i3_i_i_i = v79;
     v_lr_ph_i:;
     int v97 = i1_02_i % v13;
     long v98 = v97;
-    float* v99 = (&v11[v98]);
+    global float* v99 = (&v11[v98]);
     float v_val_i_i_i_i_i_i = v99[0];
     int v100 = i1_02_i % v17;
     long v101 = v100;
-    float* v102 = (&v15[v101]);
+    global float* v102 = (&v15[v101]);
     float v_val_i_i_i1_i_i_i = v102[0];
     float v103 = v_val_i_i_i_i_i_i + v_val_i_i_i1_i_i_i;
     long v104 = i1_02_i;
-    float* v105 = (&v9[v104]);
+    global float* v105 = (&v9[v104]);
     v105[0] = v103;
     int v107 = i1_02_i + v7;
     bool v108 = v107 < size;
@@ -1776,12 +1800,16 @@ v_sroa_9_0_in_i_i3_i_i_i = v79;
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKfLi1ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_81* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_81* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i_i_i_i;
-    float* v_sroa_6_0_in_i_i_i_i;
-    float* v_sroa_9_0_in_i_i_i_i;
+    global float* v_sroa_3_0_in_i_i_i_i;
+    global float* v_sroa_6_0_in_i_i_i_i;
+    global float* v_sroa_9_0_in_i_i_i_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -1790,16 +1818,16 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
-    float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
-    float* v11 = v10[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
+    global float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
+    global float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     int v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f2.f0[0]);
     int v15 = v14[0];
-    float*global * v16 = (&memcopied_eval[0].f1.f2.f3.f0);
-    float* v17 = v16[0];
+    global float*global * v16 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global float* v17 = v16[0];
     global int* v18 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v19 = ((global long*)v18);
     long v20 = v19[0];
@@ -1834,13 +1862,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v_lr_ph_i;
     v_lr_ph5_i:;
     long v37 = i_03_i;
-    float* v38 = (&v11[v37]);
+    global float* v38 = (&v11[v37]);
     float v39 = v38[0];
-    float* v40 = (&v38[1]);
+    global float* v40 = (&v38[1]);
     float v41 = v40[0];
-    float* v42 = (&v38[2]);
+    global float* v42 = (&v38[2]);
     float v43 = v42[0];
-    float* v44 = (&v38[3]);
+    global float* v44 = (&v38[3]);
     float v45 = v44[0];
     int v46 = i_03_i / v13;
     int v47 = v46 % v21;
@@ -1852,16 +1880,16 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v53 = v51 + 4;
     bool v54 = v53 > v23;
     long v55 = v52;
-    float* v56 = (&v17[v55]);
+    global float* v56 = (&v17[v55]);
     if(v54) {
         goto v58;
     } else {
         goto v59;
     }
     v59:;
-    float* v60 = (&v56[1]);
-    float* v61 = (&v56[2]);
-    float* v62 = (&v56[3]);
+    global float* v60 = (&v56[1]);
+    global float* v61 = (&v56[2]);
+    global float* v62 = (&v56[3]);
         v_sroa_3_0_in_i_i_i_i = v60;
 v_sroa_6_0_in_i_i_i_i = v61;
 v_sroa_9_0_in_i_i_i_i = v62;
@@ -1876,7 +1904,7 @@ v_sroa_9_0_in_i_i_i_i = v62;
     int v70 = v69 % v23;
     int v71 = v70 + v67;
     long v72 = v71;
-    float* v73 = (&v17[v72]);
+    global float* v73 = (&v17[v72]);
     int v74 = i_03_i | 2;
     int v75 = v74 / v13;
     int v76 = v75 % v21;
@@ -1886,7 +1914,7 @@ v_sroa_9_0_in_i_i_i_i = v62;
     int v80 = v79 % v23;
     int v81 = v80 + v77;
     long v82 = v81;
-    float* v83 = (&v17[v82]);
+    global float* v83 = (&v17[v82]);
     int v84 = i_03_i | 3;
     int v85 = v84 / v13;
     int v86 = v85 % v21;
@@ -1896,7 +1924,7 @@ v_sroa_9_0_in_i_i_i_i = v62;
     int v90 = v89 % v23;
     int v91 = v90 + v87;
     long v92 = v91;
-    float* v93 = (&v17[v92]);
+    global float* v93 = (&v17[v92]);
         v_sroa_3_0_in_i_i_i_i = v73;
 v_sroa_6_0_in_i_i_i_i = v83;
 v_sroa_9_0_in_i_i_i_i = v93;
@@ -1910,13 +1938,13 @@ v_sroa_9_0_in_i_i_i_i = v93;
     float v96 = v41 + v_sroa_3_0_i_i_i_i;
     float v97 = v43 + v_sroa_6_0_i_i_i_i;
     float v98 = v45 + v_sroa_9_0_i_i_i_i;
-    float* v99 = (&v9[v37]);
+    global float* v99 = (&v9[v37]);
     v99[0] = v95;
-    float* v101 = (&v99[1]);
+    global float* v101 = (&v99[1]);
     v101[0] = v96;
-    float* v103 = (&v99[2]);
+    global float* v103 = (&v99[2]);
     v103[0] = v97;
-    float* v105 = (&v99[3]);
+    global float* v105 = (&v99[3]);
     v105[0] = v98;
     int v107 = i_03_i + v26;
     bool v108 = v107 < v25;
@@ -1928,7 +1956,7 @@ v_sroa_9_0_in_i_i_i_i = v93;
     }
     v_lr_ph_i:;
     long v110 = i1_02_i;
-    float* v111 = (&v11[v110]);
+    global float* v111 = (&v11[v110]);
     float v_val_i_i_i_i = v111[0];
     int v112 = i1_02_i / v13;
     int v113 = v112 % v21;
@@ -1938,10 +1966,10 @@ v_sroa_9_0_in_i_i_i_i = v93;
     int v117 = v116 % v23;
     int v118 = v117 + v114;
     long v119 = v118;
-    float* v120 = (&v17[v119]);
+    global float* v120 = (&v17[v119]);
     float v_val_i_i_i_i_i_i = v120[0];
     float v121 = v_val_i_i_i_i + v_val_i_i_i_i_i_i;
-    float* v122 = (&v9[v110]);
+    global float* v122 = (&v9[v110]);
     v122[0] = v121;
     int v124 = i1_02_i + v7;
     bool v125 = v124 < size;
@@ -1956,12 +1984,16 @@ v_sroa_9_0_in_i_i_i_i = v93;
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKfLi2ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_86* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKfLi2ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_86* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i_i_i_i;
-    float* v_sroa_6_0_in_i_i_i_i;
-    float* v_sroa_9_0_in_i_i_i_i;
+    global float* v_sroa_3_0_in_i_i_i_i;
+    global float* v_sroa_6_0_in_i_i_i_i;
+    global float* v_sroa_9_0_in_i_i_i_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -1970,22 +2002,22 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f2.f0[0]);
     int v13 = v12[0];
-    float*global * v14 = (&memcopied_eval[0].f1.f1.f3.f0);
-    float* v15 = v14[0];
+    global float*global * v14 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global float* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v17 = ((global long*)v16);
     long v18 = v17[0];
     int v19 = (int)v18;
     long v20 = v18 >> 32;
     int v21 = (int)v20;
-    float*global * v22 = (&memcopied_eval[0].f1.f2.f0);
-    float* v23 = v22[0];
+    global float*global * v22 = (&memcopied_eval[0].f1.f2.f0);
+    global float* v23 = v22[0];
     int v24 = size / 4;
     int v25 = v24 << 2;
     int v26 = v7 << 2;
@@ -2023,16 +2055,16 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v44 = v42 + 4;
     bool v45 = v44 > v21;
     long v46 = v43;
-    float* v47 = (&v15[v46]);
+    global float* v47 = (&v15[v46]);
     if(v45) {
         goto v49;
     } else {
         goto v50;
     }
     v50:;
-    float* v51 = (&v47[1]);
-    float* v52 = (&v47[2]);
-    float* v53 = (&v47[3]);
+    global float* v51 = (&v47[1]);
+    global float* v52 = (&v47[2]);
+    global float* v53 = (&v47[3]);
         v_sroa_3_0_in_i_i_i_i = v51;
 v_sroa_6_0_in_i_i_i_i = v52;
 v_sroa_9_0_in_i_i_i_i = v53;
@@ -2047,7 +2079,7 @@ v_sroa_9_0_in_i_i_i_i = v53;
     int v61 = v60 % v21;
     int v62 = v61 + v58;
     long v63 = v62;
-    float* v64 = (&v15[v63]);
+    global float* v64 = (&v15[v63]);
     int v65 = i_03_i | 2;
     int v66 = v65 / v11;
     int v67 = v66 % v19;
@@ -2057,7 +2089,7 @@ v_sroa_9_0_in_i_i_i_i = v53;
     int v71 = v70 % v21;
     int v72 = v71 + v68;
     long v73 = v72;
-    float* v74 = (&v15[v73]);
+    global float* v74 = (&v15[v73]);
     int v75 = i_03_i | 3;
     int v76 = v75 / v11;
     int v77 = v76 % v19;
@@ -2067,7 +2099,7 @@ v_sroa_9_0_in_i_i_i_i = v53;
     int v81 = v80 % v21;
     int v82 = v81 + v78;
     long v83 = v82;
-    float* v84 = (&v15[v83]);
+    global float* v84 = (&v15[v83]);
         v_sroa_3_0_in_i_i_i_i = v64;
 v_sroa_6_0_in_i_i_i_i = v74;
 v_sroa_9_0_in_i_i_i_i = v84;
@@ -2078,25 +2110,25 @@ v_sroa_9_0_in_i_i_i_i = v84;
     float v_sroa_3_0_i_i_i_i = v_sroa_3_0_in_i_i_i_i[0];
     float v_sroa_0_0_i_i_i_i = v47[0];
     long v86 = i_03_i;
-    float* v87 = (&v23[v86]);
+    global float* v87 = (&v23[v86]);
     float v88 = v87[0];
-    float* v89 = (&v87[1]);
+    global float* v89 = (&v87[1]);
     float v90 = v89[0];
-    float* v91 = (&v87[2]);
+    global float* v91 = (&v87[2]);
     float v92 = v91[0];
-    float* v93 = (&v87[3]);
+    global float* v93 = (&v87[3]);
     float v94 = v93[0];
     float v95 = v_sroa_0_0_i_i_i_i + v88;
     float v96 = v_sroa_3_0_i_i_i_i + v90;
     float v97 = v_sroa_6_0_i_i_i_i + v92;
     float v98 = v_sroa_9_0_i_i_i_i + v94;
-    float* v99 = (&v9[v86]);
+    global float* v99 = (&v9[v86]);
     v99[0] = v95;
-    float* v101 = (&v99[1]);
+    global float* v101 = (&v99[1]);
     v101[0] = v96;
-    float* v103 = (&v99[2]);
+    global float* v103 = (&v99[2]);
     v103[0] = v97;
-    float* v105 = (&v99[3]);
+    global float* v105 = (&v99[3]);
     v105[0] = v98;
     int v107 = i_03_i + v26;
     bool v108 = v107 < v25;
@@ -2115,13 +2147,13 @@ v_sroa_9_0_in_i_i_i_i = v84;
     int v115 = v114 % v21;
     int v116 = v115 + v112;
     long v117 = v116;
-    float* v118 = (&v15[v117]);
+    global float* v118 = (&v15[v117]);
     float v_val_i_i_i_i_i_i = v118[0];
     long v119 = i1_02_i;
-    float* v120 = (&v23[v119]);
+    global float* v120 = (&v23[v119]);
     float v_val_i_i_i_i = v120[0];
     float v121 = v_val_i_i_i_i_i_i + v_val_i_i_i_i;
-    float* v122 = (&v9[v119]);
+    global float* v122 = (&v9[v119]);
     v122[0] = v121;
     int v124 = i1_02_i + v7;
     bool v125 = v124 < size;
@@ -2136,9 +2168,13 @@ v_sroa_9_0_in_i_i_i_i = v84;
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKfLi2ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKfLi2ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_88* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKfLi2ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_88* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     struct Eigen__TensorEvaluator_88 eval[1];
     int v1 = get_group_id(0);
@@ -2174,7 +2210,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph5_i:;
     struct Eigen__TensorEvaluator_89* v23 = (&eval[0].f1);
-    float* * v24 = (&eval[0].f0.f0);
+    global float* * v24 = (&eval[0].f0.f0);
     float* v_pre = v24[0];
         i_03_i = v20;
     goto v26;
@@ -2199,7 +2235,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v39 = v38[0];
     long v40 = v36 >> 32;
     int v41 = (int)v40;
-    float* * v42 = (&eval[0].f1.f1.f3.f0);
+    global float* * v42 = (&eval[0].f1.f1.f3.f0);
     float* v43 = v42[0];
     int* v44 = (&eval[0].f1.f2.f1.f0[0]);
     int v45 = v44[0];
@@ -2211,9 +2247,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v51 = v50[0];
     long v52 = v48 >> 32;
     int v53 = (int)v52;
-    float* * v54 = (&eval[0].f1.f2.f3.f0);
+    global float* * v54 = (&eval[0].f1.f2.f3.f0);
     float* v55 = v54[0];
-    float* * v56 = (&eval[0].f0.f0);
+    global float* * v56 = (&eval[0].f0.f0);
     float* v57 = v56[0];
         i1_02_i = v29;
     goto v59;
@@ -2278,13 +2314,16 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKfLi2ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-float4 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS_9TensorMapINS_6TensorIKfLi2ELi1EiEELi16EEEEESG_EENS_9GpuDeviceEE6packetILi16EEE6float4i(struct Eigen__TensorEvaluator_89* this, int index) {
+float4 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS_9TensorMapINS_6TensorIKfLi2ELi1EiEELi16EEEEESG_EENS_9GpuDeviceEE6packetILi16EEE6float4i(struct Eigen__TensorEvaluator_89* this, global float* this_ptr0, global float* this_ptr1, int index) {
     float* v_sroa_3_0_in_i_i;
     float* v_sroa_3_0_in_i_i1;
     float* v_sroa_6_0_in_i_i;
     float* v_sroa_6_0_in_i_i2;
     float* v_sroa_9_0_in_i_i;
     float* v_sroa_9_0_in_i_i3;
+this[0].f1.f3.f0 = this_ptr0;
+this[0].f2.f3.f0 = this_ptr1;
+
     label0:;
     int* v1 = (&this[0].f1.f1.f0[0]);
     int v2 = v1[0];
@@ -2303,7 +2342,7 @@ float4 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scala
     int v15 = v14 + v9;
     int v16 = v14 + 4;
     bool v17 = v16 > v13;
-    float* * v18 = (&this[0].f1.f3.f0);
+    global float* * v18 = (&this[0].f1.f3.f0);
     float* v19 = v18[0];
     long v20 = v15;
     float* v21 = (&v19[v20]);
@@ -2377,7 +2416,7 @@ v_sroa_9_0_in_i_i = v58;
     int v74 = v73 + v68;
     int v75 = v73 + 4;
     bool v76 = v75 > v72;
-    float* * v77 = (&this[0].f2.f3.f0);
+    global float* * v77 = (&this[0].f2.f3.f0);
     float* v78 = v77[0];
     long v79 = v74;
     float* v80 = (&v78[v79]);
@@ -2449,9 +2488,13 @@ v_sroa_9_0_in_i_i3 = v117;
     return oldret6_i_i;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_90* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_90* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     struct Eigen__TensorEvaluator_90 eval[1];
     int v1 = get_group_id(0);
@@ -2486,9 +2529,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    float* * v23 = (&eval[0].f1.f1.f0);
+    global float* * v23 = (&eval[0].f1.f1.f0);
     struct Eigen__TensorEvaluator_94* v24 = (&eval[0].f1.f2);
-    float* * v25 = (&eval[0].f0.f0);
+    global float* * v25 = (&eval[0].f0.f0);
     float* v_pre = v23[0];
     float* v_pre1 = v25[0];
         i_03_i = v20;
@@ -2504,7 +2547,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit;
     }
     v_lr_ph_i:;
-    float* * v33 = (&eval[0].f1.f1.f0);
+    global float* * v33 = (&eval[0].f1.f1.f0);
     float* v34 = v33[0];
     int* v35 = (&eval[0].f1.f2.f1.f0[0]);
     int v36 = v35[0];
@@ -2524,9 +2567,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v50 = (int)v49;
     int* v51 = (&eval[0].f1.f2.f3.f1.f0.f0[2]);
     int v52 = v51[0];
-    float* * v53 = (&eval[0].f1.f2.f3.f0);
+    global float* * v53 = (&eval[0].f1.f2.f3.f0);
     float* v54 = v53[0];
-    float* * v55 = (&eval[0].f0.f0);
+    global float* * v55 = (&eval[0].f0.f0);
     float* v56 = v55[0];
         i1_02_i = v30;
     goto v58;
@@ -2601,10 +2644,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS_9TensorMapINS_6TensorIKfLi3ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE6float4i(struct Eigen__TensorEvaluator_94* this, int index) {
+float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS_9TensorMapINS_6TensorIKfLi3ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE6float4i(struct Eigen__TensorEvaluator_94* this, global float* this_ptr0, int index) {
     float* v_sroa_3_0_in;
     float* v_sroa_6_0_in;
     float* v_sroa_9_0_in;
+this[0].f3.f0 = this_ptr0;
+
     label0:;
     int* v1 = (&this[0].f1.f0[0]);
     int v2 = v1[0];
@@ -2635,7 +2680,7 @@ float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEE
     int v27 = v26 + v21;
     int v28 = v26 + 4;
     bool v29 = v28 > v25;
-    float* * v30 = (&this[0].f3.f0);
+    global float* * v30 = (&this[0].f3.f0);
     float* v31 = v30[0];
     long v32 = v27;
     float* v33 = (&v31[v32]);
@@ -2721,9 +2766,13 @@ v_sroa_9_0_in = v89;
     return v94;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKfLi3ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_95* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKfLi3ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_95* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     struct Eigen__TensorEvaluator_95 eval[1];
     int v1 = get_group_id(0);
@@ -2758,8 +2807,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    float* * v23 = (&eval[0].f1.f2.f0);
-    float* * v24 = (&eval[0].f0.f0);
+    global float* * v23 = (&eval[0].f1.f2.f0);
+    global float* * v24 = (&eval[0].f0.f0);
     float* v_pre = v23[0];
     float* v_pre1 = v24[0];
         i_03_i = v20;
@@ -2793,11 +2842,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v47 = (int)v46;
     int* v48 = (&eval[0].f1.f1.f3.f1.f0.f0[2]);
     int v49 = v48[0];
-    float* * v50 = (&eval[0].f1.f1.f3.f0);
+    global float* * v50 = (&eval[0].f1.f1.f3.f0);
     float* v51 = v50[0];
-    float* * v52 = (&eval[0].f1.f2.f0);
+    global float* * v52 = (&eval[0].f1.f2.f0);
     float* v53 = v52[0];
-    float* * v54 = (&eval[0].f0.f0);
+    global float* * v54 = (&eval[0].f0.f0);
     float* v55 = v54[0];
         i1_02_i = v29;
     goto v57;
@@ -2872,9 +2921,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKfLi3ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKfLi3ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_97* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKfLi3ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_97* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     struct Eigen__TensorEvaluator_97 eval[1];
     int v1 = get_group_id(0);
@@ -2910,7 +2963,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph5_i:;
     struct Eigen__TensorEvaluator_94* v23 = (&eval[0].f1.f2);
-    float* * v24 = (&eval[0].f0.f0);
+    global float* * v24 = (&eval[0].f0.f0);
         i_03_i = v20;
     goto v26;
     label27:;
@@ -2942,7 +2995,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v47 = (int)v46;
     int* v48 = (&eval[0].f1.f1.f3.f1.f0.f0[2]);
     int v49 = v48[0];
-    float* * v50 = (&eval[0].f1.f1.f3.f0);
+    global float* * v50 = (&eval[0].f1.f1.f3.f0);
     float* v51 = v50[0];
     int* v52 = (&eval[0].f1.f2.f1.f0[0]);
     int v53 = v52[0];
@@ -2962,9 +3015,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v67 = (int)v66;
     int* v68 = (&eval[0].f1.f2.f3.f1.f0.f0[2]);
     int v69 = v68[0];
-    float* * v70 = (&eval[0].f1.f2.f3.f0);
+    global float* * v70 = (&eval[0].f1.f2.f3.f0);
     float* v71 = v70[0];
-    float* * v72 = (&eval[0].f0.f0);
+    global float* * v72 = (&eval[0].f0.f0);
     float* v73 = v72[0];
         i1_02_i = v29;
     goto v75;
@@ -3051,9 +3104,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKfLi3ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_99* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_99* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     struct Eigen__TensorEvaluator_99 eval[1];
     int v1 = get_group_id(0);
@@ -3088,9 +3145,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    float* * v23 = (&eval[0].f1.f1.f0);
+    global float* * v23 = (&eval[0].f1.f1.f0);
     struct Eigen__TensorEvaluator_103* v24 = (&eval[0].f1.f2);
-    float* * v25 = (&eval[0].f0.f0);
+    global float* * v25 = (&eval[0].f0.f0);
     float* v_pre = v23[0];
     float* v_pre1 = v25[0];
         i_03_i = v20;
@@ -3106,7 +3163,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit;
     }
     v_lr_ph_i:;
-    float* * v33 = (&eval[0].f1.f1.f0);
+    global float* * v33 = (&eval[0].f1.f1.f0);
     float* v34 = v33[0];
     int* v35 = (&eval[0].f1.f2.f1.f0[0]);
     long* v36 = ((long*)v35);
@@ -3136,9 +3193,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v60 = v59[0];
     long v61 = v57 >> 32;
     int v62 = (int)v61;
-    float* * v63 = (&eval[0].f1.f2.f3.f0);
+    global float* * v63 = (&eval[0].f1.f2.f3.f0);
     float* v64 = v63[0];
-    float* * v65 = (&eval[0].f0.f0);
+    global float* * v65 = (&eval[0].f0.f0);
     float* v66 = v65[0];
         i1_02_i = v30;
     goto v68;
@@ -3219,10 +3276,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKfLi4ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE6float4i(struct Eigen__TensorEvaluator_103* this, int index) {
+float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKfLi4ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE6float4i(struct Eigen__TensorEvaluator_103* this, global float* this_ptr0, int index) {
     float* v_sroa_3_0_in;
     float* v_sroa_6_0_in;
     float* v_sroa_9_0_in;
+this[0].f3.f0 = this_ptr0;
+
     label0:;
     int* v1 = (&this[0].f1.f0[0]);
     int v2 = v1[0];
@@ -3265,7 +3324,7 @@ float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEE
     int v39 = v38 + v33;
     int v40 = v38 + 4;
     bool v41 = v40 > v37;
-    float* * v42 = (&this[0].f3.f0);
+    global float* * v42 = (&this[0].f3.f0);
     float* v43 = v42[0];
     long v44 = v39;
     float* v45 = (&v43[v44]);
@@ -3369,9 +3428,13 @@ v_sroa_9_0_in = v119;
     return v124;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKfLi4ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_104* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKfLi4ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_104* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     struct Eigen__TensorEvaluator_104 eval[1];
     int v1 = get_group_id(0);
@@ -3406,8 +3469,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    float* * v23 = (&eval[0].f1.f2.f0);
-    float* * v24 = (&eval[0].f0.f0);
+    global float* * v23 = (&eval[0].f1.f2.f0);
+    global float* * v24 = (&eval[0].f0.f0);
     float* v_pre = v23[0];
     float* v_pre1 = v24[0];
         i_03_i = v20;
@@ -3451,11 +3514,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v57 = v56[0];
     long v58 = v54 >> 32;
     int v59 = (int)v58;
-    float* * v60 = (&eval[0].f1.f1.f3.f0);
+    global float* * v60 = (&eval[0].f1.f1.f3.f0);
     float* v61 = v60[0];
-    float* * v62 = (&eval[0].f1.f2.f0);
+    global float* * v62 = (&eval[0].f1.f2.f0);
     float* v63 = v62[0];
-    float* * v64 = (&eval[0].f0.f0);
+    global float* * v64 = (&eval[0].f0.f0);
     float* v65 = v64[0];
         i1_02_i = v29;
     goto v67;
@@ -3536,9 +3599,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKfLi4ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKfLi4ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_106* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKfLi4ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_106* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     struct Eigen__TensorEvaluator_106 eval[1];
     int v1 = get_group_id(0);
@@ -3574,7 +3641,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph5_i:;
     struct Eigen__TensorEvaluator_103* v23 = (&eval[0].f1.f2);
-    float* * v24 = (&eval[0].f0.f0);
+    global float* * v24 = (&eval[0].f0.f0);
         i_03_i = v20;
     goto v26;
     label27:;
@@ -3616,7 +3683,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v57 = v56[0];
     long v58 = v54 >> 32;
     int v59 = (int)v58;
-    float* * v60 = (&eval[0].f1.f1.f3.f0);
+    global float* * v60 = (&eval[0].f1.f1.f3.f0);
     float* v61 = v60[0];
     int* v62 = (&eval[0].f1.f2.f1.f0[0]);
     long* v63 = ((long*)v62);
@@ -3646,9 +3713,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v87 = v86[0];
     long v88 = v84 >> 32;
     int v89 = (int)v88;
-    float* * v90 = (&eval[0].f1.f2.f3.f0);
+    global float* * v90 = (&eval[0].f1.f2.f3.f0);
     float* v91 = v90[0];
-    float* * v92 = (&eval[0].f0.f0);
+    global float* * v92 = (&eval[0].f0.f0);
     float* v93 = v92[0];
         i1_02_i = v29;
     goto v95;
@@ -3747,9 +3814,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKfLi4ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_108* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_108* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     struct Eigen__TensorEvaluator_108 eval[1];
     int v1 = get_group_id(0);
@@ -3784,9 +3855,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    float* * v23 = (&eval[0].f1.f1.f0);
+    global float* * v23 = (&eval[0].f1.f1.f0);
     struct Eigen__TensorEvaluator_112* v24 = (&eval[0].f1.f2);
-    float* * v25 = (&eval[0].f0.f0);
+    global float* * v25 = (&eval[0].f0.f0);
         i_03_i = v20;
     goto v27;
     label28:;
@@ -3800,7 +3871,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit;
     }
     v_lr_ph_i:;
-    float* * v33 = (&eval[0].f1.f1.f0);
+    global float* * v33 = (&eval[0].f1.f1.f0);
     float* v34 = v33[0];
     int* v35 = (&eval[0].f1.f2.f1.f0[0]);
     int v36 = v35[0];
@@ -3836,9 +3907,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v66 = (int)v65;
     int* v67 = (&eval[0].f1.f2.f3.f1.f0.f0[4]);
     int v68 = v67[0];
-    float* * v69 = (&eval[0].f1.f2.f3.f0);
+    global float* * v69 = (&eval[0].f1.f2.f3.f0);
     float* v70 = v69[0];
-    float* * v71 = (&eval[0].f0.f0);
+    global float* * v71 = (&eval[0].f0.f0);
     float* v72 = v71[0];
         i1_02_i = v30;
     goto v74;
@@ -3927,12 +3998,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS4_INS5_IKfLi5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKfLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE6float4i(struct Eigen__TensorEvaluator_112* this, int index) {
+float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKfLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE6float4i(struct Eigen__TensorEvaluator_112* this, global float* this_ptr0, int index) {
     int i1_04;
     float v_sroa_0_0;
     float v_sroa_3_0;
     float v_sroa_6_0;
     float v_sroa_9_0;
+this[0].f3.f0 = this_ptr0;
+
     label0:;
     float values[4];
     int* v1 = (&this[0].f1.f0[0]);
@@ -3995,7 +4068,7 @@ float4 _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEE
         goto v57;
     }
     v57:;
-    float* * v58 = (&v48[0].f0);
+    global float* * v58 = (&v48[0].f0);
     float* v59 = v58[0];
     long v60 = v52;
     float* v61 = (&v59[v60]);
@@ -4013,7 +4086,7 @@ v_sroa_9_0 = v68;
     goto v70;
     v56:;
     char* v71 = ((char*)values);
-    float* * v73 = (&v48[0].f0);
+    global float* * v73 = (&v48[0].f0);
     float* v74 = v73[0];
     long v75 = v52;
     float* v76 = (&v74[v75]);
@@ -4092,9 +4165,13 @@ v_sroa_9_0 = v90;
     return v131;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKfLi5ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_113* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKfLi5ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_113* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     struct Eigen__TensorEvaluator_113 eval[1];
     int v1 = get_group_id(0);
@@ -4129,8 +4206,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    float* * v23 = (&eval[0].f1.f2.f0);
-    float* * v24 = (&eval[0].f0.f0);
+    global float* * v23 = (&eval[0].f1.f2.f0);
+    global float* * v24 = (&eval[0].f0.f0);
     float* v_pre = v23[0];
     float* v_pre1 = v24[0];
         i_03_i = v20;
@@ -4180,11 +4257,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v63 = (int)v62;
     int* v64 = (&eval[0].f1.f1.f3.f1.f0.f0[4]);
     int v65 = v64[0];
-    float* * v66 = (&eval[0].f1.f1.f3.f0);
+    global float* * v66 = (&eval[0].f1.f1.f3.f0);
     float* v67 = v66[0];
-    float* * v68 = (&eval[0].f1.f2.f0);
+    global float* * v68 = (&eval[0].f1.f2.f0);
     float* v69 = v68[0];
-    float* * v70 = (&eval[0].f0.f0);
+    global float* * v70 = (&eval[0].f0.f0);
     float* v71 = v70[0];
         i1_02_i = v29;
     goto v73;
@@ -4271,9 +4348,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKfLi5ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKfLi5ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_115* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKfLi5ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_115* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     struct Eigen__TensorEvaluator_115 eval[1];
     int v1 = get_group_id(0);
@@ -4309,7 +4390,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph5_i:;
     struct Eigen__TensorEvaluator_112* v23 = (&eval[0].f1.f2);
-    float* * v24 = (&eval[0].f0.f0);
+    global float* * v24 = (&eval[0].f0.f0);
         i_03_i = v20;
     goto v26;
     label27:;
@@ -4323,7 +4404,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKfLi5ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit;
     }
     v_lr_ph_i:;
-    float* * v32 = (&eval[0].f0.f0);
+    global float* * v32 = (&eval[0].f0.f0);
     float* v_pre_i = v32[0];
     int* v33 = (&eval[0].f1.f1.f1.f0[0]);
     int v34 = v33[0];
@@ -4359,7 +4440,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v64 = (int)v63;
     int* v65 = (&eval[0].f1.f1.f3.f1.f0.f0[4]);
     int v66 = v65[0];
-    float* * v67 = (&eval[0].f1.f1.f3.f0);
+    global float* * v67 = (&eval[0].f1.f1.f3.f0);
     float* v68 = v67[0];
     int* v69 = (&eval[0].f1.f2.f1.f0[0]);
     int v70 = v69[0];
@@ -4395,7 +4476,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v100 = (int)v99;
     int* v101 = (&eval[0].f1.f2.f3.f1.f0.f0[4]);
     int v102 = v101[0];
-    float* * v103 = (&eval[0].f1.f2.f3.f0);
+    global float* * v103 = (&eval[0].f1.f2.f3.f0);
     float* v104 = v103[0];
         i1_02_i = v29;
     goto v106;
@@ -4506,9 +4587,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKfLi5ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEKNS4_INS5_ISB_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_117* memcopied_eval, long size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEKNS4_INS5_ISB_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_117* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, long size) {
     long i1_03_i;
     long i_04_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -4519,12 +4604,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v7 = get_num_groups(0);
     int v8 = v7 * v2;
     long v9 = v8;
-    float*global * v10 = (&memcopied_eval[0].f0.f0);
-    float* v11 = v10[0];
-    float*global * v12 = (&memcopied_eval[0].f1.f1.f0);
-    float* v13 = v12[0];
-    float*global * v14 = (&memcopied_eval[0].f1.f2.f0);
-    float* v15 = v14[0];
+    global float*global * v10 = (&memcopied_eval[0].f0.f0);
+    global float* v11 = v10[0];
+    global float*global * v12 = (&memcopied_eval[0].f1.f1.f0);
+    global float* v13 = v12[0];
+    global float*global * v14 = (&memcopied_eval[0].f1.f2.f0);
+    global float* v15 = v14[0];
     long v16 = size / 2;
     long v17 = v16 << 1;
     long v18 = v9 << 1;
@@ -4554,19 +4639,19 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     v_lr_ph6_i:;
     long sext_i_i_i = i_04_i << 32;
     long v29 = sext_i_i_i >> 32;
-    float* v30 = (&v13[v29]);
+    global float* v30 = (&v13[v29]);
     float v31 = v30[0];
-    float* v32 = (&v30[1]);
+    global float* v32 = (&v30[1]);
     float v33 = v32[0];
-    float* v34 = (&v15[i_04_i]);
+    global float* v34 = (&v15[i_04_i]);
     float v35 = v34[0];
-    float* v36 = (&v34[1]);
+    global float* v36 = (&v34[1]);
     float v37 = v36[0];
     float v38 = v31 + v35;
     float v39 = v33 + v37;
-    float* v40 = (&v11[v29]);
+    global float* v40 = (&v11[v29]);
     v40[0] = v38;
-    float* v42 = (&v40[1]);
+    global float* v42 = (&v40[1]);
     v42[0] = v39;
     long v44 = i_04_i + v18;
     bool v45 = v44 < v17;
@@ -4579,12 +4664,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     v_lr_ph_i:;
     long sext_i_i2_i = i1_03_i << 32;
     long v47 = sext_i_i2_i >> 32;
-    float* v48 = (&v13[v47]);
+    global float* v48 = (&v13[v47]);
     float v_val_i_i_i_i = v48[0];
-    float* v49 = (&v15[i1_03_i]);
+    global float* v49 = (&v15[i1_03_i]);
     float v_val_i1_i_i_i = v49[0];
     float v50 = v_val_i_i_i_i + v_val_i1_i_i_i;
-    float* v51 = (&v11[v47]);
+    global float* v51 = (&v11[v47]);
     v51[0] = v50;
     long v53 = i1_03_i + v9;
     bool v54 = v53 < size;
@@ -4599,9 +4684,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEKNS4_INS5_ISB_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElLb1EE3runERSN_lll_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIddNS0_13scalar_sum_opIddEEEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_125* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIddNS0_13scalar_sum_opIddEEEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_125* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f0.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -4610,13 +4699,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
     global struct Eigen__TensorEvaluator_126* v10 = (&memcopied_eval[0].f1);
     global long* v11 = ((global long*)v10);
     long v12 = v11[0];
-    float*global * v13 = (&memcopied_eval[0].f1.f1.f0);
-    float* v14 = v13[0];
+    global float*global * v13 = (&memcopied_eval[0].f1.f1.f0);
+    global float* v14 = v13[0];
     int v15 = size / 2;
     int v16 = v15 << 1;
     int v17 = v7 << 1;
@@ -4647,16 +4736,16 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v30;
     v_lr_ph5_i:;
     long v31 = i_03_i;
-    float* v32 = (&v14[v31]);
+    global float* v32 = (&v14[v31]);
     float v33 = v32[0];
-    float* v34 = (&v32[1]);
+    global float* v34 = (&v32[1]);
     float v35 = v34[0];
     float v36 = v21[0];
     float v37 = v33 + v36;
     float v38 = v35 + v36;
-    float* v39 = (&v9[v31]);
+    global float* v39 = (&v9[v31]);
     v39[0] = v37;
-    float* v41 = (&v39[1]);
+    global float* v41 = (&v39[1]);
     v41[0] = v38;
     int v43 = i_03_i + v17;
     bool v44 = v43 < v16;
@@ -4668,11 +4757,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v30:;
     long v46 = i1_02_i;
-    float* v47 = (&v14[v46]);
+    global float* v47 = (&v14[v46]);
     float v_val_i_i_i_i = v47[0];
     float v48 = v28[0];
     float v49 = v_val_i_i_i_i + v48;
-    float* v50 = (&v9[v46]);
+    global float* v50 = (&v9[v46]);
     v50[0] = v49;
     int v52 = i1_02_i + v7;
     bool v53 = v52 < size;
@@ -4687,9 +4776,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIddNS0_13scalar_sum_opIddEEEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb1EE3runERSM_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIddNS0_13scalar_sum_opIddEEEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_128* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIddNS0_13scalar_sum_opIddEEEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_128* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f0.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -4698,13 +4791,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
     global struct Eigen__TensorEvaluator_129* v10 = (&memcopied_eval[0].f1);
     global long* v11 = ((global long*)v10);
     long v12 = v11[0];
-    float*global * v13 = (&memcopied_eval[0].f1.f1.f0);
-    float* v14 = v13[0];
+    global float*global * v13 = (&memcopied_eval[0].f1.f1.f0);
+    global float* v14 = v13[0];
     int v15 = size / 2;
     int v16 = v15 << 1;
     int v17 = v7 << 1;
@@ -4735,16 +4828,16 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v30;
     v_lr_ph5_i:;
     long v31 = i_03_i;
-    float* v32 = (&v14[v31]);
+    global float* v32 = (&v14[v31]);
     float v33 = v32[0];
-    float* v34 = (&v32[1]);
+    global float* v34 = (&v32[1]);
     float v35 = v34[0];
     float v36 = v21[0];
     float v37 = v33 + v36;
     float v38 = v35 + v36;
-    float* v39 = (&v9[v31]);
+    global float* v39 = (&v9[v31]);
     v39[0] = v37;
-    float* v41 = (&v39[1]);
+    global float* v41 = (&v39[1]);
     v41[0] = v38;
     int v43 = i_03_i + v17;
     bool v44 = v43 < v16;
@@ -4756,11 +4849,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v30:;
     long v46 = i1_02_i;
-    float* v47 = (&v14[v46]);
+    global float* v47 = (&v14[v46]);
     float v_val_i_i_i_i = v47[0];
     float v48 = v28[0];
     float v49 = v_val_i_i_i_i + v48;
-    float* v50 = (&v9[v46]);
+    global float* v50 = (&v9[v46]);
     v50[0] = v49;
     int v52 = i1_02_i + v7;
     bool v53 = v52 < size;
@@ -4775,10 +4868,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIddNS0_13scalar_sum_opIddEEEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb1EE3runERSM_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_131* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_131* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i_i_i_i_i;
+    global float* v_sroa_3_0_in_i_i_i_i_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -4787,12 +4884,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
-    float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
-    float* v11 = v10[0];
-    float*global * v12 = (&memcopied_eval[0].f1.f2.f3.f0);
-    float* v13 = v12[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
+    global float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
+    global float* v11 = v10[0];
+    global float*global * v12 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global float* v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     int v15 = v14[0];
     int v16 = size / 2;
@@ -4823,29 +4920,29 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v_lr_ph_i;
     v_lr_ph5_i:;
     long v29 = i_03_i;
-    float* v30 = (&v11[v29]);
+    global float* v30 = (&v11[v29]);
     float v31 = v30[0];
-    float* v32 = (&v30[1]);
+    global float* v32 = (&v30[1]);
     float v33 = v32[0];
     int v34 = i_03_i % v15;
     int v35 = v34 + 2;
     bool v36 = v35 > v15;
     long v37 = v34;
-    float* v38 = (&v13[v37]);
+    global float* v38 = (&v13[v37]);
     if(v36) {
         goto v40;
     } else {
         goto v41;
     }
     v41:;
-    float* v42 = (&v38[1]);
+    global float* v42 = (&v38[1]);
         v_sroa_3_0_in_i_i_i_i_i = v42;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS2_INS3_IKdLi1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESD_EEEEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     v40:;
     int v44 = i_03_i | 1;
     int v45 = v44 % v15;
     long v46 = v45;
-    float* v47 = (&v13[v46]);
+    global float* v47 = (&v13[v46]);
         v_sroa_3_0_in_i_i_i_i_i = v47;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS2_INS3_IKdLi1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESD_EEEEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS2_INS3_IKdLi1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESD_EEEEEENS_9GpuDeviceEE10evalPacketEi_exit_i:;
@@ -4853,9 +4950,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     float v_sroa_0_0_i_i_i_i_i = v38[0];
     float v49 = v31 + v_sroa_0_0_i_i_i_i_i;
     float v50 = v33 + v_sroa_3_0_i_i_i_i_i;
-    float* v51 = (&v9[v29]);
+    global float* v51 = (&v9[v29]);
     v51[0] = v49;
-    float* v53 = (&v51[1]);
+    global float* v53 = (&v51[1]);
     v53[0] = v50;
     int v55 = i_03_i + v18;
     bool v56 = v55 < v17;
@@ -4867,14 +4964,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph_i:;
     long v58 = i1_02_i;
-    float* v59 = (&v11[v58]);
+    global float* v59 = (&v11[v58]);
     float v_val_i_i_i_i = v59[0];
     int v60 = i1_02_i % v15;
     long v61 = v60;
-    float* v62 = (&v13[v61]);
+    global float* v62 = (&v13[v61]);
     float v_val_i_i_i_i_i_i = v62[0];
     float v63 = v_val_i_i_i_i + v_val_i_i_i_i_i_i;
-    float* v64 = (&v9[v58]);
+    global float* v64 = (&v9[v58]);
     v64[0] = v63;
     int v66 = i1_02_i + v7;
     bool v67 = v66 < size;
@@ -4889,10 +4986,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_134* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_134* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i_i_i_i_i;
+    global float* v_sroa_3_0_in_i_i_i_i_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -4901,14 +5002,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
-    float*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
-    float* v11 = v10[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
+    global float*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     int v13 = v12[0];
-    float*global * v14 = (&memcopied_eval[0].f1.f2.f0);
-    float* v15 = v14[0];
+    global float*global * v14 = (&memcopied_eval[0].f1.f2.f0);
+    global float* v15 = v14[0];
     int v16 = size / 2;
     int v17 = v16 << 1;
     int v18 = v7 << 1;
@@ -4940,36 +5041,36 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v30 = v29 + 2;
     bool v31 = v30 > v13;
     long v32 = v29;
-    float* v33 = (&v11[v32]);
+    global float* v33 = (&v11[v32]);
     if(v31) {
         goto v35;
     } else {
         goto v36;
     }
     v36:;
-    float* v37 = (&v33[1]);
+    global float* v37 = (&v33[1]);
         v_sroa_3_0_in_i_i_i_i_i = v37;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS2_INS3_IKdLi1ELi1EiEELi16EEEEESH_EEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     v35:;
     int v39 = i_03_i | 1;
     int v40 = v39 % v13;
     long v41 = v40;
-    float* v42 = (&v11[v41]);
+    global float* v42 = (&v11[v41]);
         v_sroa_3_0_in_i_i_i_i_i = v42;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS2_INS3_IKdLi1ELi1EiEELi16EEEEESH_EEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS2_INS3_IKdLi1ELi1EiEELi16EEEEESH_EEEENS_9GpuDeviceEE10evalPacketEi_exit_i:;
     float v_sroa_3_0_i_i_i_i_i = v_sroa_3_0_in_i_i_i_i_i[0];
     float v_sroa_0_0_i_i_i_i_i = v33[0];
     long v44 = i_03_i;
-    float* v45 = (&v15[v44]);
+    global float* v45 = (&v15[v44]);
     float v46 = v45[0];
-    float* v47 = (&v45[1]);
+    global float* v47 = (&v45[1]);
     float v48 = v47[0];
     float v49 = v_sroa_0_0_i_i_i_i_i + v46;
     float v50 = v_sroa_3_0_i_i_i_i_i + v48;
-    float* v51 = (&v9[v44]);
+    global float* v51 = (&v9[v44]);
     v51[0] = v49;
-    float* v53 = (&v51[1]);
+    global float* v53 = (&v51[1]);
     v53[0] = v50;
     int v55 = i_03_i + v18;
     bool v56 = v55 < v17;
@@ -4982,13 +5083,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     v_lr_ph_i:;
     int v58 = i1_02_i % v13;
     long v59 = v58;
-    float* v60 = (&v11[v59]);
+    global float* v60 = (&v11[v59]);
     float v_val_i_i_i_i_i_i = v60[0];
     long v61 = i1_02_i;
-    float* v62 = (&v15[v61]);
+    global float* v62 = (&v15[v61]);
     float v_val_i_i_i_i = v62[0];
     float v63 = v_val_i_i_i_i_i_i + v_val_i_i_i_i;
-    float* v64 = (&v9[v61]);
+    global float* v64 = (&v9[v61]);
     v64[0] = v63;
     int v66 = i1_02_i + v7;
     bool v67 = v66 < size;
@@ -5003,11 +5104,15 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_136* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_136* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i_i1_i_i_i;
-    float* v_sroa_3_0_in_i_i_i_i_i;
+    global float* v_sroa_3_0_in_i_i1_i_i_i;
+    global float* v_sroa_3_0_in_i_i_i_i_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -5016,14 +5121,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
-    float*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
-    float* v11 = v10[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
+    global float*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     int v13 = v12[0];
-    float*global * v14 = (&memcopied_eval[0].f1.f2.f3.f0);
-    float* v15 = v14[0];
+    global float*global * v14 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global float* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     int v17 = v16[0];
     int v18 = size / 2;
@@ -5057,21 +5162,21 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v32 = v31 + 2;
     bool v33 = v32 > v13;
     long v34 = v31;
-    float* v35 = (&v11[v34]);
+    global float* v35 = (&v11[v34]);
     if(v33) {
         goto v37;
     } else {
         goto v38;
     }
     v38:;
-    float* v39 = (&v35[1]);
+    global float* v39 = (&v35[1]);
         v_sroa_3_0_in_i_i_i_i_i = v39;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS_9TensorMapINS_6TensorIKdLi1ELi1EiEELi16EEEEENS_9GpuDeviceEE6packetILi16EEE7double2i_exit_i_i_i;
     v37:;
     int v41 = i_03_i | 1;
     int v42 = v41 % v13;
     long v43 = v42;
-    float* v44 = (&v11[v43]);
+    global float* v44 = (&v11[v43]);
         v_sroa_3_0_in_i_i_i_i_i = v44;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS_9TensorMapINS_6TensorIKdLi1ELi1EiEELi16EEEEENS_9GpuDeviceEE6packetILi16EEE7double2i_exit_i_i_i;
     _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS_9TensorMapINS_6TensorIKdLi1ELi1EiEELi16EEEEENS_9GpuDeviceEE6packetILi16EEE7double2i_exit_i_i_i:;
@@ -5081,21 +5186,21 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v47 = v46 + 2;
     bool v48 = v47 > v17;
     long v49 = v46;
-    float* v50 = (&v15[v49]);
+    global float* v50 = (&v15[v49]);
     if(v48) {
         goto v52;
     } else {
         goto v53;
     }
     v53:;
-    float* v54 = (&v50[1]);
+    global float* v54 = (&v50[1]);
         v_sroa_3_0_in_i_i1_i_i_i = v54;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS2_INS3_IKdLi1ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     v52:;
     int v56 = i_03_i | 1;
     int v57 = v56 % v17;
     long v58 = v57;
-    float* v59 = (&v15[v58]);
+    global float* v59 = (&v15[v58]);
         v_sroa_3_0_in_i_i1_i_i_i = v59;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS2_INS3_IKdLi1ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS2_INS3_IKdLi1ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEE10evalPacketEi_exit_i:;
@@ -5104,9 +5209,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     float v61 = v_sroa_0_0_i_i_i_i_i + v_sroa_0_0_i_i3_i_i_i;
     float v62 = v_sroa_3_0_i_i_i_i_i + v_sroa_3_0_i_i2_i_i_i;
     long v63 = i_03_i;
-    float* v64 = (&v9[v63]);
+    global float* v64 = (&v9[v63]);
     v64[0] = v61;
-    float* v66 = (&v64[1]);
+    global float* v66 = (&v64[1]);
     v66[0] = v62;
     int v68 = i_03_i + v20;
     bool v69 = v68 < v19;
@@ -5119,15 +5224,15 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     v_lr_ph_i:;
     int v71 = i1_02_i % v13;
     long v72 = v71;
-    float* v73 = (&v11[v72]);
+    global float* v73 = (&v11[v72]);
     float v_val_i_i_i_i_i_i = v73[0];
     int v74 = i1_02_i % v17;
     long v75 = v74;
-    float* v76 = (&v15[v75]);
+    global float* v76 = (&v15[v75]);
     float v_val_i_i_i1_i_i_i = v76[0];
     float v77 = v_val_i_i_i_i_i_i + v_val_i_i_i1_i_i_i;
     long v78 = i1_02_i;
-    float* v79 = (&v9[v78]);
+    global float* v79 = (&v9[v78]);
     v79[0] = v77;
     int v81 = i1_02_i + v7;
     bool v82 = v81 < size;
@@ -5142,10 +5247,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKdLi1ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_138* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_138* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i_i_i_i_i;
+    global float* v_sroa_3_0_in_i_i_i_i_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -5154,16 +5263,16 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
-    float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
-    float* v11 = v10[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
+    global float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
+    global float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     int v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f2.f0[0]);
     int v15 = v14[0];
-    float*global * v16 = (&memcopied_eval[0].f1.f2.f3.f0);
-    float* v17 = v16[0];
+    global float*global * v16 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global float* v17 = v16[0];
     global int* v18 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v19 = ((global long*)v18);
     long v20 = v19[0];
@@ -5198,9 +5307,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v_lr_ph_i;
     v_lr_ph5_i:;
     long v37 = i_03_i;
-    float* v38 = (&v11[v37]);
+    global float* v38 = (&v11[v37]);
     float v39 = v38[0];
-    float* v40 = (&v38[1]);
+    global float* v40 = (&v38[1]);
     float v41 = v40[0];
     int v42 = i_03_i / v13;
     int v43 = v42 % v21;
@@ -5212,14 +5321,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v49 = v47 + 2;
     bool v50 = v49 > v23;
     long v51 = v48;
-    float* v52 = (&v17[v51]);
+    global float* v52 = (&v17[v51]);
     if(v50) {
         goto v54;
     } else {
         goto v55;
     }
     v55:;
-    float* v56 = (&v52[1]);
+    global float* v56 = (&v52[1]);
         v_sroa_3_0_in_i_i_i_i_i = v56;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS2_INS3_IKdLi2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESD_EEEEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     v54:;
@@ -5232,7 +5341,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v64 = v63 % v23;
     int v65 = v64 + v61;
     long v66 = v65;
-    float* v67 = (&v17[v66]);
+    global float* v67 = (&v17[v66]);
         v_sroa_3_0_in_i_i_i_i_i = v67;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS2_INS3_IKdLi2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESD_EEEEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS2_INS3_IKdLi2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESD_EEEEEENS_9GpuDeviceEE10evalPacketEi_exit_i:;
@@ -5240,9 +5349,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     float v_sroa_0_0_i_i_i_i_i = v52[0];
     float v69 = v39 + v_sroa_0_0_i_i_i_i_i;
     float v70 = v41 + v_sroa_3_0_i_i_i_i_i;
-    float* v71 = (&v9[v37]);
+    global float* v71 = (&v9[v37]);
     v71[0] = v69;
-    float* v73 = (&v71[1]);
+    global float* v73 = (&v71[1]);
     v73[0] = v70;
     int v75 = i_03_i + v26;
     bool v76 = v75 < v25;
@@ -5254,7 +5363,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph_i:;
     long v78 = i1_02_i;
-    float* v79 = (&v11[v78]);
+    global float* v79 = (&v11[v78]);
     float v_val_i_i_i_i = v79[0];
     int v80 = i1_02_i / v13;
     int v81 = v80 % v21;
@@ -5264,10 +5373,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v85 = v84 % v23;
     int v86 = v85 + v82;
     long v87 = v86;
-    float* v88 = (&v17[v87]);
+    global float* v88 = (&v17[v87]);
     float v_val_i_i_i_i_i_i = v88[0];
     float v89 = v_val_i_i_i_i + v_val_i_i_i_i_i_i;
-    float* v90 = (&v9[v78]);
+    global float* v90 = (&v9[v78]);
     v90[0] = v89;
     int v92 = i1_02_i + v7;
     bool v93 = v92 < size;
@@ -5282,10 +5391,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKdLi2ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_143* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKdLi2ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_143* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i_i_i_i_i;
+    global float* v_sroa_3_0_in_i_i_i_i_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -5294,22 +5407,22 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f2.f0[0]);
     int v13 = v12[0];
-    float*global * v14 = (&memcopied_eval[0].f1.f1.f3.f0);
-    float* v15 = v14[0];
+    global float*global * v14 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global float* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v17 = ((global long*)v16);
     long v18 = v17[0];
     int v19 = (int)v18;
     long v20 = v18 >> 32;
     int v21 = (int)v20;
-    float*global * v22 = (&memcopied_eval[0].f1.f2.f0);
-    float* v23 = v22[0];
+    global float*global * v22 = (&memcopied_eval[0].f1.f2.f0);
+    global float* v23 = v22[0];
     int v24 = size / 2;
     int v25 = v24 << 1;
     int v26 = v7 << 1;
@@ -5347,14 +5460,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v44 = v42 + 2;
     bool v45 = v44 > v21;
     long v46 = v43;
-    float* v47 = (&v15[v46]);
+    global float* v47 = (&v15[v46]);
     if(v45) {
         goto v49;
     } else {
         goto v50;
     }
     v50:;
-    float* v51 = (&v47[1]);
+    global float* v51 = (&v47[1]);
         v_sroa_3_0_in_i_i_i_i_i = v51;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS2_INS3_IKdLi2ELi1EiEELi16EEEEESH_EEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     v49:;
@@ -5367,22 +5480,22 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v59 = v58 % v21;
     int v60 = v59 + v56;
     long v61 = v60;
-    float* v62 = (&v15[v61]);
+    global float* v62 = (&v15[v61]);
         v_sroa_3_0_in_i_i_i_i_i = v62;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS2_INS3_IKdLi2ELi1EiEELi16EEEEESH_EEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS2_INS3_IKdLi2ELi1EiEELi16EEEEESH_EEEENS_9GpuDeviceEE10evalPacketEi_exit_i:;
     float v_sroa_3_0_i_i_i_i_i = v_sroa_3_0_in_i_i_i_i_i[0];
     float v_sroa_0_0_i_i_i_i_i = v47[0];
     long v64 = i_03_i;
-    float* v65 = (&v23[v64]);
+    global float* v65 = (&v23[v64]);
     float v66 = v65[0];
-    float* v67 = (&v65[1]);
+    global float* v67 = (&v65[1]);
     float v68 = v67[0];
     float v69 = v_sroa_0_0_i_i_i_i_i + v66;
     float v70 = v_sroa_3_0_i_i_i_i_i + v68;
-    float* v71 = (&v9[v64]);
+    global float* v71 = (&v9[v64]);
     v71[0] = v69;
-    float* v73 = (&v71[1]);
+    global float* v73 = (&v71[1]);
     v73[0] = v70;
     int v75 = i_03_i + v26;
     bool v76 = v75 < v25;
@@ -5401,13 +5514,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v83 = v82 % v21;
     int v84 = v83 + v80;
     long v85 = v84;
-    float* v86 = (&v15[v85]);
+    global float* v86 = (&v15[v85]);
     float v_val_i_i_i_i_i_i = v86[0];
     long v87 = i1_02_i;
-    float* v88 = (&v23[v87]);
+    global float* v88 = (&v23[v87]);
     float v_val_i_i_i_i = v88[0];
     float v89 = v_val_i_i_i_i_i_i + v_val_i_i_i_i;
-    float* v90 = (&v9[v87]);
+    global float* v90 = (&v9[v87]);
     v90[0] = v89;
     int v92 = i1_02_i + v7;
     bool v93 = v92 < size;
@@ -5422,11 +5535,15 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKdLi2ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKdLi2ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_145* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKdLi2ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_145* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i_i1_i_i_i;
-    float* v_sroa_3_0_in_i_i_i_i_i;
+    global float* v_sroa_3_0_in_i_i1_i_i_i;
+    global float* v_sroa_3_0_in_i_i_i_i_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -5435,14 +5552,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f2.f0[0]);
     int v13 = v12[0];
-    float*global * v14 = (&memcopied_eval[0].f1.f1.f3.f0);
-    float* v15 = v14[0];
+    global float*global * v14 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global float* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v17 = ((global long*)v16);
     long v18 = v17[0];
@@ -5453,8 +5570,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v23 = v22[0];
     global int* v24 = (&memcopied_eval[0].f1.f2.f2.f0[0]);
     int v25 = v24[0];
-    float*global * v26 = (&memcopied_eval[0].f1.f2.f3.f0);
-    float* v27 = v26[0];
+    global float*global * v26 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global float* v27 = v26[0];
     global int* v28 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v29 = ((global long*)v28);
     long v30 = v29[0];
@@ -5498,14 +5615,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v54 = v52 + 2;
     bool v55 = v54 > v21;
     long v56 = v53;
-    float* v57 = (&v15[v56]);
+    global float* v57 = (&v15[v56]);
     if(v55) {
         goto v59;
     } else {
         goto v60;
     }
     v60:;
-    float* v61 = (&v57[1]);
+    global float* v61 = (&v57[1]);
         v_sroa_3_0_in_i_i_i_i_i = v61;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS_9TensorMapINS_6TensorIKdLi2ELi1EiEELi16EEEEENS_9GpuDeviceEE6packetILi16EEE7double2i_exit_i_i_i;
     v59:;
@@ -5518,7 +5635,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v69 = v68 % v21;
     int v70 = v69 + v66;
     long v71 = v70;
-    float* v72 = (&v15[v71]);
+    global float* v72 = (&v15[v71]);
         v_sroa_3_0_in_i_i_i_i_i = v72;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS_9TensorMapINS_6TensorIKdLi2ELi1EiEELi16EEEEENS_9GpuDeviceEE6packetILi16EEE7double2i_exit_i_i_i;
     _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS_9TensorMapINS_6TensorIKdLi2ELi1EiEELi16EEEEENS_9GpuDeviceEE6packetILi16EEE7double2i_exit_i_i_i:;
@@ -5534,14 +5651,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v81 = v79 + 2;
     bool v82 = v81 > v33;
     long v83 = v80;
-    float* v84 = (&v27[v83]);
+    global float* v84 = (&v27[v83]);
     if(v82) {
         goto v86;
     } else {
         goto v87;
     }
     v87:;
-    float* v88 = (&v84[1]);
+    global float* v88 = (&v84[1]);
         v_sroa_3_0_in_i_i1_i_i_i = v88;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS2_INS3_IKdLi2ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     v86:;
@@ -5554,7 +5671,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v96 = v95 % v33;
     int v97 = v96 + v93;
     long v98 = v97;
-    float* v99 = (&v27[v98]);
+    global float* v99 = (&v27[v98]);
         v_sroa_3_0_in_i_i1_i_i_i = v99;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS2_INS3_IKdLi2ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS2_INS3_IKdLi2ELi1EiEELi16EEEEESJ_EEEENS_9GpuDeviceEE10evalPacketEi_exit_i:;
@@ -5563,9 +5680,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     float v101 = v_sroa_0_0_i_i_i_i_i + v_sroa_0_0_i_i3_i_i_i;
     float v102 = v_sroa_3_0_i_i_i_i_i + v_sroa_3_0_i_i2_i_i_i;
     long v103 = i_03_i;
-    float* v104 = (&v9[v103]);
+    global float* v104 = (&v9[v103]);
     v104[0] = v101;
-    float* v106 = (&v104[1]);
+    global float* v106 = (&v104[1]);
     v106[0] = v102;
     int v108 = i_03_i + v36;
     bool v109 = v108 < v35;
@@ -5584,7 +5701,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v116 = v115 % v21;
     int v117 = v116 + v113;
     long v118 = v117;
-    float* v119 = (&v15[v118]);
+    global float* v119 = (&v15[v118]);
     float v_val_i_i_i_i_i_i = v119[0];
     int v120 = i1_02_i / v23;
     int v121 = v120 % v31;
@@ -5594,11 +5711,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v125 = v124 % v33;
     int v126 = v125 + v122;
     long v127 = v126;
-    float* v128 = (&v27[v127]);
+    global float* v128 = (&v27[v127]);
     float v_val_i_i_i1_i_i_i = v128[0];
     float v129 = v_val_i_i_i_i_i_i + v_val_i_i_i1_i_i_i;
     long v130 = i1_02_i;
-    float* v131 = (&v9[v130]);
+    global float* v131 = (&v9[v130]);
     v131[0] = v129;
     int v133 = i1_02_i + v7;
     bool v134 = v133 < size;
@@ -5613,10 +5730,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKdLi2ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_147* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_147* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i_i_i_i_i;
+    global float* v_sroa_3_0_in_i_i_i_i_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -5625,10 +5746,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
-    float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
-    float* v11 = v10[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
+    global float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
+    global float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     int v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f1.f0[1]);
@@ -5639,8 +5760,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v19 = (int)v18;
     long v20 = v18 >> 32;
     int v21 = (int)v20;
-    float*global * v22 = (&memcopied_eval[0].f1.f2.f3.f0);
-    float* v23 = v22[0];
+    global float*global * v22 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global float* v23 = v22[0];
     global int* v24 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v25 = ((global long*)v24);
     long v26 = v25[0];
@@ -5677,9 +5798,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v_lr_ph_i;
     v_lr_ph5_i:;
     long v45 = i_03_i;
-    float* v46 = (&v11[v45]);
+    global float* v46 = (&v11[v45]);
     float v47 = v46[0];
-    float* v48 = (&v46[1]);
+    global float* v48 = (&v46[1]);
     float v49 = v48[0];
     int v50 = i_03_i / v13;
     int v51 = v50 % v27;
@@ -5697,14 +5818,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v63 = v61 + 2;
     bool v64 = v63 > v31;
     long v65 = v62;
-    float* v66 = (&v23[v65]);
+    global float* v66 = (&v23[v65]);
     if(v64) {
         goto v68;
     } else {
         goto v69;
     }
     v69:;
-    float* v70 = (&v66[1]);
+    global float* v70 = (&v66[1]);
         v_sroa_3_0_in_i_i_i_i_i = v70;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS2_INS3_IKdLi3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESD_EEEEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     v68:;
@@ -5723,7 +5844,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v84 = v83 % v31;
     int v85 = v81 + v84;
     long v86 = v85;
-    float* v87 = (&v23[v86]);
+    global float* v87 = (&v23[v86]);
         v_sroa_3_0_in_i_i_i_i_i = v87;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS2_INS3_IKdLi3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESD_EEEEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS2_INS3_IKdLi3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESD_EEEEEENS_9GpuDeviceEE10evalPacketEi_exit_i:;
@@ -5731,9 +5852,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     float v_sroa_0_0_i_i_i_i_i = v66[0];
     float v89 = v47 + v_sroa_0_0_i_i_i_i_i;
     float v90 = v49 + v_sroa_3_0_i_i_i_i_i;
-    float* v91 = (&v9[v45]);
+    global float* v91 = (&v9[v45]);
     v91[0] = v89;
-    float* v93 = (&v91[1]);
+    global float* v93 = (&v91[1]);
     v93[0] = v90;
     int v95 = i_03_i + v34;
     bool v96 = v95 < v33;
@@ -5745,7 +5866,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph_i:;
     long v98 = i1_02_i;
-    float* v99 = (&v11[v98]);
+    global float* v99 = (&v11[v98]);
     float v_val_i_i_i_i = v99[0];
     int v100 = i1_02_i / v13;
     int v101 = v100 % v27;
@@ -5761,10 +5882,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v111 = v110 % v31;
     int v112 = v108 + v111;
     long v113 = v112;
-    float* v114 = (&v23[v113]);
+    global float* v114 = (&v23[v113]);
     float v_val_i_i_i_i_i_i = v114[0];
     float v115 = v_val_i_i_i_i + v_val_i_i_i_i_i_i;
-    float* v116 = (&v9[v98]);
+    global float* v116 = (&v9[v98]);
     v116[0] = v115;
     int v118 = i1_02_i + v7;
     bool v119 = v118 < size;
@@ -5779,10 +5900,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKdLi3ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_152* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKdLi3ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_152* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i_i_i_i_i;
+    global float* v_sroa_3_0_in_i_i_i_i_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -5791,8 +5916,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f1.f0[1]);
@@ -5803,8 +5928,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v17 = (int)v16;
     long v18 = v16 >> 32;
     int v19 = (int)v18;
-    float*global * v20 = (&memcopied_eval[0].f1.f1.f3.f0);
-    float* v21 = v20[0];
+    global float*global * v20 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global float* v21 = v20[0];
     global int* v22 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v23 = ((global long*)v22);
     long v24 = v23[0];
@@ -5813,8 +5938,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v27 = (int)v26;
     global int* v28 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[2]);
     int v29 = v28[0];
-    float*global * v30 = (&memcopied_eval[0].f1.f2.f0);
-    float* v31 = v30[0];
+    global float*global * v30 = (&memcopied_eval[0].f1.f2.f0);
+    global float* v31 = v30[0];
     int v32 = size / 2;
     int v33 = v32 << 1;
     int v34 = v7 << 1;
@@ -5858,14 +5983,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v58 = v56 + 2;
     bool v59 = v58 > v29;
     long v60 = v57;
-    float* v61 = (&v21[v60]);
+    global float* v61 = (&v21[v60]);
     if(v59) {
         goto v63;
     } else {
         goto v64;
     }
     v64:;
-    float* v65 = (&v61[1]);
+    global float* v65 = (&v61[1]);
         v_sroa_3_0_in_i_i_i_i_i = v65;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS2_INS3_IKdLi3ELi1EiEELi16EEEEESH_EEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     v63:;
@@ -5884,22 +6009,22 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v79 = v78 % v29;
     int v80 = v76 + v79;
     long v81 = v80;
-    float* v82 = (&v21[v81]);
+    global float* v82 = (&v21[v81]);
         v_sroa_3_0_in_i_i_i_i_i = v82;
     goto _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS2_INS3_IKdLi3ELi1EiEELi16EEEEESH_EEEENS_9GpuDeviceEE10evalPacketEi_exit_i;
     _ZN5Eigen15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS2_INS3_IKdLi3ELi1EiEELi16EEEEESH_EEEENS_9GpuDeviceEE10evalPacketEi_exit_i:;
     float v_sroa_3_0_i_i_i_i_i = v_sroa_3_0_in_i_i_i_i_i[0];
     float v_sroa_0_0_i_i_i_i_i = v61[0];
     long v84 = i_03_i;
-    float* v85 = (&v31[v84]);
+    global float* v85 = (&v31[v84]);
     float v86 = v85[0];
-    float* v87 = (&v85[1]);
+    global float* v87 = (&v85[1]);
     float v88 = v87[0];
     float v89 = v_sroa_0_0_i_i_i_i_i + v86;
     float v90 = v_sroa_3_0_i_i_i_i_i + v88;
-    float* v91 = (&v9[v84]);
+    global float* v91 = (&v9[v84]);
     v91[0] = v89;
-    float* v93 = (&v91[1]);
+    global float* v93 = (&v91[1]);
     v93[0] = v90;
     int v95 = i_03_i + v34;
     bool v96 = v95 < v33;
@@ -5924,13 +6049,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v109 = v108 % v29;
     int v110 = v106 + v109;
     long v111 = v110;
-    float* v112 = (&v21[v111]);
+    global float* v112 = (&v21[v111]);
     float v_val_i_i_i_i_i_i = v112[0];
     long v113 = i1_02_i;
-    float* v114 = (&v31[v113]);
+    global float* v114 = (&v31[v113]);
     float v_val_i_i_i_i = v114[0];
     float v115 = v_val_i_i_i_i_i_i + v_val_i_i_i_i;
-    float* v116 = (&v9[v113]);
+    global float* v116 = (&v9[v113]);
     v116[0] = v115;
     int v118 = i1_02_i + v7;
     bool v119 = v118 < size;
@@ -5945,9 +6070,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKdLi3ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKdLi3ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_154* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKdLi3ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_154* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     struct Eigen__TensorEvaluator_154 eval[1];
     int v1 = get_group_id(0);
@@ -5983,7 +6112,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph5_i:;
     struct Eigen__TensorEvaluator_155* v23 = (&eval[0].f1);
-    float* * v24 = (&eval[0].f0.f0);
+    global float* * v24 = (&eval[0].f0.f0);
         i_03_i = v20;
     goto v26;
     label27:;
@@ -6015,7 +6144,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v47 = (int)v46;
     int* v48 = (&eval[0].f1.f1.f3.f1.f0.f0[2]);
     int v49 = v48[0];
-    float* * v50 = (&eval[0].f1.f1.f3.f0);
+    global float* * v50 = (&eval[0].f1.f1.f3.f0);
     float* v51 = v50[0];
     int* v52 = (&eval[0].f1.f2.f1.f0[0]);
     int v53 = v52[0];
@@ -6035,9 +6164,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v67 = (int)v66;
     int* v68 = (&eval[0].f1.f2.f3.f1.f0.f0[2]);
     int v69 = v68[0];
-    float* * v70 = (&eval[0].f1.f2.f3.f0);
+    global float* * v70 = (&eval[0].f1.f2.f3.f0);
     float* v71 = v70[0];
-    float* * v72 = (&eval[0].f0.f0);
+    global float* * v72 = (&eval[0].f0.f0);
     float* v73 = v72[0];
         i1_02_i = v29;
     goto v75;
@@ -6109,9 +6238,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKdLi3ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS_9TensorMapINS_6TensorIKdLi3ELi1EiEELi16EEEEESG_EENS_9GpuDeviceEE6packetILi16EEE7double2i(struct Eigen__TensorEvaluator_155* this, int index) {
+struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS_9TensorMapINS_6TensorIKdLi3ELi1EiEELi16EEEEESG_EENS_9GpuDeviceEE6packetILi16EEE7double2i(struct Eigen__TensorEvaluator_155* this, global float* this_ptr0, global float* this_ptr1, int index) {
     float* v_sroa_3_0_in_i_i;
     float* v_sroa_3_0_in_i_i1;
+this[0].f1.f3.f0 = this_ptr0;
+this[0].f2.f3.f0 = this_ptr1;
+
     label0:;
     int* v1 = (&this[0].f1.f1.f0[0]);
     int v2 = v1[0];
@@ -6142,7 +6274,7 @@ struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8int
     int v27 = v21 + v26;
     int v28 = v26 + 2;
     bool v29 = v28 > v25;
-    float* * v30 = (&this[0].f1.f3.f0);
+    global float* * v30 = (&this[0].f1.f3.f0);
     float* v31 = v30[0];
     long v32 = v27;
     float* v33 = (&v31[v32]);
@@ -6206,7 +6338,7 @@ struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8int
     int v82 = v76 + v81;
     int v83 = v81 + 2;
     bool v84 = v83 > v80;
-    float* * v85 = (&this[0].f2.f3.f0);
+    global float* * v85 = (&this[0].f2.f3.f0);
     float* v86 = v85[0];
     long v87 = v82;
     float* v88 = (&v86[v87]);
@@ -6250,10 +6382,14 @@ struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8int
     return oldret2_i_i;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_156* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_156* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i_i_i;
+    global float* v_sroa_3_0_in_i_i_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -6262,10 +6398,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
-    float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
-    float* v11 = v10[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
+    global float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
+    global float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     global long* v13 = ((global long*)v12);
     long v14 = v13[0];
@@ -6282,8 +6418,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v25 = (int)v24;
     global int* v26 = (&memcopied_eval[0].f1.f2.f2.f0[2]);
     int v27 = v26[0];
-    float*global * v28 = (&memcopied_eval[0].f1.f2.f3.f0);
-    float* v29 = v28[0];
+    global float*global * v28 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global float* v29 = v28[0];
     global int* v30 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v31 = ((global long*)v30);
     long v32 = v31[0];
@@ -6324,9 +6460,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v_lr_ph_i;
     v_lr_ph5_i:;
     long v55 = i_03_i;
-    float* v56 = (&v11[v55]);
+    global float* v56 = (&v11[v55]);
     float v57 = v56[0];
-    float* v58 = (&v56[1]);
+    global float* v58 = (&v56[1]);
     float v59 = v58[0];
     int v60 = i_03_i / v15;
     int v61 = v60 % v33;
@@ -6350,14 +6486,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v79 = v77 + 2;
     bool v80 = v79 > v41;
     long v81 = v78;
-    float* v82 = (&v29[v81]);
+    global float* v82 = (&v29[v81]);
     if(v80) {
         goto v84;
     } else {
         goto v85;
     }
     v85:;
-    float* v86 = (&v82[1]);
+    global float* v86 = (&v82[1]);
         v_sroa_3_0_in_i_i_i = v86;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_9TensorMapINS_6TensorIKdLi4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESA_EEEENS_9GpuDeviceEE6packetILi16EEE7double2i_exit;
     v84:;
@@ -6382,7 +6518,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v106 = v105 % v41;
     int v107 = v103 + v106;
     long v108 = v107;
-    float* v109 = (&v29[v108]);
+    global float* v109 = (&v29[v108]);
         v_sroa_3_0_in_i_i_i = v109;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_9TensorMapINS_6TensorIKdLi4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESA_EEEENS_9GpuDeviceEE6packetILi16EEE7double2i_exit;
     _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_9TensorMapINS_6TensorIKdLi4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESA_EEEENS_9GpuDeviceEE6packetILi16EEE7double2i_exit:;
@@ -6390,9 +6526,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     float v_sroa_0_0_i_i_i = v82[0];
     float v111 = v57 + v_sroa_0_0_i_i_i;
     float v112 = v59 + v_sroa_3_0_i_i_i;
-    float* v113 = (&v9[v55]);
+    global float* v113 = (&v9[v55]);
     v113[0] = v111;
-    float* v115 = (&v113[1]);
+    global float* v115 = (&v113[1]);
     v115[0] = v112;
     int v117 = i_03_i + v44;
     bool v118 = v117 < v43;
@@ -6404,7 +6540,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph_i:;
     long v120 = i1_02_i;
-    float* v121 = (&v11[v120]);
+    global float* v121 = (&v11[v120]);
     float v_val_i_i_i_i = v121[0];
     int v122 = i1_02_i / v15;
     int v123 = v122 % v33;
@@ -6426,10 +6562,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v139 = v138 % v41;
     int v140 = v136 + v139;
     long v141 = v140;
-    float* v142 = (&v29[v141]);
+    global float* v142 = (&v29[v141]);
     float v_val_i_i_i_i_i_i = v142[0];
     float v143 = v_val_i_i_i_i + v_val_i_i_i_i_i_i;
-    float* v144 = (&v9[v120]);
+    global float* v144 = (&v9[v120]);
     v144[0] = v143;
     int v146 = i1_02_i + v7;
     bool v147 = v146 < size;
@@ -6444,10 +6580,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKdLi4ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_161* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKdLi4ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_161* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i_i_i;
+    global float* v_sroa_3_0_in_i_i_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -6456,8 +6596,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     global long* v11 = ((global long*)v10);
     long v12 = v11[0];
@@ -6474,8 +6614,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v23 = (int)v22;
     global int* v24 = (&memcopied_eval[0].f1.f1.f2.f0[2]);
     int v25 = v24[0];
-    float*global * v26 = (&memcopied_eval[0].f1.f1.f3.f0);
-    float* v27 = v26[0];
+    global float*global * v26 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global float* v27 = v26[0];
     global int* v28 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v29 = ((global long*)v28);
     long v30 = v29[0];
@@ -6488,8 +6628,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v37 = (int)v36;
     long v38 = v36 >> 32;
     int v39 = (int)v38;
-    float*global * v40 = (&memcopied_eval[0].f1.f2.f0);
-    float* v41 = v40[0];
+    global float*global * v40 = (&memcopied_eval[0].f1.f2.f0);
+    global float* v41 = v40[0];
     int v42 = size / 2;
     int v43 = v42 << 1;
     int v44 = v7 << 1;
@@ -6539,14 +6679,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v74 = v72 + 2;
     bool v75 = v74 > v39;
     long v76 = v73;
-    float* v77 = (&v27[v76]);
+    global float* v77 = (&v27[v76]);
     if(v75) {
         goto v79;
     } else {
         goto v80;
     }
     v80:;
-    float* v81 = (&v77[1]);
+    global float* v81 = (&v77[1]);
         v_sroa_3_0_in_i_i_i = v81;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKdLi4ELi1EiEELi16EEEEESE_EENS_9GpuDeviceEE6packetILi16EEE7double2i_exit;
     v79:;
@@ -6571,22 +6711,22 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v101 = v100 % v39;
     int v102 = v98 + v101;
     long v103 = v102;
-    float* v104 = (&v27[v103]);
+    global float* v104 = (&v27[v103]);
         v_sroa_3_0_in_i_i_i = v104;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKdLi4ELi1EiEELi16EEEEESE_EENS_9GpuDeviceEE6packetILi16EEE7double2i_exit;
     _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKdLi4ELi1EiEELi16EEEEESE_EENS_9GpuDeviceEE6packetILi16EEE7double2i_exit:;
     float v_sroa_3_0_i_i_i = v_sroa_3_0_in_i_i_i[0];
     float v_sroa_0_0_i_i_i = v77[0];
     long v106 = i_03_i;
-    float* v107 = (&v41[v106]);
+    global float* v107 = (&v41[v106]);
     float v108 = v107[0];
-    float* v109 = (&v107[1]);
+    global float* v109 = (&v107[1]);
     float v110 = v109[0];
     float v111 = v_sroa_0_0_i_i_i + v108;
     float v112 = v_sroa_3_0_i_i_i + v110;
-    float* v113 = (&v9[v106]);
+    global float* v113 = (&v9[v106]);
     v113[0] = v111;
-    float* v115 = (&v113[1]);
+    global float* v115 = (&v113[1]);
     v115[0] = v112;
     int v117 = i_03_i + v44;
     bool v118 = v117 < v43;
@@ -6617,13 +6757,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v137 = v136 % v39;
     int v138 = v134 + v137;
     long v139 = v138;
-    float* v140 = (&v27[v139]);
+    global float* v140 = (&v27[v139]);
     float v_val_i_i_i_i_i_i = v140[0];
     long v141 = i1_02_i;
-    float* v142 = (&v41[v141]);
+    global float* v142 = (&v41[v141]);
     float v_val_i_i_i_i = v142[0];
     float v143 = v_val_i_i_i_i_i_i + v_val_i_i_i_i;
-    float* v144 = (&v9[v141]);
+    global float* v144 = (&v9[v141]);
     v144[0] = v143;
     int v146 = i1_02_i + v7;
     bool v147 = v146 < size;
@@ -6638,9 +6778,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKdLi4ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKdLi4ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_163* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKdLi4ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_163* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     struct Eigen__TensorEvaluator_163 eval[1];
     int v1 = get_group_id(0);
@@ -6676,7 +6820,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph5_i:;
     struct Eigen__TensorEvaluator_164* v23 = (&eval[0].f1);
-    float* * v24 = (&eval[0].f0.f0);
+    global float* * v24 = (&eval[0].f0.f0);
         i_03_i = v20;
     goto v26;
     label27:;
@@ -6718,7 +6862,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v57 = v56[0];
     long v58 = v54 >> 32;
     int v59 = (int)v58;
-    float* * v60 = (&eval[0].f1.f1.f3.f0);
+    global float* * v60 = (&eval[0].f1.f1.f3.f0);
     float* v61 = v60[0];
     int* v62 = (&eval[0].f1.f2.f1.f0[0]);
     long* v63 = ((long*)v62);
@@ -6748,9 +6892,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v87 = v86[0];
     long v88 = v84 >> 32;
     int v89 = (int)v88;
-    float* * v90 = (&eval[0].f1.f2.f3.f0);
+    global float* * v90 = (&eval[0].f1.f2.f3.f0);
     float* v91 = v90[0];
-    float* * v92 = (&eval[0].f0.f0);
+    global float* * v92 = (&eval[0].f0.f0);
     float* v93 = v92[0];
         i1_02_i = v29;
     goto v95;
@@ -6834,9 +6978,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKdLi4ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKdLi4ELi1EiEELi16EEEEESG_EENS_9GpuDeviceEE6packetILi16EEE7double2i(struct Eigen__TensorEvaluator_164* this, int index) {
+struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8internal13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS_9TensorMapINS_6TensorIKdLi4ELi1EiEELi16EEEEESG_EENS_9GpuDeviceEE6packetILi16EEE7double2i(struct Eigen__TensorEvaluator_164* this, global float* this_ptr0, global float* this_ptr1, int index) {
     float* v_sroa_3_0_in_i_i;
     float* v_sroa_3_0_in_i_i1;
+this[0].f1.f3.f0 = this_ptr0;
+this[0].f2.f3.f0 = this_ptr1;
+
     label0:;
     int* v1 = (&this[0].f1.f1.f0[0]);
     int v2 = v1[0];
@@ -6879,7 +7026,7 @@ struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8int
     int v39 = v33 + v38;
     int v40 = v38 + 2;
     bool v41 = v40 > v37;
-    float* * v42 = (&this[0].f1.f3.f0);
+    global float* * v42 = (&this[0].f1.f3.f0);
     float* v43 = v42[0];
     long v44 = v39;
     float* v45 = (&v43[v44]);
@@ -6961,7 +7108,7 @@ struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8int
     int v112 = v106 + v111;
     int v113 = v111 + 2;
     bool v114 = v113 > v110;
-    float* * v115 = (&this[0].f2.f3.f0);
+    global float* * v115 = (&this[0].f2.f3.f0);
     float* v116 = v115[0];
     long v117 = v112;
     float* v118 = (&v116[v117]);
@@ -7011,10 +7158,14 @@ struct double2_124 _ZNK5Eigen15TensorEvaluatorIKNS_19TensorCwiseBinaryOpINS_8int
     return oldret2_i_i;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_165* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_165* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i;
+    global float* v_sroa_3_0_in_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -7023,10 +7174,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
-    float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
-    float* v11 = v10[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
+    global float*global * v10 = (&memcopied_eval[0].f1.f1.f0);
+    global float* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     int v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f1.f0[1]);
@@ -7049,8 +7200,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v31 = (int)v30;
     long v32 = v30 >> 32;
     int v33 = (int)v32;
-    float*global * v34 = (&memcopied_eval[0].f1.f2.f3.f0);
-    float* v35 = v34[0];
+    global float*global * v34 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global float* v35 = v34[0];
     global int* v36 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v37 = ((global long*)v36);
     long v38 = v37[0];
@@ -7093,9 +7244,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v_lr_ph_i;
     v_lr_ph5_i:;
     long v63 = i_03_i;
-    float* v64 = (&v11[v63]);
+    global float* v64 = (&v11[v63]);
     float v65 = v64[0];
-    float* v66 = (&v64[1]);
+    global float* v66 = (&v64[1]);
     float v67 = v66[0];
     int v68 = i_03_i / v13;
     int v69 = v68 % v39;
@@ -7125,14 +7276,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v93 = v91 + 2;
     bool v94 = v93 > v49;
     long v95 = v92;
-    float* v96 = (&v35[v95]);
+    global float* v96 = (&v35[v95]);
     if(v94) {
         goto v98;
     } else {
         goto v99;
     }
     v99:;
-    float* v100 = (&v96[1]);
+    global float* v100 = (&v96[1]);
         v_sroa_3_0_in_i = v100;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKdLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE7double2i_exit;
     v98:;
@@ -7163,7 +7314,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v126 = v125 % v49;
     int v127 = v123 + v126;
     long v128 = v127;
-    float* v129 = (&v35[v128]);
+    global float* v129 = (&v35[v128]);
         v_sroa_3_0_in_i = v129;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKdLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE7double2i_exit;
     _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKdLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE7double2i_exit:;
@@ -7171,9 +7322,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     float v_sroa_0_0_i = v96[0];
     float v131 = v65 + v_sroa_0_0_i;
     float v132 = v67 + v_sroa_3_0_i;
-    float* v133 = (&v9[v63]);
+    global float* v133 = (&v9[v63]);
     v133[0] = v131;
-    float* v135 = (&v133[1]);
+    global float* v135 = (&v133[1]);
     v135[0] = v132;
     int v137 = i_03_i + v52;
     bool v138 = v137 < v51;
@@ -7185,7 +7336,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     }
     v_lr_ph_i:;
     long v140 = i1_02_i;
-    float* v141 = (&v11[v140]);
+    global float* v141 = (&v11[v140]);
     float v_val_i_i_i_i = v141[0];
     int v142 = i1_02_i / v13;
     int v143 = v142 % v39;
@@ -7213,10 +7364,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v165 = v164 % v49;
     int v166 = v162 + v165;
     long v167 = v166;
-    float* v168 = (&v35[v167]);
+    global float* v168 = (&v35[v167]);
     float v_val_i_i_i_i_i_i = v168[0];
     float v169 = v_val_i_i_i_i + v_val_i_i_i_i_i_i;
-    float* v170 = (&v9[v140]);
+    global float* v170 = (&v9[v140]);
     v170[0] = v169;
     int v172 = i1_02_i + v7;
     bool v173 = v172 < size;
@@ -7231,10 +7382,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS4_INS5_IKdLi5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESE_EEEEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKdLi5ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_170* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKdLi5ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_170* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i;
+    global float* v_sroa_3_0_in_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -7243,8 +7398,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f1.f0[1]);
@@ -7267,8 +7422,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v29 = (int)v28;
     long v30 = v28 >> 32;
     int v31 = (int)v30;
-    float*global * v32 = (&memcopied_eval[0].f1.f1.f3.f0);
-    float* v33 = v32[0];
+    global float*global * v32 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global float* v33 = v32[0];
     global int* v34 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v35 = ((global long*)v34);
     long v36 = v35[0];
@@ -7283,8 +7438,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v45 = (int)v44;
     global int* v46 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[4]);
     int v47 = v46[0];
-    float*global * v48 = (&memcopied_eval[0].f1.f2.f0);
-    float* v49 = v48[0];
+    global float*global * v48 = (&memcopied_eval[0].f1.f2.f0);
+    global float* v49 = v48[0];
     int v50 = size / 2;
     int v51 = v50 << 1;
     int v52 = v7 << 1;
@@ -7340,14 +7495,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v88 = v86 + 2;
     bool v89 = v88 > v47;
     long v90 = v87;
-    float* v91 = (&v33[v90]);
+    global float* v91 = (&v33[v90]);
     if(v89) {
         goto v93;
     } else {
         goto v94;
     }
     v94:;
-    float* v95 = (&v91[1]);
+    global float* v95 = (&v91[1]);
         v_sroa_3_0_in_i = v95;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKdLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE7double2i_exit;
     v93:;
@@ -7378,22 +7533,22 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v121 = v120 % v47;
     int v122 = v118 + v121;
     long v123 = v122;
-    float* v124 = (&v33[v123]);
+    global float* v124 = (&v33[v123]);
         v_sroa_3_0_in_i = v124;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKdLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE7double2i_exit;
     _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKdLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE7double2i_exit:;
     float v_sroa_3_0_i = v_sroa_3_0_in_i[0];
     float v_sroa_0_0_i = v91[0];
     long v126 = i_03_i;
-    float* v127 = (&v49[v126]);
+    global float* v127 = (&v49[v126]);
     float v128 = v127[0];
-    float* v129 = (&v127[1]);
+    global float* v129 = (&v127[1]);
     float v130 = v129[0];
     float v131 = v_sroa_0_0_i + v128;
     float v132 = v_sroa_3_0_i + v130;
-    float* v133 = (&v9[v126]);
+    global float* v133 = (&v9[v126]);
     v133[0] = v131;
-    float* v135 = (&v133[1]);
+    global float* v135 = (&v133[1]);
     v135[0] = v132;
     int v137 = i_03_i + v52;
     bool v138 = v137 < v51;
@@ -7430,13 +7585,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v163 = v162 % v47;
     int v164 = v160 + v163;
     long v165 = v164;
-    float* v166 = (&v33[v165]);
+    global float* v166 = (&v33[v165]);
     float v_val_i_i_i_i_i_i = v166[0];
     long v167 = i1_02_i;
-    float* v168 = (&v49[v167]);
+    global float* v168 = (&v49[v167]);
     float v_val_i_i_i_i = v168[0];
     float v169 = v_val_i_i_i_i_i_i + v_val_i_i_i_i;
-    float* v170 = (&v9[v167]);
+    global float* v170 = (&v9[v167]);
     v170[0] = v169;
     int v172 = i1_02_i + v7;
     bool v173 = v172 < size;
@@ -7451,11 +7606,15 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKdLi5ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKdLi5ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_172* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKdLi5ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_172* memcopied_eval, global float* memcopied_eval_ptr0, global float* memcopied_eval_ptr1, global float* memcopied_eval_ptr2, int size) {
     int i1_02_i;
     int i_03_i;
-    float* v_sroa_3_0_in_i;
-    float* v_sroa_3_0_in_i1;
+    global float* v_sroa_3_0_in_i;
+    global float* v_sroa_3_0_in_i1;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -7464,8 +7623,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    float*global * v8 = (&memcopied_eval[0].f0.f0);
-    float* v9 = v8[0];
+    global float*global * v8 = (&memcopied_eval[0].f0.f0);
+    global float* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f1.f0[1]);
@@ -7488,8 +7647,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v29 = (int)v28;
     long v30 = v28 >> 32;
     int v31 = (int)v30;
-    float*global * v32 = (&memcopied_eval[0].f1.f1.f3.f0);
-    float* v33 = v32[0];
+    global float*global * v32 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global float* v33 = v32[0];
     global int* v34 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v35 = ((global long*)v34);
     long v36 = v35[0];
@@ -7526,8 +7685,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v67 = (int)v66;
     long v68 = v66 >> 32;
     int v69 = (int)v68;
-    float*global * v70 = (&memcopied_eval[0].f1.f2.f3.f0);
-    float* v71 = v70[0];
+    global float*global * v70 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global float* v71 = v70[0];
     global int* v72 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v73 = ((global long*)v72);
     long v74 = v73[0];
@@ -7597,14 +7756,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v124 = v122 + 2;
     bool v125 = v124 > v47;
     long v126 = v123;
-    float* v127 = (&v33[v126]);
+    global float* v127 = (&v33[v126]);
     if(v125) {
         goto v129;
     } else {
         goto v130;
     }
     v130:;
-    float* v131 = (&v127[1]);
+    global float* v131 = (&v127[1]);
         v_sroa_3_0_in_i1 = v131;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKdLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE7double2i_exit4;
     v129:;
@@ -7635,7 +7794,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v157 = v156 % v47;
     int v158 = v154 + v157;
     long v159 = v158;
-    float* v160 = (&v33[v159]);
+    global float* v160 = (&v33[v159]);
         v_sroa_3_0_in_i1 = v160;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKdLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE7double2i_exit4;
     _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKdLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE7double2i_exit4:;
@@ -7669,14 +7828,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v187 = v185 + 2;
     bool v188 = v187 > v85;
     long v189 = v186;
-    float* v190 = (&v71[v189]);
+    global float* v190 = (&v71[v189]);
     if(v188) {
         goto v192;
     } else {
         goto v193;
     }
     v193:;
-    float* v194 = (&v190[1]);
+    global float* v194 = (&v190[1]);
         v_sroa_3_0_in_i = v194;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKdLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE7double2i_exit;
     v192:;
@@ -7707,7 +7866,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v220 = v219 % v85;
     int v221 = v217 + v220;
     long v222 = v221;
-    float* v223 = (&v71[v222]);
+    global float* v223 = (&v71[v222]);
         v_sroa_3_0_in_i = v223;
     goto _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKdLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE7double2i_exit;
     _ZNK5Eigen15TensorEvaluatorIKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS_9TensorMapINS_6TensorIKdLi5ELi1EiEELi16EEEEENS_9GpuDeviceEE14packetRowMajorILi16EEE7double2i_exit:;
@@ -7716,9 +7875,9 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     float v225 = v_sroa_0_0_i3 + v_sroa_0_0_i;
     float v226 = v_sroa_3_0_i2 + v_sroa_3_0_i;
     long v227 = i_03_i;
-    float* v228 = (&v9[v227]);
+    global float* v228 = (&v9[v227]);
     v228[0] = v225;
-    float* v230 = (&v228[1]);
+    global float* v230 = (&v228[1]);
     v230[0] = v226;
     int v232 = i_03_i + v88;
     bool v233 = v232 < v87;
@@ -7755,7 +7914,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v258 = v257 % v47;
     int v259 = v255 + v258;
     long v260 = v259;
-    float* v261 = (&v33[v260]);
+    global float* v261 = (&v33[v260]);
     float v_val_i_i_i_i = v261[0];
     int v262 = i1_02_i / v49;
     int v263 = v262 % v75;
@@ -7783,11 +7942,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v285 = v284 % v85;
     int v286 = v282 + v285;
     long v287 = v286;
-    float* v288 = (&v71[v287]);
+    global float* v288 = (&v71[v287]);
     float v_val_i_i_i1_i = v288[0];
     float v289 = v_val_i_i_i_i + v_val_i_i_i1_i;
     long v290 = i1_02_i;
-    float* v291 = (&v9[v290]);
+    global float* v291 = (&v9[v290]);
     v291[0] = v289;
     int v293 = i1_02_i + v7;
     bool v294 = v293 < size;
@@ -7802,8 +7961,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIdLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIddEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKdLi5ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb1EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEKNS4_INS5_ISB_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_174* memcopied_eval, long size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEKNS4_INS5_ISB_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_174* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, long size) {
     long i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -7814,12 +7977,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v7 = get_num_groups(0);
     int v8 = v7 * v2;
     long v9 = v8;
-    long*global * v10 = (&memcopied_eval[0].f0.f0);
-    long* v11 = v10[0];
-    long*global * v12 = (&memcopied_eval[0].f1.f1.f0);
-    long* v13 = v12[0];
-    long*global * v14 = (&memcopied_eval[0].f1.f2.f0);
-    long* v15 = v14[0];
+    global long*global * v10 = (&memcopied_eval[0].f0.f0);
+    global long* v11 = v10[0];
+    global long*global * v12 = (&memcopied_eval[0].f1.f1.f0);
+    global long* v13 = v12[0];
+    global long*global * v14 = (&memcopied_eval[0].f1.f2.f0);
+    global long* v15 = v14[0];
     bool v16 = v6 < size;
     if(v16) {
         goto v_lr_ph_i_preheader;
@@ -7832,12 +7995,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     v_lr_ph_i:;
     long sext_i_i_i = i_01_i << 32;
     long v19 = sext_i_i_i >> 32;
-    long* v20 = (&v13[v19]);
+    global long* v20 = (&v13[v19]);
     long v_val_i_i_i_i = v20[0];
-    long* v21 = (&v15[i_01_i]);
+    global long* v21 = (&v15[i_01_i]);
     long v_val_i1_i_i_i = v21[0];
     long v22 = v_val_i1_i_i_i + v_val_i_i_i_i;
-    long* v23 = (&v11[v19]);
+    global long* v23 = (&v11[v19]);
     v23[0] = v22;
     long v25 = i_01_i + v9;
     bool v26 = v25 < size;
@@ -7852,8 +8015,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEKNS4_INS5_ISB_Li1ELi1ElEELi16EEEEEEENS_9GpuDeviceEEElLb0EE3runERSN_lll_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIxxNS0_13scalar_sum_opIxxEEEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_181* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIxxNS0_13scalar_sum_opIxxEEEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_181* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f0.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -7862,10 +8029,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
-    long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
-    long* v11 = v10[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
+    global long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
+    global long* v11 = v10[0];
     bool v12 = v5 < size;
     if(v12) {
         goto v_lr_ph_i;
@@ -7873,17 +8040,17 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIxxNS0_13scalar_sum_opIxxEEEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSM_iii_exit;
     }
     v_lr_ph_i:;
-    long*global * v14 = (&memcopied_eval[0].f1.f0.f0);
-    long* v15 = v14[0];
+    global long*global * v14 = (&memcopied_eval[0].f1.f0.f0);
+    global long* v15 = v14[0];
         i_01_i = v5;
     goto v17;
     v17:;
     long v18 = i_01_i;
-    long* v19 = (&v11[v18]);
+    global long* v19 = (&v11[v18]);
     long v_val_i_i_i_i = v19[0];
     long v20 = v15[0];
     long v21 = v20 + v_val_i_i_i_i;
-    long* v22 = (&v9[v18]);
+    global long* v22 = (&v9[v18]);
     v22[0] = v21;
     int v24 = i_01_i + v7;
     bool v25 = v24 < size;
@@ -7898,8 +8065,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_11scalar_leftIxxNS0_13scalar_sum_opIxxEEEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSM_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIxxNS0_13scalar_sum_opIxxEEEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_184* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIxxNS0_13scalar_sum_opIxxEEEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_184* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f0.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -7908,10 +8079,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
-    long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
-    long* v11 = v10[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
+    global long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
+    global long* v11 = v10[0];
     bool v12 = v5 < size;
     if(v12) {
         goto v_lr_ph_i;
@@ -7919,17 +8090,17 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIxxNS0_13scalar_sum_opIxxEEEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSM_iii_exit;
     }
     v_lr_ph_i:;
-    long*global * v14 = (&memcopied_eval[0].f1.f0.f0);
-    long* v15 = v14[0];
+    global long*global * v14 = (&memcopied_eval[0].f1.f0.f0);
+    global long* v15 = v14[0];
         i_01_i = v5;
     goto v17;
     v17:;
     long v18 = i_01_i;
-    long* v19 = (&v11[v18]);
+    global long* v19 = (&v11[v18]);
     long v_val_i_i_i_i = v19[0];
     long v20 = v15[0];
     long v21 = v20 + v_val_i_i_i_i;
-    long* v22 = (&v9[v18]);
+    global long* v22 = (&v9[v18]);
     v22[0] = v21;
     int v24 = i_01_i + v7;
     bool v25 = v24 < size;
@@ -7944,8 +8115,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_18TensorCwiseUnaryOpINS0_12scalar_rightIxxNS0_13scalar_sum_opIxxEEEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEEEENS_9GpuDeviceEEEiLb0EE3runERSM_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_187* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_187* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -7954,12 +8129,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
-    long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
-    long* v11 = v10[0];
-    long*global * v12 = (&memcopied_eval[0].f1.f2.f3.f0);
-    long* v13 = v12[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
+    global long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
+    global long* v11 = v10[0];
+    global long*global * v12 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global long* v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     int v15 = v14[0];
     bool v16 = v5 < size;
@@ -7973,14 +8148,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v_lr_ph_i;
     v_lr_ph_i:;
     long v19 = i_01_i;
-    long* v20 = (&v11[v19]);
+    global long* v20 = (&v11[v19]);
     long v_val_i_i_i_i = v20[0];
     int v21 = i_01_i % v15;
     long v22 = v21;
-    long* v23 = (&v13[v22]);
+    global long* v23 = (&v13[v22]);
     long v_val_i_i_i_i_i_i = v23[0];
     long v24 = v_val_i_i_i_i_i_i + v_val_i_i_i_i;
-    long* v25 = (&v9[v19]);
+    global long* v25 = (&v9[v19]);
     v25[0] = v24;
     int v27 = i_01_i + v7;
     bool v28 = v27 < size;
@@ -7995,8 +8170,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEESE_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_190* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_190* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -8005,14 +8184,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
-    long*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
-    long* v11 = v10[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
+    global long*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global long* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     int v13 = v12[0];
-    long*global * v14 = (&memcopied_eval[0].f1.f2.f0);
-    long* v15 = v14[0];
+    global long*global * v14 = (&memcopied_eval[0].f1.f2.f0);
+    global long* v15 = v14[0];
     bool v16 = v5 < size;
     if(v16) {
         goto v_lr_ph_i_preheader;
@@ -8025,13 +8204,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     v_lr_ph_i:;
     int v19 = i_01_i % v13;
     long v20 = v19;
-    long* v21 = (&v11[v20]);
+    global long* v21 = (&v11[v20]);
     long v_val_i_i_i_i_i_i = v21[0];
     long v22 = i_01_i;
-    long* v23 = (&v15[v22]);
+    global long* v23 = (&v15[v22]);
     long v_val_i_i_i_i = v23[0];
     long v24 = v_val_i_i_i_i + v_val_i_i_i_i_i_i;
-    long* v25 = (&v9[v22]);
+    global long* v25 = (&v9[v22]);
     v25[0] = v24;
     int v27 = i_01_i + v7;
     bool v28 = v27 < size;
@@ -8046,8 +8225,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiLb0EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_192* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_192* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -8056,14 +8239,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
-    long*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
-    long* v11 = v10[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
+    global long*global * v10 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global long* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     int v13 = v12[0];
-    long*global * v14 = (&memcopied_eval[0].f1.f2.f3.f0);
-    long* v15 = v14[0];
+    global long*global * v14 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global long* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     int v17 = v16[0];
     bool v18 = v5 < size;
@@ -8078,15 +8261,15 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     v_lr_ph_i:;
     int v21 = i_01_i % v13;
     long v22 = v21;
-    long* v23 = (&v11[v22]);
+    global long* v23 = (&v11[v22]);
     long v_val_i_i_i_i_i_i = v23[0];
     int v24 = i_01_i % v17;
     long v25 = v24;
-    long* v26 = (&v15[v25]);
+    global long* v26 = (&v15[v25]);
     long v_val_i_i_i1_i_i_i = v26[0];
     long v27 = v_val_i_i_i1_i_i_i + v_val_i_i_i_i_i_i;
     long v28 = i_01_i;
-    long* v29 = (&v9[v28]);
+    global long* v29 = (&v9[v28]);
     v29[0] = v27;
     int v31 = i_01_i + v7;
     bool v32 = v31 < size;
@@ -8101,8 +8284,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi1ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm1EEEKNS4_INS5_IKxLi1ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb0EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_194* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_194* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -8111,16 +8298,16 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
-    long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
-    long* v11 = v10[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
+    global long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
+    global long* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     int v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f2.f0[0]);
     int v15 = v14[0];
-    long*global * v16 = (&memcopied_eval[0].f1.f2.f3.f0);
-    long* v17 = v16[0];
+    global long*global * v16 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global long* v17 = v16[0];
     global int* v18 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v19 = ((global long*)v18);
     long v20 = v19[0];
@@ -8138,7 +8325,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v_lr_ph_i;
     v_lr_ph_i:;
     long v27 = i_01_i;
-    long* v28 = (&v11[v27]);
+    global long* v28 = (&v11[v27]);
     long v_val_i_i_i_i = v28[0];
     int v29 = i_01_i / v13;
     int v30 = v29 % v21;
@@ -8148,10 +8335,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v34 = v33 % v23;
     int v35 = v34 + v31;
     long v36 = v35;
-    long* v37 = (&v17[v36]);
+    global long* v37 = (&v17[v36]);
     long v_val_i_i_i_i_i_i = v37[0];
     long v38 = v_val_i_i_i_i_i_i + v_val_i_i_i_i;
-    long* v39 = (&v9[v27]);
+    global long* v39 = (&v9[v27]);
     v39[0] = v38;
     int v41 = i_01_i + v7;
     bool v42 = v41 < size;
@@ -8166,8 +8353,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi2ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEESE_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKxLi2ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_199* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKxLi2ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_199* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -8176,22 +8367,22 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f2.f0[0]);
     int v13 = v12[0];
-    long*global * v14 = (&memcopied_eval[0].f1.f1.f3.f0);
-    long* v15 = v14[0];
+    global long*global * v14 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global long* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v17 = ((global long*)v16);
     long v18 = v17[0];
     int v19 = (int)v18;
     long v20 = v18 >> 32;
     int v21 = (int)v20;
-    long*global * v22 = (&memcopied_eval[0].f1.f2.f0);
-    long* v23 = v22[0];
+    global long*global * v22 = (&memcopied_eval[0].f1.f2.f0);
+    global long* v23 = v22[0];
     bool v24 = v5 < size;
     if(v24) {
         goto v_lr_ph_i_preheader;
@@ -8210,13 +8401,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v32 = v31 % v21;
     int v33 = v32 + v29;
     long v34 = v33;
-    long* v35 = (&v15[v34]);
+    global long* v35 = (&v15[v34]);
     long v_val_i_i_i_i_i_i = v35[0];
     long v36 = i_01_i;
-    long* v37 = (&v23[v36]);
+    global long* v37 = (&v23[v36]);
     long v_val_i_i_i_i = v37[0];
     long v38 = v_val_i_i_i_i + v_val_i_i_i_i_i_i;
-    long* v39 = (&v9[v36]);
+    global long* v39 = (&v9[v36]);
     v39[0] = v38;
     int v41 = i_01_i + v7;
     bool v42 = v41 < size;
@@ -8231,8 +8422,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKxLi2ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiLb0EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKxLi2ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_201* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKxLi2ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_201* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -8241,14 +8436,14 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f2.f0[0]);
     int v13 = v12[0];
-    long*global * v14 = (&memcopied_eval[0].f1.f1.f3.f0);
-    long* v15 = v14[0];
+    global long*global * v14 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global long* v15 = v14[0];
     global int* v16 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v17 = ((global long*)v16);
     long v18 = v17[0];
@@ -8259,8 +8454,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v23 = v22[0];
     global int* v24 = (&memcopied_eval[0].f1.f2.f2.f0[0]);
     int v25 = v24[0];
-    long*global * v26 = (&memcopied_eval[0].f1.f2.f3.f0);
-    long* v27 = v26[0];
+    global long*global * v26 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global long* v27 = v26[0];
     global int* v28 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v29 = ((global long*)v28);
     long v30 = v29[0];
@@ -8285,7 +8480,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v42 = v41 % v21;
     int v43 = v42 + v39;
     long v44 = v43;
-    long* v45 = (&v15[v44]);
+    global long* v45 = (&v15[v44]);
     long v_val_i_i_i_i_i_i = v45[0];
     int v46 = i_01_i / v23;
     int v47 = v46 % v31;
@@ -8295,11 +8490,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v51 = v50 % v33;
     int v52 = v51 + v48;
     long v53 = v52;
-    long* v54 = (&v27[v53]);
+    global long* v54 = (&v27[v53]);
     long v_val_i_i_i1_i_i_i = v54[0];
     long v55 = v_val_i_i_i1_i_i_i + v_val_i_i_i_i_i_i;
     long v56 = i_01_i;
-    long* v57 = (&v9[v56]);
+    global long* v57 = (&v9[v56]);
     v57[0] = v55;
     int v59 = i_01_i + v7;
     bool v60 = v59 < size;
@@ -8314,8 +8509,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi2ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm2EEEKNS4_INS5_IKxLi2ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb0EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_203* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_203* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -8324,10 +8523,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
-    long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
-    long* v11 = v10[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
+    global long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
+    global long* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     int v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f1.f0[1]);
@@ -8338,8 +8537,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v19 = (int)v18;
     long v20 = v18 >> 32;
     int v21 = (int)v20;
-    long*global * v22 = (&memcopied_eval[0].f1.f2.f3.f0);
-    long* v23 = v22[0];
+    global long*global * v22 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global long* v23 = v22[0];
     global int* v24 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v25 = ((global long*)v24);
     long v26 = v25[0];
@@ -8359,7 +8558,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v_lr_ph_i;
     v_lr_ph_i:;
     long v35 = i_01_i;
-    long* v36 = (&v11[v35]);
+    global long* v36 = (&v11[v35]);
     long v_val_i_i_i_i = v36[0];
     int v37 = i_01_i / v13;
     int v38 = v37 % v27;
@@ -8375,10 +8574,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v48 = v47 % v31;
     int v49 = v45 + v48;
     long v50 = v49;
-    long* v51 = (&v23[v50]);
+    global long* v51 = (&v23[v50]);
     long v_val_i_i_i_i_i_i = v51[0];
     long v52 = v_val_i_i_i_i_i_i + v_val_i_i_i_i;
-    long* v53 = (&v9[v35]);
+    global long* v53 = (&v9[v35]);
     v53[0] = v52;
     int v55 = i_01_i + v7;
     bool v56 = v55 < size;
@@ -8393,8 +8592,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi3ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEESE_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKxLi3ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_208* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKxLi3ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_208* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -8403,8 +8606,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f1.f0[1]);
@@ -8415,8 +8618,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v17 = (int)v16;
     long v18 = v16 >> 32;
     int v19 = (int)v18;
-    long*global * v20 = (&memcopied_eval[0].f1.f1.f3.f0);
-    long* v21 = v20[0];
+    global long*global * v20 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global long* v21 = v20[0];
     global int* v22 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v23 = ((global long*)v22);
     long v24 = v23[0];
@@ -8425,8 +8628,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v27 = (int)v26;
     global int* v28 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[2]);
     int v29 = v28[0];
-    long*global * v30 = (&memcopied_eval[0].f1.f2.f0);
-    long* v31 = v30[0];
+    global long*global * v30 = (&memcopied_eval[0].f1.f2.f0);
+    global long* v31 = v30[0];
     bool v32 = v5 < size;
     if(v32) {
         goto v_lr_ph_i_preheader;
@@ -8451,13 +8654,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v46 = v45 % v29;
     int v47 = v43 + v46;
     long v48 = v47;
-    long* v49 = (&v21[v48]);
+    global long* v49 = (&v21[v48]);
     long v_val_i_i_i_i_i_i = v49[0];
     long v50 = i_01_i;
-    long* v51 = (&v31[v50]);
+    global long* v51 = (&v31[v50]);
     long v_val_i_i_i_i = v51[0];
     long v52 = v_val_i_i_i_i + v_val_i_i_i_i_i_i;
-    long* v53 = (&v9[v50]);
+    global long* v53 = (&v9[v50]);
     v53[0] = v52;
     int v55 = i_01_i + v7;
     bool v56 = v55 < size;
@@ -8472,8 +8675,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKxLi3ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiLb0EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKxLi3ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_210* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKxLi3ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_210* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -8482,8 +8689,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f1.f0[1]);
@@ -8494,8 +8701,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v17 = (int)v16;
     long v18 = v16 >> 32;
     int v19 = (int)v18;
-    long*global * v20 = (&memcopied_eval[0].f1.f1.f3.f0);
-    long* v21 = v20[0];
+    global long*global * v20 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global long* v21 = v20[0];
     global int* v22 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v23 = ((global long*)v22);
     long v24 = v23[0];
@@ -8514,8 +8721,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v37 = (int)v36;
     long v38 = v36 >> 32;
     int v39 = (int)v38;
-    long*global * v40 = (&memcopied_eval[0].f1.f2.f3.f0);
-    long* v41 = v40[0];
+    global long*global * v40 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global long* v41 = v40[0];
     global int* v42 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v43 = ((global long*)v42);
     long v44 = v43[0];
@@ -8548,7 +8755,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v64 = v63 % v29;
     int v65 = v61 + v64;
     long v66 = v65;
-    long* v67 = (&v21[v66]);
+    global long* v67 = (&v21[v66]);
     long v_val_i_i_i_i_i_i = v67[0];
     int v68 = i_01_i / v31;
     int v69 = v68 % v45;
@@ -8564,11 +8771,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v79 = v78 % v49;
     int v80 = v76 + v79;
     long v81 = v80;
-    long* v82 = (&v41[v81]);
+    global long* v82 = (&v41[v81]);
     long v_val_i_i_i1_i_i_i = v82[0];
     long v83 = v_val_i_i_i1_i_i_i + v_val_i_i_i_i_i_i;
     long v84 = i_01_i;
-    long* v85 = (&v9[v84]);
+    global long* v85 = (&v9[v84]);
     v85[0] = v83;
     int v87 = i_01_i + v7;
     bool v88 = v87 < size;
@@ -8583,8 +8790,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi3ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm3EEEKNS4_INS5_IKxLi3ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb0EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_212* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_212* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -8593,10 +8804,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
-    long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
-    long* v11 = v10[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
+    global long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
+    global long* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     global long* v13 = ((global long*)v12);
     long v14 = v13[0];
@@ -8613,8 +8824,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v25 = (int)v24;
     global int* v26 = (&memcopied_eval[0].f1.f2.f2.f0[2]);
     int v27 = v26[0];
-    long*global * v28 = (&memcopied_eval[0].f1.f2.f3.f0);
-    long* v29 = v28[0];
+    global long*global * v28 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global long* v29 = v28[0];
     global int* v30 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v31 = ((global long*)v30);
     long v32 = v31[0];
@@ -8638,7 +8849,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v_lr_ph_i;
     v_lr_ph_i:;
     long v45 = i_01_i;
-    long* v46 = (&v11[v45]);
+    global long* v46 = (&v11[v45]);
     long v_val_i_i_i_i = v46[0];
     int v47 = i_01_i / v15;
     int v48 = v47 % v33;
@@ -8660,10 +8871,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v64 = v63 % v41;
     int v65 = v61 + v64;
     long v66 = v65;
-    long* v67 = (&v29[v66]);
+    global long* v67 = (&v29[v66]);
     long v_val_i_i_i_i_i_i = v67[0];
     long v68 = v_val_i_i_i_i_i_i + v_val_i_i_i_i;
-    long* v69 = (&v9[v45]);
+    global long* v69 = (&v9[v45]);
     v69[0] = v68;
     int v71 = i_01_i + v7;
     bool v72 = v71 < size;
@@ -8678,8 +8889,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi4ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEESE_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKxLi4ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_217* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKxLi4ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_217* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -8688,8 +8903,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     global long* v11 = ((global long*)v10);
     long v12 = v11[0];
@@ -8706,8 +8921,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v23 = (int)v22;
     global int* v24 = (&memcopied_eval[0].f1.f1.f2.f0[2]);
     int v25 = v24[0];
-    long*global * v26 = (&memcopied_eval[0].f1.f1.f3.f0);
-    long* v27 = v26[0];
+    global long*global * v26 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global long* v27 = v26[0];
     global int* v28 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v29 = ((global long*)v28);
     long v30 = v29[0];
@@ -8720,8 +8935,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v37 = (int)v36;
     long v38 = v36 >> 32;
     int v39 = (int)v38;
-    long*global * v40 = (&memcopied_eval[0].f1.f2.f0);
-    long* v41 = v40[0];
+    global long*global * v40 = (&memcopied_eval[0].f1.f2.f0);
+    global long* v41 = v40[0];
     bool v42 = v5 < size;
     if(v42) {
         goto v_lr_ph_i_preheader;
@@ -8752,13 +8967,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v62 = v61 % v39;
     int v63 = v59 + v62;
     long v64 = v63;
-    long* v65 = (&v27[v64]);
+    global long* v65 = (&v27[v64]);
     long v_val_i_i_i_i_i_i = v65[0];
     long v66 = i_01_i;
-    long* v67 = (&v41[v66]);
+    global long* v67 = (&v41[v66]);
     long v_val_i_i_i_i = v67[0];
     long v68 = v_val_i_i_i_i + v_val_i_i_i_i_i_i;
-    long* v69 = (&v9[v66]);
+    global long* v69 = (&v9[v66]);
     v69[0] = v68;
     int v71 = i_01_i + v7;
     bool v72 = v71 < size;
@@ -8773,8 +8988,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKxLi4ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiLb0EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKxLi4ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_219* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKxLi4ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_219* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -8783,8 +9002,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     global long* v11 = ((global long*)v10);
     long v12 = v11[0];
@@ -8801,8 +9020,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v23 = (int)v22;
     global int* v24 = (&memcopied_eval[0].f1.f1.f2.f0[2]);
     int v25 = v24[0];
-    long*global * v26 = (&memcopied_eval[0].f1.f1.f3.f0);
-    long* v27 = v26[0];
+    global long*global * v26 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global long* v27 = v26[0];
     global int* v28 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v29 = ((global long*)v28);
     long v30 = v29[0];
@@ -8831,8 +9050,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v53 = (int)v52;
     global int* v54 = (&memcopied_eval[0].f1.f2.f2.f0[2]);
     int v55 = v54[0];
-    long*global * v56 = (&memcopied_eval[0].f1.f2.f3.f0);
-    long* v57 = v56[0];
+    global long*global * v56 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global long* v57 = v56[0];
     global int* v58 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v59 = ((global long*)v58);
     long v60 = v59[0];
@@ -8875,7 +9094,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v90 = v89 % v39;
     int v91 = v87 + v90;
     long v92 = v91;
-    long* v93 = (&v27[v92]);
+    global long* v93 = (&v27[v92]);
     long v_val_i_i_i_i_i_i = v93[0];
     int v94 = i_01_i / v43;
     int v95 = v94 % v61;
@@ -8897,11 +9116,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v111 = v110 % v69;
     int v112 = v108 + v111;
     long v113 = v112;
-    long* v114 = (&v57[v113]);
+    global long* v114 = (&v57[v113]);
     long v_val_i_i_i1_i_i_i = v114[0];
     long v115 = v_val_i_i_i1_i_i_i + v_val_i_i_i_i_i_i;
     long v116 = i_01_i;
-    long* v117 = (&v9[v116]);
+    global long* v117 = (&v9[v116]);
     v117[0] = v115;
     int v119 = i_01_i + v7;
     bool v120 = v119 < size;
@@ -8916,8 +9135,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi4ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm4EEEKNS4_INS5_IKxLi4ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiLb0EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_221* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESE_EEEEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_221* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -8926,10 +9149,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
-    long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
-    long* v11 = v10[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
+    global long*global * v10 = (&memcopied_eval[0].f1.f1.f0);
+    global long* v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f2.f1.f0[0]);
     int v13 = v12[0];
     global int* v14 = (&memcopied_eval[0].f1.f2.f1.f0[1]);
@@ -8952,8 +9175,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v31 = (int)v30;
     long v32 = v30 >> 32;
     int v33 = (int)v32;
-    long*global * v34 = (&memcopied_eval[0].f1.f2.f3.f0);
-    long* v35 = v34[0];
+    global long*global * v34 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global long* v35 = v34[0];
     global int* v36 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v37 = ((global long*)v36);
     long v38 = v37[0];
@@ -8979,7 +9202,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     goto v_lr_ph_i;
     v_lr_ph_i:;
     long v53 = i_01_i;
-    long* v54 = (&v11[v53]);
+    global long* v54 = (&v11[v53]);
     long v_val_i_i_i_i = v54[0];
     int v55 = i_01_i / v13;
     int v56 = v55 % v39;
@@ -9007,10 +9230,10 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v78 = v77 % v49;
     int v79 = v75 + v78;
     long v80 = v79;
-    long* v81 = (&v35[v80]);
+    global long* v81 = (&v35[v80]);
     long v_val_i_i_i_i_i_i = v81[0];
     long v82 = v_val_i_i_i_i_i_i + v_val_i_i_i_i;
-    long* v83 = (&v9[v53]);
+    global long* v83 = (&v9[v53]);
     v83[0] = v82;
     int v85 = i_01_i + v7;
     bool v86 = v85 < size;
@@ -9025,8 +9248,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS4_INS5_IKxLi5ELi1EiEELi16EEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEESE_EEEEEENS_9GpuDeviceEEEiLb0EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKxLi5ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_226* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKxLi5ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_226* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -9035,8 +9262,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f1.f0[1]);
@@ -9059,8 +9286,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v29 = (int)v28;
     long v30 = v28 >> 32;
     int v31 = (int)v30;
-    long*global * v32 = (&memcopied_eval[0].f1.f1.f3.f0);
-    long* v33 = v32[0];
+    global long*global * v32 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global long* v33 = v32[0];
     global int* v34 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v35 = ((global long*)v34);
     long v36 = v35[0];
@@ -9075,8 +9302,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v45 = (int)v44;
     global int* v46 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[4]);
     int v47 = v46[0];
-    long*global * v48 = (&memcopied_eval[0].f1.f2.f0);
-    long* v49 = v48[0];
+    global long*global * v48 = (&memcopied_eval[0].f1.f2.f0);
+    global long* v49 = v48[0];
     bool v50 = v5 < size;
     if(v50) {
         goto v_lr_ph_i_preheader;
@@ -9113,13 +9340,13 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v76 = v75 % v47;
     int v77 = v73 + v76;
     long v78 = v77;
-    long* v79 = (&v33[v78]);
+    global long* v79 = (&v33[v78]);
     long v_val_i_i_i_i_i_i = v79[0];
     long v80 = i_01_i;
-    long* v81 = (&v49[v80]);
+    global long* v81 = (&v49[v80]);
     long v_val_i_i_i_i = v81[0];
     long v82 = v_val_i_i_i_i + v_val_i_i_i_i_i_i;
-    long* v83 = (&v9[v80]);
+    global long* v83 = (&v9[v80]);
     v83[0] = v82;
     int v85 = i_01_i + v7;
     bool v86 = v85 < size;
@@ -9134,8 +9361,12 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKxLi5ELi1EiEELi16EEEEESI_EEEENS_9GpuDeviceEEEiLb0EE3runERSQ_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKxLi5ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_228* memcopied_eval, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIxLi5ELi1EiEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIxxEEKNS_20TensorBroadcastingOpIKNS_5arrayIlLm5EEEKNS4_INS5_IKxLi5ELi1EiEELi16EEEEESK_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_228* memcopied_eval, global long* memcopied_eval_ptr0, global long* memcopied_eval_ptr1, global long* memcopied_eval_ptr2, int size) {
     int i_01_i;
+memcopied_eval[0].f0.f0 = memcopied_eval_ptr0;
+memcopied_eval[0].f1.f1.f3.f0 = memcopied_eval_ptr1;
+memcopied_eval[0].f1.f2.f3.f0 = memcopied_eval_ptr2;
+
     label0:;
     int v1 = get_group_id(0);
     int v2 = get_local_size(0);
@@ -9144,8 +9375,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v5 = v3 + v4;
     int v6 = get_num_groups(0);
     int v7 = v6 * v2;
-    long*global * v8 = (&memcopied_eval[0].f0.f0);
-    long* v9 = v8[0];
+    global long*global * v8 = (&memcopied_eval[0].f0.f0);
+    global long* v9 = v8[0];
     global int* v10 = (&memcopied_eval[0].f1.f1.f1.f0[0]);
     int v11 = v10[0];
     global int* v12 = (&memcopied_eval[0].f1.f1.f1.f0[1]);
@@ -9168,8 +9399,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v29 = (int)v28;
     long v30 = v28 >> 32;
     int v31 = (int)v30;
-    long*global * v32 = (&memcopied_eval[0].f1.f1.f3.f0);
-    long* v33 = v32[0];
+    global long*global * v32 = (&memcopied_eval[0].f1.f1.f3.f0);
+    global long* v33 = v32[0];
     global int* v34 = (&memcopied_eval[0].f1.f1.f3.f1.f0.f0[0]);
     global long* v35 = ((global long*)v34);
     long v36 = v35[0];
@@ -9206,8 +9437,8 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v67 = (int)v66;
     long v68 = v66 >> 32;
     int v69 = (int)v68;
-    long*global * v70 = (&memcopied_eval[0].f1.f2.f3.f0);
-    long* v71 = v70[0];
+    global long*global * v70 = (&memcopied_eval[0].f1.f2.f3.f0);
+    global long* v71 = v70[0];
     global int* v72 = (&memcopied_eval[0].f1.f2.f3.f1.f0.f0[0]);
     global long* v73 = ((global long*)v72);
     long v74 = v73[0];
@@ -9258,7 +9489,7 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v112 = v111 % v47;
     int v113 = v109 + v112;
     long v114 = v113;
-    long* v115 = (&v33[v114]);
+    global long* v115 = (&v33[v114]);
     long v_val_i_i_i_i = v115[0];
     int v116 = i_01_i / v49;
     int v117 = v116 % v75;
@@ -9286,11 +9517,11 @@ kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14Tenso
     int v139 = v138 % v85;
     int v140 = v136 + v139;
     long v141 = v140;
-    long* v142 = (&v71[v141]);
+    global long* v142 = (&v71[v141]);
     long v_val_i_i_i1_i = v142[0];
     long v143 = v_val_i_i_i1_i + v_val_i_i_i_i;
     long v144 = i_01_i;
-    long* v145 = (&v9[v144]);
+    global long* v145 = (&v9[v144]);
     v145[0] = v143;
     int v147 = i_01_i + v7;
     bool v148 = v147 < size;

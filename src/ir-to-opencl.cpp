@@ -58,6 +58,7 @@ static string currentFunctionSharedDeclarations = "";
 static map<string, string> currentFunctionPhiDeclarationsByName;
 //set<string> currentFunction
 static string globalDeclarations = "";
+static string structpointershimcode = "";
 
 static bool debug;
 bool single_precision = true;
@@ -1138,6 +1139,7 @@ std::string dumpFunctionDeclaration(Function *F) {
     declaration += dumpType(retType) + " " + fname + "(";
     int i = 0;
     cout << "dumping function " << fname << endl;
+    structpointershimcode = "";
     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
         Argument *arg = &*it;
         storeValueName(arg);
@@ -1164,12 +1166,13 @@ std::string dumpFunctionDeclaration(Function *F) {
             if(StructType *structType = dyn_cast<StructType>(elemType)) {
                 outs() << "got a structtype\n";
                 unique_ptr<StructInfo> structInfo(new StructInfo());
-                walkStructType(TheModule.get(), structInfo.get(), 0, 0, std::vector<int>(), structType);
+                walkStructType(TheModule.get(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
                 for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
                     PointerInfo *pointerInfo = pointerit->get();
                     int offset = pointerInfo->offset;
                     // Type *type = pointerInfo->type;
                     declaration += ", global " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
+                    structpointershimcode += argName + "[0]" + pointerInfo->path + " = " + argName + "_ptr" + toString(j) + ";\n";
                     j++;
                 }
             }
@@ -1230,6 +1233,7 @@ std::string dumpFunction(Function *F) {
         gencode += "    " + it->second + ";\n";
     }
     gencode +=
+        structpointershimcode + "\n" +
         body +
     "}\n";
     cout << gencode;

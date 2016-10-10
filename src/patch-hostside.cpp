@@ -354,7 +354,7 @@ void patchFunction(Function *F) {
                             // of the target for eigen shows it contains a float *.  that probably points into gpu
                             // memory already.  We'd probably better scan for that.
                             unique_ptr<StructInfo> structInfo(new StructInfo());
-                            walkStructType(TheModule.get(), structInfo.get(), 0, 0, vector<int>(), cast<StructType>(value->getType()));
+                            walkStructType(TheModule.get(), structInfo.get(), 0, 0, vector<int>(), "", cast<StructType>(value->getType()));
 
                             // now we need to set up instructions to pass in:
                             // - the struct itself

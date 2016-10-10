@@ -326,9 +326,9 @@ string getIndent(int level) {
     return oss.str();
 }
 
-void walkType(Module *M, StructInfo *structInfo, int level, int offset, vector<int> indices, Type *type) {
+void walkType(Module *M, StructInfo *structInfo, int level, int offset, vector<int> indices, string path, Type *type) {
     if(StructType *structtype = dyn_cast<StructType>(type)) {
-        walkStructType(M, structInfo, level, offset, indices, structtype);
+        walkStructType(M, structInfo, level, offset, indices, path, structtype);
     } else if(PointerType *pointerType = dyn_cast<PointerType>(type)) {
         Type *elementType = pointerType->getPointerElementType();
         int addressspace = pointerType->getAddressSpace();
@@ -340,7 +340,7 @@ void walkType(Module *M, StructInfo *structInfo, int level, int offset, vector<i
         // actually, anything except float *s, we're just going to leave as-is (or set to zero), for now
         if(elementType->getPrimitiveSizeInBits() != 0) {
             outs() << "primitive type " << dumpType(pointerType) << "\n";
-            structInfo->pointerInfos.push_back(unique_ptr<PointerInfo>(new PointerInfo(offset, pointerType, indices)));
+            structInfo->pointerInfos.push_back(unique_ptr<PointerInfo>(new PointerInfo(offset, pointerType, indices, path)));
         }
     } else if(ArrayType *arrayType = dyn_cast<ArrayType>(type)) {
         Type *elemType = arrayType->getElementType();
@@ -357,7 +357,7 @@ void walkType(Module *M, StructInfo *structInfo, int level, int offset, vector<i
     }
 }
 
-void walkStructType(Module *M, StructInfo *structInfo, int level, int offset, vector<int> indices, StructType *type) {
+void walkStructType(Module *M, StructInfo *structInfo, int level, int offset, vector<int> indices, string path, StructType *type) {
     // Type *type = value->getType();
     // if(isa<StructType>(type)) {
         // outs() << "walkvalue type is struct" << "\n";
@@ -374,7 +374,7 @@ void walkStructType(Module *M, StructInfo *structInfo, int level, int offset, ve
         // outs() << getIndent(level) + "child type " << dumpType(child) << "\n";
         vector<int> childindices(indices);
         childindices.push_back(i);
-        walkType(M, structInfo, level + 1, childoffset, childindices, child);
+        walkType(M, structInfo, level + 1, childoffset, childindices, path + ".f" + toString(i), child);
         childoffset += M->getDataLayout().getTypeAllocSize(child);
         i++;
     }
