@@ -259,10 +259,9 @@ Instruction *copyStructValuesNoPointers(Instruction *lastInst, Value *src, Value
             Instruction *childDstInst = GetElementPtrInst::CreateInBounds(dst, ArrayRef<Value *>(&dstIndex[0], &dstIndex[2]));
             childDstInst->insertAfter(lastInst);
             lastInst = childDstInst;
+
             if(StructType *childStructType = dyn_cast<StructType>(childType)) {
                 lastInst = copyStructValuesNoPointers(lastInst, childSrcInst, childDstInst);
-                srcidx++;
-                dstidx++;
             // } else if(IntegerType *intType = dyn_cast<IntegerType>(childType)) {
             } else if(childType->getPrimitiveSizeInBits() > 0 ) {
                 // do we have to do `load` followed by `store`?
@@ -278,10 +277,13 @@ Instruction *copyStructValuesNoPointers(Instruction *lastInst, Value *src, Value
                 Instruction *store = new StoreInst(load, childDstInst, "storeint");
                 store->insertAfter(lastInst);
                 lastInst = store;
+
             } else {
                 outs() << "unhandled type " + dumpType(childType) << "\n";
                 // throw runtime_error("unhandled type " + dumpType(childType));
             }
+            srcidx++;
+            dstidx++;
         }
     } else {
         outs() << "skipping type " << dumpType(src->getType()) << "\n";

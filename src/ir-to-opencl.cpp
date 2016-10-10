@@ -1112,6 +1112,40 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
     return gencode;
 }
 
+string writeStructCopyCodeNoPointers(StructType *structType, string srcName, string destName) {
+    string gencode = "";
+    int srcidx = 0;
+    int dstidx = 0;
+    outs() << "writeStructCopyCodeNoPointers " << dumpType(structType) << "\n";
+    for(auto it=structType->element_begin(); it != structType->element_end(); it++) {
+        Type *childType = *it;
+        if(isa<PointerType>(childType)) {
+            // ignore
+            srcidx++;
+            dstidx++;
+            continue;
+        }
+        string childSrcName = srcName + ".f" + toString(srcidx);
+        string childDstName = destName + ".f" + toString(dstidx);
+        if(StructType *childStructType = dyn_cast<StructType>(childType)) {
+            gencode += writeStructCopyCodeNoPointers(childStructType, childSrcName, childDstName);
+            srcidx++;
+            dstidx++;
+        } else if(childType->getPrimitiveSizeInBits() > 0 ) {
+            gencode += childDstName + " = " + childSrcName + ";\n";
+            outs() << "copying " << dumpType(childType) << "\n";
+            srcidx++;
+            dstidx++;
+        } else {
+            outs() << "unhandled type " + dumpType(childType) << "\n";
+            // throw runtime_error("unhandled type " + dumpType(childType));
+            srcidx++;
+            dstidx++;
+        }
+    }
+    return gencode;
+}
+
 std::string dumpFunctionDeclaration(Function *F) {
     string declaration = "";
     Type *retType = F->getReturnType();
@@ -1162,7 +1196,7 @@ std::string dumpFunctionDeclaration(Function *F) {
                 outs() << "got a structtype\n";
                 // declare a pointerful struct, then copy the vlaues across, then copy the float *s in
                 structpointershimcode += dumpType(structType) + " " + argName + "[1];\n";
-
+                structpointershimcode += writeStructCopyCodeNoPointers(structType, argName + "_nopointers[0]", argName + "[0]");
                 unique_ptr<StructInfo> structInfo(new StructInfo());
                 walkStructType(TheModule.get(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
                 for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
