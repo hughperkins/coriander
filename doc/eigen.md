@@ -2,7 +2,7 @@
 
 Using `cocl` on Eigen is a work in progress.  You can try:
 ```
-make run-test_cuda_elementwise_small
+make run-eigen-test_cuda_elementwise_small
 ```
 which compiles and runs:
 

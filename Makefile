@@ -124,7 +124,7 @@ run-cuda_sample: build/cuda_sample
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test_cuda_elementwise_small: build/test_cuda_elementwise_small
+run-eigen-test_cuda_elementwise_small: build/eigen-test_cuda_elementwise_small
 	################################
 	# running:
 	################################
