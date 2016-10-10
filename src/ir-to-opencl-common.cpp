@@ -49,6 +49,22 @@ std::string getDeclarationsToWrite() {
 }
 std::set<string> declaredStructs;
 
+std::string getName(StructType *type) {
+    if(!type->hasName()) {
+        type->dump();
+        throw runtime_error("type doesnt have name");
+    }
+    return type->getName();
+}
+
+std::string getName(Function *type) {
+    if(!type->hasName()) {
+        type->dump();
+        throw runtime_error("function doesnt have name");
+    }
+    return type->getName();
+}
+
 GlobalVariable *addGlobalVariable(Module *M, string name, string value) {
     int N = value.size() + 1;
     LLVMContext &context = M->getContext();

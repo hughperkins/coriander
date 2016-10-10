@@ -177,22 +177,6 @@ std::string getName(Value *value) {
     return value->getName();
 }
 
-std::string getName(StructType *type) {
-    if(!type->hasName()) {
-        type->dump();
-        throw runtime_error("type doesnt have name");
-    }
-    return type->getName();
-}
-
-std::string getName(Function *type) {
-    if(!type->hasName()) {
-        type->dump();
-        throw runtime_error("function doesnt have name");
-    }
-    return type->getName();
-}
-
 string dumpConstant(Constant *constant) {
     unsigned int valueTy = constant->getValueID();
     ostringstream oss;
