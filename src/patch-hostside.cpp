@@ -277,10 +277,37 @@ Instruction *copyStructValuesNoPointers(Instruction *lastInst, Value *src, Value
                 Instruction *store = new StoreInst(load, childDstInst, "storeint");
                 store->insertAfter(lastInst);
                 lastInst = store;
+            } else if(ArrayType *arrayType = dyn_cast<ArrayType>(childType)) {
+                int numElements = arrayType->getNumElements();
+                outs() << "numlemenets " << numElements << "\n";
+                for(int i=0; i < numElements; i++) {
+                    Value *arrayindex[2];
+                    arrayindex[0] = ConstantInt::getSigned(IntegerType::get(TheContext, 32), i);
+                    arrayindex[1] = ConstantInt::getSigned(IntegerType::get(TheContext, 32), srcidx);
+                    Instruction *arrsrc = GetElementPtrInst::CreateInBounds(childSrcInst, ArrayRef<Value *>(&arrayindex[0], &arrayindex[1]));
+                    arrsrc->insertAfter(lastInst);
+                    lastInst = arrsrc;
 
+
+                    // Value *dstIndex[2];
+                    // dstIndex[0] = ConstantInt::getSigned(IntegerType::get(TheContext, 32), i);
+                    // dstIndex[1] = ConstantInt::getSigned(IntegerType::get(TheContext, 32), dstidx);
+                    Instruction *arraydst = GetElementPtrInst::CreateInBounds(childDstInst, ArrayRef<Value *>(&arrayindex[0], &arrayindex[1]));
+                    arraydst->insertAfter(lastInst);
+                    lastInst = arraydst;
+
+                    Instruction *load = new LoadInst(arrsrc, "loadarr");
+                    load->insertAfter(arraydst);
+                    lastInst = load;
+
+                    Instruction *store = new StoreInst(load, arraydst, "storearr");
+                    store->insertAfter(load);
+                    lastInst = store;
+                }
+                // throw runtime_error("unhandled type " + dumpType(childType));
             } else {
                 outs() << "unhandled type " + dumpType(childType) << "\n";
-                // throw runtime_error("unhandled type " + dumpType(childType));
+                throw runtime_error("unhandled type " + dumpType(childType));
             }
             srcidx++;
             dstidx++;
