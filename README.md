@@ -190,6 +190,10 @@ Tests are at [test](test)
 
 [faq.md](doc/faq.md)
 
+## License
+
+[Apache 2.0](LICENSE)
+
 ## News
 
 - Oct 10:
