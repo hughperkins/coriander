@@ -55,7 +55,7 @@ test/generated/%-hostraw.ll: test/%.cu
 test/eigen/generated/%-hostraw.ll: test/eigen/%.cu include/fake_funcs.h
 	echo building $@ from $<
 	mkdir -p test/eigen/generated
-	$(CLANG) -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -include include/fake_funcs.h -I$(EIGEN_HOME) -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
+	$(CLANG) -std=c++11 -include include/fake_funcs.h -I$(EIGEN_HOME) -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
 
 # .hostraw.ll => .hostpatched.ll
 
@@ -97,7 +97,7 @@ build/%-hostpatched.o: test/generated/%-hostpatched.ll
 	echo building $@ from $<
 	$(CLANG) -c $< -O3 -o $@
 
-build/%-hostpatched.o: test/eigen/generated/%-hostpatched.ll
+build/eigen-%-hostpatched.o: test/eigen/generated/%-hostpatched.ll
 	echo building $@ from $<
 	$(CLANG) -c $< -O3 -o $@
 
@@ -125,6 +125,9 @@ build/cuda_sample: build/cuda_sample-hostpatched.o build/hostside_opencl_funcs.o
 build/test_cuda_elementwise_small: build/test_cuda_elementwise_small-hostpatched.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
 	g++ -o build/test_cuda_elementwise_small build/test_cuda_elementwise_small-hostpatched.o build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
 
+build/eigen-test_cuda_nullary: build/eigen-test_cuda_nullary-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/test_cuda_nullary-device.cl
+	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
+
 run-cuda_sample: build/cuda_sample
 	################################
 	# running:
@@ -136,5 +139,11 @@ run-test_cuda_elementwise_small: build/test_cuda_elementwise_small
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/test_cuda_elementwise_small
+
+run-eigen-test_cuda_nullary: build/eigen-test_cuda_nullary
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-test_cuda_nullary
 
 .SECONDARY:

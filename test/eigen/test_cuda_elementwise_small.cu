@@ -1,9 +1,8 @@
-// This is from Eigen unsupported/test folder
-// will gradually uncomment lines, and fix the issues which thus arise
+// This is from Eigen unsupported/test/cxx11_tensor_cuda.cu
 
 #define EIGEN_TEST_NO_LONGDOUBLE
 #define EIGEN_TEST_NO_COMPLEX
-// #define EIGEN_TEST_FUNC cxx11_tensor_cuda
+#define EIGEN_TEST_FUNC cuda_elementwise_small
 #define EIGEN_USE_GPU
 
 // #if defined __CUDACC_VER__ && __CUDACC_VER__ >= 70500
