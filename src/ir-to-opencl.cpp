@@ -951,7 +951,6 @@ std::string dumpSelect(SelectInst *instr) {
 }
 
 void addPHIDeclaration(PHINode *phi) {
-    // currentFunctionPhiDeclarationsByName
     storeValueName(phi);
     string name = dumpOperand(phi);
     string declaration = dumpType(phi->getType()) + " " + dumpOperand(phi);
@@ -1183,38 +1182,6 @@ std::string dumpFunctionDeclaration(Function *F) {
     return declaration;
 }
 
-// this is going to walk over struct args, and look for float *s (for now), and add those as
-// additional kernel arguments, with some shim-type code to hook those into the incoming struct arg
-// the shim code will be returned as the string return from this function
-// the additional arguments will be patched directly into F (maybe)
-// std::string augmentStructArgs(Function *F) {
-//     string shimcode = "";
-//     outs() << "augmentStructArgs\n";
-//     int i = 0;
-//     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-//         Argument *arg = &*it;
-//         // storeValueName(arg);
-//         Type *argType = arg->getType();
-//         outs() << "arg " << i << " " << dumpType(argType) << "\n";
-//         if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
-//             Type *elemType = ptrType->getPointerElementType();
-//             if(StructType *structType = dyn_cast<StructType>(elemType)) {
-//                 outs() << "got a structtype\n";
-//                 unique_ptr<StructInfo> structInfo(new StructInfo());
-//                 walkStructType(TheModule.get(), structInfo.get(), 0, 0, std::vector<int>(), structType);
-//                 for(auto float4it=structInfo->pointerInfos.begin(); float4it != structInfo->pointerInfos.end(); float4it++) {
-//                     PointerInfo *pointerInfo = pointerit->get();
-//                     int offset = pointerInfo->offset;
-//                     Type *type = pointerInfo->type;
-
-//                 }
-//             }
-//         }
-//         i++;
-//     }
-//     return shimcode;
-// }
-
 std::string dumpFunction(Function *F) {
     currentFunctionSharedDeclarations = "";
     currentFunctionPhiDeclarationsByName.clear();
@@ -1283,11 +1250,6 @@ std::string dumpModule(Module *M) {
     cout << globalDeclarations << endl;
     cout << "done declaring global variables" << endl;
 
-    // get global constant declarations
-
-
-    // throw runtime_error("stop here");
-
     // figure out which functions are kernels
     for(auto it=M->named_metadata_begin(); it != M->named_metadata_end(); it++) {
         NamedMDNode *namedMDNode = &*it;
@@ -1322,20 +1284,6 @@ std::string dumpModule(Module *M) {
         }
     }
 
-    // augment functions for struct args contianing pointers
-    // only do this for kernel calls
-    // map<Function *, string> structShimCodeByFunction;
-    // for(auto it = M->begin(); it != M->end(); it++) {
-    //     Function *F = &*it;
-    //     string name = getName(F);
-    //     if(!iskernel_by_name[name]) {
-    //         continue;
-    //     }
-    //     outs() << "function " << name << "\n";
-    //     string structshimcode = augmentStructArgs(F);
-    //     structShimCodeByFunction[F] = structshimcode;
-    // }
-
     // dump function declarations
     cout << "beginning function declarations" << endl;
     for(auto it = M->begin(); it != M->end(); it++) {
@@ -1359,18 +1307,6 @@ std::string dumpModule(Module *M) {
     gencode += "\n";
     cout << "done writing function declarations" << endl;
     cout << endl;
-
-    // cout << "dumpvaluesymboltable" << endl;
-    // ValueSymbolTable *valueSymbolTable = &M->getValueSymbolTable();
-    // for(auto it=valueSymbolTable->begin(); it != valueSymbolTable->end(); it++) {
-    //     cout << "vst entry " << endl;
-    //     // Value *value = &*it;
-    //     StringMapEntry<Value *> *sme = &*it;
-    //     cout << string(sme->getKey()) << endl;
-    //     // sme->dump;
-    //     // value->dump();
-    // }
-    // return "";
 
     int i = 0;
     for(auto it = M->begin(); it != M->end(); it++) {
