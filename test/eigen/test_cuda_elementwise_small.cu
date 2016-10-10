@@ -25,7 +25,7 @@ void test_cuda_elementwise_small() {
   in2.setRandom();
 
   cout << "in1 " << in1 << endl;
-  cout << "in2 " << in1 << endl;
+  cout << "in2 " << in2 << endl;
 
   std::size_t in1_bytes = in1.size() * sizeof(float);
   std::size_t in2_bytes = in2.size() * sizeof(float);
