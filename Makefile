@@ -128,6 +128,9 @@ build/test_cuda_elementwise_small: build/test_cuda_elementwise_small-hostpatched
 build/eigen-test_cuda_nullary: build/eigen-test_cuda_nullary-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/test_cuda_nullary-device.cl
 	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
 
+build/eigen-test_cuda_elementwise: build/eigen-test_cuda_elementwise-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/test_cuda_elementwise-device.cl
+	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
+
 run-cuda_sample: build/cuda_sample
 	################################
 	# running:
@@ -145,5 +148,11 @@ run-eigen-test_cuda_nullary: build/eigen-test_cuda_nullary
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-test_cuda_nullary
+
+run-eigen-test_cuda_elementwise: build/eigen-test_cuda_elementwise
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-test_cuda_elementwise
 
 .SECONDARY:
