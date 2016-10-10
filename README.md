@@ -180,6 +180,10 @@ py.test -sv
 
 Tests are at [test](test)
 
+## Tensorflow/Eigen usage
+
+- [eigen](doc/eigen.md)
+
 ## What's working?
 
 [whats-working.md](doc/whats-working.md)
