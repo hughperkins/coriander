@@ -123,8 +123,6 @@ Behind the scenes, there are a few parts:
 - Device-side, we need to convert the CUDA kernels into OpenCL kernels.
 - Host-side, we need convert the cuda kernel launch code into opencl kernel launch code, and bake in the device-side OpenCL code
 
-Here's a picture of the steps involved
-
 <img src="doc/img/cudairtoopenclarchitecture6.png?raw=true" width="900" height="400" />
 
 [More detail](doc/how-it-works.md)
@@ -133,13 +131,8 @@ Here's a picture of the steps involved
 
 ### Pre-requisites
 
-You'll need:
 - Ubuntu 16.04
-- llvm 3.8
-- clang 3.8
-- include files from CUDA toolkit 7.5, at /usr/local/cuda-7.5/include
-- make
-- Have done `sudo apt-get install libc6-dev-i386`
+- 'include' files from CUDA toolkit 7.5, at /usr/local/cuda-7.5/include
 - OpenCL-enabled GPU, and appropriate OpenCL drivers installed for the GPU
 
 Other operating systems, and clang/llvm versions, might be supported, but untested.  Your mileage may vary :-)
@@ -147,6 +140,7 @@ Other operating systems, and clang/llvm versions, might be supported, but untest
 ### Procedure
 
 ```
+sudo apt-get install git cmake llvm-3.8-dev clang-3.8-dev libc6-dev-i386 make gcc g++
 git clone --recursive https://github.com/hughperkins/cuda-on-cl
 cd cuda-on-cl
 make
@@ -166,6 +160,11 @@ Thats it!
 
 In addition to above requirements for building, you'll need also:
 - python 3.5
+
+eg do:
+```
+sudo apt-get install python-3.5 python-3.5-dev
+```
 
 Setup python:
 ```
