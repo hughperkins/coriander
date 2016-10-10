@@ -1,6 +1,6 @@
 # cuda-on-cl
 
-This lets you build CUDA code for OpenCL devices.
+Build CUDA code for OpenCL devices.
 
 ## How it works
 
