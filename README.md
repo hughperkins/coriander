@@ -2,10 +2,6 @@
 
 This lets you build CUDA code for OpenCL devices.
 
-## Why?
-
-Goal is to be able to build tensorflow for OpenCL.
-
 ## How it works
 
 Host-side, we need convert the cuda kernel launch code into opencl kernel launch code.
