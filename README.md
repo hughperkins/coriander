@@ -123,7 +123,7 @@ Behind the scenes, there are a few parts:
 - Device-side, `cocl` converts the CUDA kernels into OpenCL kernels
 - Host-side, `cocl`:
   - converts the cuda kernel launch code into opencl kernel launch code, and
-  - bakes in the device-side OpenCL code
+  - bakes in the OpenCL code
 
 <img src="doc/img/cudairtoopenclarchitecture6.png?raw=true" width="900" height="400" />
 
