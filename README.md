@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 ```
 /tmp/foo$ ls
 cuda_sample.cu
-
+```
 Run `cocl` to create an object file:
 ```
 /tmp/foo$ cocl cuda_sample.cu
