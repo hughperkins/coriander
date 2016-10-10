@@ -186,15 +186,15 @@ Tests are at [test](test)
 
 ## What's working?
 
-[whats-working.md](doc/whats-working.md)
+- [whats-working.md](doc/whats-working.md)
 
 ## Roadmap
 
-[roadmap.md](doc/roadmap.md)
+- [roadmap.md](doc/roadmap.md)
 
 ## FAQ
 
-[faq.md](doc/faq.md)
+- [faq.md](doc/faq.md)
 
 ## License
 
