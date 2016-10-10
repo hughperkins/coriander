@@ -1,0 +1,53 @@
+#!/bin/bash
+
+set -x
+set -e
+
+export CUDA_HOME=/usr/local/cuda-7.5
+export CLANG=clang++-3.8
+export LLVM_CONFIG=llvm-config-3.8
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export COCL_HOME=$(dirname ${SCRIPT_DIR})
+
+export LINK_FLAGS=$(${LLVM_CONFIG} --ldflags --system-libs --libs all)
+
+INFILE=$1
+
+if [[ x$1 == x ]]; then {
+    echo Usage: $0 [infile.cu]
+    exit 1
+} fi
+
+BASENAME=$(basename -s .cu ${INFILE})
+DIRNAME=$(dirname ${INFILE})
+BASEPATH=${DIRNAME}/${BASENAME}
+
+# .cu => -device.ll
+${CLANG} -x cuda -std=c++11 -D__CUDA_ARCH__=300 -include ${COCL_HOME}/include/fake_funcs.h -I${COCL_HOME}/include -I${CUDA_HOME}/include -I/usr/include/x86_64-linux-gnu ${BASEPATH}.cu --cuda-device-only -emit-llvm -O3 -S -o ${BASEPATH}-device.ll
+
+# .cu => -hostraw.ll
+${CLANG} -I${CUDA_HOME}/include ${BASEPATH}.cu --cuda-host-only -emit-llvm  -O3 -S -o ${BASEPATH}-hostraw.ll
+
+# -device.ll => -device.cl
+${COCL_HOME}/build/ir-to-opencl ${DEBUG} ${BASEPATH}-device.ll ${BASEPATH}-device.cl
+
+# .hostraw.ll, -device.cl => -hostpatched.ll
+${COCL_HOME}/build/patch-hostside ${BASEPATH}-hostraw.ll ${BASEPATH}-device.cl ${BASEPATH}-hostpatched.ll
+
+# -hostpatched.ll => .o
+${CLANG} -std=c++11 -I${COCL_HOME}/src/EasyCL -c ${BASEPATH}-hostpatched.ll --cuda-host-only -O3 -o ${BASEPATH}.o
+
+set +x
+
+echo ""
+echo "    ${BASEPATH}.cu compiled into ${BASEPATH}.o"
+echo ""
+echo To finish off, you can do:
+echo ""
+echo "    g++ -o ${BASEPATH} ${BASEPATH}.o ${COCL_HOME}/build/hostside_opencl_funcs.o -lOpenCL -L${COCL_HOME}/build -lEasyCL"
+echo ""
+echo "... which you can run like:"
+echo
+echo "    LD_LIBRARY_PATH=${COCL_HOME}/build:${LD_LIBRARY_PATH} ${BASEPATH}"
+echo 
