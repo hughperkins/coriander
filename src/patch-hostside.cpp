@@ -433,9 +433,6 @@ void patchFunction(Function *F) {
                             // In LLVM versions 3.2 and above, the DataLayout type replaces TargetData
 
                             Module *M = F->getParent();
-                            const DataLayout *dataLayout = &M->getDataLayout();
-                            int allocSize = dataLayout->getTypeAllocSize(value->getType());
-                            outs() << "typeallocsize " << allocSize << "\n";
                             // we could just naively allocate this, and copy it to the kernel, but superficial inspection
                             // of the target for eigen shows it contains a float *.  that probably points into gpu
                             // memory already.  We'd probably better scan for that.
@@ -454,13 +451,6 @@ void patchFunction(Function *F) {
                             // So, for the struct, at patch time, we probalby need to call a function like:
                             // - setKernelArgStruct(char *pCpuStruct, int structAllocateSize);
 
-                            Function *setKernelArgStruct = cast<Function>(F->getParent()->getOrInsertFunction(
-                                "_Z18setKernelArgStructPci",
-                                Type::getVoidTy(TheContext),
-                                PointerType::get(IntegerType::get(TheContext, 8), 0),
-                                IntegerType::get(TheContext, 32),
-                                NULL));
-
                             // Value * indices[1];
                             // indices[0] = createInt32Constant(&TheContext, 0);
                             // GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(value->getType(), value, ArrayRef<Value *>(&indices[0], &indices[1]));
@@ -468,12 +458,18 @@ void patchFunction(Function *F) {
                             // lastInst = gep;
 
                             Type *newType = cloneStructTypeNoPointers(cast<StructType>(value->getType()));
-                            // if(pointerlessTypeByOriginalType.find(value->getType()) == pointerlessTypeByOriginalType.end()) {
-                            //     newType = cloneStructTypeNoPointers(cast<StructType>(value->getType()));
-                            //     pointerlessTypeByOriginalType[value->getType()] = newType;
-                            // } else {
-                            //     newType = pointerlessTypeByOriginalType[value->getType()];
-                            // }
+
+                            const DataLayout *dataLayout = &M->getDataLayout();
+                            int allocSize = dataLayout->getTypeAllocSize(newType);
+                            outs() << "original typeallocsize " << dataLayout->getTypeAllocSize(value->getType()) << "\n";
+                            outs() << "pointerfree typeallocsize " << allocSize << "\n";
+
+                            Function *setKernelArgStruct = cast<Function>(F->getParent()->getOrInsertFunction(
+                                "_Z18setKernelArgStructPci",
+                                Type::getVoidTy(TheContext),
+                                PointerType::get(IntegerType::get(TheContext, 8), 0),
+                                IntegerType::get(TheContext, 32),
+                                NULL));
 
                             AllocaInst *alloca = new AllocaInst(newType, "newalloca");
                             alloca->insertAfter(lastInst);

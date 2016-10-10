@@ -103,47 +103,43 @@ build/eigen-%-hostpatched.o: test/eigen/generated/%-hostpatched.ll
 
 ## generic cpp objects, from cpp code
 
-build/test_call_cl.o: test/test_call_cl.cpp easycl
+build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp easycl
 	echo building $@ from $<
-	$(CLANG) -std=c++11 -Isrc/EasyCL -I$(CUDA_HOME)/include -c $< --cuda-host-only -O3 -o $@
+	$(CLANG) -std=c++11 -Isrc/EasyCL -c $< -O3 -o $@
 
 build/%.o: test/%.cpp easycl
 	echo building $@ from $<
 	$(CLANG) -std=c++11 -Isrc/EasyCL -c $< --cuda-host-only -O3 -o $@
 
-build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp easycl
-	echo building $@ from $<
-	$(CLANG) -std=c++11 -Isrc/EasyCL -c $< -O3 -o $@
-
 # executables
 build/cuda_sample: build/cuda_sample-hostpatched.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
-	g++ -o build/cuda_sample build/hostside_opencl_funcs.o build/cuda_sample-hostpatched.o -lOpenCL -Lbuild -lEasyCL
+	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
 
-build/eigen-%i: build/eigen-%i-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/%i-device.cl
+build/eigen-%: build/eigen-%-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/%-device.cl
 	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
 
 run-cuda_sample: build/cuda_sample
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/cuda_sample
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
 run-test_cuda_elementwise_small: build/test_cuda_elementwise_small
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/test_cuda_elementwise_small
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
 run-eigen-test_cuda_nullary: build/eigen-test_cuda_nullary
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-test_cuda_nullary
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
 run-eigen-test_cuda_elementwise: build/eigen-test_cuda_elementwise
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-test_cuda_elementwise
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
 .SECONDARY:
