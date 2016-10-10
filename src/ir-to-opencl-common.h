@@ -69,3 +69,11 @@ public:
 void walkStructType(llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices, std::string path, llvm::StructType *type);
 void walkType(llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices, std::string path, llvm::Type *type);
 std::string getIndent(int level);
+
+std::string getName(llvm::StructType *type);
+std::string getName(llvm::Function *type);
+
+std::string dumpTypeNoPointers(llvm::Type *type);
+
+void updateAddressSpace(llvm::Value *value, int newSpace);
+void copyAddressSpace(llvm::Value *src, llvm::Value *dest);

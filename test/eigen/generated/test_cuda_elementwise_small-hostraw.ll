@@ -1902,7 +1902,7 @@ _ZNK5Eigen9GpuDevice6streamEv.exit:               ; preds = %186
   br i1 %198, label %232, label %199
 
 ; <label>:199                                     ; preds = %197
-  call void @__assert_fail(i8* nonnull getelementptr inbounds ([106 x i8], [106 x i8]* @.str.26, i64 0, i64 0), i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 57, i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @__PRETTY_FUNCTION__._Z27test_cuda_elementwise_smallv, i64 0, i64 0)) #21
+  call void @__assert_fail(i8* nonnull getelementptr inbounds ([106 x i8], [106 x i8]* @.str.26, i64 0, i64 0), i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 56, i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @__PRETTY_FUNCTION__._Z27test_cuda_elementwise_smallv, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:200                                     ; preds = %17
@@ -1999,7 +1999,7 @@ _ZNK5Eigen9GpuDevice6streamEv.exit55:             ; preds = %232
   br i1 %242, label %244, label %243
 
 ; <label>:243                                     ; preds = %241
-  call void @__assert_fail(i8* nonnull getelementptr inbounds ([58 x i8], [58 x i8]* @.str.28, i64 0, i64 0), i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 58, i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @__PRETTY_FUNCTION__._Z27test_cuda_elementwise_smallv, i64 0, i64 0)) #21
+  call void @__assert_fail(i8* nonnull getelementptr inbounds ([58 x i8], [58 x i8]* @.str.28, i64 0, i64 0), i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 57, i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @__PRETTY_FUNCTION__._Z27test_cuda_elementwise_smallv, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:244                                     ; preds = %241
@@ -2079,7 +2079,7 @@ _ZNSolsEPFRSoS_E.exit59.preheader.preheader:      ; preds = %.noexc61
   %283 = load %"class.std::__cxx11::basic_string"*, %"class.std::__cxx11::basic_string"** getelementptr inbounds (%"class.std::vector", %"class.std::vector"* @_ZN5EigenL12g_test_stackB5cxx11E, i64 0, i32 0, i32 0, i32 1), align 8, !tbaa !16
   %284 = getelementptr inbounds %"class.std::__cxx11::basic_string", %"class.std::__cxx11::basic_string"* %283, i64 -1, i32 0, i32 0
   %285 = load i8*, i8** %284, align 8, !tbaa !8
-  invoke void @_Z11verify_implbPKcS0_iS0_(i1 zeroext %281, i8* %285, i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 65, i8* nonnull getelementptr inbounds ([149 x i8], [149 x i8]* @.str.30, i64 0, i64 0))
+  invoke void @_Z11verify_implbPKcS0_iS0_(i1 zeroext %281, i8* %285, i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 64, i8* nonnull getelementptr inbounds ([149 x i8], [149 x i8]* @.str.30, i64 0, i64 0))
           to label %_ZNSolsEPFRSoS_E.exit59 unwind label %.loopexit
 
 _ZNSolsEPFRSoS_E.exit59:                          ; preds = %282
@@ -2194,7 +2194,7 @@ _ZN5Eigen16CudaStreamDeviceD2Ev.exit:             ; preds = %.noexc1.i, %212, %2
   %331 = load %"class.std::__cxx11::basic_string"*, %"class.std::__cxx11::basic_string"** getelementptr inbounds (%"class.std::vector", %"class.std::vector"* @_ZN5EigenL12g_test_stackB5cxx11E, i64 0, i32 0, i32 0, i32 1), align 8, !tbaa !16
   %332 = getelementptr inbounds %"class.std::__cxx11::basic_string", %"class.std::__cxx11::basic_string"* %331, i64 -1, i32 0, i32 0
   %333 = load i8*, i8** %332, align 8, !tbaa !8
-  invoke void @_Z11verify_implbPKcS0_iS0_(i1 zeroext %295, i8* %333, i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 65, i8* nonnull getelementptr inbounds ([149 x i8], [149 x i8]* @.str.30, i64 0, i64 0))
+  invoke void @_Z11verify_implbPKcS0_iS0_(i1 zeroext %295, i8* %333, i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 64, i8* nonnull getelementptr inbounds ([149 x i8], [149 x i8]* @.str.30, i64 0, i64 0))
           to label %_ZNSolsEPFRSoS_E.exit59.1 unwind label %.loopexit
 
 _ZNSolsEPFRSoS_E.exit59.1:                        ; preds = %330

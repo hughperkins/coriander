@@ -67,6 +67,13 @@ target triple = "x86_64-pc-linux-gnu"
 %"struct.Eigen::TensorEvaluator.33" = type { float*, %"struct.Eigen::DSizes", %"struct.Eigen::GpuDevice"* }
 %"struct.Eigen::TensorEvaluator.34" = type { %"struct.Eigen::internal::scalar_sum_op", %"struct.Eigen::TensorEvaluator.35", %"struct.Eigen::TensorEvaluator.35" }
 %"struct.Eigen::TensorEvaluator.35" = type { float*, %"struct.Eigen::DSizes", %"struct.Eigen::GpuDevice"* }
+%"struct.Eigen::TensorEvaluator.32_nopointers" = type { %"struct.Eigen::TensorEvaluator.33_nopointers", %"struct.Eigen::TensorEvaluator.34_nopointers" }
+%"struct.Eigen::TensorEvaluator.33_nopointers" = type { %"struct.Eigen::DSizes_nopointers" }
+%"struct.Eigen::DSizes_nopointers" = type { %"class.Eigen::array_nopointers" }
+%"class.Eigen::array_nopointers" = type { [1 x i64] }
+%"struct.Eigen::TensorEvaluator.34_nopointers" = type { %"struct.Eigen::internal::scalar_sum_op_nopointers", %"struct.Eigen::TensorEvaluator.35_nopointers", %"struct.Eigen::TensorEvaluator.35_nopointers" }
+%"struct.Eigen::internal::scalar_sum_op_nopointers" = type { i8 }
+%"struct.Eigen::TensorEvaluator.35_nopointers" = type { %"struct.Eigen::DSizes_nopointers" }
 
 $_ZNSt6vectorINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESaIS5_EED2Ev = comdat any
 
@@ -211,7 +218,7 @@ $_ZTIN5Eigen16CudaStreamDeviceE = comdat any
 @.str.56 = private unnamed_addr constant [22 x i8] c", relative error is: \00", align 1
 @llvm.global_ctors = appending global [2 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* @_GLOBAL__sub_I_test_cuda_elementwise_small.cu, i8* null }, { i32, void ()*, i8* } { i32 65535, void ()* bitcast (void (i8*)* @__cuda_module_ctor to void ()*), i8* null }]
 @llvm.global_dtors = appending global [1 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* bitcast (void (i8*)* @__cuda_module_dtor to void ()*), i8* null }]
-@__opencl_sourcecode = global [5147 x i8] c"struct class_Eigen__array {\0A    long f0[1];\0A};\0A\0Astruct Eigen__DSizes {\0A    struct class_Eigen__array f0;\0A};\0A\0Astruct class_Eigen__StreamInterface {\0A};\0A\0Astruct Eigen__GpuDevice {\0A    global struct class_Eigen__StreamInterface* f0;\0A    int f1;\0A    char f2[4];\0A};\0A\0Astruct Eigen__TensorEvaluator_0 {\0A    global float* f0;\0A    struct Eigen__DSizes f1;\0A    global struct Eigen__GpuDevice* f2;\0A};\0A\0Astruct Eigen__internal__scalar_sum_op {\0A    char f0;\0A};\0A\0Astruct Eigen__TensorEvaluator_2 {\0A    global float* f0;\0A    struct Eigen__DSizes f1;\0A    global struct Eigen__GpuDevice* f2;\0A};\0A\0Astruct Eigen__TensorEvaluator_1 {\0A    struct Eigen__internal__scalar_sum_op f0;\0A    struct Eigen__TensorEvaluator_2 f1;\0A    struct Eigen__TensorEvaluator_2 f2;\0A};\0A\0Astruct Eigen__TensorEvaluator {\0A    struct Eigen__TensorEvaluator_0 f0;\0A    struct Eigen__TensorEvaluator_1 f1;\0A};\0A\0A\0A\0A\0Akernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator* eval, global float* eval_ptr0, global float* eval_ptr1, global float* eval_ptr2, long size) {\0A    long i1_02_i;\0A    long i_03_i;\0Aeval[0].f0.f0 = eval_ptr0;\0Aeval[0].f1.f1.f0 = eval_ptr1;\0Aeval[0].f1.f2.f0 = eval_ptr2;\0A\0A    label0:;\0A    int v1 = get_group_id(0);\0A    int v2 = get_local_size(0);\0A    int v3 = v2 * v1;\0A    int v4 = get_global_id(0);\0A    int v5 = v3 + v4;\0A    long v6 = v5;\0A    int v7 = get_num_groups(0);\0A    int v8 = v7 * v2;\0A    long v9 = v8;\0A    long v10 = size / 4;\0A    long v11 = v10 << 2;\0A    long v12 = v9 << 2;\0A    long v13 = v6 << 2;\0A    bool v14 = v13 < v11;\0A    if(v14) {\0A        goto v_lr_ph5_i;\0A    } else {\0A        goto v__crit_edge6_i;\0A    }\0A    v_lr_ph5_i:;\0A    global float*global * v16 = (&eval[0].f1.f1.f0);\0A    global float*global * v17 = (&eval[0].f1.f2.f0);\0A    global float*global * v18 = (&eval[0].f0.f0);\0A    global float* v19 = v16[0];\0A    global float* v20 = v17[0];\0A    global float* v21 = v18[0];\0A        i_03_i = v13;\0A    goto v23;\0A    label24:;\0A        goto v__crit_edge6_i;\0A    v__crit_edge6_i:;\0A    long v26 = v6 + v11;\0A    bool v27 = v26 < size;\0A    if(v27) {\0A        goto v_lr_ph_i;\0A    } else {\0A        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElLb1EE3runERSH_lll_exit;\0A    }\0A    v_lr_ph_i:;\0A    global float*global * v29 = (&eval[0].f1.f1.f0);\0A    global float* v30 = v29[0];\0A    global float*global * v31 = (&eval[0].f1.f2.f0);\0A    global float* v32 = v31[0];\0A    global float*global * v33 = (&eval[0].f0.f0);\0A    global float* v34 = v33[0];\0A        i1_02_i = v26;\0A    goto v36;\0A    v23:;\0A    global float* v37 = (&v19[i_03_i]);\0A    float v38 = v37[0];\0A    global float* v39 = (&v37[1]);\0A    float v40 = v39[0];\0A    global float* v41 = (&v37[2]);\0A    float v42 = v41[0];\0A    global float* v43 = (&v37[3]);\0A    float v44 = v43[0];\0A    global float* v45 = (&v20[i_03_i]);\0A    float v46 = v45[0];\0A    global float* v47 = (&v45[1]);\0A    float v48 = v47[0];\0A    global float* v49 = (&v45[2]);\0A    float v50 = v49[0];\0A    global float* v51 = (&v45[3]);\0A    float v52 = v51[0];\0A    float v53 = v38 + v46;\0A    float v54 = v40 + v48;\0A    float v55 = v42 + v50;\0A    float v56 = v44 + v52;\0A    global float* v57 = (&v21[i_03_i]);\0A    v57[0] = v53;\0A    global float* v59 = (&v57[1]);\0A    v59[0] = v54;\0A    global float* v61 = (&v57[2]);\0A    v61[0] = v55;\0A    global float* v63 = (&v57[3]);\0A    v63[0] = v56;\0A    long v65 = i_03_i + v12;\0A    bool v66 = v65 < v11;\0A    if(v66) {\0A        i_03_i = v65;\0A        goto v23;\0A    } else {\0A        goto label24;\0A    }\0A    v36:;\0A    global float* v68 = (&v30[i1_02_i]);\0A    float v_val_i_i_i_i = v68[0];\0A    global float* v69 = (&v32[i1_02_i]);\0A    float v_val_i1_i_i_i = v69[0];\0A    float v70 = v_val_i_i_i_i + v_val_i1_i_i_i;\0A    global float* v71 = (&v34[i1_02_i]);\0A    v71[0] = v70;\0A    long v73 = i1_02_i + v9;\0A    bool v74 = v73 < size;\0A    if(v74) {\0A        i1_02_i = v73;\0A        goto v36;\0A    } else {\0A        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElLb1EE3runERSH_lll_exit_loopexit;\0A    }\0A    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElLb1EE3runERSH_lll_exit_loopexit:;\0A        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElLb1EE3runERSH_lll_exit;\0A    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElLb1EE3runERSH_lll_exit:;\0A}\0A\00"
+@__opencl_sourcecode = global [6167 x i8] c"struct class_Eigen__array_nopointers {\0A    long f0[1];\0A};\0A\0Astruct Eigen__DSizes_nopointers {\0A    struct class_Eigen__array_nopointers f0;\0A};\0A\0Astruct Eigen__TensorEvaluator_0_nopointers {\0A        struct Eigen__DSizes_nopointers f1;\0A    };\0A\0Astruct Eigen__internal__scalar_sum_op_nopointers {\0A    char f0;\0A};\0A\0Astruct Eigen__TensorEvaluator_2_nopointers {\0A        struct Eigen__DSizes_nopointers f1;\0A    };\0A\0Astruct Eigen__TensorEvaluator_1_nopointers {\0A    struct Eigen__internal__scalar_sum_op_nopointers f0;\0A    struct Eigen__TensorEvaluator_2_nopointers f1;\0A    struct Eigen__TensorEvaluator_2_nopointers f2;\0A};\0A\0Astruct Eigen__TensorEvaluator_nopointers {\0A    struct Eigen__TensorEvaluator_0_nopointers f0;\0A    struct Eigen__TensorEvaluator_1_nopointers f1;\0A};\0A\0Astruct class_Eigen__array {\0A    long f0[1];\0A};\0A\0Astruct Eigen__DSizes {\0A    struct class_Eigen__array f0;\0A};\0A\0Astruct class_Eigen__StreamInterface {\0A};\0A\0Astruct Eigen__GpuDevice {\0A    global struct class_Eigen__StreamInterface* f0;\0A    int f1;\0A    char f2[4];\0A};\0A\0Astruct Eigen__TensorEvaluator_0 {\0A    global float* f0;\0A    struct Eigen__DSizes f1;\0A    global struct Eigen__GpuDevice* f2;\0A};\0A\0Astruct Eigen__internal__scalar_sum_op {\0A    char f0;\0A};\0A\0Astruct Eigen__TensorEvaluator_2 {\0A    global float* f0;\0A    struct Eigen__DSizes f1;\0A    global struct Eigen__GpuDevice* f2;\0A};\0A\0Astruct Eigen__TensorEvaluator_1 {\0A    struct Eigen__internal__scalar_sum_op f0;\0A    struct Eigen__TensorEvaluator_2 f1;\0A    struct Eigen__TensorEvaluator_2 f2;\0A};\0A\0Astruct Eigen__TensorEvaluator {\0A    struct Eigen__TensorEvaluator_0 f0;\0A    struct Eigen__TensorEvaluator_1 f1;\0A};\0A\0A\0A\0A\0Akernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_nopointers* eval_nopointers, global float* eval_ptr0, global float* eval_ptr1, global float* eval_ptr2, long size) {\0A    long i1_02_i;\0A    long i_03_i;\0Astruct Eigen__TensorEvaluator eval[1];\0Aeval[0].f0.f1.f0.f0[0] = eval_nopointers[0].f0.f1.f0.f0[0];\0Aeval[0].f1.f0.f0 = eval_nopointers[0].f1.f0.f0;\0Aeval[0].f1.f1.f1.f0.f0[0] = eval_nopointers[0].f1.f1.f1.f0.f0[0];\0Aeval[0].f1.f2.f1.f0.f0[0] = eval_nopointers[0].f1.f2.f1.f0.f0[0];\0Aeval[0].f0.f0 = eval_ptr0;\0Aeval[0].f1.f1.f0 = eval_ptr1;\0Aeval[0].f1.f2.f0 = eval_ptr2;\0A\0A    label0:;\0A    int v1 = get_group_id(0);\0A    int v2 = get_local_size(0);\0A    int v3 = v2 * v1;\0A    int v4 = get_global_id(0);\0A    int v5 = v3 + v4;\0A    long v6 = v5;\0A    int v7 = get_num_groups(0);\0A    int v8 = v7 * v2;\0A    long v9 = v8;\0A    long v10 = size / 4;\0A    long v11 = v10 << 2;\0A    long v12 = v9 << 2;\0A    long v13 = v6 << 2;\0A    bool v14 = v13 < v11;\0A    if(v14) {\0A        goto v_lr_ph5_i;\0A    } else {\0A        goto v__crit_edge6_i;\0A    }\0A    v_lr_ph5_i:;\0A    global float** v16 = (&eval[0].f1.f1.f0);\0A    global float** v17 = (&eval[0].f1.f2.f0);\0A    global float** v18 = (&eval[0].f0.f0);\0A    global float* v19 = v16[0];\0A    global float* v20 = v17[0];\0A    global float* v21 = v18[0];\0A        i_03_i = v13;\0A    goto v23;\0A    label24:;\0A        goto v__crit_edge6_i;\0A    v__crit_edge6_i:;\0A    long v26 = v6 + v11;\0A    bool v27 = v26 < size;\0A    if(v27) {\0A        goto v_lr_ph_i;\0A    } else {\0A        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElLb1EE3runERSH_lll_exit;\0A    }\0A    v_lr_ph_i:;\0A    global float** v29 = (&eval[0].f1.f1.f0);\0A    global float* v30 = v29[0];\0A    global float** v31 = (&eval[0].f1.f2.f0);\0A    global float* v32 = v31[0];\0A    global float** v33 = (&eval[0].f0.f0);\0A    global float* v34 = v33[0];\0A        i1_02_i = v26;\0A    goto v36;\0A    v23:;\0A    global float* v37 = (&v19[i_03_i]);\0A    float v38 = v37[0];\0A    global float* v39 = (&v37[1]);\0A    float v40 = v39[0];\0A    global float* v41 = (&v37[2]);\0A    float v42 = v41[0];\0A    global float* v43 = (&v37[3]);\0A    float v44 = v43[0];\0A    global float* v45 = (&v20[i_03_i]);\0A    float v46 = v45[0];\0A    global float* v47 = (&v45[1]);\0A    float v48 = v47[0];\0A    global float* v49 = (&v45[2]);\0A    float v50 = v49[0];\0A    global float* v51 = (&v45[3]);\0A    float v52 = v51[0];\0A    float v53 = v38 + v46;\0A    float v54 = v40 + v48;\0A    float v55 = v42 + v50;\0A    float v56 = v44 + v52;\0A    global float* v57 = (&v21[i_03_i]);\0A    v57[0] = v53;\0A    global float* v59 = (&v57[1]);\0A    v59[0] = v54;\0A    global float* v61 = (&v57[2]);\0A    v61[0] = v55;\0A    global float* v63 = (&v57[3]);\0A    v63[0] = v56;\0A    long v65 = i_03_i + v12;\0A    bool v66 = v65 < v11;\0A    if(v66) {\0A        i_03_i = v65;\0A        goto v23;\0A    } else {\0A        goto label24;\0A    }\0A    v36:;\0A    global float* v68 = (&v30[i1_02_i]);\0A    float v_val_i_i_i_i = v68[0];\0A    global float* v69 = (&v32[i1_02_i]);\0A    float v_val_i1_i_i_i = v69[0];\0A    float v70 = v_val_i_i_i_i + v_val_i1_i_i_i;\0A    global float* v71 = (&v34[i1_02_i]);\0A    v71[0] = v70;\0A    long v73 = i1_02_i + v9;\0A    bool v74 = v73 < size;\0A    if(v74) {\0A        i1_02_i = v73;\0A        goto v36;\0A    } else {\0A        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElLb1EE3runERSH_lll_exit_loopexit;\0A    }\0A    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElLb1EE3runERSH_lll_exit_loopexit:;\0A        goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElLb1EE3runERSH_lll_exit;\0A    _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElLb1EE3runERSH_lll_exit:;\0A}\0A\00"
 @s._ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElEEvT_T0_ = global [209 x i8] c"_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElEEvT_T0_\00"
 
 declare void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"*) #0
@@ -1904,7 +1911,7 @@ _ZNK5Eigen9GpuDevice6streamEv.exit:               ; preds = %186
   br i1 %198, label %232, label %199
 
 ; <label>:199                                     ; preds = %197
-  call void @__assert_fail(i8* nonnull getelementptr inbounds ([106 x i8], [106 x i8]* @.str.26, i64 0, i64 0), i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 57, i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @__PRETTY_FUNCTION__._Z27test_cuda_elementwise_smallv, i64 0, i64 0)) #21
+  call void @__assert_fail(i8* nonnull getelementptr inbounds ([106 x i8], [106 x i8]* @.str.26, i64 0, i64 0), i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 56, i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @__PRETTY_FUNCTION__._Z27test_cuda_elementwise_smallv, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:200                                     ; preds = %17
@@ -2001,7 +2008,7 @@ _ZNK5Eigen9GpuDevice6streamEv.exit55:             ; preds = %232
   br i1 %242, label %244, label %243
 
 ; <label>:243                                     ; preds = %241
-  call void @__assert_fail(i8* nonnull getelementptr inbounds ([58 x i8], [58 x i8]* @.str.28, i64 0, i64 0), i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 58, i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @__PRETTY_FUNCTION__._Z27test_cuda_elementwise_smallv, i64 0, i64 0)) #21
+  call void @__assert_fail(i8* nonnull getelementptr inbounds ([58 x i8], [58 x i8]* @.str.28, i64 0, i64 0), i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 57, i8* nonnull getelementptr inbounds ([35 x i8], [35 x i8]* @__PRETTY_FUNCTION__._Z27test_cuda_elementwise_smallv, i64 0, i64 0)) #21
   unreachable
 
 ; <label>:244                                     ; preds = %241
@@ -2081,7 +2088,7 @@ _ZNSolsEPFRSoS_E.exit59.preheader.preheader:      ; preds = %.noexc61
   %283 = load %"class.std::__cxx11::basic_string"*, %"class.std::__cxx11::basic_string"** getelementptr inbounds (%"class.std::vector", %"class.std::vector"* @_ZN5EigenL12g_test_stackB5cxx11E, i64 0, i32 0, i32 0, i32 1), align 8, !tbaa !16
   %284 = getelementptr inbounds %"class.std::__cxx11::basic_string", %"class.std::__cxx11::basic_string"* %283, i64 -1, i32 0, i32 0
   %285 = load i8*, i8** %284, align 8, !tbaa !8
-  invoke void @_Z11verify_implbPKcS0_iS0_(i1 zeroext %281, i8* %285, i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 65, i8* nonnull getelementptr inbounds ([149 x i8], [149 x i8]* @.str.30, i64 0, i64 0))
+  invoke void @_Z11verify_implbPKcS0_iS0_(i1 zeroext %281, i8* %285, i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 64, i8* nonnull getelementptr inbounds ([149 x i8], [149 x i8]* @.str.30, i64 0, i64 0))
           to label %_ZNSolsEPFRSoS_E.exit59 unwind label %.loopexit
 
 _ZNSolsEPFRSoS_E.exit59:                          ; preds = %282
@@ -2196,7 +2203,7 @@ _ZN5Eigen16CudaStreamDeviceD2Ev.exit:             ; preds = %.noexc1.i, %212, %2
   %331 = load %"class.std::__cxx11::basic_string"*, %"class.std::__cxx11::basic_string"** getelementptr inbounds (%"class.std::vector", %"class.std::vector"* @_ZN5EigenL12g_test_stackB5cxx11E, i64 0, i32 0, i32 0, i32 1), align 8, !tbaa !16
   %332 = getelementptr inbounds %"class.std::__cxx11::basic_string", %"class.std::__cxx11::basic_string"* %331, i64 -1, i32 0, i32 0
   %333 = load i8*, i8** %332, align 8, !tbaa !8
-  invoke void @_Z11verify_implbPKcS0_iS0_(i1 zeroext %295, i8* %333, i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 65, i8* nonnull getelementptr inbounds ([149 x i8], [149 x i8]* @.str.30, i64 0, i64 0))
+  invoke void @_Z11verify_implbPKcS0_iS0_(i1 zeroext %295, i8* %333, i8* nonnull getelementptr inbounds ([42 x i8], [42 x i8]* @.str.27, i64 0, i64 0), i32 64, i8* nonnull getelementptr inbounds ([149 x i8], [149 x i8]* @.str.30, i64 0, i64 0))
           to label %_ZNSolsEPFRSoS_E.exit59.1 unwind label %.loopexit
 
 _ZNSolsEPFRSoS_E.exit59.1:                        ; preds = %330
@@ -5645,7 +5652,7 @@ define linkonce_odr void @_ZN5Eigen8internal14TensorExecutorIKNS_14TensorAssignO
   %62 = load %struct.CUstream_st*, %struct.CUstream_st** %61, align 8, !tbaa !16
   %63 = tail call i32 @cudaConfigureCall(i64 %53, i32 1, i64 %55, i32 1, i64 0, %struct.CUstream_st* %62)
   %64 = icmp eq i32 %63, 0
-  br i1 %64, label %65, label %83
+  br i1 %64, label %65, label %119
 
 ; <label>:65                                      ; preds = %0
   %66 = bitcast %"struct.Eigen::TensorEvaluator.32"* %2 to <2 x i64>*
@@ -5677,37 +5684,82 @@ define linkonce_odr void @_ZN5Eigen8internal14TensorExecutorIKNS_14TensorAssignO
 
 ; <label>:79                                      ; preds = %77
   %80 = getelementptr inbounds [209 x i8], [209 x i8]* @s._ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElEEvT_T0_, i32 0, i32 0
-  %81 = getelementptr inbounds [5147 x i8], [5147 x i8]* @__opencl_sourcecode, i32 0, i32 0
+  %81 = getelementptr inbounds [6167 x i8], [6167 x i8]* @__opencl_sourcecode, i32 0, i32 0
   call void @configureKernel(i8* %80, i8* %81)
-  %82 = bitcast %"struct.Eigen::TensorEvaluator.32"* %2 to i8*
-  call void @_Z18setKernelArgStructPci(i8* %82, i32 80)
+  %newalloca = alloca %"struct.Eigen::TensorEvaluator.32_nopointers"
+  %82 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32", %"struct.Eigen::TensorEvaluator.32"* %2, i32 0, i32 0
+  %83 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32_nopointers", %"struct.Eigen::TensorEvaluator.32_nopointers"* %newalloca, i32 0, i32 0
+  %84 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.33", %"struct.Eigen::TensorEvaluator.33"* %82, i32 0, i32 1
+  %85 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.33_nopointers", %"struct.Eigen::TensorEvaluator.33_nopointers"* %83, i32 0, i32 0
+  %86 = getelementptr inbounds %"struct.Eigen::DSizes", %"struct.Eigen::DSizes"* %84, i32 0, i32 0
+  %87 = getelementptr inbounds %"struct.Eigen::DSizes_nopointers", %"struct.Eigen::DSizes_nopointers"* %85, i32 0, i32 0
+  %88 = getelementptr inbounds %"class.Eigen::array", %"class.Eigen::array"* %86, i32 0, i32 0
+  %89 = getelementptr inbounds %"class.Eigen::array_nopointers", %"class.Eigen::array_nopointers"* %87, i32 0, i32 0
+  %90 = getelementptr inbounds [1 x i64], [1 x i64]* %88, i32 0, i32 0
+  %91 = getelementptr inbounds [1 x i64], [1 x i64]* %89, i32 0, i32 0
+  %loadarr = load i64, i64* %90
+  store volatile i64 %loadarr, i64* %91
+  %92 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32", %"struct.Eigen::TensorEvaluator.32"* %2, i32 0, i32 1
+  %93 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32_nopointers", %"struct.Eigen::TensorEvaluator.32_nopointers"* %newalloca, i32 0, i32 1
+  %94 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.34", %"struct.Eigen::TensorEvaluator.34"* %92, i32 0, i32 0
+  %95 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.34_nopointers", %"struct.Eigen::TensorEvaluator.34_nopointers"* %93, i32 0, i32 0
+  %96 = getelementptr inbounds %"struct.Eigen::internal::scalar_sum_op", %"struct.Eigen::internal::scalar_sum_op"* %94, i32 0, i32 0
+  %97 = getelementptr inbounds %"struct.Eigen::internal::scalar_sum_op_nopointers", %"struct.Eigen::internal::scalar_sum_op_nopointers"* %95, i32 0, i32 0
+  %loadint = load i8, i8* %96
+  store volatile i8 %loadint, i8* %97
+  %98 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.34", %"struct.Eigen::TensorEvaluator.34"* %92, i32 0, i32 1
+  %99 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.34_nopointers", %"struct.Eigen::TensorEvaluator.34_nopointers"* %93, i32 0, i32 1
+  %100 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.35", %"struct.Eigen::TensorEvaluator.35"* %98, i32 0, i32 1
+  %101 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.35_nopointers", %"struct.Eigen::TensorEvaluator.35_nopointers"* %99, i32 0, i32 0
+  %102 = getelementptr inbounds %"struct.Eigen::DSizes", %"struct.Eigen::DSizes"* %100, i32 0, i32 0
+  %103 = getelementptr inbounds %"struct.Eigen::DSizes_nopointers", %"struct.Eigen::DSizes_nopointers"* %101, i32 0, i32 0
+  %104 = getelementptr inbounds %"class.Eigen::array", %"class.Eigen::array"* %102, i32 0, i32 0
+  %105 = getelementptr inbounds %"class.Eigen::array_nopointers", %"class.Eigen::array_nopointers"* %103, i32 0, i32 0
+  %106 = getelementptr inbounds [1 x i64], [1 x i64]* %104, i32 0, i32 0
+  %107 = getelementptr inbounds [1 x i64], [1 x i64]* %105, i32 0, i32 0
+  %loadarr2 = load i64, i64* %106
+  store volatile i64 %loadarr2, i64* %107
+  %108 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.34", %"struct.Eigen::TensorEvaluator.34"* %92, i32 0, i32 2
+  %109 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.34_nopointers", %"struct.Eigen::TensorEvaluator.34_nopointers"* %93, i32 0, i32 2
+  %110 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.35", %"struct.Eigen::TensorEvaluator.35"* %108, i32 0, i32 1
+  %111 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.35_nopointers", %"struct.Eigen::TensorEvaluator.35_nopointers"* %109, i32 0, i32 0
+  %112 = getelementptr inbounds %"struct.Eigen::DSizes", %"struct.Eigen::DSizes"* %110, i32 0, i32 0
+  %113 = getelementptr inbounds %"struct.Eigen::DSizes_nopointers", %"struct.Eigen::DSizes_nopointers"* %111, i32 0, i32 0
+  %114 = getelementptr inbounds %"class.Eigen::array", %"class.Eigen::array"* %112, i32 0, i32 0
+  %115 = getelementptr inbounds %"class.Eigen::array_nopointers", %"class.Eigen::array_nopointers"* %113, i32 0, i32 0
+  %116 = getelementptr inbounds [1 x i64], [1 x i64]* %114, i32 0, i32 0
+  %117 = getelementptr inbounds [1 x i64], [1 x i64]* %115, i32 0, i32 0
+  %loadarr3 = load i64, i64* %116
+  store volatile i64 %loadarr3, i64* %117
+  %118 = bitcast %"struct.Eigen::TensorEvaluator.32_nopointers"* %newalloca to i8*
+  call void @_Z18setKernelArgStructPci(i8* %118, i32 32)
   %getfloatstaraddr = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32", %"struct.Eigen::TensorEvaluator.32"* %2, i32 0, i32 0, i32 0
   %loadgep = load float*, float** %getfloatstaraddr
   call void @_Z21setKernelArgFloatStarPf(float* %loadgep)
-  %getfloatstaraddr2 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32", %"struct.Eigen::TensorEvaluator.32"* %2, i32 0, i32 1, i32 1, i32 0
-  %loadgep3 = load float*, float** %getfloatstaraddr2
-  call void @_Z21setKernelArgFloatStarPf(float* %loadgep3)
-  %getfloatstaraddr4 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32", %"struct.Eigen::TensorEvaluator.32"* %2, i32 0, i32 1, i32 2, i32 0
+  %getfloatstaraddr4 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32", %"struct.Eigen::TensorEvaluator.32"* %2, i32 0, i32 1, i32 1, i32 0
   %loadgep5 = load float*, float** %getfloatstaraddr4
   call void @_Z21setKernelArgFloatStarPf(float* %loadgep5)
+  %getfloatstaraddr6 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32", %"struct.Eigen::TensorEvaluator.32"* %2, i32 0, i32 1, i32 2, i32 0
+  %loadgep7 = load float*, float** %getfloatstaraddr6
+  call void @_Z21setKernelArgFloatStarPf(float* %loadgep7)
   call void @_Z17setKernelArgInt64l(i64 %loadCudaArg1)
   call void @_Z8kernelGov()
   br label %_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElEEvT_T0_.exit
 
 _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElEEvT_T0_.exit: ; preds = %79, %77, %65
   call void @llvm.lifetime.end(i64 8, i8* %74)
-  br label %83
+  br label %119
 
-; <label>:83                                      ; preds = %_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElEEvT_T0_.exit, %0
-  %84 = call i32 @cudaGetLastError()
-  %85 = icmp eq i32 %84, 0
-  br i1 %85, label %87, label %86
+; <label>:119                                     ; preds = %_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElEEvT_T0_.exit, %0
+  %120 = call i32 @cudaGetLastError()
+  %121 = icmp eq i32 %120, 0
+  br i1 %121, label %123, label %122
 
-; <label>:86                                      ; preds = %83
+; <label>:122                                     ; preds = %119
   call void @__assert_fail(i8* nonnull getelementptr inbounds ([34 x i8], [34 x i8]* @.str.53, i64 0, i64 0), i8* nonnull getelementptr inbounds ([69 x i8], [69 x i8]* @.str.54, i64 0, i64 0), i32 262, i8* nonnull getelementptr inbounds ([763 x i8], [763 x i8]* @__PRETTY_FUNCTION__._ZN5Eigen8internal14TensorExecutorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS6_SA_EEEENS_9GpuDeviceELb1EE3runERSE_RKSF_, i64 0, i64 0)) #21
   unreachable
 
-; <label>:87                                      ; preds = %83
+; <label>:123                                     ; preds = %119
   ret void
 }
 
@@ -5720,34 +5772,79 @@ define weak_odr void @_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIK
   %2 = bitcast %"struct.Eigen::TensorEvaluator.32"* %eval to i8*
   %loadCudaArg = load %"struct.Eigen::TensorEvaluator.32", %"struct.Eigen::TensorEvaluator.32"* %eval
   %3 = icmp eq i32 0, 0
-  br i1 %3, label %4, label %11
+  br i1 %3, label %4, label %47
 
 ; <label>:4                                       ; preds = %0
   %5 = bitcast i64* %1 to i8*
   %loadCudaArg1 = load i64, i64* %1
   %6 = icmp eq i32 0, 0
-  br i1 %6, label %7, label %11
+  br i1 %6, label %7, label %47
 
 ; <label>:7                                       ; preds = %4
   %8 = getelementptr inbounds [209 x i8], [209 x i8]* @s._ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElEEvT_T0_, i32 0, i32 0
-  %9 = getelementptr inbounds [5147 x i8], [5147 x i8]* @__opencl_sourcecode, i32 0, i32 0
+  %9 = getelementptr inbounds [6167 x i8], [6167 x i8]* @__opencl_sourcecode, i32 0, i32 0
   call void @configureKernel(i8* %8, i8* %9)
-  %10 = bitcast %"struct.Eigen::TensorEvaluator.32"* %eval to i8*
-  call void @_Z18setKernelArgStructPci(i8* %10, i32 80)
+  %newalloca = alloca %"struct.Eigen::TensorEvaluator.32_nopointers"
+  %10 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32", %"struct.Eigen::TensorEvaluator.32"* %eval, i32 0, i32 0
+  %11 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32_nopointers", %"struct.Eigen::TensorEvaluator.32_nopointers"* %newalloca, i32 0, i32 0
+  %12 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.33", %"struct.Eigen::TensorEvaluator.33"* %10, i32 0, i32 1
+  %13 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.33_nopointers", %"struct.Eigen::TensorEvaluator.33_nopointers"* %11, i32 0, i32 0
+  %14 = getelementptr inbounds %"struct.Eigen::DSizes", %"struct.Eigen::DSizes"* %12, i32 0, i32 0
+  %15 = getelementptr inbounds %"struct.Eigen::DSizes_nopointers", %"struct.Eigen::DSizes_nopointers"* %13, i32 0, i32 0
+  %16 = getelementptr inbounds %"class.Eigen::array", %"class.Eigen::array"* %14, i32 0, i32 0
+  %17 = getelementptr inbounds %"class.Eigen::array_nopointers", %"class.Eigen::array_nopointers"* %15, i32 0, i32 0
+  %18 = getelementptr inbounds [1 x i64], [1 x i64]* %16, i32 0, i32 0
+  %19 = getelementptr inbounds [1 x i64], [1 x i64]* %17, i32 0, i32 0
+  %loadarr = load i64, i64* %18
+  store volatile i64 %loadarr, i64* %19
+  %20 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32", %"struct.Eigen::TensorEvaluator.32"* %eval, i32 0, i32 1
+  %21 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32_nopointers", %"struct.Eigen::TensorEvaluator.32_nopointers"* %newalloca, i32 0, i32 1
+  %22 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.34", %"struct.Eigen::TensorEvaluator.34"* %20, i32 0, i32 0
+  %23 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.34_nopointers", %"struct.Eigen::TensorEvaluator.34_nopointers"* %21, i32 0, i32 0
+  %24 = getelementptr inbounds %"struct.Eigen::internal::scalar_sum_op", %"struct.Eigen::internal::scalar_sum_op"* %22, i32 0, i32 0
+  %25 = getelementptr inbounds %"struct.Eigen::internal::scalar_sum_op_nopointers", %"struct.Eigen::internal::scalar_sum_op_nopointers"* %23, i32 0, i32 0
+  %loadint = load i8, i8* %24
+  store volatile i8 %loadint, i8* %25
+  %26 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.34", %"struct.Eigen::TensorEvaluator.34"* %20, i32 0, i32 1
+  %27 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.34_nopointers", %"struct.Eigen::TensorEvaluator.34_nopointers"* %21, i32 0, i32 1
+  %28 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.35", %"struct.Eigen::TensorEvaluator.35"* %26, i32 0, i32 1
+  %29 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.35_nopointers", %"struct.Eigen::TensorEvaluator.35_nopointers"* %27, i32 0, i32 0
+  %30 = getelementptr inbounds %"struct.Eigen::DSizes", %"struct.Eigen::DSizes"* %28, i32 0, i32 0
+  %31 = getelementptr inbounds %"struct.Eigen::DSizes_nopointers", %"struct.Eigen::DSizes_nopointers"* %29, i32 0, i32 0
+  %32 = getelementptr inbounds %"class.Eigen::array", %"class.Eigen::array"* %30, i32 0, i32 0
+  %33 = getelementptr inbounds %"class.Eigen::array_nopointers", %"class.Eigen::array_nopointers"* %31, i32 0, i32 0
+  %34 = getelementptr inbounds [1 x i64], [1 x i64]* %32, i32 0, i32 0
+  %35 = getelementptr inbounds [1 x i64], [1 x i64]* %33, i32 0, i32 0
+  %loadarr2 = load i64, i64* %34
+  store volatile i64 %loadarr2, i64* %35
+  %36 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.34", %"struct.Eigen::TensorEvaluator.34"* %20, i32 0, i32 2
+  %37 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.34_nopointers", %"struct.Eigen::TensorEvaluator.34_nopointers"* %21, i32 0, i32 2
+  %38 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.35", %"struct.Eigen::TensorEvaluator.35"* %36, i32 0, i32 1
+  %39 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.35_nopointers", %"struct.Eigen::TensorEvaluator.35_nopointers"* %37, i32 0, i32 0
+  %40 = getelementptr inbounds %"struct.Eigen::DSizes", %"struct.Eigen::DSizes"* %38, i32 0, i32 0
+  %41 = getelementptr inbounds %"struct.Eigen::DSizes_nopointers", %"struct.Eigen::DSizes_nopointers"* %39, i32 0, i32 0
+  %42 = getelementptr inbounds %"class.Eigen::array", %"class.Eigen::array"* %40, i32 0, i32 0
+  %43 = getelementptr inbounds %"class.Eigen::array_nopointers", %"class.Eigen::array_nopointers"* %41, i32 0, i32 0
+  %44 = getelementptr inbounds [1 x i64], [1 x i64]* %42, i32 0, i32 0
+  %45 = getelementptr inbounds [1 x i64], [1 x i64]* %43, i32 0, i32 0
+  %loadarr3 = load i64, i64* %44
+  store volatile i64 %loadarr3, i64* %45
+  %46 = bitcast %"struct.Eigen::TensorEvaluator.32_nopointers"* %newalloca to i8*
+  call void @_Z18setKernelArgStructPci(i8* %46, i32 32)
   %getfloatstaraddr = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32", %"struct.Eigen::TensorEvaluator.32"* %eval, i32 0, i32 0, i32 0
   %loadgep = load float*, float** %getfloatstaraddr
   call void @_Z21setKernelArgFloatStarPf(float* %loadgep)
-  %getfloatstaraddr2 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32", %"struct.Eigen::TensorEvaluator.32"* %eval, i32 0, i32 1, i32 1, i32 0
-  %loadgep3 = load float*, float** %getfloatstaraddr2
-  call void @_Z21setKernelArgFloatStarPf(float* %loadgep3)
-  %getfloatstaraddr4 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32", %"struct.Eigen::TensorEvaluator.32"* %eval, i32 0, i32 1, i32 2, i32 0
+  %getfloatstaraddr4 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32", %"struct.Eigen::TensorEvaluator.32"* %eval, i32 0, i32 1, i32 1, i32 0
   %loadgep5 = load float*, float** %getfloatstaraddr4
   call void @_Z21setKernelArgFloatStarPf(float* %loadgep5)
+  %getfloatstaraddr6 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.32", %"struct.Eigen::TensorEvaluator.32"* %eval, i32 0, i32 1, i32 2, i32 0
+  %loadgep7 = load float*, float** %getfloatstaraddr6
+  call void @_Z21setKernelArgFloatStarPf(float* %loadgep7)
   call void @_Z17setKernelArgInt64l(i64 %loadCudaArg1)
   call void @_Z8kernelGov()
-  br label %11
+  br label %47
 
-; <label>:11                                      ; preds = %7, %4, %0
+; <label>:47                                      ; preds = %7, %4, %0
   ret void
 }
 

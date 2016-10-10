@@ -103,58 +103,46 @@ build/eigen-%-hostpatched.o: test/eigen/generated/%-hostpatched.ll
 
 ## generic cpp objects, from cpp code
 
+build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp easycl
+	echo building $@ from $<
+	$(CLANG) -std=c++11 -Isrc/EasyCL -c $< -O3 -o $@
+
 build/%.o: test/%.cpp easycl
 	echo building $@ from $<
 	$(CLANG) -std=c++11 -O2 -Isrc/EasyCL -c $< --cuda-host-only -O3 -o $@
 
-build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp easycl
-	echo building $@ from $<
-	$(CLANG) -std=c++11 -O2 -Isrc/EasyCL -c $< -O3 -o $@
-
 # executables
-build/test_call_cl: build/test_call_cl.o build/testcudakernel1-hostpatched.o build/hostside_opencl_funcs.o test/generated/testcudakernel1-device.cl
-	g++ -o build/test_call_cl -O2 build/test_call_cl.o build/hostside_opencl_funcs.o build/testcudakernel1-hostpatched.o -lOpenCL -Lbuild -lEasyCL
-
 build/cuda_sample: build/cuda_sample-hostpatched.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
-	g++ -o build/cuda_sample -O2 build/hostside_opencl_funcs.o build/cuda_sample-hostpatched.o -lOpenCL -Lbuild -lEasyCL
+	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
 
-build/test_cuda_elementwise_small: build/test_cuda_elementwise_small-hostpatched.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
-	g++ -o build/test_cuda_elementwise_small -O2 build/test_cuda_elementwise_small-hostpatched.o build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
-
-build/eigen-test_cuda_nullary: build/eigen-test_cuda_nullary-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/test_cuda_nullary-device.cl
-	g++ -o $@ $< build/hostside_opencl_funcs.o -O2 -lOpenCL -Lbuild -lEasyCL
-
-build/eigen-test_cuda_elementwise: build/eigen-test_cuda_elementwise-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/test_cuda_elementwise-device.cl
-	g++ -o $@ $< build/hostside_opencl_funcs.o -O2 -lOpenCL -Lbuild -lEasyCL
-
-build/eigen-test-cxx11_tensor_cuda: build/eigen-cxx11_tensor_cuda-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/cxx11_tensor_cuda-device.cl
-	g++ -o $@ $< build/hostside_opencl_funcs.o -O2 -lOpenCL -Lbuild -lEasyCL
+build/eigen-%: build/eigen-%-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/%-device.cl
+	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
 
 run-cuda_sample: build/cuda_sample
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/cuda_sample
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test_cuda_elementwise_small: build/test_cuda_elementwise_small
+run-eigen-test_cuda_elementwise_small: build/eigen-test_cuda_elementwise_small
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/test_cuda_elementwise_small
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
 run-eigen-test_cuda_nullary: build/eigen-test_cuda_nullary
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-test_cuda_nullary
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
 run-eigen-test_cuda_elementwise: build/eigen-test_cuda_elementwise
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-test_cuda_elementwise
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-eigen-test-cxx11_tensor_cuda: build/eigen-test-cxx11_tensor_cuda
+run-eigen-cxx11_tensor_cuda: build/eigen-cxx11_tensor_cuda
 	################################
 	# running:
 	################################

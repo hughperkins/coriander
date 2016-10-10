@@ -1,11 +1,16 @@
+struct class_Eigen__StreamInterface_nopointers {
+    };
+
 struct class_Eigen__StreamInterface {
 };
 
 
 
-void _Z7test_siPf(struct class_Eigen__StreamInterface* data);
+void _Z7test_siPf(global struct class_Eigen__StreamInterface_nopointers* data_nopointers);
 
-void _Z7test_siPf(struct class_Eigen__StreamInterface* data) {
+void _Z7test_siPf(global struct class_Eigen__StreamInterface_nopointers* data_nopointers) {
+struct class_Eigen__StreamInterface data[1];
+
     label0:;
 }
 

@@ -1,6 +1,15 @@
+struct MyStruct_nopointers {
+    int f0;
+    float f1;
+};
+
 struct MyStruct {
     int f0;
     float f1;
+};
+
+struct hasArray_nopointers {
+    int f0[4];
 };
 
 struct hasArray {
@@ -511,18 +520,22 @@ kernel void _Z8setValuePfif(global float* data, int idx, float value) {
     v5:;
 }
 
-kernel void _Z11testStructsP8MyStructPfPi(global struct MyStruct* structs, global float* float_data, global int* int_data) {
+kernel void _Z11testStructsP8MyStructPfPi(global struct MyStruct_nopointers* structs_nopointers, global float* float_data, global int* int_data) {
+struct MyStruct structs[1];
+structs[0].f0 = structs_nopointers[0].f0;
+structs[0].f1 = structs_nopointers[0].f1;
+
     label0:;
-    global int* v1 = (&structs[0].f0);
+    int* v1 = (&structs[0].f0);
     int v2 = v1[0];
     int_data[0] = v2;
-    global float* v4 = (&structs[0].f1);
-    global int* v5 = ((global int*)v4);
+    float* v4 = (&structs[0].f1);
+    int* v5 = ((int*)v4);
     int v6 = v5[0];
     global int* v7 = ((global int*)float_data);
     v7[0] = v6;
-    global float* v9 = (&structs[1].f1);
-    global int* v10 = ((global int*)v9);
+    float* v9 = (&structs[1].f1);
+    int* v10 = ((int*)v9);
     int v11 = v10[0];
     global float* v12 = (&float_data[1]);
     global int* v13 = ((global int*)v12);
@@ -1004,11 +1017,17 @@ kernel void _Z22testFloat4_insertvalueP6float4Pfi(global float4* data, global fl
     v8[0] = v3;
 }
 
-kernel void _Z11useHasArrayP8hasArray(global struct hasArray* data) {
+kernel void _Z11useHasArrayP8hasArray(global struct hasArray_nopointers* data_nopointers) {
+struct hasArray data[1];
+data[0].f0[0] = data_nopointers[0].f0[0];
+data[0].f0[1] = data_nopointers[0].f0[1];
+data[0].f0[2] = data_nopointers[0].f0[2];
+data[0].f0[3] = data_nopointers[0].f0[3];
+
     label0:;
-    global int* v1 = (&data[1].f0[2]);
+    int* v1 = (&data[1].f0[2]);
     int v2 = v1[0];
-    global int* v3 = (&data[0].f0[0]);
+    int* v3 = (&data[0].f0[0]);
     v3[0] = v2;
 }
 

@@ -186,22 +186,6 @@ std::string getName(Value *value) {
     return value->getName();
 }
 
-std::string getName(StructType *type) {
-    if(!type->hasName()) {
-        type->dump();
-        throw runtime_error("type doesnt have name");
-    }
-    return type->getName();
-}
-
-std::string getName(Function *type) {
-    if(!type->hasName()) {
-        type->dump();
-        throw runtime_error("function doesnt have name");
-    }
-    return type->getName();
-}
-
 string dumpConstant(Constant *constant) {
     unsigned int valueTy = constant->getValueID();
     ostringstream oss;
@@ -346,28 +330,6 @@ std::string dumpAlloca(Instruction *alloca) {
     }
 }
 
-void updateAddressSpace(Value *value, int newSpace) {
-    Type *elementType = value->getType()->getPointerElementType();
-    Type *newType = PointerType::get(elementType, newSpace);
-    value->mutateType(newType);
-}
-
-void copyAddressSpace(Value *src, Value *dest) {
-    // copies address space from src value to dest value
-    int srcTypeID = src->getType()->getTypeID();
-    if(srcTypeID != Type::PointerTyID) { // not a pointer, so skipe
-        return;
-    }
-    if(PointerType *srcType = dyn_cast<PointerType>(src->getType())) {
-        if(isa<PointerType>(dest->getType())) {
-            int addressspace = srcType->getAddressSpace();
-            if(addressspace != 0) {
-                updateAddressSpace(dest, addressspace);
-            }
-        }
-    }
-}
-
 string dumpLoad(LoadInst *instr) {
     string gencode = "";
     string rhs = dumpOperand(instr->getOperand(0)) + "[0]";
@@ -424,10 +386,13 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
         // pointer into shared memory.
         addSharedDeclaration(instr->getOperand(0));
     }
-    copyAddressSpace(instr->getOperand(0), instr);
+    // copyAddressSpace(instr->getOperand(0), instr);
+    // int addressspace = 
     for(int d=0; d < numOperands - 1; d++) {
-        // cout << "d " << d << " currenttype " << dumpType(currentType) << endl;
         Type *newType = 0;
+        if(PointerType *ptrtype = dyn_cast<PointerType>(currentType)) {
+            outs() << "d " << d << " currenttype " << dumpType(currentType) << " addressspace " << ptrtype->getAddressSpace() << "\n";
+        }
         if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
             if(d == 0) {
                 if(isa<ArrayType>(currentType->getPointerElementType())) {
@@ -456,8 +421,14 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
             currentType->dump();
             throw runtime_error("type not implemented in gpe");
         }
+        // if new type is a pointer, and old type was a struct, then we assume its a global pointer, and therefore
+        // update the addressspace to be global, ie 1.  This is a bit hacky I know
+        if(isa<PointerType>(newType) && isa<StructType>(currentType)) {
+            addressspace = 1;
+        }
         currentType = newType;
     }
+    updateAddressSpace(instr, addressspace);
     rhs = "(&" + rhs + ")";
     return rhs;
 }
@@ -1147,6 +1118,49 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
     return gencode;
 }
 
+string writeStructCopyCodeNoPointers(StructType *structType, string srcName, string destName) {
+    string gencode = "";
+    int srcidx = 0;
+    int dstidx = 0;
+    outs() << "writeStructCopyCodeNoPointers " << dumpType(structType) << "\n";
+    for(auto it=structType->element_begin(); it != structType->element_end(); it++) {
+        Type *childType = *it;
+        if(isa<PointerType>(childType)) {
+            // ignore
+            srcidx++;
+            dstidx++;
+            continue;
+        }
+        string childSrcName = srcName + ".f" + toString(srcidx);
+        string childDstName = destName + ".f" + toString(dstidx);
+        if(StructType *childStructType = dyn_cast<StructType>(childType)) {
+            gencode += writeStructCopyCodeNoPointers(childStructType, childSrcName, childDstName);
+            srcidx++;
+            dstidx++;
+        } else if(childType->getPrimitiveSizeInBits() > 0 ) {
+            gencode += childDstName + " = " + childSrcName + ";\n";
+            outs() << "copying " << dumpType(childType) << "\n";
+            srcidx++;
+            dstidx++;
+        } else if(ArrayType *arrayType = dyn_cast<ArrayType>(childType)) {
+            int numElements = arrayType->getNumElements();
+            outs() << "numlemenets " << numElements << "\n";
+            for(int i=0; i < numElements; i++) {
+                gencode += childDstName + "[" + toString(i) + "] = " + childSrcName + "[" + toString(i) +  "];\n";
+            }
+            srcidx++;
+            dstidx++;
+            // throw runtime_error("unhandled type " + dumpType(childType));
+        } else {
+            outs() << "unhandled type " + dumpType(childType) << "\n";
+            throw runtime_error("unhandled type " + dumpType(childType));
+            srcidx++;
+            dstidx++;
+        }
+    }
+    return gencode;
+}
+
 std::string dumpFunctionDeclaration(Function *F) {
     string declaration = "";
     Type *retType = F->getReturnType();
@@ -1163,15 +1177,29 @@ std::string dumpFunctionDeclaration(Function *F) {
         Argument *arg = &*it;
         storeValueName(arg);
         Type *argType = arg->getType();
-        if(iskernel_by_name[fname]) {
+        string argName = dumpOperand(arg);
+        bool isstruct = false;
+        string argdeclaration = "";
+        if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
+            Type *elemType = ptrType->getPointerElementType();
+            if(StructType *structType = dyn_cast<StructType>(elemType)) {
+                outs() << "name " << getName(structType) << "\n";
+                if(getName(structType) != "struct.float4") {
+                    isstruct = true;
+                    argdeclaration = "global " + dumpTypeNoPointers(structType) + "* " + argName + "_nopointers";
+                }
+            }
+        }
+        if(iskernel_by_name[fname] && !isstruct) {
             if(argType->getTypeID() == Type::PointerTyID) {
                 Type *elementType = argType->getPointerElementType();
                 Type *newtype = PointerType::get(elementType, 1);
                 arg->mutateType(newtype);
             }
         }
-        string argName = dumpOperand(arg);
-        string argdeclaration = dumpType(arg->getType()) + " " + argName;
+        if(!isstruct) {
+            argdeclaration = dumpType(arg->getType()) + " " + argName;
+        }
         if(i > 0) {
             declaration += ", ";
         }
@@ -1183,16 +1211,21 @@ std::string dumpFunctionDeclaration(Function *F) {
         if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
             Type *elemType = ptrType->getPointerElementType();
             if(StructType *structType = dyn_cast<StructType>(elemType)) {
-                outs() << "got a structtype\n";
-                unique_ptr<StructInfo> structInfo(new StructInfo());
-                walkStructType(TheModule.get(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
-                for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
-                    PointerInfo *pointerInfo = pointerit->get();
-                    int offset = pointerInfo->offset;
-                    // Type *type = pointerInfo->type;
-                    declaration += ", global " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
-                    structpointershimcode += argName + "[0]" + pointerInfo->path + " = " + argName + "_ptr" + toString(j) + ";\n";
-                    j++;
+                if(getName(structType) != "struct.float4") {
+                    outs() << "got a structtype\n";
+                    // declare a pointerful struct, then copy the vlaues across, then copy the float *s in
+                    structpointershimcode += dumpType(structType) + " " + argName + "[1];\n";
+                    structpointershimcode += writeStructCopyCodeNoPointers(structType, argName + "_nopointers[0]", argName + "[0]");
+                    unique_ptr<StructInfo> structInfo(new StructInfo());
+                    walkStructType(TheModule.get(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
+                    for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
+                        PointerInfo *pointerInfo = pointerit->get();
+                        int offset = pointerInfo->offset;
+                        // Type *type = pointerInfo->type;
+                        declaration += ", global " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
+                        structpointershimcode += argName + "[0]" + pointerInfo->path + " = " + argName + "_ptr" + toString(j) + ";\n";
+                        j++;
+                    }
                 }
             }
         }
