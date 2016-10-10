@@ -98,7 +98,12 @@ void declareGlobal(GlobalValue *global) {
     if(GlobalVariable *var = dyn_cast<GlobalVariable>(global)) {
         cout << "hasinitializer() " << var->hasInitializer() << endl;
         cout << "name " << getName(global) << endl;
-        gencode += "constant " + dumpType(global->getType()->getPointerElementType()) + " " + getName(global);
+        string name = getName(global);
+        if(name == "$str") {
+            return;  // lazily skip $str for now...
+        }
+        // name = replace(name, '$', '_');
+        gencode += "constant " + dumpType(global->getType()->getPointerElementType()) + " " + name;
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
             int addressspace = pointerType->getAddressSpace();
             if(addressspace == 3) { // shared/local => skip
@@ -218,6 +223,9 @@ string dumpConstant(Constant *constant) {
         ostringstream oss;
         oss << floatvalue;
         string floatvaluestr = oss.str();
+        if(floatvaluestr == "inf") {
+            return "INFINITY";
+        }
         if(single_precision) {
             if(floatvaluestr.find('.') == string::npos) {
                 floatvaluestr += ".0";
@@ -292,6 +300,10 @@ void storeValueName(Value *value) {
         }
         name = replace(name, '.', '_');
         name = replace(name, '-', '_');
+        name = replace(name, '$', '_');
+        if(name == "kernel") {
+            name = "_kernel";
+        }
         nameByValue[value] = name;
     } else {
         int idx = nextNameIdx;
@@ -722,7 +734,7 @@ std::string dumpCall(CallInst *instr) {
         return "";
     }
     if(functionName == "__nvvm_reflect") {
-        return ""; //ignore
+        return gencode + " 0;\n"; //ignore, (but pretend to return 0)
     }
     if(functionName == "llvm.memcpy.p0i8.p0i8.i64") {
         return dumpMemcpyCharCharLong(instr);  // just ignore for now
