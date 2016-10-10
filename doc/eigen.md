@@ -10,4 +10,4 @@ which compiles and runs:
 
 Result should be something like:
 
-<img src="img/makeeigentest.png?raw=true" />
+<img src="img/makeeigentestb.png?raw=true" />
