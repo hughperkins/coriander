@@ -1136,9 +1136,18 @@ string writeStructCopyCodeNoPointers(StructType *structType, string srcName, str
             outs() << "copying " << dumpType(childType) << "\n";
             srcidx++;
             dstidx++;
+        } else if(ArrayType *arrayType = dyn_cast<ArrayType>(childType)) {
+            int numElements = arrayType->getNumElements();
+            outs() << "numlemenets " << numElements << "\n";
+            for(int i=0; i < numElements; i++) {
+                gencode += childDstName + "[" + toString(i) + "] = " + childSrcName + "[" + toString(i) +  "];\n";
+            }
+            srcidx++;
+            dstidx++;
+            // throw runtime_error("unhandled type " + dumpType(childType));
         } else {
             outs() << "unhandled type " + dumpType(childType) << "\n";
-            // throw runtime_error("unhandled type " + dumpType(childType));
+            throw runtime_error("unhandled type " + dumpType(childType));
             srcidx++;
             dstidx++;
         }

@@ -271,13 +271,13 @@ void declareStructNoPointers(string name, StructType *type) {
         // }
         std::string memberName = "f" + toString(i);
         if(ArrayType *arraytype = dyn_cast<ArrayType>(elementType)) {
-            // Type *arrayelementtype = arraytype->getPointerElementType();
-            // // outs() << "arrayelementtype " << dumpType(arrayelementtype) << "\n";
-            // int numElements = arraytype->getNumElements();
+            Type *arrayelementtype = arraytype->getPointerElementType();
+            outs() << "arrayelementtype " << dumpType(arrayelementtype) << "\n";
+            int numElements = arraytype->getNumElements();
             // // outs() << "numelements " << numElements << "\n";
-            // declaration += "    " + dumpType(arrayelementtype) + " ";
-            // declaration += memberName + "[" + toString(numElements) + "];\n";
-            // // throw runtime_error("not implemented declarestruct for arraytype elements");
+            declaration += "    " + dumpType(arrayelementtype) + " ";
+            declaration += memberName + "[" + toString(numElements) + "];\n";
+            //throw runtime_error("not implemented declarestruct for arraytype elements");
         } else {
             declaration += "    ";
             // if its a pointer, we skip it, otherwise we handle it

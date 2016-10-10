@@ -1,3 +1,34 @@
+struct class_Eigen__array_nopointers {
+    long f0[1];
+};
+
+struct Eigen__DSizes_nopointers {
+    struct class_Eigen__array_nopointers f0;
+};
+
+struct Eigen__TensorEvaluator_0_nopointers {
+        struct Eigen__DSizes_nopointers f1;
+    };
+
+struct Eigen__internal__scalar_sum_op_nopointers {
+    char f0;
+};
+
+struct Eigen__TensorEvaluator_2_nopointers {
+        struct Eigen__DSizes_nopointers f1;
+    };
+
+struct Eigen__TensorEvaluator_1_nopointers {
+    struct Eigen__internal__scalar_sum_op_nopointers f0;
+    struct Eigen__TensorEvaluator_2_nopointers f1;
+    struct Eigen__TensorEvaluator_2_nopointers f2;
+};
+
+struct Eigen__TensorEvaluator_nopointers {
+    struct Eigen__TensorEvaluator_0_nopointers f0;
+    struct Eigen__TensorEvaluator_1_nopointers f1;
+};
+
 struct class_Eigen__array {
     long f0[1];
 };
@@ -45,9 +76,14 @@ struct Eigen__TensorEvaluator {
 
 
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator* eval, global float* eval_ptr0, global float* eval_ptr1, global float* eval_ptr2, long size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_nopointers* eval_nopointers, global float* eval_ptr0, global float* eval_ptr1, global float* eval_ptr2, long size) {
     long i1_02_i;
     long i_03_i;
+struct Eigen__TensorEvaluator eval[1];
+eval[0].f0.f1.f0.f0[0] = eval_nopointers[0].f0.f1.f0.f0[0];
+eval[0].f1.f0.f0 = eval_nopointers[0].f1.f0.f0;
+eval[0].f1.f1.f1.f0.f0[0] = eval_nopointers[0].f1.f1.f1.f0.f0[0];
+eval[0].f1.f2.f1.f0.f0[0] = eval_nopointers[0].f1.f2.f1.f0.f0[0];
 eval[0].f0.f0 = eval_ptr0;
 eval[0].f1.f1.f0 = eval_ptr1;
 eval[0].f1.f2.f0 = eval_ptr2;
@@ -73,12 +109,12 @@ eval[0].f1.f2.f0 = eval_ptr2;
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    global float*global * v16 = (&eval[0].f1.f1.f0);
-    global float*global * v17 = (&eval[0].f1.f2.f0);
-    global float*global * v18 = (&eval[0].f0.f0);
-    global float* v19 = v16[0];
-    global float* v20 = v17[0];
-    global float* v21 = v18[0];
+    float* * v16 = (&eval[0].f1.f1.f0);
+    float* * v17 = (&eval[0].f1.f2.f0);
+    float* * v18 = (&eval[0].f0.f0);
+    float* v19 = v16[0];
+    float* v20 = v17[0];
+    float* v21 = v18[0];
         i_03_i = v13;
     goto v23;
     label24:;
@@ -92,42 +128,42 @@ eval[0].f1.f2.f0 = eval_ptr2;
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElLb1EE3runERSH_lll_exit;
     }
     v_lr_ph_i:;
-    global float*global * v29 = (&eval[0].f1.f1.f0);
-    global float* v30 = v29[0];
-    global float*global * v31 = (&eval[0].f1.f2.f0);
-    global float* v32 = v31[0];
-    global float*global * v33 = (&eval[0].f0.f0);
-    global float* v34 = v33[0];
+    float* * v29 = (&eval[0].f1.f1.f0);
+    float* v30 = v29[0];
+    float* * v31 = (&eval[0].f1.f2.f0);
+    float* v32 = v31[0];
+    float* * v33 = (&eval[0].f0.f0);
+    float* v34 = v33[0];
         i1_02_i = v26;
     goto v36;
     v23:;
-    global float* v37 = (&v19[i_03_i]);
+    float* v37 = (&v19[i_03_i]);
     float v38 = v37[0];
-    global float* v39 = (&v37[1]);
+    float* v39 = (&v37[1]);
     float v40 = v39[0];
-    global float* v41 = (&v37[2]);
+    float* v41 = (&v37[2]);
     float v42 = v41[0];
-    global float* v43 = (&v37[3]);
+    float* v43 = (&v37[3]);
     float v44 = v43[0];
-    global float* v45 = (&v20[i_03_i]);
+    float* v45 = (&v20[i_03_i]);
     float v46 = v45[0];
-    global float* v47 = (&v45[1]);
+    float* v47 = (&v45[1]);
     float v48 = v47[0];
-    global float* v49 = (&v45[2]);
+    float* v49 = (&v45[2]);
     float v50 = v49[0];
-    global float* v51 = (&v45[3]);
+    float* v51 = (&v45[3]);
     float v52 = v51[0];
     float v53 = v38 + v46;
     float v54 = v40 + v48;
     float v55 = v42 + v50;
     float v56 = v44 + v52;
-    global float* v57 = (&v21[i_03_i]);
+    float* v57 = (&v21[i_03_i]);
     v57[0] = v53;
-    global float* v59 = (&v57[1]);
+    float* v59 = (&v57[1]);
     v59[0] = v54;
-    global float* v61 = (&v57[2]);
+    float* v61 = (&v57[2]);
     v61[0] = v55;
-    global float* v63 = (&v57[3]);
+    float* v63 = (&v57[3]);
     v63[0] = v56;
     long v65 = i_03_i + v12;
     bool v66 = v65 < v11;
@@ -138,12 +174,12 @@ eval[0].f1.f2.f0 = eval_ptr2;
         goto label24;
     }
     v36:;
-    global float* v68 = (&v30[i1_02_i]);
+    float* v68 = (&v30[i1_02_i]);
     float v_val_i_i_i_i = v68[0];
-    global float* v69 = (&v32[i1_02_i]);
+    float* v69 = (&v32[i1_02_i]);
     float v_val_i1_i_i_i = v69[0];
     float v70 = v_val_i_i_i_i + v_val_i1_i_i_i;
-    global float* v71 = (&v34[i1_02_i]);
+    float* v71 = (&v34[i1_02_i]);
     v71[0] = v70;
     long v73 = i1_02_i + v9;
     bool v74 = v73 < size;
