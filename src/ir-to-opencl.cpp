@@ -1177,8 +1177,11 @@ std::string dumpFunctionDeclaration(Function *F) {
         if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
             Type *elemType = ptrType->getPointerElementType();
             if(StructType *structType = dyn_cast<StructType>(elemType)) {
-                isstruct = true;
-                argdeclaration = "global " + dumpTypeNoPointers(structType) + "* " + argName + "_nopointers";
+                outs() << "name " << getName(structType) << "\n";
+                if(getName(structType) != "struct.float4") {
+                    isstruct = true;
+                    argdeclaration = "global " + dumpTypeNoPointers(structType) + "* " + argName + "_nopointers";
+                }
             }
         }
         if(iskernel_by_name[fname] && !isstruct) {
@@ -1202,19 +1205,21 @@ std::string dumpFunctionDeclaration(Function *F) {
         if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
             Type *elemType = ptrType->getPointerElementType();
             if(StructType *structType = dyn_cast<StructType>(elemType)) {
-                outs() << "got a structtype\n";
-                // declare a pointerful struct, then copy the vlaues across, then copy the float *s in
-                structpointershimcode += dumpType(structType) + " " + argName + "[1];\n";
-                structpointershimcode += writeStructCopyCodeNoPointers(structType, argName + "_nopointers[0]", argName + "[0]");
-                unique_ptr<StructInfo> structInfo(new StructInfo());
-                walkStructType(TheModule.get(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
-                for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
-                    PointerInfo *pointerInfo = pointerit->get();
-                    int offset = pointerInfo->offset;
-                    // Type *type = pointerInfo->type;
-                    declaration += ", global " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
-                    structpointershimcode += argName + "[0]" + pointerInfo->path + " = " + argName + "_ptr" + toString(j) + ";\n";
-                    j++;
+                if(getName(structType) != "struct.float4") {
+                    outs() << "got a structtype\n";
+                    // declare a pointerful struct, then copy the vlaues across, then copy the float *s in
+                    structpointershimcode += dumpType(structType) + " " + argName + "[1];\n";
+                    structpointershimcode += writeStructCopyCodeNoPointers(structType, argName + "_nopointers[0]", argName + "[0]");
+                    unique_ptr<StructInfo> structInfo(new StructInfo());
+                    walkStructType(TheModule.get(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
+                    for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
+                        PointerInfo *pointerInfo = pointerit->get();
+                        int offset = pointerInfo->offset;
+                        // Type *type = pointerInfo->type;
+                        declaration += ", global " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
+                        structpointershimcode += argName + "[0]" + pointerInfo->path + " = " + argName + "_ptr" + toString(j) + ";\n";
+                        j++;
+                    }
                 }
             }
         }
