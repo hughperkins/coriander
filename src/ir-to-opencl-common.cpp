@@ -175,7 +175,8 @@ std::string dumpPointerType(PointerType *ptr) {
     }
     // we're just going to hackily assume that anything that is `global **` should be `global * global *`
     if(isa<PointerType>(ptr->getPointerElementType())) {
-        return "global " + elementTypeString + addressspacestr + " *";
+        // return "global " + elementTypeString + addressspacestr + " *";
+        return elementTypeString + addressspacestr + " *";
     }
     if(addressspacestr != "") {
         gencode += addressspacestr + " ";

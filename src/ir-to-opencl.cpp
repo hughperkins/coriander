@@ -1128,13 +1128,6 @@ std::string dumpFunctionDeclaration(Function *F) {
         Argument *arg = &*it;
         storeValueName(arg);
         Type *argType = arg->getType();
-        if(iskernel_by_name[fname]) {
-            if(argType->getTypeID() == Type::PointerTyID) {
-                Type *elementType = argType->getPointerElementType();
-                Type *newtype = PointerType::get(elementType, 1);
-                arg->mutateType(newtype);
-            }
-        }
         string argName = dumpOperand(arg);
         bool isstruct = false;
         string argdeclaration = "";
@@ -1142,7 +1135,14 @@ std::string dumpFunctionDeclaration(Function *F) {
             Type *elemType = ptrType->getPointerElementType();
             if(StructType *structType = dyn_cast<StructType>(elemType)) {
                 isstruct = true;
-                argdeclaration = "global " + dumpTypeNoPointers(structType) + "* " + argName;
+                argdeclaration = "global " + dumpTypeNoPointers(structType) + "* " + argName + "_nopointers";
+            }
+        }
+        if(iskernel_by_name[fname] && !isstruct) {
+            if(argType->getTypeID() == Type::PointerTyID) {
+                Type *elementType = argType->getPointerElementType();
+                Type *newtype = PointerType::get(elementType, 1);
+                arg->mutateType(newtype);
             }
         }
         if(!isstruct) {
@@ -1160,6 +1160,9 @@ std::string dumpFunctionDeclaration(Function *F) {
             Type *elemType = ptrType->getPointerElementType();
             if(StructType *structType = dyn_cast<StructType>(elemType)) {
                 outs() << "got a structtype\n";
+                // declare a pointerful struct, then copy the vlaues across, then copy the float *s in
+                structpointershimcode += dumpType(structType) + " " + argName + "[1];\n";
+
                 unique_ptr<StructInfo> structInfo(new StructInfo());
                 walkStructType(TheModule.get(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
                 for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
