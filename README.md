@@ -120,8 +120,10 @@ Thats it!  :-)  Youve run your first `cuda-on-cl` program :-)
 ## How it works
 
 Behind the scenes, there are a few parts:
-- Device-side, we need to convert the CUDA kernels into OpenCL kernels.
-- Host-side, we need convert the cuda kernel launch code into opencl kernel launch code, and bake in the device-side OpenCL code
+- Device-side, `cocl` converts the CUDA kernels into OpenCL kernels
+- Host-side, `cocl`:
+  - converts the cuda kernel launch code into opencl kernel launch code, and
+  - bakes in the device-side OpenCL code
 
 <img src="doc/img/cudairtoopenclarchitecture6.png?raw=true" width="900" height="400" />
 
@@ -132,10 +134,10 @@ Behind the scenes, there are a few parts:
 ### Pre-requisites
 
 - Ubuntu 16.04
-- 'include' files from CUDA toolkit 7.5, at /usr/local/cuda-7.5/include
+- 'include' files from CUDA toolkit 7.5, at `/usr/local/cuda-7.5/include`
 - OpenCL-enabled GPU, and appropriate OpenCL drivers installed for the GPU
 
-Other operating systems, and clang/llvm versions, might be supported, but untested.  Your mileage may vary :-)
+Other operating systems, cuda version, and clang/llvm versions, might work too, but untested.  Your mileage may vary :-)
 
 ### Procedure
 
