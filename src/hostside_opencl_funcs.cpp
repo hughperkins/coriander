@@ -128,6 +128,7 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
         err = clEnqueueReadBuffer(*queue, srcclmem, CL_TRUE, 0,
                                          count, dst, 0, NULL, NULL);
         cl->checkError(err);
+        // cl->finish();
     } else if(cudaMemcpyKind == 1) {
         // host => device
         int dstidx = idxByAddr[(void *)dst];
@@ -237,6 +238,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
         err = clEnqueueReadBuffer(*queue, srcclmem, CL_TRUE, 0,
                                          bytes, dst, 0, NULL, NULL);
         cl->checkError(err);
+        // cl->finish();
     } else if(cudaMemcpyKind == 1) {
         // host => device
         int dstidx = idxByAddr[(void *)dst];
@@ -267,6 +269,14 @@ size_t cudaMalloc(void **p_mem, size_t N) {
 }
 
 size_t cudaFree(void *mem) {
+    // for(int i = 0 ; i < clmems.size(); i++) {
+    //     cout << "cuda free i " << i << " " << &clmems[i] << endl;
+    //     // err = clReleaseMemObject(clmems[i]);
+    //     // cl->checkError(err);
+    // }
+    // err = clReleaseMemObject(*(cl_mem *)(*p_mem));
+    // cl->checkError(err);
+
     int idx = idxByAddr[mem];
 
     cout << "cudafree using opencl idx " << idx << endl;
@@ -297,7 +307,12 @@ size_t cudaConfigureCall(
     return 0;
 }
 
-void configureKernel(const char *kernelName, const char *clSourcecodeString) {
+    // uint32_t block_x = block_xy & ((1ul << 31) - 1);
+    // uint32_t block_y = block_xy >> 32;
+
+void configureKernel(
+        const char *kernelName, const char *clSourcecodeString) {
+    // cout << "configureKernel (name=" << kernelName << ", source=" << clSourcecodeString << ")" << endl;
     assure_initialized();
     kernel.reset(cl->buildKernelFromString(clSourcecodeString, kernelName, "", "__internal__"));
 }
@@ -332,18 +347,37 @@ void setKernelArgFloatStar(float *clmem_as_floatstar) {
     kernel->inout(&clmem);
 }
 
+// void setKernelArgCharStar(char *clmem_as_charstar) {
+//     cout << "setKernelArgCharStar" << endl;
+//     cl_mem *p_mem = (cl_mem *)clmem_as_charstar;
+//     // cout << "setKernelArgFloatStar" << endl;
+//     kernel->inout(p_mem);
+// }
+
+// void setKernelArgStruct() {
+//     cout << "setKernelArgStruct" << endl;
+//     // cl_mem *p_mem = (cl_mem *)clmem_as_charstar;
+//     // cout << "setKernelArgFloatStar" << endl;
+//     // kernel->inout(p_mem);
+// }
+
 void setKernelArgInt64(int64_t value) {
     cout << "setKernelArgInt64 " << value << endl;
+    // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
+    // cout << "setkernelargint " << value << endl;
     kernel->in(value);
 }
 
 void setKernelArgInt32(int value) {
     cout << "setKernelArgInt32 " << value << endl;
+    // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
+    // cout << "setkernelargint " << value << endl;
     kernel->in(value);
 }
 
 void setKernelArgFloat(float value) {
     cout << "setKernelArgFloat " << value << endl;
+    // cout << "setkernelargfloat " << value << endl;
     kernel->in(value);
 }
 

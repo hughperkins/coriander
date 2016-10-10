@@ -32,11 +32,13 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_os_ostream.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
+// #include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
 #include <map>
 #include <set>
+// #include <iostream>
 #include <stdexcept>
 #include <sstream>
 #include <fstream>
@@ -55,12 +57,19 @@ bool single_precision = true;
 class LaunchCallInfo {
 public:
     LaunchCallInfo() {
+        // launchInstruction = 0;
+        // kernelName = "";
+        // for(int i = 0; i < 3; i++) {
+        //     grid[i] = 0;
+        //     block[i] = 0;
+        // }
         grid_xy_value = 0;
         grid_z_value = 0;
         block_xy_value = 0;
         block_z_value = 0;
     }
     std::string kernelName = "";
+    // CallInst *launchInstruction;
     vector<Type *> callTypes;
     vector<Value *> callValuesByValue;
     vector<Value *> callValuesAsPointers;
@@ -68,6 +77,8 @@ public:
     Value *grid_z_value;
     Value *block_xy_value;
     Value *block_z_value;
+    // int grid[3];
+    // int block[3];
 };
 
 static unique_ptr<LaunchCallInfo> launchCallInfo(new LaunchCallInfo);
@@ -76,6 +87,26 @@ ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
     raw_os_ostream my_raw_os_ostream(os);
     my_raw_os_ostream << "LaunchCallInfo " << info.kernelName;
     my_raw_os_ostream << "<<<";
+
+    // my_raw_os_ostream << "dim3(";
+    // for(int j = 0; j < 3; j++) {
+    //     if(j > 0) {
+    //         my_raw_os_ostream << ", ";
+    //     }
+    //     my_raw_os_ostream << info.grid[j];
+    // }
+    // my_raw_os_ostream << ")";
+    // my_raw_os_ostream << ", ";
+
+    // my_raw_os_ostream << "dim3(";
+    // for(int j = 0; j < 3; j++) {
+    //     if(j > 0) {
+    //         my_raw_os_ostream << ", ";
+    //     }
+    //     my_raw_os_ostream << info.block[j];
+    // }
+    // my_raw_os_ostream << ")";
+
     my_raw_os_ostream << ">>>";
     my_raw_os_ostream << "(";
     int i = 0;
@@ -125,6 +156,7 @@ void getLaunchTypes(CallInst *inst, LaunchCallInfo *info) {
     } else {
         throw runtime_error("getlaunchtypes, didnt get ConstantExpr");
     }
+    // return launchCallInfo;
 }
 
 void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
@@ -149,6 +181,14 @@ void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
         throw runtime_error("getlaunchvalue, first operatnd of inst is not an instruction...");
     }
     Instruction *bitcast = cast<Instruction>(inst->getOperand(0));
+    // if(!isa<Instruction>(bitcast->getOperand(0))) {
+    //     outs() << "getlaunchvalue, bitcast first operatnd of inst is not an instruction..." << "\n";
+    //     bitcast->dump();
+    //     outs() << "\n";
+    //     bitcast->getOperand(0)->dump();
+    //     outs() << "\n";
+    //     throw runtime_error("getlaunchvalue, bitcast first operatnd of inst is not an instruction...");
+    // }
     Value *alloca = bitcast->getOperand(0);
     Instruction *load = new LoadInst(alloca, "loadCudaArg");
     load->insertBefore(inst);
@@ -196,7 +236,6 @@ void patchFunction(Function *F) {
                     continue;
                 }
                 string calledFunctionName = called->getName();
-                outs() << "caledFunctionanem " << calledFunctionName << "\n";
                 if(calledFunctionName == "cudaLaunch") {
                     outs() << "cudaLaunch\n";
                     getLaunchTypes(inst, launchCallInfo.get());
@@ -250,6 +289,7 @@ void patchFunction(Function *F) {
                             call->insertAfter(lastInst);
                             lastInst = call;
                         } else if(value->getType()->isFloatingPointTy()) {
+                            // outs() << "got a float" << "\n";
                             Function *setKernelArgFloat = cast<Function>(F->getParent()->getOrInsertFunction(
                                 "_Z17setKernelArgFloatf",
                                 Type::getVoidTy(TheContext),
@@ -259,8 +299,10 @@ void patchFunction(Function *F) {
                             call->insertAfter(lastInst);
                             lastInst = call;
                         } else if(value->getType()->isPointerTy()) {
+                            // outs() << "got a pointer " << "\n";
                             Type *elementType = value->getType()->getPointerElementType();
                             if(elementType->isFloatingPointTy()) {
+                                // outs() << "got a float *" << "\n";
                                 Function *setKernelArgFloatStar = cast<Function>(F->getParent()->getOrInsertFunction(
                                     "_Z21setKernelArgFloatStarPf",
                                     Type::getVoidTy(TheContext),
@@ -333,6 +375,12 @@ void patchFunction(Function *F) {
                                 IntegerType::get(TheContext, 32),
                                 NULL));
 
+                            // Value * indices[1];
+                            // indices[0] = createInt32Constant(&TheContext, 0);
+                            // GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(value->getType(), value, ArrayRef<Value *>(&indices[0], &indices[1]));
+                            // gep->insertAfter(lastInst);
+                            // lastInst = gep;
+
                             BitCastInst *bitcast = new BitCastInst(valueAsPointerInstr, PointerType::get(IntegerType::get(TheContext, 8), 0));
                             bitcast->insertAfter(lastInst);
                             lastInst = bitcast;
@@ -349,8 +397,11 @@ void patchFunction(Function *F) {
                             outs() << "pointers in struct:" << "\n";
                             for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
                                 PointerInfo *pointerInfo = pointerit->get();
+                                // outs() << "pointer: " << *pointerInfo << "\n";
                                 int offset = pointerInfo->offset;
                                 Type *type = pointerInfo->type;
+                                // vector<int> indicesvect = pointerInfo->indices;
+                                // create a GetElementPtr instruction?
                                 vector<Value *> indices;
                                 // add a leading 0:
                                 indices.push_back(createInt32Constant(&TheContext, 0));
@@ -359,6 +410,10 @@ void patchFunction(Function *F) {
                                     outs() << "idx " << idx << "\n";
                                     indices.push_back(createInt32Constant(&TheContext, idx));
                                 }
+                                // // add a trailing 0 ... :
+                                // indices.push_back(createInt32Constant(&TheContext, 0));
+                                // value->getType()->dump();
+                                // valueAsPointerInstr->dump();
                                 GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(value->getType(), valueAsPointerInstr, ArrayRef<Value *>(&indices[0], &indices[indices.size()]), "getfloatstaraddr");
                                 outs() << "gep type " << dumpType(gep->getType()) << "\n";
                                 gep->insertAfter(lastInst);
@@ -381,6 +436,23 @@ void patchFunction(Function *F) {
                                 call->insertAfter(lastInst);
                                 lastInst = call;
                             }
+
+                            // Type *elementType = value->getType()->getPointerElementType();
+                            // // if(elementType->isFloatingPointTy()) {
+                            //     // outs() << "got a float *" << "\n";
+                            //     Function *setKernelArgCharStar = cast<Function>(F->getParent()->getOrInsertFunction(
+                            //         "_Z20setKernelArgCharStarPf",
+                            //         Type::getVoidTy(TheContext),
+                            //         PointerType::get(IntegerType::get(TheContext, 8), 0),
+                            //         NULL));
+                            //     BitCastInst *bitcast = new BitCastInst(value, PointerType::get(IntegerType::get(TheContext, 8), 0));
+                            //     bitcast->insertAfter(lastInst);
+                            //     lastInst = bitcast;
+                            //     CallInst *call = CallInst::Create(setKernelArgCharStar, bitcast);
+                            //     call->insertAfter(lastInst);
+                            //     lastInst = call;
+                            // // }
+                            // throw runtime_error("type struct not implemented");
                         } else {
                             throw runtime_error("type not implemented " + dumpType(value->getType()));
                         }
@@ -397,11 +469,19 @@ void patchFunction(Function *F) {
 
                     launchCallInfo->callValuesByValue.clear();
                     launchCallInfo->callValuesAsPointers.clear();
+                    // launchCallInfo.reset(new LaunchCallInfo);
                 } else if(calledFunctionName == "cudaSetupArgument") {
                     outs() << "cudaSetupArgument\n";
                     getLaunchArgValue(inst, launchCallInfo.get());
                     to_replace_with_zero.push_back(inst);
                 }
+                // } else if(calledFunctionName == "cudaConfigureCall") {
+                //     outs() << "cudaConfigureCall\n";
+                //     launchCallInfo.reset(new LaunchCallInfo);
+                //     getBlockGridDimensions(inst, launchCallInfo.get());
+                //     dumpLaunchCallInfo(launchCallInfo.get());
+                //     to_replace_with_zero.push_back(inst);
+                // }
             }
         }
     }
@@ -409,11 +489,14 @@ void patchFunction(Function *F) {
         Instruction *inst = *it;
         BasicBlock::iterator ii(inst);
         ReplaceInstWithValue(inst->getParent()->getInstList(), ii, constzero);
+        // outs() << "after replacevalue" << "\n";
     }
 }
 
 
 void patchModule(string deviceclfilename, Module *M) {
+    // int i = 0;
+
     // add in opencl sourcecode
     ifstream f_in(deviceclfilename);
     string cl_sourcecode(
@@ -424,8 +507,34 @@ void patchModule(string deviceclfilename, Module *M) {
 
     vector<Function *> functionsToRemove;
     for(auto it = M->begin(); it != M->end(); it++) {
+        // nameByValue.clear();
+        // nextNameIdx = 0;
         Function *F = &*it;
         string name = F->getName();
+        // outs() << "name " << name << "\n";
+        // if(name.find("cuda") == 0) {
+            // functionsToRemove.push_back(F);
+            // https://groups.google.com/forum/#!topic/llvm-dev/ovvfIe_zU3Y
+            // F->replaceAllUsesWith(UndefValue::get(F->getType()));
+            // F->eraseFromParent();
+            // continue;
+        // }
+        // if(name == "_Z14launchSetValuePfif") {
+            // outs() << "Function " << name << "\n";
+            patchFunction(F);
+            // outs() << "verifying function..." << "\n";
+            verifyFunction(*F);
+            // outs() << "function verified" << "\n";
+        // }
+        // if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
+        //         knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
+        //     Function *F = &*it;
+        //     if(i > 0) {
+        //         outs() << "\n";
+        //     }
+        //     dumpFunction(F);
+        //     i++;
+        // }
     }
 }
 
@@ -443,6 +552,15 @@ int main(int argc, char *argv[]) {
     outs() << "reading device cl file " << deviceclfilename << "\n";
     outs() << "outputing to patchedhost file " << patchedhostfilename << "\n";
 
+    // debug = false;
+    // if(argc == 3) {
+    //     if(string(argv[1]) != "--debug") {
+    //         outs() << "Usage: " << argv[0] << " [--debug] target.ll" << "\n";
+    //         return 1;
+    //     } else {
+    //         debug = true;
+    //     }
+    // }
     TheModule = parseIRFile(rawhostfilename, Err, TheContext);
     if(!TheModule) {
         Err.print(argv[0], errs());
@@ -456,7 +574,11 @@ int main(int argc, char *argv[]) {
     ofile.open(patchedhostfilename);
     raw_os_ostream my_raw_os_ostream(ofile);
     verifyModule(*TheModule);
+    // outs() << "printing module" << "\n";
     TheModule->print(my_raw_os_ostream, &assemblyAnnotationWriter);
+    // my_raw_os_ostream.close();
     ofile.close();
+    // TheModule->dump();
+//    dumpModule(TheModule.get());
     return 0;
 }
