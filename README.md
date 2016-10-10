@@ -1,6 +1,6 @@
 # cuda-on-cl
 
-This lets you compile CUDA code for use on non-CUDA OpenCL devices.
+This lets you build CUDA code for OpenCL devices.
 
 ## Why?
 
