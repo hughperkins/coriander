@@ -63,6 +63,7 @@ test/generated/%-device.cl: test/%-device.ll build/ir-to-opencl
 	echo building $@ from $<
 	build/ir-to-opencl $(DEBUG) $< $@
 
+# cocl
 %.o: %.cu
 	echo building $@ from $<
 	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen $<
@@ -74,6 +75,7 @@ build/cuda_sample: test/cuda_sample.o build/hostside_opencl_funcs.o test/generat
 build/eigen-%: test/eigen/%.o build/libcocl.a
 	g++ -o $@ $< -lcocl -lOpenCL -Lbuild -lEasyCL
 
+# run
 run-cuda_sample: build/cuda_sample
 	################################
 	# running:
