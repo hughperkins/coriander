@@ -108,7 +108,7 @@ cudafree using opencl idx 0
 
 Thats it!  :-)  Youve run your first `cuda-on-cl` program :-)
 
-## Command-line Options
+## Options
 
 | Option | Description |
 |--------|-------------|
