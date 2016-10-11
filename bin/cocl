@@ -20,10 +20,6 @@ BASENAME=$(basename -s .cu ${INFILE})
 DIRNAME=$(dirname ${INFILE})
 BASEPATH=${DIRNAME}/${BASENAME}
 
-make -f ${COCL_HOME}/src/cocl.Makefile ${BASEPATH}-device.ll
-make -f ${COCL_HOME}/src/cocl.Makefile ${BASEPATH}-device.cl
-make -f ${COCL_HOME}/src/cocl.Makefile ${BASEPATH}-hostraw.ll
-make -f ${COCL_HOME}/src/cocl.Makefile ${BASEPATH}-hostpatched.ll
 make -f ${COCL_HOME}/src/cocl.Makefile ${BASEPATH}.o
 
 set +x
