@@ -1,3 +1,40 @@
+struct class_Eigen__array_nopointers {
+    int f0[1];
+};
+
+struct Eigen__DSizes_nopointers {
+    struct class_Eigen__array_nopointers f0;
+};
+
+struct Eigen__TensorEvaluator_0_nopointers {
+        struct Eigen__DSizes_nopointers f1;
+    };
+
+struct Eigen__internal__scalar_constant_op_nopointers {
+    float f0;
+};
+
+struct Eigen__TensorEvaluator_2_nopointers {
+        struct Eigen__DSizes_nopointers f1;
+    };
+
+struct Eigen__internal__nullary_wrapper_nopointers {
+    char f0;
+};
+
+struct Eigen__TensorEvaluator_1_nopointers {
+    struct Eigen__internal__scalar_constant_op_nopointers f0;
+    char f1[4];
+    struct Eigen__TensorEvaluator_2_nopointers f2;
+    struct Eigen__internal__nullary_wrapper_nopointers f3;
+    char f4[7];
+};
+
+struct Eigen__TensorEvaluator_nopointers {
+    struct Eigen__TensorEvaluator_0_nopointers f0;
+    struct Eigen__TensorEvaluator_1_nopointers f1;
+};
+
 struct class_Eigen__array {
     int f0[1];
 };
@@ -48,6 +85,26 @@ struct Eigen__TensorEvaluator {
     struct Eigen__TensorEvaluator_1 f1;
 };
 
+struct class_Eigen__internal__UniformRandomGenerator_nopointers {
+    long f0;
+};
+
+struct Eigen__internal__nullary_wrapper_5_nopointers {
+    char f0;
+};
+
+struct Eigen__TensorEvaluator_4_nopointers {
+    struct class_Eigen__internal__UniformRandomGenerator_nopointers f0;
+    struct Eigen__TensorEvaluator_2_nopointers f1;
+    struct Eigen__internal__nullary_wrapper_5_nopointers f2;
+    char f3[7];
+};
+
+struct Eigen__TensorEvaluator_3_nopointers {
+    struct Eigen__TensorEvaluator_0_nopointers f0;
+    struct Eigen__TensorEvaluator_4_nopointers f1;
+};
+
 struct class_Eigen__internal__UniformRandomGenerator {
     long f0;
 };
@@ -66,6 +123,37 @@ struct Eigen__TensorEvaluator_4 {
 struct Eigen__TensorEvaluator_3 {
     struct Eigen__TensorEvaluator_0 f0;
     struct Eigen__TensorEvaluator_4 f1;
+};
+
+struct class_Eigen__array_10_nopointers {
+    long f0[1];
+};
+
+struct Eigen__DSizes_9_nopointers {
+    struct class_Eigen__array_10_nopointers f0;
+};
+
+struct Eigen__TensorEvaluator_8_nopointers {
+        struct Eigen__DSizes_9_nopointers f1;
+    };
+
+struct Eigen__internal__scalar_sum_op_nopointers {
+    char f0;
+};
+
+struct Eigen__TensorEvaluator_12_nopointers {
+        struct Eigen__DSizes_9_nopointers f1;
+    };
+
+struct Eigen__TensorEvaluator_11_nopointers {
+    struct Eigen__internal__scalar_sum_op_nopointers f0;
+    struct Eigen__TensorEvaluator_12_nopointers f1;
+    struct Eigen__TensorEvaluator_12_nopointers f2;
+};
+
+struct Eigen__TensorEvaluator_7_nopointers {
+    struct Eigen__TensorEvaluator_8_nopointers f0;
+    struct Eigen__TensorEvaluator_11_nopointers f1;
 };
 
 struct class_Eigen__array_10 {
@@ -101,6 +189,43 @@ struct Eigen__TensorEvaluator_11 {
 struct Eigen__TensorEvaluator_7 {
     struct Eigen__TensorEvaluator_8 f0;
     struct Eigen__TensorEvaluator_11 f1;
+};
+
+struct class_Eigen__array_16_nopointers {
+    long f0[3];
+};
+
+struct Eigen__DSizes_15_nopointers {
+    struct class_Eigen__array_16_nopointers f0;
+};
+
+struct Eigen__TensorEvaluator_14_nopointers {
+        struct Eigen__DSizes_15_nopointers f1;
+    };
+
+struct Eigen__TensorEvaluator_18_nopointers {
+        struct Eigen__DSizes_15_nopointers f1;
+    };
+
+struct Eigen__internal__scalar_product_op_nopointers {
+    char f0;
+};
+
+struct Eigen__TensorEvaluator_19_nopointers {
+    struct Eigen__internal__scalar_product_op_nopointers f0;
+    struct Eigen__TensorEvaluator_18_nopointers f1;
+    struct Eigen__TensorEvaluator_18_nopointers f2;
+};
+
+struct Eigen__TensorEvaluator_17_nopointers {
+    struct Eigen__internal__scalar_sum_op_nopointers f0;
+    struct Eigen__TensorEvaluator_18_nopointers f1;
+    struct Eigen__TensorEvaluator_19_nopointers f2;
+};
+
+struct Eigen__TensorEvaluator_13_nopointers {
+    struct Eigen__TensorEvaluator_14_nopointers f0;
+    struct Eigen__TensorEvaluator_17_nopointers f1;
 };
 
 struct class_Eigen__array_16 {
@@ -144,6 +269,24 @@ struct Eigen__TensorEvaluator_13 {
     struct Eigen__TensorEvaluator_17 f1;
 };
 
+struct Eigen__TensorEvaluator_21_nopointers {
+        struct Eigen__DSizes_9_nopointers f1;
+    };
+
+struct Eigen__internal__scalar_isnan_op_nopointers {
+    char f0;
+};
+
+struct Eigen__TensorEvaluator_22_nopointers {
+    struct Eigen__internal__scalar_isnan_op_nopointers f0;
+    struct Eigen__TensorEvaluator_12_nopointers f1;
+};
+
+struct Eigen__TensorEvaluator_20_nopointers {
+    struct Eigen__TensorEvaluator_21_nopointers f0;
+    struct Eigen__TensorEvaluator_22_nopointers f1;
+};
+
 struct Eigen__TensorEvaluator_21 {
     global char* f0;
     struct Eigen__DSizes_9 f1;
@@ -164,6 +307,14 @@ struct Eigen__TensorEvaluator_20 {
     struct Eigen__TensorEvaluator_22 f1;
 };
 
+struct Eigen__TensorEvaluator_24_nopointers {
+        struct Eigen__DSizes_9_nopointers f1;
+    };
+
+struct Eigen__TensorEvaluator_23_nopointers {
+    struct Eigen__TensorEvaluator_24_nopointers f0;
+        };
+
 struct Eigen__TensorEvaluator_24 {
     global float* f0;
     struct Eigen__DSizes_9 f1;
@@ -175,6 +326,18 @@ struct Eigen__TensorEvaluator_23 {
     global struct Eigen__GpuDevice* f1;
     global float* f2;
 };
+
+struct class_Eigen__array_27_nopointers {
+    long f0[4];
+};
+
+struct Eigen__DSizes_26_nopointers {
+    struct class_Eigen__array_27_nopointers f0;
+};
+
+struct Eigen__TensorEvaluator_25_nopointers {
+        struct Eigen__DSizes_26_nopointers f1;
+    };
 
 struct class_Eigen__array_27 {
     long f0[4];
@@ -190,11 +353,25 @@ struct Eigen__TensorEvaluator_25 {
     global struct Eigen__GpuDevice* f2;
 };
 
+struct class_Eigen__internal__IndexMapper_nopointers {
+    struct class_Eigen__array_27_nopointers f0;
+    struct class_Eigen__array_27_nopointers f1;
+    struct class_Eigen__array_27_nopointers f2;
+    struct class_Eigen__array_27_nopointers f3;
+};
+
 struct class_Eigen__internal__IndexMapper {
     struct class_Eigen__array_27 f0;
     struct class_Eigen__array_27 f1;
     struct class_Eigen__array_27 f2;
     struct class_Eigen__array_27 f3;
+};
+
+struct class_Eigen__internal__IndexMapper_30_nopointers {
+    struct class_Eigen__array_27_nopointers f0;
+    struct class_Eigen__array_27_nopointers f1;
+    struct class_Eigen__array_27_nopointers f2;
+    struct class_Eigen__array_27_nopointers f3;
 };
 
 struct class_Eigen__internal__IndexMapper_30 {
@@ -204,11 +381,40 @@ struct class_Eigen__internal__IndexMapper_30 {
     struct class_Eigen__array_27 f3;
 };
 
+struct class_Eigen__internal__IndexMapper_31_nopointers {
+    struct class_Eigen__array_27_nopointers f0;
+    struct class_Eigen__array_27_nopointers f1;
+    struct class_Eigen__array_27_nopointers f2;
+    struct class_Eigen__array_27_nopointers f3;
+};
+
 struct class_Eigen__internal__IndexMapper_31 {
     struct class_Eigen__array_27 f0;
     struct class_Eigen__array_27 f1;
     struct class_Eigen__array_27 f2;
     struct class_Eigen__array_27 f3;
+};
+
+struct Eigen__TensorEvaluator_33_nopointers {
+        struct Eigen__DSizes_26_nopointers f1;
+    };
+
+struct class_Eigen__TensorMap_nopointers {
+        struct Eigen__DSizes_9_nopointers f1;
+};
+
+struct Eigen__TensorEvaluator_34_nopointers {
+    struct Eigen__TensorEvaluator_25_nopointers f0;
+    struct Eigen__TensorEvaluator_24_nopointers f1;
+    struct class_Eigen__TensorMap_nopointers f2;
+    struct class_Eigen__array_10_nopointers f3;
+    struct Eigen__DSizes_26_nopointers f4;
+            char f7;
+    };
+
+struct Eigen__TensorEvaluator_32_nopointers {
+    struct Eigen__TensorEvaluator_33_nopointers f0;
+    struct Eigen__TensorEvaluator_34_nopointers f1;
 };
 
 struct Eigen__TensorEvaluator_33 {
@@ -239,6 +445,14 @@ struct Eigen__TensorEvaluator_32 {
     struct Eigen__TensorEvaluator_34 f1;
 };
 
+struct Eigen__TensorEvaluator_37_nopointers {
+        struct Eigen__DSizes_9_nopointers f1;
+    };
+
+struct Eigen__TensorEvaluator_36_nopointers {
+    struct Eigen__TensorEvaluator_37_nopointers f0;
+        };
+
 struct Eigen__TensorEvaluator_37 {
     global float* f0;
     struct Eigen__DSizes_9 f1;
@@ -251,10 +465,21 @@ struct Eigen__TensorEvaluator_36 {
     global float* f2;
 };
 
+struct Eigen__TensorEvaluator_38_nopointers {
+        struct Eigen__DSizes_26_nopointers f1;
+    };
+
 struct Eigen__TensorEvaluator_38 {
     global float* f0;
     struct Eigen__DSizes_26 f1;
     global struct Eigen__GpuDevice* f2;
+};
+
+struct class_Eigen__internal__IndexMapper_39_nopointers {
+    struct class_Eigen__array_27_nopointers f0;
+    struct class_Eigen__array_27_nopointers f1;
+    struct class_Eigen__array_27_nopointers f2;
+    struct class_Eigen__array_27_nopointers f3;
 };
 
 struct class_Eigen__internal__IndexMapper_39 {
@@ -264,6 +489,13 @@ struct class_Eigen__internal__IndexMapper_39 {
     struct class_Eigen__array_27 f3;
 };
 
+struct class_Eigen__internal__IndexMapper_40_nopointers {
+    struct class_Eigen__array_27_nopointers f0;
+    struct class_Eigen__array_27_nopointers f1;
+    struct class_Eigen__array_27_nopointers f2;
+    struct class_Eigen__array_27_nopointers f3;
+};
+
 struct class_Eigen__internal__IndexMapper_40 {
     struct class_Eigen__array_27 f0;
     struct class_Eigen__array_27 f1;
@@ -271,11 +503,40 @@ struct class_Eigen__internal__IndexMapper_40 {
     struct class_Eigen__array_27 f3;
 };
 
+struct class_Eigen__internal__IndexMapper_41_nopointers {
+    struct class_Eigen__array_27_nopointers f0;
+    struct class_Eigen__array_27_nopointers f1;
+    struct class_Eigen__array_27_nopointers f2;
+    struct class_Eigen__array_27_nopointers f3;
+};
+
 struct class_Eigen__internal__IndexMapper_41 {
     struct class_Eigen__array_27 f0;
     struct class_Eigen__array_27 f1;
     struct class_Eigen__array_27 f2;
     struct class_Eigen__array_27 f3;
+};
+
+struct Eigen__TensorEvaluator_43_nopointers {
+        struct Eigen__DSizes_26_nopointers f1;
+    };
+
+struct class_Eigen__TensorMap_45_nopointers {
+        struct Eigen__DSizes_9_nopointers f1;
+};
+
+struct Eigen__TensorEvaluator_44_nopointers {
+    struct Eigen__TensorEvaluator_38_nopointers f0;
+    struct Eigen__TensorEvaluator_37_nopointers f1;
+    struct class_Eigen__TensorMap_45_nopointers f2;
+    struct class_Eigen__array_10_nopointers f3;
+    struct Eigen__DSizes_26_nopointers f4;
+            char f7;
+    };
+
+struct Eigen__TensorEvaluator_42_nopointers {
+    struct Eigen__TensorEvaluator_43_nopointers f0;
+    struct Eigen__TensorEvaluator_44_nopointers f1;
 };
 
 struct Eigen__TensorEvaluator_43 {
@@ -309,9 +570,25 @@ struct Eigen__TensorEvaluator_42 {
 
 
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0EiEELi16EEEKNS_20TensorCwiseNullaryOpINS0_18scalar_constant_opIfEEKS7_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator* eval, global float* eval_ptr0, global float* eval_ptr1, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0EiEELi16EEEKNS_20TensorCwiseNullaryOpINS0_18scalar_constant_opIfEEKS7_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_nopointers* eval_nopointers, global float* eval_ptr0, global float* eval_ptr1, int size) {
     int i1_02_i;
     int i_03_i;
+struct Eigen__TensorEvaluator eval[1];
+eval[0].f0.f1.f0.f0[0] = eval_nopointers[0].f0.f1.f0.f0[0];
+eval[0].f1.f0.f0 = eval_nopointers[0].f1.f0.f0;
+eval[0].f1.f1[0] = eval_nopointers[0].f1.f1[0];
+eval[0].f1.f1[1] = eval_nopointers[0].f1.f1[1];
+eval[0].f1.f1[2] = eval_nopointers[0].f1.f1[2];
+eval[0].f1.f1[3] = eval_nopointers[0].f1.f1[3];
+eval[0].f1.f2.f1.f0.f0[0] = eval_nopointers[0].f1.f2.f1.f0.f0[0];
+eval[0].f1.f3.f0 = eval_nopointers[0].f1.f3.f0;
+eval[0].f1.f4[0] = eval_nopointers[0].f1.f4[0];
+eval[0].f1.f4[1] = eval_nopointers[0].f1.f4[1];
+eval[0].f1.f4[2] = eval_nopointers[0].f1.f4[2];
+eval[0].f1.f4[3] = eval_nopointers[0].f1.f4[3];
+eval[0].f1.f4[4] = eval_nopointers[0].f1.f4[4];
+eval[0].f1.f4[5] = eval_nopointers[0].f1.f4[5];
+eval[0].f1.f4[6] = eval_nopointers[0].f1.f4[6];
 eval[0].f0.f0 = eval_ptr0;
 eval[0].f1.f2.f0 = eval_ptr1;
 
@@ -334,9 +611,9 @@ eval[0].f1.f2.f0 = eval_ptr1;
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    global float* v14 = (&eval[0].f1.f0.f0);
-    global int* v15 = ((global int*)v14);
-    global float*global * v16 = (&eval[0].f0.f0);
+    float* v14 = (&eval[0].f1.f0.f0);
+    int* v15 = ((int*)v14);
+    global float** v16 = (&eval[0].f0.f0);
     int v17 = v15[0];
     global float* v18 = v16[0];
         i_03_i = v11;
@@ -352,9 +629,9 @@ eval[0].f1.f2.f0 = eval_ptr1;
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0EiEELi16EEEKNS_20TensorCwiseNullaryOpINS0_18scalar_constant_opIfEEKS7_EEEENS_9GpuDeviceEEEiLb1EE3runERSH_iii_exit;
     }
     v_lr_ph_i:;
-    global float* v26 = (&eval[0].f1.f0.f0);
-    global int* v27 = ((global int*)v26);
-    global float*global * v28 = (&eval[0].f0.f0);
+    float* v26 = (&eval[0].f1.f0.f0);
+    int* v27 = ((int*)v26);
+    global float** v28 = (&eval[0].f0.f0);
     global float* v29 = v28[0];
     int v30 = v27[0];
         i1_02_i = v23;
@@ -399,13 +676,25 @@ eval[0].f1.f2.f0 = eval_ptr1;
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0EiEELi16EEEKNS_20TensorCwiseNullaryOpINS0_18scalar_constant_opIfEEKS7_EEEENS_9GpuDeviceEEEiLb1EE3runERSH_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0EiEELi16EEEKNS_20TensorCwiseNullaryOpINS0_22UniformRandomGeneratorIfEEKS7_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_3* eval, global float* eval_ptr0, global float* eval_ptr1, int size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0EiEELi16EEEKNS_20TensorCwiseNullaryOpINS0_22UniformRandomGeneratorIfEEKS7_EEEENS_9GpuDeviceEEEiEEvT_T0_(global struct Eigen__TensorEvaluator_3_nopointers* eval_nopointers, global float* eval_ptr0, global float* eval_ptr1, int size) {
     int i1_02_i;
     int i_03_i;
     long v18;
     long v30;
     long v_lcssa;
     long v_lcssa6;
+struct Eigen__TensorEvaluator_3 eval[1];
+eval[0].f0.f1.f0.f0[0] = eval_nopointers[0].f0.f1.f0.f0[0];
+eval[0].f1.f0.f0 = eval_nopointers[0].f1.f0.f0;
+eval[0].f1.f1.f1.f0.f0[0] = eval_nopointers[0].f1.f1.f1.f0.f0[0];
+eval[0].f1.f2.f0 = eval_nopointers[0].f1.f2.f0;
+eval[0].f1.f3[0] = eval_nopointers[0].f1.f3[0];
+eval[0].f1.f3[1] = eval_nopointers[0].f1.f3[1];
+eval[0].f1.f3[2] = eval_nopointers[0].f1.f3[2];
+eval[0].f1.f3[3] = eval_nopointers[0].f1.f3[3];
+eval[0].f1.f3[4] = eval_nopointers[0].f1.f3[4];
+eval[0].f1.f3[5] = eval_nopointers[0].f1.f3[5];
+eval[0].f1.f3[6] = eval_nopointers[0].f1.f3[6];
 eval[0].f0.f0 = eval_ptr0;
 eval[0].f1.f1.f0 = eval_ptr1;
 
@@ -428,8 +717,8 @@ eval[0].f1.f1.f0 = eval_ptr1;
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    global long* v14 = (&eval[0].f1.f0.f0);
-    global float*global * v15 = (&eval[0].f0.f0);
+    long* v14 = (&eval[0].f1.f0.f0);
+    global float** v15 = (&eval[0].f0.f0);
     global float* v16 = v15[0];
     long v_promoted = v14[0];
         v18 = v_promoted;
@@ -447,8 +736,8 @@ i_03_i = v11;
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0EiEELi16EEEKNS_20TensorCwiseNullaryOpINS0_22UniformRandomGeneratorIfEEKS7_EEEENS_9GpuDeviceEEEiLb1EE3runERSH_iii_exit;
     }
     v_lr_ph_i:;
-    global long* v26 = (&eval[0].f1.f0.f0);
-    global float*global * v27 = (&eval[0].f0.f0);
+    long* v26 = (&eval[0].f1.f0.f0);
+    global float** v27 = (&eval[0].f0.f0);
     global float* v28 = v27[0];
     long v_promoted_i = v26[0];
         v30 = v_promoted_i;
@@ -556,9 +845,14 @@ i1_02_i = v112;
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0EiEELi16EEEKNS_20TensorCwiseNullaryOpINS0_22UniformRandomGeneratorIfEEKS7_EEEENS_9GpuDeviceEEEiLb1EE3runERSH_iii_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_7* eval, global float* eval_ptr0, global float* eval_ptr1, global float* eval_ptr2, long size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_7_nopointers* eval_nopointers, global float* eval_ptr0, global float* eval_ptr1, global float* eval_ptr2, long size) {
     long i1_02_i;
     long i_03_i;
+struct Eigen__TensorEvaluator_7 eval[1];
+eval[0].f0.f1.f0.f0[0] = eval_nopointers[0].f0.f1.f0.f0[0];
+eval[0].f1.f0.f0 = eval_nopointers[0].f1.f0.f0;
+eval[0].f1.f1.f1.f0.f0[0] = eval_nopointers[0].f1.f1.f1.f0.f0[0];
+eval[0].f1.f2.f1.f0.f0[0] = eval_nopointers[0].f1.f2.f1.f0.f0[0];
 eval[0].f0.f0 = eval_ptr0;
 eval[0].f1.f1.f0 = eval_ptr1;
 eval[0].f1.f2.f0 = eval_ptr2;
@@ -584,9 +878,9 @@ eval[0].f1.f2.f0 = eval_ptr2;
         goto v__crit_edge6_i;
     }
     v_lr_ph5_i:;
-    global float*global * v16 = (&eval[0].f1.f1.f0);
-    global float*global * v17 = (&eval[0].f1.f2.f0);
-    global float*global * v18 = (&eval[0].f0.f0);
+    global float** v16 = (&eval[0].f1.f1.f0);
+    global float** v17 = (&eval[0].f1.f2.f0);
+    global float** v18 = (&eval[0].f0.f0);
     global float* v19 = v16[0];
     global float* v20 = v17[0];
     global float* v21 = v18[0];
@@ -603,11 +897,11 @@ eval[0].f1.f2.f0 = eval_ptr2;
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElLb1EE3runERSH_lll_exit;
     }
     v_lr_ph_i:;
-    global float*global * v29 = (&eval[0].f1.f1.f0);
+    global float** v29 = (&eval[0].f1.f1.f0);
     global float* v30 = v29[0];
-    global float*global * v31 = (&eval[0].f1.f2.f0);
+    global float** v31 = (&eval[0].f1.f2.f0);
     global float* v32 = v31[0];
-    global float*global * v33 = (&eval[0].f0.f0);
+    global float** v33 = (&eval[0].f0.f0);
     global float* v34 = v33[0];
         i1_02_i = v26;
     goto v36;
@@ -669,8 +963,23 @@ eval[0].f1.f2.f0 = eval_ptr2;
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi0ElEELi16EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_SB_EEEENS_9GpuDeviceEEElLb1EE3runERSH_lll_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi3ELi0ElEELi0EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_KNS8_INS0_17scalar_product_opIffEESB_SB_EEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_13* eval, global float* eval_ptr0, global float* eval_ptr1, global float* eval_ptr2, global float* eval_ptr3, long size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi3ELi0ElEELi0EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_KNS8_INS0_17scalar_product_opIffEESB_SB_EEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_13_nopointers* eval_nopointers, global float* eval_ptr0, global float* eval_ptr1, global float* eval_ptr2, global float* eval_ptr3, long size) {
     long i_01_i;
+struct Eigen__TensorEvaluator_13 eval[1];
+eval[0].f0.f1.f0.f0[0] = eval_nopointers[0].f0.f1.f0.f0[0];
+eval[0].f0.f1.f0.f0[1] = eval_nopointers[0].f0.f1.f0.f0[1];
+eval[0].f0.f1.f0.f0[2] = eval_nopointers[0].f0.f1.f0.f0[2];
+eval[0].f1.f0.f0 = eval_nopointers[0].f1.f0.f0;
+eval[0].f1.f1.f1.f0.f0[0] = eval_nopointers[0].f1.f1.f1.f0.f0[0];
+eval[0].f1.f1.f1.f0.f0[1] = eval_nopointers[0].f1.f1.f1.f0.f0[1];
+eval[0].f1.f1.f1.f0.f0[2] = eval_nopointers[0].f1.f1.f1.f0.f0[2];
+eval[0].f1.f2.f0.f0 = eval_nopointers[0].f1.f2.f0.f0;
+eval[0].f1.f2.f1.f1.f0.f0[0] = eval_nopointers[0].f1.f2.f1.f1.f0.f0[0];
+eval[0].f1.f2.f1.f1.f0.f0[1] = eval_nopointers[0].f1.f2.f1.f1.f0.f0[1];
+eval[0].f1.f2.f1.f1.f0.f0[2] = eval_nopointers[0].f1.f2.f1.f1.f0.f0[2];
+eval[0].f1.f2.f2.f1.f0.f0[0] = eval_nopointers[0].f1.f2.f2.f1.f0.f0[0];
+eval[0].f1.f2.f2.f1.f0.f0[1] = eval_nopointers[0].f1.f2.f2.f1.f0.f0[1];
+eval[0].f1.f2.f2.f1.f0.f0[2] = eval_nopointers[0].f1.f2.f2.f1.f0.f0[2];
 eval[0].f0.f0 = eval_ptr0;
 eval[0].f1.f1.f0 = eval_ptr1;
 eval[0].f1.f2.f1.f0 = eval_ptr2;
@@ -693,13 +1002,13 @@ eval[0].f1.f2.f2.f0 = eval_ptr3;
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi3ELi0ElEELi0EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_KNS8_INS0_17scalar_product_opIffEESB_SB_EEEEEENS_9GpuDeviceEEElLb0EE3runERSL_lll_exit;
     }
     v_lr_ph_i:;
-    global float*global * v12 = (&eval[0].f1.f1.f0);
+    global float** v12 = (&eval[0].f1.f1.f0);
     global float* v13 = v12[0];
-    global float*global * v14 = (&eval[0].f1.f2.f1.f0);
+    global float** v14 = (&eval[0].f1.f2.f1.f0);
     global float* v15 = v14[0];
-    global float*global * v16 = (&eval[0].f1.f2.f2.f0);
+    global float** v16 = (&eval[0].f1.f2.f2.f0);
     global float* v17 = v16[0];
-    global float*global * v18 = (&eval[0].f0.f0);
+    global float** v18 = (&eval[0].f0.f0);
     global float* v19 = v18[0];
         i_01_i = v6;
     goto v21;
@@ -727,9 +1036,13 @@ eval[0].f1.f2.f2.f0 = eval_ptr3;
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi3ELi0ElEELi0EEEKNS_19TensorCwiseBinaryOpINS0_13scalar_sum_opIffEEKS7_KNS8_INS0_17scalar_product_opIffEESB_SB_EEEEEENS_9GpuDeviceEEElLb0EE3runERSL_lll_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIbLi1ELi0ElEELi16EEEKNS_18TensorCwiseUnaryOpINS0_15scalar_isnan_opIfEEKNS4_INS5_IfLi1ELi0ElEELi16EEEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_20* eval, global char* eval_ptr0, global float* eval_ptr1, long size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIbLi1ELi0ElEELi16EEEKNS_18TensorCwiseUnaryOpINS0_15scalar_isnan_opIfEEKNS4_INS5_IfLi1ELi0ElEELi16EEEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_20_nopointers* eval_nopointers, global char* eval_ptr0, global float* eval_ptr1, long size) {
     long i_01_i;
     long i_01_us_i;
+struct Eigen__TensorEvaluator_20 eval[1];
+eval[0].f0.f1.f0.f0[0] = eval_nopointers[0].f0.f1.f0.f0[0];
+eval[0].f1.f0.f0 = eval_nopointers[0].f1.f0.f0;
+eval[0].f1.f1.f1.f0.f0[0] = eval_nopointers[0].f1.f1.f1.f0.f0[0];
 eval[0].f0.f0 = eval_ptr0;
 eval[0].f1.f1.f0 = eval_ptr1;
 
@@ -750,11 +1063,11 @@ eval[0].f1.f1.f0 = eval_ptr1;
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIbLi1ELi0ElEELi16EEEKNS_18TensorCwiseUnaryOpINS0_15scalar_isnan_opIfEEKNS4_INS5_IfLi1ELi0ElEELi16EEEEEEENS_9GpuDeviceEEElLb0EE3runERSJ_lll_exit;
     }
     v_lr_ph_i:;
-    global float*global * v12 = (&eval[0].f1.f1.f0);
+    global float** v12 = (&eval[0].f1.f1.f0);
     global float* v13 = v12[0];
     int call_i_i_i_i_i_i_i_i_i_i =  0;
     bool v14 = call_i_i_i_i_i_i_i_i_i_i == 0;
-    global char*global * v15 = (&eval[0].f0.f0);
+    global char** v15 = (&eval[0].f0.f0);
     global char* v16 = v15[0];
     if(v14) {
         goto v_lr_ph_split_us_i_preheader;
@@ -806,8 +1119,10 @@ eval[0].f1.f1.f0 = eval_ptr1;
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIbLi1ELi0ElEELi16EEEKNS_18TensorCwiseUnaryOpINS0_15scalar_isnan_opIfEEKNS4_INS5_IfLi1ELi0ElEELi16EEEEEEENS_9GpuDeviceEEElLb0EE3runERSJ_lll_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorEvalToOpIKNS_9TensorMapINS_6TensorIfLi1ELi0ElEELi0EEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_23* eval, global float* eval_ptr0, global float* eval_ptr1, long size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorEvalToOpIKNS_9TensorMapINS_6TensorIfLi1ELi0ElEELi0EEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_23_nopointers* eval_nopointers, global float* eval_ptr0, global float* eval_ptr1, long size) {
     long i_01_i;
+struct Eigen__TensorEvaluator_23 eval[1];
+eval[0].f0.f1.f0.f0[0] = eval_nopointers[0].f0.f1.f0.f0[0];
 eval[0].f0.f0 = eval_ptr0;
 eval[0].f2 = eval_ptr1;
 
@@ -828,9 +1143,9 @@ eval[0].f2 = eval_ptr1;
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorEvalToOpIKNS_9TensorMapINS_6TensorIfLi1ELi0ElEELi0EEEEENS_9GpuDeviceEEElLb0EE3runERSC_lll_exit;
     }
     v_lr_ph_i:;
-    global float*global * v12 = (&eval[0].f0.f0);
+    global float** v12 = (&eval[0].f0.f0);
     global float* v13 = v12[0];
-    global float*global * v14 = (&eval[0].f2);
+    global float** v14 = (&eval[0].f2);
     global float* v15 = v14[0];
         i_01_i = v6;
     goto v17;
@@ -854,12 +1169,34 @@ eval[0].f2 = eval_ptr1;
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorEvalToOpIKNS_9TensorMapINS_6TensorIfLi1ELi0ElEELi0EEEEENS_9GpuDeviceEEElLb0EE3runERSC_lll_exit:;
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel1DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi4EEEvT_NS_8internal11IndexMapperIT0_T1_Li1EXsrSB_6LayoutEEEPKfiiiiPf(global struct Eigen__TensorEvaluator_25* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int kernelSize, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel1DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi4EEEvT_NS_8internal11IndexMapperIT0_T1_Li1EXsrSB_6LayoutEEEPKfiiiiPf(global struct Eigen__TensorEvaluator_25_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int kernelSize, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i1_010;
     int i_07;
     int p_014;
+struct Eigen__TensorEvaluator_25 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -884,35 +1221,35 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge17;
     }
     v_lr_ph16:;
-    global long* v17 = (&indexMapper[0].f2.f0[3]);
+    long* v17 = (&indexMapper[0].f2.f0[3]);
     long v18 = v17[0];
-    global long* v19 = (&indexMapper[0].f0.f0[3]);
+    long* v19 = (&indexMapper[0].f0.f0[3]);
     long v20 = v19[0];
-    global long* v21 = (&indexMapper[0].f2.f0[2]);
+    long* v21 = (&indexMapper[0].f2.f0[2]);
     long v22 = v21[0];
-    global long* v23 = (&indexMapper[0].f0.f0[2]);
+    long* v23 = (&indexMapper[0].f0.f0[2]);
     long v24 = v23[0];
-    global long* v25 = (&indexMapper[0].f0.f0[1]);
+    long* v25 = (&indexMapper[0].f0.f0[1]);
     long v26 = v25[0];
     int v27 = v7 * v13;
     int v28 = get_global_id(0);
     bool v29 = v28 < v7;
-    global long* v30 = (&indexMapper[0].f3.f0[3]);
+    long* v30 = (&indexMapper[0].f3.f0[3]);
     long v31 = v30[0];
-    global long* v32 = (&indexMapper[0].f1.f0[3]);
+    long* v32 = (&indexMapper[0].f1.f0[3]);
     long v33 = v32[0];
-    global long* v34 = (&indexMapper[0].f3.f0[2]);
+    long* v34 = (&indexMapper[0].f3.f0[2]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[2]);
+    long* v36 = (&indexMapper[0].f1.f0[2]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[1]);
+    long* v38 = (&indexMapper[0].f1.f0[1]);
     long v39 = v38[0];
     bool v40 = v28 > v6;
-    global long* v41 = (&indexMapper[0].f1.f0[0]);
+    long* v41 = (&indexMapper[0].f1.f0[0]);
     long v42 = v41[0];
-    global long* v43 = (&indexMapper[0].f0.f0[0]);
+    long* v43 = (&indexMapper[0].f0.f0[0]);
     long v44 = v43[0];
-    global float*global * v45 = (&eval[0].f0);
+    global float** v45 = (&eval[0].f0);
     global float* v46 = v45[0];
     global float* v_phi_trans_insert = (&_kernel[1]);
     global float* v_phi_trans_insert19 = (&_kernel[2]);
@@ -1055,12 +1392,34 @@ eval[0].f0 = eval_ptr0;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel1DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi7EEEvT_NS_8internal11IndexMapperIT0_T1_Li1EXsrSB_6LayoutEEEPKfiiiiPf(global struct Eigen__TensorEvaluator_25* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int kernelSize, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel1DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi7EEEvT_NS_8internal11IndexMapperIT0_T1_Li1EXsrSB_6LayoutEEEPKfiiiiPf(global struct Eigen__TensorEvaluator_25_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int kernelSize, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i1_010;
     int i_07;
     int p_014;
+struct Eigen__TensorEvaluator_25 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -1085,35 +1444,35 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge17;
     }
     v_lr_ph16:;
-    global long* v17 = (&indexMapper[0].f2.f0[3]);
+    long* v17 = (&indexMapper[0].f2.f0[3]);
     long v18 = v17[0];
-    global long* v19 = (&indexMapper[0].f0.f0[3]);
+    long* v19 = (&indexMapper[0].f0.f0[3]);
     long v20 = v19[0];
-    global long* v21 = (&indexMapper[0].f2.f0[2]);
+    long* v21 = (&indexMapper[0].f2.f0[2]);
     long v22 = v21[0];
-    global long* v23 = (&indexMapper[0].f0.f0[2]);
+    long* v23 = (&indexMapper[0].f0.f0[2]);
     long v24 = v23[0];
-    global long* v25 = (&indexMapper[0].f0.f0[1]);
+    long* v25 = (&indexMapper[0].f0.f0[1]);
     long v26 = v25[0];
     int v27 = v7 * v13;
     int v28 = get_global_id(0);
     bool v29 = v28 < v7;
-    global long* v30 = (&indexMapper[0].f3.f0[3]);
+    long* v30 = (&indexMapper[0].f3.f0[3]);
     long v31 = v30[0];
-    global long* v32 = (&indexMapper[0].f1.f0[3]);
+    long* v32 = (&indexMapper[0].f1.f0[3]);
     long v33 = v32[0];
-    global long* v34 = (&indexMapper[0].f3.f0[2]);
+    long* v34 = (&indexMapper[0].f3.f0[2]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[2]);
+    long* v36 = (&indexMapper[0].f1.f0[2]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[1]);
+    long* v38 = (&indexMapper[0].f1.f0[1]);
     long v39 = v38[0];
     bool v40 = v28 > v6;
-    global long* v41 = (&indexMapper[0].f1.f0[0]);
+    long* v41 = (&indexMapper[0].f1.f0[0]);
     long v42 = v41[0];
-    global long* v43 = (&indexMapper[0].f0.f0[0]);
+    long* v43 = (&indexMapper[0].f0.f0[0]);
     long v44 = v43[0];
-    global float*global * v45 = (&eval[0].f0);
+    global float** v45 = (&eval[0].f0);
     global float* v46 = v45[0];
     global float* v_phi_trans_insert = (&_kernel[1]);
     global float* v_phi_trans_insert19 = (&_kernel[2]);
@@ -1283,7 +1642,7 @@ eval[0].f0 = eval_ptr0;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel1DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li1EXsrSB_6LayoutEEEPKfiiiiPf(global struct Eigen__TensorEvaluator_25* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int kernelSize, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel1DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li1EXsrSB_6LayoutEEEPKfiiiiPf(global struct Eigen__TensorEvaluator_25_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int kernelSize, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i1_013;
     int i1_013_us;
@@ -1296,7 +1655,29 @@ kernel void _ZN5Eigen24EigenConvolutionKernel1DINS_15TensorEvaluatorIKNS_9Tensor
     float v_lcssa;
     float v_lcssa28;
     float v_lcssa_unr;
+struct Eigen__TensorEvaluator_25 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -1321,36 +1702,36 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge20;
     }
     v_lr_ph19:;
-    global long* v17 = (&indexMapper[0].f2.f0[3]);
+    long* v17 = (&indexMapper[0].f2.f0[3]);
     long v18 = v17[0];
-    global long* v19 = (&indexMapper[0].f0.f0[3]);
+    long* v19 = (&indexMapper[0].f0.f0[3]);
     long v20 = v19[0];
-    global long* v21 = (&indexMapper[0].f2.f0[2]);
+    long* v21 = (&indexMapper[0].f2.f0[2]);
     long v22 = v21[0];
-    global long* v23 = (&indexMapper[0].f0.f0[2]);
+    long* v23 = (&indexMapper[0].f0.f0[2]);
     long v24 = v23[0];
-    global long* v25 = (&indexMapper[0].f0.f0[1]);
+    long* v25 = (&indexMapper[0].f0.f0[1]);
     long v26 = v25[0];
     int v27 = v7 * v13;
     int v28 = get_global_id(0);
     bool v29 = v28 < v7;
-    global long* v30 = (&indexMapper[0].f3.f0[3]);
+    long* v30 = (&indexMapper[0].f3.f0[3]);
     long v31 = v30[0];
-    global long* v32 = (&indexMapper[0].f1.f0[3]);
+    long* v32 = (&indexMapper[0].f1.f0[3]);
     long v33 = v32[0];
-    global long* v34 = (&indexMapper[0].f3.f0[2]);
+    long* v34 = (&indexMapper[0].f3.f0[2]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[2]);
+    long* v36 = (&indexMapper[0].f1.f0[2]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[1]);
+    long* v38 = (&indexMapper[0].f1.f0[1]);
     long v39 = v38[0];
     bool v40 = v28 > v6;
     bool v41 = kernelSize > 0;
-    global long* v42 = (&indexMapper[0].f1.f0[0]);
+    long* v42 = (&indexMapper[0].f1.f0[0]);
     long v43 = v42[0];
-    global long* v44 = (&indexMapper[0].f0.f0[0]);
+    long* v44 = (&indexMapper[0].f0.f0[0]);
     long v45 = v44[0];
-    global float*global * v46 = (&eval[0].f0);
+    global float** v46 = (&eval[0].f0);
     global float* v47 = v46[0];
     int xtraiter = kernelSize & 1;
     bool lcmp_mod = xtraiter == 0;
@@ -1556,7 +1937,7 @@ result_08_us = v122;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi4ELi7EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_25* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_30* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi4ELi7EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_25_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_30_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i2_020;
     int i_010_us;
@@ -1565,7 +1946,29 @@ kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9Tensor
     int j_011;
     int j_011_us;
     int p_027;
+struct Eigen__TensorEvaluator_25 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper_30 indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -1598,31 +2001,31 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge30;
     }
     v_lr_ph29:;
-    global long* v25 = (&indexMapper[0].f2.f0[3]);
+    long* v25 = (&indexMapper[0].f2.f0[3]);
     long v26 = v25[0];
-    global long* v27 = (&indexMapper[0].f0.f0[3]);
+    long* v27 = (&indexMapper[0].f0.f0[3]);
     long v28 = v27[0];
-    global long* v29 = (&indexMapper[0].f0.f0[2]);
+    long* v29 = (&indexMapper[0].f0.f0[2]);
     long v30 = v29[0];
     int v31 = v15 * v21;
     int v32 = get_global_id(1);
     bool v33 = v32 < v15;
-    global long* v34 = (&indexMapper[0].f3.f0[3]);
+    long* v34 = (&indexMapper[0].f3.f0[3]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[3]);
+    long* v36 = (&indexMapper[0].f1.f0[3]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[2]);
+    long* v38 = (&indexMapper[0].f1.f0[2]);
     long v39 = v38[0];
     bool v40 = v32 > v14;
-    global long* v41 = (&indexMapper[0].f1.f0[0]);
+    long* v41 = (&indexMapper[0].f1.f0[0]);
     long v42 = v41[0];
-    global long* v43 = (&indexMapper[0].f1.f0[1]);
+    long* v43 = (&indexMapper[0].f1.f0[1]);
     long v44 = v43[0];
-    global long* v45 = (&indexMapper[0].f0.f0[0]);
+    long* v45 = (&indexMapper[0].f0.f0[0]);
     long v46 = v45[0];
-    global long* v47 = (&indexMapper[0].f0.f0[1]);
+    long* v47 = (&indexMapper[0].f0.f0[1]);
     long v48 = v47[0];
-    global float*global * v49 = (&eval[0].f0);
+    global float** v49 = (&eval[0].f0);
     global float* v50 = v49[0];
     global float* v51 = (&_kernel[1]);
     global float* v52 = (&_kernel[2]);
@@ -2112,7 +2515,7 @@ eval[0].f0 = eval_ptr0;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi4ELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_25* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_30* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi4ELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_25_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_30_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i2_022;
     int i2_022_us;
@@ -2124,7 +2527,29 @@ kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9Tensor
     int p_030;
     float result_018_us;
     float v_lcssa;
+struct Eigen__TensorEvaluator_25 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper_30 indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -2157,32 +2582,32 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge33;
     }
     v_lr_ph32:;
-    global long* v25 = (&indexMapper[0].f2.f0[3]);
+    long* v25 = (&indexMapper[0].f2.f0[3]);
     long v26 = v25[0];
-    global long* v27 = (&indexMapper[0].f0.f0[3]);
+    long* v27 = (&indexMapper[0].f0.f0[3]);
     long v28 = v27[0];
-    global long* v29 = (&indexMapper[0].f0.f0[2]);
+    long* v29 = (&indexMapper[0].f0.f0[2]);
     long v30 = v29[0];
     int v31 = v15 * v21;
     int v32 = get_global_id(1);
     bool v33 = v32 < v15;
-    global long* v34 = (&indexMapper[0].f3.f0[3]);
+    long* v34 = (&indexMapper[0].f3.f0[3]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[3]);
+    long* v36 = (&indexMapper[0].f1.f0[3]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[2]);
+    long* v38 = (&indexMapper[0].f1.f0[2]);
     long v39 = v38[0];
     bool v40 = v32 > v14;
     bool v41 = kernelSizeY > 0;
-    global long* v42 = (&indexMapper[0].f1.f0[0]);
+    long* v42 = (&indexMapper[0].f1.f0[0]);
     long v43 = v42[0];
-    global long* v44 = (&indexMapper[0].f1.f0[1]);
+    long* v44 = (&indexMapper[0].f1.f0[1]);
     long v45 = v44[0];
-    global long* v46 = (&indexMapper[0].f0.f0[0]);
+    long* v46 = (&indexMapper[0].f0.f0[0]);
     long v47 = v46[0];
-    global long* v48 = (&indexMapper[0].f0.f0[1]);
+    long* v48 = (&indexMapper[0].f0.f0[1]);
     long v49 = v48[0];
-    global float*global * v50 = (&eval[0].f0);
+    global float** v50 = (&eval[0].f0);
     global float* v51 = v50[0];
         p_030 = v22;
     goto v53;
@@ -2439,7 +2864,7 @@ result_018_us = 0.0f;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi7ELi4EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_25* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_30* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi7ELi4EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_25_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_30_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i2_020;
     int i_010_us;
@@ -2448,7 +2873,29 @@ kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9Tensor
     int j_011;
     int j_011_us;
     int p_027;
+struct Eigen__TensorEvaluator_25 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper_30 indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -2481,31 +2928,31 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge30;
     }
     v_lr_ph29:;
-    global long* v25 = (&indexMapper[0].f2.f0[3]);
+    long* v25 = (&indexMapper[0].f2.f0[3]);
     long v26 = v25[0];
-    global long* v27 = (&indexMapper[0].f0.f0[3]);
+    long* v27 = (&indexMapper[0].f0.f0[3]);
     long v28 = v27[0];
-    global long* v29 = (&indexMapper[0].f0.f0[2]);
+    long* v29 = (&indexMapper[0].f0.f0[2]);
     long v30 = v29[0];
     int v31 = v15 * v21;
     int v32 = get_global_id(1);
     bool v33 = v32 < v15;
-    global long* v34 = (&indexMapper[0].f3.f0[3]);
+    long* v34 = (&indexMapper[0].f3.f0[3]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[3]);
+    long* v36 = (&indexMapper[0].f1.f0[3]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[2]);
+    long* v38 = (&indexMapper[0].f1.f0[2]);
     long v39 = v38[0];
     bool v40 = v32 > v14;
-    global long* v41 = (&indexMapper[0].f1.f0[0]);
+    long* v41 = (&indexMapper[0].f1.f0[0]);
     long v42 = v41[0];
-    global long* v43 = (&indexMapper[0].f1.f0[1]);
+    long* v43 = (&indexMapper[0].f1.f0[1]);
     long v44 = v43[0];
-    global long* v45 = (&indexMapper[0].f0.f0[0]);
+    long* v45 = (&indexMapper[0].f0.f0[0]);
     long v46 = v45[0];
-    global long* v47 = (&indexMapper[0].f0.f0[1]);
+    long* v47 = (&indexMapper[0].f0.f0[1]);
     long v48 = v47[0];
-    global float*global * v49 = (&eval[0].f0);
+    global float** v49 = (&eval[0].f0);
     global float* v50 = v49[0];
     global float* v51 = (&_kernel[1]);
     global float* v52 = (&_kernel[2]);
@@ -2983,7 +3430,7 @@ eval[0].f0 = eval_ptr0;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi7ELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_25* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_30* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi7ELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_25_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_30_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i2_022;
     int i2_022_us;
@@ -2995,7 +3442,29 @@ kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9Tensor
     int p_030;
     float result_018_us;
     float v_lcssa;
+struct Eigen__TensorEvaluator_25 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper_30 indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -3028,32 +3497,32 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge33;
     }
     v_lr_ph32:;
-    global long* v25 = (&indexMapper[0].f2.f0[3]);
+    long* v25 = (&indexMapper[0].f2.f0[3]);
     long v26 = v25[0];
-    global long* v27 = (&indexMapper[0].f0.f0[3]);
+    long* v27 = (&indexMapper[0].f0.f0[3]);
     long v28 = v27[0];
-    global long* v29 = (&indexMapper[0].f0.f0[2]);
+    long* v29 = (&indexMapper[0].f0.f0[2]);
     long v30 = v29[0];
     int v31 = v15 * v21;
     int v32 = get_global_id(1);
     bool v33 = v32 < v15;
-    global long* v34 = (&indexMapper[0].f3.f0[3]);
+    long* v34 = (&indexMapper[0].f3.f0[3]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[3]);
+    long* v36 = (&indexMapper[0].f1.f0[3]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[2]);
+    long* v38 = (&indexMapper[0].f1.f0[2]);
     long v39 = v38[0];
     bool v40 = v32 > v14;
     bool v41 = kernelSizeY > 0;
-    global long* v42 = (&indexMapper[0].f1.f0[0]);
+    long* v42 = (&indexMapper[0].f1.f0[0]);
     long v43 = v42[0];
-    global long* v44 = (&indexMapper[0].f1.f0[1]);
+    long* v44 = (&indexMapper[0].f1.f0[1]);
     long v45 = v44[0];
-    global long* v46 = (&indexMapper[0].f0.f0[0]);
+    long* v46 = (&indexMapper[0].f0.f0[0]);
     long v47 = v46[0];
-    global long* v48 = (&indexMapper[0].f0.f0[1]);
+    long* v48 = (&indexMapper[0].f0.f0[1]);
     long v49 = v48[0];
-    global float*global * v50 = (&eval[0].f0);
+    global float** v50 = (&eval[0].f0);
     global float* v51 = v50[0];
         p_030 = v22;
     goto v53;
@@ -3343,7 +3812,7 @@ result_018_us = 0.0f;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELin1ELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_25* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_30* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELin1ELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_25_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_30_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i2_026;
     int i2_026_us;
@@ -3363,7 +3832,29 @@ kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9Tensor
     float v_lcssa63;
     float v_lcssa_lcssa;
     float v_lcssa_unr;
+struct Eigen__TensorEvaluator_25 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper_30 indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -3396,33 +3887,33 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge37;
     }
     v_lr_ph36:;
-    global long* v25 = (&indexMapper[0].f2.f0[3]);
+    long* v25 = (&indexMapper[0].f2.f0[3]);
     long v26 = v25[0];
-    global long* v27 = (&indexMapper[0].f0.f0[3]);
+    long* v27 = (&indexMapper[0].f0.f0[3]);
     long v28 = v27[0];
-    global long* v29 = (&indexMapper[0].f0.f0[2]);
+    long* v29 = (&indexMapper[0].f0.f0[2]);
     long v30 = v29[0];
     int v31 = v15 * v21;
     int v32 = get_global_id(1);
     bool v33 = v32 < v15;
-    global long* v34 = (&indexMapper[0].f3.f0[3]);
+    long* v34 = (&indexMapper[0].f3.f0[3]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[3]);
+    long* v36 = (&indexMapper[0].f1.f0[3]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[2]);
+    long* v38 = (&indexMapper[0].f1.f0[2]);
     long v39 = v38[0];
     bool v40 = v32 > v14;
     bool v41 = kernelSizeY > 0;
-    global long* v42 = (&indexMapper[0].f1.f0[0]);
+    long* v42 = (&indexMapper[0].f1.f0[0]);
     long v43 = v42[0];
-    global long* v44 = (&indexMapper[0].f1.f0[1]);
+    long* v44 = (&indexMapper[0].f1.f0[1]);
     long v45 = v44[0];
     bool v46 = kernelSizeX > 0;
-    global long* v47 = (&indexMapper[0].f0.f0[0]);
+    long* v47 = (&indexMapper[0].f0.f0[0]);
     long v48 = v47[0];
-    global long* v49 = (&indexMapper[0].f0.f0[1]);
+    long* v49 = (&indexMapper[0].f0.f0[1]);
     long v50 = v49[0];
-    global float*global * v51 = (&eval[0].f0);
+    global float** v51 = (&eval[0].f0);
     global float* v52 = v51[0];
     int xtraiter = kernelSizeX & 1;
     bool lcmp_mod = xtraiter == 0;
@@ -3720,7 +4211,7 @@ result_116_us_us = v194;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel3DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEEEEvT_NS_8internal11IndexMapperIT0_T1_Li3EXsrSB_6LayoutEEEPKfmmmmmmmmmmPf(global struct Eigen__TensorEvaluator_25* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_31* indexMapper, global float* _kernel, long numPlanes, long numX, long maxX, long numY, long maxY, long numZ, long maxZ, long kernelSizeX, long kernelSizeY, long kernelSizeZ, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel3DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEEEEvT_NS_8internal11IndexMapperIT0_T1_Li3EXsrSB_6LayoutEEEPKfmmmmmmmmmmPf(global struct Eigen__TensorEvaluator_25_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_31_nopointers* indexMapper_nopointers, global float* _kernel, long numPlanes, long numX, long maxX, long numY, long maxY, long numZ, long maxZ, long kernelSizeX, long kernelSizeY, long kernelSizeZ, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i3_039;
     int i_014_us_us;
@@ -3751,7 +4242,29 @@ kernel void _ZN5Eigen24EigenConvolutionKernel3DINS_15TensorEvaluatorIKNS_9Tensor
     float v_lcssa_lcssa;
     float v_lcssa_unr;
     long v_unr;
+struct Eigen__TensorEvaluator_25 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper_31 indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -3806,29 +4319,29 @@ eval[0].f0 = eval_ptr0;
         goto v_lr_ph54;
     }
     v_lr_ph54:;
-    global long* v43 = (&indexMapper[0].f0.f0[3]);
+    long* v43 = (&indexMapper[0].f0.f0[3]);
     long v44 = v43[0];
     int v45 = get_global_id(2);
     bool v46 = v45 < v40;
-    global long* v47 = (&indexMapper[0].f1.f0[3]);
+    long* v47 = (&indexMapper[0].f1.f0[3]);
     long v48 = v47[0];
     bool v49 = v45 > v37;
     bool v50 = kernelSizeZ == 0;
-    global long* v51 = (&indexMapper[0].f1.f0[0]);
+    long* v51 = (&indexMapper[0].f1.f0[0]);
     long v52 = v51[0];
-    global long* v53 = (&indexMapper[0].f1.f0[1]);
+    long* v53 = (&indexMapper[0].f1.f0[1]);
     long v54 = v53[0];
-    global long* v55 = (&indexMapper[0].f1.f0[2]);
+    long* v55 = (&indexMapper[0].f1.f0[2]);
     long v56 = v55[0];
     bool v57 = kernelSizeY == 0;
     bool v58 = kernelSizeX == 0;
-    global long* v59 = (&indexMapper[0].f0.f0[0]);
+    long* v59 = (&indexMapper[0].f0.f0[0]);
     long v60 = v59[0];
-    global long* v61 = (&indexMapper[0].f0.f0[1]);
+    long* v61 = (&indexMapper[0].f0.f0[1]);
     long v62 = v61[0];
-    global long* v63 = (&indexMapper[0].f0.f0[2]);
+    long* v63 = (&indexMapper[0].f0.f0[2]);
     long v64 = v63[0];
-    global float*global * v65 = (&eval[0].f0);
+    global float** v65 = (&eval[0].f0);
     global float* v66 = v65[0];
     bool brmerge = v50 | v57;
     long xtraiter = kernelSizeX & 1;
@@ -4198,8 +4711,25 @@ result_225_us_us = v237;
     }
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEEKNS_19TensorConvolutionOpIKNS_5arrayIlLm1EEEKS7_KNS4_INS5_IfLi1ELi0ElEELi0EEEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_32* eval, global float* eval_ptr0, global float* eval_ptr1, global float* eval_ptr2, global float* eval_ptr3, global float* eval_ptr4, global float* eval_ptr5, long size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEEKNS_19TensorConvolutionOpIKNS_5arrayIlLm1EEEKS7_KNS4_INS5_IfLi1ELi0ElEELi0EEEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_32_nopointers* eval_nopointers, global float* eval_ptr0, global float* eval_ptr1, global float* eval_ptr2, global float* eval_ptr3, global float* eval_ptr4, global float* eval_ptr5, long size) {
     long i_01_i;
+struct Eigen__TensorEvaluator_32 eval[1];
+eval[0].f0.f1.f0.f0[0] = eval_nopointers[0].f0.f1.f0.f0[0];
+eval[0].f0.f1.f0.f0[1] = eval_nopointers[0].f0.f1.f0.f0[1];
+eval[0].f0.f1.f0.f0[2] = eval_nopointers[0].f0.f1.f0.f0[2];
+eval[0].f0.f1.f0.f0[3] = eval_nopointers[0].f0.f1.f0.f0[3];
+eval[0].f1.f0.f1.f0.f0[0] = eval_nopointers[0].f1.f0.f1.f0.f0[0];
+eval[0].f1.f0.f1.f0.f0[1] = eval_nopointers[0].f1.f0.f1.f0.f0[1];
+eval[0].f1.f0.f1.f0.f0[2] = eval_nopointers[0].f1.f0.f1.f0.f0[2];
+eval[0].f1.f0.f1.f0.f0[3] = eval_nopointers[0].f1.f0.f1.f0.f0[3];
+eval[0].f1.f1.f1.f0.f0[0] = eval_nopointers[0].f1.f1.f1.f0.f0[0];
+eval[0].f1.f2.f1.f0.f0[0] = eval_nopointers[0].f1.f2.f1.f0.f0[0];
+eval[0].f1.f3.f0[0] = eval_nopointers[0].f1.f3.f0[0];
+eval[0].f1.f4.f0.f0[0] = eval_nopointers[0].f1.f4.f0.f0[0];
+eval[0].f1.f4.f0.f0[1] = eval_nopointers[0].f1.f4.f0.f0[1];
+eval[0].f1.f4.f0.f0[2] = eval_nopointers[0].f1.f4.f0.f0[2];
+eval[0].f1.f4.f0.f0[3] = eval_nopointers[0].f1.f4.f0.f0[3];
+eval[0].f1.f7 = eval_nopointers[0].f1.f7;
 eval[0].f0.f0 = eval_ptr0;
 eval[0].f1.f0.f0 = eval_ptr1;
 eval[0].f1.f1.f0 = eval_ptr2;
@@ -4224,9 +4754,9 @@ eval[0].f1.f6 = eval_ptr5;
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEEKNS_19TensorConvolutionOpIKNS_5arrayIlLm1EEEKS7_KNS4_INS5_IfLi1ELi0ElEELi0EEEEEEENS_9GpuDeviceEEElLb0EE3runERSL_lll_exit;
     }
     v_lr_ph_i:;
-    global float*global * v12 = (&eval[0].f1.f5);
+    global float** v12 = (&eval[0].f1.f5);
     global float* v13 = v12[0];
-    global float*global * v14 = (&eval[0].f0.f0);
+    global float** v14 = (&eval[0].f0.f0);
     global float* v15 = v14[0];
         i_01_i = v6;
     goto v17;
@@ -4250,8 +4780,10 @@ eval[0].f1.f6 = eval_ptr5;
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi0ElEELi0EEEKNS_19TensorConvolutionOpIKNS_5arrayIlLm1EEEKS7_KNS4_INS5_IfLi1ELi0ElEELi0EEEEEEENS_9GpuDeviceEEElLb0EE3runERSL_lll_exit:;
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorEvalToOpIKNS_9TensorMapINS_6TensorIfLi1ELi1ElEELi0EEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_36* eval, global float* eval_ptr0, global float* eval_ptr1, long size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorEvalToOpIKNS_9TensorMapINS_6TensorIfLi1ELi1ElEELi0EEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_36_nopointers* eval_nopointers, global float* eval_ptr0, global float* eval_ptr1, long size) {
     long i_01_i;
+struct Eigen__TensorEvaluator_36 eval[1];
+eval[0].f0.f1.f0.f0[0] = eval_nopointers[0].f0.f1.f0.f0[0];
 eval[0].f0.f0 = eval_ptr0;
 eval[0].f2 = eval_ptr1;
 
@@ -4272,9 +4804,9 @@ eval[0].f2 = eval_ptr1;
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorEvalToOpIKNS_9TensorMapINS_6TensorIfLi1ELi1ElEELi0EEEEENS_9GpuDeviceEEElLb0EE3runERSC_lll_exit;
     }
     v_lr_ph_i:;
-    global float*global * v12 = (&eval[0].f0.f0);
+    global float** v12 = (&eval[0].f0.f0);
     global float* v13 = v12[0];
-    global float*global * v14 = (&eval[0].f2);
+    global float** v14 = (&eval[0].f2);
     global float* v15 = v14[0];
         i_01_i = v6;
     goto v17;
@@ -4298,12 +4830,34 @@ eval[0].f2 = eval_ptr1;
     _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorEvalToOpIKNS_9TensorMapINS_6TensorIfLi1ELi1ElEELi0EEEEENS_9GpuDeviceEEElLb0EE3runERSC_lll_exit:;
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel1DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi4EEEvT_NS_8internal11IndexMapperIT0_T1_Li1EXsrSB_6LayoutEEEPKfiiiiPf(global struct Eigen__TensorEvaluator_38* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_39* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int kernelSize, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel1DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi4EEEvT_NS_8internal11IndexMapperIT0_T1_Li1EXsrSB_6LayoutEEEPKfiiiiPf(global struct Eigen__TensorEvaluator_38_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_39_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int kernelSize, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i1_010;
     int i_07;
     int p_014;
+struct Eigen__TensorEvaluator_38 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper_39 indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -4328,35 +4882,35 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge17;
     }
     v_lr_ph16:;
-    global long* v17 = (&indexMapper[0].f2.f0[0]);
+    long* v17 = (&indexMapper[0].f2.f0[0]);
     long v18 = v17[0];
-    global long* v19 = (&indexMapper[0].f0.f0[0]);
+    long* v19 = (&indexMapper[0].f0.f0[0]);
     long v20 = v19[0];
-    global long* v21 = (&indexMapper[0].f2.f0[1]);
+    long* v21 = (&indexMapper[0].f2.f0[1]);
     long v22 = v21[0];
-    global long* v23 = (&indexMapper[0].f0.f0[1]);
+    long* v23 = (&indexMapper[0].f0.f0[1]);
     long v24 = v23[0];
-    global long* v25 = (&indexMapper[0].f0.f0[2]);
+    long* v25 = (&indexMapper[0].f0.f0[2]);
     long v26 = v25[0];
     int v27 = v7 * v13;
     int v28 = get_global_id(0);
     bool v29 = v28 < v7;
-    global long* v30 = (&indexMapper[0].f3.f0[0]);
+    long* v30 = (&indexMapper[0].f3.f0[0]);
     long v31 = v30[0];
-    global long* v32 = (&indexMapper[0].f1.f0[0]);
+    long* v32 = (&indexMapper[0].f1.f0[0]);
     long v33 = v32[0];
-    global long* v34 = (&indexMapper[0].f3.f0[1]);
+    long* v34 = (&indexMapper[0].f3.f0[1]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[1]);
+    long* v36 = (&indexMapper[0].f1.f0[1]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[2]);
+    long* v38 = (&indexMapper[0].f1.f0[2]);
     long v39 = v38[0];
     bool v40 = v28 > v6;
-    global long* v41 = (&indexMapper[0].f1.f0[3]);
+    long* v41 = (&indexMapper[0].f1.f0[3]);
     long v42 = v41[0];
-    global long* v43 = (&indexMapper[0].f0.f0[3]);
+    long* v43 = (&indexMapper[0].f0.f0[3]);
     long v44 = v43[0];
-    global float*global * v45 = (&eval[0].f0);
+    global float** v45 = (&eval[0].f0);
     global float* v46 = v45[0];
     global float* v_phi_trans_insert = (&_kernel[1]);
     global float* v_phi_trans_insert19 = (&_kernel[2]);
@@ -4499,12 +5053,34 @@ eval[0].f0 = eval_ptr0;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel1DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi7EEEvT_NS_8internal11IndexMapperIT0_T1_Li1EXsrSB_6LayoutEEEPKfiiiiPf(global struct Eigen__TensorEvaluator_38* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_39* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int kernelSize, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel1DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi7EEEvT_NS_8internal11IndexMapperIT0_T1_Li1EXsrSB_6LayoutEEEPKfiiiiPf(global struct Eigen__TensorEvaluator_38_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_39_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int kernelSize, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i1_010;
     int i_07;
     int p_014;
+struct Eigen__TensorEvaluator_38 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper_39 indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -4529,35 +5105,35 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge17;
     }
     v_lr_ph16:;
-    global long* v17 = (&indexMapper[0].f2.f0[0]);
+    long* v17 = (&indexMapper[0].f2.f0[0]);
     long v18 = v17[0];
-    global long* v19 = (&indexMapper[0].f0.f0[0]);
+    long* v19 = (&indexMapper[0].f0.f0[0]);
     long v20 = v19[0];
-    global long* v21 = (&indexMapper[0].f2.f0[1]);
+    long* v21 = (&indexMapper[0].f2.f0[1]);
     long v22 = v21[0];
-    global long* v23 = (&indexMapper[0].f0.f0[1]);
+    long* v23 = (&indexMapper[0].f0.f0[1]);
     long v24 = v23[0];
-    global long* v25 = (&indexMapper[0].f0.f0[2]);
+    long* v25 = (&indexMapper[0].f0.f0[2]);
     long v26 = v25[0];
     int v27 = v7 * v13;
     int v28 = get_global_id(0);
     bool v29 = v28 < v7;
-    global long* v30 = (&indexMapper[0].f3.f0[0]);
+    long* v30 = (&indexMapper[0].f3.f0[0]);
     long v31 = v30[0];
-    global long* v32 = (&indexMapper[0].f1.f0[0]);
+    long* v32 = (&indexMapper[0].f1.f0[0]);
     long v33 = v32[0];
-    global long* v34 = (&indexMapper[0].f3.f0[1]);
+    long* v34 = (&indexMapper[0].f3.f0[1]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[1]);
+    long* v36 = (&indexMapper[0].f1.f0[1]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[2]);
+    long* v38 = (&indexMapper[0].f1.f0[2]);
     long v39 = v38[0];
     bool v40 = v28 > v6;
-    global long* v41 = (&indexMapper[0].f1.f0[3]);
+    long* v41 = (&indexMapper[0].f1.f0[3]);
     long v42 = v41[0];
-    global long* v43 = (&indexMapper[0].f0.f0[3]);
+    long* v43 = (&indexMapper[0].f0.f0[3]);
     long v44 = v43[0];
-    global float*global * v45 = (&eval[0].f0);
+    global float** v45 = (&eval[0].f0);
     global float* v46 = v45[0];
     global float* v_phi_trans_insert = (&_kernel[1]);
     global float* v_phi_trans_insert19 = (&_kernel[2]);
@@ -4727,7 +5303,7 @@ eval[0].f0 = eval_ptr0;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel1DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li1EXsrSB_6LayoutEEEPKfiiiiPf(global struct Eigen__TensorEvaluator_38* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_39* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int kernelSize, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel1DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li1EXsrSB_6LayoutEEEPKfiiiiPf(global struct Eigen__TensorEvaluator_38_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_39_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int kernelSize, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i1_013;
     int i1_013_us;
@@ -4740,7 +5316,29 @@ kernel void _ZN5Eigen24EigenConvolutionKernel1DINS_15TensorEvaluatorIKNS_9Tensor
     float v_lcssa;
     float v_lcssa28;
     float v_lcssa_unr;
+struct Eigen__TensorEvaluator_38 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper_39 indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -4765,36 +5363,36 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge20;
     }
     v_lr_ph19:;
-    global long* v17 = (&indexMapper[0].f2.f0[0]);
+    long* v17 = (&indexMapper[0].f2.f0[0]);
     long v18 = v17[0];
-    global long* v19 = (&indexMapper[0].f0.f0[0]);
+    long* v19 = (&indexMapper[0].f0.f0[0]);
     long v20 = v19[0];
-    global long* v21 = (&indexMapper[0].f2.f0[1]);
+    long* v21 = (&indexMapper[0].f2.f0[1]);
     long v22 = v21[0];
-    global long* v23 = (&indexMapper[0].f0.f0[1]);
+    long* v23 = (&indexMapper[0].f0.f0[1]);
     long v24 = v23[0];
-    global long* v25 = (&indexMapper[0].f0.f0[2]);
+    long* v25 = (&indexMapper[0].f0.f0[2]);
     long v26 = v25[0];
     int v27 = v7 * v13;
     int v28 = get_global_id(0);
     bool v29 = v28 < v7;
-    global long* v30 = (&indexMapper[0].f3.f0[0]);
+    long* v30 = (&indexMapper[0].f3.f0[0]);
     long v31 = v30[0];
-    global long* v32 = (&indexMapper[0].f1.f0[0]);
+    long* v32 = (&indexMapper[0].f1.f0[0]);
     long v33 = v32[0];
-    global long* v34 = (&indexMapper[0].f3.f0[1]);
+    long* v34 = (&indexMapper[0].f3.f0[1]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[1]);
+    long* v36 = (&indexMapper[0].f1.f0[1]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[2]);
+    long* v38 = (&indexMapper[0].f1.f0[2]);
     long v39 = v38[0];
     bool v40 = v28 > v6;
     bool v41 = kernelSize > 0;
-    global long* v42 = (&indexMapper[0].f1.f0[3]);
+    long* v42 = (&indexMapper[0].f1.f0[3]);
     long v43 = v42[0];
-    global long* v44 = (&indexMapper[0].f0.f0[3]);
+    long* v44 = (&indexMapper[0].f0.f0[3]);
     long v45 = v44[0];
-    global float*global * v46 = (&eval[0].f0);
+    global float** v46 = (&eval[0].f0);
     global float* v47 = v46[0];
     int xtraiter = kernelSize & 1;
     bool lcmp_mod = xtraiter == 0;
@@ -5000,7 +5598,7 @@ result_08_us = v122;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi4ELi7EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_38* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_40* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi4ELi7EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_38_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_40_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i2_020;
     int i_010_us;
@@ -5009,7 +5607,29 @@ kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9Tensor
     int j_011;
     int j_011_us;
     int p_027;
+struct Eigen__TensorEvaluator_38 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper_40 indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -5042,31 +5662,31 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge30;
     }
     v_lr_ph29:;
-    global long* v25 = (&indexMapper[0].f2.f0[0]);
+    long* v25 = (&indexMapper[0].f2.f0[0]);
     long v26 = v25[0];
-    global long* v27 = (&indexMapper[0].f0.f0[0]);
+    long* v27 = (&indexMapper[0].f0.f0[0]);
     long v28 = v27[0];
-    global long* v29 = (&indexMapper[0].f0.f0[1]);
+    long* v29 = (&indexMapper[0].f0.f0[1]);
     long v30 = v29[0];
     int v31 = v15 * v21;
     int v32 = get_global_id(1);
     bool v33 = v32 < v15;
-    global long* v34 = (&indexMapper[0].f3.f0[0]);
+    long* v34 = (&indexMapper[0].f3.f0[0]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[0]);
+    long* v36 = (&indexMapper[0].f1.f0[0]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[1]);
+    long* v38 = (&indexMapper[0].f1.f0[1]);
     long v39 = v38[0];
     bool v40 = v32 > v14;
-    global long* v41 = (&indexMapper[0].f1.f0[2]);
+    long* v41 = (&indexMapper[0].f1.f0[2]);
     long v42 = v41[0];
-    global long* v43 = (&indexMapper[0].f1.f0[3]);
+    long* v43 = (&indexMapper[0].f1.f0[3]);
     long v44 = v43[0];
-    global long* v45 = (&indexMapper[0].f0.f0[2]);
+    long* v45 = (&indexMapper[0].f0.f0[2]);
     long v46 = v45[0];
-    global long* v47 = (&indexMapper[0].f0.f0[3]);
+    long* v47 = (&indexMapper[0].f0.f0[3]);
     long v48 = v47[0];
-    global float*global * v49 = (&eval[0].f0);
+    global float** v49 = (&eval[0].f0);
     global float* v50 = v49[0];
     global float* v51 = (&_kernel[1]);
     global float* v52 = (&_kernel[2]);
@@ -5556,7 +6176,7 @@ eval[0].f0 = eval_ptr0;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi4ELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_38* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_40* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi4ELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_38_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_40_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i2_022;
     int i2_022_us;
@@ -5568,7 +6188,29 @@ kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9Tensor
     int p_030;
     float result_018_us;
     float v_lcssa;
+struct Eigen__TensorEvaluator_38 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper_40 indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -5601,32 +6243,32 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge33;
     }
     v_lr_ph32:;
-    global long* v25 = (&indexMapper[0].f2.f0[0]);
+    long* v25 = (&indexMapper[0].f2.f0[0]);
     long v26 = v25[0];
-    global long* v27 = (&indexMapper[0].f0.f0[0]);
+    long* v27 = (&indexMapper[0].f0.f0[0]);
     long v28 = v27[0];
-    global long* v29 = (&indexMapper[0].f0.f0[1]);
+    long* v29 = (&indexMapper[0].f0.f0[1]);
     long v30 = v29[0];
     int v31 = v15 * v21;
     int v32 = get_global_id(1);
     bool v33 = v32 < v15;
-    global long* v34 = (&indexMapper[0].f3.f0[0]);
+    long* v34 = (&indexMapper[0].f3.f0[0]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[0]);
+    long* v36 = (&indexMapper[0].f1.f0[0]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[1]);
+    long* v38 = (&indexMapper[0].f1.f0[1]);
     long v39 = v38[0];
     bool v40 = v32 > v14;
     bool v41 = kernelSizeY > 0;
-    global long* v42 = (&indexMapper[0].f1.f0[2]);
+    long* v42 = (&indexMapper[0].f1.f0[2]);
     long v43 = v42[0];
-    global long* v44 = (&indexMapper[0].f1.f0[3]);
+    long* v44 = (&indexMapper[0].f1.f0[3]);
     long v45 = v44[0];
-    global long* v46 = (&indexMapper[0].f0.f0[2]);
+    long* v46 = (&indexMapper[0].f0.f0[2]);
     long v47 = v46[0];
-    global long* v48 = (&indexMapper[0].f0.f0[3]);
+    long* v48 = (&indexMapper[0].f0.f0[3]);
     long v49 = v48[0];
-    global float*global * v50 = (&eval[0].f0);
+    global float** v50 = (&eval[0].f0);
     global float* v51 = v50[0];
         p_030 = v22;
     goto v53;
@@ -5883,7 +6525,7 @@ result_018_us = 0.0f;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi7ELi4EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_38* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_40* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi7ELi4EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_38_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_40_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i2_020;
     int i_010_us;
@@ -5892,7 +6534,29 @@ kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9Tensor
     int j_011;
     int j_011_us;
     int p_027;
+struct Eigen__TensorEvaluator_38 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper_40 indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -5925,31 +6589,31 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge30;
     }
     v_lr_ph29:;
-    global long* v25 = (&indexMapper[0].f2.f0[0]);
+    long* v25 = (&indexMapper[0].f2.f0[0]);
     long v26 = v25[0];
-    global long* v27 = (&indexMapper[0].f0.f0[0]);
+    long* v27 = (&indexMapper[0].f0.f0[0]);
     long v28 = v27[0];
-    global long* v29 = (&indexMapper[0].f0.f0[1]);
+    long* v29 = (&indexMapper[0].f0.f0[1]);
     long v30 = v29[0];
     int v31 = v15 * v21;
     int v32 = get_global_id(1);
     bool v33 = v32 < v15;
-    global long* v34 = (&indexMapper[0].f3.f0[0]);
+    long* v34 = (&indexMapper[0].f3.f0[0]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[0]);
+    long* v36 = (&indexMapper[0].f1.f0[0]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[1]);
+    long* v38 = (&indexMapper[0].f1.f0[1]);
     long v39 = v38[0];
     bool v40 = v32 > v14;
-    global long* v41 = (&indexMapper[0].f1.f0[2]);
+    long* v41 = (&indexMapper[0].f1.f0[2]);
     long v42 = v41[0];
-    global long* v43 = (&indexMapper[0].f1.f0[3]);
+    long* v43 = (&indexMapper[0].f1.f0[3]);
     long v44 = v43[0];
-    global long* v45 = (&indexMapper[0].f0.f0[2]);
+    long* v45 = (&indexMapper[0].f0.f0[2]);
     long v46 = v45[0];
-    global long* v47 = (&indexMapper[0].f0.f0[3]);
+    long* v47 = (&indexMapper[0].f0.f0[3]);
     long v48 = v47[0];
-    global float*global * v49 = (&eval[0].f0);
+    global float** v49 = (&eval[0].f0);
     global float* v50 = v49[0];
     global float* v51 = (&_kernel[1]);
     global float* v52 = (&_kernel[2]);
@@ -6427,7 +7091,7 @@ eval[0].f0 = eval_ptr0;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi7ELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_38* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_40* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELi7ELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_38_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_40_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i2_022;
     int i2_022_us;
@@ -6439,7 +7103,29 @@ kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9Tensor
     int p_030;
     float result_018_us;
     float v_lcssa;
+struct Eigen__TensorEvaluator_38 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper_40 indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -6472,32 +7158,32 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge33;
     }
     v_lr_ph32:;
-    global long* v25 = (&indexMapper[0].f2.f0[0]);
+    long* v25 = (&indexMapper[0].f2.f0[0]);
     long v26 = v25[0];
-    global long* v27 = (&indexMapper[0].f0.f0[0]);
+    long* v27 = (&indexMapper[0].f0.f0[0]);
     long v28 = v27[0];
-    global long* v29 = (&indexMapper[0].f0.f0[1]);
+    long* v29 = (&indexMapper[0].f0.f0[1]);
     long v30 = v29[0];
     int v31 = v15 * v21;
     int v32 = get_global_id(1);
     bool v33 = v32 < v15;
-    global long* v34 = (&indexMapper[0].f3.f0[0]);
+    long* v34 = (&indexMapper[0].f3.f0[0]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[0]);
+    long* v36 = (&indexMapper[0].f1.f0[0]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[1]);
+    long* v38 = (&indexMapper[0].f1.f0[1]);
     long v39 = v38[0];
     bool v40 = v32 > v14;
     bool v41 = kernelSizeY > 0;
-    global long* v42 = (&indexMapper[0].f1.f0[2]);
+    long* v42 = (&indexMapper[0].f1.f0[2]);
     long v43 = v42[0];
-    global long* v44 = (&indexMapper[0].f1.f0[3]);
+    long* v44 = (&indexMapper[0].f1.f0[3]);
     long v45 = v44[0];
-    global long* v46 = (&indexMapper[0].f0.f0[2]);
+    long* v46 = (&indexMapper[0].f0.f0[2]);
     long v47 = v46[0];
-    global long* v48 = (&indexMapper[0].f0.f0[3]);
+    long* v48 = (&indexMapper[0].f0.f0[3]);
     long v49 = v48[0];
-    global float*global * v50 = (&eval[0].f0);
+    global float** v50 = (&eval[0].f0);
     global float* v51 = v50[0];
         p_030 = v22;
     goto v53;
@@ -6787,7 +7473,7 @@ result_018_us = 0.0f;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELin1ELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_38* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_40* indexMapper, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEELin1ELin1EEEvT_NS_8internal11IndexMapperIT0_T1_Li2EXsrSB_6LayoutEEEPKfiiiiiiiPf(global struct Eigen__TensorEvaluator_38_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_40_nopointers* indexMapper_nopointers, global float* _kernel, int numPlanes, int numX, int maxX, int numY, int maxY, int kernelSizeX, int kernelSizeY, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i2_026;
     int i2_026_us;
@@ -6807,7 +7493,29 @@ kernel void _ZN5Eigen24EigenConvolutionKernel2DINS_15TensorEvaluatorIKNS_9Tensor
     float v_lcssa63;
     float v_lcssa_lcssa;
     float v_lcssa_unr;
+struct Eigen__TensorEvaluator_38 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper_40 indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -6840,33 +7548,33 @@ eval[0].f0 = eval_ptr0;
         goto v__crit_edge37;
     }
     v_lr_ph36:;
-    global long* v25 = (&indexMapper[0].f2.f0[0]);
+    long* v25 = (&indexMapper[0].f2.f0[0]);
     long v26 = v25[0];
-    global long* v27 = (&indexMapper[0].f0.f0[0]);
+    long* v27 = (&indexMapper[0].f0.f0[0]);
     long v28 = v27[0];
-    global long* v29 = (&indexMapper[0].f0.f0[1]);
+    long* v29 = (&indexMapper[0].f0.f0[1]);
     long v30 = v29[0];
     int v31 = v15 * v21;
     int v32 = get_global_id(1);
     bool v33 = v32 < v15;
-    global long* v34 = (&indexMapper[0].f3.f0[0]);
+    long* v34 = (&indexMapper[0].f3.f0[0]);
     long v35 = v34[0];
-    global long* v36 = (&indexMapper[0].f1.f0[0]);
+    long* v36 = (&indexMapper[0].f1.f0[0]);
     long v37 = v36[0];
-    global long* v38 = (&indexMapper[0].f1.f0[1]);
+    long* v38 = (&indexMapper[0].f1.f0[1]);
     long v39 = v38[0];
     bool v40 = v32 > v14;
     bool v41 = kernelSizeY > 0;
-    global long* v42 = (&indexMapper[0].f1.f0[2]);
+    long* v42 = (&indexMapper[0].f1.f0[2]);
     long v43 = v42[0];
-    global long* v44 = (&indexMapper[0].f1.f0[3]);
+    long* v44 = (&indexMapper[0].f1.f0[3]);
     long v45 = v44[0];
     bool v46 = kernelSizeX > 0;
-    global long* v47 = (&indexMapper[0].f0.f0[2]);
+    long* v47 = (&indexMapper[0].f0.f0[2]);
     long v48 = v47[0];
-    global long* v49 = (&indexMapper[0].f0.f0[3]);
+    long* v49 = (&indexMapper[0].f0.f0[3]);
     long v50 = v49[0];
-    global float*global * v51 = (&eval[0].f0);
+    global float** v51 = (&eval[0].f0);
     global float* v52 = v51[0];
     int xtraiter = kernelSizeX & 1;
     bool lcmp_mod = xtraiter == 0;
@@ -7164,7 +7872,7 @@ result_116_us_us = v194;
     }
 }
 
-kernel void _ZN5Eigen24EigenConvolutionKernel3DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEEEEvT_NS_8internal11IndexMapperIT0_T1_Li3EXsrSB_6LayoutEEEPKfmmmmmmmmmmPf(global struct Eigen__TensorEvaluator_38* eval, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_41* indexMapper, global float* _kernel, long numPlanes, long numX, long maxX, long numY, long maxY, long numZ, long maxZ, long kernelSizeX, long kernelSizeY, long kernelSizeZ, global float* buffer) {
+kernel void _ZN5Eigen24EigenConvolutionKernel3DINS_15TensorEvaluatorIKNS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEENS_9GpuDeviceEEElNS_6DSizesIlLi4EEEEEvT_NS_8internal11IndexMapperIT0_T1_Li3EXsrSB_6LayoutEEEPKfmmmmmmmmmmPf(global struct Eigen__TensorEvaluator_38_nopointers* eval_nopointers, global float* eval_ptr0, global struct class_Eigen__internal__IndexMapper_41_nopointers* indexMapper_nopointers, global float* _kernel, long numPlanes, long numX, long maxX, long numY, long maxY, long numZ, long maxZ, long kernelSizeX, long kernelSizeY, long kernelSizeZ, global float* buffer) {
     local float _ZN5Eigen1sE[0];
     int i3_039;
     int i_014_us_us;
@@ -7195,7 +7903,29 @@ kernel void _ZN5Eigen24EigenConvolutionKernel3DINS_15TensorEvaluatorIKNS_9Tensor
     float v_lcssa_lcssa;
     float v_lcssa_unr;
     long v_unr;
+struct Eigen__TensorEvaluator_38 eval[1];
+eval[0].f1.f0.f0[0] = eval_nopointers[0].f1.f0.f0[0];
+eval[0].f1.f0.f0[1] = eval_nopointers[0].f1.f0.f0[1];
+eval[0].f1.f0.f0[2] = eval_nopointers[0].f1.f0.f0[2];
+eval[0].f1.f0.f0[3] = eval_nopointers[0].f1.f0.f0[3];
 eval[0].f0 = eval_ptr0;
+struct class_Eigen__internal__IndexMapper_41 indexMapper[1];
+indexMapper[0].f0.f0[0] = indexMapper_nopointers[0].f0.f0[0];
+indexMapper[0].f0.f0[1] = indexMapper_nopointers[0].f0.f0[1];
+indexMapper[0].f0.f0[2] = indexMapper_nopointers[0].f0.f0[2];
+indexMapper[0].f0.f0[3] = indexMapper_nopointers[0].f0.f0[3];
+indexMapper[0].f1.f0[0] = indexMapper_nopointers[0].f1.f0[0];
+indexMapper[0].f1.f0[1] = indexMapper_nopointers[0].f1.f0[1];
+indexMapper[0].f1.f0[2] = indexMapper_nopointers[0].f1.f0[2];
+indexMapper[0].f1.f0[3] = indexMapper_nopointers[0].f1.f0[3];
+indexMapper[0].f2.f0[0] = indexMapper_nopointers[0].f2.f0[0];
+indexMapper[0].f2.f0[1] = indexMapper_nopointers[0].f2.f0[1];
+indexMapper[0].f2.f0[2] = indexMapper_nopointers[0].f2.f0[2];
+indexMapper[0].f2.f0[3] = indexMapper_nopointers[0].f2.f0[3];
+indexMapper[0].f3.f0[0] = indexMapper_nopointers[0].f3.f0[0];
+indexMapper[0].f3.f0[1] = indexMapper_nopointers[0].f3.f0[1];
+indexMapper[0].f3.f0[2] = indexMapper_nopointers[0].f3.f0[2];
+indexMapper[0].f3.f0[3] = indexMapper_nopointers[0].f3.f0[3];
 
     label0:;
     int v1 = get_group_id(0);
@@ -7250,29 +7980,29 @@ eval[0].f0 = eval_ptr0;
         goto v_lr_ph54;
     }
     v_lr_ph54:;
-    global long* v43 = (&indexMapper[0].f0.f0[0]);
+    long* v43 = (&indexMapper[0].f0.f0[0]);
     long v44 = v43[0];
     int v45 = get_global_id(2);
     bool v46 = v45 < v40;
-    global long* v47 = (&indexMapper[0].f1.f0[0]);
+    long* v47 = (&indexMapper[0].f1.f0[0]);
     long v48 = v47[0];
     bool v49 = v45 > v37;
     bool v50 = kernelSizeZ == 0;
-    global long* v51 = (&indexMapper[0].f1.f0[1]);
+    long* v51 = (&indexMapper[0].f1.f0[1]);
     long v52 = v51[0];
-    global long* v53 = (&indexMapper[0].f1.f0[2]);
+    long* v53 = (&indexMapper[0].f1.f0[2]);
     long v54 = v53[0];
-    global long* v55 = (&indexMapper[0].f1.f0[3]);
+    long* v55 = (&indexMapper[0].f1.f0[3]);
     long v56 = v55[0];
     bool v57 = kernelSizeY == 0;
     bool v58 = kernelSizeX == 0;
-    global long* v59 = (&indexMapper[0].f0.f0[1]);
+    long* v59 = (&indexMapper[0].f0.f0[1]);
     long v60 = v59[0];
-    global long* v61 = (&indexMapper[0].f0.f0[2]);
+    long* v61 = (&indexMapper[0].f0.f0[2]);
     long v62 = v61[0];
-    global long* v63 = (&indexMapper[0].f0.f0[3]);
+    long* v63 = (&indexMapper[0].f0.f0[3]);
     long v64 = v63[0];
-    global float*global * v65 = (&eval[0].f0);
+    global float** v65 = (&eval[0].f0);
     global float* v66 = v65[0];
     bool brmerge = v50 | v57;
     long xtraiter = kernelSizeX & 1;
@@ -7642,8 +8372,25 @@ result_225_us_us = v237;
     }
 }
 
-kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEEKNS_19TensorConvolutionOpIKNS_5arrayIlLm1EEEKS7_KNS4_INS5_IfLi1ELi1ElEELi0EEEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_42* eval, global float* eval_ptr0, global float* eval_ptr1, global float* eval_ptr2, global float* eval_ptr3, global float* eval_ptr4, global float* eval_ptr5, long size) {
+kernel void _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEEKNS_19TensorConvolutionOpIKNS_5arrayIlLm1EEEKS7_KNS4_INS5_IfLi1ELi1ElEELi0EEEEEEENS_9GpuDeviceEEElEEvT_T0_(global struct Eigen__TensorEvaluator_42_nopointers* eval_nopointers, global float* eval_ptr0, global float* eval_ptr1, global float* eval_ptr2, global float* eval_ptr3, global float* eval_ptr4, global float* eval_ptr5, long size) {
     long i_01_i;
+struct Eigen__TensorEvaluator_42 eval[1];
+eval[0].f0.f1.f0.f0[0] = eval_nopointers[0].f0.f1.f0.f0[0];
+eval[0].f0.f1.f0.f0[1] = eval_nopointers[0].f0.f1.f0.f0[1];
+eval[0].f0.f1.f0.f0[2] = eval_nopointers[0].f0.f1.f0.f0[2];
+eval[0].f0.f1.f0.f0[3] = eval_nopointers[0].f0.f1.f0.f0[3];
+eval[0].f1.f0.f1.f0.f0[0] = eval_nopointers[0].f1.f0.f1.f0.f0[0];
+eval[0].f1.f0.f1.f0.f0[1] = eval_nopointers[0].f1.f0.f1.f0.f0[1];
+eval[0].f1.f0.f1.f0.f0[2] = eval_nopointers[0].f1.f0.f1.f0.f0[2];
+eval[0].f1.f0.f1.f0.f0[3] = eval_nopointers[0].f1.f0.f1.f0.f0[3];
+eval[0].f1.f1.f1.f0.f0[0] = eval_nopointers[0].f1.f1.f1.f0.f0[0];
+eval[0].f1.f2.f1.f0.f0[0] = eval_nopointers[0].f1.f2.f1.f0.f0[0];
+eval[0].f1.f3.f0[0] = eval_nopointers[0].f1.f3.f0[0];
+eval[0].f1.f4.f0.f0[0] = eval_nopointers[0].f1.f4.f0.f0[0];
+eval[0].f1.f4.f0.f0[1] = eval_nopointers[0].f1.f4.f0.f0[1];
+eval[0].f1.f4.f0.f0[2] = eval_nopointers[0].f1.f4.f0.f0[2];
+eval[0].f1.f4.f0.f0[3] = eval_nopointers[0].f1.f4.f0.f0[3];
+eval[0].f1.f7 = eval_nopointers[0].f1.f7;
 eval[0].f0.f0 = eval_ptr0;
 eval[0].f1.f0.f0 = eval_ptr1;
 eval[0].f1.f1.f0 = eval_ptr2;
@@ -7668,9 +8415,9 @@ eval[0].f1.f6 = eval_ptr5;
         goto _ZN5Eigen8internal19EigenMetaKernelEvalINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi4ELi1ElEELi0EEEKNS_19TensorConvolutionOpIKNS_5arrayIlLm1EEEKS7_KNS4_INS5_IfLi1ELi1ElEELi0EEEEEEENS_9GpuDeviceEEElLb0EE3runERSL_lll_exit;
     }
     v_lr_ph_i:;
-    global float*global * v12 = (&eval[0].f1.f5);
+    global float** v12 = (&eval[0].f1.f5);
     global float* v13 = v12[0];
-    global float*global * v14 = (&eval[0].f0.f0);
+    global float** v14 = (&eval[0].f0.f0);
     global float* v15 = v14[0];
         i_01_i = v6;
     goto v17;
