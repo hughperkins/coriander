@@ -1,0 +1,34 @@
+# In theory we should use eg cmake, but this gives us more control for now,
+# and we only have like ~4 sourcecode files for now anyway
+
+CUDA_HOME=/usr/local/cuda-7.5
+# EIGEN_HOME=/usr/local/eigen
+
+CLANG=clang++-3.8
+LLVM_CONFIG=llvm-config-3.8
+LLVM_INCLUDE=/usr/include/llvm-3.8
+
+# COMPILE_FLAGS=`$(LLVM_CONFIG) --cxxflags` -std=c++11
+LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
+# the llvm-config compile flags suppresses asserts
+COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -g -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++11
+
+%-device.ll: %.cu $(COCL_HOME)/include/fake_funcs.h $(COCL_HOME)/build/ir-to-opencl
+	echo building $@ from $<
+	$(CLANG) -include $(COCL_HOME)/include/fake_funcs.h -I$(CUDA_HOME)/include $< --cuda-device-only -emit-llvm -std=c++11 -I/usr/include/x86_64-linux-gnu -O3 -S -o $@
+
+%-device.cl: %-device.ll $(COCL_HOME)/build/ir-to-opencl
+	echo building $@ from $<
+	$(COCL_HOME)/build/ir-to-opencl $(DEBUG) $< $@
+
+%-hostraw.ll: %.cu $(COCL_HOME)/include/fake_funcs.h
+	echo building $@ from $<
+	$(CLANG) -std=c++11 -include $(COCL_HOME)/include/fake_funcs.h -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
+
+%-hostpatched.ll: %-hostraw.ll %-device.cl $(COCL_HOME)/build/patch-hostside
+	echo building $@ from $<
+	$(COCL_HOME)/build/patch-hostside $< $(word 2,$^) $@
+
+%.o: %-hostpatched.ll
+	echo building $@ from $<
+	$(CLANG) -c $< -O3 -o $@
