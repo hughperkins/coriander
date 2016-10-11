@@ -11,13 +11,16 @@ export COCL_HOME=$(dirname ${SCRIPT_DIR})
 
 INCLUDES=
 unset OUTPATH
-while getopts o:I: opt; do
+while getopts co:I: opt; do
     case $opt in
     I)
         INCLUDES="$INCLUDES -I$OPTARG"
         ;;
     o)
         OUTPATH=$OPTARG
+        ;;
+    c)
+        COMPILE=1
         ;;
     esac
 done
@@ -28,6 +31,7 @@ INFILE=$1
 echo INCLUDES ${INCLUDES}
 echo INFILE ${INFILE}
 echo OUTPATH ${OUTPATH}
+echo COMPILE ${COMPILE}
 export INCLUDES
 
 if [[ x$1 == x ]]; then {
@@ -54,16 +58,27 @@ OUTPUTBASEPATH=${OUTPUTDIRNAME}/${OUTPUTBASENAME}
 )
 OUTPUTBASEPATH=${OUTPUTBASEPATH} INPUTBASEPATH=${INPUTBASEPATH} make -f ${COCL_HOME}/src/cocl.Makefile
 
-set +x
-
-echo ""
-echo "    ${BASEPATH}.cu compiled into ${BASEPATH}.o"
-echo ""
-echo To finish off, you can do:
-echo ""
-echo "    g++ -o ${OUTPUTBASEPATH} ${OUTPUTBASEPATH}.o -L${COCL_HOME}/build -lcocl -lEasyCL -lOpenCL"
-echo ""
-echo "... which you can run like:"
-echo
-echo "    LD_LIBRARY_PATH=${COCL_HOME}/build:${LD_LIBRARY_PATH} ${OUTPUTBASEPATH}"
-echo 
+if [[ -v COMPILE ]]; then {
+    set +x
+    echo ""
+    echo "    ${INPUTBASEPATH}.cu compiled into ${OUTPUTBASEPATH}.o"
+    echo ""
+    echo To finish off, you can do:
+    echo ""
+    echo "    g++ -o ${OUTPUTBASEPATH} ${OUTPUTBASEPATH}.o -L${COCL_HOME}/build -lcocl -lEasyCL -lOpenCL"
+    echo ""
+    echo "... which you can run like:"
+    echo
+    echo "    LD_LIBRARY_PATH=${COCL_HOME}/build:${LD_LIBRARY_PATH} ${OUTPUTBASEPATH}"
+    echo 
+} else {
+    g++ -o ${OUTPUTBASEPATH} ${OUTPUTBASEPATH}.o -L${COCL_HOME}/build -lcocl -lEasyCL -lOpenCL
+    set +x
+    echo ""
+    echo "    ${INPUTBASEPATH}.cu compiled into ${OUTPUTBASEPATH}"
+    echo ""
+    echo "You can run by doing:"
+    echo
+    echo "    LD_LIBRARY_PATH=${COCL_HOME}/build:${LD_LIBRARY_PATH} ${OUTPUTBASEPATH}"
+    echo 
+} fi

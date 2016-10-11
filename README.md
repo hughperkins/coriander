@@ -55,31 +55,22 @@ int main(int argc, char *argv[]) {
 /tmp/foo$ ls
 cuda_sample.cu
 ```
-Run `cocl` to create an object file:
+Run `cocl` to compile it:
 ```
 /tmp/foo$ cocl cuda_sample.cu
    ...
    ... (bunch of compily stuff) ...
    ...
 
-    ./cuda_sample.cu compiled into ./cuda_sample.o
+    ./cuda_sample.cu compiled into ./cuda_sample
 
-To finish off, you can do:
-
-    g++ -o ./cuda_sample ./cuda_sample.o /home/ubuntu/git/cuda-on-cl/build/hostside_opencl_funcs.o -lOpenCL -L/home/ubuntu/git/cuda-on-cl/build -lEasyCL
-
-... which you can run like:
+You can run by doing:
 
     LD_LIBRARY_PATH=/home/ubuntu/git/cuda-on-cl/build: ./cuda_sample
 
 
 ```
-Do what it says:
-```
-/tmp/foo$ g++ -o ./cuda_sample ./cuda_sample.o /home/ubuntu/git/cuda-on-cl/build/hostside_opencl_funcs.o -lOpenCL -L/home/ubuntu/git/cuda-on-cl/build -lEasyCL
-/tmp/foo$
-```
-And run it:
+Run it:
 ```
 /tmp/foo$ LD_LIBRARY_PATH=/home/ubuntu/git/cuda-on-cl/build: ./cuda_sample
 initialize cl context
@@ -123,6 +114,7 @@ Thats it!  :-)  Youve run your first `cuda-on-cl` program :-)
 |--------|-------------|
 | -I   | provide an include directory |
 | -o   | output filepath, eg foo.o |
+| -c   | compile to .o file; dont link |
 
 ## How it works
 
