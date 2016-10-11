@@ -10,33 +10,49 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export COCL_HOME=$(dirname ${SCRIPT_DIR})
 
 INCLUDES=
-while getopts I: opt; do
+unset OUTPATH
+while getopts o:I: opt; do
     case $opt in
     I)
         INCLUDES="$INCLUDES -I$OPTARG"
+        ;;
+    o)
+        OUTPATH=$OPTARG
         ;;
     esac
 done
 shift $((OPTIND - 1))
 
-echo INCLUDES ${INCLUDES}
-export INCLUDES
-
 INFILE=$1
+
+echo INCLUDES ${INCLUDES}
+echo INFILE ${INFILE}
+echo OUTPATH ${OUTPATH}
+export INCLUDES
 
 if [[ x$1 == x ]]; then {
     echo Usage: $0 [infile.cu]
     exit 1
 } fi
 
-BASENAME=$(basename -s .cu ${INFILE})
-DIRNAME=$(dirname ${INFILE})
-BASEPATH=${DIRNAME}/${BASENAME}
+INPUTBASENAME=$(basename -s .cu ${INFILE})
+INPUTDIRNAME=$(dirname ${INFILE})
+INPUTBASEPATH=${INPUTDIRNAME}/${INPUTBASENAME}
+
+if [[ -v OUTPATH ]]; then {
+    OUTFILE=${OUTPATH}
+} else {
+    OUTFILE=${INPUTBASEPATH}.o
+} fi
+
+OUTPUTBASENAME=$(basename -s .o ${OUTFILE})
+OUTPUTDIRNAME=$(dirname ${OUTFILE})
+OUTPUTBASEPATH=${OUTPUTDIRNAME}/${OUTPUTBASENAME}
 
 (cd ${COCL_HOME}
-    make
+    # make
 )
-make -f ${COCL_HOME}/src/cocl.Makefile ${BASEPATH}.o
+OUTPUTBASEPATH=${OUTPUTBASEPATH} INPUTBASEPATH=${INPUTBASEPATH} make -f ${COCL_HOME}/src/cocl.Makefile
 
 set +x
 
@@ -45,9 +61,9 @@ echo "    ${BASEPATH}.cu compiled into ${BASEPATH}.o"
 echo ""
 echo To finish off, you can do:
 echo ""
-echo "    g++ -o ${BASEPATH} ${BASEPATH}.o -L${COCL_HOME}/build -lcocl -lEasyCL -lOpenCL"
+echo "    g++ -o ${OUTPUTBASEPATH} ${OUTPUTBASEPATH}.o -L${COCL_HOME}/build -lcocl -lEasyCL -lOpenCL"
 echo ""
 echo "... which you can run like:"
 echo
-echo "    LD_LIBRARY_PATH=${COCL_HOME}/build:${LD_LIBRARY_PATH} ${BASEPATH}"
+echo "    LD_LIBRARY_PATH=${COCL_HOME}/build:${LD_LIBRARY_PATH} ${OUTPUTBASEPATH}"
 echo 

@@ -122,6 +122,7 @@ Thats it!  :-)  Youve run your first `cuda-on-cl` program :-)
 | Option | Description |
 |--------|-------------|
 | -I   | provide an include directory |
+| -o   | output filepath, eg foo.o |
 
 ## How it works
 
