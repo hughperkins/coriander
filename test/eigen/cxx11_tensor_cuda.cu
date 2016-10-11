@@ -12,6 +12,10 @@
 #define EIGEN_TEST_FUNC cxx11_tensor_cuda
 #define EIGEN_USE_GPU
 
+#define EIGEN_TEST_PART_1
+// #define EIGEN_TEST_PART_2
+// #define EIGEN_TEST_PART_3
+
 // #if defined __CUDACC_VER__ && __CUDACC_VER__ >= 70500
 // #include <cuda_fp16.h>
 // #endif
@@ -25,6 +29,8 @@ void test_cuda_nullary() {
   Tensor<float, 1, 0, int> in2(2);
   in1.setRandom();
   in2.setRandom();
+
+  std::cout << "cuda_nullary" << std::endl;
 
   std::size_t tensor_bytes = in1.size() * sizeof(float);
 
@@ -1214,11 +1220,12 @@ void test_cuda_betainc()
 
 void test_cxx11_tensor_cuda()
 {
+  std::cout << "test_cxx11_tensor_cuda" << std::endl;
   CALL_SUBTEST_1(test_cuda_nullary());
   CALL_SUBTEST_1(test_cuda_elementwise_small());
   CALL_SUBTEST_1(test_cuda_elementwise());
   CALL_SUBTEST_1(test_cuda_props());
-  CALL_SUBTEST_1(test_cuda_reduction());
+  // CALL_SUBTEST_1(test_cuda_reduction());
   CALL_SUBTEST_2(test_cuda_contraction<ColMajor>());
   CALL_SUBTEST_2(test_cuda_contraction<RowMajor>());
   CALL_SUBTEST_3(test_cuda_convolution_1d<ColMajor>());
