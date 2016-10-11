@@ -13,7 +13,7 @@ LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
 # the llvm-config compile flags suppresses asserts
 COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -g -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++11
 
-all: build/ir-to-opencl build/patch-hostside build/hostside_opencl_funcs.o
+all: build/ir-to-opencl build/patch-hostside build/libcocl.a
 
 build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h
 	mkdir -p build
@@ -106,6 +106,9 @@ build/eigen-%-hostpatched.o: test/eigen/generated/%-hostpatched.ll
 build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp easycl
 	echo building $@ from $<
 	$(CLANG) -std=c++11 -Isrc/EasyCL -c $< -O3 -o $@
+
+build/libcocl.a: build/hostside_opencl_funcs.o
+	ar rcs $@ $^
 
 build/%.o: test/%.cpp easycl
 	echo building $@ from $<

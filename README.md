@@ -147,7 +147,7 @@ git clone --recursive https://github.com/hughperkins/cuda-on-cl
 cd cuda-on-cl
 make
 ```
-=> `ir-to-opencl`, `patch-hostside`, `libEasyCL.so`, and `hostside_opencl_funcs.o` should be built into `build` subdirectory
+=> `ir-to-opencl`, `patch-hostside`, `libEasyCL.so`, and `libcocl.a` should be built into `build` subdirectory
 
 To use, you'll need to add `build` to your `PATH` variable:
 ```
