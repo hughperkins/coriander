@@ -64,15 +64,23 @@ test/generated/%-device.cl: test/%-device.ll build/ir-to-opencl
 	build/ir-to-opencl $(DEBUG) $< $@
 
 # cocl
-%.o: %.cu
+build/eigen-%.o: test/eigen/%.cu
 	echo building $@ from $<
-	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen $<
+	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -o $@ $<
+
+build/test-%.o: test/%.cu
+	echo building $@ from $<
+	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -o $@ $<
+
+# %.o: %.cu
+# 	echo building $@ from $<
+# 	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen $<
 
 # executables
-build/cuda_sample: test/cuda_sample.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
+build/cuda_sample: build/test-cuda_sample.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
 	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
 
-build/eigen-%: test/eigen/%.o build/libcocl.a
+build/eigen-%: build/eigen-%.o build/libcocl.a
 	g++ -o $@ $< -lcocl -lOpenCL -Lbuild -lEasyCL
 
 # run
