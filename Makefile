@@ -15,7 +15,7 @@ LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
 # the llvm-config compile flags suppresses asserts
 COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -g -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++11
 
-all: build/ir-to-opencl build/patch-hostside build/libcocl.a
+all: build/ir-to-opencl build/patch-hostside build/libcocl.a easycl
 
 build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h
 	mkdir -p build
@@ -30,8 +30,14 @@ easycl:
 	cd build && cmake ../src/EasyCL -DCMAKE_INSTALL_PREFIX=`pwd`/dist -DBUILD_TESTS=ON
 	cd build && make -j 4
 
+build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp
+	$(CLANG) -c -o $@ -std=c++11 -O3 -I$(COCL_HOME)/src/EasyCL $<
+
+build/libcocl.a: build/hostside_opencl_funcs.o
+	ar rcs $@ $^
+
 clean:
-	rm -Rf build/* test/generated/*
+	rm -Rf build/* test/generated/* test/eigen/generated/* test/eigen/*.o test/*.o
 
 # IR
 
@@ -47,39 +53,9 @@ test/eigen/generated/%-device.ll: test/eigen/%.cu include/fake_funcs.h build/ir-
 	mkdir -p test/eigen/generated
 	$(CLANG) -x cuda -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -D__CUDA_ARCH__=300 -include include/fake_funcs.h -Iinclude -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -Itest/eigen -I$(CUDA_HOME)/include -I/usr/include/x86_64-linux-gnu $< --cuda-device-only -emit-llvm -O3 -S -o $@
 
-# hostside goes from .cu -> -hostraw.ll
-
-test/generated/%-hostraw.ll: test/%.cu
-	echo building $@ from $< using $(CLANG) CUDA_HOME $(CUDA_HOME)
-	mkdir -p test/generated
-	$(CLANG) -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
-
-test/eigen/generated/%-hostraw.ll: test/eigen/%.cu include/fake_funcs.h
-	echo building $@ from $<
-	mkdir -p test/eigen/generated
-	$(CLANG) -std=c++11 -include include/fake_funcs.h -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -Itest/eigen -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
-
-# .hostraw.ll => .hostpatched.ll
-
-test/generated/%-hostpatched.ll: test/generated/%-hostraw.ll test/generated/%-device.cl build/patch-hostside
-	echo building $@ from $<
-	build/patch-hostside $< $(word 2,$^) $@
-
-test/eigen/generated/%-hostpatched.ll: test/eigen/generated/%-hostraw.ll test/eigen/generated/%-device.cl build/patch-hostside
-	echo building $@ from $<
-	build/patch-hostside $< $(word 2,$^) $@
-
-test/eigen/generated/%-hostpatched.ll-lldb: test/eigen/generated/%-hostraw.ll test/eigen/generated/%-device.cl build/patch-hostside
-	echo building $@ from $<
-	lldb-3.8 build/patch-hostside $< $(word 2,$^) $@
-
 # opencl (from the -device.ll)
 
 %-device.cl: %-device.ll build/ir-to-opencl
-	echo building $@ from $<
-	build/ir-to-opencl $(DEBUG) $< $@
-
-tensorflow/generated/%.cl: tensorflow/generated/%.ll build/ir-to-opencl
 	echo building $@ from $<
 	build/ir-to-opencl $(DEBUG) $< $@
 
@@ -87,44 +63,9 @@ test/generated/%-device.cl: test/%-device.ll build/ir-to-opencl
 	echo building $@ from $<
 	build/ir-to-opencl $(DEBUG) $< $@
 
-%-device.cl-lldb: %-device.ll build/ir-to-opencl
-	echo building $@ from $<
-	lldb-3.8 build/ir-to-opencl $(DEBUG) $< $@
-
-# objects
-
-## objects from hostside patched ll
-
-# build/%-hostpatched.o: test/generated/%-hostpatched.ll
-# 	echo building $@ from $<
-# 	$(CLANG) -c $< -O3 -o $@
-
-# build/eigen-%-hostpatched.o: test/eigen/generated/%-hostpatched.ll
-# 	echo building $@ from $<
-# 	$(CLANG) -c $< -O3 -o $@
-
-# %.o: %-hostpatched.ll
-# 	echo building $@ from $<
-# 	$(CLANG) -c $< -O3 -o $@
-
-# include $(COCL_HOME/src/cocl.Makefile)
-
-# %.o: %-hostpatched.ll
-# 	echo building $@ from $<
-# 	$(CLANG) -c $< -O3 -o $@
-
 %.o: %.cu
 	echo building $@ from $<
 	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen $<
-
-## generic cpp objects, from cpp code
-
-build/libcocl.a: build/hostside_opencl_funcs.o
-	ar rcs $@ $^
-
-# build/%.o: test/%.cpp easycl
-# 	echo building $@ from $<
-# 	$(CLANG) -std=c++11 -O2 -Isrc/EasyCL -c $< --cuda-host-only -O3 -o $@
 
 # executables
 build/cuda_sample: test/cuda_sample.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl

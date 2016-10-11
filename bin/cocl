@@ -33,9 +33,9 @@ BASENAME=$(basename -s .cu ${INFILE})
 DIRNAME=$(dirname ${INFILE})
 BASEPATH=${DIRNAME}/${BASENAME}
 
-# echo ${CFLAGS}
-# export CFLAGS
-
+(cd ${COCL_HOME}
+    make
+)
 make -f ${COCL_HOME}/src/cocl.Makefile ${BASEPATH}.o
 
 set +x
