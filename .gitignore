@@ -75,3 +75,5 @@ llvm/langimpl01/ir-to-opencl
 test/junit-pytest-report.xml
 
 *.o
+
+generated/
