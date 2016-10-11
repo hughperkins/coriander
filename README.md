@@ -148,9 +148,9 @@ make
 ```
 => `ir-to-opencl`, `patch-hostside`, `libEasyCL.so`, and `libcocl.a` should be built into `build` subdirectory
 
-To use, you'll need to add `build` to your `PATH` variable:
+To use, you'll need to add `build` and `bin` to your `PATH` variable:
 ```
-export PATH=$PATH:$PWD/build
+export PATH=$PATH:$PWD/bin:$PWD/build
 ```
 
 Thats it!
