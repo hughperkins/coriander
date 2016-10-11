@@ -112,8 +112,8 @@ Thats it!  :-)  Youve run your first `cuda-on-cl` program :-)
 
 | Option | Description |
 |--------|-------------|
-| -I   | provide an include directory |
-| -o   | output filepath, eg foo.o |
+| -I   | provide an include directory, eg `-I /usr/local/eigen` |
+| -o   | output filepath, eg `-o foo.o` |
 | -c   | compile to .o file; dont link |
 
 ## How it works
