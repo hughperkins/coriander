@@ -9,7 +9,7 @@
 - Oct 5
   - fix float constants to correctly have `.0f` at the end
   - added `extractvalue`
-  - conversion of [tensorflow/generated/cwise_op_gpu_add-deviceside.ll](tensorflow/generated/cwise_op_gpu_add-deviceside.ll) to [tensorflow/generated/cwise_op_gpu_add-deviceside.cl](tensorflow/generated/cwise_op_gpu_add-deviceside.cl) runs to completion now, though a "bit" buggy :-P
+  - conversion of [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc) to OpenCL runs to completion now, though the OpenCL generated is not yet compileable
 - Oct 4:
   - added `llvm.memcpy`
   - added `insertvalue`
