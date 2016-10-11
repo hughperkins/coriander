@@ -8,6 +8,8 @@ CLANG=clang++-3.8
 LLVM_CONFIG=llvm-config-3.8
 LLVM_INCLUDE=/usr/include/llvm-3.8
 
+COCL_HOME=`pwd`
+
 # COMPILE_FLAGS=`$(LLVM_CONFIG) --cxxflags` -std=c++11
 LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
 # the llvm-config compile flags suppresses asserts
@@ -93,33 +95,43 @@ test/generated/%-device.cl: test/%-device.ll build/ir-to-opencl
 
 ## objects from hostside patched ll
 
-build/%-hostpatched.o: test/generated/%-hostpatched.ll
-	echo building $@ from $<
-	$(CLANG) -c $< -O3 -o $@
+# build/%-hostpatched.o: test/generated/%-hostpatched.ll
+# 	echo building $@ from $<
+# 	$(CLANG) -c $< -O3 -o $@
 
-build/eigen-%-hostpatched.o: test/eigen/generated/%-hostpatched.ll
+# build/eigen-%-hostpatched.o: test/eigen/generated/%-hostpatched.ll
+# 	echo building $@ from $<
+# 	$(CLANG) -c $< -O3 -o $@
+
+# %.o: %-hostpatched.ll
+# 	echo building $@ from $<
+# 	$(CLANG) -c $< -O3 -o $@
+
+# include $(COCL_HOME/src/cocl.Makefile)
+
+# %.o: %-hostpatched.ll
+# 	echo building $@ from $<
+# 	$(CLANG) -c $< -O3 -o $@
+
+%.o: %.cu
 	echo building $@ from $<
-	$(CLANG) -c $< -O3 -o $@
+	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen $<
 
 ## generic cpp objects, from cpp code
-
-build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp easycl
-	echo building $@ from $<
-	$(CLANG) -std=c++11 -Isrc/EasyCL -c $< -O3 -o $@
 
 build/libcocl.a: build/hostside_opencl_funcs.o
 	ar rcs $@ $^
 
-build/%.o: test/%.cpp easycl
-	echo building $@ from $<
-	$(CLANG) -std=c++11 -O2 -Isrc/EasyCL -c $< --cuda-host-only -O3 -o $@
+# build/%.o: test/%.cpp easycl
+# 	echo building $@ from $<
+# 	$(CLANG) -std=c++11 -O2 -Isrc/EasyCL -c $< --cuda-host-only -O3 -o $@
 
 # executables
-build/cuda_sample: build/cuda_sample-hostpatched.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
+build/cuda_sample: test/cuda_sample.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
 	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
 
-build/eigen-%: build/eigen-%-hostpatched.o build/hostside_opencl_funcs.o test/eigen/generated/%-device.cl
-	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
+build/eigen-%: test/eigen/%.o build/libcocl.a
+	g++ -o $@ $< -lcocl -lOpenCL -Lbuild -lEasyCL
 
 run-cuda_sample: build/cuda_sample
 	################################

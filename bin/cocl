@@ -9,6 +9,19 @@ export CLANG=clang++-3.8
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export COCL_HOME=$(dirname ${SCRIPT_DIR})
 
+INCLUDES=
+while getopts I: opt; do
+    case $opt in
+    I)
+        INCLUDES="$INCLUDES -I$OPTARG"
+        ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+echo INCLUDES ${INCLUDES}
+export INCLUDES
+
 INFILE=$1
 
 if [[ x$1 == x ]]; then {
@@ -19,6 +32,9 @@ if [[ x$1 == x ]]; then {
 BASENAME=$(basename -s .cu ${INFILE})
 DIRNAME=$(dirname ${INFILE})
 BASEPATH=${DIRNAME}/${BASENAME}
+
+# echo ${CFLAGS}
+# export CFLAGS
 
 make -f ${COCL_HOME}/src/cocl.Makefile ${BASEPATH}.o
 
