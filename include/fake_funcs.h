@@ -40,23 +40,32 @@ stubout_scope(cta)
 
 #include "__clang_cuda_runtime_wrapper.h"
 
-#define tanh our_pretend_tanh
-#define log our_pretend_log
-#define exp our_pretend_exp
-
 // this is for eigen (which calls like:  ::tanh)
-//namespace std {
-float our_pretend_tanh(float in);
-float our_pretend_log(float in);
-float our_pretend_exp(float in);
-//}
+// float our_pretend_tanh(float in);
+// float our_pretend_log(float in);
+// float our_pretend_exp(float in);
 
-// this is for std library:  (which calls like:   tanh)
-namespace std {
-float our_pretend_tanh(float in);
-float our_pretend_log(float in);
-float our_pretend_exp(float in);
-}
+// this is for std library:  (which calls like:   std::tanh)
+// namespace std {
+// float our_pretend_tanh(float in);
+// float our_pretend_log(float in);
+// float our_pretend_exp(float in);
+// }
+
+// namespace cocl {
+// float our_pretend_tanh(float in);
+// float our_pretend_log(float in);
+// float our_pretend_exp(float in);
+// }
+
+// namespace std {
+
+// namespace cocl {
+// T our_pretend_tanh<T>(T in);
+// T our_pretend_log<T>(T in);
+// T our_pretend_exp<T>(T in);
+// }
+// }
 
 // using namespace std;  // trying to fix error about arg
 
@@ -67,4 +76,19 @@ float our_pretend_exp(float in);
 #include <complex>
 template<class T> T arg (const std::complex<T>& x) {
     return std::arg(x);
+}
+// #include <random>
+
+// #define tanh our_pretend_tanh
+// #define log our_pretend_log
+// #define exp our_pretend_exp
+
+extern "C" {
+double our_pretend_tanh(double in);
+double our_pretend_log(double in);
+double our_pretend_exp(double in);
+
+double tanh(double in);
+double log(double in);
+double exp(double in);
 }

@@ -39,7 +39,7 @@ __constant__ struct Foo foo = {777, 11.0f};
 __constant__ struct Bar bar = {12.0f};
 
 __global__ void somekernel(float *data) {
-    struct Foo bar = { 23.4f };
+    struct Foo bar = { 23 };
     data[0] = bar.somefloat;
     data[1] = getFooValue(bar);
     SomeClass someclass;

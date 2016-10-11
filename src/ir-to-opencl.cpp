@@ -1505,6 +1505,10 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["_ZSt15our_pretend_logf"] = "log";
     knownFunctionsMap["_ZSt15our_pretend_expf"] = "exp";
 
+    knownFunctionsMap["_ZSt4tanhf"] = "tanh";
+    knownFunctionsMap["_ZSt3logf"] = "log";
+    knownFunctionsMap["_ZSt3expf"] = "exp";
+
     try {
         string gencode = dumpModule(TheModule.get());
         ofstream of;

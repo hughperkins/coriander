@@ -38,7 +38,7 @@ clean:
 test/generated/%-device.ll: test/%.cu include/fake_funcs.h build/ir-to-opencl
 	echo building $@ from $<
 	mkdir -p test/generated
-	$(CLANG) -include include/fake_funcs.h -I$(CUDA_HOME)/include $< --cuda-device-only -emit-llvm -O3 -S -o $@
+	$(CLANG) -include include/fake_funcs.h -I$(CUDA_HOME)/include $< --cuda-device-only -emit-llvm -std=c++11 -I/usr/include/x86_64-linux-gnu -O3 -S -o $@
 
 test/eigen/generated/%-device.ll: test/eigen/%.cu include/fake_funcs.h build/ir-to-opencl
 	echo building $@ from $<
