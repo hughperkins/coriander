@@ -108,6 +108,6 @@ run-eigen-cxx11_tensor_cuda: build/eigen-cxx11_tensor_cuda
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-test-cxx11_tensor_cuda
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-cxx11_tensor_cuda
 
 .SECONDARY:

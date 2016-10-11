@@ -347,6 +347,15 @@ void setKernelArgFloatStar(float *clmem_as_floatstar) {
     kernel->inout(&clmem);
 }
 
+void setKernelArgCharStar(char *clmem_as_charstar) {
+    cout << "setKernelArgCharStar" << endl;
+    int idx = idxByAddr[(void *)clmem_as_charstar];
+    cl_mem clmem = clmems[idx];
+    // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
+    // cout << "setKernelArgFloatStar" << endl;
+    kernel->inout(&clmem);
+}
+
 // void setKernelArgCharStar(char *clmem_as_charstar) {
 //     cout << "setKernelArgCharStar" << endl;
 //     cl_mem *p_mem = (cl_mem *)clmem_as_charstar;

@@ -551,16 +551,34 @@ void patchFunction(Function *F) {
                                 lastInst = loadgep;
 
                                 outs() << "loadgep type " << dumpType(loadgep->getType()) << "\n";
-
-                                // we're just going to assume everything is a float* for now
-                                Function *setKernelArgFloatStar = cast<Function>(F->getParent()->getOrInsertFunction(
-                                    "_Z21setKernelArgFloatStarPf",
-                                    Type::getVoidTy(TheContext),
-                                    PointerType::get(Type::getFloatTy(TheContext), 0),
-                                    NULL));
-                                CallInst *call = CallInst::Create(setKernelArgFloatStar, loadgep);
-                                call->insertAfter(lastInst);
-                                lastInst = call;
+                                Type *gepElementType = loadgep->getType()->getPointerElementType();
+                                outs() << "gepElementType " << dumpType(gepElementType) << "\n";
+                                if(IntegerType *integerType = dyn_cast<IntegerType>(gepElementType)) {
+                                    if(integerType->getBitWidth() == 8) {
+                                        Function *setKernelArgCharStar = cast<Function>(F->getParent()->getOrInsertFunction(
+                                            "_Z20setKernelArgCharStarPc",
+                                            Type::getVoidTy(TheContext),
+                                            PointerType::get(IntegerType::get(TheContext, 8), 0),
+                                            NULL));
+                                        CallInst *call = CallInst::Create(setKernelArgCharStar, loadgep);
+                                        call->insertAfter(lastInst);
+                                        lastInst = call;
+                                    } else {
+                                        throw runtime_error("integer type with bitwidth " + toString(integerType->getBitWidth()) + " not implemented for pointers in struct");
+                                    }
+                                } else if(gepElementType->isFloatingPointTy()) {
+                                    // we're just going to assume everything is a float* for now
+                                    Function *setKernelArgFloatStar = cast<Function>(F->getParent()->getOrInsertFunction(
+                                        "_Z21setKernelArgFloatStarPf",
+                                        Type::getVoidTy(TheContext),
+                                        PointerType::get(Type::getFloatTy(TheContext), 0),
+                                        NULL));
+                                    CallInst *call = CallInst::Create(setKernelArgFloatStar, loadgep);
+                                    call->insertAfter(lastInst);
+                                    lastInst = call;
+                                } else {
+                                    throw runtime_error("type " + dumpType(gepElementType) + " not implemented for pointers in structs");
+                                }
                             }
 
                             // Type *elementType = value->getType()->getPointerElementType();
