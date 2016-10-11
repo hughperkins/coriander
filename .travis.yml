@@ -1,0 +1,23 @@
+language: objective-c
+matrix:
+  include:
+    - env: OSX=10.11
+      os: osx
+      osx_image: osx10.11
+      rvm: system
+
+before_install:
+  - if [ -f ".git/shallow" ]; then travis_retry git fetch --unshallow; fi
+
+script:
+  - BASEDIR=$(pwd)
+  - echo BASEDIR ${BASEDIR}
+  - make
+  - make run-cuda_sample
+  - make run-test_cuda_elementwise
+  - make run-test_cuda_nullary
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always
