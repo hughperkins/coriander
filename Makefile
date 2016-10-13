@@ -31,7 +31,7 @@ easycl:
 	cd build && make -j 4
 
 build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp
-	$(CLANG) -c -o $@ -std=c++11 -O3 -I$(COCL_HOME)/src/EasyCL $<
+	$(CLANG) -c -o $@ -std=c++11 -O2 -I$(COCL_HOME)/src/EasyCL $<
 
 build/libcocl.a: build/hostside_opencl_funcs.o
 	ar rcs $@ $^
@@ -73,8 +73,8 @@ build/test-%.o: test/%.cu
 	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
 
 # executables
-build/cuda_sample: build/test-cuda_sample.o build/hostside_opencl_funcs.o test/generated/cuda_sample-device.cl
-	g++ -o $@ $< build/hostside_opencl_funcs.o -lOpenCL -Lbuild -lEasyCL
+build/cuda_sample: build/test-cuda_sample.o build/libcocl.a test/generated/cuda_sample-device.cl
+	g++ -o $@ $< -lcocl -lOpenCL -Lbuild -lEasyCL
 
 build/eigen-%: build/eigen-%.o build/libcocl.a
 	g++ -o $@ $< -lcocl -lOpenCL -Lbuild -lEasyCL

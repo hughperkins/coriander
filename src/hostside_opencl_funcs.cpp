@@ -39,17 +39,17 @@ static map<void *, int> idxByAddr;
 static bool initialized = false;
 
 extern "C" {
-    void hostside_opencl_funcs_assure_initialized();
+    void hostside_opencl_funcs_assure_initialized(void);
 }
 
-static void hostside_opencl_funcs_init() {
+void hostside_opencl_funcs_init() {
     cout << "initialize cl context" << endl;
     cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
     ctx = cl->context;
     queue = cl->queue;
 }
 
-void hostside_opencl_funcs_assure_initialized() {
+void hostside_opencl_funcs_assure_initialized(void) {
     // yes this is not threadsafe.  or anything safe really...
     if(!initialized) {
         hostside_opencl_funcs_init();
