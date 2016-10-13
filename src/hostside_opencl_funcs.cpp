@@ -38,14 +38,18 @@ static map<void *, int> idxByAddr;
 
 static bool initialized = false;
 
-void hostside_opencl_funcs_init() {
+extern "C" {
+    void hostside_opencl_funcs_assure_initialized();
+}
+
+static void hostside_opencl_funcs_init() {
     cout << "initialize cl context" << endl;
     cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
     ctx = cl->context;
     queue = cl->queue;
 }
 
-void assure_initialized() {
+void hostside_opencl_funcs_assure_initialized() {
     // yes this is not threadsafe.  or anything safe really...
     if(!initialized) {
         hostside_opencl_funcs_init();
@@ -254,7 +258,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
 }
 
 size_t cudaMalloc(void **p_mem, size_t N) {
-    assure_initialized();
+    hostside_opencl_funcs_assure_initialized();
     cout << "cudaMalloc using cl, size " << N << endl;
     cl_mem float_data_gpu = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, N,
                                            NULL, &err);
@@ -313,7 +317,7 @@ size_t cudaConfigureCall(
 void configureKernel(
         const char *kernelName, const char *clSourcecodeString) {
     // cout << "configureKernel (name=" << kernelName << ", source=" << clSourcecodeString << ")" << endl;
-    assure_initialized();
+    hostside_opencl_funcs_assure_initialized();
     kernel.reset(cl->buildKernelFromString(clSourcecodeString, kernelName, "", "__internal__"));
 }
 
