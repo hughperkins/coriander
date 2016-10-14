@@ -103,6 +103,17 @@ extern "C" {
         unsigned long long block_xy, unsigned int block_z, size_t sharedMem=0, void *stream=0);
     void configureKernel(
         const char *kernelName, const char *clSourcecodeString);
+    size_t cuInit(unsigned int flags);
+
+    /*
+    cuDeviceCanAccessPeer
+    cuOccupancyMaxActiveBlocksP
+    */
+}
+
+size_t cuInit(unsigned int flags) {
+    cout << "redirected cuInit()" << endl;
+    return 0;
 }
 
 size_t cudaGetLastError() {
