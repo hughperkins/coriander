@@ -109,6 +109,13 @@ extern "C" {
     cuDeviceCanAccessPeer
     cuOccupancyMaxActiveBlocksP
     */
+
+
+    size_t cuDeviceGetCount (int *count);
+}
+
+size_t cuDeviceGetCount (int *count) {
+    return cudaGetDeviceCount(count);
 }
 
 size_t cuInit(unsigned int flags) {
