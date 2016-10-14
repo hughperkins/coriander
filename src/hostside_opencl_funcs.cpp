@@ -124,7 +124,7 @@ extern "C" {
 
 size_t cuDriverGetVersion(int *driver_version) {
     cout << "cuDriverGetVersion redirected" << endl;
-    driver_version = 1;
+    *driver_version = 1;
     return 0;
 }
 
