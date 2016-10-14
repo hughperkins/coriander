@@ -119,6 +119,13 @@ extern "C" {
     size_t cuCtxGetCurrent(PretendContext *context);
     size_t cuCtxSetCurrent(PretendContext context);
     size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, void *device);
+    size_t cuDriverGetVersion(int *driver_version);
+}
+
+size_t cuDriverGetVersion(int *driver_version) {
+    cout << "cuDriverGetVersion redirected" << endl;
+    driver_version = 1;
+    return 0;
 }
 
 size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, void *device) {
