@@ -85,6 +85,8 @@ struct cudaDeviceProp {
     int tccDriver;
 };
 
+typedef int *PretendContext;
+
 extern "C" {
     size_t cudaMalloc(void **p_mem, size_t N);
     size_t cudaFree(void *mem);
@@ -113,9 +115,9 @@ extern "C" {
 
     size_t cuDeviceGetCount(int *count);
     size_t cuDeviceGet (void *device, int ordinal);
-    size_t cuCtxCreate_v2(void *new_context, unsigned int flags, void *device);
-    size_t cuCtxGetCurrent(void *context);
-    size_t cuCtxSetCurrent(void *former_context);
+    size_t cuCtxCreate_v2(PretendContext *new_context, unsigned int flags, void *device);
+    size_t cuCtxGetCurrent(PretendContext *context);
+    size_t cuCtxSetCurrent(PretendContext *former_context);
     size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, void *device);
 }
 
@@ -128,7 +130,6 @@ size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, void *device) {
 
 vector<int> pretendcontexts;
 
-typedef int *PretendContext;
 PretendContext currentpretendcontext = 0;
 
 size_t cuCtxGetCurrent(PretendContext *context) {
