@@ -115,9 +115,9 @@ extern "C" {
 
     size_t cuDeviceGetCount(int *count);
     size_t cuDeviceGet (void *device, int ordinal);
-    size_t cuCtxCreate_v2(PretendContext *new_context, unsigned int flags, void *device);
+    size_t cuCtxCreate_v2(PretendContext *context, unsigned int flags, void *device);
     size_t cuCtxGetCurrent(PretendContext *context);
-    size_t cuCtxSetCurrent(PretendContext *former_context);
+    size_t cuCtxSetCurrent(PretendContext context);
     size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, void *device);
 }
 
@@ -138,9 +138,9 @@ size_t cuCtxGetCurrent(PretendContext *context) {
     return 0;
 }
 
-size_t cuCtxSetCurrent(PretendContext *context) {
+size_t cuCtxSetCurrent(PretendContext context) {
     cout << "cuCtxSetCurrent redirected" << endl;
-    currentpretendcontext = *context;
+    currentpretendcontext = context;
     return 0;
 }
 
