@@ -128,7 +128,7 @@ size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, void *device) {
 
 size_t cuCtxGetCurrent(void *context) {
     cout << "cuCtxGetCurrent redirected" << endl;
-    *context = 0;
+    *(int *)context = 0;
     return 0;
 }
 
