@@ -127,25 +127,29 @@ size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, void *device) {
 }
 
 vector<int> pretendcontexts;
-int *currentpretendcontext = 0;
 
-size_t cuCtxGetCurrent(void *context) {
+typedef int *PretendContext;
+PretendContext currentpretendcontext = 0;
+
+size_t cuCtxGetCurrent(PretendContext *context) {
     cout << "cuCtxGetCurrent redirected" << endl;
-    *(int **)context = currentpretendcontext;
+    *context = currentpretendcontext;
     return 0;
 }
 
-size_t cuCtxSetCurrent(void *context) {
+size_t cuCtxSetCurrent(PretendContext *context) {
     cout << "cuCtxSetCurrent redirected" << endl;
-    currentpretendcontext = *(int **)context;
+    currentpretendcontext = *context;
     return 0;
 }
 
-size_t cuCtxCreate_v2 (void *context, unsigned int flags, void *device) {
+size_t cuCtxCreate_v2 (PretendContext *context, unsigned int flags, void *device) {
     cout << "cuCtxCreate_v2 redirected" << endl;
     // *(int *)new_context = 0;
     pretendcontexts.push_back(1);
-    *(int **)context = &pretendcontexts[pretendcontexts.size() - 1];
+    PretendContext newcontext = &pretendcontexts[pretendcontexts.size() - 1];
+    currentpretendcontext = newcontext;
+    *context = newcontext;
     return 0;
 }
 
