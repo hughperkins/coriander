@@ -114,6 +114,7 @@ extern "C" {
     size_t cuDeviceGetCount(int *count);
     size_t cuDeviceGet (void *device, int ordinal);
     size_t cuCtxCreate_v2(void *new_context, unsigned int flags, void *device);
+    size_t cuCtxGetCurrent(void *context);
     size_t cuCtxSetCurrent(void *former_context);
     size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, void *device);
 }
@@ -122,6 +123,12 @@ size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, void *device) {
     cout << "cuDeviceComputeCapability redirected" << endl;
     *cc_major = 3;
     *cc_minor = 5;
+    return 0;
+}
+
+size_t cuCtxGetCurrent(void *context) {
+    cout << "cuCtxGetCurrent redirected" << endl;
+    *context = 0;
     return 0;
 }
 
