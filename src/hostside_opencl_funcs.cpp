@@ -122,7 +122,7 @@ extern "C" {
     size_t cuDriverGetVersion(int *driver_version);
     size_t cuDeviceGetPCIBusId(char *buf, int bufsize, void *device);
     size_t cuDeviceGetName(char *buf, int bufsize, void *device);
-    size_t cuDeviceTotalMem_v2(int *value, void *device);
+    size_t cuDeviceTotalMem_v2(uint64_t *value, void *device);
     size_t cuDeviceGetAttribute(
        int64_t *value, int attribute, void *device);
     size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, int device_ordinal);
@@ -170,7 +170,7 @@ size_t cuDeviceGetAttribute(
     return 0;
 }
 
-size_t cuDeviceTotalMem_v2(int *value, void *device) {
+size_t cuDeviceTotalMem_v2(uint64_t *value, void *device) {
     cout << "cuDeviceTotalMem_v2 redirected" << endl;
     *value = 1024 * 1024;
     return 0;
