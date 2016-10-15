@@ -129,6 +129,7 @@ extern "C" {
 }
 
 // enum constants from http://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__TYPES.html#axzz4N4NYrYWt
+const int CU_DEVICE_ATTRIBUTE_SHARED_MEMORY_PER_BLOCK = 8;
 const int CU_DEVICE_ATTRIBUTE_ECC_ENABLED = 32;
 const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X = 5;
 const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y = 6;
@@ -151,6 +152,8 @@ size_t cuDeviceGetAttribute(
     } else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z == attribute) {
         *value = 1024;
     } else if(CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR == attribute) {
+        *value = 65536;
+    } else if(CU_DEVICE_ATTRIBUTE_SHARED_MEMORY_PER_BLOCK == attribute) {
         *value = 65536;
     } else if(CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT == attribute) {
         *value = 16;
