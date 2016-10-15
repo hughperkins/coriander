@@ -201,6 +201,11 @@ Tests are at [test](test)
 
 ## News
 
+- Oct 15:
+  - fixed critical bug where `return;` wasnt being written out.  Which didnt matter when that was at the end of a kernel.  But mattered more when that was the only exit condition for a kernel :-P
+  - added event handling
+  - added pinned memory handling
+  - added a bunch of api call implementations for getting information about the driver (mostly stubbed out for now...)
 - Oct 10:
   - [test/eigen/test_cuda_elementwise_small.cu](https://github.com/hughperkins/cuda-on-cl/blob/a8f6aa55eb678e534cc7d17a3db26c6b8762d683/test/eigen/test_cuda_elementwise_small.cu) builds and runs ok now
 - [Older news](doc/news.md)
