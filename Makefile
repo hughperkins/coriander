@@ -79,6 +79,9 @@ build/cuda_sample: build/test-cuda_sample.o build/libcocl.a test/generated/cuda_
 build/test-test_memhostalloc: build/test-test_memhostalloc.o build/libcocl.a test/generated/test_memhostalloc-device.cl
 	g++ -o $@ $< -g -lcocl -lOpenCL -Lbuild -lEasyCL
 
+build/test-testevents: build/test-testevents.o build/libcocl.a
+	g++ -o $@ $< -g -lcocl -lOpenCL -Lbuild -lEasyCL
+
 build/eigen-%: build/eigen-%.o build/libcocl.a
 	g++ -o $@ $< -lcocl -lOpenCL -Lbuild -lEasyCL
 
@@ -90,6 +93,12 @@ run-cuda_sample: build/cuda_sample
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
 run-test-test_memhostalloc: build/test-test_memhostalloc
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
+run-test-testevents: build/test-testevents
 	################################
 	# running:
 	################################

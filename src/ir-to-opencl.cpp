@@ -113,6 +113,7 @@ void declareGlobal(GlobalValue *global) {
                 updateAddressSpace(var, 4);
             }
         }
+        cout << "declareGlobal name=" << name << " hasinitializer " << var->hasInitializer() << endl;
         if(var->hasInitializer()) {
             Constant *initializer = var->getInitializer();
             gencode += " = {";
@@ -130,6 +131,8 @@ void declareGlobal(GlobalValue *global) {
                 }
             }
             gencode += "}";
+        } else {
+            gencode += " = {}";
         }
     } else {
         global->dump();
@@ -313,17 +316,26 @@ std::string dumpReturn(ReturnInst *retInst) {
 }
 
 std::string dumpAlloca(Instruction *alloca) {
+    string gencode = "";
     if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
         Type *ptrElementType = allocatypeptr->getPointerElementType();
         std::string typestring = dumpType(ptrElementType);
+        cout << "dumpAlloca typestring " << typestring << endl;
         int count = readInt32Constant(alloca->getOperand(0));
         if(count == 1) {
             if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
+                cout << "arraytype" << endl;
                 int innercount = arrayType->getNumElements();
                 Type *elementType = arrayType->getElementType();
                 return dumpType(elementType) + " " + dumpOperand(alloca) + "[" + toString(innercount) + "];\n";
             } else {
-                return typestring + " " + dumpOperand(alloca) + "[1];\n";
+                // if the elementType is a pointer, assume its global?
+                if(isa<PointerType>(ptrElementType)) {
+                    gencode += "global ";
+                    updateAddressSpace(alloca, 1);
+                    // return "global " + dumpType(elementType) + " " + dumpOperand(alloca) + "[" + toString(innercount) + "];\n";
+                }
+                return gencode + typestring + " " + dumpOperand(alloca) + "[1];\n";
             }
         } else {
             throw runtime_error("not implemented: alloca for count != 1");

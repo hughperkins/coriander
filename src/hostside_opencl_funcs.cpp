@@ -159,7 +159,6 @@ extern "C" {
         unsigned long long block_xy, unsigned int block_z, size_t sharedMem=0, void *stream=0);
     void configureKernel(
         const char *kernelName, const char *clSourcecodeString);
-    size_t cuInit(unsigned int flags);
 
     /*
     cuDeviceCanAccessPeer
@@ -167,6 +166,8 @@ extern "C" {
     */
 
 
+    size_t cuInit(unsigned int flags);
+    size_t cuCtxSynchronize(void);
     size_t cuDeviceGetCount(int *count);
     size_t cuDeviceGet (void *device, int ordinal);
     size_t cuCtxCreate_v2(PretendContext *context, unsigned int flags, void *device);
@@ -204,7 +205,7 @@ const int CU_DEVICE_ATTRIBUTE_WARP_SIZE = 10;
 size_t cuMemHostAlloc(void **p_mem, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE) {
     cout << "cuMemHostAlloc redirected bytes=" << bytes << endl;
     hostside_opencl_funcs_assure_initialized();
-    cout << "cudaMalloc using cl, size " << bytes << endl;
+    cout << "cuMemHostAlloc using cl, size " << bytes << endl;
     cl_mem float_data_gpu = clCreateBuffer(*ctx, CL_MEM_ALLOC_HOST_PTR, bytes,
                                            NULL, &err);
     cl->checkError(err);
@@ -217,8 +218,8 @@ size_t cuMemHostAlloc(void **p_mem, unsigned int bytes, int CU_MEMHOSTALLOC_PORT
 
     *p_mem = clEnqueueMapBuffer (*queue,
         float_data_gpu,
-        true,
-        CL_MAP_WRITE,
+        CL_FALSE,
+        CL_MAP_READ | CL_MAP_WRITE,
         0,
         bytes,
         0,
@@ -235,6 +236,12 @@ size_t cuMemHostAlloc(void **p_mem, unsigned int bytes, int CU_MEMHOSTALLOC_PORT
     sizeByClmem[float_data_gpu] = bytes;
 
     // CL_MEM_ALLOC_HOST_PTR ?
+    return 0;
+}
+
+size_t cuCtxSynchronize(void) {
+    cout << "cuCtxSynchronize redirected" << endl;
+    cl->finish();
     return 0;
 }
 
@@ -349,6 +356,7 @@ size_t cuDeviceGetCount (int *count) {
 
 size_t cuInit(unsigned int flags) {
     cout << "redirected cuInit()" << endl;
+    hostside_opencl_funcs_assure_initialized();
     return 0;
 }
 
@@ -695,11 +703,18 @@ void kernelGo() {
     size_t global[3];
     for(int i = 0; i < 3; i++) {
         global[i] = grid[i] * block[i];
+        cout << "global[" << i << "]=" << global[i] << endl;
+    }
+    for(int i = 0; i < 3; i++) {
+        cout << "block[" << i << "]=" << block[i] << endl;
     }
     // cout << "launching kernel, using OpenCL..." << endl;
     kernel->run(3, global, block);
+    cout << ".. kernel queued" << endl;
+    // cl->finish();
     // cout << ".. kernel finished" << endl;
     for(auto it=kernelArgsToBeReleased.begin(); it != kernelArgsToBeReleased.end(); it++) {
+        cout << "release arg" << endl;
         cl_mem memObject = *it;
         err = clReleaseMemObject(memObject);
         cl->checkError(err);
@@ -710,10 +725,12 @@ void kernelGo() {
         cl_mem clmem = *it;
         int size = sizeByClmem[clmem];
         cout << "remapping buffer, size=" << size << endl;
-        void *p_mem = clEnqueueMapBuffer (*queue,
+        // cl_event event;
+        void *p_mem = clEnqueueMapBuffer (
+            *queue,
             clmem,
-            true,
-            CL_MAP_WRITE,
+            CL_FALSE,
+            CL_MAP_READ | CL_MAP_WRITE,
             0,
             size,
             0,
@@ -721,8 +738,11 @@ void kernelGo() {
             0,
             &err
         );
-        cout << "new pointer: " << p_mem << endl;
+        cout << "checking error" << endl;
         cl->checkError(err);
+        cout << "new pointer: " << p_mem << endl;
+        // err=  clReleaseEvent(event);
+        // cl->checkError(err);
     }
     kernelArgsToBeRemapped.clear();
 }
