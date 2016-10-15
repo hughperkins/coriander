@@ -120,6 +120,56 @@ extern "C" {
     size_t cuCtxSetCurrent(PretendContext context);
     size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, void *device);
     size_t cuDriverGetVersion(int *driver_version);
+    size_t cuDeviceGetPCIBusId(char *buf, int bufsize, void *device);
+    size_t cuDeviceGetName(char *buf, int bufsize, void *device);
+    size_t cuDeviceTotalMem_v2(int *value, void *device);
+    size_t cuDeviceGetAttribute(
+       int *value, int attribute, void *device);
+}
+
+// enum constants from http://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__TYPES.html#axzz4N4NYrYWt
+const int CU_DEVICE_ATTRIBUTE_ECC_ENABLED = 32;
+const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X = 5;
+const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y = 6;
+const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z = 7;
+
+size_t cuDeviceGetAttribute(
+       int *value, int attribute, void *device) {
+    cout << "cuDeviceGetAttribute redirected" << endl;
+    if(CU_DEVICE_ATTRIBUTE_ECC_ENABLED == attribute) {
+        *value = 0;
+    }
+    else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X == attribute) {
+        *value = 1024;
+    }
+    else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y == attribute) {
+        *value = 1024;
+    }
+    else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z == attribute) {
+        *value = 1024;
+    } else {
+        cout << "attribute " << attribute << endl;
+        throw runtime_error("attribute not implemented");
+    }
+    return 0;
+}
+
+size_t cuDeviceTotalMem_v2(int *value, void *device) {
+    cout << "cuDeviceTotalMem_v2 redirected" << endl;
+    *value = 1024 * 1024;
+    return 0;
+}
+
+size_t cuDeviceGetName(char *buf, int bufsize, void *device) {
+    cout << "cuDeviceGetName redirected" << endl;
+    sprintf(buf, "an opencl device");
+    return 0;
+}
+
+size_t cuDeviceGetPCIBusId(char *buf, int bufsize, void *device) {
+    cout << "cuDeviceGetPCIBusId redirected" << endl;
+    sprintf(buf, "0000.0000");
+    return 0;
 }
 
 size_t cuDriverGetVersion(int *driver_version) {
