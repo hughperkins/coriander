@@ -77,6 +77,11 @@ void hostside_opencl_funcs_assure_initialized(void) {
     }
 }
 
+static inline cl_mem *voidStarToClmem(void *voidStar) {
+    int idx = idxByAddr[voidStar];
+    return &clmems[idx];
+}
+
 struct cudaDeviceProp {
     char name[256];
     size_t totalGlobalMem;
@@ -149,7 +154,8 @@ extern "C" {
     size_t cuMemGetInfo_v2(size_t *free, size_t *total);
     size_t cuMemAlloc_v2(void **mem, size_t bytes);
     size_t cuMemFree_v2(void *mem);
-    // size_t cuMemsetD32_v2(void *location, int value, uint32 count);
+    size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count);
+    size_t cuMemsetD32_v2(void *location, unsigned int value, uint32_t count);
 }
 
 // enum constants from http://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__TYPES.html#axzz4N4NYrYWt
@@ -337,6 +343,20 @@ size_t cudaMemsetAsync(void *devPtr, int value, size_t count, void *stream) {
     cout << "cudaMemsetAsync stub value=" << value << " count=" << count << " stream=" << stream << endl;
     assert(stream == 0);
 
+    return 0;
+}
+
+size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count) {
+    cout << "cuMemsetD8_v2 redirected value " << value << " count=" << count << endl;
+    cl_int err = clEnqueueFillBuffer(*queue, *voidStarToClmem(location), &value, sizeof(unsigned char), 0, count * sizeof(unsigned char), 0, 0, 0);
+    cl->checkError(err);
+    return 0;
+}
+
+size_t cuMemsetD32_v2(void *location, unsigned int value, uint32_t count) {
+    cout << "cuMemsetD32_v2 redirected value " << value << " count=" << count << endl;
+    cl_int err = clEnqueueFillBuffer(*queue, *voidStarToClmem(location), &value, sizeof(int), 0, count * sizeof(int), 0, 0, 0);
+    cl->checkError(err);
     return 0;
 }
 
