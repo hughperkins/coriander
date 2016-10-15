@@ -33,7 +33,16 @@ easycl:
 build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp
 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
 
-build/libcocl.a: build/hostside_opencl_funcs.o
+build/events.o: src/events.cpp
+	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
+
+build/memory.o: src/memory.cpp
+	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
+
+build/properties.o: src/properties.cpp
+	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
+
+build/libcocl.a: build/hostside_opencl_funcs.o build/events.o build/memory.o build/properties.o
 	ar rcs $@ $^
 
 clean:
@@ -80,7 +89,7 @@ build/eigen-%: build/eigen-%.o build/libcocl.a
 	g++ -o $@ $< -lcocl -lOpenCL -Lbuild -lEasyCL
 
 # run
-run-cuda_sample: build/cuda_sample
+run-cuda_sample: build/test-cuda_sample
 	################################
 	# running:
 	################################

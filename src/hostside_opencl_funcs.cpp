@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "hostside_opencl_funcs.h"
+
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -24,72 +26,27 @@
 
 using namespace std;
 
-static size_t grid[3];
-static size_t block[3];
-static unique_ptr<CLKernel> kernel;
-
-unique_ptr<EasyCL> cl;
-static cl_context *ctx;
-static cl_command_queue *queue;
-static cl_int err;
-
-// static vector<cl_mem> clmems;
-static int nextIdx = 0;
-static map<int, cl_mem> clmemByIdx;  // seems like we could just merge these two maps :-P
-static map<void *, int> idxByAddr;
-static map<cl_mem, int> sizeByClmem;  // for mapped buffers mostly, ofr now
-
-static set<cl_mem> clmemNeedsMap;
-
-static vector<cl_mem> kernelArgsToBeReleased;
-static vector<cl_mem> kernelArgsToBeRemapped;
-
-static bool initialized = false;
-
 extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
 }
 
-EasyCL *hostside_opencl_funcs_getCl() {
-    return cl.get();
+namespace cocl {
+    size_t grid[3];
+    size_t block[3];
+    unique_ptr<CLKernel> kernel;
+
+    unique_ptr<EasyCL> cl;
+    cl_context *ctx;
+    cl_command_queue *queue;
+    cl_int err;
+
+    vector<cl_mem> kernelArgsToBeReleased;
+    vector<cl_mem> kernelArgsToBeRemapped;
+
+    bool initialized = false;
 }
 
-cl_context *hostside_opencl_funcs_getContext() {
-    return ctx;
-}
-
-
-cl_command_queue *hostside_opencl_funcs_getQueue() {
-    return queue;
-}
-
-map<int, cl_mem> &hostside_opencl_funcs_getclmemByIdx() {
-    return clmemByIdx;
-}
-
-map<void *, int> &hostside_opencl_funcs_getIdxByAddr() {
-    return idxByAddr;
-}
-
-int hostside_opencl_funcs_getNextIdx() {
-    return nextIdx;
-}
-
-void hostside_opencl_funcs_setNextIdx(int _nextIdx) {
-    nextIdx = _nextIdx;
-}
-
-set<cl_mem> &hostside_opencl_funcs_getclmemNeedsMap() {
-    return clmemNeedsMap;
-}
-
-vector<cl_mem> &hostside_opencl_funcs_kernelArgsToBeReleased() {
-    return kernelArgsToBeReleased;
-}
-vector<cl_mem> &hostside_opencl_funcs_kernelArgsToBeRemapped() {
-    return kernelArgsToBeRemapped;
-}
-
+using namespace cocl;
 
 void hostside_opencl_funcs_init() {
     cout << "initialize cl context" << endl;
@@ -106,52 +63,13 @@ void hostside_opencl_funcs_assure_initialized(void) {
     }
 }
 
-static inline cl_mem *voidStarToClmem(void *voidStar) {
-    int idx = idxByAddr[voidStar];
-    return &clmemByIdx[idx];
-}
-
-struct cudaDeviceProp {
-    char name[256];
-    size_t totalGlobalMem;
-    size_t sharedMemPerBlock;
-    int regsPerBlock;
-    int warpSize;
-    size_t memPitch;
-    int maxThreadsPerBlock;
-    int maxThreadsDim[3];
-    int maxGridSize[3];
-    size_t totalConstMem;
-    int major;
-    int minor;
-    int clockRate;
-    size_t textureAlignment;
-    int deviceOverlap;
-    int multiProcessorCount;
-    int kernelExecTimeoutEnabled;
-    int integrated;
-    int canMapHostMemory;
-    int computeMode;
-    int concurrentKernels;
-    int ECCEnabled;
-    int pciBusID;
-    int pciDeviceID;
-    int tccDriver;
-};
-
 typedef int *PretendContext;
 
 extern "C" {
-    size_t cudaMalloc(void **p_mem, size_t N);
-    size_t cudaFree(void *mem);
-    size_t cudaMemcpy(void *dst, const void *, size_t, size_t cudaMemcpyKind);
     size_t cudaSetDevice (int device);
-    size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, int device);
-    size_t cudaMemsetAsync(void *devPtr, int value, size_t count, void *stream = 0);
     const char *cudaGetErrorString (size_t error);
     size_t cudaGetDevice (int *device);
     size_t cudaGetDeviceCount (int *count);
-    size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t kind, void *stream = 0);
     size_t cudaStreamSynchronize(void *stream);
     size_t cudaGetLastError();
     size_t cudaConfigureCall(
@@ -165,7 +83,6 @@ extern "C" {
     cuOccupancyMaxActiveBlocksP
     */
 
-
     size_t cuInit(unsigned int flags);
     size_t cuCtxSynchronize(void);
     size_t cuDeviceGetCount(int *count);
@@ -173,231 +90,12 @@ extern "C" {
     size_t cuCtxCreate_v2(PretendContext *context, unsigned int flags, void *device);
     size_t cuCtxGetCurrent(PretendContext *context);
     size_t cuCtxSetCurrent(PretendContext context);
-    size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, void *device);
-    size_t cuDriverGetVersion(int *driver_version);
-    size_t cuDeviceGetPCIBusId(char *buf, int bufsize, void *device);
-    size_t cuDeviceGetName(char *buf, int bufsize, void *device);
-    size_t cuDeviceTotalMem_v2(uint64_t *value, void *device);
-    size_t cuDeviceGetAttribute(
-       int64_t *value, int attribute, void *device);
-    size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, int device_ordinal);
-    size_t cuMemGetInfo_v2(size_t *free, size_t *total);
-    size_t cuMemAlloc_v2(void **mem, size_t bytes);
-    size_t cuMemFree_v2(void *mem);
-    size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count);
-    size_t cuMemsetD32_v2(void *location, unsigned int value, uint32_t count);
-    size_t cuMemHostAlloc(void **mem, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE);
-    size_t cuMemFreeHost(void *mem);
 
-}
-
-class CoclEventClass {
-    // since cuda creates events then records them, but opencl doesnt create events until
-    // the time of 'record', and the cuda client already has a pointer to the event, before record is called,
-    // so we will create our own object to interface between these two behaviors
-    // we'll send a CoclEvent to the client, and tell them its a CUevent object. approximately
-public:
-    CoclEventClass() {
-        cout << "CoclEventClass()" << endl;
-    }
-    ~CoclEventClass() {
-        cout << "~CoclEventClass()" << endl;
-        if(event != 0) {
-            clReleaseEvent(event);
-        }
-    }
-    cl_event event = 0;
-};
-
-typedef CoclEventClass *CoclEvent;
-
-extern "C" {
-    size_t cuEventCreate(CoclEvent *pevent, unsigned int flags);
-    size_t cuEventSynchronize(CoclEvent event);
-    size_t cuEventRecord(CoclEvent event);
-    size_t cuEventQuery(CoclEvent event);
-    size_t cuEventDestroy_v2(CoclEvent event);
-}
-
-size_t cuEventCreate(CoclEvent *pevent, unsigned int flags) {
-    cout << "cuEventCreate redirected flags=" << flags << endl;
-    // cl_int err;
-    // cl_event event = clCreateUserEvent(*ctx, &err);
-    // cl->checkError(err);
-    CoclEvent event = new CoclEventClass();
-    *pevent = event;
-    // *(void **)pevent = (void *)event;
-    return 0;
-}
-
-size_t cuEventSynchronize(CoclEvent coclevent) {
-    // cl_event event = (cl_event)event_as_voidstar;
-    cout << "cuEventSynchronize redirected" << endl;
-    cl_int err = clWaitForEvents(1, &coclevent->event);
-    cl->checkError(err);
-    return 0;
-}
-
-size_t cuEventRecord(CoclEvent coclevent) {
-    cout << "cuEventRecord redirected" << endl;
-    cl_event clevent;
-    clEnqueueMarkerWithWaitList(*queue, 0, 0, &clevent);
-    coclevent->event = clevent;
-    return 0;
-}
-
-size_t cuEventQuery(CoclEvent coclevent) {
-    cout << "cuEventQuery redirected" << endl;
-    cl_int res;
-    cl_int err = clGetEventInfo (
-        coclevent->event,
-        CL_EVENT_COMMAND_EXECUTION_STATUS,
-        sizeof(cl_int),
-        &res,
-        0);
-    cout << "clGetEventInfo: " << res << endl;
-    cl->checkError(err);
-    if(res == CL_COMPLETE) { // success
-        return 0;
-    } else if(res > 0) { // not finished yet
-        return 34;
-    } else { // error
-        return 1;
-    }
-}
-
-size_t cuEventDestroy_v2(CoclEvent event) {
-    cout << "cuEventDestroy redirected" << endl;
-    delete event;
-    return 0;
-}
-
-
-size_t cuMemHostAlloc(void **p_mem, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE) {
-    cout << "cuMemHostAlloc redirected bytes=" << bytes << endl;
-    hostside_opencl_funcs_assure_initialized();
-    cout << "cuMemHostAlloc using cl, size " << bytes << endl;
-    cl_mem float_data_gpu = clCreateBuffer(*ctx, CL_MEM_ALLOC_HOST_PTR, bytes,
-                                           NULL, &err);
-    cl->checkError(err);
-    int idx = nextIdx;
-    nextIdx++;
-    clmemByIdx[idx] = float_data_gpu;
-    // clmems.push_back(float_data_gpu);
-    // int idx = clmems.size() - 1;
-    // *p_mem = (float *)&clmems[idx];
-
-    *p_mem = clEnqueueMapBuffer (*queue,
-        float_data_gpu,
-        CL_FALSE,
-        CL_MAP_READ | CL_MAP_WRITE,
-        0,
-        bytes,
-        0,
-        0,
-        0,
-        &err
-    );
-    cl->checkError(err);
-    cout << "cuMemHostAlloc after map: " << *p_mem << endl;
-
-    idxByAddr[*p_mem] = idx;
-    cout << "ptr " << *p_mem << " idx=" << idx << endl;
-    clmemNeedsMap.insert(float_data_gpu);
-    sizeByClmem[float_data_gpu] = bytes;
-
-    // CL_MEM_ALLOC_HOST_PTR ?
-    return 0;
 }
 
 size_t cuCtxSynchronize(void) {
     cout << "cuCtxSynchronize redirected" << endl;
     cl->finish();
-    return 0;
-}
-
-size_t cuMemFreeHost(void *mem) {
-    cout << "cuMemFreeHost redirected" << endl;
-    return 0;
-}
-
-size_t cuMemGetInfo_v2(size_t *free, size_t *total) {
-    cout << "cuMemGetInfo_v2 redirected" << endl;
-    *free = 1024 * 1024;
-    *total = 1024 * 1024;
-    return 0;
-}
-
-// enum constants from http://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__TYPES.html#axzz4N4NYrYWt
-const int CU_DEVICE_ATTRIBUTE_SHARED_MEMORY_PER_BLOCK = 8;
-const int CU_DEVICE_ATTRIBUTE_ECC_ENABLED = 32;
-const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X = 5;
-const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y = 6;
-const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z = 7;
-const int CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR = 81;
-const int CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT = 16;
-const int CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR = 39;
-const int CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK = 12;
-const int CU_DEVICE_ATTRIBUTE_WARP_SIZE = 10;
-
-size_t cuDeviceGetAttribute(
-       int64_t *value, int attribute, void *device) {
-    cout << "cuDeviceGetAttribute redirected" << endl;
-    if(CU_DEVICE_ATTRIBUTE_ECC_ENABLED == attribute) {
-        *value = 0;
-    } else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X == attribute) {
-        *value = 1024;
-    } else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y == attribute) {
-        *value = 1024;
-    } else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z == attribute) {
-        *value = 1024;
-    } else if(CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR == attribute) {
-        *value = 65536;
-    } else if(CU_DEVICE_ATTRIBUTE_SHARED_MEMORY_PER_BLOCK == attribute) {
-        *value = 65536;
-    } else if(CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT == attribute) {
-        *value = 16;
-    } else if(CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK == attribute) {
-        *value = 64;
-    } else if(CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR == attribute) {
-        *value = 128;
-    } else if(CU_DEVICE_ATTRIBUTE_WARP_SIZE == attribute) {
-        *value = 32;
-    } else {
-        cout << "attribute " << attribute << endl;
-        throw runtime_error("attribute not implemented");
-    }
-    return 0;
-}
-
-size_t cuDeviceTotalMem_v2(uint64_t *value, void *device) {
-    cout << "cuDeviceTotalMem_v2 redirected" << endl;
-    *value = 1024 * 1024;
-    return 0;
-}
-
-size_t cuDeviceGetName(char *buf, int bufsize, void *device) {
-    cout << "cuDeviceGetName redirected" << endl;
-    sprintf(buf, "an opencl device");
-    return 0;
-}
-
-size_t cuDeviceGetPCIBusId(char *buf, int bufsize, void *device) {
-    cout << "cuDeviceGetPCIBusId redirected" << endl;
-    sprintf(buf, "0000.0000");
-    return 0;
-}
-
-size_t cuDriverGetVersion(int *driver_version) {
-    cout << "cuDriverGetVersion redirected" << endl;
-    *driver_version = 1;
-    return 0;
-}
-
-size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, void *device) {
-    cout << "cuDeviceComputeCapability redirected" << endl;
-    *cc_major = 3;
-    *cc_minor = 5;
     return 0;
 }
 
@@ -457,35 +155,6 @@ size_t cudaStreamSynchronize(void *stream) {
     return 0;
 }
 
-size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMemcpyKind, void *stream) {
-    cout << "cudaMemcpyAsync count=" << count << " cudaMemcpyKind=" << cudaMemcpyKind << " stream=" << stream << endl;
-
-    assert(stream == 0);
-
-    cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << " count=" << count << endl;
-    if(cudaMemcpyKind == 2) {
-        // device => host
-        int srcidx = idxByAddr[(void *)src];
-        cl_mem srcclmem = clmemByIdx[srcidx];
-        err = clEnqueueReadBuffer(*queue, srcclmem, CL_TRUE, 0,
-                                         count, dst, 0, NULL, NULL);
-        cl->checkError(err);
-        // cl->finish();
-    } else if(cudaMemcpyKind == 1) {
-        // host => device
-        int dstidx = idxByAddr[(void *)dst];
-        cl_mem dstclmem = clmemByIdx[dstidx];
-        err = clEnqueueWriteBuffer(*queue, dstclmem, CL_TRUE, 0,
-                                          count, src, 0, NULL, NULL);
-        cl->checkError(err);
-    } else {
-        cout << "cudaMemcpyKind using opencl " << cudaMemcpyKind << endl;
-        throw runtime_error("unhandled cudaMemcpyKind");
-    }
-
-    return 0;
-}
-
 const char *cudaGetErrorString (size_t error) {
     cout << "cudaGetErrorString error=" << error << endl;
     return "all was ok?";
@@ -503,163 +172,10 @@ size_t cudaGetDeviceCount (int *count) {
     return 0;
 }
 
-size_t cudaMemsetAsync(void *devPtr, int value, size_t count, void *stream) {
-    cout << "cudaMemsetAsync stub value=" << value << " count=" << count << " stream=" << stream << endl;
-    assert(stream == 0);
-
-    return 0;
-}
-
-size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count) {
-    cout << "cuMemsetD8_v2 redirected value " << value << " count=" << count << endl;
-    cl_int err = clEnqueueFillBuffer(*queue, *voidStarToClmem(location), &value, sizeof(unsigned char), 0, count * sizeof(unsigned char), 0, 0, 0);
-    cl->checkError(err);
-    return 0;
-}
-
-size_t cuMemsetD32_v2(void *location, unsigned int value, uint32_t count) {
-    cout << "cuMemsetD32_v2 redirected value " << value << " count=" << count << endl;
-    cl_int err = clEnqueueFillBuffer(*queue, *voidStarToClmem(location), &value, sizeof(int), 0, count * sizeof(int), 0, 0, 0);
-    cl->checkError(err);
-    return 0;
-}
-
 size_t cudaSetDevice (int device) {
     cout << "cudaSetDevice stub device=" << device << endl;
     return 0;
 }
-
-    char name[256];
-    size_t totalGlobalMem;
-    size_t sharedMemPerBlock;
-    int regsPerBlock;
-    int warpSize;
-    size_t memPitch;
-    int maxThreadsPerBlock;
-    int maxThreadsDim[3];
-    int maxGridSize[3];
-    size_t totalConstMem;
-    int major;
-    int minor;
-    int clockRate;
-    size_t textureAlignment;
-    int deviceOverlap;
-    int multiProcessorCount;
-    int kernelExecTimeoutEnabled;
-    int integrated;
-    int canMapHostMemory;
-    int computeMode;
-    int concurrentKernels;
-    int ECCEnabled;
-    int pciBusID;
-    int pciDeviceID;
-    int tccDriver;
-
-size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, int device) {
-    cout << "cudaGetDeviceProperties stub device=" << device << endl;
-    prop->totalGlobalMem = 1024 * 1024 * 1024;
-    prop->sharedMemPerBlock = 65536;
-    prop->regsPerBlock = 64;
-    prop->warpSize = 32;
-    prop->memPitch = 4; // whats this?
-    prop->maxThreadsPerBlock = 128;
-    prop->maxThreadsDim[0] = 1024;
-    prop->maxThreadsDim[1] = 1024;
-    prop->maxThreadsDim[2] = 1024;
-    prop->totalConstMem = 16 * 1024;
-    prop->major = 3;
-    prop->minor = 0;
-    prop->clockRate = 900 * 1000 * 1000;
-    prop->textureAlignment = 128;  // whats this?
-    prop->deviceOverlap = 0; // whats this?
-    prop->multiProcessorCount = 3;
-    prop->kernelExecTimeoutEnabled = true;
-    prop->integrated = true;
-    prop->canMapHostMemory = false;
-    prop->computeMode = 0;  //whats this?
-    prop->concurrentKernels = 1;
-    prop->ECCEnabled = false;
-    prop->pciBusID = 0;
-    prop->pciDeviceID = 0;
-    prop->tccDriver = 0; // no idea
-    return 0;
-}
-
-size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, int device_ordinal) {
-    //return cudaGetDeviceProperties(device_properties, device_ordinal);
-    return -1;
-}
-
-size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKind) {
-    cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << " count=" << bytes << endl;
-    if(cudaMemcpyKind == 2) {
-        // device => host
-        int srcidx = idxByAddr[(void *)src];
-        cl_mem srcclmem = clmemByIdx[srcidx];
-        err = clEnqueueReadBuffer(*queue, srcclmem, CL_TRUE, 0,
-                                         bytes, dst, 0, NULL, NULL);
-        cl->checkError(err);
-        // cl->finish();
-    } else if(cudaMemcpyKind == 1) {
-        // host => device
-        int dstidx = idxByAddr[(void *)dst];
-        cl_mem dstclmem = clmemByIdx[dstidx];
-        err = clEnqueueWriteBuffer(*queue, dstclmem, CL_TRUE, 0,
-                                          bytes, src, 0, NULL, NULL);
-        cl->checkError(err);
-    } else {
-        cout << "cudaMemcpyKind using opencl " << cudaMemcpyKind << endl;
-        throw runtime_error("unhandled cudaMemcpyKind");
-    }
-    return 0;
-}
-
-size_t cudaMalloc(void **p_mem, size_t N) {
-    hostside_opencl_funcs_assure_initialized();
-    cout << "cudaMalloc using cl, size " << N << endl;
-    cl_mem float_data_gpu = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, N,
-                                           NULL, &err);
-    cl->checkError(err);
-    int idx = nextIdx;
-    nextIdx++;
-    clmemByIdx[idx] = float_data_gpu;
-    // int idx = clmems.size() - 1;
-    *p_mem = (float *)&clmemByIdx[idx];
-    idxByAddr[*p_mem] = idx;
-    cout << "ptr " << *p_mem << endl;
-
-    return 0;
-}
-
-size_t cudaFree(void *mem) {
-    // for(int i = 0 ; i < clmems.size(); i++) {
-    //     cout << "cuda free i " << i << " " << &clmems[i] << endl;
-    //     // err = clReleaseMemObject(clmems[i]);
-    //     // cl->checkError(err);
-    // }
-    // err = clReleaseMemObject(*(cl_mem *)(*p_mem));
-    // cl->checkError(err);
-
-    int idx = idxByAddr[mem];
-
-    cout << "cudafree using opencl idx " << idx << endl;
-    err = clReleaseMemObject(clmemByIdx[idx]);
-    // err = clReleaseMemObject(*(cl_mem *)mem);
-    cl->checkError(err);
-    return 0;
-}
-
-size_t cuMemAlloc_v2(void **mem, size_t bytes) {
-    return cudaMalloc(mem, bytes);
-}
-
-size_t cuMemFree_v2(void *mem) {
-    return cudaFree(mem);
-}
-
-// size_t cuMemsetD32_v2(void *location, int value, uint32 count) {
-//     err = clEnqueueFillBuffer(*queue, location, &value, sizeof(int), 0, count * sizeof(int), 0, 0, 0);
-// }
 
 size_t cudaConfigureCall(
         unsigned long long grid_xy, unsigned int grid_z,
