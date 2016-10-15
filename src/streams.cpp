@@ -34,6 +34,7 @@ extern "C" {
     size_t cudaStreamSynchronize(QueueForClient stream);
     size_t cuStreamCreate(QueueForClient *stream, unsigned int flags);
     size_t cuStreamDestroy_v2(QueueForClient stream);
+    size_t cuStreamSynchronize(QueueForClient stream);
 }
 
 size_t cudaStreamSynchronize(QueueForClient stream) {
@@ -50,6 +51,10 @@ size_t cudaStreamSynchronize(QueueForClient stream) {
 
     // cl->finish();
     return 0;
+}
+
+size_t cuStreamSynchronize(QueueForClient stream) {
+    return cudaStreamSynchronize(stream);
 }
 
 size_t cuStreamCreate(QueueForClient *pstream, unsigned int flags) {
