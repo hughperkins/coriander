@@ -33,19 +33,19 @@ easycl:
 build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp
 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
 
-build/events.o: src/events.cpp
+build/cocl_events.o: src/cocl_events.cpp
 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
 
-build/memory.o: src/memory.cpp
+build/cocl_memory.o: src/cocl_memory.cpp
 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
 
-build/properties.o: src/properties.cpp
+build/cocl_properties.o: src/cocl_properties.cpp
 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
 
-build/streams.o: src/streams.cpp
+build/cocl_streams.o: src/cocl_streams.cpp
 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
 
-build/libcocl.a: build/hostside_opencl_funcs.o build/events.o build/memory.o build/properties.o build/streams.o
+build/libcocl.a: build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_memory.o build/cocl_properties.o build/cocl_streams.o
 	ar rcs $@ $^
 
 clean:
