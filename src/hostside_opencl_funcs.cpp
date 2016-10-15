@@ -133,21 +133,33 @@ const int CU_DEVICE_ATTRIBUTE_ECC_ENABLED = 32;
 const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X = 5;
 const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y = 6;
 const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z = 7;
+const int CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR = 81;
+const int CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT = 16;
+const int CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR = 39;
+const int CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK = 12;
+const int CU_DEVICE_ATTRIBUTE_WARP_SIZE = 10;
 
 size_t cuDeviceGetAttribute(
        int *value, int attribute, void *device) {
     cout << "cuDeviceGetAttribute redirected" << endl;
     if(CU_DEVICE_ATTRIBUTE_ECC_ENABLED == attribute) {
         *value = 0;
-    }
-    else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X == attribute) {
+    } else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X == attribute) {
         *value = 1024;
-    }
-    else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y == attribute) {
+    } else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y == attribute) {
         *value = 1024;
-    }
-    else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z == attribute) {
+    } else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z == attribute) {
         *value = 1024;
+    } else if(CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR == attribute) {
+        *value = 65536;
+    } else if(CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT == attribute) {
+        *value = 16;
+    } else if(CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK == attribute) {
+        *value = 64;
+    } else if(CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR == attribute) {
+        *value = 128;
+    } else if(CU_DEVICE_ATTRIBUTE_WARP_SIZE == attribute) {
+        *value = 32;
     } else {
         cout << "attribute " << attribute << endl;
         throw runtime_error("attribute not implemented");
