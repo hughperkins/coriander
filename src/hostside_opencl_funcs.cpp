@@ -127,6 +127,8 @@ extern "C" {
        int64_t *value, int attribute, void *device);
     size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, int device_ordinal);
     size_t cuMemGetInfo_v2(size_t *free, size_t *total);
+    size_t cuMemAlloc_v2(void **mem, size_t bytes);
+    size_t cuMemFree_v2(void *mem);
 }
 
 // enum constants from http://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__TYPES.html#axzz4N4NYrYWt
@@ -438,6 +440,14 @@ size_t cudaFree(void *mem) {
     // err = clReleaseMemObject(*(cl_mem *)mem);
     cl->checkError(err);
     return 0;
+}
+
+size_t cuMemAlloc_v2(void **mem, size_t bytes) {
+    return cudaMalloc(mem, bytes);
+}
+
+size_t cuMemFree_v2(void *mem) {
+    return cudaFree(mem);
 }
 
 size_t cudaConfigureCall(
