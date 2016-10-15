@@ -25,6 +25,7 @@
 #include "CL/cl.h"
 
 using namespace std;
+using namespace easycl;
 
 extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);

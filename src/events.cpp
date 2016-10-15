@@ -26,6 +26,7 @@
 
 using namespace std;
 using namespace cocl;
+using namespace easycl;
 
 class CoclEventClass {
     // since cuda creates events then records them, but opencl doesnt create events until

@@ -25,9 +25,9 @@
 namespace cocl {
     extern size_t grid[3];
     extern size_t block[3];
-    extern std::unique_ptr<CLKernel> kernel;
+    extern std::unique_ptr<easycl::CLKernel> kernel;
 
-    extern std::unique_ptr<EasyCL> cl;
+    extern std::unique_ptr<easycl::EasyCL> cl;
     extern cl_context *ctx;
     extern cl_command_queue *queue;
     extern cl_int err;

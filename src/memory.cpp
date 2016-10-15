@@ -26,6 +26,7 @@
 
 using namespace std;
 using namespace cocl;
+using namespace easycl;
 
 extern "C" {
     size_t cudaMalloc(void **p_mem, size_t N);

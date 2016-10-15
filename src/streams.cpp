@@ -26,6 +26,7 @@
 
 using namespace std;
 using namespace cocl;
+using namespace easycl;
 
 typedef CLQueue *QueueForClient;
 
