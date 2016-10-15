@@ -18,6 +18,7 @@ int main(int argc, char *argv[]) {
 
     CUstream newstream;
     cuStreamCreate(&newstream, 0);
+    cout << "got stream" << endl;
 
     float *floats;
     cuMemHostAlloc((void **)&floats, N * sizeof(float), CU_MEMHOSTALLOC_PORTABLE);

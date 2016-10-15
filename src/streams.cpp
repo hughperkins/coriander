@@ -27,28 +27,48 @@
 using namespace std;
 using namespace cocl;
 
+typedef CLQueue *QueueForClient;
+
 extern "C" {
-    size_t cudaStreamSynchronize(void *stream);
-    size_t cuStreamCreate(void *stream, unsigned int flags);
-    size_t cuStreamDestroy_v2(void *stream);
+    size_t cudaStreamSynchronize(QueueForClient stream);
+    size_t cuStreamCreate(QueueForClient *stream, unsigned int flags);
+    size_t cuStreamDestroy_v2(QueueForClient stream);
 }
 
-size_t cudaStreamSynchronize(void *stream) {
+size_t cudaStreamSynchronize(QueueForClient stream) {
     cout << "cudaStreamSynchronize stream=" << stream << endl;
+    hostside_opencl_funcs_assure_initialized();
 
-    assert(stream == 0);
+    // assert(stream == 0);
 
-    cl->finish();
+    if(stream == 0) {
+        cl->finish();
+    } else {
+        clFinish(stream->queue);
+    }
+
+    // cl->finish();
     return 0;
 }
 
-size_t cuStreamCreate(void *stream, unsigned int flags) {
+size_t cuStreamCreate(QueueForClient *pstream, unsigned int flags) {
     cout << "cuStreamCreate redirected" << endl;
-    // lets just say we cant create streams for now?
-    return 1;
+    hostside_opencl_funcs_assure_initialized();
+    cl_int err;
+    // cl_command_queue queue = clCreateCommandQueue(*cl->context, cl->device, 0, &err);
+    CLQueue *queue = cl->newQueue();
+    cout << "created queue" << endl;
+    *pstream = queue;
+    cout << "done assign" << endl;
+
+    // // lets just say we cant create streams for now?
+    // return 1;
+    return 0;
 }
 
-size_t cuStreamDestroy_v2(void *stream) {
+size_t cuStreamDestroy_v2(QueueForClient stream) {
     cout << "cuStreamDestroy_v2 redirected" << endl;
-    return 1;
+    delete stream;
+    // return 1;
+    return 0;
 }
