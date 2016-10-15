@@ -124,7 +124,7 @@ extern "C" {
     size_t cuDeviceGetName(char *buf, int bufsize, void *device);
     size_t cuDeviceTotalMem_v2(int *value, void *device);
     size_t cuDeviceGetAttribute(
-       int *value, int64_t attribute, void *device);
+       int64_t *value, int attribute, void *device);
     size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, int device_ordinal);
 }
 
@@ -141,7 +141,7 @@ const int CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK = 12;
 const int CU_DEVICE_ATTRIBUTE_WARP_SIZE = 10;
 
 size_t cuDeviceGetAttribute(
-       int *value, int64_t attribute, void *device) {
+       int64_t *value, int attribute, void *device) {
     cout << "cuDeviceGetAttribute redirected" << endl;
     if(CU_DEVICE_ATTRIBUTE_ECC_ENABLED == attribute) {
         *value = 0;
