@@ -304,6 +304,10 @@ std::string dumpReturn(ReturnInst *retInst) {
     Value *retValue = retInst->getReturnValue();
     if(retValue != 0) {
         gencode += "return " + dumpOperand(retValue) + ";\n";
+    } else {
+        // we still need to have "return" if no value, since some loops terminate with a `return` in the middle
+        // of the codeblock.  Or rather, they dont terminate, if we dont write out a `return` :-P
+        gencode += "return;\n";
     }
     return gencode;
 }
