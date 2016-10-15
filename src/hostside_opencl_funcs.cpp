@@ -42,6 +42,26 @@ extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
 }
 
+EasyCL *hostside_opencl_funcs_getCl() {
+    return cl.get();
+}
+
+cl_context *hostside_opencl_funcs_getContext() {
+    return ctx;
+}
+
+cl_command_queue *hostside_opencl_funcs_getQueue() {
+    return queue;
+}
+
+vector<cl_mem> &hostside_opencl_funcs_getClmems() {
+    return clmems;
+}
+
+map<void *, int> &hostside_opencl_funcs_getIdxByAddr() {
+    return idxByAddr;
+}
+
 void hostside_opencl_funcs_init() {
     cout << "initialize cl context" << endl;
     cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
@@ -129,6 +149,7 @@ extern "C" {
     size_t cuMemGetInfo_v2(size_t *free, size_t *total);
     size_t cuMemAlloc_v2(void **mem, size_t bytes);
     size_t cuMemFree_v2(void *mem);
+    // size_t cuMemsetD32_v2(void *location, int value, uint32 count);
 }
 
 // enum constants from http://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__TYPES.html#axzz4N4NYrYWt
@@ -449,6 +470,10 @@ size_t cuMemAlloc_v2(void **mem, size_t bytes) {
 size_t cuMemFree_v2(void *mem) {
     return cudaFree(mem);
 }
+
+// size_t cuMemsetD32_v2(void *location, int value, uint32 count) {
+//     err = clEnqueueFillBuffer(*queue, location, &value, sizeof(int), 0, count * sizeof(int), 0, 0, 0);
+// }
 
 size_t cudaConfigureCall(
         unsigned long long grid_xy, unsigned int grid_z,
