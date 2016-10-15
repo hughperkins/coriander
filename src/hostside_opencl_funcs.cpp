@@ -126,6 +126,7 @@ extern "C" {
     size_t cuDeviceGetAttribute(
        int64_t *value, int attribute, void *device);
     size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, int device_ordinal);
+    size_t cuMemGetInfo_v2(size_t *free, size_t *total);
 }
 
 // enum constants from http://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__TYPES.html#axzz4N4NYrYWt
@@ -139,6 +140,13 @@ const int CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT = 16;
 const int CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR = 39;
 const int CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK = 12;
 const int CU_DEVICE_ATTRIBUTE_WARP_SIZE = 10;
+
+size_t cuMemGetInfo_v2(size_t *free, size_t *total) {
+    cout << "cuMemGetInfo_v2 redirected" << endl;
+    *free = 1024 * 1024;
+    *total = 1024 * 1024;
+    return 0;
+}
 
 size_t cuDeviceGetAttribute(
        int64_t *value, int attribute, void *device) {
