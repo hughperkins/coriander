@@ -58,17 +58,38 @@ cl_context *hostside_opencl_funcs_getContext() {
     return ctx;
 }
 
+
 cl_command_queue *hostside_opencl_funcs_getQueue() {
     return queue;
 }
 
-// vector<cl_mem> &hostside_opencl_funcs_getClmems() {
-//     return clmems;
-// }
+map<int, cl_mem> &hostside_opencl_funcs_getclmemByIdx() {
+    return clmemByIdx;
+}
 
 map<void *, int> &hostside_opencl_funcs_getIdxByAddr() {
     return idxByAddr;
 }
+
+int hostside_opencl_funcs_getNextIdx() {
+    return nextIdx;
+}
+
+void hostside_opencl_funcs_setNextIdx(int _nextIdx) {
+    nextIdx = _nextIdx;
+}
+
+set<cl_mem> &hostside_opencl_funcs_getclmemNeedsMap() {
+    return clmemNeedsMap;
+}
+
+vector<cl_mem> &hostside_opencl_funcs_kernelArgsToBeReleased() {
+    return kernelArgsToBeReleased;
+}
+vector<cl_mem> &hostside_opencl_funcs_kernelArgsToBeRemapped() {
+    return kernelArgsToBeRemapped;
+}
+
 
 void hostside_opencl_funcs_init() {
     cout << "initialize cl context" << endl;
