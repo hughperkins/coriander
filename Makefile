@@ -31,7 +31,7 @@ easycl:
 	cd build && make -j 4
 
 build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp
-	$(CLANG) -c -o $@ -std=c++11 -O2 -I$(COCL_HOME)/src/EasyCL $<
+	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
 
 build/libcocl.a: build/hostside_opencl_funcs.o
 	ar rcs $@ $^
@@ -70,17 +70,26 @@ build/eigen-%.o: test/eigen/%.cu
 
 build/test-%.o: test/%.cu
 	echo building $@ from $<
-	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
+	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -g -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
 
 # executables
 build/cuda_sample: build/test-cuda_sample.o build/libcocl.a test/generated/cuda_sample-device.cl
 	g++ -o $@ $< -lcocl -lOpenCL -Lbuild -lEasyCL
+
+build/test-test_memhostalloc: build/test-test_memhostalloc.o build/libcocl.a test/generated/test_memhostalloc-device.cl
+	g++ -o $@ $< -g -lcocl -lOpenCL -Lbuild -lEasyCL
 
 build/eigen-%: build/eigen-%.o build/libcocl.a
 	g++ -o $@ $< -lcocl -lOpenCL -Lbuild -lEasyCL
 
 # run
 run-cuda_sample: build/cuda_sample
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
+run-test-test_memhostalloc: build/test-test_memhostalloc
 	################################
 	# running:
 	################################

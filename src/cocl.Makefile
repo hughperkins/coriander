@@ -46,7 +46,7 @@ all: $(OUTPUTBASEPATH).o
 
 $(OUTPUTBASEPATH).o: $(OUTPUTBASEPATH)-hostpatched.ll
 	echo building $@ from $<
-	$(CLANG) -c $< -O3 -o $@
+	$(CLANG) -c $< -O3 $(OPT_G) -o $@
 
 .INTERMEDIATE: $(OUTPUTBASEPATH)-hostpatched.ll
 

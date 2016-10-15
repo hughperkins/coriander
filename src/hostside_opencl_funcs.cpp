@@ -16,6 +16,7 @@
 #include <memory>
 #include <vector>
 #include <map>
+#include <set>
 
 #include "EasyCL.h"
 
@@ -32,9 +33,16 @@ static cl_context *ctx;
 static cl_command_queue *queue;
 static cl_int err;
 
-static vector<cl_mem> clmems;
-static vector<cl_mem> kernelArgsToBeReleased;
+// static vector<cl_mem> clmems;
+static int nextIdx = 0;
+static map<int, cl_mem> clmemByIdx;  // seems like we could just merge these two maps :-P
 static map<void *, int> idxByAddr;
+static map<cl_mem, int> sizeByClmem;  // for mapped buffers mostly, ofr now
+
+static set<cl_mem> clmemNeedsMap;
+
+static vector<cl_mem> kernelArgsToBeReleased;
+static vector<cl_mem> kernelArgsToBeRemapped;
 
 static bool initialized = false;
 
@@ -54,9 +62,9 @@ cl_command_queue *hostside_opencl_funcs_getQueue() {
     return queue;
 }
 
-vector<cl_mem> &hostside_opencl_funcs_getClmems() {
-    return clmems;
-}
+// vector<cl_mem> &hostside_opencl_funcs_getClmems() {
+//     return clmems;
+// }
 
 map<void *, int> &hostside_opencl_funcs_getIdxByAddr() {
     return idxByAddr;
@@ -79,7 +87,7 @@ void hostside_opencl_funcs_assure_initialized(void) {
 
 static inline cl_mem *voidStarToClmem(void *voidStar) {
     int idx = idxByAddr[voidStar];
-    return &clmems[idx];
+    return &clmemByIdx[idx];
 }
 
 struct cudaDeviceProp {
@@ -156,6 +164,8 @@ extern "C" {
     size_t cuMemFree_v2(void *mem);
     size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count);
     size_t cuMemsetD32_v2(void *location, unsigned int value, uint32_t count);
+    size_t cuMemHostAlloc(void **mem, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE);
+    size_t cuMemFreeHost(void *mem);
 }
 
 // enum constants from http://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__TYPES.html#axzz4N4NYrYWt
@@ -169,6 +179,48 @@ const int CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT = 16;
 const int CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR = 39;
 const int CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK = 12;
 const int CU_DEVICE_ATTRIBUTE_WARP_SIZE = 10;
+
+size_t cuMemHostAlloc(void **p_mem, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE) {
+    cout << "cuMemHostAlloc redirected bytes=" << bytes << endl;
+    hostside_opencl_funcs_assure_initialized();
+    cout << "cudaMalloc using cl, size " << bytes << endl;
+    cl_mem float_data_gpu = clCreateBuffer(*ctx, CL_MEM_ALLOC_HOST_PTR, bytes,
+                                           NULL, &err);
+    cl->checkError(err);
+    int idx = nextIdx;
+    nextIdx++;
+    clmemByIdx[idx] = float_data_gpu;
+    // clmems.push_back(float_data_gpu);
+    // int idx = clmems.size() - 1;
+    // *p_mem = (float *)&clmems[idx];
+
+    *p_mem = clEnqueueMapBuffer (*queue,
+        float_data_gpu,
+        true,
+        CL_MAP_WRITE,
+        0,
+        bytes,
+        0,
+        0,
+        0,
+        &err
+    );
+    cl->checkError(err);
+    cout << "cuMemHostAlloc after map: " << *p_mem << endl;
+
+    idxByAddr[*p_mem] = idx;
+    cout << "ptr " << *p_mem << " idx=" << idx << endl;
+    clmemNeedsMap.insert(float_data_gpu);
+    sizeByClmem[float_data_gpu] = bytes;
+
+    // CL_MEM_ALLOC_HOST_PTR ?
+    return 0;
+}
+
+size_t cuMemFreeHost(void *mem) {
+    cout << "cuMemFreeHost redirected" << endl;
+    return 0;
+}
 
 size_t cuMemGetInfo_v2(size_t *free, size_t *total) {
     cout << "cuMemGetInfo_v2 redirected" << endl;
@@ -302,7 +354,7 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
     if(cudaMemcpyKind == 2) {
         // device => host
         int srcidx = idxByAddr[(void *)src];
-        cl_mem srcclmem = clmems[srcidx];
+        cl_mem srcclmem = clmemByIdx[srcidx];
         err = clEnqueueReadBuffer(*queue, srcclmem, CL_TRUE, 0,
                                          count, dst, 0, NULL, NULL);
         cl->checkError(err);
@@ -310,7 +362,7 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
     } else if(cudaMemcpyKind == 1) {
         // host => device
         int dstidx = idxByAddr[(void *)dst];
-        cl_mem dstclmem = clmems[dstidx];
+        cl_mem dstclmem = clmemByIdx[dstidx];
         err = clEnqueueWriteBuffer(*queue, dstclmem, CL_TRUE, 0,
                                           count, src, 0, NULL, NULL);
         cl->checkError(err);
@@ -431,7 +483,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
     if(cudaMemcpyKind == 2) {
         // device => host
         int srcidx = idxByAddr[(void *)src];
-        cl_mem srcclmem = clmems[srcidx];
+        cl_mem srcclmem = clmemByIdx[srcidx];
         err = clEnqueueReadBuffer(*queue, srcclmem, CL_TRUE, 0,
                                          bytes, dst, 0, NULL, NULL);
         cl->checkError(err);
@@ -439,7 +491,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
     } else if(cudaMemcpyKind == 1) {
         // host => device
         int dstidx = idxByAddr[(void *)dst];
-        cl_mem dstclmem = clmems[dstidx];
+        cl_mem dstclmem = clmemByIdx[dstidx];
         err = clEnqueueWriteBuffer(*queue, dstclmem, CL_TRUE, 0,
                                           bytes, src, 0, NULL, NULL);
         cl->checkError(err);
@@ -456,11 +508,13 @@ size_t cudaMalloc(void **p_mem, size_t N) {
     cl_mem float_data_gpu = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, N,
                                            NULL, &err);
     cl->checkError(err);
-    clmems.push_back(float_data_gpu);
-    int idx = clmems.size() - 1;
-    *p_mem = (float *)&clmems[idx];
+    int idx = nextIdx;
+    nextIdx++;
+    clmemByIdx[idx] = float_data_gpu;
+    // int idx = clmems.size() - 1;
+    *p_mem = (float *)&clmemByIdx[idx];
     idxByAddr[*p_mem] = idx;
-    cout << "clmems.size() " << clmems.size() << " ptr " << *p_mem << endl;
+    cout << "ptr " << *p_mem << endl;
 
     return 0;
 }
@@ -477,7 +531,7 @@ size_t cudaFree(void *mem) {
     int idx = idxByAddr[mem];
 
     cout << "cudafree using opencl idx " << idx << endl;
-    err = clReleaseMemObject(clmems[idx]);
+    err = clReleaseMemObject(clmemByIdx[idx]);
     // err = clReleaseMemObject(*(cl_mem *)mem);
     cl->checkError(err);
     return 0;
@@ -548,9 +602,25 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
 }
 
 void setKernelArgFloatStar(float *clmem_as_floatstar) {
-    cout << "setKernelArgFloatStar" << endl;
+    cout << "setKernelArgFloatStar " << clmem_as_floatstar << endl;
     int idx = idxByAddr[(void *)clmem_as_floatstar];
-    cl_mem clmem = clmems[idx];
+    cout << "idx " << idx << endl;
+    cl_mem clmem = clmemByIdx[idx];
+
+    if(clmemNeedsMap.find(clmem) != clmemNeedsMap.end()) {
+        cout << "setKernelArgFloatStar running unmap" << endl;
+        cl_int err = clEnqueueUnmapMemObject (
+            *queue,
+            clmem,
+            clmem_as_floatstar,
+            0,
+            0,
+            0
+        );
+        cl->checkError(err);
+        kernelArgsToBeRemapped.push_back(clmem);
+    }
+
     // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
     // cout << "setKernelArgFloatStar" << endl;
     kernel->inout(&clmem);
@@ -559,7 +629,7 @@ void setKernelArgFloatStar(float *clmem_as_floatstar) {
 void setKernelArgCharStar(char *clmem_as_charstar) {
     cout << "setKernelArgCharStar" << endl;
     int idx = idxByAddr[(void *)clmem_as_charstar];
-    cl_mem clmem = clmems[idx];
+    cl_mem clmem = clmemByIdx[idx];
     // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
     // cout << "setKernelArgFloatStar" << endl;
     kernel->inout(&clmem);
@@ -614,4 +684,24 @@ void kernelGo() {
         cl->checkError(err);
     }
     kernelArgsToBeReleased.clear();
+
+    for(auto it=kernelArgsToBeRemapped.begin(); it != kernelArgsToBeRemapped.end(); it++) {
+        cl_mem clmem = *it;
+        int size = sizeByClmem[clmem];
+        cout << "remapping buffer, size=" << size << endl;
+        void *p_mem = clEnqueueMapBuffer (*queue,
+            clmem,
+            true,
+            CL_MAP_WRITE,
+            0,
+            size,
+            0,
+            0,
+            0,
+            &err
+        );
+        cout << "new pointer: " << p_mem << endl;
+        cl->checkError(err);
+    }
+    kernelArgsToBeRemapped.clear();
 }

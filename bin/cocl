@@ -11,7 +11,7 @@ export COCL_HOME=$(dirname ${SCRIPT_DIR})
 
 INCLUDES=
 unset OUTPATH
-while getopts co:I: opt; do
+while getopts gco:I: opt; do
     case $opt in
     I)
         INCLUDES="$INCLUDES -I$OPTARG"
@@ -21,6 +21,9 @@ while getopts co:I: opt; do
         ;;
     c)
         COMPILE=1
+        ;;
+    g)
+        OPT_G=-g
         ;;
     esac
 done
@@ -56,7 +59,7 @@ OUTPUTBASEPATH=${OUTPUTDIRNAME}/${OUTPUTBASENAME}
 (cd ${COCL_HOME}
     # make
 )
-OUTPUTBASEPATH=${OUTPUTBASEPATH} INPUTBASEPATH=${INPUTBASEPATH} make -f ${COCL_HOME}/src/cocl.Makefile
+OUTPUTBASEPATH=${OUTPUTBASEPATH} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${COCL_HOME}/src/cocl.Makefile
 
 if [[ -v COMPILE ]]; then {
     set +x
