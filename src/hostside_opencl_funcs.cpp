@@ -125,6 +125,7 @@ extern "C" {
     size_t cuDeviceTotalMem_v2(int *value, void *device);
     size_t cuDeviceGetAttribute(
        int *value, int attribute, void *device);
+    size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, int device_ordinal);
 }
 
 // enum constants from http://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__TYPES.html#axzz4N4NYrYWt
@@ -352,6 +353,10 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, int device) {
     prop->pciDeviceID = 0;
     prop->tccDriver = 0; // no idea
     return 0;
+}
+
+size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, int device_ordinal) {
+    return cudaGetDeviceProperties(device_properties, device_ordinal);
 }
 
 size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKind) {
