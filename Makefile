@@ -42,7 +42,10 @@ build/memory.o: src/memory.cpp
 build/properties.o: src/properties.cpp
 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
 
-build/libcocl.a: build/hostside_opencl_funcs.o build/events.o build/memory.o build/properties.o
+build/streams.o: src/streams.cpp
+	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
+
+build/libcocl.a: build/hostside_opencl_funcs.o build/events.o build/memory.o build/properties.o build/streams.o
 	ar rcs $@ $^
 
 clean:

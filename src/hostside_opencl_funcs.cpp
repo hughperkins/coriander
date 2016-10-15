@@ -70,7 +70,6 @@ extern "C" {
     const char *cudaGetErrorString (size_t error);
     size_t cudaGetDevice (int *device);
     size_t cudaGetDeviceCount (int *count);
-    size_t cudaStreamSynchronize(void *stream);
     size_t cudaGetLastError();
     size_t cudaConfigureCall(
         unsigned long long grid_xy, unsigned int grid_z,
@@ -143,15 +142,6 @@ size_t cuInit(unsigned int flags) {
 
 size_t cudaGetLastError() {
     cout << "cudaGetLastError" << endl;
-    return 0;
-}
-
-size_t cudaStreamSynchronize(void *stream) {
-    cout << "cudaStreamSynchronize stream=" << stream << endl;
-
-    assert(stream == 0);
-
-    cl->finish();
     return 0;
 }
 
