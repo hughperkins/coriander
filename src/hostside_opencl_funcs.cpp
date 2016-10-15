@@ -371,7 +371,8 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, int device) {
 }
 
 size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, int device_ordinal) {
-    return cudaGetDeviceProperties(device_properties, device_ordinal);
+    //return cudaGetDeviceProperties(device_properties, device_ordinal);
+    return -1;
 }
 
 size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKind) {
