@@ -73,16 +73,7 @@ build/test-%.o: test/%.cu
 	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -g -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
 
 # executables
-build/cuda_sample: build/test-cuda_sample.o build/libcocl.a test/generated/cuda_sample-device.cl
-	g++ -o $@ $< -lcocl -lOpenCL -Lbuild -lEasyCL
-
-build/test-test_memhostalloc: build/test-test_memhostalloc.o build/libcocl.a test/generated/test_memhostalloc-device.cl
-	g++ -o $@ $< -g -lcocl -lOpenCL -Lbuild -lEasyCL
-
-build/test-testevents: build/test-testevents.o build/libcocl.a
-	g++ -o $@ $< -g -lcocl -lOpenCL -Lbuild -lEasyCL
-
-build/test-testevents2: build/test-testevents2.o build/libcocl.a
+build/test-%: build/test-%.o build/libcocl.a
 	g++ -o $@ $< -g -lcocl -lOpenCL -Lbuild -lEasyCL
 
 build/eigen-%: build/eigen-%.o build/libcocl.a
@@ -108,6 +99,12 @@ run-test-testevents: build/test-testevents
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
 run-test-testevents2: build/test-testevents2
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
+run-test-teststream: build/test-teststream
 	################################
 	# running:
 	################################
