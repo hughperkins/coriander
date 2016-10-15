@@ -188,19 +188,90 @@ extern "C" {
     size_t cuMemsetD32_v2(void *location, unsigned int value, uint32_t count);
     size_t cuMemHostAlloc(void **mem, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE);
     size_t cuMemFreeHost(void *mem);
+
 }
 
-// enum constants from http://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__TYPES.html#axzz4N4NYrYWt
-const int CU_DEVICE_ATTRIBUTE_SHARED_MEMORY_PER_BLOCK = 8;
-const int CU_DEVICE_ATTRIBUTE_ECC_ENABLED = 32;
-const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X = 5;
-const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y = 6;
-const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z = 7;
-const int CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR = 81;
-const int CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT = 16;
-const int CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR = 39;
-const int CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK = 12;
-const int CU_DEVICE_ATTRIBUTE_WARP_SIZE = 10;
+class CoclEventClass {
+    // since cuda creates events then records them, but opencl doesnt create events until
+    // the time of 'record', and the cuda client already has a pointer to the event, before record is called,
+    // so we will create our own object to interface between these two behaviors
+    // we'll send a CoclEvent to the client, and tell them its a CUevent object. approximately
+public:
+    CoclEventClass() {
+        cout << "CoclEventClass()" << endl;
+    }
+    ~CoclEventClass() {
+        cout << "~CoclEventClass()" << endl;
+        if(event != 0) {
+            clReleaseEvent(event);
+        }
+    }
+    cl_event event = 0;
+};
+
+typedef CoclEventClass *CoclEvent;
+
+extern "C" {
+    size_t cuEventCreate(CoclEvent *pevent, unsigned int flags);
+    size_t cuEventSynchronize(CoclEvent event);
+    size_t cuEventRecord(CoclEvent event);
+    size_t cuEventQuery(CoclEvent event);
+    size_t cuEventDestroy_v2(CoclEvent event);
+}
+
+size_t cuEventCreate(CoclEvent *pevent, unsigned int flags) {
+    cout << "cuEventCreate redirected flags=" << flags << endl;
+    // cl_int err;
+    // cl_event event = clCreateUserEvent(*ctx, &err);
+    // cl->checkError(err);
+    CoclEvent event = new CoclEventClass();
+    *pevent = event;
+    // *(void **)pevent = (void *)event;
+    return 0;
+}
+
+size_t cuEventSynchronize(CoclEvent coclevent) {
+    // cl_event event = (cl_event)event_as_voidstar;
+    cout << "cuEventSynchronize redirected" << endl;
+    cl_int err = clWaitForEvents(1, &coclevent->event);
+    cl->checkError(err);
+    return 0;
+}
+
+size_t cuEventRecord(CoclEvent coclevent) {
+    cout << "cuEventRecord redirected" << endl;
+    cl_event clevent;
+    clEnqueueMarkerWithWaitList(*queue, 0, 0, &clevent);
+    coclevent->event = clevent;
+    return 0;
+}
+
+size_t cuEventQuery(CoclEvent coclevent) {
+    cout << "cuEventQuery redirected" << endl;
+    cl_int res;
+    cl_int err = clGetEventInfo (
+        coclevent->event,
+        CL_EVENT_COMMAND_EXECUTION_STATUS,
+        sizeof(cl_int),
+        &res,
+        0);
+    cout << "clGetEventInfo: " << res << endl;
+    cl->checkError(err);
+    if(res == CL_COMPLETE) { // success
+        return 0;
+    } else if(res > 0) { // not finished yet
+        return 34;
+    } else { // error
+        return 1;
+    }
+}
+
+size_t cuEventDestroy_v2(CoclEvent event) {
+    cout << "cuEventDestroy redirected" << endl;
+    delete event;
+    return 0;
+}
+
 
 size_t cuMemHostAlloc(void **p_mem, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE) {
     cout << "cuMemHostAlloc redirected bytes=" << bytes << endl;
@@ -256,6 +327,18 @@ size_t cuMemGetInfo_v2(size_t *free, size_t *total) {
     *total = 1024 * 1024;
     return 0;
 }
+
+// enum constants from http://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__TYPES.html#axzz4N4NYrYWt
+const int CU_DEVICE_ATTRIBUTE_SHARED_MEMORY_PER_BLOCK = 8;
+const int CU_DEVICE_ATTRIBUTE_ECC_ENABLED = 32;
+const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X = 5;
+const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y = 6;
+const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z = 7;
+const int CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR = 81;
+const int CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT = 16;
+const int CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR = 39;
+const int CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK = 12;
+const int CU_DEVICE_ATTRIBUTE_WARP_SIZE = 10;
 
 size_t cuDeviceGetAttribute(
        int64_t *value, int attribute, void *device) {
