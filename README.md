@@ -202,7 +202,7 @@ Tests are at [test](test)
 ## News
 
 - Oct 16:
-  - added streams
+  - added streams, including kernel launch on non-default stream
 - Oct 15:
   - fixed critical bug where `return;` wasnt being written out.  Which didnt matter when that was at the end of a kernel.  But mattered more when that was the only exit condition for a kernel :-P
   - added event handling
