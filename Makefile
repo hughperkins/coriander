@@ -152,4 +152,6 @@ run-eigen-cxx11_tensor_cuda: build/eigen-cxx11_tensor_cuda
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-cxx11_tensor_cuda
 
+run-test-all: run-cuda_sample run-test-test_memhostalloc run-test-testevents run-test-testevents2 run-test-testcumemcpy run-test-teststream run-eigen-test_cuda_elementwise_small run-eigen-test_cuda_nullary run-eigen-test_cuda_elementwise
+
 .SECONDARY:

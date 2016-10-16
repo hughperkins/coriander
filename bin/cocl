@@ -56,9 +56,12 @@ OUTPUTBASENAME=$(basename -s .o ${OUTFILE})
 OUTPUTDIRNAME=$(dirname ${OUTFILE})
 OUTPUTBASEPATH=${OUTPUTDIRNAME}/${OUTPUTBASENAME}
 
-(cd ${COCL_HOME}
-    # make
-)
+if [[ x$(NOCOCLREBUILD) == x ]]; then {
+    (cd ${COCL_HOME}
+         make
+    )
+} fi
+
 OUTPUTBASEPATH=${OUTPUTBASEPATH} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${COCL_HOME}/src/cocl.Makefile
 
 if [[ -v COMPILE ]]; then {
