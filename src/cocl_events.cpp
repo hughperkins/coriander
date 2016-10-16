@@ -47,18 +47,13 @@ extern "C" {
 }
 
 size_t cuEventCreate(Event **pevent, unsigned int flags) {
-    // cl_int err;
-    // cl_event event = clCreateUserEvent(*ctx, &err);
-    // cl->checkError(err);
     Event *event = new Event();
     *pevent = event;
     cout << "cuEventCreate redirected flags=" << flags << " new event=" << event << endl;
-    // *(void **)pevent = (void *)event;
     return 0;
 }
 
 size_t cuEventSynchronize(Event *event) {
-    // cl_event event = (cl_event)event_as_voidstar;
     cout << "cuEventSynchronize redirected event=" << event << endl;
     cl_int err = clWaitForEvents(1, &event->event);
     cl->checkError(err);
