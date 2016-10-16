@@ -134,9 +134,13 @@ size_t cuMemGetInfo_v2(size_t *free, size_t *total) {
 size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMemcpyKind, CLQueue *queue) {
     cout << "cudaMemcpyAsync count=" << count << " cudaMemcpyKind=" << cudaMemcpyKind << " queue=" << queue << endl;
 
+    if(queue == 0) {
+        queue = cl->default_queue;
+        cout << "using default queue" << endl;
+    }
     // assert(stream == 0);
     // CLQueue *queue = (CLQueue)
-    cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << " count=" << count << endl;
+    // cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << " count=" << count << endl;
     cl_int err;
     if(cudaMemcpyKind == 2) {
         // device => host
