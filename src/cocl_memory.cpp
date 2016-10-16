@@ -46,6 +46,8 @@ extern "C" {
     size_t cuMemcpyDtoH_v2(void *host_dst, void *gpu_src, size_t size);
     size_t cuMemcpyHtoD(void *gpu_dst, void *host_src, size_t size);
     size_t cuMemcpyDtoH(void *host_dst, void *gpu_src, size_t size);
+    size_t cuMemcpyHtoDAsync_v2(void *gpu_dst, void *host_src, size_t size);
+    size_t cuMemcpyDtoHAsync_v2(void *host_dst, void *gpu_src, size_t size);
 }
 
 namespace cocl {
@@ -201,6 +203,25 @@ size_t cudaMalloc(void **p_mem, size_t N) {
     idxByAddr[*p_mem] = idx;
     cout << "ptr " << *p_mem << endl;
 
+    return 0;
+}
+
+size_t cuMemcpyHtoDAsync_v2(void *dst, void *src, size_t bytes) {
+    // host => device
+    int dstidx = idxByAddr[(void *)dst];
+    cl_mem dstclmem = clmemByIdx[dstidx];
+    err = clEnqueueWriteBuffer(*queue, dstclmem, CL_FALSE, 0,
+                                      bytes, src, 0, NULL, NULL);
+    cl->checkError(err);
+    return 0;
+}
+
+size_t  cuMemcpyDtoHAsync_v2(void *dst, void *src, size_t bytes) {
+    int srcidx = idxByAddr[(void *)src];
+    cl_mem srcclmem = clmemByIdx[srcidx];
+    err = clEnqueueReadBuffer(*queue, srcclmem, CL_FALSE, 0,
+                                     bytes, dst, 0, NULL, NULL);
+    cl->checkError(err);
     return 0;
 }
 
