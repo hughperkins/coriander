@@ -29,7 +29,7 @@ namespace cocl {
 
     extern std::unique_ptr<easycl::EasyCL> cl;
     extern cl_context *ctx;
-    extern cl_command_queue *queue;
+    // extern cl_command_queue *queue;
 
     // extern std::vector<cl_mem> kernelArgsToBeReleased;
     // extern std::vector<cl_mem> kernelArgsToBeRemapped;

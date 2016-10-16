@@ -38,14 +38,6 @@ namespace cocl {
     }
 }
 
-extern "C" {
-    size_t cuEventCreate(Event **pevent, unsigned int flags);
-    size_t cuEventSynchronize(Event *event);
-    size_t cuEventRecord(Event *event);
-    size_t cuEventQuery(Event *event);
-    size_t cuEventDestroy_v2(Event *event);
-}
-
 size_t cuEventCreate(Event **pevent, unsigned int flags) {
     Event *event = new Event();
     *pevent = event;
@@ -60,10 +52,14 @@ size_t cuEventSynchronize(Event *event) {
     return 0;
 }
 
-size_t cuEventRecord(Event *event) {
-    cout << "cuEventRecord redirected event=" << event << endl;
+size_t cuEventRecord(Event *event, CLQueue *queue) {
+    cout << "cuEventRecord redirected event=" << event << " queue=" << queue << endl;
+    if(queue == 0) {
+        cout << "cuEventRecord redirected not implemented for stream 0" << endl;
+        throw runtime_error("cuEventRecord redirected not implemented for stream 0");
+    }
     cl_event clevent;
-    clEnqueueMarkerWithWaitList(*queue, 0, 0, &clevent);
+    clEnqueueMarkerWithWaitList(queue->queue, 0, 0, &clevent);
     event->event = clevent;
     return 0;
 }

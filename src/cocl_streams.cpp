@@ -46,7 +46,28 @@ size_t cuStreamWaitEvent(CLQueue *queue, Event *event, unsigned int flags) {
         cout << "cuStreamWaitEvent stream==0 not implemented" << std::endl;
         throw runtime_error("cuStreamWaitEvent stream==0 not implemented");
     }
-    throw runtime_error("cuStreamWaitEvent not implemented");
+
+    // I think what cuStreamWaitEvent does is:
+    // - add something to the queue, some marker/barrier
+    // - anything added to the queue after this will NOT start executing
+    // - until the event given to cuStreamWaitEvent is marked as finished
+    //
+    // I think that with clWaitForEvents, we can give a list of cl events to wait on,
+    // but its the *host* thread that waits, ie the call is blocking
+    // I think that cuStreamWaitEvent is not actually a blocking call, for the host, its more like
+    // some kind of barrier
+
+    // I think waht we plausibly need is clEnqueueBarrierWithWaitList
+    // so lets try that...
+
+    if(!event->has_event()) {
+        cout << "cuStreamWaitEvent redirected: Warning: you havent Recorded on the event you passed in" << endl;
+    }
+    cl_event clevent;
+    clEnqueueBarrierWithWaitList(queue->queue,
+        1,
+        &event->event,
+        0);
     return 0;
 }
 

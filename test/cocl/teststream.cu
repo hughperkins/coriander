@@ -24,18 +24,21 @@ int main(int argc, char *argv[]) {
     cuMemHostAlloc((void **)&floats, N * sizeof(float), CU_MEMHOSTALLOC_PORTABLE);
 
     longKernel<<<dim3(102400 / 32, 1, 1), dim3(32, 1, 1), 0, newstream>>>(floats, N, 3.0f);
-    cout << "queued kernel x" << endl;
+    cout << "queued kernel 1" << endl;
 
     CUevent event;
     cuEventCreate(&event, CU_EVENT_DISABLE_TIMING);
+    cuEventRecord(event, newstream);
+    cuStreamWaitEvent(newstream, event, 0);
 
-    // cuStreamWaitEvent(newstream, event, 0);
+    longKernel<<<dim3(102400 / 32, 1, 1), dim3(32, 1, 1), 0, newstream>>>(floats, N, 3.0f);
+    cout << "queued kernel 2" << endl;
 
     cuCtxSynchronize();
     cout << "finished" << endl;
 
+    cuEventDestroy(event);
     cuMemFreeHost(floats);
-
     cuStreamDestroy_v2(newstream);
 
     return 0;
