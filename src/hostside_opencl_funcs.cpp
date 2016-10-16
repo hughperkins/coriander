@@ -84,45 +84,9 @@ extern "C" {
     */
 
     size_t cuInit(unsigned int flags);
-    size_t cuCtxSynchronize(void);
     size_t cuDeviceGetCount(int *count);
     size_t cuDeviceGet (void *device, int ordinal);
-    size_t cuCtxCreate_v2(PretendContext *context, unsigned int flags, void *device);
-    size_t cuCtxGetCurrent(PretendContext *context);
-    size_t cuCtxSetCurrent(PretendContext context);
 
-}
-
-size_t cuCtxSynchronize(void) {
-    cout << "cuCtxSynchronize redirected" << endl;
-    cl->finish();
-    return 0;
-}
-
-vector<int> pretendcontexts;
-
-PretendContext currentpretendcontext = 0;
-
-size_t cuCtxGetCurrent(PretendContext *context) {
-    cout << "cuCtxGetCurrent redirected" << endl;
-    *context = currentpretendcontext;
-    return 0;
-}
-
-size_t cuCtxSetCurrent(PretendContext context) {
-    cout << "cuCtxSetCurrent redirected" << endl;
-    currentpretendcontext = context;
-    return 0;
-}
-
-size_t cuCtxCreate_v2 (PretendContext *context, unsigned int flags, void *device) {
-    cout << "cuCtxCreate_v2 redirected" << endl;
-    // *(int *)new_context = 0;
-    pretendcontexts.push_back(1);
-    PretendContext newcontext = &pretendcontexts[pretendcontexts.size() - 1];
-    currentpretendcontext = newcontext;
-    *context = newcontext;
-    return 0;
 }
 
 size_t cuDeviceGet (void *device, int ordinal) {

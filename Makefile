@@ -45,7 +45,10 @@ build/cocl_properties.o: src/cocl_properties.cpp
 build/cocl_streams.o: src/cocl_streams.cpp
 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
 
-build/libcocl.a: build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_memory.o build/cocl_properties.o build/cocl_streams.o
+build/cocl_context.o: src/cocl_context.cpp
+	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
+
+build/libcocl.a: build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_memory.o build/cocl_properties.o build/cocl_streams.o build/cocl_context.o
 	ar rcs $@ $^
 
 clean:
@@ -84,8 +87,15 @@ build/test-%.o: test/%.cu
 	echo building $@ from $<
 	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -g -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
 
+build/test-cocl-%.o: test/cocl/%.cu
+	echo building $@ from $<
+	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -g -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
+
 # executables
 build/test-%: build/test-%.o build/libcocl.a
+	g++ -o $@ $< -g -lcocl -lOpenCL -Lbuild -lEasyCL
+
+build/test-cocl-%: build/test-cocl-%.o build/libcocl.a
 	g++ -o $@ $< -g -lcocl -lOpenCL -Lbuild -lEasyCL
 
 build/eigen-%: build/eigen-%.o build/libcocl.a
@@ -98,31 +108,31 @@ run-cuda_sample: build/test-cuda_sample
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-test_memhostalloc: build/test-test_memhostalloc
+run-test-cocl-test_memhostalloc: build/test-cocl-test_memhostalloc
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-testevents: build/test-testevents
+run-test-cocl-testevents: build/test-cocl-testevents
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-testevents2: build/test-testevents2
+run-test-cocl-testevents2: build/test-cocl-testevents2
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-testcumemcpy: build/test-testcumemcpy
+run-test-cocl-testcumemcpy: build/test-cocl-testcumemcpy
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-teststream: build/test-teststream
+run-test-cocl-teststream: build/test-cocl-teststream
 	################################
 	# running:
 	################################
@@ -152,6 +162,6 @@ run-eigen-cxx11_tensor_cuda: build/eigen-cxx11_tensor_cuda
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-cxx11_tensor_cuda
 
-run-test-all: run-cuda_sample run-test-test_memhostalloc run-test-testevents run-test-testevents2 run-test-testcumemcpy run-test-teststream run-eigen-test_cuda_elementwise_small run-eigen-test_cuda_nullary run-eigen-test_cuda_elementwise
+run-test-all: run-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-testevents run-test-cocl-testevents2 run-test-cocl-testcumemcpy run-test-cocl-teststream run-eigen-test_cuda_elementwise_small run-eigen-test_cuda_nullary run-eigen-test_cuda_elementwise
 
 .SECONDARY:
