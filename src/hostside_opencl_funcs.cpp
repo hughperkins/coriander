@@ -41,7 +41,6 @@ namespace cocl {
     unique_ptr<EasyCL> cl;
     cl_context *ctx;
     cl_command_queue *queue;
-    // cl_int err;
 
     vector<cl_mem> kernelArgsToBeReleased;
     vector<Memory *> kernelArgsToBeRemapped;
@@ -152,9 +151,6 @@ size_t cudaConfigureCall(
     block[2] = block_z;
     return 0;
 }
-
-    // uint32_t block_x = block_xy & ((1ul << 31) - 1);
-    // uint32_t block_y = block_xy >> 32;
 
 void configureKernel(
         const char *kernelName, const char *clSourcecodeString) {

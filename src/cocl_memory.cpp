@@ -22,8 +22,6 @@
 #include <map>
 #include <set>
 
-// #include "EasyCL.h"
-
 #include "CL/cl.h"
 
 using namespace std;
@@ -221,8 +219,6 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
     if(cudaMemcpyKind == 2) {
         // device => host
         Memory *srcMemory = memoryByHostPointer[src];
-        // int srcidx = idxByAddr[(void *)src];
-        // cl_mem srcclmem = clmemByIdx[srcidx];
         err = clEnqueueReadBuffer(*queue, srcMemory->clmem, CL_TRUE, 0,
                                          bytes, dst, 0, NULL, NULL);
         cl->checkError(err);
@@ -230,8 +226,6 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
     } else if(cudaMemcpyKind == 1) {
         // host => device
         Memory *dstMemory = memoryByHostPointer[dst];
-        // int dstidx = idxByAddr[(void *)dst];
-        // cl_mem dstclmem = clmemByIdx[dstidx];
         err = clEnqueueWriteBuffer(*queue, dstMemory->clmem, CL_TRUE, 0,
                                           bytes, src, 0, NULL, NULL);
         cl->checkError(err);
@@ -254,8 +248,6 @@ size_t cudaMalloc(void **pHostPointer, size_t N) {
 size_t cuMemcpyHtoDAsync_v2(void *dst, void *src, size_t bytes) {
     // host => device
     Memory *dstMemory = (Memory *)dst;
-    // int dstidx = idxByAddr[(void *)dst];
-    // cl_mem dstclmem = clmemByIdx[dstidx];
     cl_int err = clEnqueueWriteBuffer(*queue, dstMemory->clmem, CL_FALSE, 0,
                                       bytes, src, 0, NULL, NULL);
     cl->checkError(err);
@@ -264,8 +256,6 @@ size_t cuMemcpyHtoDAsync_v2(void *dst, void *src, size_t bytes) {
 
 size_t  cuMemcpyDtoHAsync_v2(void *dst, void *src, size_t bytes) {
     Memory *srcMemory = memoryByHostPointer[src];
-    // int srcidx = idxByAddr[(void *)src];
-    // cl_mem srcclmem = clmemByIdx[srcidx];
     cl_int err = clEnqueueReadBuffer(*queue, srcMemory->clmem, CL_FALSE, 0,
                                      bytes, dst, 0, NULL, NULL);
     cl->checkError(err);
