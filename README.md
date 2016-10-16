@@ -203,7 +203,7 @@ Tests are at [test](test)
 
 - Oct 16:
   - added streams, including kernel launch on non-default stream
-  - removed pinned memory: `cuMemHostAlloc` now just calls `malloc`, see [design.md](design.md) for analysis and thoughts on this.  Let me know if you have any ideas (eg via an issue).
+  - removed pinned memory: `cuMemHostAlloc` now just calls `malloc`, see [design.md](doc/design.md) for analysis and thoughts on this.  Let me know if you have any ideas (eg via an issue).
 - Oct 15:
   - fixed critical bug where `return;` wasnt being written out.  Which didnt matter when that was at the end of a kernel.  But mattered more when that was the only exit condition for a kernel :-P
   - added event handling
