@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "cocl_events.h"
+
 #include "hostside_opencl_funcs.h"
 
 #include <iostream>
@@ -26,47 +28,58 @@ using namespace std;
 using namespace cocl;
 using namespace easycl;
 
-typedef CLQueue *PCLQueue;
+// typedef CLQueue *PCLQueue;
 
 extern "C" {
-    size_t cudaStreamSynchronize(PCLQueue stream);
-    size_t cuStreamCreate(PCLQueue *stream, unsigned int flags);
-    size_t cuStreamDestroy_v2(PCLQueue stream);
-    size_t cuStreamSynchronize(PCLQueue stream);
-    // size_t cuStreamWaitEvent(stream, event, 0 /* = flags */)
+    size_t cuStreamCreate(CLQueue **pqueue, unsigned int flags);
+    size_t cudaStreamSynchronize(CLQueue *pqueue);
+    size_t cuStreamDestroy_v2(CLQueue *queue);
+    size_t cuStreamSynchronize(CLQueue *queue);
+    size_t cuStreamWaitEvent(CLQueue *queue, Event *event, unsigned int flags);
 }
 
-size_t cudaStreamSynchronize(PCLQueue pqueue) {
-    cout << "cudaStreamSynchronize stream=" << pqueue << endl;
+// CLDriver::WaitStreamOnEvent stream=0x2e18610 context=0x328a780 event=0x2e1c980  flags=0
+
+size_t cuStreamWaitEvent(CLQueue *queue, Event *event, unsigned int flags) {
+    cout << "cuStreamWaitEvent redirected queue=" << queue << " event=" << event << " flags=" << flags << endl;
+    if(queue == 0) {
+        cout << "cuStreamWaitEvent stream==0 not implemented" << std::endl;
+        throw runtime_error("cuStreamWaitEvent stream==0 not implemented");
+    }
+    throw runtime_error("cuStreamWaitEvent not implemented");
+    return 0;
+}
+
+size_t cudaStreamSynchronize(CLQueue *queue) {
+    cout << "cudaStreamSynchronize queue=" << queue << endl;
     hostside_opencl_funcs_assure_initialized();
 
     // assert(stream == 0);
 
-    if(pqueue == 0) {
+    if(queue == 0) {
         cl->finish();
     } else {
-        clFinish(pqueue->queue);
+        clFinish(queue->queue);
     }
 
     return 0;
 }
 
-size_t cuStreamSynchronize(PCLQueue pqueue) {
-    return cudaStreamSynchronize(pqueue);
+size_t cuStreamSynchronize(CLQueue *queue) {
+    return cudaStreamSynchronize(queue);
 }
 
-size_t cuStreamCreate(PCLQueue *ppqueue, unsigned int flags) {
-    cout << "cuStreamCreate redirected" << endl;
+size_t cuStreamCreate(CLQueue **pqueue, unsigned int flags) {
     hostside_opencl_funcs_assure_initialized();
     CLQueue *queue = cl->newQueue();
-    cout << "created queue" << endl;
-    *ppqueue = queue;
-    cout << "done assign" << endl;
+    cout << "cuStreamCreate redirected new queue " << queue << endl;
+    *pqueue = queue;
+    // cout << "done assign" << endl;
     return 0;
 }
 
-size_t cuStreamDestroy_v2(PCLQueue pqueue) {
-    cout << "cuStreamDestroy_v2 redirected" << endl;
-    delete pqueue;
+size_t cuStreamDestroy_v2(CLQueue *queue) {
+    cout << "cuStreamDestroy_v2 redirected queue=" << queue << endl;
+    delete queue;
     return 0;
 }

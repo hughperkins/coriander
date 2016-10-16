@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "cocl_events.h"
+
 #include "hostside_opencl_funcs.h"
 
 #include <iostream>
@@ -20,74 +22,62 @@
 #include <map>
 #include <set>
 
-// #include "EasyCL.h"
-
-#include "CL/cl.h"
-
 using namespace std;
 using namespace cocl;
 using namespace easycl;
 
-class CoclEventClass {
-    // since cuda creates events then records them, but opencl doesnt create events until
-    // the time of 'record', and the cuda client already has a pointer to the event, before record is called,
-    // so we will create our own object to interface between these two behaviors
-    // we'll send a CoclEvent to the client, and tell them its a CUevent object. approximately
-public:
-    CoclEventClass() {
-        cout << "CoclEventClass()" << endl;
+namespace cocl {
+    Event::Event() {
+        cout << "Event()" << endl;
     }
-    ~CoclEventClass() {
-        cout << "~CoclEventClass()" << endl;
+    Event::~Event() {
+        cout << "~Event()" << endl;
         if(event != 0) {
             clReleaseEvent(event);
         }
     }
-    cl_event event = 0;
-};
-
-typedef CoclEventClass *CoclEvent;
-
-extern "C" {
-    size_t cuEventCreate(CoclEvent *pevent, unsigned int flags);
-    size_t cuEventSynchronize(CoclEvent event);
-    size_t cuEventRecord(CoclEvent event);
-    size_t cuEventQuery(CoclEvent event);
-    size_t cuEventDestroy_v2(CoclEvent event);
 }
 
-size_t cuEventCreate(CoclEvent *pevent, unsigned int flags) {
-    cout << "cuEventCreate redirected flags=" << flags << endl;
+extern "C" {
+    size_t cuEventCreate(Event **pevent, unsigned int flags);
+    size_t cuEventSynchronize(Event *event);
+    size_t cuEventRecord(Event *event);
+    size_t cuEventQuery(Event *event);
+    size_t cuEventDestroy_v2(Event *event);
+}
+
+size_t cuEventCreate(Event **pevent, unsigned int flags) {
     // cl_int err;
     // cl_event event = clCreateUserEvent(*ctx, &err);
     // cl->checkError(err);
-    CoclEvent event = new CoclEventClass();
+    Event *event = new Event();
     *pevent = event;
+    cout << "cuEventCreate redirected flags=" << flags << " new event=" << event << endl;
     // *(void **)pevent = (void *)event;
     return 0;
 }
 
-size_t cuEventSynchronize(CoclEvent coclevent) {
+size_t cuEventSynchronize(Event *event) {
     // cl_event event = (cl_event)event_as_voidstar;
-    cout << "cuEventSynchronize redirected" << endl;
-    cl_int err = clWaitForEvents(1, &coclevent->event);
+    cout << "cuEventSynchronize redirected event=" << event << endl;
+    cl_int err = clWaitForEvents(1, &event->event);
     cl->checkError(err);
     return 0;
 }
 
-size_t cuEventRecord(CoclEvent coclevent) {
-    cout << "cuEventRecord redirected" << endl;
+size_t cuEventRecord(Event *event) {
+    cout << "cuEventRecord redirected event=" << event << endl;
     cl_event clevent;
     clEnqueueMarkerWithWaitList(*queue, 0, 0, &clevent);
-    coclevent->event = clevent;
+    event->event = clevent;
     return 0;
 }
 
-size_t cuEventQuery(CoclEvent coclevent) {
-    cout << "cuEventQuery redirected" << endl;
+size_t cuEventQuery(Event *event) {
+    cout << "cuEventQuery redirected event=" << event << endl;
     cl_int res;
     cl_int err = clGetEventInfo (
-        coclevent->event,
+        event->event,
         CL_EVENT_COMMAND_EXECUTION_STATUS,
         sizeof(cl_int),
         &res,
@@ -103,8 +93,8 @@ size_t cuEventQuery(CoclEvent coclevent) {
     }
 }
 
-size_t cuEventDestroy_v2(CoclEvent event) {
-    cout << "cuEventDestroy redirected" << endl;
+size_t cuEventDestroy_v2(Event *event) {
+    cout << "cuEventDestroy redirected event=" << event << endl;
     delete event;
     return 0;
 }
