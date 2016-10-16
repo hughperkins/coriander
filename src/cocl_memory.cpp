@@ -156,25 +156,29 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
     assert(stream == 0);
 
     cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << " count=" << count << endl;
-    // if(cudaMemcpyKind == 2) {
-    //     // device => host
-    //     int srcidx = idxByAddr[(void *)src];
-    //     cl_mem srcclmem = clmemByIdx[srcidx];
-    //     err = clEnqueueReadBuffer(*queue, srcclmem, CL_TRUE, 0,
-    //                                      count, dst, 0, NULL, NULL);
-    //     cl->checkError(err);
-    //     // cl->finish();
-    // } else if(cudaMemcpyKind == 1) {
-    //     // host => device
-    //     int dstidx = idxByAddr[(void *)dst];
-    //     cl_mem dstclmem = clmemByIdx[dstidx];
-    //     err = clEnqueueWriteBuffer(*queue, dstclmem, CL_TRUE, 0,
-    //                                       count, src, 0, NULL, NULL);
-    //     cl->checkError(err);
-    // } else {
-    //     cout << "cudaMemcpyKind using opencl " << cudaMemcpyKind << endl;
-    //     throw runtime_error("unhandled cudaMemcpyKind");
-    // }
+    cl_int err;
+    if(cudaMemcpyKind == 2) {
+        // device => host
+        // int srcidx = idxByAddr[(void *)src];
+        Memory *srcMemory = (Memory *)src;
+        // cl_mem srcclmem = clmemByIdx[srcidx];
+        err = clEnqueueReadBuffer(*queue, srcMemory->clmem, CL_TRUE, 0,
+                                         count, dst, 0, NULL, NULL);
+        cl->checkError(err);
+        // cl->finish();
+    } else if(cudaMemcpyKind == 1) {
+        // host => device
+        // int dstidx = idxByAddr[(void *)dst];
+        Memory *dstMemory = (Memory *)dst;
+        // cl_mem dstclmem = clmemByIdx[dstidx];
+        // cl_mem dstclmem
+        err = clEnqueueWriteBuffer(*queue, dstMemory->clmem, CL_TRUE, 0,
+                                          count, src, 0, NULL, NULL);
+        cl->checkError(err);
+    } else {
+        cout << "cudaMemcpyKind using opencl " << cudaMemcpyKind << endl;
+        throw runtime_error("unhandled cudaMemcpyKind");
+    }
 
     return 0;
 }
