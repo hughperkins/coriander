@@ -138,6 +138,12 @@ run-test-cocl-teststream: build/test-cocl-teststream
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
+run-test-cocl-testpartialcopy: build/test-cocl-testpartialcopy
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
 run-eigen-test_cuda_elementwise_small: build/eigen-test_cuda_elementwise_small
 	################################
 	# running:
