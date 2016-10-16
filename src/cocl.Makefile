@@ -50,4 +50,4 @@ $(OUTPUTBASEPATH).o: $(OUTPUTBASEPATH)-hostpatched.ll
 
 .INTERMEDIATE: $(OUTPUTBASEPATH)-hostpatched.ll
 
-# .SECONDARY: $(OUTPUTBASEPATH)-device.cl $(OUTPUTBASEPATH)-device.ll
+# .SECONDARY: $(OUTPUTBASEPATH)-device.cl $(OUTPUTBASEPATH)-device.ll $(OUTPUTBASEPATH)-hostraw.ll
