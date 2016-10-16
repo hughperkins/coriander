@@ -40,15 +40,11 @@ C++ things:
 ## Host-side
 
 On the host-side, there is code to:
-- get hold of the name of the kernel being called
-- get hold of the llvm `Value *`s being passed to the kernel call
-- get hold of the `grid` and `block` dimensions being passed to the kernel launch
-- replace the cuda kernel launch calls with opencl kernel launch calls
-- cudaMalloc
-- cudaFree
-- cudaMemcpy (in both directions device=>host and host=>device)
+- handle kernel launches (using OpenCL)
+- handle streams/queues (create, destroy)
+- handle events (create, wait, destroy)
+- manage memory (allocation, copy, set, free)
 - inject the generated opencl sourcecode, so it's available at runtime (all in one executable)
-- handle initializing opencl automatically
 
 ## Host/device interface
 
