@@ -28,31 +28,6 @@ using namespace std;
 using namespace cocl;
 using namespace easycl;
 
-extern "C" {
-    size_t cudaMalloc(void **pHostPointer, size_t N);
-    size_t cuMemAlloc_v2(void **pHostPointer, size_t bytes);
-    size_t cuMemFree_v2(void *hostPointer);
-    size_t cudaFree(void *hostPointer);
-
-    size_t cuMemHostAlloc(void **pHostPointer, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE);
-    size_t cuMemFreeHost(void *hostPointer);
-
-    size_t cudaMemsetAsync(void *devPtr, int value, size_t count, void *stream = 0);
-    size_t cudaMemcpy(void *dst, const void *, size_t, size_t cudaMemcpyKind);
-    size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t kind, void *stream = 0);
-    size_t cuMemGetInfo_v2(size_t *free, size_t *total);
-    size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count);
-    size_t cuMemsetD32_v2(void *location, unsigned int value, uint32_t count);
-    size_t cuMemcpyHtoD_v2(void *gpu_dst, void *host_src, size_t size);
-    size_t cuMemcpyDtoH_v2(void *host_dst, void *gpu_src, size_t size);
-    size_t cuMemcpyHtoD(void *gpu_dst, void *host_src, size_t size);
-    size_t cuMemcpyDtoH(void *host_dst, void *gpu_src, size_t size);
-    size_t cuMemcpyHtoDAsync_v2(void *gpu_dst, void *host_src, size_t size);
-    size_t cuMemcpyDtoHAsync_v2(void *host_dst, void *gpu_src, size_t size);
-
-    size_t cuDeviceTotalMem_v2(uint64_t *value, void *device);
-}
-
 namespace cocl {
     map<const void *, Memory *> memoryByHostPointer;
 
@@ -67,7 +42,7 @@ namespace cocl {
                                                NULL, &err);
         cl->checkError(err);
         Memory *memory = new Memory(clmem, bytes, MemoryType::Pinned);
-        memory->hostPointer = memory->map();
+        memory->hostPointer = memory->map(cl->default_queue);  // I guess we should use default_queue ??
 
         memoryByHostPointer[memory->hostPointer] = memory;
         return memory;
@@ -93,10 +68,10 @@ namespace cocl {
         cl->checkError(err);
     }
 
-    void *Memory::map() {
+    void *Memory::map(CLQueue *queue) {
         cout << "Memory calling map" << endl;
         cl_int err;
-        hostPointer = clEnqueueMapBuffer(*queue,
+        hostPointer = clEnqueueMapBuffer(queue->queue,
             clmem,
             CL_FALSE,
             CL_MAP_READ | CL_MAP_WRITE,
@@ -112,10 +87,10 @@ namespace cocl {
         return hostPointer;
     }
 
-    void Memory::unmap() {
+    void Memory::unmap(CLQueue *queue) {
         cout << "Memory calling unmap" << endl;
         cl_int err = clEnqueueUnmapMemObject (
-            *queue,
+            queue->queue,
             clmem,
             hostPointer,
             0,
@@ -156,24 +131,24 @@ size_t cuMemGetInfo_v2(size_t *free, size_t *total) {
     return 0;
 }
 
-size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMemcpyKind, void *stream) {
-    cout << "cudaMemcpyAsync count=" << count << " cudaMemcpyKind=" << cudaMemcpyKind << " stream=" << stream << endl;
+size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMemcpyKind, CLQueue *queue) {
+    cout << "cudaMemcpyAsync count=" << count << " cudaMemcpyKind=" << cudaMemcpyKind << " queue=" << queue << endl;
 
-    assert(stream == 0);
-
+    // assert(stream == 0);
+    // CLQueue *queue = (CLQueue)
     cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << " count=" << count << endl;
     cl_int err;
     if(cudaMemcpyKind == 2) {
         // device => host
         Memory *srcMemory = memoryByHostPointer[src];
-        err = clEnqueueReadBuffer(*queue, srcMemory->clmem, CL_TRUE, 0,
+        err = clEnqueueReadBuffer(queue->queue, srcMemory->clmem, CL_TRUE, 0,
                                          count, dst, 0, NULL, NULL);
         cl->checkError(err);
         // cl->finish();
     } else if(cudaMemcpyKind == 1) {
         // host => device
         Memory *dstMemory = memoryByHostPointer[dst];
-        err = clEnqueueWriteBuffer(*queue, dstMemory->clmem, CL_TRUE, 0,
+        err = clEnqueueWriteBuffer(queue->queue, dstMemory->clmem, CL_TRUE, 0,
                                           count, src, 0, NULL, NULL);
         cl->checkError(err);
     } else {
@@ -184,9 +159,10 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
     return 0;
 }
 
-size_t cudaMemsetAsync(void *devPtr, int value, size_t count, void *stream) {
-    cout << "cudaMemsetAsync stub value=" << value << " count=" << count << " stream=" << stream << endl;
-    assert(stream == 0);
+size_t cudaMemsetAsync(void *devPtr, int value, size_t count, CLQueue *queue) {
+    cout << "cudaMemsetAsync stub value=" << value << " count=" << count << " queue=" << queue << endl;
+    // assert(stream == 0);
+    throw runtime_error("cudaMemsetAsync not implemented");
 
     return 0;
 }
@@ -194,7 +170,8 @@ size_t cudaMemsetAsync(void *devPtr, int value, size_t count, void *stream) {
 size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count) {
     cout << "cuMemsetD8_v2 redirected value " << value << " count=" << count << endl;
     Memory *memory = memoryByHostPointer[location];
-    cl_int err = clEnqueueFillBuffer(*queue, memory->clmem, &value, sizeof(unsigned char), 0, count * sizeof(unsigned char), 0, 0, 0);
+    // use default queue??
+    cl_int err = clEnqueueFillBuffer(cl->default_queue->queue, memory->clmem, &value, sizeof(unsigned char), 0, count * sizeof(unsigned char), 0, 0, 0);
     cl->checkError(err);
     return 0;
 }
@@ -202,7 +179,7 @@ size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count) {
 size_t cuMemsetD32_v2(void *location, unsigned int value, uint32_t count) {
     cout << "cuMemsetD32_v2 redirected value " << value << " count=" << count << endl;
     Memory *memory = memoryByHostPointer[location];
-    cl_int err = clEnqueueFillBuffer(*queue, memory->clmem, &value, sizeof(int), 0, count * sizeof(int), 0, 0, 0);
+    cl_int err = clEnqueueFillBuffer(cl->default_queue->queue, memory->clmem, &value, sizeof(int), 0, count * sizeof(int), 0, 0, 0);
     cl->checkError(err);
     return 0;
 }
@@ -219,14 +196,14 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
     if(cudaMemcpyKind == 2) {
         // device => host
         Memory *srcMemory = memoryByHostPointer[src];
-        err = clEnqueueReadBuffer(*queue, srcMemory->clmem, CL_TRUE, 0,
+        err = clEnqueueReadBuffer(cl->default_queue->queue, srcMemory->clmem, CL_TRUE, 0,
                                          bytes, dst, 0, NULL, NULL);
         cl->checkError(err);
         // cl->finish();
     } else if(cudaMemcpyKind == 1) {
         // host => device
         Memory *dstMemory = memoryByHostPointer[dst];
-        err = clEnqueueWriteBuffer(*queue, dstMemory->clmem, CL_TRUE, 0,
+        err = clEnqueueWriteBuffer(cl->default_queue->queue, dstMemory->clmem, CL_TRUE, 0,
                                           bytes, src, 0, NULL, NULL);
         cl->checkError(err);
     } else {
@@ -248,7 +225,7 @@ size_t cudaMalloc(void **pHostPointer, size_t N) {
 size_t cuMemcpyHtoDAsync_v2(void *dst, void *src, size_t bytes) {
     // host => device
     Memory *dstMemory = (Memory *)dst;
-    cl_int err = clEnqueueWriteBuffer(*queue, dstMemory->clmem, CL_FALSE, 0,
+    cl_int err = clEnqueueWriteBuffer(cl->default_queue->queue, dstMemory->clmem, CL_FALSE, 0,
                                       bytes, src, 0, NULL, NULL);
     cl->checkError(err);
     return 0;
@@ -256,7 +233,7 @@ size_t cuMemcpyHtoDAsync_v2(void *dst, void *src, size_t bytes) {
 
 size_t  cuMemcpyDtoHAsync_v2(void *dst, void *src, size_t bytes) {
     Memory *srcMemory = memoryByHostPointer[src];
-    cl_int err = clEnqueueReadBuffer(*queue, srcMemory->clmem, CL_FALSE, 0,
+    cl_int err = clEnqueueReadBuffer(cl->default_queue->queue, srcMemory->clmem, CL_FALSE, 0,
                                      bytes, dst, 0, NULL, NULL);
     cl->checkError(err);
     return 0;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CL/cl.h"
+#include "EasyCL.h"
 
 namespace cocl {
     enum MemoryType {
@@ -16,8 +17,8 @@ namespace cocl {
         static Memory *newPinned(size_t bytes);
         static Memory *newDeviceAlloc(size_t bytes);
         ~Memory();
-        void *map();
-        void unmap();
+        void *map(easycl::CLQueue *queue);
+        void unmap(easycl::CLQueue *queue);
         bool needsMap() {
             return type == Pinned;
         }
@@ -31,4 +32,29 @@ namespace cocl {
     typedef Memory *PMemory;
 
     Memory *getMemoryForHostPointer(void *hostPointer);
+}
+
+extern "C" {
+    size_t cudaMalloc(void **pHostPointer, size_t N);
+    size_t cuMemAlloc_v2(void **pHostPointer, size_t bytes);
+    size_t cuMemFree_v2(void *hostPointer);
+    size_t cudaFree(void *hostPointer);
+
+    size_t cuMemHostAlloc(void **pHostPointer, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE);
+    size_t cuMemFreeHost(void *hostPointer);
+
+    size_t cudaMemsetAsync(void *devPtr, int value, size_t count, easycl::CLQueue *queue);
+    size_t cudaMemcpy(void *dst, const void *, size_t, size_t cudaMemcpyKind);
+    size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t kind, easycl::CLQueue *queue);
+    size_t cuMemGetInfo_v2(size_t *free, size_t *total);
+    size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count);
+    size_t cuMemsetD32_v2(void *location, unsigned int value, uint32_t count);
+    size_t cuMemcpyHtoD_v2(void *gpu_dst, void *host_src, size_t size);
+    size_t cuMemcpyDtoH_v2(void *host_dst, void *gpu_src, size_t size);
+    size_t cuMemcpyHtoD(void *gpu_dst, void *host_src, size_t size);
+    size_t cuMemcpyDtoH(void *host_dst, void *gpu_src, size_t size);
+    size_t cuMemcpyHtoDAsync_v2(void *gpu_dst, void *host_src, size_t size);
+    size_t cuMemcpyDtoHAsync_v2(void *host_dst, void *gpu_src, size_t size);
+
+    size_t cuDeviceTotalMem_v2(uint64_t *value, void *device);
 }

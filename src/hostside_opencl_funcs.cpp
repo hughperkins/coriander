@@ -203,7 +203,7 @@ void setKernelArgFloatStar(float *hostpointer) {
 
     if(memory->needsMap()) {
         cout << "setKernelArgFloatStar running unmap" << endl;
-        memory->unmap();
+        memory->unmap(launchConfiguration.queue);
         launchConfiguration.kernelArgsToBeRemapped.push_back(memory);
     }
 
@@ -271,7 +271,7 @@ void kernelGo() {
 
     for(auto it=launchConfiguration.kernelArgsToBeRemapped.begin(); it != launchConfiguration.kernelArgsToBeRemapped.end(); it++) {
         Memory *pMemory = *it;
-        pMemory->map();
+        pMemory->map(launchConfiguration.queue);
     }
     launchConfiguration.kernelArgsToBeRemapped.clear();
 }
