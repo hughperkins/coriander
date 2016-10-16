@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "cocl_streams.h"
+
 #include "cocl_events.h"
 
 #include "hostside_opencl_funcs.h"
@@ -27,18 +29,6 @@
 using namespace std;
 using namespace cocl;
 using namespace easycl;
-
-// typedef CLQueue *PCLQueue;
-
-extern "C" {
-    size_t cuStreamCreate(CLQueue **pqueue, unsigned int flags);
-    size_t cudaStreamSynchronize(CLQueue *pqueue);
-    size_t cuStreamDestroy_v2(CLQueue *queue);
-    size_t cuStreamSynchronize(CLQueue *queue);
-    size_t cuStreamWaitEvent(CLQueue *queue, Event *event, unsigned int flags);
-}
-
-// CLDriver::WaitStreamOnEvent stream=0x2e18610 context=0x328a780 event=0x2e1c980  flags=0
 
 size_t cuStreamWaitEvent(CLQueue *queue, Event *event, unsigned int flags) {
     cout << "cuStreamWaitEvent redirected queue=" << queue << " event=" << event << " flags=" << flags << endl;

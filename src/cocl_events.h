@@ -1,3 +1,5 @@
+#pragma once
+
 #include "CL/cl.h"
 #include "EasyCL.h"
 

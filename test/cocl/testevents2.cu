@@ -25,10 +25,12 @@ int main(int argc, char *argv[]) {
 
     CUevent event;
     cuEventCreate(&event, CU_EVENT_DISABLE_TIMING);
+    CUstream stream;
+    cuStreamCreate(&stream, 0);
 
     cout << "created event" << endl;
 
-    cuEventRecord(event, 0);
+    cuEventRecord(event, stream);
     cout << "recoreded event" << endl;
 
     cout << "event finished? " << (cuEventQuery(event) == 0) << endl;
@@ -57,6 +59,8 @@ int main(int argc, char *argv[]) {
 
     cout << "finished" << endl;
 
+    cuStreamDestroy(stream);
+    cuEventDestroy(event);
     cudaFree(gpufloats);
 
     return 0;
