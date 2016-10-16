@@ -57,14 +57,6 @@ extern "C" {
 
 namespace cocl {
     map<void *, Memory *> memoryByHostPointer;
-    // map<cl_mem, Memory *> memoryByClmem;
-
-    // int nextIdx = 0;
-    // map<int, cl_mem> clmemByIdx;  // seems like we could just merge these two maps :-P
-    // map<void *, int> idxByAddr;
-    // map<cl_mem, int> sizeByClmem;  // for mapped buffers mostly, ofr now
-
-    // set<cl_mem> clmemNeedsMap;
 
     Memory::Memory(cl_mem clmem, size_t bytes, MemoryType type) :
             clmem(clmem), bytes(bytes), type(type) {
@@ -79,7 +71,6 @@ namespace cocl {
         Memory *memory = new Memory(clmem, bytes, MemoryType::Pinned);
         memory->hostPointer = memory->map();
 
-        // memoryByClmem[memory->clmem] = memory;
         memoryByHostPointer[memory->hostPointer] = memory;
         return memory;
     }
@@ -93,7 +84,6 @@ namespace cocl {
         Memory *memory = new Memory(clmem, bytes, MemoryType::Device);
         memory->hostPointer = memory;
 
-        // memoryByClmem[memory->clmem] = memory;
         memoryByHostPointer[memory->hostPointer] = memory;
 
         return memory;
@@ -142,40 +132,9 @@ size_t cuMemHostAlloc(PMemory *ppMemory, unsigned int bytes, int CU_MEMHOSTALLOC
     hostside_opencl_funcs_assure_initialized();
     cout << "cuMemHostAlloc using cl, size " << bytes << endl;
     Memory *memory = Memory::newPinned(bytes);
-    // cl_mem float_data_gpu = clCreateBuffer(*ctx, CL_MEM_ALLOC_HOST_PTR, bytes,
-    //                                        NULL, &err);
-    // Memory *memory = new Memory(float_data_gpu, bytes);
-    // cl->checkError(err);
-    // int idx = nextIdx;
-    // nextIdx++;
-    // clmemByIdx[idx] = float_data_gpu;
-    // clmems.push_back(float_data_gpu);
-    // int idx = clmems.size() - 1;
-    // *p_mem = (float *)&clmems[idx];
 
-    // *p_mem = clEnqueueMapBuffer (*queue,
-    //     float_data_gpu,
-    //     CL_FALSE,
-    //     CL_MAP_READ | CL_MAP_WRITE,
-    //     0,
-    //     bytes,
-    //     0,
-    //     0,
-    //     0,
-    //     &err
-    // );
-    // cl->checkError(err);
-    // cout << "cuMemHostAlloc after map: " << *p_mem << endl;
-
-    // memoryByHostpointer[memory->hostPointer] = memory;
     *ppMemory = memory;
 
-    // idxByAddr[*p_mem] = idx;
-    // cout << "ptr " << *p_mem << " idx=" << idx << endl;
-    // clmemNeedsMap.insert(memory->clmem);
-    // sizeByClmem[float_data_gpu] = bytes;
-
-    // CL_MEM_ALLOC_HOST_PTR ?
     return 0;
 }
 
@@ -275,20 +234,8 @@ size_t cudaMalloc(PMemory *ppMemory, size_t N) {
     hostside_opencl_funcs_assure_initialized();
     cout << "cudaMalloc using cl, size " << N << endl;
     Memory *memory = Memory::newDeviceAlloc(N);
-    // memoryByHostpointer[memory->hostPointer] = memory;
+
     *ppMemory = memory;
-
-    // cl_mem float_data_gpu = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, N,
-    //                                        NULL, &err);
-    // cl->checkError(err);
-    // int idx = nextIdx;
-    // nextIdx++;
-    // clmemByIdx[idx] = float_data_gpu;
-    // // int idx = clmems.size() - 1;
-    // *p_mem = (float *)&clmemByIdx[idx];
-    // idxByAddr[*p_mem] = idx;
-    // cout << "ptr " << *p_mem << endl;
-
     return 0;
 }
 
@@ -336,22 +283,8 @@ size_t  cuMemcpyDtoH(void *host_dst, void *gpu_src, size_t size) {
 }
 
 size_t cudaFree(PMemory pMemory) {
-    // for(int i = 0 ; i < clmems.size(); i++) {
-    //     cout << "cuda free i " << i << " " << &clmems[i] << endl;
-    //     // err = clReleaseMemObject(clmems[i]);
-    //     // cl->checkError(err);
-    // }
-    // err = clReleaseMemObject(*(cl_mem *)(*p_mem));
-    // cl->checkError(err);
-
-    // int idx = idxByAddr[mem];
-
     cout << "cudafree using opencl hostpointer=" << pMemory << endl;
     delete pMemory;
-
-    // err = clReleaseMemObject(clmemByIdx[idx]);
-    // err = clReleaseMemObject(*(cl_mem *)mem);
-    // cl->checkError(err);
     return 0;
 }
 
