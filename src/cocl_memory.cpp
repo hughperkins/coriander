@@ -29,6 +29,9 @@ using namespace cocl;
 using namespace easycl;
 
 namespace cocl {
+    // we should index these, but a set is ok-ish for now. maybe
+    set<Memory *>memories;
+
     Memory::Memory(cl_mem clmem, size_t bytes) :
             clmem(clmem), bytes(bytes) {
     }
@@ -40,7 +43,7 @@ namespace cocl {
         cl->checkError(err);
         Memory *memory = new Memory(clmem, bytes);
         cout << "Memory::newDeviceAlloc bytes=" << bytes << " memory=" << (void *)memory << " clmem=" << (void*)memory->clmem << endl;
-
+        memories.insert(memory);
         return memory;
     }
 
@@ -48,6 +51,19 @@ namespace cocl {
         cout << "~Memory releasing mem object memory=" << (void *)this << endl;
         cl_int err = clReleaseMemObject(clmem);
         cl->checkError(err);
+    }
+
+    Memory *findMemory(Memory *passedInPointer) {
+        char *passedInAsCharStar = (char *)passedInPointer;
+        for(auto it=memories.begin(), e=memories.end(); it != e; it++) {
+            Memory *memory = *it;
+            if(passedInAsCharStar >= (char *)memory && passedInAsCharStar < (char *)memory + memory->bytes) {
+                cout << "found memory: " << (void *)memory;
+                return memory;
+            }
+        }
+        cout << "could not find memory for " << (void *)passedInPointer << endl;
+        throw runtime_error("could not find memory");
     }
 }
 
@@ -166,19 +182,26 @@ size_t cudaMalloc(Memory **pMemory, size_t N) {
 size_t cuMemcpyHtoDAsync_v2(void *dst, void *src, size_t bytes) {
     // host => device
     cout << "cuMemcpyHtoDAsync_v2 dst=" << dst << " src=" << src << " bytes=" << bytes << endl;
-    cout << "cuMemcpyHtoDAsync_v2 cl->default_queue=" << cl->default_queue << endl;
-    Memory *dstMemory = (Memory *)dst;
-    cout << "cuMemcpyHtoDAsync_v2 dstMemory->clmem " << dstMemory->clmem << endl;
-    cout << "cuMemcpyHtoDAsync_v2 cl->default_queue->queue=" << cl->default_queue->queue << endl;
-    cl_int err = clEnqueueWriteBuffer(cl->default_queue->queue, dstMemory->clmem, CL_FALSE, 0,
+    Memory *dstMemory = findMemory((Memory *)dst);
+    size_t offset = (char *)dst - (char *)dstMemory;
+    cout << "memory " << (void *)dstMemory << " offset=" << offset << endl;
+    // cout << "cuMemcpyHtoDAsync_v2 cl->default_queue=" << cl->default_queue << endl;
+    // Memory *dstMemory = (Memory *)dst;
+    // cout << "cuMemcpyHtoDAsync_v2 dstMemory->clmem " << dstMemory->clmem << endl;
+    // cout << "cuMemcpyHtoDAsync_v2 cl->default_queue->queue=" << cl->default_queue->queue << endl;
+    cl_int err = clEnqueueWriteBuffer(cl->default_queue->queue, dstMemory->clmem, CL_FALSE, offset,
                                       bytes, src, 0, NULL, NULL);
     cl->checkError(err);
     return 0;
 }
 
 size_t  cuMemcpyDtoHAsync_v2(void *dst, void *src, size_t bytes) {
-    Memory *srcMemory = (Memory *)src;
-    cl_int err = clEnqueueReadBuffer(cl->default_queue->queue, srcMemory->clmem, CL_FALSE, 0,
+    cout << "cuMemcpyDtoHAsync_v2 dst=" << dst << " src=" << src << " bytes=" << bytes << endl;
+    Memory *srcMemory = findMemory((Memory *)src);
+    size_t offset = (char *)src - (char *)srcMemory;
+    cout << "memory " << (void *)srcMemory << " offset=" << offset << endl;
+    // Memory *srcMemory = (Memory *)src;
+    cl_int err = clEnqueueReadBuffer(cl->default_queue->queue, srcMemory->clmem, CL_FALSE, offset,
                                      bytes, dst, 0, NULL, NULL);
     cl->checkError(err);
     return 0;
