@@ -141,6 +141,10 @@ size_t cudaConfigureCall(
         unsigned long long block_xy, unsigned int block_z, size_t sharedMem, void *queue_as_voidstar) {
     CLQueue *queue = (CLQueue *)queue_as_voidstar;
     cout << "cudaConfigureCall queue=" << queue << endl;
+    if(sharedMem != 0) {
+        cout << "cudaConfigureCall: Not implemented: non-zero shared memory" << endl;
+        throw runtime_error("cudaConfigureCall: Not implemented: non-zero shared memory");
+    }
     if(queue == 0) {
         queue = cl->default_queue;
         cout << "using default_queue " << queue << endl;
