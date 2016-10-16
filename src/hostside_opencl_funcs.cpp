@@ -34,16 +34,21 @@ extern "C" {
 }
 
 namespace cocl {
-    size_t grid[3];
-    size_t block[3];
-    unique_ptr<CLKernel> kernel;
+    class LaunchConfiguration {
+    public:
+        size_t grid[3];
+        size_t block[3];
+        unique_ptr<CLKernel> kernel;
+        CLQueue *queue = 0;  // NOT owned by us
+
+        vector<cl_mem> kernelArgsToBeReleased;
+        vector<Memory *> kernelArgsToBeRemapped;
+    };
+    LaunchConfiguration launchConfiguration;
 
     unique_ptr<EasyCL> cl;
     cl_context *ctx;
     cl_command_queue *queue;
-
-    vector<cl_mem> kernelArgsToBeReleased;
-    vector<Memory *> kernelArgsToBeRemapped;
 
     bool initialized = false;
 }
@@ -133,8 +138,13 @@ size_t cudaSetDevice (int device) {
 
 size_t cudaConfigureCall(
         unsigned long long grid_xy, unsigned int grid_z,
-        unsigned long long block_xy, unsigned int block_z, size_t sharedMem, void *stream) {
-    cout << "cudaConfigureCall" << endl;
+        unsigned long long block_xy, unsigned int block_z, size_t sharedMem, void *queue_as_voidstar) {
+    CLQueue *queue = (CLQueue *)queue_as_voidstar;
+    cout << "cudaConfigureCall queue=" << queue << endl;
+    if(queue == 0) {
+        queue = cl->default_queue;
+        cout << "using default_queue " << queue << endl;
+    }
     cout << "grid_xy " << grid_xy << " grid_z " << grid_z << endl;
     cout << "block_xy " << block_xy << " grid_z " << block_z << endl;
     int grid_x = grid_xy & ((1ul << 31) - 1);
@@ -143,12 +153,13 @@ size_t cudaConfigureCall(
     int block_y = block_xy >> 32;
     cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl;
     cout << "block(" << block_x << ", " << block_y << ", " << block_z << ")" << endl;
-    grid[0] = grid_x;
-    grid[1] = grid_y;
-    grid[2] = grid_z;
-    block[0] = block_x;
-    block[1] = block_y;
-    block[2] = block_z;
+    launchConfiguration.queue = queue;
+    launchConfiguration.grid[0] = grid_x;
+    launchConfiguration.grid[1] = grid_y;
+    launchConfiguration.grid[2] = grid_z;
+    launchConfiguration.block[0] = block_x;
+    launchConfiguration.block[1] = block_y;
+    launchConfiguration.block[2] = block_z;
     return 0;
 }
 
@@ -156,7 +167,7 @@ void configureKernel(
         const char *kernelName, const char *clSourcecodeString) {
     // cout << "configureKernel (name=" << kernelName << ", source=" << clSourcecodeString << ")" << endl;
     hostside_opencl_funcs_assure_initialized();
-    kernel.reset(cl->buildKernelFromString(clSourcecodeString, kernelName, "", "__internal__"));
+    launchConfiguration.kernel.reset(cl->buildKernelFromString(clSourcecodeString, kernelName, "", "__internal__"));
 }
 
 void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
@@ -174,11 +185,11 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     cl_mem gpu_struct = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, structAllocateSize,
                                            NULL, &err);
     cl->checkError(err);
-    err = clEnqueueWriteBuffer(*queue, gpu_struct, CL_TRUE, 0,
+    err = clEnqueueWriteBuffer(launchConfiguration.queue->queue, gpu_struct, CL_TRUE, 0,
                                       structAllocateSize, pCpuStruct, 0, NULL, NULL);
     cl->checkError(err);
-    kernelArgsToBeReleased.push_back(gpu_struct);
-    kernel->inout(&kernelArgsToBeReleased[kernelArgsToBeReleased.size() - 1]);
+    launchConfiguration.kernelArgsToBeReleased.push_back(gpu_struct);
+    launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
 }
 
 void setKernelArgFloatStar(float *hostpointer) {
@@ -189,17 +200,17 @@ void setKernelArgFloatStar(float *hostpointer) {
     if(memory->needsMap()) {
         cout << "setKernelArgFloatStar running unmap" << endl;
         memory->unmap();
-        kernelArgsToBeRemapped.push_back(memory);
+        launchConfiguration.kernelArgsToBeRemapped.push_back(memory);
     }
 
-    kernel->inout(&clmem);
+    launchConfiguration.kernel->inout(&clmem);
 }
 
 void setKernelArgCharStar(char *hostpointer) {
     cout << "setKernelArgCharStar" << endl;
     Memory *pMemory = getMemoryForHostPointer(hostpointer);
     cl_mem clmem = pMemory->clmem;
-    kernel->inout(&clmem);
+    launchConfiguration.kernel->inout(&clmem);
 }
 
 // void setKernelArgCharStar(char *clmem_as_charstar) {
@@ -218,45 +229,45 @@ void setKernelArgCharStar(char *hostpointer) {
 
 void setKernelArgInt64(int64_t value) {
     cout << "setKernelArgInt64 " << value << endl;
-    kernel->in(value);
+    launchConfiguration.kernel->in(value);
 }
 
 void setKernelArgInt32(int value) {
     cout << "setKernelArgInt32 " << value << endl;
-    kernel->in(value);
+    launchConfiguration.kernel->in(value);
 }
 
 void setKernelArgFloat(float value) {
     cout << "setKernelArgFloat " << value << endl;
-    kernel->in(value);
+    launchConfiguration.kernel->in(value);
 }
 
 void kernelGo() {
     cout << "kernelGo " << endl;
     size_t global[3];
     for(int i = 0; i < 3; i++) {
-        global[i] = grid[i] * block[i];
+        global[i] = launchConfiguration.grid[i] * launchConfiguration.block[i];
         cout << "global[" << i << "]=" << global[i] << endl;
     }
     for(int i = 0; i < 3; i++) {
-        cout << "block[" << i << "]=" << block[i] << endl;
+        cout << "block[" << i << "]=" << launchConfiguration.block[i] << endl;
     }
     // cout << "launching kernel, using OpenCL..." << endl;
-    kernel->run(3, global, block);
+    launchConfiguration.kernel->run(launchConfiguration.queue, 3, global, launchConfiguration.block);
     cout << ".. kernel queued" << endl;
     // cl->finish();
     // cout << ".. kernel finished" << endl;
-    for(auto it=kernelArgsToBeReleased.begin(); it != kernelArgsToBeReleased.end(); it++) {
+    for(auto it=launchConfiguration.kernelArgsToBeReleased.begin(); it != launchConfiguration.kernelArgsToBeReleased.end(); it++) {
         cout << "release arg" << endl;
         cl_mem memObject = *it;
         cl_int err = clReleaseMemObject(memObject);
         cl->checkError(err);
     }
-    kernelArgsToBeReleased.clear();
+    launchConfiguration.kernelArgsToBeReleased.clear();
 
-    for(auto it=kernelArgsToBeRemapped.begin(); it != kernelArgsToBeRemapped.end(); it++) {
+    for(auto it=launchConfiguration.kernelArgsToBeRemapped.begin(); it != launchConfiguration.kernelArgsToBeRemapped.end(); it++) {
         Memory *pMemory = *it;
         pMemory->map();
     }
-    kernelArgsToBeRemapped.clear();
+    launchConfiguration.kernelArgsToBeRemapped.clear();
 }
