@@ -55,7 +55,7 @@ size_t cuCtxSynchronize(void) {
 }
 
 size_t cuCtxGetCurrent(PContext *ppContext) {
-    cout << "cuCtxGetCurrent redirected" << endl;
+    // cout << "cuCtxGetCurrent redirected" << endl;
     *ppContext = currentContext;
     return 0;
 }
