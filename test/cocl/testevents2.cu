@@ -40,28 +40,11 @@ int main(int argc, char *argv[]) {
 
     cout << "event finished? " << (cuEventQuery(event) == 0) << endl;
 
-    cuEventDestroy(event);
-    cout << "destroyed event" << endl;
-
-    // opencl:
-    // clCreateUserEvent()   CL_EVENT_COMMAND_ EXECUTION_STATUS
-    // clWaitForEvents(num_events, event_list);
-    // clEnqueueMarkerWithWaitList
-    // clGetEventInfo() 
-    // clReleaseEvent
-
-    // cuda:
-    // cuEventCreate(CUEvent *, flags)
-    // cuEventRecord(CUEvent, CUstream);  => puts into the stream
-    // cuEventQuery(CUevent)
-    // cuEventSynchronize(CUevent)
-    // cuEventDestroy
-
-    cout << "finished" << endl;
-
     cuStreamDestroy(stream);
     cuEventDestroy(event);
     cudaFree(gpufloats);
+
+    cout << "finished" << endl;
 
     return 0;
 }

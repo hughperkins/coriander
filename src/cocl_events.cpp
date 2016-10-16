@@ -38,6 +38,20 @@ namespace cocl {
     }
 }
 
+// opencl:
+// clCreateUserEvent()   CL_EVENT_COMMAND_ EXECUTION_STATUS
+// clWaitForEvents(num_events, event_list);
+// clEnqueueMarkerWithWaitList
+// clGetEventInfo() 
+// clReleaseEvent
+
+// cuda:
+// cuEventCreate(CUEvent *, flags)
+// cuEventRecord(CUEvent, CUstream);  => puts into the stream
+// cuEventQuery(CUevent)
+// cuEventSynchronize(CUevent)
+// cuEventDestroy
+
 size_t cuEventCreate(Event **pevent, unsigned int flags) {
     Event *event = new Event();
     *pevent = event;
