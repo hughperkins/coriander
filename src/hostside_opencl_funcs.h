@@ -30,25 +30,25 @@ namespace cocl {
     extern std::unique_ptr<easycl::EasyCL> cl;
     extern cl_context *ctx;
     extern cl_command_queue *queue;
-    extern cl_int err;
+    // extern cl_int err;
 
     // static vector<cl_mem> clmems;
-    extern int nextIdx;
-    extern std::map<int, cl_mem> clmemByIdx;  // seems like we could just merge these two maps :-P
-    extern std::map<void *, int> idxByAddr;
-    extern std::map<cl_mem, int> sizeByClmem;  // for mapped buffers mostly, ofr now
+    // extern int nextIdx;
+    // extern std::map<int, cl_mem> clmemByIdx;  // seems like we could just merge these two maps :-P
+    // extern std::map<void *, int> idxByAddr;
+    // extern std::map<cl_mem, int> sizeByClmem;  // for mapped buffers mostly, ofr now
 
-    extern std::set<cl_mem> clmemNeedsMap;
+    // extern std::set<cl_mem> clmemNeedsMap;
 
-    extern std::vector<cl_mem> kernelArgsToBeReleased;
-    extern std::vector<cl_mem> kernelArgsToBeRemapped;
+    // extern std::vector<cl_mem> kernelArgsToBeReleased;
+    // extern std::vector<cl_mem> kernelArgsToBeRemapped;
 
-    extern bool initialized;
+    // extern bool initialized;
 
-    static inline cl_mem *voidStarToClmem(void *voidStar) {
-        int idx = idxByAddr[voidStar];
-        return &clmemByIdx[idx];
-    }
+    // static inline cl_mem *voidStarToClmem(void *voidStar) {
+    //     int idx = idxByAddr[voidStar];
+    //     return &clmemByIdx[idx];
+    // }
 }
 
 extern "C" {

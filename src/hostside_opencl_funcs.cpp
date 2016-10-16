@@ -14,6 +14,8 @@
 
 #include "hostside_opencl_funcs.h"
 
+#include "cocl_memory.h"
+
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -39,10 +41,10 @@ namespace cocl {
     unique_ptr<EasyCL> cl;
     cl_context *ctx;
     cl_command_queue *queue;
-    cl_int err;
+    // cl_int err;
 
     vector<cl_mem> kernelArgsToBeReleased;
-    vector<cl_mem> kernelArgsToBeRemapped;
+    vector<Memory *> kernelArgsToBeRemapped;
 
     bool initialized = false;
 }
@@ -63,8 +65,6 @@ void hostside_opencl_funcs_assure_initialized(void) {
         initialized = true;
     }
 }
-
-typedef int *PretendContext;
 
 extern "C" {
     size_t cudaSetDevice (int device);
@@ -174,6 +174,7 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     // (we assume hte struct is passed by-value, so we dont have to actually copy it back afterwards)
     cout << "setKernelArgStruct structsize=" << structAllocateSize << endl;
     // int idx = 
+    cl_int err;
     cl_mem gpu_struct = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, structAllocateSize,
                                            NULL, &err);
     cl->checkError(err);
@@ -184,24 +185,28 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     kernel->inout(&kernelArgsToBeReleased[kernelArgsToBeReleased.size() - 1]);
 }
 
-void setKernelArgFloatStar(float *clmem_as_floatstar) {
-    cout << "setKernelArgFloatStar " << clmem_as_floatstar << endl;
-    int idx = idxByAddr[(void *)clmem_as_floatstar];
-    cout << "idx " << idx << endl;
-    cl_mem clmem = clmemByIdx[idx];
+void setKernelArgFloatStar(float *pMem_as_floatstar) {
+    cout << "setKernelArgFloatStar " << pMem_as_floatstar << endl;
+    Memory *memory = (Memory *)pMem_as_floatstar;
+    // int idx = idxByAddr[(void *)clmem_as_floatstar];
+    // cout << "idx " << idx << endl;
+    // cl_mem clmem = clmemByIdx[idx];
+    cl_mem clmem = memory->clmem;
 
-    if(clmemNeedsMap.find(clmem) != clmemNeedsMap.end()) {
+    // if(clmemNeedsMap.find(clmem) != clmemNeedsMap.end()) {
+    if(memory->needsMap()) {
         cout << "setKernelArgFloatStar running unmap" << endl;
-        cl_int err = clEnqueueUnmapMemObject (
-            *queue,
-            clmem,
-            clmem_as_floatstar,
-            0,
-            0,
-            0
-        );
-        cl->checkError(err);
-        kernelArgsToBeRemapped.push_back(clmem);
+        memory->unmap();
+        // cl_int err = clEnqueueUnmapMemObject (
+        //     *queue,
+        //     clmem,
+        //     clmem_as_floatstar,
+        //     0,
+        //     0,
+        //     0
+        // );
+        // cl->checkError(err);
+        kernelArgsToBeRemapped.push_back(memory);
     }
 
     // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
@@ -209,10 +214,12 @@ void setKernelArgFloatStar(float *clmem_as_floatstar) {
     kernel->inout(&clmem);
 }
 
-void setKernelArgCharStar(char *clmem_as_charstar) {
+void setKernelArgCharStar(char *pmem_as_charstar) {
     cout << "setKernelArgCharStar" << endl;
-    int idx = idxByAddr[(void *)clmem_as_charstar];
-    cl_mem clmem = clmemByIdx[idx];
+    Memory *pMemory = (Memory *)pmem_as_charstar;
+    // int idx = idxByAddr[(void *)clmem_as_charstar];
+    // cl_mem clmem = clmemByIdx[idx];
+    cl_mem clmem = pMemory->clmem;
     // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
     // cout << "setKernelArgFloatStar" << endl;
     kernel->inout(&clmem);
@@ -270,31 +277,34 @@ void kernelGo() {
     for(auto it=kernelArgsToBeReleased.begin(); it != kernelArgsToBeReleased.end(); it++) {
         cout << "release arg" << endl;
         cl_mem memObject = *it;
-        err = clReleaseMemObject(memObject);
+        cl_int err = clReleaseMemObject(memObject);
         cl->checkError(err);
     }
     kernelArgsToBeReleased.clear();
 
     for(auto it=kernelArgsToBeRemapped.begin(); it != kernelArgsToBeRemapped.end(); it++) {
-        cl_mem clmem = *it;
-        int size = sizeByClmem[clmem];
-        cout << "remapping buffer, size=" << size << endl;
-        // cl_event event;
-        void *p_mem = clEnqueueMapBuffer (
-            *queue,
-            clmem,
-            CL_FALSE,
-            CL_MAP_READ | CL_MAP_WRITE,
-            0,
-            size,
-            0,
-            0,
-            0,
-            &err
-        );
-        cout << "checking error" << endl;
-        cl->checkError(err);
-        cout << "new pointer: " << p_mem << endl;
+        // cl_mem clmem = *it;
+        Memory *pMemory = *it;
+        pMemory->map();
+        // int size = pMemory->;
+        // cout << "remapping buffer, size=" << size << endl;
+        // // cl_event event;
+        // cl_int err;
+        // void *p_mem = clEnqueueMapBuffer (
+        //     *queue,
+        //     clmem,
+        //     CL_FALSE,
+        //     CL_MAP_READ | CL_MAP_WRITE,
+        //     0,
+        //     size,
+        //     0,
+        //     0,
+        //     0,
+        //     &err
+        // );
+        // cout << "checking error" << endl;
+        // cl->checkError(err);
+        // cout << "new pointer: " << p_mem << endl;
         // err=  clReleaseEvent(event);
         // cl->checkError(err);
     }
