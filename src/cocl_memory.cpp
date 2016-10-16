@@ -181,8 +181,8 @@ size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count) {
 }
 
 size_t cuMemsetD32_v2(void *location, unsigned int value, uint32_t count) {
-    cout << "cuMemsetD32_v2 redirected value " << value << " count=" << count << endl;
     Memory *memory = memoryByHostPointer[location];
+    cout << "cuMemsetD32_v2 redirected value " << value << " count=" << count << " location=" << location << " memory=" << (void *)memory << endl;
     cl_int err = clEnqueueFillBuffer(cl->default_queue->queue, memory->clmem, &value, sizeof(int), 0, count * sizeof(int), 0, 0, 0);
     cl->checkError(err);
     return 0;
@@ -219,9 +219,8 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
 
 size_t cudaMalloc(void **pHostPointer, size_t N) {
     hostside_opencl_funcs_assure_initialized();
-    cout << "cudaMalloc using cl, size " << N << endl;
     Memory *memory = Memory::newDeviceAlloc(N);
-
+    cout << "cudaMalloc using cl, size " << N << " hostpointer=" << memory->hostPointer << " memory=" << (void *)memory << endl;
     *pHostPointer = memory->hostPointer;
     return 0;
 }
