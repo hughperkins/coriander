@@ -20,62 +20,53 @@
 #include <map>
 #include <set>
 
-// #include "EasyCL.h"
-
 #include "CL/cl.h"
 
 using namespace std;
 using namespace cocl;
 using namespace easycl;
 
-typedef CLQueue *QueueForClient;
+typedef CLQueue *PCLQueue;
 
 extern "C" {
-    size_t cudaStreamSynchronize(QueueForClient stream);
-    size_t cuStreamCreate(QueueForClient *stream, unsigned int flags);
-    size_t cuStreamDestroy_v2(QueueForClient stream);
-    size_t cuStreamSynchronize(QueueForClient stream);
+    size_t cudaStreamSynchronize(PCLQueue stream);
+    size_t cuStreamCreate(PCLQueue *stream, unsigned int flags);
+    size_t cuStreamDestroy_v2(PCLQueue stream);
+    size_t cuStreamSynchronize(PCLQueue stream);
     // size_t cuStreamWaitEvent(stream, event, 0 /* = flags */)
 }
 
-size_t cudaStreamSynchronize(QueueForClient stream) {
-    cout << "cudaStreamSynchronize stream=" << stream << endl;
+size_t cudaStreamSynchronize(PCLQueue pqueue) {
+    cout << "cudaStreamSynchronize stream=" << pqueue << endl;
     hostside_opencl_funcs_assure_initialized();
 
     // assert(stream == 0);
 
-    if(stream == 0) {
+    if(pqueue == 0) {
         cl->finish();
     } else {
-        clFinish(stream->queue);
+        clFinish(pqueue->queue);
     }
 
-    // cl->finish();
     return 0;
 }
 
-size_t cuStreamSynchronize(QueueForClient stream) {
-    return cudaStreamSynchronize(stream);
+size_t cuStreamSynchronize(PCLQueue pqueue) {
+    return cudaStreamSynchronize(pqueue);
 }
 
-size_t cuStreamCreate(QueueForClient *pstream, unsigned int flags) {
+size_t cuStreamCreate(PCLQueue *ppqueue, unsigned int flags) {
     cout << "cuStreamCreate redirected" << endl;
     hostside_opencl_funcs_assure_initialized();
-    cl_int err;
-    // cl_command_queue queue = clCreateCommandQueue(*cl->context, cl->device, 0, &err);
     CLQueue *queue = cl->newQueue();
     cout << "created queue" << endl;
-    *pstream = queue;
+    *ppqueue = queue;
     cout << "done assign" << endl;
-
-    // // lets just say we cant create streams for now?
-    // return 1;
     return 0;
 }
 
-size_t cuStreamDestroy_v2(QueueForClient stream) {
+size_t cuStreamDestroy_v2(PCLQueue pqueue) {
     cout << "cuStreamDestroy_v2 redirected" << endl;
-    delete stream;
-    // return 1;
+    delete pqueue;
     return 0;
 }
