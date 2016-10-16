@@ -42,6 +42,10 @@ extern "C" {
     size_t cuMemHostAlloc(void **mem, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE);
     size_t cuMemFreeHost(void *mem);
     size_t cuDeviceTotalMem_v2(uint64_t *value, void *device);
+    size_t cuMemcpyHtoD_v2(void *gpu_dst, void *host_src, size_t size);
+    size_t cuMemcpyDtoH_v2(void *host_dst, void *gpu_src, size_t size);
+    size_t cuMemcpyHtoD(void *gpu_dst, void *host_src, size_t size);
+    size_t cuMemcpyDtoH(void *host_dst, void *gpu_src, size_t size);
 }
 
 namespace cocl {
@@ -198,6 +202,30 @@ size_t cudaMalloc(void **p_mem, size_t N) {
     cout << "ptr " << *p_mem << endl;
 
     return 0;
+}
+
+// => synchronous <=
+size_t cuMemcpyHtoD_v2(void *gpu_dst, void *host_src, size_t size) {
+    cudaMemcpy(gpu_dst, host_src, size, 1);
+    cl->finish();
+    return 0;
+}
+
+// => synchronous <=
+size_t cuMemcpyHtoD(void *gpu_dst, void *host_src, size_t size) {
+    return cuMemcpyHtoD_v2(gpu_dst, host_src, size);
+}
+
+// => synchronous <=
+size_t  cuMemcpyDtoH_v2(void *host_dst, void *gpu_src, size_t size) {
+    return cudaMemcpy(host_dst, gpu_src, size, 2);
+    cl->finish();
+    return 0;
+}
+
+// => synchronous <=
+size_t  cuMemcpyDtoH(void *host_dst, void *gpu_src, size_t size) {
+    return cuMemcpyDtoH(host_dst, gpu_src, size);
 }
 
 size_t cudaFree(void *mem) {

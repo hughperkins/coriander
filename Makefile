@@ -116,6 +116,12 @@ run-test-testevents2: build/test-testevents2
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
+run-test-testcumemcpy: build/test-testcumemcpy
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
 run-test-teststream: build/test-teststream
 	################################
 	# running:
