@@ -4,41 +4,42 @@
 #include "EasyCL.h"
 
 namespace cocl {
-    enum MemoryType {
-        Pinned,
-        Device
-    };
+    // enum MemoryType {
+    //     Pinned,
+    //     Device
+    // };
 
     class Memory {
     protected:
-        Memory(cl_mem clmem, size_t bytes, MemoryType type);
+        Memory(cl_mem clmem, size_t bytes);
 
      public:
-        static Memory *newPinned(size_t bytes);
+        // static Memory *newPinned(size_t bytes);
         static Memory *newDeviceAlloc(size_t bytes);
         ~Memory();
-        void *map(easycl::CLQueue *queue);
-        void unmap(easycl::CLQueue *queue);
-        bool needsMap() {
-            return type == Pinned;
-        }
+        // void *map(easycl::CLQueue *queue);
+        // void unmap(easycl::CLQueue *queue);
+        // bool needsMap() {
+        //     return type == Pinned;
+        // }
 
         cl_mem clmem; // this is assumed to always be valid
         size_t bytes; // should always be valid (ideally > 0...)
-        void *hostPointer; // will point to memory area for pinned, otherwise to this object
-        MemoryType type;
+        // void *hostPointer; // will point to memory area for pinned, otherwise to this object
+        // MemoryType type;
     };
 
     typedef Memory *PMemory;
 
-    Memory *getMemoryForHostPointer(void *hostPointer);
+    // Memory *getMemoryForHostPointer(void *hostPointer);
 }
 
 extern "C" {
-    size_t cudaMalloc(void **pHostPointer, size_t N);
-    size_t cuMemAlloc_v2(void **pHostPointer, size_t bytes);
-    size_t cuMemFree_v2(void *hostPointer);
-    size_t cudaFree(void *hostPointer);
+    size_t cudaMalloc(cocl::Memory **pMemory, size_t N);
+    size_t cudaFree(cocl::Memory *memory);
+
+    size_t cuMemAlloc_v2(cocl::Memory **pMemory, size_t bytes);
+    size_t cuMemFree_v2(cocl::Memory *memory);
 
     size_t cuMemHostAlloc(void **pHostPointer, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE);
     size_t cuMemFreeHost(void *hostPointer);

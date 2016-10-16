@@ -42,7 +42,7 @@ namespace cocl {
         CLQueue *queue = 0;  // NOT owned by us
 
         vector<cl_mem> kernelArgsToBeReleased;
-        vector<Memory *> kernelArgsToBeRemapped;
+        // vector<Memory *> kernelArgsToBeRemapped;
     };
     LaunchConfiguration launchConfiguration;
 
@@ -196,23 +196,25 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
 }
 
-void setKernelArgFloatStar(float *hostpointer) {
-    cout << "setKernelArgFloatStar " << hostpointer << endl;
-    Memory *memory = getMemoryForHostPointer(hostpointer);
+void setKernelArgFloatStar(float *memory_as_floatstar) {
+    cout << "setKernelArgFloatStar " << memory_as_floatstar << endl;
+    // Memory *memory = getMemoryForHostPointer(hostpointer);
+    Memory *memory = (Memory *)memory_as_floatstar;
     cl_mem clmem = memory->clmem;
 
-    if(memory->needsMap()) {
-        cout << "setKernelArgFloatStar running unmap" << endl;
-        memory->unmap(launchConfiguration.queue);
-        launchConfiguration.kernelArgsToBeRemapped.push_back(memory);
-    }
+    // if(memory->needsMap()) {
+    //     cout << "setKernelArgFloatStar running unmap" << endl;
+    //     memory->unmap(launchConfiguration.queue);
+    //     launchConfiguration.kernelArgsToBeRemapped.push_back(memory);
+    // }
 
     launchConfiguration.kernel->inout(&clmem);
 }
 
-void setKernelArgCharStar(char *hostpointer) {
-    cout << "setKernelArgCharStar" << endl;
-    Memory *pMemory = getMemoryForHostPointer(hostpointer);
+void setKernelArgCharStar(char *memory_as_charstar) {
+    cout << "setKernelArgCharStar " << memory_as_charstar << endl;
+    // Memory *pMemory = getMemoryForHostPointer(hostpointer);
+    Memory *pMemory = (Memory *)memory_as_charstar;
     cl_mem clmem = pMemory->clmem;
     launchConfiguration.kernel->inout(&clmem);
 }
@@ -269,9 +271,9 @@ void kernelGo() {
     }
     launchConfiguration.kernelArgsToBeReleased.clear();
 
-    for(auto it=launchConfiguration.kernelArgsToBeRemapped.begin(); it != launchConfiguration.kernelArgsToBeRemapped.end(); it++) {
-        Memory *pMemory = *it;
-        pMemory->map(launchConfiguration.queue);
-    }
-    launchConfiguration.kernelArgsToBeRemapped.clear();
+    // for(auto it=launchConfiguration.kernelArgsToBeRemapped.begin(); it != launchConfiguration.kernelArgsToBeRemapped.end(); it++) {
+    //     Memory *pMemory = *it;
+    //     pMemory->map(launchConfiguration.queue);
+    // }
+    // launchConfiguration.kernelArgsToBeRemapped.clear();
 }
