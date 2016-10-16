@@ -20,21 +20,32 @@
 #include <map>
 #include <set>
 
-// #include "EasyCL.h"
-
 #include "CL/cl.h"
 
 using namespace std;
 using namespace cocl;
 using namespace easycl;
 
-typedef int *PretendContext;
+namespace cocl {
+    class Context {
+    public:
+        Context() {
+            cout << "Context " << this << endl;
+        }
+        ~Context() {
+            cout << "~Context() " << this << endl;
+        }
+    };
+    typedef Context *PContext;
+
+    Context *currentContext = 0;
+}
 
 extern "C" {
     size_t cuCtxSynchronize(void);
-    size_t cuCtxCreate_v2(PretendContext *context, unsigned int flags, void *device);
-    size_t cuCtxGetCurrent(PretendContext *context);
-    size_t cuCtxSetCurrent(PretendContext context);
+    size_t cuCtxCreate_v2(PContext *context, unsigned int flags, void *device);
+    size_t cuCtxGetCurrent(PContext *context);
+    size_t cuCtxSetCurrent(PContext context);
 }
 
 size_t cuCtxSynchronize(void) {
@@ -43,28 +54,22 @@ size_t cuCtxSynchronize(void) {
     return 0;
 }
 
-vector<int> pretendcontexts;
-
-PretendContext currentpretendcontext = 0;
-
-size_t cuCtxGetCurrent(PretendContext *context) {
+size_t cuCtxGetCurrent(PContext *ppContext) {
     cout << "cuCtxGetCurrent redirected" << endl;
-    *context = currentpretendcontext;
+    *ppContext = currentContext;
     return 0;
 }
 
-size_t cuCtxSetCurrent(PretendContext context) {
+size_t cuCtxSetCurrent(PContext pContext) {
     cout << "cuCtxSetCurrent redirected" << endl;
-    currentpretendcontext = context;
+    currentContext = pContext;
     return 0;
 }
 
-size_t cuCtxCreate_v2 (PretendContext *context, unsigned int flags, void *device) {
+size_t cuCtxCreate_v2 (PContext *ppContext, unsigned int flags, void *device) {
     cout << "cuCtxCreate_v2 redirected" << endl;
-    // *(int *)new_context = 0;
-    pretendcontexts.push_back(1);
-    PretendContext newcontext = &pretendcontexts[pretendcontexts.size() - 1];
-    currentpretendcontext = newcontext;
-    *context = newcontext;
+    Context *newContext = new Context();
+    currentContext = newContext;
+    *ppContext = newContext;
     return 0;
 }
