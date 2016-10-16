@@ -29,4 +29,6 @@ namespace cocl {
     };
 
     typedef Memory *PMemory;
+
+    Memory *getMemoryForHostPointer(void *hostPointer);
 }

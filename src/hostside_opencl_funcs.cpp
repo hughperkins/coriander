@@ -185,9 +185,9 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     kernel->inout(&kernelArgsToBeReleased[kernelArgsToBeReleased.size() - 1]);
 }
 
-void setKernelArgFloatStar(float *pMem_as_floatstar) {
-    cout << "setKernelArgFloatStar " << pMem_as_floatstar << endl;
-    Memory *memory = (Memory *)pMem_as_floatstar;
+void setKernelArgFloatStar(float *hostpointer) {
+    cout << "setKernelArgFloatStar " << hostpointer << endl;
+    Memory *memory = getMemoryForHostPointer(hostpointer);
     cl_mem clmem = memory->clmem;
 
     if(memory->needsMap()) {
@@ -199,9 +199,9 @@ void setKernelArgFloatStar(float *pMem_as_floatstar) {
     kernel->inout(&clmem);
 }
 
-void setKernelArgCharStar(char *pmem_as_charstar) {
+void setKernelArgCharStar(char *hostpointer) {
     cout << "setKernelArgCharStar" << endl;
-    Memory *pMemory = (Memory *)pmem_as_charstar;
+    Memory *pMemory = getMemoryForHostPointer(hostpointer);
     cl_mem clmem = pMemory->clmem;
     kernel->inout(&clmem);
 }

@@ -110,7 +110,7 @@ namespace cocl {
             &err
         );
         cl->checkError(err);
-        cout << "Memory after map hostpoiner=" << hostPointer << endl;
+        cout << "Memory after map hostpointer=" << hostPointer << endl;
         return hostPointer;
     }
 
@@ -125,6 +125,10 @@ namespace cocl {
             0
         );
         cl->checkError(err);
+    }
+
+    Memory *getMemoryForHostPointer(void *hostPointer) {
+        return memoryByHostPointer[hostPointer];
     }
 }
 
