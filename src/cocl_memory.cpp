@@ -49,12 +49,12 @@ namespace cocl {
     // }
 
     Memory *Memory::newDeviceAlloc(size_t bytes) {
-        cout << "Memory allocating new device memory object" << endl;
         cl_int err;
         cl_mem clmem = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, bytes,
                                                NULL, &err);
         cl->checkError(err);
         Memory *memory = new Memory(clmem, bytes);
+        cout << "Memory::newDeviceAlloc bytes=" << bytes << " memory=" << (void *)memory << " clmem=" << (void*)memory->clmem << endl;
         // memory->hostPointer = memory;
 
         // memoryByHostPointer[memory->hostPointer] = memory;
@@ -63,7 +63,7 @@ namespace cocl {
     }
 
     Memory::~Memory() {
-        cout << "~Memory releasing mem object" << endl;
+        cout << "~Memory releasing mem object memory=" << (void *)this << endl;
         cl_int err = clReleaseMemObject(clmem);
         cl->checkError(err);
     }
@@ -149,7 +149,7 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
         // device => host
         // Memory *srcMemory = memoryByHostPointer[src];
         Memory *srcMemory = (Memory *)src;
-        err = clEnqueueReadBuffer(queue->queue, srcMemory->clmem, CL_TRUE, 0,
+        err = clEnqueueReadBuffer(queue->queue, srcMemory->clmem, CL_FALSE, 0,
                                          count, dst, 0, NULL, NULL);
         cl->checkError(err);
         // cl->finish();
@@ -157,7 +157,7 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
         // host => device
         // Memory *dstMemory = memoryByHostPointer[dst];
         Memory *dstMemory = (Memory*)dst;
-        err = clEnqueueWriteBuffer(queue->queue, dstMemory->clmem, CL_TRUE, 0,
+        err = clEnqueueWriteBuffer(queue->queue, dstMemory->clmem, CL_FALSE, 0,
                                           count, src, 0, NULL, NULL);
         cl->checkError(err);
     } else {
@@ -240,7 +240,7 @@ size_t cuMemcpyHtoDAsync_v2(void *dst, void *src, size_t bytes) {
     cout << "cuMemcpyHtoDAsync_v2 cl->default_queue=" << cl->default_queue << endl;
     // Memory *dstMemory = memoryByHostPointer[dst];
     Memory *dstMemory = (Memory *)dst;
-    cout << "cuMemcpyHtoDAsync_v2 dstMemory->clmem" << dstMemory->clmem << endl;
+    cout << "cuMemcpyHtoDAsync_v2 dstMemory->clmem " << dstMemory->clmem << endl;
     cout << "cuMemcpyHtoDAsync_v2 cl->default_queue->queue=" << cl->default_queue->queue << endl;
     cl_int err = clEnqueueWriteBuffer(cl->default_queue->queue, dstMemory->clmem, CL_FALSE, 0,
                                       bytes, src, 0, NULL, NULL);

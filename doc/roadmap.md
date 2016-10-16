@@ -10,7 +10,7 @@
 
 ## Host-side
 
-- generalize structs containing pointers, eg have a config file saying how to handle them?
+- need to handle requests to copy from a hostside offset not equal to the start of an allocated region
 
 ## Tensorflow
 
