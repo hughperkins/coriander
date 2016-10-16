@@ -228,7 +228,7 @@ size_t cudaMalloc(void **pHostPointer, size_t N) {
 
 size_t cuMemcpyHtoDAsync_v2(void *dst, void *src, size_t bytes) {
     // host => device
-    Memory *dstMemory = (Memory *)dst;
+    Memory *dstMemory = memoryByHostPointer[dst];
     cl_int err = clEnqueueWriteBuffer(cl->default_queue->queue, dstMemory->clmem, CL_FALSE, 0,
                                       bytes, src, 0, NULL, NULL);
     cl->checkError(err);
