@@ -188,40 +188,21 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
 void setKernelArgFloatStar(float *pMem_as_floatstar) {
     cout << "setKernelArgFloatStar " << pMem_as_floatstar << endl;
     Memory *memory = (Memory *)pMem_as_floatstar;
-    // int idx = idxByAddr[(void *)clmem_as_floatstar];
-    // cout << "idx " << idx << endl;
-    // cl_mem clmem = clmemByIdx[idx];
     cl_mem clmem = memory->clmem;
 
-    // if(clmemNeedsMap.find(clmem) != clmemNeedsMap.end()) {
     if(memory->needsMap()) {
         cout << "setKernelArgFloatStar running unmap" << endl;
         memory->unmap();
-        // cl_int err = clEnqueueUnmapMemObject (
-        //     *queue,
-        //     clmem,
-        //     clmem_as_floatstar,
-        //     0,
-        //     0,
-        //     0
-        // );
-        // cl->checkError(err);
         kernelArgsToBeRemapped.push_back(memory);
     }
 
-    // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
-    // cout << "setKernelArgFloatStar" << endl;
     kernel->inout(&clmem);
 }
 
 void setKernelArgCharStar(char *pmem_as_charstar) {
     cout << "setKernelArgCharStar" << endl;
     Memory *pMemory = (Memory *)pmem_as_charstar;
-    // int idx = idxByAddr[(void *)clmem_as_charstar];
-    // cl_mem clmem = clmemByIdx[idx];
     cl_mem clmem = pMemory->clmem;
-    // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
-    // cout << "setKernelArgFloatStar" << endl;
     kernel->inout(&clmem);
 }
 
@@ -241,21 +222,16 @@ void setKernelArgCharStar(char *pmem_as_charstar) {
 
 void setKernelArgInt64(int64_t value) {
     cout << "setKernelArgInt64 " << value << endl;
-    // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
-    // cout << "setkernelargint " << value << endl;
     kernel->in(value);
 }
 
 void setKernelArgInt32(int value) {
     cout << "setKernelArgInt32 " << value << endl;
-    // cl_mem *p_mem = (cl_mem *)clmem_as_floatstar;
-    // cout << "setkernelargint " << value << endl;
     kernel->in(value);
 }
 
 void setKernelArgFloat(float value) {
     cout << "setKernelArgFloat " << value << endl;
-    // cout << "setkernelargfloat " << value << endl;
     kernel->in(value);
 }
 
@@ -283,30 +259,8 @@ void kernelGo() {
     kernelArgsToBeReleased.clear();
 
     for(auto it=kernelArgsToBeRemapped.begin(); it != kernelArgsToBeRemapped.end(); it++) {
-        // cl_mem clmem = *it;
         Memory *pMemory = *it;
         pMemory->map();
-        // int size = pMemory->;
-        // cout << "remapping buffer, size=" << size << endl;
-        // // cl_event event;
-        // cl_int err;
-        // void *p_mem = clEnqueueMapBuffer (
-        //     *queue,
-        //     clmem,
-        //     CL_FALSE,
-        //     CL_MAP_READ | CL_MAP_WRITE,
-        //     0,
-        //     size,
-        //     0,
-        //     0,
-        //     0,
-        //     &err
-        // );
-        // cout << "checking error" << endl;
-        // cl->checkError(err);
-        // cout << "new pointer: " << p_mem << endl;
-        // err=  clReleaseEvent(event);
-        // cl->checkError(err);
     }
     kernelArgsToBeRemapped.clear();
 }
