@@ -18,29 +18,29 @@ COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffu
 
 all: $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX)
 
-%-device.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/fake_funcs.h $(COCL_HOME)/build/ir-to-opencl
+# $(OUTPUTBASEPATH)-device.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/fake_funcs.h $(COCL_HOME)/build/ir-to-opencl
+# 	echo building $@ from $<
+# 	$(CLANG) $(PASSTHRU) -x cuda -std=c++11 -D__CUDA_ARCH__=300 -include $(COCL_HOME)/include/fake_funcs.h -I$(COCL_HOME)/include -I$(CUDA_HOME)/include $(INCLUDES) $< --cuda-device-only -emit-llvm -I/usr/include/x86_64-linux-gnu -O3 -S -o $@
+
+# 	# $(CLANG) -x cuda -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -D__CUDA_ARCH__=300 -include include/fake_funcs.h -Iinclude -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -Itest/eigen
+# 	#                                                                               -I$(CUDA_HOME)/include -I/usr/include/x86_64-linux-gnu $< --cuda-device-only -emit-llvm -O3 -S -o $@
+
+$(OUTPUTBASEPATH)-device.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/fake_funcs.h $(COCL_HOME)/build/ir-to-opencl
 	echo building $@ from $<
 	$(CLANG) $(PASSTHRU) -x cuda -std=c++11 -D__CUDA_ARCH__=300 -include $(COCL_HOME)/include/fake_funcs.h -I$(COCL_HOME)/include -I$(CUDA_HOME)/include $(INCLUDES) $< --cuda-device-only -emit-llvm -I/usr/include/x86_64-linux-gnu -O3 -S -o $@
 
 	# $(CLANG) -x cuda -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -D__CUDA_ARCH__=300 -include include/fake_funcs.h -Iinclude -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -Itest/eigen
 	#                                                                               -I$(CUDA_HOME)/include -I/usr/include/x86_64-linux-gnu $< --cuda-device-only -emit-llvm -O3 -S -o $@
 
-%-device.ll: %.cu $(COCL_HOME)/include/fake_funcs.h $(COCL_HOME)/build/ir-to-opencl
-	echo building $@ from $<
-	$(CLANG) $(PASSTHRU) -x cuda -std=c++11 -D__CUDA_ARCH__=300 -include $(COCL_HOME)/include/fake_funcs.h -I$(COCL_HOME)/include -I$(CUDA_HOME)/include $(INCLUDES) $< --cuda-device-only -emit-llvm -I/usr/include/x86_64-linux-gnu -O3 -S -o $@
-
-	# $(CLANG) -x cuda -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -D__CUDA_ARCH__=300 -include include/fake_funcs.h -Iinclude -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -Itest/eigen
-	#                                                                               -I$(CUDA_HOME)/include -I/usr/include/x86_64-linux-gnu $< --cuda-device-only -emit-llvm -O3 -S -o $@
-
-%-device.cl: %-device.ll $(COCL_HOME)/build/ir-to-opencl
+$(OUTPUTBASEPATH)-device.cl: $(OUTPUTBASEPATH)-device.ll $(COCL_HOME)/build/ir-to-opencl
 	echo building $@ from $<
 	$(COCL_HOME)/build/ir-to-opencl $(DEBUG) $< $@
 
-%-hostraw.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/fake_funcs.h
+$(OUTPUTBASEPATH)-hostraw.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/fake_funcs.h
 	echo building $@ from $<
 	$(CLANG) $(PASSTHRU) $(INCLUDES) -std=c++11 -include $(COCL_HOME)/include/fake_funcs.h -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
 
-%-hostpatched.ll: %-hostraw.ll %-device.cl $(COCL_HOME)/build/patch-hostside
+$(OUTPUTBASEPATH)-hostpatched.ll: $(OUTPUTBASEPATH)-hostraw.ll $(OUTPUTBASEPATH)-device.cl $(COCL_HOME)/build/patch-hostside
 	echo building $@ from $<
 	$(COCL_HOME)/build/patch-hostside $< $(word 2,$^) $@
 
