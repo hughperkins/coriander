@@ -97,6 +97,9 @@ while [[ x$1 != x ]]; do {
                 # clang doesnt like this => ignore
                 # PASSTHRU="$PASSTHRU $1"
                 ;;
+            -fPIC)
+                PASSTHRU="$PASSTHRU $1"
+                ;;
             -fno-canonical-system-headers)
                 # echo ignoring -fno-canonical-system-headers
                 # clang doesnt like this => ignore
@@ -129,9 +132,9 @@ while [[ x$1 != x ]]; do {
     shift
 } done
 
-# echo OUTPATH [$OUTPATH]
-# echo INFILES ["$INFILES"]
-# echo PASSTHRU $PASSTHRU
+echo OUTPATH [$OUTPATH]
+echo INFILES ["$INFILES"]
+echo PASSTHRU $PASSTHRU
 INPATH=${INFILES}
 
 # echo INCLUDES ${INCLUDES}
@@ -204,10 +207,12 @@ if [[ x${NOCOCLREBUILD} == x ]]; then {
 } fi
 
 if [[ ! -v COMPILE ]]; then {
+    FINALPOSTFIX=${OUTPUTPOSTFIX}
     OUTPUTPOSTFIX=.o
 } fi
 
-PASSTHRU="${PASSTHRU}" OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${COCL_HOME}/src/cocl.Makefile
+# PASSTHRU="${PASSTHRU}" OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${COCL_HOME}/src/cocl.Makefile
+OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${COCL_HOME}/src/cocl.Makefile
 
 if [[ -v COMPILE ]]; then {
     set +x
@@ -223,7 +228,7 @@ if [[ -v COMPILE ]]; then {
     echo "    LD_LIBRARY_PATH=${COCL_HOME}/build:${LD_LIBRARY_PATH} ${OUTPUTBASEPATH}"
     echo 
 } else {
-    g++ -o ${OUTPUTBASEPATH} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} -L${COCL_HOME}/build -lcocl -lEasyCL -lOpenCL
+    g++ -o ${OUTPUTBASEPATH}${FINALPOSTFIX} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} -L${COCL_HOME}/build -lcocl -lEasyCL -lOpenCL
     set +x
     echo ""
     echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}"

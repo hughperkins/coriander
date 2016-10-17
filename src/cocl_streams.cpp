@@ -53,7 +53,7 @@ size_t cuStreamWaitEvent(CLQueue *queue, Event *event, unsigned int flags) {
     if(!event->has_event()) {
         cout << "cuStreamWaitEvent redirected: Warning: you havent Recorded on the event you passed in" << endl;
     }
-    cl_event clevent;
+    // cl_event clevent;
     clEnqueueBarrierWithWaitList(queue->queue,
         1,
         &event->event,
