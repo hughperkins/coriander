@@ -9,41 +9,207 @@ export CLANG=clang++-3.8
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export COCL_HOME=$(dirname ${SCRIPT_DIR})
 
-INCLUDES=
-unset OUTPATH
-while getopts gco:I: opt; do
-    case $opt in
-    I)
-        INCLUDES="$INCLUDES -I$OPTARG"
-        ;;
-    o)
-        OUTPATH=$OPTARG
-        ;;
-    c)
-        COMPILE=1
-        ;;
-    g)
-        OPT_G=-g
-        ;;
-    esac
-done
-shift $((OPTIND - 1))
+# what comes out of tf crosstool by default:
+# gpus/crosstool: external/cocl/bin/cocl
+#   -D_FORCE_INLINES
+#   -gencode=arch=compute_30,\"code=sm_30,compute_30\"  
+#   -U_FORTIFY_SOURCE
+#   -D_FORTIFY_SOURCE=1
+#   -std=c++11
+#   --compiler-options "
+#   -isystem external/bazel_tools/tools/cpp/gcc3
+#   -iquote .
+#   -iquote bazel-out/local_linux-py3-fastbuild/genfiles
+#   -iquote external/cocl
+#   -iquote bazel-out/local_linux-py3-fastbuild/genfiles/external/cocl
+#   -iquote external/EasyCL
+#   -iquote bazel-out/local_linux-py3-fastbuild/genfiles/external/EasyCL
+#   -iquote external/bazel_tools
+#   -iquote bazel-out/local_linux-py3-fastbuild/genfiles/external/bazel_tools -fno-canonical-system-headers"
+#   --compiler-bindir=/usr/bin/gcc
+#   -I .
+#   -x cu
+#   tensorflow/hugh/testcu.cu.cc
+#   -M
+#   -o bazel-out/local_linux-py3-fastbuild/bin/tensorflow/hugh/_objs/testcu/tensorflow/hugh/testcu.cu.pic.d
 
-INFILE=$1
+# another example:
+# gpus/crosstool: /home/ubuntu/git/cuda-ir-to-opencl/bin/cocl -D_FORCE_INLINES
+# -gencode=arch=compute_30,\"code=sm_30,compute_30\" 
+#  -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=1
+# -std=c++11
+# --compiler-options "
+# -isystem external/bazel_tools/tools/cpp/gcc3 -iquote .
+# -iquote bazel-out/local_linux-py3-fastbuild/genfiles -iquote external/cocl
+# -iquote bazel-out/local_linux-py3-fastbuild/genfiles/external/cocl -iquote external/EasyCL
+# -iquote bazel-out/local_linux-py3-fastbuild/genfiles/external/EasyCL -iquote external/bazel_tools
+# -iquote bazel-out/local_linux-py3-fastbuild/genfiles/external/bazel_tools
+# -fno-canonical-system-headers"
+# --compiler-bindir=/usr/bin/gcc
+# -I . -x cu  -M
+# -o bazel-out/local_linux-py3-fastbuild/bin/tensorflow/hugh/_objs/testcu/tensorflow/hugh/testcu.cu.pic.d
+# tensorflow/hugh/testcu.cu.cc
+
+
+# Using this weird bash, compared to other possibilities because:
+# - getopts cant handle long options
+# - would rather not make cocl dependent on python (although I know that tensorflow already is)
+# - getopt non-gnu cant handle long options either
+# - getopt gnu is not the default on Mac
+# I *hope* that bash is fairly portable, across Linux, Mac, cygwin/msys64?
+
+PASSTHRU=
+while [[ x$1 != x ]]; do {
+    # echo 1 $1
+    arr1=(${1//=/ })
+    THISARG=${arr1[0]}
+    DONE=0
+    TWOLETTERS=${1:0:2}
+    echo TWOLETTERS [$TWOLETTERS]
+    case "${TWOLETTERS}" in
+        -I)
+            echo got include
+            # need to check if theres a space or not
+            if [[ $1 == -I ]]; then {
+                INCLUDES="$INCLUDES -I$2"
+                shift
+            } else {
+                INCLUDES="$INCLUDES $1"
+            } fi
+            DONE=1
+            ;;
+        -D)
+            PASSTHRU="$PASSTHRU $1"
+            DONE=1
+            ;;
+        -U)
+            PASSTHRU="$PASSTHRU $1"
+            DONE=1
+            ;;
+        -x)
+            # not sure why we are receiving -x cu? ignore for now
+            shift
+            DONE=1
+            ;;
+         *)
+            ;;
+    esac
+    if [[ $DONE != 1 ]]; then {
+        # echo THISARG ${THISARG}
+        case $THISARG in
+            -M)
+                PASSTHRU="$PASSTHRU -M"
+                ;;
+            # -I)
+            #    INCLUDES="$INCLUDES $1"
+            #     ;;
+            -c)
+                COMPILE=1
+                ;;
+            -g)
+                OPT_G=-g
+                ;;
+            -o)
+                OUTPATH=$2
+                shift
+                ;;
+            -iquote)
+                PASSTHRU="$PASSTHRU $1 $2"
+                shift
+                ;;
+            -isystem)
+                PASSTHRU="$PASSTHRU $1 $2"
+                shift
+                ;;
+            -gencode)
+                PASSTHRU="$PASSTHRU $1"
+                ;;
+            --compiler-bindir)
+                PASSTHRU="$PASSTHRU $1"
+                ;;
+            -fno-canonical-system-headers)
+                PASSTHRU="$PASSTHRU $1"
+                ;;
+            --compiler-options)
+                PASSTHRU="$PASSTHRU $1"
+                ;;
+            -std)
+                PASSTHRU="$PASSTHRU $1"
+                ;;
+            *)
+                if [[ x$INFILES != x ]]; then {
+                    INFILES="$INFILES $1"
+                } else {
+                    INFILES="$1"
+                } fi
+                ;;
+        esac
+    } fi
+    # esac
+    shift
+} done
+
+echo OUTPATH [$OUTPATH]
+echo INFILES ["$INFILES"]
+echo PASSTHRU $PASSTHRU
+INPATH=${INFILES}
+
+# INCLUDES=
+# unset OUTPATH
+# while getopts i:Mgco:I:D: opt; do
+#     case $opt in
+#     I)
+#         INCLUDES="$INCLUDES -I$OPTARG"
+#         ;;
+#     o)
+#         OUTPATH=$OPTARG
+#         echo OUTPATH $OUTPATH
+#         ;;
+#     c)
+#         COMPILE=1
+#         ;;
+#     g)
+#         OPT_G=-g
+#         ;;
+#     M)
+#         echo warning: ignoring -M arg
+#         ;;
+#     D)
+#         echo warning: ignoring -D arg: $OPTARG
+#         ;;
+#     U)
+#         echo warning: ignoring -U arg: $OPTARG
+#         ;;
+#     i)
+#         IARG="-i$OPTARG $THIS"
+#         echo warning: ignoring -i arg: $IARG;
+#         shift;
+#         # OPTIND=$(($OPTIND + 1)) 
+#         ;;
+#     esac
+# done
+# shift $((OPTIND - 1))
+
+# INFILE=$1
 
 echo INCLUDES ${INCLUDES}
-echo INFILE ${INFILE}
+echo INPATH ${INPATH}
 echo OUTPATH ${OUTPATH}
 echo COMPILE ${COMPILE}
 export INCLUDES
 
-if [[ x$1 == x ]]; then {
-    echo Usage: $0 [infile.cu]
+if [[ x$INPATH == x ]]; then {
+    echo Usage: $0 [infile.cu] [-c] [-g] [[-Iincludepath]...] [-o outfile]
     exit 1
 } fi
 
-INPUTBASENAME=$(basename -s .cu ${INFILE})
-INPUTDIRNAME=$(dirname ${INFILE})
+# since tf feeds us weird postfixes like '.cu.cc' ,and '.cu.pic.d' (is that a foldername? unclear for now...), so
+# we need to do something more robust than just assume the files end in '.cu' or '.o'
+# so, we'll do a bash string split
+
+# INPUTBASENAME=$(basename -s .cc ${INPATH})
+INPUTBASENAME=$(basename -s .cu ${INPATH})
+INPUTDIRNAME=$(dirname ${INPATH})
 INPUTBASEPATH=${INPUTDIRNAME}/${INPUTBASENAME}
 
 if [[ -v OUTPATH ]]; then {
@@ -56,13 +222,15 @@ OUTPUTBASENAME=$(basename -s .o ${OUTFILE})
 OUTPUTDIRNAME=$(dirname ${OUTFILE})
 OUTPUTBASEPATH=${OUTPUTDIRNAME}/${OUTPUTBASENAME}
 
-if [[ x$(NOCOCLREBUILD) == x ]]; then {
+# exit 1
+
+if [[ x${NOCOCLREBUILD} == x ]]; then {
     (cd ${COCL_HOME}
          make
     )
 } fi
 
-OUTPUTBASEPATH=${OUTPUTBASEPATH} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${COCL_HOME}/src/cocl.Makefile
+PASSTHRU="${PASSTHRU}" OUTPUTBASEPATH=${OUTPUTBASEPATH} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${COCL_HOME}/src/cocl.Makefile
 
 if [[ -v COMPILE ]]; then {
     set +x
