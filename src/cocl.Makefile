@@ -16,9 +16,9 @@ LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
 # the llvm-config compile flags suppresses asserts
 COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -g -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++11
 
-all: $(OUTPUTBASEPATH).o
+all: $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX)
 
-%-device.ll: $(INPUTBASEPATH).cu $(COCL_HOME)/include/fake_funcs.h $(COCL_HOME)/build/ir-to-opencl
+%-device.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/fake_funcs.h $(COCL_HOME)/build/ir-to-opencl
 	echo building $@ from $<
 	$(CLANG) $(PASSTHRU) -x cuda -std=c++11 -D__CUDA_ARCH__=300 -include $(COCL_HOME)/include/fake_funcs.h -I$(COCL_HOME)/include -I$(CUDA_HOME)/include $(INCLUDES) $< --cuda-device-only -emit-llvm -I/usr/include/x86_64-linux-gnu -O3 -S -o $@
 
@@ -36,7 +36,7 @@ all: $(OUTPUTBASEPATH).o
 	echo building $@ from $<
 	$(COCL_HOME)/build/ir-to-opencl $(DEBUG) $< $@
 
-%-hostraw.ll: $(INPUTBASEPATH).cu $(COCL_HOME)/include/fake_funcs.h
+%-hostraw.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/fake_funcs.h
 	echo building $@ from $<
 	$(CLANG) $(PASSTHRU) $(INCLUDES) -std=c++11 -include $(COCL_HOME)/include/fake_funcs.h -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
 
@@ -44,7 +44,7 @@ all: $(OUTPUTBASEPATH).o
 	echo building $@ from $<
 	$(COCL_HOME)/build/patch-hostside $< $(word 2,$^) $@
 
-$(OUTPUTBASEPATH).o: $(OUTPUTBASEPATH)-hostpatched.ll
+$(OUTPUTBASEPATH)$(OUTPUTPOSTFIX): $(OUTPUTBASEPATH)-hostpatched.ll
 	echo building $@ from $<
 	$(CLANG) -c $< -O3 $(OPT_G) -o $@
 

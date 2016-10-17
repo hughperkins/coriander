@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+# set -x
 set -e
 
 export CUDA_HOME=/usr/local/cuda-7.5
@@ -9,48 +9,6 @@ export CLANG=clang++-3.8
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export COCL_HOME=$(dirname ${SCRIPT_DIR})
 
-# what comes out of tf crosstool by default:
-# gpus/crosstool: external/cocl/bin/cocl
-#   -D_FORCE_INLINES
-#   -gencode=arch=compute_30,\"code=sm_30,compute_30\"  
-#   -U_FORTIFY_SOURCE
-#   -D_FORTIFY_SOURCE=1
-#   -std=c++11
-#   --compiler-options "
-#   -isystem external/bazel_tools/tools/cpp/gcc3
-#   -iquote .
-#   -iquote bazel-out/local_linux-py3-fastbuild/genfiles
-#   -iquote external/cocl
-#   -iquote bazel-out/local_linux-py3-fastbuild/genfiles/external/cocl
-#   -iquote external/EasyCL
-#   -iquote bazel-out/local_linux-py3-fastbuild/genfiles/external/EasyCL
-#   -iquote external/bazel_tools
-#   -iquote bazel-out/local_linux-py3-fastbuild/genfiles/external/bazel_tools -fno-canonical-system-headers"
-#   --compiler-bindir=/usr/bin/gcc
-#   -I .
-#   -x cu
-#   tensorflow/hugh/testcu.cu.cc
-#   -M
-#   -o bazel-out/local_linux-py3-fastbuild/bin/tensorflow/hugh/_objs/testcu/tensorflow/hugh/testcu.cu.pic.d
-
-# another example:
-# gpus/crosstool: /home/ubuntu/git/cuda-ir-to-opencl/bin/cocl -D_FORCE_INLINES
-# -gencode=arch=compute_30,\"code=sm_30,compute_30\" 
-#  -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=1
-# -std=c++11
-# --compiler-options "
-# -isystem external/bazel_tools/tools/cpp/gcc3 -iquote .
-# -iquote bazel-out/local_linux-py3-fastbuild/genfiles -iquote external/cocl
-# -iquote bazel-out/local_linux-py3-fastbuild/genfiles/external/cocl -iquote external/EasyCL
-# -iquote bazel-out/local_linux-py3-fastbuild/genfiles/external/EasyCL -iquote external/bazel_tools
-# -iquote bazel-out/local_linux-py3-fastbuild/genfiles/external/bazel_tools
-# -fno-canonical-system-headers"
-# --compiler-bindir=/usr/bin/gcc
-# -I . -x cu  -M
-# -o bazel-out/local_linux-py3-fastbuild/bin/tensorflow/hugh/_objs/testcu/tensorflow/hugh/testcu.cu.pic.d
-# tensorflow/hugh/testcu.cu.cc
-
-
 # Using this weird bash, compared to other possibilities because:
 # - getopts cant handle long options
 # - would rather not make cocl dependent on python (although I know that tensorflow already is)
@@ -58,6 +16,7 @@ export COCL_HOME=$(dirname ${SCRIPT_DIR})
 # - getopt gnu is not the default on Mac
 # I *hope* that bash is fairly portable, across Linux, Mac, cygwin/msys64?
 
+echo args "$@"
 PASSTHRU=
 while [[ x$1 != x ]]; do {
     # echo 1 $1
@@ -95,8 +54,8 @@ while [[ x$1 != x ]]; do {
             ;;
     esac
     if [[ $DONE != 1 ]]; then {
-        # echo THISARG ${THISARG}
-        case $THISARG in
+        echo THISARG ${THISARG}
+        case ${THISARG} in
             -M)
                 PASSTHRU="$PASSTHRU -M"
                 ;;
@@ -122,21 +81,33 @@ while [[ x$1 != x ]]; do {
                 shift
                 ;;
             -gencode)
-                PASSTHRU="$PASSTHRU $1"
+                echo ignoring -gencode
+                # clang doesnt like this => ignore
+                # PASSTHRU="$PASSTHRU $1"
                 ;;
             --compiler-bindir)
-                PASSTHRU="$PASSTHRU $1"
+                echo ignoring --compiler-bindir
+                # clang doesnt like this => ignore
+                # PASSTHRU="$PASSTHRU $1"
                 ;;
             -fno-canonical-system-headers)
-                PASSTHRU="$PASSTHRU $1"
+                echo ignoring -fno-canonical-system-headers
+                # clang doesnt like this => ignore
+                # PASSTHRU="$PASSTHRU $1"
                 ;;
             --compiler-options)
-                PASSTHRU="$PASSTHRU $1"
+                echo ignoring --compiler-options
+                shift
+                # echo ignoring compiler-options
+                # clang doesnt like this => ignore
+                # PASSTHRU="$PASSTHRU $1"
                 ;;
             -std)
+                echo got -std
                 PASSTHRU="$PASSTHRU $1"
                 ;;
             *)
+                echo adding $1 as input file
                 if [[ x$INFILES != x ]]; then {
                     INFILES="$INFILES $1"
                 } else {
@@ -146,6 +117,8 @@ while [[ x$1 != x ]]; do {
         esac
     } fi
     # esac
+    echo new passthru $PASSTHRU
+    echo doing shift
     shift
 } done
 
@@ -153,44 +126,6 @@ echo OUTPATH [$OUTPATH]
 echo INFILES ["$INFILES"]
 echo PASSTHRU $PASSTHRU
 INPATH=${INFILES}
-
-# INCLUDES=
-# unset OUTPATH
-# while getopts i:Mgco:I:D: opt; do
-#     case $opt in
-#     I)
-#         INCLUDES="$INCLUDES -I$OPTARG"
-#         ;;
-#     o)
-#         OUTPATH=$OPTARG
-#         echo OUTPATH $OUTPATH
-#         ;;
-#     c)
-#         COMPILE=1
-#         ;;
-#     g)
-#         OPT_G=-g
-#         ;;
-#     M)
-#         echo warning: ignoring -M arg
-#         ;;
-#     D)
-#         echo warning: ignoring -D arg: $OPTARG
-#         ;;
-#     U)
-#         echo warning: ignoring -U arg: $OPTARG
-#         ;;
-#     i)
-#         IARG="-i$OPTARG $THIS"
-#         echo warning: ignoring -i arg: $IARG;
-#         shift;
-#         # OPTIND=$(($OPTIND + 1)) 
-#         ;;
-#     esac
-# done
-# shift $((OPTIND - 1))
-
-# INFILE=$1
 
 echo INCLUDES ${INCLUDES}
 echo INPATH ${INPATH}
@@ -207,10 +142,36 @@ if [[ x$INPATH == x ]]; then {
 # we need to do something more robust than just assume the files end in '.cu' or '.o'
 # so, we'll do a bash string split
 
-# INPUTBASENAME=$(basename -s .cc ${INPATH})
-INPUTBASENAME=$(basename -s .cu ${INPATH})
-INPUTDIRNAME=$(dirname ${INPATH})
-INPUTBASEPATH=${INPUTDIRNAME}/${INPUTBASENAME}
+# gets a file basename and postfix, for unknown postfix
+# output: BASEPATH POSTFIX
+# eg input: foo/bar/somefile.cu.cc
+# outputs will be:
+# BASEPATH=foo/bar/somefile
+# POSTFIX=.cu.cc
+function split_path {
+    DIRNAME=$(dirname $1)
+
+    BASENAME=$(basename $1)
+
+    BASEARR=(${BASENAME//./ })
+    BASEPATH=${DIRNAME}/${BASEARR[0]}
+
+    LENARR=$((${#BASEARR[@]} - 1))
+    ARGREST=
+    for j in $(seq 1 ${LENARR}); do {
+        ARGREST="$ARGREST.${BASEARR[$j]}";
+    } done
+    POSTFIX=$ARGREST
+}
+
+split_path ${INPATH}
+INPUTBASEPATH=${BASEPATH}
+INPUTPOSTFIX=${POSTFIX}
+
+# # INPUTBASENAME=$(basename -s .cc ${INPATH})
+# INPUTBASENAME=$(basename -s .cu ${INPATH})
+# INPUTDIRNAME=$(dirname ${INPATH})
+# INPUTBASEPATH=${INPUTDIRNAME}/${INPUTBASENAME}
 
 if [[ -v OUTPATH ]]; then {
     OUTFILE=${OUTPATH}
@@ -218,9 +179,14 @@ if [[ -v OUTPATH ]]; then {
     OUTFILE=${INPUTBASEPATH}.o
 } fi
 
-OUTPUTBASENAME=$(basename -s .o ${OUTFILE})
-OUTPUTDIRNAME=$(dirname ${OUTFILE})
-OUTPUTBASEPATH=${OUTPUTDIRNAME}/${OUTPUTBASENAME}
+split_path ${OUTFILE}
+OUTPUTBASEPATH=${BASEPATH}
+OUTPUTPOSTFIX=${POSTFIX}
+
+
+# OUTPUTBASENAME=$(basename -s .o ${OUTFILE})
+# OUTPUTDIRNAME=$(dirname ${OUTFILE})
+# OUTPUTBASEPATH=${OUTPUTDIRNAME}/${OUTPUTBASENAME}
 
 # exit 1
 
@@ -230,16 +196,16 @@ if [[ x${NOCOCLREBUILD} == x ]]; then {
     )
 } fi
 
-PASSTHRU="${PASSTHRU}" OUTPUTBASEPATH=${OUTPUTBASEPATH} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${COCL_HOME}/src/cocl.Makefile
+PASSTHRU="${PASSTHRU}" OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${COCL_HOME}/src/cocl.Makefile
 
 if [[ -v COMPILE ]]; then {
     set +x
     echo ""
-    echo "    ${INPUTBASEPATH}.cu compiled into ${OUTPUTBASEPATH}.o"
+    echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}"
     echo ""
     echo To finish off, you can do:
     echo ""
-    echo "    g++ -o ${OUTPUTBASEPATH} ${OUTPUTBASEPATH}.o -L${COCL_HOME}/build -lcocl -lEasyCL -lOpenCL"
+    echo "    g++ -o ${OUTPUTBASEPATH} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} -L${COCL_HOME}/build -lcocl -lEasyCL -lOpenCL"
     echo ""
     echo "... which you can run like:"
     echo
@@ -249,7 +215,7 @@ if [[ -v COMPILE ]]; then {
     g++ -o ${OUTPUTBASEPATH} ${OUTPUTBASEPATH}.o -L${COCL_HOME}/build -lcocl -lEasyCL -lOpenCL
     set +x
     echo ""
-    echo "    ${INPUTBASEPATH}.cu compiled into ${OUTPUTBASEPATH}"
+    echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}"
     echo ""
     echo "You can run by doing:"
     echo
