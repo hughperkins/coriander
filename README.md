@@ -82,6 +82,24 @@ hostFloats[2] 444
 
 Thats it!  :-)  Youve run your first `cuda-on-cl` program :-)
 
+### Two-step compilation
+
+If you want, you can compile in two steps:
+
+```
+cocl -c teststream.cu
+g++ -o teststream teststream.o -lcocl -lOpenCL
+```
+Result is the same:
+```
+/tmp/foo$ ./cuda_sample
+Using Intel , OpenCL platform: Intel Gen OCL Driver
+Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
+hostFloats[2] 123
+hostFloats[2] 222
+hostFloats[2] 444
+```
+
 ## Options
 
 | Option | Description |
