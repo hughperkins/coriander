@@ -32,13 +32,13 @@ $(OUTPUTBASEPATH)-device.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/includ
 	#                                                                               -I$(CUDA_HOME)/include -I/usr/include/x86_64-linux-gnu $< --cuda-device-only -emit-llvm -O3 -S -o $@
 
 $(OUTPUTBASEPATH)-device.cl: $(OUTPUTBASEPATH)-device.ll $(COCL_HOME)/build/ir-to-opencl
-	$(COCL_HOME)/build/ir-to-opencl $(DEBUG) $< $@
+	ir-to-opencl $(DEBUG) $< $@
 
 $(OUTPUTBASEPATH)-hostraw.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/fake_funcs.h
 	$(CLANG) $(PASSTHRU) $(INCLUDES) -x cuda -std=c++11 -include $(COCL_HOME)/include/fake_funcs.h -I$(CUDA_HOME)/include $< --cuda-host-only -emit-llvm  -O3 -S -o $@
 
 $(OUTPUTBASEPATH)-hostpatched.ll: $(OUTPUTBASEPATH)-hostraw.ll $(OUTPUTBASEPATH)-device.cl $(COCL_HOME)/build/patch-hostside
-	$(COCL_HOME)/build/patch-hostside $< $(word 2,$^) $@
+	patch-hostside $< $(word 2,$^) $@
 
 $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX): $(OUTPUTBASEPATH)-hostpatched.ll
 	$(CLANG) -c $< -O3 $(OPT_G) -o $@
