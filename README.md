@@ -5,7 +5,7 @@ Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 ## Concept
 
 - *Compile* using `cocl`
-- *link* with `libcocl.a`
+- *link* using `-lcocl -lOpenCL`
 - at runtime, loads *libOpenCL.so*
 
 ## How to use, example
@@ -69,15 +69,10 @@ Run `cocl` to compile it:
 
     ./cuda_sample.cu compiled into ./cuda_sample
 
-You can run by doing:
-
-    LD_LIBRARY_PATH=/home/ubuntu/git/cuda-on-cl/build: ./cuda_sample
-
-
 ```
 Run it:
 ```
-/tmp/foo$ LD_LIBRARY_PATH=/home/ubuntu/git/cuda-on-cl/build: ./cuda_sample
+/tmp/foo$ ./cuda_sample
 initialize cl context
 Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
@@ -199,6 +194,9 @@ Tests are at [test](test)
 
 ## News
 
+- Oct 18:
+  - installs to `/usr/local` now
+  - `libcocl.a` contains `libEasyCL.a` now, no need for `libEasyCL.so` at runtime
 - Oct 16:
   - added streams, including kernel launch on non-default stream
   - removed pinned memory: `cuMemHostAlloc` now just calls `malloc`, see [design.md](doc/design.md) for analysis and thoughts on this.  Let me know if you have any ideas (eg via an issue).

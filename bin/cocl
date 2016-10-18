@@ -132,9 +132,9 @@ while [[ x$1 != x ]]; do {
     shift
 } done
 
-echo OUTPATH [$OUTPATH]
-echo INFILES ["$INFILES"]
-echo PASSTHRU $PASSTHRU
+# echo OUTPATH [$OUTPATH]
+# echo INFILES ["$INFILES"]
+# echo PASSTHRU $PASSTHRU
 INPATH=${INFILES}
 
 # echo INCLUDES ${INCLUDES}
@@ -144,7 +144,7 @@ INPATH=${INFILES}
 export INCLUDES
 
 if [[ x$INPATH == x ]]; then {
-    echo Usage: $0 [infile.cu] [-c] [-g] [[-Iincludepath]...] [-o outfile]
+    echo Usage: $0 [-c] [-g] [[-Iincludepath]...] [-o outfile] [infile.cu]
     exit 1
 } fi
 
@@ -186,7 +186,11 @@ INPUTPOSTFIX=${POSTFIX}
 if [[ -v OUTPATH ]]; then {
     OUTFILE=${OUTPATH}
 } else {
-    OUTFILE=${INPUTBASEPATH}.o
+    if [[ $COMPILE == 1 ]]; then {
+        OUTFILE=${INPUTBASEPATH}.o
+    } else {
+        OUTFILE=${INPUTBASEPATH}
+    } fi
 } fi
 
 split_path ${OUTFILE}
@@ -202,7 +206,7 @@ OUTPUTPOSTFIX=${POSTFIX}
 
 if [[ x${NOCOCLREBUILD} == x ]]; then {
     (cd ${COCL_HOME}
-         make
+         # make
     )
 } fi
 
@@ -212,29 +216,18 @@ if [[ ! -v COMPILE ]]; then {
 } fi
 
 # PASSTHRU="${PASSTHRU}" OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${COCL_HOME}/src/cocl.Makefile
-OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${COCL_HOME}/src/cocl.Makefile
+echo ${SCRIPT_DIR}/../share/cocl/cocl.Makefile
+OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${SCRIPT_DIR}/../share/cocl/cocl.Makefile
 
 if [[ -v COMPILE ]]; then {
     set +x
     echo ""
     echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}"
     echo ""
-    echo To finish off, you can do:
-    echo ""
-    echo "    g++ -o ${OUTPUTBASEPATH} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} -L${COCL_HOME}/build -lcocl -lEasyCL -lOpenCL"
-    echo ""
-    echo "... which you can run like:"
-    echo
-    echo "    LD_LIBRARY_PATH=${COCL_HOME}/build:${LD_LIBRARY_PATH} ${OUTPUTBASEPATH}"
-    echo 
 } else {
     g++ -o ${OUTPUTBASEPATH}${FINALPOSTFIX} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} -L${COCL_HOME}/build -lcocl -lEasyCL -lOpenCL
     set +x
     echo ""
-    echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}"
+    echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}${FINALPOSTFIX}"
     echo ""
-    echo "You can run by doing:"
-    echo
-    echo "    LD_LIBRARY_PATH=${COCL_HOME}/build:${LD_LIBRARY_PATH} ${OUTPUTBASEPATH}"
-    echo 
 } fi

@@ -10,7 +10,7 @@ LLVM_INCLUDE=/usr/include/llvm-3.8
 
 COCL_HOME=`pwd`
 
-prefix=/usr/local
+PREFIX=/usr/local
 
 # COMPILE_FLAGS=`$(LLVM_CONFIG) --cxxflags` -std=c++11
 LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
@@ -50,8 +50,12 @@ build/cocl_streams.o: src/cocl_streams.cpp src/cocl*.h
 build/cocl_context.o: src/cocl_context.cpp src/cocl*.h
 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
 
-build/libcocl.a: build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_memory.o build/cocl_properties.o build/cocl_streams.o build/cocl_context.o
-	ar rcs $@ $^
+build/libcocl.a: build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_memory.o build/cocl_properties.o build/cocl_streams.o build/cocl_context.o easycl
+	mkdir -p $(COCL_HOME)/build/easycl-extract
+	touch $(COCL_HOME)/build/easycl-extract/foo
+	rm $(COCL_HOME)/build/easycl-extract/*
+	(cd $(COCL_HOME)/build/easycl-extract/; ar x ../libEasyCL.a)
+	ar rcs $@ build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_memory.o build/cocl_properties.o build/cocl_streams.o build/cocl_context.o $(COCL_HOME)/build/easycl-extract/*.o
 
 clean:
 	rm -Rf build/* test/generated/* test/eigen/generated/* test/eigen/*.o test/*.o
@@ -83,15 +87,15 @@ test/generated/%-device.cl: test/%-device.ll build/ir-to-opencl
 # cocl
 build/eigen-%.o: test/eigen/%.cu
 	echo building $@ from $<
-	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
+	cocl -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
 
 build/test-%.o: test/%.cu
 	echo building $@ from $<
-	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -g -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
+	cocl -I$(EIGEN_HOME) -g -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
 
 build/test-cocl-%.o: test/cocl/%.cu
 	echo building $@ from $<
-	$(COCL_HOME)/bin/cocl -I$(EIGEN_HOME) -g -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
+	cocl -I$(EIGEN_HOME) -g -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
 
 # executables
 build/test-%: build/test-%.o build/libcocl.a
@@ -175,10 +179,16 @@ run-test-all: all run-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-
 .SECONDARY:
 
 install: build/ir-to-opencl build/patch-hostside build/libcocl.a
-	install -m 0755 build/ir-to-opencl $(prefix)/bin
-	install -m 0755 build/patch-hostside $(prefix)/bin
-	install -m 0644 build/libcocl.a $(prefix)/lib
-	install -m 0644 build/libEasyCL.a $(prefix)/lib
-#	install -m 0644 build/libcocl.a $(prefix)/lib
+	install -m 0755 build/ir-to-opencl $(PREFIX)/bin
+	install -m 0755 build/patch-hostside $(PREFIX)/bin
+	install -m 0644 build/libcocl.a $(PREFIX)/lib
+	mkdir -p $(PREFIX)/share/cocl
+	install -m 0644 src/cocl.Makefile $(PREFIX)/share/cocl/cocl.Makefile
+	install -m 0755 bin/cocl $(PREFIX)/bin
+	mkdir -p $(PREFIX)/include/cocl
+	install -m 0644 include/fake_funcs.h $(PREFIX)/include/cocl/
+	install -m 0644 include/__clang_cuda_runtime_wrapper.h $(PREFIX)/include/cocl/
+	# install -m 0644 build/libEasyCL.a $(PREFIX)/lib
+#	install -m 0644 build/libcocl.a $(PREFIX)/lib
 
 .PHONY: install
