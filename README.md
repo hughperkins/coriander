@@ -55,14 +55,14 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 ```
-- let's save this file eg to /tmp/foo/cuda_sample.cu:
+- let's save this file eg to `cuda_sample.cu`:
 ```
-/tmp/foo$ ls
+$ ls
 cuda_sample.cu
 ```
 Run `cocl` to compile it:
 ```
-/tmp/foo$ cocl cuda_sample.cu
+$ cocl cuda_sample.cu
    ...
    ... (bunch of compily stuff) ...
    ...
@@ -72,7 +72,7 @@ Run `cocl` to compile it:
 ```
 Run `./cuda_sample`:
 ```
-/tmp/foo$ ./cuda_sample
+$ ./cuda_sample
 Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 hostFloats[2] 123
@@ -92,7 +92,7 @@ g++ -o teststream teststream.o -lcocl -lOpenCL
 ```
 Result is the same:
 ```
-/tmp/foo$ ./cuda_sample
+$ ./cuda_sample
 Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 hostFloats[2] 123
