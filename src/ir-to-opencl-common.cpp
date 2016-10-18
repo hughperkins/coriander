@@ -481,6 +481,7 @@ std::string dumpTypeNoPointers(Type *type) {
         //     outs() << "type id " << typeID << "\n";
         //     throw runtime_error("unrecognized type");
     }
+    return "";
 }
 
 llvm::Constant *createInt32Constant(llvm::LLVMContext *context, int value) {

@@ -144,16 +144,9 @@ Other operating systems, cuda version, and clang/llvm versions, might work too, 
 sudo apt-get install git cmake llvm-3.8-dev clang-3.8-dev libc6-dev-i386 make gcc g++
 git clone --recursive https://github.com/hughperkins/cuda-on-cl
 cd cuda-on-cl
-make
+make -j 4
+sudo make install
 ```
-=> `ir-to-opencl`, `patch-hostside`, `libEasyCL.so`, and `libcocl.a` should be built into `build` subdirectory
-
-To use, you'll need to add `build` and `bin` to your `PATH` variable:
-```
-export PATH=$PATH:$PWD/bin:$PWD/build
-```
-
-Thats it!
 
 ## Test
 

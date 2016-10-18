@@ -10,6 +10,8 @@ LLVM_INCLUDE=/usr/include/llvm-3.8
 
 COCL_HOME=`pwd`
 
+prefix=/usr/local
+
 # COMPILE_FLAGS=`$(LLVM_CONFIG) --cxxflags` -std=c++11
 LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
 # the llvm-config compile flags suppresses asserts
@@ -27,7 +29,7 @@ build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-
 
 easycl:
 	git submodule update --init --recursive
-	cd build && cmake ../src/EasyCL -DCMAKE_INSTALL_PREFIX=`pwd`/dist -DBUILD_TESTS=ON
+	cd build && cmake ../src/EasyCL -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_TESTS=OFF -DUSE_CLEW=OFF -DBUILD_SHARED=OFF
 	cd build && make -j 4
 
 build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp src/cocl*.h
@@ -171,3 +173,12 @@ run-eigen-cxx11_tensor_cuda: build/eigen-cxx11_tensor_cuda
 run-test-all: all run-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-testevents run-test-cocl-testevents2 run-test-cocl-testcumemcpy run-test-cocl-teststream run-eigen-test_cuda_elementwise_small run-eigen-test_cuda_nullary run-eigen-test_cuda_elementwise
 
 .SECONDARY:
+
+install: build/ir-to-opencl build/patch-hostside build/libcocl.a
+	install -m 0755 build/ir-to-opencl $(prefix)/bin
+	install -m 0755 build/patch-hostside $(prefix)/bin
+	install -m 0644 build/libcocl.a $(prefix)/lib
+	install -m 0644 build/libEasyCL.a $(prefix)/lib
+#	install -m 0644 build/libcocl.a $(prefix)/lib
+
+.PHONY: install
