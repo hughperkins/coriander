@@ -2,7 +2,13 @@
 
 Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 
-## How to use
+## Concept
+
+- `cocl` is a drop-in replacement for `nvcc`, for building for OpenCL platform
+- link with `libcocl.a`, instead of to `libcudart.so` et al
+- at runtime, you'll need an OpenCL-enabled GPU available, and OpenCL runtime libraries
+
+## How to use, example
 
 - write a CUDA sourcecode file, or find an existing one
 - just use normal CUDA operations, like cudaMalloc, cudaFree, standard CUDA kernel launch syntax, and so on
