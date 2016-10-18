@@ -189,6 +189,7 @@ Tests are at [test](test)
 - Oct 18:
   - installs to `/usr/local` now
   - `libcocl.a` contains `libEasyCL.a` now, no need for `libEasyCL.so` at runtime
+  - fixed bug with linking multiple compiled `.cu` files causing error about 'multiple definitions of __opencl_source'
 - Oct 16:
   - added streams, including kernel launch on non-default stream
   - removed pinned memory: `cuMemHostAlloc` now just calls `malloc`, see [design.md](doc/design.md) for analysis and thoughts on this.  Let me know if you have any ideas (eg via an issue).

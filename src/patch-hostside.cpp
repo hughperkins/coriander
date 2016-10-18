@@ -51,6 +51,8 @@ using namespace std;
 static llvm::LLVMContext TheContext;
 static llvm::IRBuilder<> Builder(TheContext);
 static std::unique_ptr<llvm::Module> TheModule;
+// static std::string deviceclfilename;
+static std::string sourcecode_stringname;
 
 static std::map<Type *, Type *> pointerlessTypeByOriginalType;
 
@@ -359,7 +361,7 @@ void patchFunction(Function *F) {
                     Instruction *stringInstr = addStringInstr(F->getParent(), "s." + launchCallInfo->kernelName, launchCallInfo->kernelName);
                     stringInstr->insertBefore(inst);
 
-                    Instruction *clSourcecodeInstr = addStringInstrExistingGlobal(F->getParent(), "__opencl_sourcecode");
+                    Instruction *clSourcecodeInstr = addStringInstrExistingGlobal(F->getParent(), sourcecode_stringname);
                     clSourcecodeInstr->insertBefore(inst);
 
                     Function *configureKernel = cast<Function>(F->getParent()->getOrInsertFunction(
@@ -647,7 +649,9 @@ void patchModule(string deviceclfilename, Module *M) {
         (std::istreambuf_iterator<char>(f_in)),
         (std::istreambuf_iterator<char>()));
 
-    addGlobalVariable(M, "__opencl_sourcecode", cl_sourcecode);
+    // deviceclfilename = deviceclfilename;
+    sourcecode_stringname = "__opencl_sourcecode" + deviceclfilename;
+    addGlobalVariable(M, sourcecode_stringname, cl_sourcecode);
 
     vector<Function *> functionsToRemove;
     for(auto it = M->begin(); it != M->end(); it++) {
