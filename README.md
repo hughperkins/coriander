@@ -70,7 +70,7 @@ Run `cocl` to compile it:
     ./cuda_sample.cu compiled into ./cuda_sample
 
 ```
-Run it:
+Run `./cuda_sample`:
 ```
 /tmp/foo$ ./cuda_sample
 Using Intel , OpenCL platform: Intel Gen OCL Driver
