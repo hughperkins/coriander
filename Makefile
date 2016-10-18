@@ -85,6 +85,10 @@ test/generated/%-device.cl: test/%-device.ll build/ir-to-opencl
 	build/ir-to-opencl $(DEBUG) $< $@
 
 # cocl
+build/test-cocl-multi1-%.o: test/cocl/multi1/%.cu
+	echo building $@ from $<
+	cocl -c -o $@ $<
+
 build/eigen-%.o: test/eigen/%.cu
 	echo building $@ from $<
 	cocl -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
@@ -98,6 +102,9 @@ build/test-cocl-%.o: test/cocl/%.cu
 	cocl -I$(EIGEN_HOME) -g -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
 
 # executables
+build/test-cocl-multi1: build/test-cocl-multi1-main.o build/test-cocl-multi1-k1.o build/test-cocl-multi1-k2.o build/libcocl.a
+	g++ -o $@ build/test-cocl-multi1-main.o build/test-cocl-multi1-k1.o build/test-cocl-multi1-k2.o -g -lcocl -lOpenCL -Lbuild -lEasyCL
+
 build/test-%: build/test-%.o build/libcocl.a
 	g++ -o $@ $< -g -lcocl -lOpenCL -Lbuild -lEasyCL
 
@@ -145,6 +152,12 @@ run-test-cocl-teststream: build/test-cocl-teststream
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
 run-test-cocl-testpartialcopy: build/test-cocl-testpartialcopy
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
+run-test-cocl-multi1: build/test-cocl-multi1
 	################################
 	# running:
 	################################
