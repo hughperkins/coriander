@@ -11,7 +11,6 @@ Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 ## How to use, example
 
 - write a CUDA sourcecode file, or find an existing one
-- just use normal CUDA operations, like cudaMalloc, cudaFree, standard CUDA kernel launch syntax, and so on
 - here's a simple example: [cuda_sample.cu](test/cuda_sample.cu)
 ```
 // a cuda app.  we will convert this to opencl, and run it :-)
