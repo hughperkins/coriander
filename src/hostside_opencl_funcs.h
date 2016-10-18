@@ -39,3 +39,9 @@ extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
 }
 
+#ifdef COCL_SPAM
+#define COCL_PRINT(stuff) \
+   stuff;
+#else
+   #define COCL_PRINT(stuff)
+#endif

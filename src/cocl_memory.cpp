@@ -42,13 +42,13 @@ namespace cocl {
                                                NULL, &err);
         cl->checkError(err);
         Memory *memory = new Memory(clmem, bytes);
-        cout << "Memory::newDeviceAlloc bytes=" << bytes << " memory=" << (void *)memory << " clmem=" << (void*)memory->clmem << endl;
+        COCL_PRINT(cout << "Memory::newDeviceAlloc bytes=" << bytes << " memory=" << (void *)memory << " clmem=" << (void*)memory->clmem << endl);
         memories.insert(memory);
         return memory;
     }
 
     Memory::~Memory() {
-        cout << "~Memory releasing mem object memory=" << (void *)this << endl;
+        COCL_PRINT(cout << "~Memory releasing mem object memory=" << (void *)this << endl);
         cl_int err = clReleaseMemObject(clmem);
         cl->checkError(err);
     }
@@ -58,7 +58,7 @@ namespace cocl {
         for(auto it=memories.begin(), e=memories.end(); it != e; it++) {
             Memory *memory = *it;
             if(passedInAsCharStar >= (char *)memory && passedInAsCharStar < (char *)memory + memory->bytes) {
-                cout << "found memory: " << (void *)memory;
+                COCL_PRINT(cout << "found memory: " << (void *)memory);
                 return memory;
             }
         }
@@ -68,30 +68,30 @@ namespace cocl {
 }
 
 size_t cuMemHostAlloc(void **pHostPointer, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE) {
-    cout << "cuMemHostAlloc redirected bytes=" << bytes << endl;
+    COCL_PRINT(cout << "cuMemHostAlloc redirected bytes=" << bytes << endl);
     *pHostPointer = malloc(bytes);
     return 0;
 }
 
 size_t cuMemFreeHost(void *hostPointer) {
-    cout << "cuMemFreeHost redirected" << endl;
+    COCL_PRINT(cout << "cuMemFreeHost redirected" << endl);
     free(hostPointer);
     return 0;
 }
 
 size_t cuMemGetInfo_v2(size_t *free, size_t *total) {
-    cout << "cuMemGetInfo_v2 redirected" << endl;
+    COCL_PRINT(cout << "cuMemGetInfo_v2 redirected" << endl);
     *free = 1024 * 1024;
     *total = 1024 * 1024;
     return 0;
 }
 
 size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMemcpyKind, CLQueue *queue) {
-    cout << "cudaMemcpyAsync count=" << count << " cudaMemcpyKind=" << cudaMemcpyKind << " queue=" << queue << endl;
+    COCL_PRINT(cout << "cudaMemcpyAsync count=" << count << " cudaMemcpyKind=" << cudaMemcpyKind << " queue=" << queue << endl);
 
     if(queue == 0) {
         queue = cl->default_queue;
-        cout << "using default queue" << endl;
+        COCL_PRINT(cout << "using default queue" << endl);
     }
     cl_int err;
     if(cudaMemcpyKind == 2) {
@@ -116,7 +116,7 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
 }
 
 size_t cudaMemsetAsync(void *devPtr, int value, size_t count, CLQueue *queue) {
-    cout << "cudaMemsetAsync stub value=" << value << " count=" << count << " queue=" << queue << endl;
+    COCL_PRINT(cout << "cudaMemsetAsync stub value=" << value << " count=" << count << " queue=" << queue << endl);
     // assert(stream == 0);
     throw runtime_error("cudaMemsetAsync not implemented");
 
@@ -124,7 +124,7 @@ size_t cudaMemsetAsync(void *devPtr, int value, size_t count, CLQueue *queue) {
 }
 
 size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count) {
-    cout << "cuMemsetD8_v2 redirected value " << value << " count=" << count << endl;
+    COCL_PRINT(cout << "cuMemsetD8_v2 redirected value " << value << " count=" << count << endl);
     Memory *memory = (Memory *)location;
     // use default queue??
     cl_int err = clEnqueueFillBuffer(cl->default_queue->queue, memory->clmem, &value, sizeof(unsigned char), 0, count * sizeof(unsigned char), 0, 0, 0);
@@ -134,20 +134,20 @@ size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count) {
 
 size_t cuMemsetD32_v2(void *location, unsigned int value, uint32_t count) {
     Memory *memory = (Memory *)location;
-    cout << "cuMemsetD32_v2 redirected value " << value << " count=" << count << " location=" << location << " memory=" << (void *)memory << endl;
+    COCL_PRINT(cout << "cuMemsetD32_v2 redirected value " << value << " count=" << count << " location=" << location << " memory=" << (void *)memory << endl);
     cl_int err = clEnqueueFillBuffer(cl->default_queue->queue, memory->clmem, &value, sizeof(int), 0, count * sizeof(int), 0, 0, 0);
     cl->checkError(err);
     return 0;
 }
 
 size_t cuDeviceTotalMem_v2(uint64_t *value, void *device) {
-    cout << "cuDeviceTotalMem_v2 redirected" << endl;
+    COCL_PRINT(cout << "cuDeviceTotalMem_v2 redirected" << endl);
     *value = 1024 * 1024;
     return 0;
 }
 
 size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKind) {
-    cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << " count=" << bytes << endl;
+    COCL_PRINT(cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << " count=" << bytes << endl);
     cl_int err;
     if(cudaMemcpyKind == 2) {
         // device => host
@@ -174,17 +174,17 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
 size_t cudaMalloc(Memory **pMemory, size_t N) {
     hostside_opencl_funcs_assure_initialized();
     Memory *memory = Memory::newDeviceAlloc(N);
-    cout << "cudaMalloc using cl, size " << N << " memory=" << (void *)memory << endl;
+    COCL_PRINT(cout << "cudaMalloc using cl, size " << N << " memory=" << (void *)memory << endl);
     *pMemory = memory;
     return 0;
 }
 
 size_t cuMemcpyHtoDAsync_v2(void *dst, void *src, size_t bytes) {
     // host => device
-    cout << "cuMemcpyHtoDAsync_v2 dst=" << dst << " src=" << src << " bytes=" << bytes << endl;
+    COCL_PRINT(cout << "cuMemcpyHtoDAsync_v2 dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
     Memory *dstMemory = findMemory((Memory *)dst);
     size_t offset = (char *)dst - (char *)dstMemory;
-    cout << "memory " << (void *)dstMemory << " offset=" << offset << endl;
+    COCL_PRINT(cout << "memory " << (void *)dstMemory << " offset=" << offset << endl);
     // cout << "cuMemcpyHtoDAsync_v2 cl->default_queue=" << cl->default_queue << endl;
     // Memory *dstMemory = (Memory *)dst;
     // cout << "cuMemcpyHtoDAsync_v2 dstMemory->clmem " << dstMemory->clmem << endl;
@@ -196,10 +196,10 @@ size_t cuMemcpyHtoDAsync_v2(void *dst, void *src, size_t bytes) {
 }
 
 size_t  cuMemcpyDtoHAsync_v2(void *dst, void *src, size_t bytes) {
-    cout << "cuMemcpyDtoHAsync_v2 dst=" << dst << " src=" << src << " bytes=" << bytes << endl;
+    COCL_PRINT(cout << "cuMemcpyDtoHAsync_v2 dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
     Memory *srcMemory = findMemory((Memory *)src);
     size_t offset = (char *)src - (char *)srcMemory;
-    cout << "memory " << (void *)srcMemory << " offset=" << offset << endl;
+    COCL_PRINT(cout << "memory " << (void *)srcMemory << " offset=" << offset << endl);
     // Memory *srcMemory = (Memory *)src;
     cl_int err = clEnqueueReadBuffer(cl->default_queue->queue, srcMemory->clmem, CL_FALSE, offset,
                                      bytes, dst, 0, NULL, NULL);
@@ -232,7 +232,7 @@ size_t  cuMemcpyDtoH(void *host_dst, void *gpu_src, size_t size) {
 }
 
 size_t cudaFree(Memory *memory) {
-    cout << "cudafree using opencl memory=" << memory << endl;
+    COCL_PRINT(cout << "cudafree using opencl memory=" << memory << endl);
     delete memory;
     return 0;
 }

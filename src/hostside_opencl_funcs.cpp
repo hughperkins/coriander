@@ -55,7 +55,7 @@ namespace cocl {
 using namespace cocl;
 
 void hostside_opencl_funcs_init() {
-    cout << "initialize cl context" << endl;
+    COCL_PRINT(cout << "initialize cl context" << endl);
     cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
     ctx = cl->context;
     queue = cl->queue;
@@ -93,7 +93,7 @@ extern "C" {
 }
 
 size_t cuDeviceGet (void *device, int ordinal) {
-    cout << "cuDeviceGet redirected" << endl;
+    COCL_PRINT(cout << "cuDeviceGet redirected" << endl);
     *(int *)device = 0;
     return 0;
 }
@@ -103,35 +103,35 @@ size_t cuDeviceGetCount (int *count) {
 }
 
 size_t cuInit(unsigned int flags) {
-    cout << "redirected cuInit()" << endl;
+    COCL_PRINT(cout << "redirected cuInit()" << endl);
     hostside_opencl_funcs_assure_initialized();
     return 0;
 }
 
 size_t cudaGetLastError() {
-    cout << "cudaGetLastError" << endl;
+    COCL_PRINT(cout << "cudaGetLastError" << endl);
     return 0;
 }
 
 const char *cudaGetErrorString (size_t error) {
-    cout << "cudaGetErrorString error=" << error << endl;
+    COCL_PRINT(cout << "cudaGetErrorString error=" << error << endl);
     return "all was ok?";
 }
 
 size_t cudaGetDevice (int *device) {
-    cout << "cudaGetDevice" << endl;
+    COCL_PRINT(cout << "cudaGetDevice" << endl);
     *device = 0;
     return 0;
 }
 
 size_t cudaGetDeviceCount (int *count) {
-    cout << "cudaGetDeviceCount" << endl;
+    COCL_PRINT(cout << "cudaGetDeviceCount" << endl);
     *count = 1;
     return 0;
 }
 
 size_t cudaSetDevice (int device) {
-    cout << "cudaSetDevice stub device=" << device << endl;
+    COCL_PRINT(cout << "cudaSetDevice stub device=" << device << endl);
     return 0;
 }
 
@@ -139,23 +139,23 @@ size_t cudaConfigureCall(
         unsigned long long grid_xy, unsigned int grid_z,
         unsigned long long block_xy, unsigned int block_z, size_t sharedMem, void *queue_as_voidstar) {
     CLQueue *queue = (CLQueue *)queue_as_voidstar;
-    cout << "cudaConfigureCall queue=" << queue << endl;
+    COCL_PRINT(cout << "cudaConfigureCall queue=" << queue << endl);
     if(sharedMem != 0) {
-        cout << "cudaConfigureCall: Not implemented: non-zero shared memory" << endl;
+        COCL_PRINT(cout << "cudaConfigureCall: Not implemented: non-zero shared memory" << endl);
         throw runtime_error("cudaConfigureCall: Not implemented: non-zero shared memory");
     }
     if(queue == 0) {
         queue = cl->default_queue;
-        cout << "using default_queue " << queue << endl;
+        COCL_PRINT(cout << "using default_queue " << queue << endl);
     }
-    cout << "grid_xy " << grid_xy << " grid_z " << grid_z << endl;
-    cout << "block_xy " << block_xy << " grid_z " << block_z << endl;
+    COCL_PRINT(cout << "grid_xy " << grid_xy << " grid_z " << grid_z << endl);
+    COCL_PRINT(cout << "block_xy " << block_xy << " grid_z " << block_z << endl);
     int grid_x = grid_xy & ((1ul << 31) - 1);
     int grid_y = grid_xy >> 32;
     int block_x = block_xy & ((1ul << 31) - 1);
     int block_y = block_xy >> 32;
-    cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl;
-    cout << "block(" << block_x << ", " << block_y << ", " << block_z << ")" << endl;
+    COCL_PRINT(cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl);
+    COCL_PRINT(cout << "block(" << block_x << ", " << block_y << ", " << block_z << ")" << endl);
     launchConfiguration.queue = queue;
     launchConfiguration.grid[0] = grid_x;
     launchConfiguration.grid[1] = grid_y;
@@ -182,7 +182,7 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     // we should also:
     // deallocate the cl_mem after calling the kernel
     // (we assume hte struct is passed by-value, so we dont have to actually copy it back afterwards)
-    cout << "setKernelArgStruct structsize=" << structAllocateSize << endl;
+    COCL_PRINT(cout << "setKernelArgStruct structsize=" << structAllocateSize << endl);
     // int idx = 
     cl_int err;
     cl_mem gpu_struct = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, structAllocateSize,
@@ -196,14 +196,14 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
 }
 
 void setKernelArgFloatStar(float *memory_as_floatstar) {
-    cout << "setKernelArgFloatStar " << memory_as_floatstar << endl;
+    COCL_PRINT(cout << "setKernelArgFloatStar " << memory_as_floatstar << endl);
     Memory *memory = (Memory *)memory_as_floatstar;
     cl_mem clmem = memory->clmem;
     launchConfiguration.kernel->inout(&clmem);
 }
 
 void setKernelArgCharStar(char *memory_as_charstar) {
-    cout << "setKernelArgCharStar " << memory_as_charstar << endl;
+    COCL_PRINT(cout << "setKernelArgCharStar " << memory_as_charstar << endl);
     Memory *pMemory = (Memory *)memory_as_charstar;
     cl_mem clmem = pMemory->clmem;
     launchConfiguration.kernel->inout(&clmem);
@@ -224,37 +224,37 @@ void setKernelArgCharStar(char *memory_as_charstar) {
 // }
 
 void setKernelArgInt64(int64_t value) {
-    cout << "setKernelArgInt64 " << value << endl;
+    COCL_PRINT(cout << "setKernelArgInt64 " << value << endl);
     launchConfiguration.kernel->in(value);
 }
 
 void setKernelArgInt32(int value) {
-    cout << "setKernelArgInt32 " << value << endl;
+    COCL_PRINT(cout << "setKernelArgInt32 " << value << endl);
     launchConfiguration.kernel->in(value);
 }
 
 void setKernelArgFloat(float value) {
-    cout << "setKernelArgFloat " << value << endl;
+    COCL_PRINT(cout << "setKernelArgFloat " << value << endl);
     launchConfiguration.kernel->in(value);
 }
 
 void kernelGo() {
-    cout << "kernelGo " << endl;
+    COCL_PRINT(cout << "kernelGo " << endl);
     size_t global[3];
     for(int i = 0; i < 3; i++) {
         global[i] = launchConfiguration.grid[i] * launchConfiguration.block[i];
-        cout << "global[" << i << "]=" << global[i] << endl;
+        COCL_PRINT(cout << "global[" << i << "]=" << global[i] << endl);
     }
     for(int i = 0; i < 3; i++) {
-        cout << "block[" << i << "]=" << launchConfiguration.block[i] << endl;
+        COCL_PRINT(cout << "block[" << i << "]=" << launchConfiguration.block[i] << endl);
     }
     // cout << "launching kernel, using OpenCL..." << endl;
     launchConfiguration.kernel->run(launchConfiguration.queue, 3, global, launchConfiguration.block);
-    cout << ".. kernel queued" << endl;
+    COCL_PRINT(cout << ".. kernel queued" << endl);
     // cl->finish();
     // cout << ".. kernel finished" << endl;
     for(auto it=launchConfiguration.kernelArgsToBeReleased.begin(); it != launchConfiguration.kernelArgsToBeReleased.end(); it++) {
-        cout << "release arg" << endl;
+        COCL_PRINT(cout << "release arg" << endl);
         cl_mem memObject = *it;
         cl_int err = clReleaseMemObject(memObject);
         cl->checkError(err);

@@ -31,7 +31,7 @@ using namespace cocl;
 using namespace easycl;
 
 size_t cuStreamWaitEvent(CLQueue *queue, Event *event, unsigned int flags) {
-    cout << "cuStreamWaitEvent redirected queue=" << queue << " event=" << event << " flags=" << flags << endl;
+    COCL_PRINT(cout << "cuStreamWaitEvent redirected queue=" << queue << " event=" << event << " flags=" << flags << endl);
     if(queue == 0) {
         cout << "cuStreamWaitEvent stream==0 not implemented" << std::endl;
         throw runtime_error("cuStreamWaitEvent stream==0 not implemented");
@@ -51,7 +51,7 @@ size_t cuStreamWaitEvent(CLQueue *queue, Event *event, unsigned int flags) {
     // so lets try that...
 
     if(!event->has_event()) {
-        cout << "cuStreamWaitEvent redirected: Warning: you havent Recorded on the event you passed in" << endl;
+        cerr << "cuStreamWaitEvent redirected: Warning: you havent Recorded on the event you passed in" << endl;
     }
     // cl_event clevent;
     clEnqueueBarrierWithWaitList(queue->queue,
@@ -62,7 +62,7 @@ size_t cuStreamWaitEvent(CLQueue *queue, Event *event, unsigned int flags) {
 }
 
 size_t cudaStreamSynchronize(CLQueue *queue) {
-    cout << "cudaStreamSynchronize queue=" << queue << endl;
+    COCL_PRINT(cout << "cudaStreamSynchronize queue=" << queue << endl);
     hostside_opencl_funcs_assure_initialized();
 
     // assert(stream == 0);
@@ -83,14 +83,14 @@ size_t cuStreamSynchronize(CLQueue *queue) {
 size_t cuStreamCreate(CLQueue **pqueue, unsigned int flags) {
     hostside_opencl_funcs_assure_initialized();
     CLQueue *queue = cl->newQueue();
-    cout << "cuStreamCreate redirected new queue " << queue << endl;
+    COCL_PRINT(cout << "cuStreamCreate redirected new queue " << queue << endl);
     *pqueue = queue;
     // cout << "done assign" << endl;
     return 0;
 }
 
 size_t cuStreamDestroy_v2(CLQueue *queue) {
-    cout << "cuStreamDestroy_v2 redirected queue=" << queue << endl;
+    COCL_PRINT(cout << "cuStreamDestroy_v2 redirected queue=" << queue << endl);
     delete queue;
     return 0;
 }

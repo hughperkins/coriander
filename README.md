@@ -73,37 +73,12 @@ Run `cocl` to compile it:
 Run it:
 ```
 /tmp/foo$ ./cuda_sample
-initialize cl context
 Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
-cudaMalloc using cl, size 4096
-clmems.size() 1 ptr 0xea4c70
-cudaConfigureCall
-grid_xy 4294967328 grid_z 1
-block_xy 4294967328 grid_z 1
-grid(32, 1, 1)
-block(32, 1, 1)
-setKernelArgFloatStar
-setKernelArgInt32 2
-setKernelArgFloat 123
-kernelGo 
-cudamempcy using opencl cudaMemcpyKind 2 count=16
-hostFloats[2] 123
-cudaConfigureCall
-grid_xy 4294967328 grid_z 1
-block_xy 4294967328 grid_z 1
-grid(32, 1, 1)
-block(32, 1, 1)
-setKernelArgFloatStar
-setKernelArgInt32 2
-setKernelArgFloat 222
-kernelGo 
-cudamempcy using opencl cudaMemcpyKind 2 count=16
-hostFloats[2] 222
-cudamempcy using opencl cudaMemcpyKind 1 count=16
-cudamempcy using opencl cudaMemcpyKind 2 count=16
-hostFloats[2] 444
-cudafree using opencl idx 0
+got stream
+queued kernel 1
+queued kernel 2
+finished
 ```
 
 Thats it!  :-)  Youve run your first `cuda-on-cl` program :-)

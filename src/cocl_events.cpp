@@ -28,10 +28,10 @@ using namespace easycl;
 
 namespace cocl {
     Event::Event() {
-        cout << "Event()" << endl;
+        COCL_PRINT(cout << "Event()" << endl);
     }
     Event::~Event() {
-        cout << "~Event()" << endl;
+        COCL_PRINT(cout << "~Event()" << endl);
         if(event != 0) {
             clReleaseEvent(event);
         }
@@ -55,19 +55,19 @@ namespace cocl {
 size_t cuEventCreate(Event **pevent, unsigned int flags) {
     Event *event = new Event();
     *pevent = event;
-    cout << "cuEventCreate redirected flags=" << flags << " new event=" << event << endl;
+    COCL_PRINT(cout << "cuEventCreate redirected flags=" << flags << " new event=" << event << endl);
     return 0;
 }
 
 size_t cuEventSynchronize(Event *event) {
-    cout << "cuEventSynchronize redirected event=" << event << endl;
+    COCL_PRINT(cout << "cuEventSynchronize redirected event=" << event << endl);
     cl_int err = clWaitForEvents(1, &event->event);
     cl->checkError(err);
     return 0;
 }
 
 size_t cuEventRecord(Event *event, CLQueue *queue) {
-    cout << "cuEventRecord redirected event=" << event << " queue=" << queue << endl;
+    COCL_PRINT(cout << "cuEventRecord redirected event=" << event << " queue=" << queue << endl);
     if(queue == 0) {
         cout << "cuEventRecord redirected not implemented for stream 0" << endl;
         throw runtime_error("cuEventRecord redirected not implemented for stream 0");
@@ -79,7 +79,7 @@ size_t cuEventRecord(Event *event, CLQueue *queue) {
 }
 
 size_t cuEventQuery(Event *event) {
-    cout << "cuEventQuery redirected event=" << event << endl;
+    COCL_PRINT(cout << "cuEventQuery redirected event=" << event << endl);
     cl_int res;
     cl_int err = clGetEventInfo (
         event->event,
@@ -87,7 +87,7 @@ size_t cuEventQuery(Event *event) {
         sizeof(cl_int),
         &res,
         0);
-    cout << "clGetEventInfo: " << res << endl;
+    COCL_PRINT(cout << "clGetEventInfo: " << res << endl);
     cl->checkError(err);
     if(res == CL_COMPLETE) { // success
         return 0;
@@ -99,7 +99,7 @@ size_t cuEventQuery(Event *event) {
 }
 
 size_t cuEventDestroy_v2(Event *event) {
-    cout << "cuEventDestroy redirected event=" << event << endl;
+    COCL_PRINT(cout << "cuEventDestroy redirected event=" << event << endl);
     delete event;
     return 0;
 }

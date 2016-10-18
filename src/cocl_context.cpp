@@ -30,10 +30,10 @@ namespace cocl {
     class Context {
     public:
         Context() {
-            cout << "Context " << this << endl;
+            COCL_PRINT(cout << "Context " << this << endl);
         }
         ~Context() {
-            cout << "~Context() " << this << endl;
+            COCL_PRINT(cout << "~Context() " << this << endl);
         }
     };
     typedef Context *PContext;
@@ -49,7 +49,7 @@ extern "C" {
 }
 
 size_t cuCtxSynchronize(void) {
-    cout << "cuCtxSynchronize redirected" << endl;
+    COCL_PRINT(cout << "cuCtxSynchronize redirected" << endl);
     cl->finish();
     return 0;
 }
@@ -61,13 +61,13 @@ size_t cuCtxGetCurrent(PContext *ppContext) {
 }
 
 size_t cuCtxSetCurrent(PContext pContext) {
-    cout << "cuCtxSetCurrent redirected" << endl;
+    COCL_PRINT(cout << "cuCtxSetCurrent redirected" << endl);
     currentContext = pContext;
     return 0;
 }
 
 size_t cuCtxCreate_v2 (PContext *ppContext, unsigned int flags, void *device) {
-    cout << "cuCtxCreate_v2 redirected" << endl;
+    COCL_PRINT(cout << "cuCtxCreate_v2 redirected" << endl);
     Context *newContext = new Context();
     currentContext = newContext;
     *ppContext = newContext;
