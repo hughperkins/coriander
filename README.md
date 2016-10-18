@@ -11,7 +11,7 @@ Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 ## How to use, example
 
 - write a CUDA sourcecode file, or find an existing one
-- here's a simple example: [cuda_sample.cu](test/cuda_sample.cu)
+- here's a simple example: [cuda_sample.cu](https://github.com/hughperkins/cuda-on-cl/blob/76a849d9510276bc67167c9a7676d64ff04c3e4a/test/cuda_sample.cu)
 ```
 // a cuda app.  we will convert this to opencl, and run it :-)
 
@@ -75,10 +75,9 @@ Run it:
 /tmp/foo$ ./cuda_sample
 Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
-got stream
-queued kernel 1
-queued kernel 2
-finished
+hostFloats[2] 123
+hostFloats[2] 222
+hostFloats[2] 444
 ```
 
 Thats it!  :-)  Youve run your first `cuda-on-cl` program :-)
