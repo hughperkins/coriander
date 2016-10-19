@@ -1,7 +1,8 @@
 #pragma once
 
 #include "CL/cl.h"
-#include "EasyCL.h"
+#include "/home/ubuntu/git/cuda-ir-to-opencl/src/EasyCL/EasyCL.h"
+// #include "EasyCL.h"
 
 namespace cocl {
     class Event {
@@ -22,7 +23,7 @@ namespace cocl {
 extern "C" {
     size_t cuEventCreate(cocl::Event **pevent, unsigned int flags);
     size_t cuEventSynchronize(cocl::Event *event);
-    size_t cuEventRecord(cocl::Event *event, easycl::CLQueue *queue);
+    size_t cuEventRecord(cocl::Event *event, char *queue);
     size_t cuEventQuery(cocl::Event *event);
     size_t cuEventDestroy_v2(cocl::Event *event);
 }

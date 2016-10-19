@@ -179,7 +179,8 @@ size_t cudaMalloc(Memory **pMemory, size_t N) {
     return 0;
 }
 
-size_t cuMemcpyHtoDAsync_v2(void *dst, void *src, size_t bytes) {
+size_t cuMemcpyHtoDAsync_v2(void *dst, void *src, size_t bytes, char *_queue) {
+    CLQueue *queue = (CLQueue*)_queue;
     // host => device
     COCL_PRINT(cout << "cuMemcpyHtoDAsync_v2 dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
     Memory *dstMemory = findMemory((Memory *)dst);
@@ -189,19 +190,20 @@ size_t cuMemcpyHtoDAsync_v2(void *dst, void *src, size_t bytes) {
     // Memory *dstMemory = (Memory *)dst;
     // cout << "cuMemcpyHtoDAsync_v2 dstMemory->clmem " << dstMemory->clmem << endl;
     // cout << "cuMemcpyHtoDAsync_v2 cl->default_queue->queue=" << cl->default_queue->queue << endl;
-    cl_int err = clEnqueueWriteBuffer(cl->default_queue->queue, dstMemory->clmem, CL_FALSE, offset,
+    cl_int err = clEnqueueWriteBuffer(queue->queue, dstMemory->clmem, CL_FALSE, offset,
                                       bytes, src, 0, NULL, NULL);
     cl->checkError(err);
     return 0;
 }
 
-size_t  cuMemcpyDtoHAsync_v2(void *dst, void *src, size_t bytes) {
+size_t  cuMemcpyDtoHAsync_v2(void *dst, void *src, size_t bytes, char *_queue) {
+    CLQueue *queue = (CLQueue*)_queue;
     COCL_PRINT(cout << "cuMemcpyDtoHAsync_v2 dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
     Memory *srcMemory = findMemory((Memory *)src);
     size_t offset = (char *)src - (char *)srcMemory;
     COCL_PRINT(cout << "memory " << (void *)srcMemory << " offset=" << offset << endl);
     // Memory *srcMemory = (Memory *)src;
-    cl_int err = clEnqueueReadBuffer(cl->default_queue->queue, srcMemory->clmem, CL_FALSE, offset,
+    cl_int err = clEnqueueReadBuffer(queue->queue, srcMemory->clmem, CL_FALSE, offset,
                                      bytes, dst, 0, NULL, NULL);
     cl->checkError(err);
     return 0;

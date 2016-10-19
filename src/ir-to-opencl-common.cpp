@@ -363,6 +363,7 @@ std::string dumpStructType(StructType *type) {
             }
         }
     } else {
+        type->dump();
         throw runtime_error("not implemented: anonymous struct types");
     }
 }

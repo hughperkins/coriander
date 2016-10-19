@@ -66,7 +66,8 @@ size_t cuEventSynchronize(Event *event) {
     return 0;
 }
 
-size_t cuEventRecord(Event *event, CLQueue *queue) {
+size_t cuEventRecord(Event *event, char *_queue) {
+    CLQueue *queue = (CLQueue *)_queue;
     COCL_PRINT(cout << "cuEventRecord redirected event=" << event << " queue=" << queue << endl);
     if(queue == 0) {
         cout << "cuEventRecord redirected not implemented for stream 0" << endl;

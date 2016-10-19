@@ -135,9 +135,14 @@ size_t cudaSetDevice (int device) {
     return 0;
 }
 
-size_t cudaConfigureCall(
-        unsigned long long grid_xy, unsigned int grid_z,
-        unsigned long long block_xy, unsigned int block_z, size_t sharedMem, void *queue_as_voidstar) {
+#include "/usr/local/include/cuda.h"
+
+// size_t cudaConfigureCall(
+//         unsigned long long grid_xy, unsigned int grid_z,
+//         unsigned long long block_xy, unsigned int block_z, size_t sharedMem, void *queue_as_voidstar) {
+int cudaConfigureCall(
+        dim3 grid,
+        dim3 block, long long sharedMem, char *queue_as_voidstar) {
     CLQueue *queue = (CLQueue *)queue_as_voidstar;
     COCL_PRINT(cout << "cudaConfigureCall queue=" << queue << endl);
     if(sharedMem != 0) {
@@ -148,12 +153,18 @@ size_t cudaConfigureCall(
         queue = cl->default_queue;
         COCL_PRINT(cout << "using default_queue " << queue << endl);
     }
-    COCL_PRINT(cout << "grid_xy " << grid_xy << " grid_z " << grid_z << endl);
-    COCL_PRINT(cout << "block_xy " << block_xy << " grid_z " << block_z << endl);
-    int grid_x = grid_xy & ((1ul << 31) - 1);
-    int grid_y = grid_xy >> 32;
-    int block_x = block_xy & ((1ul << 31) - 1);
-    int block_y = block_xy >> 32;
+    // COCL_PRINT(cout << "grid_xy " << grid_xy << " grid_z " << grid_z << endl);
+    // COCL_PRINT(cout << "block_xy " << block_xy << " grid_z " << block_z << endl);
+    // int grid_x = grid_xy & ((1ul << 31) - 1);
+    // int grid_y = grid_xy >> 32;
+    // int block_x = block_xy & ((1ul << 31) - 1);
+    // int block_y = block_xy >> 32;
+    int grid_x = grid.x;
+    int grid_y = grid.y;
+    int grid_z = grid.z;
+    int block_x = block.x;
+    int block_y = block.y;
+    int block_z = block.z;
     COCL_PRINT(cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl);
     COCL_PRINT(cout << "block(" << block_x << ", " << block_y << ", " << block_z << ")" << endl);
     launchConfiguration.queue = queue;

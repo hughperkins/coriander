@@ -58,12 +58,12 @@
 // WARNING: Preprocessor hacks below are based on specific details of
 // CUDA-7.x headers and are not expected to work with any other
 // version of CUDA headers.
-#include "cuda.h"
-#if !defined(CUDA_VERSION)
-#error "cuda.h did not define CUDA_VERSION"
-//#elif CUDA_VERSION < 7000 || CUDA_VERSION > 7050
-//#error "Unsupported CUDA version!"
-#endif
+// #include "cuda.h"
+// #if !defined(CUDA_VERSION)
+// #error "cuda.h did not define CUDA_VERSION"
+// //#elif CUDA_VERSION < 7000 || CUDA_VERSION > 7050
+// //#error "Unsupported CUDA version!"
+// #endif
 
 // Make largest subset of device functions available during host
 // compilation -- SM_35 for the time being.
@@ -88,15 +88,15 @@
 // Disables definitions of device-side runtime support stubs in
 // cuda_device_runtime_api.h
 #define __CUDADEVRT_INTERNAL__
-#include "host_config.h"
-#include "host_defines.h"
-#include "driver_types.h"
-#include "common_functions.h"
+// #include "host_config.h"
+// #include "host_defines.h"
+// #include "driver_types.h"
+// #include "common_functions.h"
 #undef __CUDADEVRT_INTERNAL__
 
 #undef __CUDABE__
 #define __CUDACC__
-#include "cuda_runtime.h"
+// #include "cuda_runtime.h"
 
 #undef __CUDACC__
 #define __CUDABE__
@@ -106,8 +106,8 @@
 #define __nvvm_memcpy(s,d,n,a) __builtin_memcpy(s,d,n)
 #define __nvvm_memset(d,c,n,a) __builtin_memset(d,c,n)
 
-#include "crt/host_runtime.h"
-#include "crt/device_runtime.h"
+// #include "crt/host_runtime.h"
+// #include "crt/device_runtime.h"
 // device_runtime.h defines __cxa_* macros that will conflict with
 // cxxabi.h.
 // FIXME: redefine these as __device__ functions.
@@ -129,12 +129,12 @@
 #pragma push_macro("__host__")
 #define __host__
 #define __CUDACC_RTC__
-#include "device_functions_decls.h"
+// #include "device_functions_decls.h"
 #undef __CUDACC_RTC__
 
 // Temporarily poison __host__ macro to ensure it's not used by any of
 // the headers we're about to include.
-#define __host__ UNEXPECTED_HOST_ATTRIBUTE
+// #define __host__ UNEXPECTED_HOST_ATTRIBUTE
 
 // device_functions.hpp and math_functions*.hpp use 'static
 // __forceinline__' (with no __device__) for definitions of device
@@ -142,34 +142,34 @@
 // __device__.
 #pragma push_macro("__forceinline__")
 #define __forceinline__ __device__ __inline__ __attribute__((always_inline))
-#include "device_functions.hpp"
-#include "math_functions.hpp"
-#include "math_functions_dbl_ptx3.hpp"
+// #include "device_functions.hpp"
+// #include "math_functions.hpp"
+// #include "math_functions_dbl_ptx3.hpp"
 #pragma pop_macro("__forceinline__")
 
 // Pull in host-only functions that are only available when neither
 // __CUDACC__ nor __CUDABE__ are defined.
 #undef __MATH_FUNCTIONS_HPP__
 #undef __CUDABE__
-#include "math_functions.hpp"
+// #include "math_functions.hpp"
 // Alas, additional overloads for these functions are hard to get to.
 // Considering that we only need these overloads for a few functions,
 // we can provide them here.
-static inline float rsqrt(float a) { return rsqrtf(a); }
-static inline float rcbrt(float a) { return rcbrtf(a); }
-static inline float sinpi(float a) { return sinpif(a); }
-static inline float cospi(float a) { return cospif(a); }
-static inline void sincospi(float a, float *b, float *c) {
-  return sincospi(a, b, c);
-}
-static inline float erfcinv(float a) { return erfcinvf(a); }
-static inline float normcdfinv(float a) { return normcdfinvf(a); }
-static inline float normcdf(float a) { return normcdff(a); }
-static inline float erfcx(float a) { return erfcxf(a); }
+// static inline float rsqrt(float a) { return rsqrtf(a); }
+// static inline float rcbrt(float a) { return rcbrtf(a); }
+// static inline float sinpi(float a) { return sinpif(a); }
+// static inline float cospi(float a) { return cospif(a); }
+// static inline void sincospi(float a, float *b, float *c) {
+//   return sincospi(a, b, c);
+// }
+// static inline float erfcinv(float a) { return erfcinvf(a); }
+// static inline float normcdfinv(float a) { return normcdfinvf(a); }
+// static inline float normcdf(float a) { return normcdff(a); }
+// static inline float erfcx(float a) { return erfcxf(a); }
 
 // For some reason single-argument variant is not always declared by
 // CUDA headers. Alas, device_functions.hpp included below needs it.
-static inline __device__ void __brkpt(int c) { __brkpt(); }
+// static inline __device__ void __brkpt(int c) { __brkpt(); }
 
 // Now include *.hpp with definitions of various GPU functions.  Alas,
 // a lot of thins get declared/defined with __host__ attribute which
@@ -181,20 +181,20 @@ static inline __device__ void __brkpt(int c) { __brkpt(); }
 #undef __CUDABE__
 #define __CUDACC__
 #undef __DEVICE_FUNCTIONS_HPP__
-#include "device_functions.hpp"
-#include "device_atomic_functions.hpp"
-#include "sm_20_atomic_functions.hpp"
-#include "sm_32_atomic_functions.hpp"
-#include "sm_20_intrinsics.hpp"
-// sm_30_intrinsics.h has declarations that use default argument, so
-// we have to include it and it will in turn include .hpp
-#include "sm_30_intrinsics.h"
-#include "sm_32_intrinsics.hpp"
-#undef __MATH_FUNCTIONS_HPP__
-#include "math_functions.hpp"
-#pragma pop_macro("__host__")
+// #include "device_functions.hpp"
+// #include "device_atomic_functions.hpp"
+// #include "sm_20_atomic_functions.hpp"
+// #include "sm_32_atomic_functions.hpp"
+// #include "sm_20_intrinsics.hpp"
+// // sm_30_intrinsics.h has declarations that use default argument, so
+// // we have to include it and it will in turn include .hpp
+// #include "sm_30_intrinsics.h"
+// #include "sm_32_intrinsics.hpp"
+// #undef __MATH_FUNCTIONS_HPP__
+// #include "math_functions.hpp"
+// #pragma pop_macro("__host__")
 
-#include "texture_indirect_functions.h"
+// #include "texture_indirect_functions.h"
 
 // Restore state of __CUDA_ARCH__ and __THROW we had on entry.
 #pragma pop_macro("__CUDA_ARCH__")
@@ -204,6 +204,8 @@ static inline __device__ void __brkpt(int c) { __brkpt(); }
 #undef __CUDABE__
 #define __CUDACC__
 #define __NVCC__
+
+#define __device__ __attribute__((device))
 
 #if defined(__CUDA_ARCH__)
 // We need to emit IR declaration for non-existing __nvvm_reflect() to

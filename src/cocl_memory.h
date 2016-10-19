@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CL/cl.h"
-#include "EasyCL.h"
+#include "/home/ubuntu/git/cuda-ir-to-opencl/src/EasyCL/EasyCL.h"
 
 namespace cocl {
     // enum MemoryType {
@@ -54,8 +54,8 @@ extern "C" {
     size_t cuMemcpyDtoH_v2(void *host_dst, void *gpu_src, size_t size);
     size_t cuMemcpyHtoD(void *gpu_dst, void *host_src, size_t size);
     size_t cuMemcpyDtoH(void *host_dst, void *gpu_src, size_t size);
-    size_t cuMemcpyHtoDAsync_v2(void *gpu_dst, void *host_src, size_t size);
-    size_t cuMemcpyDtoHAsync_v2(void *host_dst, void *gpu_src, size_t size);
+    size_t cuMemcpyHtoDAsync_v2(void *gpu_dst, void *host_src, size_t size, char*queue);
+    size_t cuMemcpyDtoHAsync_v2(void *host_dst, void *gpu_src, size_t size, char*queue);
 
     size_t cuDeviceTotalMem_v2(uint64_t *value, void *device);
 }

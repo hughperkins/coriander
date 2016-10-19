@@ -30,7 +30,8 @@ using namespace std;
 using namespace cocl;
 using namespace easycl;
 
-size_t cuStreamWaitEvent(CLQueue *queue, Event *event, unsigned int flags) {
+size_t cuStreamWaitEvent(char *_queue, Event *event, unsigned int flags) {
+    CLQueue *queue = (CLQueue*)_queue;
     COCL_PRINT(cout << "cuStreamWaitEvent redirected queue=" << queue << " event=" << event << " flags=" << flags << endl);
     if(queue == 0) {
         cout << "cuStreamWaitEvent stream==0 not implemented" << std::endl;
@@ -61,7 +62,8 @@ size_t cuStreamWaitEvent(CLQueue *queue, Event *event, unsigned int flags) {
     return 0;
 }
 
-size_t cudaStreamSynchronize(CLQueue *queue) {
+size_t cudaStreamSynchronize(char *_queue) {
+    CLQueue *queue = (CLQueue*)_queue;
     COCL_PRINT(cout << "cudaStreamSynchronize queue=" << queue << endl);
     hostside_opencl_funcs_assure_initialized();
 
@@ -76,11 +78,13 @@ size_t cudaStreamSynchronize(CLQueue *queue) {
     return 0;
 }
 
-size_t cuStreamSynchronize(CLQueue *queue) {
-    return cudaStreamSynchronize(queue);
+size_t cuStreamSynchronize(char *_queue) {
+    // CLQueue *queue = (CLQueue*)_queue;
+    return cudaStreamSynchronize(_queue);
 }
 
-size_t cuStreamCreate(CLQueue **pqueue, unsigned int flags) {
+size_t cuStreamCreate(char **_pqueue, unsigned int flags) {
+    CLQueue **pqueue = (CLQueue**)_pqueue;
     hostside_opencl_funcs_assure_initialized();
     CLQueue *queue = cl->newQueue();
     COCL_PRINT(cout << "cuStreamCreate redirected new queue " << queue << endl);
@@ -89,7 +93,8 @@ size_t cuStreamCreate(CLQueue **pqueue, unsigned int flags) {
     return 0;
 }
 
-size_t cuStreamDestroy_v2(CLQueue *queue) {
+size_t cuStreamDestroy_v2(char *_queue) {
+    CLQueue *queue = (CLQueue*)_queue;
     COCL_PRINT(cout << "cuStreamDestroy_v2 redirected queue=" << queue << endl);
     delete queue;
     return 0;
