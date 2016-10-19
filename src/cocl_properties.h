@@ -37,6 +37,8 @@ struct cudaSharedMemConfig {
   // nothing here :-P
 };
 
+extern struct cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
+
 // struct cudaSharedMemBankSizeEightByte {
 // };
 
