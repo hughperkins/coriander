@@ -37,6 +37,11 @@ struct cudaSharedMemConfig {
   // nothing here :-P
 };
 
+struct cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
+
+// struct cudaSharedMemBankSizeEightByte {
+// };
+
 extern "C" {
     size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, int device);
     size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, void *device);

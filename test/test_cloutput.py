@@ -22,11 +22,18 @@ from test import test_common
 
 @pytest.fixture(scope='module')
 def testcudakernel1_cl():
-    cl_path = 'test/generated/testcudakernel1-device.cl'
+    # cl_path = 'test/generated/testcudakernel1-device.cl'
+    # print(subprocess.check_output([
+    #     'make',
+    #     cl_path
+    # ]).decode('utf-8'))
+    # we need to fix this to be a bit more robust to makefile changes...
     print(subprocess.check_output([
-        'make',
-        cl_path
+        'cocl',
+        '-c', '-o', 'build/testcudakernel1.o',
+        'test/testcudakernel1.cu'
     ]).decode('utf-8'))
+    cl_path = 'build/testcudakernel1-device.cl'
     return cl_path
 
 

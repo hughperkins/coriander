@@ -53,7 +53,11 @@
 #define STRINGIZE(x) #x
 #define SSTRINGIZE(x) STRINGIZE(x)
 
-#define __CUDA_ARCH__ 250  // this doesnt need atomic exchange
+// // __CUDACC_VER__ constraints:
+// // - should be less than 70500, so we dont get fp16 (from Core/Eigen line 217)
+// #define __CUDACC_VER__ 70000
+
+#define __CUDA_ARCH__ 250  // this doesnt need atomic exchange (CXX11/TensorReductionCuda.h line line 28)
 #pragma message "__CUDA_ARCH__ is " SSTRINGIZE(__CUDA_ARCH__)
 
 // Preserve common macros that will be changed below by us or by CUDA

@@ -1,3 +1,5 @@
 #pragma once
 
-// stuff for device
+#pragma message "reading cocl_deviceside.h"
+
+

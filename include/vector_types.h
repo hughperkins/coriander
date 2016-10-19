@@ -14,6 +14,18 @@ float4 make_float4(float x, float y, float z, float w) {
     return float4(x,y,z,w);
 }
 
+class float2 {
+public:
+    float2() {}
+    float2(float x, float y) : x(x), y(y) {}
+    float x;
+    float y;
+};
+
+float2 make_float2(float x, float y) {
+    return float2(x,y);
+}
+
 class double2 {
 public:
     double2() {}
