@@ -86,7 +86,8 @@ size_t cuMemGetInfo_v2(size_t *free, size_t *total) {
     return 0;
 }
 
-size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMemcpyKind, CLQueue *queue) {
+size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMemcpyKind, char *_queue) {
+    CLQueue *queue = (CLQueue *)_queue;
     COCL_PRINT(cout << "cudaMemcpyAsync count=" << count << " cudaMemcpyKind=" << cudaMemcpyKind << " queue=" << queue << endl);
 
     if(queue == 0) {
@@ -115,7 +116,8 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
     return 0;
 }
 
-size_t cudaMemsetAsync(void *devPtr, int value, size_t count, CLQueue *queue) {
+size_t cudaMemsetAsync(void *devPtr, int value, size_t count, char *_queue) {
+    CLQueue *queue = (CLQueue *)_queue;
     COCL_PRINT(cout << "cudaMemsetAsync stub value=" << value << " count=" << count << " queue=" << queue << endl);
     // assert(stream == 0);
     throw runtime_error("cudaMemsetAsync not implemented");

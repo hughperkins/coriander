@@ -44,9 +44,9 @@ extern "C" {
     size_t cuMemHostAlloc(void **pHostPointer, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE);
     size_t cuMemFreeHost(void *hostPointer);
 
-    size_t cudaMemsetAsync(void *devPtr, int value, size_t count, easycl::CLQueue *queue);
+    size_t cudaMemsetAsync(void *devPtr, int value, size_t count, char *queue);
     size_t cudaMemcpy(void *dst, const void *, size_t, size_t cudaMemcpyKind);
-    size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t kind, easycl::CLQueue *queue);
+    size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t kind, char *queue);
     size_t cuMemGetInfo_v2(size_t *free, size_t *total);
     size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count);
     size_t cuMemsetD32_v2(void *location, unsigned int value, uint32_t count);
