@@ -36,25 +36,7 @@ build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp src/cocl*.h
 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
 
 build/cocl_%.o: src/cocl_%.cpp src/cocl*.h
-	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
-
-# build/cocl_events.o: src/cocl_events.cpp src/cocl*.h
-# 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
-
-# build/cocl_device.o: src/cocl_device.cpp src/cocl*.h
-# 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
-
-# build/cocl_memory.o: src/cocl_memory.cpp src/cocl*.h
-# 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
-
-# build/cocl_properties.o: src/cocl_properties.cpp src/cocl*.h
-# 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
-
-# build/cocl_streams.o: src/cocl_streams.cpp src/cocl*.h
-# 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
-
-# build/cocl_context.o: src/cocl_context.cpp src/cocl*.h
-# 	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/src/EasyCL $<
+	$(CLANG) -c -o $@ -std=c++11 $(DCOCL_SPAM) -g -O2 -I$(COCL_HOME)/src/EasyCL $<
 
 build/libcocl.a: build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_error.o build/cocl_memory.o build/cocl_device.o build/cocl_properties.o build/cocl_streams.o build/cocl_context.o easycl
 	mkdir -p $(COCL_HOME)/build/easycl-extract
@@ -164,6 +146,12 @@ run-test-cocl-testmemcpydevicetodevice: build/test-cocl-testmemcpydevicetodevice
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
 run-test-cocl-testpartialcopy: build/test-cocl-testpartialcopy
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
+run-test-cocl-test_bitcast: build/test-cocl-test_bitcast
 	################################
 	# running:
 	################################

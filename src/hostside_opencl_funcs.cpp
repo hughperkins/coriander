@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "hostside_opencl_funcs.h"
+// #include "cocl_kernellaunch.h"
 #include "cocl.h"
 #include "cocl_memory.h"
 
@@ -25,6 +26,7 @@
 #include "EasyCL.h"
 
 #include "CL/cl.h"
+#include "cocl.h"
 
 using namespace std;
 using namespace easycl;
@@ -70,9 +72,6 @@ void hostside_opencl_funcs_assure_initialized(void) {
 }
 
 extern "C" {
-    size_t cudaConfigureCall(
-        unsigned long long grid_xy, unsigned int grid_z,
-        unsigned long long block_xy, unsigned int block_z, size_t sharedMem=0, void *stream=0);
     void configureKernel(
         const char *kernelName, const char *clSourcecodeString);
 
@@ -159,6 +158,13 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
 void setKernelArgFloatStar(float *memory_as_floatstar) {
     COCL_PRINT(cout << "setKernelArgFloatStar " << memory_as_floatstar << endl);
     Memory *memory = (Memory *)memory_as_floatstar;
+    cl_mem clmem = memory->clmem;
+    launchConfiguration.kernel->inout(&clmem);
+}
+
+void setKernelArgIntStar(int *memory_as_intstar) {
+    COCL_PRINT(cout << "setKernelArgFloatStar " << memory_as_intstar << endl);
+    Memory *memory = (Memory *)memory_as_intstar;
     cl_mem clmem = memory->clmem;
     launchConfiguration.kernel->inout(&clmem);
 }

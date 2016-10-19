@@ -46,5 +46,3 @@ extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
 }
 
-int cudaConfigureCall(dim3 grid, dim3 block, long long shared = 0,  char * stream = 0);
-///int cudaConfigureCall(long long xy, int z, long long xy, int z, long long shared,  char * stream);

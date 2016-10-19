@@ -381,10 +381,15 @@ void patchFunction(Function *F) {
                     int i = 0;
                     for(auto argit=launchCallInfo->callValuesByValue.begin(); argit != launchCallInfo->callValuesByValue.end(); argit++) {
                         Value *value = *argit;
+                        // value->dump();
+                        // outs() << "\n";
                         Value *valueAsPointerInstr = launchCallInfo->callValuesAsPointers[i];
+                        // valueAsPointerInstr->dump();
+                        // outs() << "\n";
                         if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
+                            // outs() << "got a pointer " << "\n";
                             int bitLength = intType->getBitWidth();
-                            outs() << "bitLength " << bitLength << "\n";
+                            // outs() << "bitLength " << bitLength << "\n";
                             string mangledName = "";
                             if(bitLength == 32) {
                                 // typeabbrev = "i";
@@ -426,6 +431,21 @@ void patchFunction(Function *F) {
                                 CallInst *call = CallInst::Create(setKernelArgFloatStar, value);
                                 call->insertAfter(lastInst);
                                 lastInst = call;
+                            } else if(IntegerType *elementTypeInt = dyn_cast<IntegerType>(elementType)) {
+                                int bitLength = elementTypeInt->getBitWidth();
+                                outs() << "bitLength " << bitLength << "\n";
+                                Function *setKernelArgFloatStar = cast<Function>(F->getParent()->getOrInsertFunction(
+                                    "_Z19setKernelArgIntStarPi",
+                                    Type::getVoidTy(TheContext),
+                                    PointerType::get(IntegerType::get(TheContext, bitLength), 0),
+                                    NULL));
+                                CallInst *call = CallInst::Create(setKernelArgFloatStar, value);
+                                call->insertAfter(lastInst);
+                                lastInst = call;
+                            } else {
+                                elementType->dump();
+                                outs() << "\n";
+                                throw std::runtime_error("Not implemented: sending this pointer type to kernel");
                             }
                         } else if(isa<StructType>(value->getType())) {
                             outs() << "got a struct" << "\n";
@@ -618,6 +638,8 @@ void patchFunction(Function *F) {
                     // launchCallInfo.reset(new LaunchCallInfo);
                 } else if(calledFunctionName == "cudaSetupArgument") {
                     outs() << "cudaSetupArgument\n";
+                    inst->dump();
+                    outs() << "\n";
                     getLaunchArgValue(inst, launchCallInfo.get());
                     to_replace_with_zero.push_back(inst);
                 }

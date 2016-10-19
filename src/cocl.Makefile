@@ -11,6 +11,8 @@ CLANG=clang++-3.8
 LLVM_CONFIG=llvm-config-3.8
 LLVM_INCLUDE=/usr/include/llvm-3.8
 
+# COCL_SPAM=1
+
 # COMPILE_FLAGS=`$(LLVM_CONFIG) --cxxflags` -std=c++11
 LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
 # the llvm-config compile flags suppresses asserts
@@ -26,7 +28,7 @@ all: $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX)
 # 	#                                                                               -I$(CUDA_HOME)/include -I/usr/include/x86_64-linux-gnu $< --cuda-device-only -emit-llvm -O3 -S -o $@
 
 $(OUTPUTBASEPATH)-device.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/cocl/fake_funcs.h
-	$(CLANG) $(PASSTHRU) -x cuda -std=c++11 -D__CUDA_ARCH__=300 -include /usr/local/include/cuda.h -include $(COCL_HOME)/include/cocl/fake_funcs.h -I$(COCL_HOME)/include $(INCLUDES) $< --cuda-device-only -emit-llvm -I/usr/include/x86_64-linux-gnu -O3 -S -o $@
+	$(CLANG) $(PASSTHRU) -x cuda -std=c++11 -D__CUDA_ARCH__=300 -include /usr/local/include/cuda.h -include $(COCL_HOME)/include/cocl/fake_funcs.h -include $(COCL_HOME)/include/cocl/cocl_deviceside.h -I$(COCL_HOME)/include $(INCLUDES) $< --cuda-device-only -emit-llvm -I/usr/include/x86_64-linux-gnu -O3 -S -o $@
 
 	# $(CLANG) -x cuda -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -D__CUDA_ARCH__=300 -include include/fake_funcs.h -Iinclude -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -Itest/eigen
 	#                                                                               -I$(CUDA_HOME)/include -I/usr/include/x86_64-linux-gnu $< --cuda-device-only -emit-llvm -O3 -S -o $@
