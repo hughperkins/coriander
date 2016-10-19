@@ -35,6 +35,8 @@ extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
 }
 
+dim3 nulldim3;
+
 namespace cocl {
     class LaunchConfiguration {
     public:

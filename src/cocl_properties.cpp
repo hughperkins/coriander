@@ -59,6 +59,8 @@ size_t cuDeviceGetAttribute(
     return 0;
 }
 
+struct cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
+
 size_t cuDeviceGetName(char *buf, int bufsize, void *device) {
     COCL_PRINT(cout << "cuDeviceGetName redirected" << endl);
     sprintf(buf, "an opencl device");

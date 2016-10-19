@@ -37,7 +37,7 @@ $(OUTPUTBASEPATH)-device.cl: $(OUTPUTBASEPATH)-device.ll
 	ir-to-opencl $(DEBUG) $< $@
 
 $(OUTPUTBASEPATH)-hostraw.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/cocl/fake_funcs.h
-	$(CLANG) $(PASSTHRU) $(INCLUDES) -x cuda -std=c++11 -I$(COCL_HOME)/src/EasyCL -include /usr/local/include/cuda.h -include $(COCL_HOME)/include/cocl/fake_funcs.h $< --cuda-host-only -emit-llvm  -O3 -S -o $@
+	$(CLANG) $(PASSTHRU) $(INCLUDES) -x cuda -std=c++11 -I$(COCL_HOME)/src/EasyCL -include /usr/local/include/cuda.h -include $(COCL_HOME)/include/cocl/fake_funcs.h -include $(COCL_HOME)/include/cocl/cocl_hostside.h $< --cuda-host-only -emit-llvm  -O3 -S -o $@
 
 $(OUTPUTBASEPATH)-hostpatched.ll: $(OUTPUTBASEPATH)-hostraw.ll $(OUTPUTBASEPATH)-device.cl
 	patch-hostside $< $(word 2,$^) $@
