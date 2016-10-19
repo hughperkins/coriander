@@ -3,32 +3,38 @@
 #include <cstddef>
 #include <cstdint>
 
+// order of members is arbitrary, just need our sourcecode to use the same declaration
 struct cudaDeviceProp {
-    char name[256];
+    // size_t memPitch;
+    size_t totalConstMem;
     size_t totalGlobalMem;
     size_t sharedMemPerBlock;
+    // size_t textureAlignment;
     int regsPerBlock;
     int warpSize;
-    size_t memPitch;
+    // int pciDeviceID;
     int maxThreadsPerBlock;
     int maxThreadsDim[3];
     int maxGridSize[3];
-    size_t totalConstMem;
-    int major;
-    int minor;
+    int maxThreadsPerMultiProcessor;
     int clockRate;
-    size_t textureAlignment;
-    int deviceOverlap;
+    // int deviceOverlap;
     int multiProcessorCount;
     int kernelExecTimeoutEnabled;
     int integrated;
     int canMapHostMemory;
-    int computeMode;
-    int concurrentKernels;
-    int ECCEnabled;
-    int pciBusID;
-    int pciDeviceID;
-    int tccDriver;
+    int major;
+    int minor;
+    // int computeMode;
+    // int concurrentKernels;
+    // int ECCEnabled;
+    // int pciBusID;
+    // int tccDriver;
+    char name[256];
+};
+
+struct cudaSharedMemConfig {
+  // nothing here :-P
 };
 
 extern "C" {
@@ -40,16 +46,17 @@ extern "C" {
     size_t cuDeviceGetAttribute(
        int64_t *value, int attribute, void *device);
     size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, int device_ordinal);
+    size_t cudaDeviceSetSharedMemConfig(cudaSharedMemConfig config);
 }
 
-// enum constants from http://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__TYPES.html#axzz4N4NYrYWt
-const int CU_DEVICE_ATTRIBUTE_SHARED_MEMORY_PER_BLOCK = 8;
-const int CU_DEVICE_ATTRIBUTE_ECC_ENABLED = 32;
-const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X = 5;
-const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y = 6;
-const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z = 7;
-const int CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR = 81;
-const int CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT = 16;
-const int CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR = 39;
-const int CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK = 12;
+// constants are arbitrary, just as long as we use this header file for compiling the client sourcecode
+const int CU_DEVICE_ATTRIBUTE_SHARED_MEMORY_PER_BLOCK = 1;
+const int CU_DEVICE_ATTRIBUTE_ECC_ENABLED = 2;
+const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X = 3;
+const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y = 4;
+const int CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z = 5;
+const int CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR = 6;
+const int CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT = 7;
+const int CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR = 8;
+const int CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK = 9;
 const int CU_DEVICE_ATTRIBUTE_WARP_SIZE = 10;

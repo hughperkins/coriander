@@ -50,6 +50,12 @@
 #include <stdlib.h>
 #include <cmath>
 
+#define STRINGIZE(x) #x
+#define SSTRINGIZE(x) STRINGIZE(x)
+
+#define __CUDA_ARCH__ 250  // this doesnt need atomic exchange
+#pragma message "__CUDA_ARCH__ is " SSTRINGIZE(__CUDA_ARCH__)
+
 // Preserve common macros that will be changed below by us or by CUDA
 // headers.
 #pragma push_macro("__THROW")
@@ -67,9 +73,9 @@
 
 // Make largest subset of device functions available during host
 // compilation -- SM_35 for the time being.
-#ifndef __CUDA_ARCH__
-#define __CUDA_ARCH__ 350
-#endif
+// #ifndef __CUDA_ARCH__
+// #define __CUDA_ARCH__ 350
+// #endif
 
 #include "cuda_builtin_vars.h"
 

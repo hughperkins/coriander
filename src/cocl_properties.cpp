@@ -90,7 +90,7 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, int device) {
     prop->sharedMemPerBlock = 65536;
     prop->regsPerBlock = 64;
     prop->warpSize = 32;
-    prop->memPitch = 4; // whats this?
+    // prop->memPitch = 4; // whats this?
     prop->maxThreadsPerBlock = 128;
     prop->maxThreadsDim[0] = 1024;
     prop->maxThreadsDim[1] = 1024;
@@ -99,22 +99,28 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, int device) {
     prop->major = 3;
     prop->minor = 0;
     prop->clockRate = 900 * 1000 * 1000;
-    prop->textureAlignment = 128;  // whats this?
-    prop->deviceOverlap = 0; // whats this?
+    // prop->textureAlignment = 128;  // whats this?
+    // prop->deviceOverlap = 0; // whats this?
     prop->multiProcessorCount = 3;
     prop->kernelExecTimeoutEnabled = true;
     prop->integrated = true;
     prop->canMapHostMemory = false;
-    prop->computeMode = 0;  //whats this?
-    prop->concurrentKernels = 1;
-    prop->ECCEnabled = false;
-    prop->pciBusID = 0;
-    prop->pciDeviceID = 0;
-    prop->tccDriver = 0; // no idea
+    // prop->computeMode = 0;  //whats this?
+    // prop->concurrentKernels = 1;
+    // prop->ECCEnabled = false;
+    // prop->pciBusID = 0;
+    // prop->pciDeviceID = 0;
+    // prop->tccDriver = 0; // no idea
+    prop->maxThreadsPerMultiProcessor = 128;
     return 0;
 }
 
 size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, int device_ordinal) {
     //return cudaGetDeviceProperties(device_properties, device_ordinal);
     return -1;
+}
+
+size_t cudaDeviceSetSharedMemConfig(cudaSharedMemConfig config) {
+    // stub
+    return 0;
 }

@@ -99,3 +99,8 @@ size_t cuStreamDestroy_v2(char *_queue) {
     delete queue;
     return 0;
 }
+
+size_t cudaStreamQuery(char *_queue) {
+    CLQueue *queue = (CLQueue*)_queue;
+    throw runtime_error("not implemented");
+}

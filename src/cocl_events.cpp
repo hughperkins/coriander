@@ -14,13 +14,17 @@
 
 #include "cocl_events.h"
 
+#include "cocl_error.h"
+
+#include "cocl_defs.h"
+
 #include "hostside_opencl_funcs.h"
 
 #include <iostream>
 #include <memory>
-#include <vector>
-#include <map>
-#include <set>
+// #include <vector>
+// #include <map>
+// #include <set>
 
 using namespace std;
 using namespace cocl;
@@ -93,7 +97,7 @@ size_t cuEventQuery(Event *event) {
     if(res == CL_COMPLETE) { // success
         return 0;
     } else if(res > 0) { // not finished yet
-        return 34;
+        return cudaErrorNotReady;
     } else { // error
         return 1;
     }
