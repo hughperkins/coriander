@@ -56,6 +56,6 @@ __host__ void doSomething_host2(mynamespace::Bar bar, mynamespace::Templated<int
     doSomething<<<dim3(32), dim3(32)>>>(bar, t, data, int_data);
 }
 
-__host__ void doSomething_host2(mynamespace::Bar bar, mynamespace::Templated<double> t, double *data, int *int_data) {
+__host__ void doSomething_host2(mynamespace::Bar bar, mynamespace::Templated<char> t, char *data, int *int_data) {
     doSomething<<<dim3(32), dim3(32)>>>(bar, t, data, int_data);
 }

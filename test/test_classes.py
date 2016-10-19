@@ -28,9 +28,15 @@ def test_classes_cl():
     cl_filepath = 'test/generated/test_classes-device.cl'
 
     print('running make...')
+    # print(subprocess.check_output([
+    #     'make',
+    #     cl_filepath
+    # ]).decode('utf-8'))
     print(subprocess.check_output([
-        'make',
-        cl_filepath
+        'cocl',
+        '-c', '-o', 'test/generated/test_classes.o',
+        'test/test_classes.cu'
+        # cl_filepath
     ]).decode('utf-8'))
     print('... make finished')
     return cl_filepath

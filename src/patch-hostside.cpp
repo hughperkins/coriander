@@ -397,6 +397,9 @@ void patchFunction(Function *F) {
                             } else if(bitLength == 64) {
                                 // typeabbrev = "l";
                                 mangledName = "_Z17setKernelArgInt64l";
+                            } else if(bitLength == 8) {
+                                // typeabbrev = "l";
+                                mangledName = "_Z16setKernelArgInt8c";
                             } else {
                                 throw runtime_error("bitlength " + toString(bitLength) + " not implemented");
                             }
@@ -434,8 +437,16 @@ void patchFunction(Function *F) {
                             } else if(IntegerType *elementTypeInt = dyn_cast<IntegerType>(elementType)) {
                                 int bitLength = elementTypeInt->getBitWidth();
                                 outs() << "bitLength " << bitLength << "\n";
+                                string mangledName = "";
+                                if(bitLength == 8) {
+                                    mangledName = "_Z20setKernelArgCharStarPc";
+                                } else if(bitLength == 32) {
+                                    mangledName = "_Z19setKernelArgIntStarPi";
+                                } else {
+                                    throw runtime_error("Not implemented: bitlength " + toString(bitLength));
+                                }
                                 Function *setKernelArgFloatStar = cast<Function>(F->getParent()->getOrInsertFunction(
-                                    "_Z19setKernelArgIntStarPi",
+                                    mangledName,
                                     Type::getVoidTy(TheContext),
                                     PointerType::get(IntegerType::get(TheContext, bitLength), 0),
                                     NULL));
