@@ -35,10 +35,6 @@ typedef size_t cudaError_t;
 
 #define cuStreamDestroy cuStreamDestroy_v2
 #define cuEventDestroy cuEventDestroy_v2
-#define cuMemcpyHtoDAsync cuMemcpyHtoDAsync_v2
-#define cuMemcpyDtoHAsync cuMemcpyDtoHAsync_v2
-#define cuMemAlloc cuMemAlloc_v2
-#define cuMemFree cuMemFree_v2
 
 class  dim3 {
 public:
@@ -47,5 +43,5 @@ unsigned int x;
 unsigned int y;
 unsigned int z;
 };
-int cudaConfigureCall(dim3 grid, dim3 block, long long shared,  char * stream);
+int cudaConfigureCall(dim3 grid, dim3 block, long long shared = 0,  char * stream = 0);
 ///int cudaConfigureCall(long long xy, int z, long long xy, int z, long long shared,  char * stream);

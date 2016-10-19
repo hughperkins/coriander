@@ -154,17 +154,30 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
     if(cudaMemcpyKind == cudaMemcpyDeviceToHost) {
         // device => host
         Memory *srcMemory = (Memory *)src;
-        // Memory *srcMemory = memoryByHostPointer[src];
         err = clEnqueueReadBuffer(cl->default_queue->queue, srcMemory->clmem, CL_TRUE, 0,
                                          bytes, dst, 0, NULL, NULL);
         cl->checkError(err);
         // cl->finish();
     } else if(cudaMemcpyKind == cudaMemcpyHostToDevice) {
         // host => device
-        // Memory *dstMemory = memoryByHostPointer[dst];
         Memory *dstMemory = (Memory *)dst;
         err = clEnqueueWriteBuffer(cl->default_queue->queue, dstMemory->clmem, CL_TRUE, 0,
                                           bytes, src, 0, NULL, NULL);
+        cl->checkError(err);
+    } else if(cudaMemcpyKind == cudaMemcpyDeviceToDevice) {
+        // device => device
+        Memory *srcMemory = (Memory *)src;
+        Memory *dstMemory = (Memory *)dst;
+        err = clEnqueueCopyBuffer(
+            cl->default_queue->queue,
+            srcMemory->clmem,
+            dstMemory->clmem,
+            0,
+            0,
+            bytes,
+            0,
+            0,
+            0);
         cl->checkError(err);
     } else {
         cout << "cudaMemcpyKind using opencl " << cudaMemcpyKind << endl;

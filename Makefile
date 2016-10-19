@@ -157,6 +157,12 @@ run-test-cocl-teststream: build/test-cocl-teststream
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
+run-test-cocl-testmemcpydevicetodevice: build/test-cocl-testmemcpydevicetodevice
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
 run-test-cocl-testpartialcopy: build/test-cocl-testpartialcopy
 	################################
 	# running:
