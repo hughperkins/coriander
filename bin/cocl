@@ -3,7 +3,6 @@
 # set -x
 set -e
 
-export CUDA_HOME=/usr/local/cuda-7.5
 export CLANG=clang++-3.8
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
