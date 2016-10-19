@@ -12,15 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iostream>
+// #include <iostream>
 #include <memory>
-#include <vector>
-#include <map>
-#include <set>
+// #include <vector>
+// #include <map>
+// #include <set>
 
-#include "EasyCL.h"
+// #include "EasyCL.h"
 
 #include "CL/cl.h"
+
+#include "cocl_defs.h"
+
+namespace easycl {
+    class CLKernel;
+    class EasyCL;
+}
 
 namespace cocl {
     extern size_t grid[3];
@@ -38,10 +45,3 @@ namespace cocl {
 extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
 }
-
-#ifdef COCL_SPAM
-#define COCL_PRINT(stuff) \
-   stuff;
-#else
-   #define COCL_PRINT(stuff)
-#endif

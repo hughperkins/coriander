@@ -94,14 +94,14 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
         COCL_PRINT(cout << "using default queue" << endl);
     }
     cl_int err;
-    if(cudaMemcpyKind == 2) {
+    if(cudaMemcpyKind == cudaMemcpyDeviceToHost) {
         // device => host
         Memory *srcMemory = (Memory *)src;
         err = clEnqueueReadBuffer(queue->queue, srcMemory->clmem, CL_FALSE, 0,
                                          count, dst, 0, NULL, NULL);
         cl->checkError(err);
         // cl->finish();
-    } else if(cudaMemcpyKind == 1) {
+    } else if(cudaMemcpyKind == cudaMemcpyHostToDevice) {
         // host => device
         Memory *dstMemory = (Memory*)dst;
         err = clEnqueueWriteBuffer(queue->queue, dstMemory->clmem, CL_FALSE, 0,
@@ -149,7 +149,7 @@ size_t cuDeviceTotalMem_v2(uint64_t *value, void *device) {
 size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKind) {
     COCL_PRINT(cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << " count=" << bytes << endl);
     cl_int err;
-    if(cudaMemcpyKind == 2) {
+    if(cudaMemcpyKind == cudaMemcpyDeviceToHost) {
         // device => host
         Memory *srcMemory = (Memory *)src;
         // Memory *srcMemory = memoryByHostPointer[src];
@@ -157,7 +157,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
                                          bytes, dst, 0, NULL, NULL);
         cl->checkError(err);
         // cl->finish();
-    } else if(cudaMemcpyKind == 1) {
+    } else if(cudaMemcpyKind == cudaMemcpyHostToDevice) {
         // host => device
         // Memory *dstMemory = memoryByHostPointer[dst];
         Memory *dstMemory = (Memory *)dst;
@@ -171,7 +171,8 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
     return 0;
 }
 
-size_t cudaMalloc(Memory **pMemory, size_t N) {
+size_t cudaMalloc(void **_pMemory, size_t N) {
+    Memory **pMemory = (Memory **)_pMemory;
     hostside_opencl_funcs_assure_initialized();
     Memory *memory = Memory::newDeviceAlloc(N);
     COCL_PRINT(cout << "cudaMalloc using cl, size " << N << " memory=" << (void *)memory << endl);
@@ -211,7 +212,7 @@ size_t  cuMemcpyDtoHAsync_v2(void *dst, void *src, size_t bytes, char *_queue) {
 
 // => synchronous <=
 size_t cuMemcpyHtoD_v2(void *gpu_dst, void *host_src, size_t size) {
-    cudaMemcpy(gpu_dst, host_src, size, 1);
+    cudaMemcpy(gpu_dst, host_src, size, cudaMemcpyHostToDevice);
     cl->finish();
     return 0;
 }
@@ -223,7 +224,7 @@ size_t cuMemcpyHtoD(void *gpu_dst, void *host_src, size_t size) {
 
 // => synchronous <=
 size_t  cuMemcpyDtoH_v2(void *host_dst, void *gpu_src, size_t size) {
-    cudaMemcpy(host_dst, gpu_src, size, 2);
+    cudaMemcpy(host_dst, gpu_src, size, cudaMemcpyDeviceToHost);
     cl->finish();
     return 0;
 }
@@ -233,16 +234,19 @@ size_t  cuMemcpyDtoH(void *host_dst, void *gpu_src, size_t size) {
     return cuMemcpyDtoH(host_dst, gpu_src, size);
 }
 
-size_t cudaFree(Memory *memory) {
+size_t cudaFree(void *_memory) {
+    Memory *memory = (Memory *)_memory;
     COCL_PRINT(cout << "cudafree using opencl memory=" << memory << endl);
     delete memory;
     return 0;
 }
 
-size_t cuMemAlloc_v2(Memory **pMemory, size_t bytes) {
-    return cudaMalloc(pMemory, bytes);
+size_t cuMemAlloc_v2(void **_pMemory, size_t bytes) {
+    // Memory **pMemory = (Memory **)_pMemory;
+    return cudaMalloc(_pMemory, bytes);
 }
 
-size_t cuMemFree_v2(Memory *memory) {
+size_t cuMemFree_v2(void *memory) {
+    // Memory *pMemory = (Memory *)_memory;
     return cudaFree(memory);
 }

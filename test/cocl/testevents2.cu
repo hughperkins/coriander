@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 
     float *hostfloats = new float[N];
     float *gpufloats;
-    cudaMalloc(&gpufloats, N * sizeof(float));
+    cudaMalloc((void **)&gpufloats, N * sizeof(float));
 
     longKernel<<<dim3(102400 / 32, 1, 1), dim3(32, 1, 1)>>>(gpufloats, N, 3.0f);
     cout << "queued kernel x" << endl;

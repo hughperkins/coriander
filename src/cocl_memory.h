@@ -35,11 +35,11 @@ namespace cocl {
 }
 
 extern "C" {
-    size_t cudaMalloc(cocl::Memory **pMemory, size_t N);
-    size_t cudaFree(cocl::Memory *memory);
+    size_t cudaMalloc(void **pMemory, size_t N);
+    size_t cudaFree(void *memory);
 
-    size_t cuMemAlloc_v2(cocl::Memory **pMemory, size_t bytes);
-    size_t cuMemFree_v2(cocl::Memory *memory);
+    size_t cuMemAlloc_v2(void **pMemory, size_t bytes);
+    size_t cuMemFree_v2(void *memory);
 
     size_t cuMemHostAlloc(void **pHostPointer, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE);
     size_t cuMemFreeHost(void *hostPointer);
@@ -59,3 +59,6 @@ extern "C" {
 
     size_t cuDeviceTotalMem_v2(uint64_t *value, void *device);
 }
+
+#define cudaMemcpyDeviceToHost 111
+#define cudaMemcpyHostToDevice 222

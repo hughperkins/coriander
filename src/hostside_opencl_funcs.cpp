@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include "hostside_opencl_funcs.h"
-
+#include "cocl.h"
 #include "cocl_memory.h"
 
 #include <iostream>
@@ -70,36 +70,13 @@ void hostside_opencl_funcs_assure_initialized(void) {
 }
 
 extern "C" {
-    size_t cudaSetDevice (int device);
-    const char *cudaGetErrorString (size_t error);
-    size_t cudaGetDevice (int *device);
-    size_t cudaGetDeviceCount (int *count);
-    size_t cudaGetLastError();
     size_t cudaConfigureCall(
         unsigned long long grid_xy, unsigned int grid_z,
         unsigned long long block_xy, unsigned int block_z, size_t sharedMem=0, void *stream=0);
     void configureKernel(
         const char *kernelName, const char *clSourcecodeString);
 
-    /*
-    cuDeviceCanAccessPeer
-    cuOccupancyMaxActiveBlocksP
-    */
-
     size_t cuInit(unsigned int flags);
-    size_t cuDeviceGetCount(int *count);
-    size_t cuDeviceGet (void *device, int ordinal);
-
-}
-
-size_t cuDeviceGet (void *device, int ordinal) {
-    COCL_PRINT(cout << "cuDeviceGet redirected" << endl);
-    *(int *)device = 0;
-    return 0;
-}
-
-size_t cuDeviceGetCount (int *count) {
-    return cudaGetDeviceCount(count);
 }
 
 size_t cuInit(unsigned int flags) {
@@ -108,34 +85,7 @@ size_t cuInit(unsigned int flags) {
     return 0;
 }
 
-size_t cudaGetLastError() {
-    COCL_PRINT(cout << "cudaGetLastError" << endl);
-    return 0;
-}
-
-const char *cudaGetErrorString (size_t error) {
-    COCL_PRINT(cout << "cudaGetErrorString error=" << error << endl);
-    return "all was ok?";
-}
-
-size_t cudaGetDevice (int *device) {
-    COCL_PRINT(cout << "cudaGetDevice" << endl);
-    *device = 0;
-    return 0;
-}
-
-size_t cudaGetDeviceCount (int *count) {
-    COCL_PRINT(cout << "cudaGetDeviceCount" << endl);
-    *count = 1;
-    return 0;
-}
-
-size_t cudaSetDevice (int device) {
-    COCL_PRINT(cout << "cudaSetDevice stub device=" << device << endl);
-    return 0;
-}
-
-#include "/usr/local/include/cuda.h"
+// #include "/usr/local/include/cuda.h"
 
 // size_t cudaConfigureCall(
 //         unsigned long long grid_xy, unsigned int grid_z,

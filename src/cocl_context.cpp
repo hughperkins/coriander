@@ -22,6 +22,8 @@
 
 #include "CL/cl.h"
 
+#include "EasyCL.h"
+
 using namespace std;
 using namespace cocl;
 using namespace easycl;

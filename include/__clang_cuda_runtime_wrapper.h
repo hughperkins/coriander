@@ -126,11 +126,11 @@
 // with no attributes at all. To work around that, define __CUDA_RTC__
 // which produces HD variant and undef __host__ which gives us desided
 // decls with __device__ attribute.
-#pragma push_macro("__host__")
-#define __host__
-#define __CUDACC_RTC__
+// #pragma push_macro("__host__")
+// #define __host__
+// #define __CUDACC_RTC__
 // #include "device_functions_decls.h"
-#undef __CUDACC_RTC__
+// #undef __CUDACC_RTC__
 
 // Temporarily poison __host__ macro to ensure it's not used by any of
 // the headers we're about to include.
@@ -177,7 +177,7 @@
 // {device,math}_functions.hpp again in order to extract the other
 // branch of #if/else inside.
 
-#define __host__
+// #define __host__
 #undef __CUDABE__
 #define __CUDACC__
 #undef __DEVICE_FUNCTIONS_HPP__
