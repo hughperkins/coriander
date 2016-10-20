@@ -50,6 +50,8 @@ size_t cuDeviceGetAttribute(
         *value = 64;
     } else if(CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR == attribute) {
         *value = 128;
+    } else if(CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_BLOCK == attribute) {
+        return 40000;
     } else if(CU_DEVICE_ATTRIBUTE_WARP_SIZE == attribute) {
         *value = 32;
     } else {
@@ -61,7 +63,7 @@ size_t cuDeviceGetAttribute(
 
 cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
 
-size_t cuDeviceGetName(char *buf, int bufsize, void *device) {
+size_t cuDeviceGetName(char *buf, int bufsize, CUdevice device) {
     COCL_PRINT(cout << "cuDeviceGetName redirected" << endl);
     sprintf(buf, "an opencl device");
     return 0;
@@ -118,8 +120,8 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
 }
 
 size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, CUdevice device_ordinal) {
-    //return cudaGetDeviceProperties(device_properties, device_ordinal);
-    return -1;
+    return cudaGetDeviceProperties(device_properties, device_ordinal);
+    // return -1;
 }
 
 size_t cudaDeviceSetSharedMemConfig(cudaSharedMemConfig config) {
