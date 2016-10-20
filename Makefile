@@ -208,7 +208,13 @@ install: build/ir-to-opencl build/patch-hostside build/libcocl.a
 	install -m 0644 include/cocl/cocl_*.h $(PREFIX)/include/cocl/
 	install -m 0644 include/cocl/__clang_cuda_runtime_wrapper.h $(PREFIX)/include/cocl/
 	install -m 0644 include/cocl/fake_funcs.h $(PREFIX)/include/cocl/
-	# install -m 0644 build/libEasyCL.a $(PREFIX)/lib
-#	install -m 0644 build/libcocl.a $(PREFIX)/lib
 
-.PHONY: install
+uninstall:
+	rm -Rf $(PREFIX)/include/cocl
+	rm -Rf $(PREFIX)/share/cocl
+	rm -R $(PREFIX)/bin/cocl
+	rm -R $(PREFIX)/bin/ir-to-opencl
+	rm -R $(PREFIX)/bin/patch-hostside
+	rm $(PREFIX)/lib/libcocl.a
+
+.PHONY: install uninstall

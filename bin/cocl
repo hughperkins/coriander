@@ -224,7 +224,7 @@ if [[ -v COMPILE ]]; then {
     echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}"
     echo ""
 } else {
-    g++ -o ${OUTPUTBASEPATH}${FINALPOSTFIX} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} -L${COCL_HOME}/build -lcocl -lEasyCL -lOpenCL
+    g++ -o ${OUTPUTBASEPATH}${FINALPOSTFIX} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} -L${COCL_HOME}/build -lcocl -lOpenCL
     set +x
     echo ""
     echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}${FINALPOSTFIX}"
