@@ -197,7 +197,7 @@ install: build/ir-to-opencl build/patch-hostside build/libcocl.a
 	install -m 0755 build/patch-hostside $(PREFIX)/bin
 	install -m 0644 build/libcocl.a $(PREFIX)/lib
 	mkdir -p $(PREFIX)/share/cocl
-	install -m 0644 src/cocl.Makefile $(PREFIX)/share/cocl/cocl.Makefile
+	install -m 0644 share/cocl/cocl.Makefile $(PREFIX)/share/cocl/cocl.Makefile
 	install -m 0755 bin/cocl $(PREFIX)/bin
 	mkdir -p $(PREFIX)/include/cocl
 	install -m 0644 include/cocl/cocl.h $(PREFIX)/include/cocl/
@@ -217,4 +217,14 @@ uninstall:
 	rm -R $(PREFIX)/bin/patch-hostside
 	rm $(PREFIX)/lib/libcocl.a
 
-.PHONY: install uninstall
+install-dev:
+	mkdir -p $(PREFIX)/share
+	mkdir -p $(PREFIX)/include
+	ln -sf `pwd`/bin/cocl $(PREFIX)/bin/cocl
+	ln -nsf `pwd`/share/cocl $(PREFIX)/share/cocl
+	ln -nsf `pwd`/include/cocl $(PREFIX)/include/cocl
+	ln -sf `pwd`/build/libcocl.a $(PREFIX)/lib/libcocl.a
+	ln -sf `pwd`/build/ir-to-opencl $(PREFIX)/bin/ir-to-opencl
+	ln -sf `pwd`/build/patch-hostside $(PREFIX)/bin/patch-hostside
+
+.PHONY: install uninstall install-dev
