@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
 
 // order of members is arbitrary, just need our sourcecode to use the same declaration
 struct cudaDeviceProp {
@@ -34,12 +35,14 @@ struct cudaDeviceProp {
 };
 typedef cudaDeviceProp CUdevprop;
 
-struct cudaSharedMemConfig {
-  // nothing here :-P
-};
+// struct cudaSharedMemConfig {
+//   // nothing here :-P
+// };
+typedef std::string cudaSharedMemConfig;
 typedef cudaSharedMemConfig CUsharedconfig;
 
-extern struct cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
+// extern struct cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
+extern cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
 
 // struct cudaSharedMemBankSizeEightByte {
 // };
