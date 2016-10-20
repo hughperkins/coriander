@@ -37,6 +37,12 @@ extern "C" {
 
 // dim3 nulldim3;
 
+// stubs
+CUfunc_cache CU_FUNC_CACHE_PREFER_NONE;
+CUfunc_cache CU_FUNC_CACHE_PREFER_SHARED;
+CUfunc_cache CU_FUNC_CACHE_PREFER_L1;
+CUfunc_cache CU_FUNC_CACHE_PREFER_EQUAL;
+
 namespace cocl {
     class LaunchConfiguration {
     public:

@@ -8,3 +8,6 @@ extern "C" {
 }
 
 #define cudaErrorNotReady 2222
+
+#define CUDA_ERROR_NOT_READY cudaErrorNotReady
+#define CUDA_SUCCESS 0
