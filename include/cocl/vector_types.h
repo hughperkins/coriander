@@ -1,4 +1,4 @@
-#pragma oncce
+#pragma once
 
 struct float4 {
 public:
