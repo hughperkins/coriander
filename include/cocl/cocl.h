@@ -41,6 +41,7 @@ typedef char *CUcontext;
 
 // used by stream_executor/cl_driver.h; we just declare them for now...
 typedef void *CUfunction;
+typedef void *CUfunction_attribute;
 struct CUfunc_cache {
 };
 typedef void *CUmodule;
