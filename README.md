@@ -55,12 +55,8 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 ```
-- let's save this file eg to `cuda_sample.cu`:
-```
-$ ls
-cuda_sample.cu
-```
-Run `cocl` to compile it:
+- let's save this file eg to `cuda_sample.cu`
+- Run `cocl` to compile it:
 ```
 $ cocl cuda_sample.cu
    ...
@@ -70,7 +66,7 @@ $ cocl cuda_sample.cu
     ./cuda_sample.cu compiled into ./cuda_sample
 
 ```
-Run `./cuda_sample`:
+Run:
 ```
 $ ./cuda_sample
 Using Intel , OpenCL platform: Intel Gen OCL Driver
