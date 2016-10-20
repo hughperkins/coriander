@@ -7,7 +7,7 @@ extern "C" {
     size_t cudaGetLastError();
 }
 
-#define cudaErrorNotReady 2222
+// #define cudaErrorNotReady 2222
 
 #define CUDA_SUCCESS 0  // this should probably be zero, by convention
 

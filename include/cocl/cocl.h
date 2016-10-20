@@ -34,7 +34,6 @@ inline double rsqrt(double x) {
 typedef char *CUstream;
 typedef long long CUdevice;
 typedef cocl::Event *CUevent;
-typedef const void *CUdeviceptr;
 typedef char *cudaStream_t;
 typedef size_t cudaError_t;
 typedef size_t CUresult;

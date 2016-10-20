@@ -144,7 +144,7 @@ size_t cuMemsetD32_v2(void *location, unsigned int value, uint32_t count) {
     return 0;
 }
 
-size_t cuDeviceTotalMem_v2(uint64_t *value, void *device) {
+size_t cuDeviceTotalMem_v2(uint64_t *value, CUdeviceptr device) {
     COCL_PRINT(cout << "cuDeviceTotalMem_v2 redirected" << endl);
     *value = 1024 * 1024;
     return 0;
@@ -188,16 +188,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
     return 0;
 }
 
-size_t cudaMalloc(void **_pMemory, size_t N) {
-    Memory **pMemory = (Memory **)_pMemory;
-    hostside_opencl_funcs_assure_initialized();
-    Memory *memory = Memory::newDeviceAlloc(N);
-    COCL_PRINT(cout << "cudaMalloc using cl, size " << N << " memory=" << (void *)memory << endl);
-    *pMemory = memory;
-    return 0;
-}
-
-size_t cuMemcpyHtoDAsync_v2(void *dst, void *src, size_t bytes, char *_queue) {
+size_t cuMemcpyHtoDAsync_v2(CUdeviceptr dst, void *src, size_t bytes, char *_queue) {
     CLQueue *queue = (CLQueue*)_queue;
     // host => device
     COCL_PRINT(cout << "cuMemcpyHtoDAsync_v2 dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
@@ -214,7 +205,7 @@ size_t cuMemcpyHtoDAsync_v2(void *dst, void *src, size_t bytes, char *_queue) {
     return 0;
 }
 
-size_t  cuMemcpyDtoHAsync_v2(void *dst, void *src, size_t bytes, char *_queue) {
+size_t  cuMemcpyDtoHAsync_v2(void *dst, CUdeviceptr src, size_t bytes, char *_queue) {
     CLQueue *queue = (CLQueue*)_queue;
     COCL_PRINT(cout << "cuMemcpyDtoHAsync_v2 dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
     Memory *srcMemory = findMemory((Memory *)src);
@@ -228,27 +219,41 @@ size_t  cuMemcpyDtoHAsync_v2(void *dst, void *src, size_t bytes, char *_queue) {
 }
 
 // => synchronous <=
-size_t cuMemcpyHtoD_v2(void *gpu_dst, void *host_src, size_t size) {
-    cudaMemcpy(gpu_dst, host_src, size, cudaMemcpyHostToDevice);
+size_t cuMemcpyHtoD_v2(CUdeviceptr gpu_dst, void *host_src, size_t size) {
+    cudaMemcpy((void *)gpu_dst, host_src, size, cudaMemcpyHostToDevice);
     cl->finish();
     return 0;
 }
 
 // => synchronous <=
-size_t cuMemcpyHtoD(void *gpu_dst, void *host_src, size_t size) {
+size_t cuMemcpyHtoD(CUdeviceptr gpu_dst, void *host_src, size_t size) {
     return cuMemcpyHtoD_v2(gpu_dst, host_src, size);
 }
 
 // => synchronous <=
-size_t  cuMemcpyDtoH_v2(void *host_dst, void *gpu_src, size_t size) {
-    cudaMemcpy(host_dst, gpu_src, size, cudaMemcpyDeviceToHost);
+size_t  cuMemcpyDtoH_v2(void *host_dst, CUdeviceptr gpu_src, size_t size) {
+    cudaMemcpy(host_dst, (void *)gpu_src, size, cudaMemcpyDeviceToHost);
     cl->finish();
     return 0;
 }
 
 // => synchronous <=
-size_t  cuMemcpyDtoH(void *host_dst, void *gpu_src, size_t size) {
+size_t  cuMemcpyDtoH(void *host_dst, CUdeviceptr gpu_src, size_t size) {
     return cuMemcpyDtoH(host_dst, gpu_src, size);
+}
+
+size_t cudaMalloc(void **_pMemory, size_t N) {
+    Memory **pMemory = (Memory **)_pMemory;
+    hostside_opencl_funcs_assure_initialized();
+    Memory *memory = Memory::newDeviceAlloc(N);
+    COCL_PRINT(cout << "cudaMalloc using cl, size " << N << " memory=" << (void *)memory << endl);
+    *pMemory = memory;
+    return 0;
+}
+
+size_t cuMemAlloc_v2(CUdeviceptr*_pMemory, size_t bytes) {
+    // Memory **pMemory = (Memory **)_pMemory;
+    return cudaMalloc((void **)_pMemory, bytes);
 }
 
 size_t cudaFree(void *_memory) {
@@ -258,12 +263,7 @@ size_t cudaFree(void *_memory) {
     return 0;
 }
 
-size_t cuMemAlloc_v2(void **_pMemory, size_t bytes) {
-    // Memory **pMemory = (Memory **)_pMemory;
-    return cudaMalloc(_pMemory, bytes);
-}
-
-size_t cuMemFree_v2(void *memory) {
+size_t cuMemFree_v2(CUdeviceptr memory) {
     // Memory *pMemory = (Memory *)_memory;
-    return cudaFree(memory);
+    return cudaFree((void *)memory);
 }
