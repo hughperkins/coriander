@@ -13,13 +13,13 @@ struct cudaDeviceProp {
     int regsPerBlock;
     int warpSize;
     // int pciDeviceID;
-    int maxThreadsPerBlock;
+    int maxThreadsPerBlock;  // <=
     int maxThreadsDim[3];
     int maxGridSize[3];
-    int maxThreadsPerMultiProcessor;
+    int maxThreadsPerMultiProcessor;  // <=
     int clockRate;
     // int deviceOverlap;
-    int multiProcessorCount;
+    int multiProcessorCount;  // <=
     int kernelExecTimeoutEnabled;
     int integrated;
     int canMapHostMemory;

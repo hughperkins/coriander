@@ -183,7 +183,8 @@ Tests are at [test](test)
 
 - Oct 20:
   - no longer need CUDA toolkit installed!
-    - note that test_cuda_elementwise is currently partially broken, a regression.  Looking into this....
+  - fix bug where `threadIdx.x` was being incorrectly written as `get_global_id` instead of `get_local_id` ...
+     - magically, the `test_cuda_elementwise` kernel works much better now
 - Oct 18:
   - installs to `/usr/local` now
   - `libcocl.a` contains `libEasyCL.a` now, no need for `libEasyCL.so` at runtime

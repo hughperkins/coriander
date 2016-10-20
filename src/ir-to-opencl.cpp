@@ -672,13 +672,13 @@ std::string dumpCall(CallInst *instr) {
 
     string functionName = getName(instr->getCalledValue());
     if(functionName == "llvm.ptx.read.tid.x") {
-        return gencode + "get_global_id(0);\n";
+        return gencode + "get_local_id(0);\n";
     }
     if(functionName == "llvm.ptx.read.tid.y") {
-        return gencode + "get_global_id(1);\n";
+        return gencode + "get_local_id(1);\n";
     }
     if(functionName == "llvm.ptx.read.tid.z") {
-        return gencode + "get_global_id(2);\n";
+        return gencode + "get_local_id(2);\n";
     }
     if(functionName == "llvm.ptx.read.ctaid.x") {
         return gencode + "get_group_id(0);\n";
