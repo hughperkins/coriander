@@ -11,16 +11,10 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-
-This needs CUDA_HOME defined, pointing to eg /usr/local/cuda-7.5
 """
 import subprocess
 import pyopencl as cl
 import pytest
-import os
-from os import path
-from test import test_common
 
 
 @pytest.fixture(scope='module')

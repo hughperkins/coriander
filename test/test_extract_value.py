@@ -11,9 +11,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-
-This needs CUDA_HOME defined, pointing to eg /usr/local/cuda-7.5
 """
 import subprocess
 import pyopencl as cl
@@ -31,7 +28,6 @@ def extract_value_cl():
     ll_filepath = 'test/extract_value.ll'
     cl_filepath = 'test/generated/extract_value.cl'
 
-    # cuda_home = os.environ.get('CUDA_HOME', '/usr/local/cuda-7.5')
     # print(subprocess.check_output([
     #     clang_path,
     #     '-I%s/include' % cuda_home,
