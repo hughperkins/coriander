@@ -147,6 +147,17 @@ make run-test-all
 ```
 make run-eigen-test_cuda_elementwise
 ```
+Result:
+```
+################################
+# running:
+################################
+LD_LIBRARY_PATH=build: build/eigen-test_cuda_elementwise
+Initializing random number generator with seed 1476930631
+Repeating each test 10 times
+Using Intel , OpenCL platform: Intel Gen OCL Driver
+Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
+```
 
 - the tests prefixed `cocl` are at [test/cocl](test/cocl)
 - the tests prefixed `eigen` are at [test/eigen](test/eigen)
