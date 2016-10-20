@@ -141,9 +141,16 @@ sudo make install
 
 Simply run:
 ```
-make run-test-all
+make run-tests
 ```
-... to run all tests.  Or you can run the tests by name, eg:
+... to run all non-eigen tests.  If you want to run eigen tests too, you need to:
+- clone Eigen repository into `/usr/local/eigen`
+- run:
+```
+make run-tests-all
+```
+
+You can run a test by name, eg:
 ```
 make run-eigen-test_cuda_elementwise
 ```
