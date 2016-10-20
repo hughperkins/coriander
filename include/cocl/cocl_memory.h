@@ -34,14 +34,14 @@ extern "C" {
     size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t kind, char *queue);
 
     size_t cuMemGetInfo_v2(size_t *free, size_t *total);
-    size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count);
-    size_t cuMemsetD32_v2(void *location, unsigned int value, uint32_t count);
+    size_t cuMemsetD8_v2(CUdeviceptr location, unsigned char value, uint32_t count);
+    size_t cuMemsetD32_v2(CUdeviceptr location, unsigned int value, uint32_t count);
 
-    size_t cuMemcpyHtoD_v2(CUdeviceptr gpu_dst, void *host_src, size_t size);
+    size_t cuMemcpyHtoD_v2(CUdeviceptr gpu_dst, const void *host_src, size_t size);
     size_t cuMemcpyDtoH_v2(void *host_dst, CUdeviceptr gpu_src, size_t size);
-    size_t cuMemcpyHtoD(CUdeviceptr gpu_dst, void *host_src, size_t size);
+    size_t cuMemcpyHtoD(CUdeviceptr gpu_dst, const void *host_src, size_t size);
     size_t cuMemcpyDtoH(void *host_dst, CUdeviceptr gpu_src, size_t size);
-    size_t cuMemcpyHtoDAsync_v2(CUdeviceptr gpu_dst, void *host_src, size_t size, char*queue);
+    size_t cuMemcpyHtoDAsync_v2(CUdeviceptr gpu_dst, const void *host_src, size_t size, char*queue);
     size_t cuMemcpyDtoHAsync_v2(void *host_dst, CUdeviceptr gpu_src, size_t size, char*queue);
 
     size_t cuDeviceTotalMem_v2(uint64_t *value, CUdeviceptr device);
@@ -55,3 +55,8 @@ extern "C" {
 #define cudaMemcpyDeviceToHost 111
 #define cudaMemcpyHostToDevice 222
 #define cudaMemcpyDeviceToDevice 333
+
+enum MemoryTypeEnum {
+    CU_MEMORYTYPE_DEVICE = 60000,
+    CU_MEMORYTYPE_HOST
+};

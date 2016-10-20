@@ -30,7 +30,7 @@ using namespace std;
 using namespace cocl;
 
 size_t cuDeviceGetAttribute(
-       int *value, int attribute, void *device) {
+       int *value, int attribute, CUdevice device) {
     COCL_PRINT(cout << "cuDeviceGetAttribute redirected" << endl);
     if(CU_DEVICE_ATTRIBUTE_ECC_ENABLED == attribute) {
         *value = 0;
@@ -67,7 +67,7 @@ size_t cuDeviceGetName(char *buf, int bufsize, void *device) {
     return 0;
 }
 
-size_t cuDeviceGetPCIBusId(char *buf, int bufsize, void *device) {
+size_t cuDeviceGetPCIBusId(char *buf, int bufsize, CUdevice device) {
     COCL_PRINT(cout << "cuDeviceGetPCIBusId redirected" << endl);
     sprintf(buf, "0000.0000");
     return 0;
@@ -79,14 +79,14 @@ size_t cuDriverGetVersion(int *driver_version) {
     return 0;
 }
 
-size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, void *device) {
+size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, CUdevice device) {
     COCL_PRINT(cout << "cuDeviceComputeCapability redirected" << endl);
     *cc_major = 3;
     *cc_minor = 5;
     return 0;
 }
 
-size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, int device) {
+size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
     COCL_PRINT(cout << "cudaGetDeviceProperties stub device=" << device << endl);
     prop->totalGlobalMem = 1024 * 1024 * 1024;
     prop->sharedMemPerBlock = 65536;
@@ -117,7 +117,7 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, int device) {
     return 0;
 }
 
-size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, int device_ordinal) {
+size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, CUdevice device_ordinal) {
     //return cudaGetDeviceProperties(device_properties, device_ordinal);
     return -1;
 }

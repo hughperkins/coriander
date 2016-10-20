@@ -127,7 +127,7 @@ size_t cudaMemsetAsync(void *devPtr, int value, size_t count, char *_queue) {
     return 0;
 }
 
-size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count) {
+size_t cuMemsetD8_v2(CUdeviceptr location, unsigned char value, uint32_t count) {
     COCL_PRINT(cout << "cuMemsetD8_v2 redirected value " << value << " count=" << count << endl);
     Memory *memory = (Memory *)location;
     // use default queue??
@@ -136,7 +136,7 @@ size_t cuMemsetD8_v2(void *location, unsigned char value, uint32_t count) {
     return 0;
 }
 
-size_t cuMemsetD32_v2(void *location, unsigned int value, uint32_t count) {
+size_t cuMemsetD32_v2(CUdeviceptr location, unsigned int value, uint32_t count) {
     Memory *memory = (Memory *)location;
     COCL_PRINT(cout << "cuMemsetD32_v2 redirected value " << value << " count=" << count << " location=" << location << " memory=" << (void *)memory << endl);
     cl_int err = clEnqueueFillBuffer(cl->default_queue->queue, memory->clmem, &value, sizeof(int), 0, count * sizeof(int), 0, 0, 0);
@@ -188,7 +188,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
     return 0;
 }
 
-size_t cuMemcpyHtoDAsync_v2(CUdeviceptr dst, void *src, size_t bytes, char *_queue) {
+size_t cuMemcpyHtoDAsync_v2(CUdeviceptr dst, const void *src, size_t bytes, char *_queue) {
     CLQueue *queue = (CLQueue*)_queue;
     // host => device
     COCL_PRINT(cout << "cuMemcpyHtoDAsync_v2 dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
@@ -219,14 +219,14 @@ size_t  cuMemcpyDtoHAsync_v2(void *dst, CUdeviceptr src, size_t bytes, char *_qu
 }
 
 // => synchronous <=
-size_t cuMemcpyHtoD_v2(CUdeviceptr gpu_dst, void *host_src, size_t size) {
+size_t cuMemcpyHtoD_v2(CUdeviceptr gpu_dst, const void *host_src, size_t size) {
     cudaMemcpy((void *)gpu_dst, host_src, size, cudaMemcpyHostToDevice);
     cl->finish();
     return 0;
 }
 
 // => synchronous <=
-size_t cuMemcpyHtoD(CUdeviceptr gpu_dst, void *host_src, size_t size) {
+size_t cuMemcpyHtoD(CUdeviceptr gpu_dst, const void *host_src, size_t size) {
     return cuMemcpyHtoD_v2(gpu_dst, host_src, size);
 }
 

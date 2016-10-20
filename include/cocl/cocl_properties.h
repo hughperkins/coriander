@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cocl/cocl_device.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -48,13 +50,13 @@ extern cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
 // };
 
 extern "C" {
-    size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, int device);
-    size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, void *device);
+    size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device);
+    size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, CUdevice device);
     size_t cuDriverGetVersion(int *driver_version);
-    size_t cuDeviceGetPCIBusId(char *buf, int bufsize, void *device);
-    size_t cuDeviceGetName(char *buf, int bufsize, void *device);
+    size_t cuDeviceGetPCIBusId(char *buf, int bufsize, CUdevice device);
+    size_t cuDeviceGetName(char *buf, int bufsize, CUdevice device);
     size_t cuDeviceGetAttribute(
-       int *value, int attribute, void *device);
+       int *value, int attribute, CUdevice device);
     size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, int device_ordinal);
     size_t cudaDeviceSetSharedMemConfig(cudaSharedMemConfig config);
 }

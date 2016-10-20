@@ -32,7 +32,6 @@ inline double rsqrt(double x) {
 #define erfcxf erfcx
 
 typedef char *CUstream;
-typedef long long CUdevice;
 typedef cocl::Event *CUevent;
 typedef char *cudaStream_t;
 typedef size_t cudaError_t;
@@ -129,5 +128,14 @@ int __shfl_xor(int a, int b); // just declare it for now, to get Eigen compiling
 int __umulhi(int magic, int n);
 
 typedef unsigned int CUjit_option;
+
+#define CU_JIT_ERROR_LOG_BUFFER_SIZE_BYTES 65536
+#define CU_JIT_INFO_LOG_BUFFER_SIZE_BYTES 65536
+
+enum cujitenum {
+    CU_JIT_LOG_VERBOSE = 50000,
+    CU_JIT_INFO_LOG_BUFFER,
+    CU_JIT_ERROR_LOG_BUFFER
+};
 
 #define CUDART_CB

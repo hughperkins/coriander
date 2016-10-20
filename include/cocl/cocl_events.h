@@ -25,3 +25,8 @@ extern "C" {
     size_t cuEventQuery(cocl::Event *event);
     size_t cuEventDestroy_v2(cocl::Event *event);
 }
+
+enum EventEnum {
+    CU_EVENT_DEFAULT = 70000,
+    CU_EVENT_DISABLE_TIMING
+};
