@@ -18,6 +18,8 @@
 
 #include "cocl/hostside_opencl_funcs.h"
 
+#include "EasyCL.h"
+
 #include <iostream>
 #include <memory>
 #include <vector>

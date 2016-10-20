@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdexcept>
+#include <cmath>
 
 #define __device__ __attribute__((device))
 #define __host__ __attribute__((host))

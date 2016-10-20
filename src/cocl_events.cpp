@@ -15,16 +15,13 @@
 #include "cocl/cocl_events.h"
 
 #include "cocl/cocl_error.h"
-
 #include "cocl/cocl_defs.h"
-
 #include "cocl/hostside_opencl_funcs.h"
+
+#include "EasyCL.h"
 
 #include <iostream>
 #include <memory>
-// #include <vector>
-// #include <map>
-// #include <set>
 
 using namespace std;
 using namespace cocl;

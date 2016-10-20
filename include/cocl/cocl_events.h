@@ -1,8 +1,6 @@
 #pragma once
 
 #include "CL/cl.h"
-#include "/home/ubuntu/git/cuda-ir-to-opencl/src/EasyCL/EasyCL.h"
-// #include "EasyCL.h"
 
 namespace cocl {
     class Event {
