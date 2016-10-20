@@ -30,7 +30,7 @@ using namespace std;
 using namespace cocl;
 
 size_t cuDeviceGetAttribute(
-       int64_t *value, int attribute, void *device) {
+       int *value, int attribute, void *device) {
     COCL_PRINT(cout << "cuDeviceGetAttribute redirected" << endl);
     if(CU_DEVICE_ATTRIBUTE_ECC_ENABLED == attribute) {
         *value = 0;
