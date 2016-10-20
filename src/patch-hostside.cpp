@@ -230,7 +230,14 @@ Type *cloneStructTypeNoPointers(StructType *inType) {
         }
         // Type *childType = walkType(M, structInfo, child);
     }
-    Type *newType = StructType::create(ArrayRef<Type *>(&newChildren[0], &newChildren[newChildren.size()]), newName);
+    outs() << "newchildren.size() " << newChildren.size() << "\n";
+    Type *newType = 0;
+    if(newChildren.size() > 0) {
+        newType = StructType::create(ArrayRef<Type *>(&newChildren[0], &newChildren[newChildren.size()]), newName);
+    } else {
+        // newType = StructType::create(TheContext, newName);
+        newType = StructType::get(TheContext);
+    }
     pointerlessTypeByOriginalType[inType] = newType;
     return newType;
 }

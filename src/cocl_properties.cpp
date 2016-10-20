@@ -31,7 +31,7 @@ using namespace cocl;
 
 size_t cuDeviceGetAttribute(
        int *value, int attribute, CUdevice device) {
-    COCL_PRINT(cout << "cuDeviceGetAttribute redirected" << endl);
+    // COCL_PRINT(cout << "cuDeviceGetAttribute redirected" << endl);
     if(CU_DEVICE_ATTRIBUTE_ECC_ENABLED == attribute) {
         *value = 0;
     } else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X == attribute) {
@@ -51,13 +51,14 @@ size_t cuDeviceGetAttribute(
     } else if(CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR == attribute) {
         *value = 128;
     } else if(CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_BLOCK == attribute) {
-        return 40000;
+        *value = 40000;
     } else if(CU_DEVICE_ATTRIBUTE_WARP_SIZE == attribute) {
         *value = 32;
     } else {
         cout << "attribute " << attribute << endl;
         throw runtime_error("attribute not implemented");
     }
+    cout << "cuDeviceGetAttribute redirected att=" << attribute << " value=" << *value << endl;
     return 0;
 }
 
