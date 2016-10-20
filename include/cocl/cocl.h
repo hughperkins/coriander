@@ -30,6 +30,7 @@ inline double rsqrt(double x) {
 #define erfcxf erfcx
 
 typedef char *CUstream;
+typedef char *CUdevice;
 typedef cocl::Event *CUevent;
 typedef void *CUdeviceptr;
 typedef char *cudaStream_t;

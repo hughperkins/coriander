@@ -156,6 +156,12 @@ run-test-cocl-test_bitcast: build/test-cocl-test_bitcast
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
+run-test-cocl-test_types: build/test-cocl-test_types
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
 run-test-cocl-multi1: build/test-cocl-multi1
 	################################
 	# running:
