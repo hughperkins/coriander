@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "hostside_opencl_funcs.h"
+#include "cocl/hostside_opencl_funcs.h"
 
 #include <iostream>
 #include <memory>

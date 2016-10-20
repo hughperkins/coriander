@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "hostside_opencl_funcs.h"
+#include "cocl/hostside_opencl_funcs.h"
 // #include "cocl_kernellaunch.h"
-#include "cocl.h"
+#include "cocl/cocl.h"
 #include "cocl/cocl_memory.h"
 
 #include <iostream>
@@ -26,7 +26,7 @@
 #include "EasyCL.h"
 
 #include "CL/cl.h"
-#include "cocl.h"
+#include "cocl/cocl.h"
 
 using namespace std;
 using namespace easycl;

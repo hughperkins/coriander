@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "cocl_memory.h"
+#include "cocl/cocl_memory.h"
 
-#include "hostside_opencl_funcs.h"
+#include "cocl/hostside_opencl_funcs.h"
 
 #include <iostream>
 #include <memory>

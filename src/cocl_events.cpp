@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "cocl_events.h"
+#include "cocl/cocl_events.h"
 
-#include "cocl_error.h"
+#include "cocl/cocl_error.h"
 
-#include "cocl_defs.h"
+#include "cocl/cocl_defs.h"
 
-#include "hostside_opencl_funcs.h"
+#include "cocl/hostside_opencl_funcs.h"
 
 #include <iostream>
 #include <memory>

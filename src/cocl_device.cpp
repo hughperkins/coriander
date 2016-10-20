@@ -1,4 +1,4 @@
-#include "cocl_device.h"
+#include "cocl/cocl_device.h"
 
 #include <iostream>
 using namespace std;

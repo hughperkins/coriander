@@ -1,6 +1,6 @@
-#include "cocl_error.h"
+#include "cocl/cocl_error.h"
 
-#include "cocl_defs.h"
+#include "cocl/cocl_defs.h"
 
 #include <iostream>
 using namespace std;

@@ -22,7 +22,7 @@
 
 #include "CL/cl.h"
 
-#include "cocl_defs.h"
+#include "cocl/cocl_defs.h"
 
 namespace easycl {
     class CLKernel;

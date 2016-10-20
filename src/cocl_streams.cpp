@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "cocl_streams.h"
+#include "cocl/cocl_streams.h"
 
-#include "cocl_events.h"
+#include "cocl/cocl_events.h"
 
-#include "hostside_opencl_funcs.h"
+#include "cocl/hostside_opencl_funcs.h"
 
 #include <iostream>
 #include <memory>
