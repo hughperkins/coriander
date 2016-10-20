@@ -19,7 +19,7 @@
 #include "cocl/cocl_properties.h"
 #include "cocl/cocl_kernellaunch.h"
 // #include "cocl/EasyCL/EasyCL.h"
-#include "vector_types.h"
+#include "cocl/vector_types.h"
 
 inline double rsqrt(double x) {
     return sqrt(1.0 / x);
