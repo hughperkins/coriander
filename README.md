@@ -162,22 +162,6 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 - the tests prefixed `cocl` are at [test/cocl](test/cocl)
 - the tests prefixed `eigen` are at [test/eigen](test/eigen)
 
-## Tensorflow/Eigen usage
-
-- [eigen](doc/eigen.md)
-
-## What's working?
-
-- [whats-working.md](doc/whats-working.md)
-
-## Roadmap
-
-- [roadmap.md](doc/roadmap.md)
-
-## FAQ
-
-- [faq.md](doc/faq.md)
-
 ## License
 
 [Apache 2.0](LICENSE)
