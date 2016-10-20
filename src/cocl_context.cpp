@@ -45,9 +45,9 @@ namespace cocl {
 
 extern "C" {
     size_t cuCtxSynchronize(void);
-    size_t cuCtxCreate_v2(PContext *context, unsigned int flags, void *device);
-    size_t cuCtxGetCurrent(PContext *context);
-    size_t cuCtxSetCurrent(PContext context);
+    size_t cuCtxCreate_v2(Context **pcontext, unsigned int flags, void *device);
+    size_t cuCtxGetCurrent(Context **pcontext);
+    size_t cuCtxSetCurrent(Context *context);
 }
 
 size_t cuCtxSynchronize(void) {
@@ -56,19 +56,19 @@ size_t cuCtxSynchronize(void) {
     return 0;
 }
 
-size_t cuCtxGetCurrent(PContext *ppContext) {
+size_t cuCtxGetCurrent(Context **ppContext) {
     // cout << "cuCtxGetCurrent redirected" << endl;
     *ppContext = currentContext;
     return 0;
 }
 
-size_t cuCtxSetCurrent(PContext pContext) {
+size_t cuCtxSetCurrent(Context *pContext) {
     COCL_PRINT(cout << "cuCtxSetCurrent redirected" << endl);
     currentContext = pContext;
     return 0;
 }
 
-size_t cuCtxCreate_v2 (PContext *ppContext, unsigned int flags, void *device) {
+size_t cuCtxCreate_v2 (Context **ppContext, unsigned int flags, void *device) {
     COCL_PRINT(cout << "cuCtxCreate_v2 redirected" << endl);
     Context *newContext = new Context();
     currentContext = newContext;

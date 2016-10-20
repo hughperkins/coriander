@@ -35,6 +35,13 @@ typedef cocl::Event *CUevent;
 typedef void *CUdeviceptr;
 typedef char *cudaStream_t;
 typedef size_t cudaError_t;
+typedef size_t CUresult;
+typedef char *CUcontext;
+
+// used by stream_executor/cl_driver.h; we just declare them for now...
+typedef void *CUfunction;
+typedef void *CUfunc_cache;
+typedef void *CUmodule;
 
 #define CU_EVENT_DISABLE_TIMING 1
 #define CU_MEMHOSTALLOC_PORTABLE 123

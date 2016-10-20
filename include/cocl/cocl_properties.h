@@ -32,10 +32,12 @@ struct cudaDeviceProp {
     // int tccDriver;
     char name[256];
 };
+typedef cudaDeviceProp CUdevprop;
 
 struct cudaSharedMemConfig {
   // nothing here :-P
 };
+typedef cudaSharedMemConfig CUsharedconfig;
 
 extern struct cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
 
