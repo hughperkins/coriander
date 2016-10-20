@@ -125,10 +125,9 @@ Behind the scenes, there are a few parts:
 ### Pre-requisites
 
 - Ubuntu 16.04
-- 'include' files from CUDA toolkit 7.5, at `/usr/local/cuda-7.5/include`
 - OpenCL-enabled GPU, and appropriate OpenCL drivers installed for the GPU
 
-Other operating systems, cuda version, and clang/llvm versions, might work too, but untested.  Your mileage may vary :-)
+Other operating systems, and clang/llvm versions, might work too, but untested.  Your mileage may vary :-)
 
 ### Procedure
 
@@ -186,6 +185,9 @@ Tests are at [test](test)
 
 ## News
 
+- Oct 20:
+  - no longer need CUDA toolkit installed!
+    - note that test_cuda_elementwise is currently partially broken, a regression.  Looking into this....
 - Oct 18:
   - installs to `/usr/local` now
   - `libcocl.a` contains `libEasyCL.a` now, no need for `libEasyCL.so` at runtime
