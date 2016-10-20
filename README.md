@@ -139,25 +139,17 @@ sudo make install
 
 ### Pre-requisites
 
-In addition to above requirements for building, you'll need also:
-- python 3.5
-
-eg do:
+Simply run:
 ```
-sudo apt-get install python-3.5 python-3.5-dev
+make run-test-all
 ```
-
-Setup python:
+... to run all tests.  Or you can run the tests by name, eg:
 ```
-pip -install -r test/requirements.txt
+make run-eigen-test_cuda_elementwise
 ```
 
-Run tests:
-```
-py.test -sv
-```
-
-Tests are at [test](test)
+- the tests prefixed `cocl` are at [test/cocl](test/cocl)
+- the tests prefixed `eigen` are at [test/eigen](test/eigen)
 
 ## Tensorflow/Eigen usage
 
