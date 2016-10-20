@@ -1,6 +1,6 @@
 #pragma once
 
-#include "/home/ubuntu/git/cuda-ir-to-opencl/src/EasyCL/EasyCL.h"
+// #include "EasyCL.h"
 #include "cocl_events.h"
 
 extern "C" {

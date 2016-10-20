@@ -198,6 +198,7 @@ install: build/ir-to-opencl build/patch-hostside build/libcocl.a
 	install -m 0644 src/cocl.Makefile $(PREFIX)/share/cocl/cocl.Makefile
 	install -m 0755 bin/cocl $(PREFIX)/bin
 	mkdir -p $(PREFIX)/include/cocl
+	install -m 0644 src/cocl_*.h $(PREFIX)/include/cocl/
 	install -m 0644 include/__clang_cuda_runtime_wrapper.h $(PREFIX)/include/cocl/
 	install -m 0644 include/fake_funcs.h $(PREFIX)/include/cocl/
 	# install -m 0644 build/libEasyCL.a $(PREFIX)/lib

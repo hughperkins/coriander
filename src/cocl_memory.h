@@ -1,37 +1,20 @@
 #pragma once
 
 #include "CL/cl.h"
-#include "/home/ubuntu/git/cuda-ir-to-opencl/src/EasyCL/EasyCL.h"
 
 namespace cocl {
-    // enum MemoryType {
-    //     Pinned,
-    //     Device
-    // };
-
     class Memory {
     protected:
         Memory(cl_mem clmem, size_t bytes);
 
      public:
-        // static Memory *newPinned(size_t bytes);
         static Memory *newDeviceAlloc(size_t bytes);
         ~Memory();
-        // void *map(easycl::CLQueue *queue);
-        // void unmap(easycl::CLQueue *queue);
-        // bool needsMap() {
-        //     return type == Pinned;
-        // }
-
         cl_mem clmem; // this is assumed to always be valid
         size_t bytes; // should always be valid (ideally > 0...)
-        // void *hostPointer; // will point to memory area for pinned, otherwise to this object
-        // MemoryType type;
     };
 
     typedef Memory *PMemory;
-
-    // Memory *getMemoryForHostPointer(void *hostPointer);
 }
 
 extern "C" {

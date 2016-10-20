@@ -15,7 +15,7 @@
 #include "hostside_opencl_funcs.h"
 // #include "cocl_kernellaunch.h"
 #include "cocl.h"
-#include "cocl_memory.h"
+#include "cocl/cocl_memory.h"
 
 #include <iostream>
 #include <memory>

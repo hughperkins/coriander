@@ -11,14 +11,14 @@
 
 #define __launch_bounds__(x) __attribute__((launch_bounds(x)))
 
-#include "/home/ubuntu/git/cuda-ir-to-opencl/src/cocl_memory.h"
-#include "/home/ubuntu/git/cuda-ir-to-opencl/src/cocl_streams.h"
-#include "/home/ubuntu/git/cuda-ir-to-opencl/src/cocl_context.h"
-#include "/home/ubuntu/git/cuda-ir-to-opencl/src/cocl_device.h"
-#include "/home/ubuntu/git/cuda-ir-to-opencl/src/cocl_error.h"
-#include "/home/ubuntu/git/cuda-ir-to-opencl/src/cocl_properties.h"
-#include "/home/ubuntu/git/cuda-ir-to-opencl/src/cocl_kernellaunch.h"
-#include "/home/ubuntu/git/cuda-ir-to-opencl/src/EasyCL/EasyCL.h"
+#include "cocl/cocl_memory.h"
+#include "cocl/cocl_streams.h"
+#include "cocl/cocl_context.h"
+#include "cocl/cocl_device.h"
+#include "cocl/cocl_error.h"
+#include "cocl/cocl_properties.h"
+#include "cocl/cocl_kernellaunch.h"
+// #include "cocl/EasyCL/EasyCL.h"
 #include "vector_types.h"
 
 inline double rsqrt(double x) {

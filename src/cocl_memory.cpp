@@ -22,6 +22,8 @@
 #include <map>
 #include <set>
 
+#include "EasyCL.h"
+
 #include "CL/cl.h"
 
 using namespace std;
