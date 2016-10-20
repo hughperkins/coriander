@@ -32,9 +32,9 @@ inline double rsqrt(double x) {
 #define erfcxf erfcx
 
 typedef char *CUstream;
-typedef char *CUdevice;
+typedef long long CUdevice;
 typedef cocl::Event *CUevent;
-typedef void *CUdeviceptr;
+typedef const void *CUdeviceptr;
 typedef char *cudaStream_t;
 typedef size_t cudaError_t;
 typedef size_t CUresult;
@@ -128,3 +128,7 @@ int __shfl_xor(int a, int b); // just declare it for now, to get Eigen compiling
 
 // ditto
 int __umulhi(int magic, int n);
+
+typedef unsigned int CUjit_option;
+
+#define CUDART_CB
