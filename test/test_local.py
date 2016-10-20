@@ -27,9 +27,13 @@ from test import test_common
 def test_local_cl():
     cl_filepath = 'test/generated/test_local-device.cl'
 
+    # print(subprocess.check_output([
+    #     'make',
+    #     cl_filepath
+    # ]).decode('utf-8'))
     print(subprocess.check_output([
-        'make',
-        cl_filepath
+        'cocl', '-c', '-o', 'test/generated/test_local.o',
+        'test/test_local.cu'
     ]).decode('utf-8'))
     return cl_filepath
 

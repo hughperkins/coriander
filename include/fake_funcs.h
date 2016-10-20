@@ -3,7 +3,7 @@
 //__host__ __device__ int __nvvm_atom_cta_min_gen_i(volatile int *p, int val);
 // __host__ __device__ long long __nvvm_atom_cta_min_gen_ll(long long *p, long long val);
 
-#pragma message "reading fake_funcs.h"
+// #pragma message "reading fake_funcs.h"
 
 #include <cstdlib>
 

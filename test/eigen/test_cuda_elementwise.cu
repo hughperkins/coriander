@@ -12,6 +12,8 @@
 
 #include "main.h"
 
+#include <iostream>
+
 using Eigen::Tensor;
 
 void test_cuda_elementwise()
@@ -58,7 +60,11 @@ void test_cuda_elementwise()
   for (int i = 0; i < 72; ++i) {
     for (int j = 0; j < 53; ++j) {
       for (int k = 0; k < 97; ++k) {
-        VERIFY_IS_APPROX(out(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)), in1(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)) + in2(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)) * in3(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)));
+        float diff = out(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)) - (in1(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)) + in2(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)) * in3(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)));
+        if(diff != 0) {
+          std::cout << "i=" << i << " j=" << j << " k=" << k << " diff=" << diff << std::endl;
+        }
+        // VERIFY_IS_APPROX(out(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)), in1(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)) + in2(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)) * in3(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)));
       }
     }
   }

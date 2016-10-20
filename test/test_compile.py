@@ -9,14 +9,19 @@ import pytest
     "test/generated/struct_initializer-device.cl",
     "test/generated/phiaddressspace-device.cl",
     # pytest.mark.xfail("test/generated/pointerpointer-device.cl"),
-    "test/eigen/generated/test_cuda_elementwise_small-device.cl",
-    "test/eigen/generated/test_cuda_nullary-device.cl",
-    "test/eigen/generated/cxx11_tensor_cuda-device.cl"
+    # pytest.mark.xfail("test/eigen/generated/test_cuda_elementwise_small-device.cl"),
+    # "test/eigen/generated/test_cuda_nullary-device.cl",
+    # "test/eigen/generated/cxx11_tensor_cuda-device.cl"
 ])
 def test_compile(context, cl_filepath):
+    # print(subprocess.check_output([
+    #     'make',
+    #     cl_filepath
+    # ]).decode('utf-8'))
+
     print(subprocess.check_output([
-        'make',
-        cl_filepath
+        'cocl', '-c', '-o', cl_filepath.replace('-device.cl', '.o'),
+        cl_filepath.replace('/generated', '').replace('-device.cl', '.cu')
     ]).decode('utf-8'))
 
     with open(cl_filepath, 'r') as f:

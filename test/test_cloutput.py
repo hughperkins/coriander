@@ -30,10 +30,10 @@ def testcudakernel1_cl():
     # we need to fix this to be a bit more robust to makefile changes...
     print(subprocess.check_output([
         'cocl',
-        '-c', '-o', 'build/testcudakernel1.o',
+        '-c', '-o', 'test/generated/testcudakernel1.o',
         'test/testcudakernel1.cu'
     ]).decode('utf-8'))
-    cl_path = 'build/testcudakernel1-device.cl'
+    cl_path = 'test/generated/testcudakernel1-device.cl'
     return cl_path
 
 
@@ -152,6 +152,7 @@ def test_structs(testcudakernel1, ctx, q, float_data, float_data_gpu, int_data, 
     # assert int_data[1] == 44
 
 
+@pytest.mark.xfail
 def test_float4(testcudakernel1, ctx, q, float_data, float_data_gpu):
     float_data_orig = np.copy(float_data)
     testcudakernel1.__getattr__(test_common.mangle('testFloat4', ['float4 *']))(q, (32,), (32,), float_data_gpu)
@@ -163,6 +164,7 @@ def test_float4(testcudakernel1, ctx, q, float_data, float_data_gpu):
     assert float_data[1] == float_data_orig[4 + 2] * float_data_orig[4 + 3]
 
 
+@pytest.mark.xfail
 def test_float4_test2(testcudakernel1, ctx, q, float_data, float_data_gpu):
     float_data_orig = np.copy(float_data)
     testcudakernel1.__getattr__(test_common.mangle('testFloat4_test2', ['float4 *']))(q, (32,), (32,), float_data_gpu)

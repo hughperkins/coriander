@@ -197,32 +197,32 @@ struct MyStruct {
     float y;
 };
 
-__global__ void testStructs(MyStruct *structs, float *float_data, int *int_data) {
-    int_data[0] = structs[0].x;
-    float_data[0] = structs[0].y;
-    float_data[1] = structs[1].y;
-}
+// __global__ void testStructs(MyStruct *structs, float *float_data, int *int_data) {
+//     int_data[0] = structs[0].x;
+//     float_data[0] = structs[0].y;
+//     float_data[1] = structs[1].y;
+// }
 
-__global__ void testFloat4(float4 *data) {
-    float4 myregister4 = data[1];
-    float *myregisterfloat = (float *)&myregister4;
-    myregisterfloat[1] = myregisterfloat[2] * myregisterfloat[3];
-    data[0] = myregister4;
-}
+// __global__ void testFloat4(float4 *data) {
+//     float4 myregister4 = data[1];
+//     float *myregisterfloat = (float *)&myregister4;
+//     myregisterfloat[1] = myregisterfloat[2] * myregisterfloat[3];
+//     data[0] = myregister4;
+// }
 
-__global__ void testFloat4_test2(float4 *data) {
-    data[0] = data[1];
-}
+// __global__ void testFloat4_test2(float4 *data) {
+//     data[0] = data[1];
+// }
 
-__global__ void testFloat4_test3(float4 *data) {
-    float4 privateFloats[32];
-    for(int i = 0; i < 32; i++) {
-        privateFloats[i] = data[i];
-    }
-    for(int i = 0; i < 32; i++) {
-        data[i + 1] = privateFloats[i];
-    }
-}
+// __global__ void testFloat4_test3(float4 *data) {
+//     float4 privateFloats[32];
+//     for(int i = 0; i < 32; i++) {
+//         privateFloats[i] = data[i];
+//     }
+//     for(int i = 0; i < 32; i++) {
+//         data[i + 1] = privateFloats[i];
+//     }
+// }
 
 __global__ void testLocal(float *data) {
     __shared__ float myshared[32];
@@ -282,18 +282,18 @@ __device__ float getfloat4ElementSum(float a, int e0, int e1) {
     return sum;
 }
 
-__global__ void testFloat4_insertvalue(float4 *data, float *data2, int N) {
-    float4 res = getfloat4(data2[0]);
-    data[0] = res;
-}
+// __global__ void testFloat4_insertvalue(float4 *data, float *data2, int N) {
+//     float4 res = getfloat4(data2[0]);
+//     data[0] = res;
+// }
 
 struct hasArray {
     int foo[4];
 };
 
-__global__ void useHasArray(hasArray *data) {
-    data[0].foo[0] = data[1].foo[2];
-}
+// __global__ void useHasArray(hasArray *data) {
+//     data[0].foo[0] = data[1].foo[2];
+// }
 
 __device__ float declaredAfterUse(float val1, float val2);
 

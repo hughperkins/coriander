@@ -5,6 +5,7 @@
 #define __device__ __attribute__((device))
 #define __host__ __attribute__((host))
 #define __global__ __attribute__((global))
+#define __constant__ __attribute__((constant))
 #define __shared__ __attribute__((shared))
 #define __align__(x) __attribute__((aligned(x)))
 
@@ -18,6 +19,7 @@
 #include "/home/ubuntu/git/cuda-ir-to-opencl/src/cocl_properties.h"
 #include "/home/ubuntu/git/cuda-ir-to-opencl/src/cocl_kernellaunch.h"
 #include "/home/ubuntu/git/cuda-ir-to-opencl/src/EasyCL/EasyCL.h"
+#include "vector_types.h"
 
 inline double rsqrt(double x) {
     return sqrt(1.0 / x);
