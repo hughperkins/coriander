@@ -76,6 +76,10 @@ build/test-cocl-multi1-%.o: test/cocl/multi1/%.cu
 	echo building $@ from $<
 	cocl -c -o $@ $<
 
+build/test-cocl-callinternal-%.o: test/cocl/callinternal/%.cu
+	echo building $@ from $<
+	cocl -c -o $@ $<
+
 build/eigen-%.o: test/eigen/%.cu
 	echo building $@ from $<
 	cocl -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
@@ -91,6 +95,9 @@ build/test-cocl-%.o: test/cocl/%.cu
 # executables
 build/test-cocl-multi1: build/test-cocl-multi1-main.o build/test-cocl-multi1-k1.o build/test-cocl-multi1-k2.o build/libcocl.a
 	g++ -o $@ build/test-cocl-multi1-main.o build/test-cocl-multi1-k1.o build/test-cocl-multi1-k2.o -g -lcocl -lOpenCL -Lbuild -lEasyCL
+
+build/test-cocl-callinternal: build/test-cocl-callinternal-main.o build/test-cocl-callinternal-test_callinternal.o build/libcocl.a
+	g++ -o $@ build/test-cocl-callinternal-main.o build/test-cocl-callinternal-test_callinternal.o -g -lcocl -lOpenCL -Lbuild -lEasyCL
 
 build/test-%: build/test-%.o build/libcocl.a
 	g++ -o $@ $< -g -lcocl -lOpenCL -Lbuild -lEasyCL
@@ -157,6 +164,12 @@ run-test-cocl-test_bitcast: build/test-cocl-test_bitcast
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
 run-test-cocl-test_types: build/test-cocl-test_types
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
+run-test-cocl-callinternal: build/test-cocl-callinternal
 	################################
 	# running:
 	################################

@@ -35,8 +35,6 @@ extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
 }
 
-// dim3 nulldim3;
-
 // stubs
 CUfunc_cache CU_FUNC_CACHE_PREFER_NONE;
 CUfunc_cache CU_FUNC_CACHE_PREFER_SHARED;
@@ -52,6 +50,8 @@ namespace cocl {
         CLQueue *queue = 0;  // NOT owned by us
 
         vector<cl_mem> kernelArgsToBeReleased;
+        std::string kernelName = "";;
+        std::string kernelSource = "";
     };
     LaunchConfiguration launchConfiguration;
 
@@ -138,7 +138,22 @@ void configureKernel(
         const char *kernelName, const char *clSourcecodeString) {
     // cout << "configureKernel (name=" << kernelName << ", source=" << clSourcecodeString << ")" << endl;
     hostside_opencl_funcs_assure_initialized();
-    launchConfiguration.kernel.reset(cl->buildKernelFromString(clSourcecodeString, kernelName, "", "__internal__"));
+    launchConfiguration.kernelName = kernelName;
+    launchConfiguration.kernelSource = clSourcecodeString;
+    try {
+        launchConfiguration.kernel.reset(cl->buildKernelFromString(clSourcecodeString, kernelName, "", "__internal__"));
+    } catch(runtime_error &e) {
+        cout << "kernel failed to build" << endl;
+        cout << "kernel name: [" << launchConfiguration.kernelName << "]" << endl;
+        cout << "saving kernel soucecode to /tmp/failed-kernel.cl" << endl;
+        ofstream f;
+        f.open("/tmp/failed-kernel.cl", ios_base::out);
+        f << launchConfiguration.kernelName << endl;
+        f << launchConfiguration.kernelSource << endl;
+        f << e.what() << endl;
+        f.close();
+        throw e;
+    }
 }
 
 void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
@@ -224,7 +239,19 @@ void kernelGo() {
         COCL_PRINT(cout << "block[" << i << "]=" << launchConfiguration.block[i] << endl);
     }
     // cout << "launching kernel, using OpenCL..." << endl;
-    launchConfiguration.kernel->run(launchConfiguration.queue, 3, global, launchConfiguration.block);
+    try {
+        launchConfiguration.kernel->run(launchConfiguration.queue, 3, global, launchConfiguration.block);
+    } catch(runtime_error &e) {
+        cout << "kernel failed to run" << endl;
+        cout << "kernel name: [" << launchConfiguration.kernelName << "]" << endl;
+        cout << "saving kernel soucecode to /tmp/failed-kernel.cl" << endl;
+        ofstream f;
+        f.open("/tmp/failed-kernel.cl", ios_base::out);
+        f << launchConfiguration.kernelName << endl;
+        f << launchConfiguration.kernelSource << endl;
+        f.close();
+        throw e;
+    }
     COCL_PRINT(cout << ".. kernel queued" << endl);
     // cl->finish();
     // cout << ".. kernel finished" << endl;
