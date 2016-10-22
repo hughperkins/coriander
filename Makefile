@@ -175,6 +175,12 @@ run-test-cocl-testpartialcopy: build/test-cocl-testpartialcopy
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
+run-test-cocl-offsetkernelargs: build/test-cocl-offsetkernelargs
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
 run-test-cocl-test_bitcast: build/test-cocl-test_bitcast
 	################################
 	# running:

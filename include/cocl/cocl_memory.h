@@ -47,12 +47,17 @@ extern "C" {
     size_t cuDeviceTotalMem(uint64_t *value, CUdeviceptr device);
 }
 
-// #define cuMemcpyHtoDAsync cuMemcpyHtoDAsync_v2
-// #define cuMemcpyDtoHAsync cuMemcpyDtoHAsync_v2
-// #define cuMemAlloc_v2 cuMemAlloc
-// #define cuMemFree_v2 cuMemFree
-// #define cuMemcpyHtoD_v2 cuMemcpyHtoD
-// #define cuMemcpyDtoH_v2 cuMemcpyDtoH
+#define cuMemcpyHtoDAsync_v2 cuMemcpyHtoDAsync
+#define cuMemcpyDtoHAsync_v2 cuMemcpyDtoHAsync
+#define cuMemAlloc_v2 cuMemAlloc
+#define cuMemFree_v2 cuMemFree
+#define cuMemcpyHtoD_v2 cuMemcpyHtoD
+#define cuMemcpyDtoH_v2 cuMemcpyDtoH
+#define cuMemsetD8_v2 cuMemsetD8
+#define cuMemsetD32_v2 cuMemsetD32
+
+#define cuDeviceTotalMem_v2 cuDeviceTotalMem
+#define cuMemGetInfo_v2 cuMemGetInfo
 
 #define cudaMemcpyDeviceToHost 111
 #define cudaMemcpyHostToDevice 222

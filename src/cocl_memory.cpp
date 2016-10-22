@@ -30,6 +30,10 @@ using namespace std;
 using namespace cocl;
 using namespace easycl;
 
+#undef COCL_PRINT
+#define COCL_PRINT(stuff) \
+   stuff
+
 namespace cocl {
     // we should index these, but a set is ok-ish for now. maybe
     set<Memory *>memories;

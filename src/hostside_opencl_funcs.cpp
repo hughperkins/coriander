@@ -36,6 +36,10 @@ extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
 }
 
+#undef COCL_PRINT
+#define COCL_PRINT(stuff) \
+   stuff
+
 // stubs
 CUfunc_cache CU_FUNC_CACHE_PREFER_NONE;
 CUfunc_cache CU_FUNC_CACHE_PREFER_SHARED;
