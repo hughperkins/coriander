@@ -16,6 +16,7 @@ import numpy as np
 import pyopencl as cl
 import pyopencl.tools
 import pytest
+import os
 import subprocess
 from test import test_common
 
@@ -28,6 +29,9 @@ def testcudakernel1_cl():
     #     cl_path
     # ]).decode('utf-8'))
     # we need to fix this to be a bit more robust to makefile changes...
+    for file in os.listdir('test/generated'):
+        if file.startswith('testcudakernel'):
+            os.unlink('test/generated/%s' % file)
     print(subprocess.check_output([
         'cocl',
         '-c', '-o', 'test/generated/testcudakernel1.o',
