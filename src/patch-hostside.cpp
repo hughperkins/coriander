@@ -284,6 +284,101 @@ Instruction *addSetKernelArgInst_pointer(Instruction *lastInst, Value *value) {
     return lastInst;
 }
 
+Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *value, Value *valueAsPointerInstr) {
+    Module *M = lastInst->getModule();
+
+    outs() << "got a byvalue struct" << "\n";
+    unique_ptr<StructInfo> structInfo(new StructInfo());
+    walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", cast<StructType>(value->getType()));
+
+    bool structHasPointers = structInfo->pointerInfos.size() > 0;
+    outs() << "struct has pointers? " << structHasPointers << "\n";
+
+    Type *newType = cloneStructTypeNoPointers(cast<StructType>(value->getType()));
+
+    const DataLayout *dataLayout = &M->getDataLayout();
+    int allocSize = dataLayout->getTypeAllocSize(newType);
+    outs() << "original typeallocsize " << dataLayout->getTypeAllocSize(value->getType()) << "\n";
+    outs() << "pointerfree typeallocsize " << allocSize << "\n";
+
+    Function *setKernelArgStruct = cast<Function>(M->getOrInsertFunction(
+        "_Z18setKernelArgStructPci",
+        Type::getVoidTy(context),
+        PointerType::get(IntegerType::get(context, 8), 0),
+        IntegerType::get(context, 32),
+        NULL));
+
+    AllocaInst *alloca = new AllocaInst(newType, "newalloca");
+    alloca->insertAfter(lastInst);
+    lastInst = alloca;
+
+    lastInst = copyStructValuesNoPointers(lastInst, valueAsPointerInstr, alloca);
+
+    BitCastInst *bitcast = new BitCastInst(alloca, PointerType::get(IntegerType::get(context, 8), 0));
+    bitcast->insertAfter(lastInst);
+    lastInst = bitcast;
+
+    Value *args[2];
+    args[0] = bitcast;
+    args[1] = createInt32Constant(&context, allocSize);
+
+    CallInst *call = CallInst::Create(setKernelArgStruct, ArrayRef<Value *>(args));
+    call->insertAfter(lastInst);
+    lastInst = call;
+
+    outs() << "pointers in struct:" << "\n";
+    for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
+        PointerInfo *pointerInfo = pointerit->get();
+        int offset = pointerInfo->offset;
+        Type *type = pointerInfo->type;
+        vector<Value *> indices;
+        indices.push_back(createInt32Constant(&context, 0));
+        for(auto idxit = pointerInfo->indices.begin(); idxit != pointerInfo->indices.end(); idxit++) {
+            int idx = *idxit;
+            outs() << "idx " << idx << "\n";
+            indices.push_back(createInt32Constant(&context, idx));
+        }
+        GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(value->getType(), valueAsPointerInstr, ArrayRef<Value *>(&indices[0], &indices[indices.size()]), "getfloatstaraddr");
+        outs() << "gep type " << dumpType(gep->getType()) << "\n";
+        gep->insertAfter(lastInst);
+        lastInst = gep;
+
+        LoadInst *loadgep = new LoadInst(gep, "loadgep");
+        loadgep->insertAfter(lastInst);
+        lastInst = loadgep;
+
+        outs() << "loadgep type " << dumpType(loadgep->getType()) << "\n";
+        Type *gepElementType = loadgep->getType()->getPointerElementType();
+        outs() << "gepElementType " << dumpType(gepElementType) << "\n";
+        if(IntegerType *integerType = dyn_cast<IntegerType>(gepElementType)) {
+            if(integerType->getBitWidth() == 8) {
+                Function *setKernelArgCharStar = cast<Function>(M->getOrInsertFunction(
+                    "_Z20setKernelArgCharStarPc",
+                    Type::getVoidTy(context),
+                    PointerType::get(IntegerType::get(context, 8), 0),
+                    NULL));
+                CallInst *call = CallInst::Create(setKernelArgCharStar, loadgep);
+                call->insertAfter(lastInst);
+                lastInst = call;
+            } else {
+                throw runtime_error("integer type with bitwidth " + toString(integerType->getBitWidth()) + " not implemented for pointers in struct");
+            }
+        } else if(gepElementType->isFloatingPointTy()) {
+            Function *setKernelArgFloatStar = cast<Function>(M->getOrInsertFunction(
+                "_Z21setKernelArgFloatStarPf",
+                Type::getVoidTy(context),
+                PointerType::get(Type::getFloatTy(context), 0),
+                NULL));
+            CallInst *call = CallInst::Create(setKernelArgFloatStar, loadgep);
+            call->insertAfter(lastInst);
+            lastInst = call;
+        } else {
+            throw runtime_error("type " + dumpType(gepElementType) + " not implemented for pointers in structs");
+        }
+    }
+    return lastInst;
+}
+
 Instruction *addSetKernelArgInst(Instruction *lastInst, Value *value, Value *valueAsPointerInstr) {
     Module *M = lastInst->getModule();
 
@@ -294,97 +389,11 @@ Instruction *addSetKernelArgInst(Instruction *lastInst, Value *value, Value *val
     } else if(value->getType()->isPointerTy()) {
         lastInst = addSetKernelArgInst_pointer(lastInst, value);
     } else if(isa<StructType>(value->getType())) {
-        outs() << "got a struct" << "\n";
-        unique_ptr<StructInfo> structInfo(new StructInfo());
-        walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", cast<StructType>(value->getType()));
-
-        bool structHasPointers = structInfo->pointerInfos.size() > 0;
-        outs() << "struct has pointers? " << structHasPointers << "\n";
-
-        Type *newType = cloneStructTypeNoPointers(cast<StructType>(value->getType()));
-
-        const DataLayout *dataLayout = &M->getDataLayout();
-        int allocSize = dataLayout->getTypeAllocSize(newType);
-        outs() << "original typeallocsize " << dataLayout->getTypeAllocSize(value->getType()) << "\n";
-        outs() << "pointerfree typeallocsize " << allocSize << "\n";
-
-        Function *setKernelArgStruct = cast<Function>(M->getOrInsertFunction(
-            "_Z18setKernelArgStructPci",
-            Type::getVoidTy(context),
-            PointerType::get(IntegerType::get(context, 8), 0),
-            IntegerType::get(context, 32),
-            NULL));
-
-        AllocaInst *alloca = new AllocaInst(newType, "newalloca");
-        alloca->insertAfter(lastInst);
-        lastInst = alloca;
-
-        lastInst = copyStructValuesNoPointers(lastInst, valueAsPointerInstr, alloca);
-
-        BitCastInst *bitcast = new BitCastInst(alloca, PointerType::get(IntegerType::get(context, 8), 0));
-        bitcast->insertAfter(lastInst);
-        lastInst = bitcast;
-
-        Value *args[2];
-        args[0] = bitcast;
-        args[1] = createInt32Constant(&context, allocSize);
-
-        CallInst *call = CallInst::Create(setKernelArgStruct, ArrayRef<Value *>(args));
-        call->insertAfter(lastInst);
-        lastInst = call;
-
-        outs() << "pointers in struct:" << "\n";
-        for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
-            PointerInfo *pointerInfo = pointerit->get();
-            int offset = pointerInfo->offset;
-            Type *type = pointerInfo->type;
-            vector<Value *> indices;
-            indices.push_back(createInt32Constant(&context, 0));
-            for(auto idxit = pointerInfo->indices.begin(); idxit != pointerInfo->indices.end(); idxit++) {
-                int idx = *idxit;
-                outs() << "idx " << idx << "\n";
-                indices.push_back(createInt32Constant(&context, idx));
-            }
-            GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(value->getType(), valueAsPointerInstr, ArrayRef<Value *>(&indices[0], &indices[indices.size()]), "getfloatstaraddr");
-            outs() << "gep type " << dumpType(gep->getType()) << "\n";
-            gep->insertAfter(lastInst);
-            lastInst = gep;
-
-            LoadInst *loadgep = new LoadInst(gep, "loadgep");
-            loadgep->insertAfter(lastInst);
-            lastInst = loadgep;
-
-            outs() << "loadgep type " << dumpType(loadgep->getType()) << "\n";
-            Type *gepElementType = loadgep->getType()->getPointerElementType();
-            outs() << "gepElementType " << dumpType(gepElementType) << "\n";
-            if(IntegerType *integerType = dyn_cast<IntegerType>(gepElementType)) {
-                if(integerType->getBitWidth() == 8) {
-                    Function *setKernelArgCharStar = cast<Function>(M->getOrInsertFunction(
-                        "_Z20setKernelArgCharStarPc",
-                        Type::getVoidTy(context),
-                        PointerType::get(IntegerType::get(context, 8), 0),
-                        NULL));
-                    CallInst *call = CallInst::Create(setKernelArgCharStar, loadgep);
-                    call->insertAfter(lastInst);
-                    lastInst = call;
-                } else {
-                    throw runtime_error("integer type with bitwidth " + toString(integerType->getBitWidth()) + " not implemented for pointers in struct");
-                }
-            } else if(gepElementType->isFloatingPointTy()) {
-                Function *setKernelArgFloatStar = cast<Function>(M->getOrInsertFunction(
-                    "_Z21setKernelArgFloatStarPf",
-                    Type::getVoidTy(context),
-                    PointerType::get(Type::getFloatTy(context), 0),
-                    NULL));
-                CallInst *call = CallInst::Create(setKernelArgFloatStar, loadgep);
-                call->insertAfter(lastInst);
-                lastInst = call;
-            } else {
-                throw runtime_error("type " + dumpType(gepElementType) + " not implemented for pointers in structs");
-            }
-        }
+        lastInst = addSetKernelArgInst_byvaluestruct(lastInst, value, valueAsPointerInstr);
     } else {
-        throw runtime_error("type not implemented " + dumpType(value->getType()));
+        value->dump();
+        outs() << "\n";
+        throw runtime_error("kernel arg type type not implemented " + dumpType(value->getType()));
     }
     return lastInst;
 }
