@@ -135,7 +135,6 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
     - (structs containing pointers can be passed only by-value)
   - possible to call kernels with offsets added now, as in eg [test/cocl/offsetkernelargs.cu](test/cocl/offsetkernelargs.cu)
 - Oct 20:
-  - no longer need CUDA toolkit installed!
   - fix bug where `threadIdx.x` was being incorrectly written as `get_global_id` instead of `get_local_id` ...
      - magically, the `test_cuda_elementwise` kernel works much better now :-)
 - Oct 18:
