@@ -47,6 +47,7 @@
 #include <fstream>
 
 #include "mutations.h"
+#include "struct_clone.h"
 #include "ir-to-opencl-common.h"
 
 using namespace llvm;
@@ -54,8 +55,6 @@ using namespace std;
 
 static llvm::LLVMContext context;
 static std::string sourcecode_stringname;
-
-static std::map<Type *, Type *> pointerlessTypeByOriginalType;
 
 bool single_precision = true;
 
@@ -190,118 +189,6 @@ void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
     load->insertBefore(inst);
     info->callValuesByValue.push_back(load);
     info->callValuesAsPointers.push_back(alloca);
-}
-
-Type *cloneStructTypeNoPointers(StructType *inType);
-
-Type *cloneStructTypeNoPointers(StructType *inType) {
-    if(pointerlessTypeByOriginalType.find(inType) != pointerlessTypeByOriginalType.end()) {
-        return pointerlessTypeByOriginalType[inType];
-    }
-    string name = getName(inType);
-    string newName = name + "_nopointers";
-    vector<Type *>newChildren;
-    for(auto it=inType->element_begin(); it != inType->element_end(); it++) {
-        Type *childType = *it;
-        if(StructType *childStructType = dyn_cast<StructType>(childType)) {
-            childType = cloneStructTypeNoPointers(childStructType);
-            newChildren.push_back(childType);
-        } else if(isa<PointerType>(childType)) {
-            // ignore
-        } else {
-            newChildren.push_back(childType);
-        }
-    }
-    outs() << "newchildren.size() " << newChildren.size() << "\n";
-    Type *newType = 0;
-    if(newChildren.size() > 0) {
-        newType = StructType::create(ArrayRef<Type *>(&newChildren[0], &newChildren[newChildren.size()]), newName);
-    } else {
-        newType = StructType::get(context);
-    }
-    pointerlessTypeByOriginalType[inType] = newType;
-    return newType;
-}
-
-Instruction *copyStructValuesNoPointers(Instruction *lastInst, Value *src, Value *dst) {
-    int srcidx = 0;
-    int dstidx = 0;
-    Type *type = src->getType();
-    outs() << "copyStructValuesNoPointers " << dumpType(type) << "\n";
-    if(StructType *structType = dyn_cast<StructType>(src->getType()->getPointerElementType())) {
-        for(auto it=structType->element_begin(); it != structType->element_end(); it++) {
-            Type *childType = *it;
-            if(isa<PointerType>(childType)) {
-                // ignore
-                srcidx++;
-                continue;
-            }
-            Value *srcIndex[2];
-            srcIndex[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
-            srcIndex[1] = ConstantInt::getSigned(IntegerType::get(context, 32), srcidx);
-            Instruction *childSrcInst = GetElementPtrInst::CreateInBounds(src, ArrayRef<Value *>(&srcIndex[0], &srcIndex[2]));
-            childSrcInst->insertAfter(lastInst);
-            lastInst = childSrcInst;
-
-            Value *dstIndex[2];
-            dstIndex[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
-            dstIndex[1] = ConstantInt::getSigned(IntegerType::get(context, 32), dstidx);
-            Instruction *childDstInst = GetElementPtrInst::CreateInBounds(dst, ArrayRef<Value *>(&dstIndex[0], &dstIndex[2]));
-            childDstInst->insertAfter(lastInst);
-            lastInst = childDstInst;
-
-            if(StructType *childStructType = dyn_cast<StructType>(childType)) {
-                lastInst = copyStructValuesNoPointers(lastInst, childSrcInst, childDstInst);
-            // } else if(IntegerType *intType = dyn_cast<IntegerType>(childType)) {
-            } else if(childType->getPrimitiveSizeInBits() > 0 ) {
-                // do we have to do `load` followed by `store`?
-                outs() << "copying " << dumpType(childType) << "\n";
-                // Instruction *alloca = new AllocaInst(intType, "allocateint");
-                // alloca->insertAfter(lastInst);
-                // lastInst = alloca;
-
-                Instruction *load = new LoadInst(childSrcInst, "loadint");
-                load->insertAfter(lastInst);
-                lastInst = load;
-
-                Instruction *store = new StoreInst(load, childDstInst, "storeint");
-                store->insertAfter(lastInst);
-                lastInst = store;
-            } else if(ArrayType *arrayType = dyn_cast<ArrayType>(childType)) {
-                int numElements = arrayType->getNumElements();
-                outs() << "numlemenets " << numElements << "\n";
-                for(int i=0; i < numElements; i++) {
-                    Value *arrayindex[2];
-                    arrayindex[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
-                    arrayindex[1] = ConstantInt::getSigned(IntegerType::get(context, 32), i);
-                    Instruction *arrsrc = GetElementPtrInst::CreateInBounds(childSrcInst, ArrayRef<Value *>(&arrayindex[0], &arrayindex[2]));
-                    arrsrc->insertAfter(lastInst);
-                    lastInst = arrsrc;
-
-                    Instruction *arraydst = GetElementPtrInst::CreateInBounds(childDstInst, ArrayRef<Value *>(&arrayindex[0], &arrayindex[2]));
-                    arraydst->insertAfter(lastInst);
-                    lastInst = arraydst;
-
-                    Instruction *load = new LoadInst(arrsrc, "loadarr");
-                    load->insertAfter(arraydst);
-                    lastInst = load;
-
-                    Instruction *store = new StoreInst(load, arraydst, "storearr");
-                    store->insertAfter(load);
-                    lastInst = store;
-                }
-                // throw runtime_error("unhandled type " + dumpType(childType));
-            } else {
-                outs() << "unhandled type " + dumpType(childType) << "\n";
-                throw runtime_error("unhandled type " + dumpType(childType));
-            }
-            srcidx++;
-            dstidx++;
-        }
-    } else {
-        outs() << "skipping type " << dumpType(src->getType()) << "\n";
-    }
-    return lastInst;
 }
 
 ostream &operator<<(ostream &os, const PointerInfo &pointerInfo) {

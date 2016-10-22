@@ -26,13 +26,17 @@ build/readIR.o: src/readIR.cpp src/readIR.h
 	mkdir -p build
 	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -c -o $@ -g -I$(LLVM_INCLUDE) $<
 
-build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/readIR.o
+build/struct_clone.o: src/struct_clone.cpp src/struct_clone.h
 	mkdir -p build
-	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/ir-to-opencl -g -I$(LLVM_INCLUDE) src/ir-to-opencl.cpp build/readIR.o src/ir-to-opencl-common.cpp build/mutations.o $(LINK_FLAGS)
+	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -c -o $@ -g -I$(LLVM_INCLUDE) $<
 
-build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/readIR.o
+build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/readIR.o build/struct_clone.o
 	mkdir -p build
-	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/patch-hostside -g -I$(LLVM_INCLUDE) src/patch-hostside.cpp build/readIR.o build/mutations.o src/ir-to-opencl-common.cpp $(LINK_FLAGS)
+	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/ir-to-opencl -g -I$(LLVM_INCLUDE) src/ir-to-opencl.cpp build/struct_clone.o build/readIR.o src/ir-to-opencl-common.cpp build/mutations.o $(LINK_FLAGS)
+
+build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/struct_clone.o build/readIR.o build/struct_clone.o
+	mkdir -p build
+	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/patch-hostside -g -I$(LLVM_INCLUDE) src/patch-hostside.cpp build/readIR.o build/mutations.o build/struct_clone.o src/ir-to-opencl-common.cpp $(LINK_FLAGS)
 
 easycl:
 	git submodule update --init --recursive
