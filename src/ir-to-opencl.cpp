@@ -384,7 +384,6 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
     string rhs = "";
     rhs += "" + dumpOperand(instr->getOperand(0));
     Type *currentType = instr->getOperand(0)->getType();
-    // copyAddressSpace(instr->getOperand(0), instr);
     PointerType *op0typeptr = dyn_cast<PointerType>(instr->getOperand(0)->getType());
     if(op0typeptr == 0) {
         throw runtime_error("dumpgetelementptrrhs op0typeptr is 0");
@@ -394,8 +393,6 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
         // pointer into shared memory.
         addSharedDeclaration(instr->getOperand(0));
     }
-    // copyAddressSpace(instr->getOperand(0), instr);
-    // int addressspace = 
     for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
         if(PointerType *ptrtype = dyn_cast<PointerType>(currentType)) {
@@ -444,27 +441,6 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
 string dumpGetElementPtr(GetElementPtrInst *instr) {
     string gencode = "";
     string rhs = dumpGetElementPtrRhs(instr);
-    // we're going to hackily assume that anything that is a global ** should be
-    // a * global *   Its true more often than its not, for now
-    // if(PointerType *p1 = dyn_cast<PointerType>(instr->getType())) {
-    //     cout << "gep p1 " << dumpType(p1) << endl;
-    //     Type *p1e = p1->getPointerElementType();
-    //     if(PointerType *p2 = dyn_cast<PointerType>(p1e)) {
-    //         cout << "gep p2 " << dumpType(p2) << endl;
-    //         int addressspace = p1->getAddressSpace();
-    //         cout << "p1 addressspace " << addressspace << endl;
-    //         // updateAddressSpace(instr, 0);
-    //         PointerType *p2new = PointerType::get(p2->getPointerElementType(), addressspace);
-    //         PointerType *p1new = PointerType::get(p2new, 0);
-    //         cout << " p2new " << dumpType(p2new) << endl;
-    //         cout << " p1new " << dumpType(p1new) << endl;
-    //         p1new->dump();
-    //         cout << endl;
-    //         instr->mutateType(p1new);
-    //         // copyAddressSpace()
-    //         // Type *p1e = p1->getPointerElementType();
-    //     }
-    // }
     gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + rhs;
     gencode += ";\n";
     cout << gencode << endl;
@@ -1250,38 +1226,6 @@ std::string dumpFunctionDeclaration(Function *F) {
     return declaration;
 }
 
-// this is going to walk over struct args, and look for float *s (for now), and add those as
-// additional kernel arguments, with some shim-type code to hook those into the incoming struct arg
-// the shim code will be returned as the string return from this function
-// the additional arguments will be patched directly into F (maybe)
-// std::string augmentStructArgs(Function *F) {
-//     string shimcode = "";
-//     outs() << "augmentStructArgs\n";
-//     int i = 0;
-//     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-//         Argument *arg = &*it;
-//         // storeValueName(arg);
-//         Type *argType = arg->getType();
-//         outs() << "arg " << i << " " << dumpType(argType) << "\n";
-//         if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
-//             Type *elemType = ptrType->getPointerElementType();
-//             if(StructType *structType = dyn_cast<StructType>(elemType)) {
-//                 outs() << "got a structtype\n";
-//                 unique_ptr<StructInfo> structInfo(new StructInfo());
-//                 walkStructType(TheModule.get(), structInfo.get(), 0, 0, std::vector<int>(), structType);
-//                 for(auto float4it=structInfo->pointerInfos.begin(); float4it != structInfo->pointerInfos.end(); float4it++) {
-//                     PointerInfo *pointerInfo = pointerit->get();
-//                     int offset = pointerInfo->offset;
-//                     Type *type = pointerInfo->type;
-
-//                 }
-//             }
-//         }
-//         i++;
-//     }
-//     return shimcode;
-// }
-
 std::string dumpFunction(Function *F) {
     currentFunctionSharedDeclarations = "";
     currentFunctionPhiDeclarationsByName.clear();
@@ -1312,18 +1256,6 @@ std::string dumpFunction(Function *F) {
 std::string dumpModule(Module *M) {
     string gencode;
 
-    // for(auto it=M->alias_begin(); it != M->alias_end(); it++) {
-    //     GlobalAlias *alias = &*it;
-    //     alias->dump();
-    // }
-
-    // ValueSymbolTable &V = M->getValueSymbolTable();
-    // for(auto it=V.begin(); it != V.end(); it++) {
-    //     cout << string(it->first()) << endl;
-    //     // ValueSymbol *v = &*it;
-    //     // v->dump();
-    // }
-
     // get struct declarations
     // global_begin/end returns all the bits that start with '@', at the top of the .ll
     cout << "begin declare global variables" << endl;
@@ -1349,11 +1281,6 @@ std::string dumpModule(Module *M) {
     cout << getDeclarationsToWrite() << endl;
     cout << globalDeclarations << endl;
     cout << "done declaring global variables" << endl;
-
-    // get global constant declarations
-
-
-    // throw runtime_error("stop here");
 
     // figure out which functions are kernels
     for(auto it=M->named_metadata_begin(); it != M->named_metadata_end(); it++) {
@@ -1389,20 +1316,6 @@ std::string dumpModule(Module *M) {
         }
     }
 
-    // augment functions for struct args contianing pointers
-    // only do this for kernel calls
-    // map<Function *, string> structShimCodeByFunction;
-    // for(auto it = M->begin(); it != M->end(); it++) {
-    //     Function *F = &*it;
-    //     string name = getName(F);
-    //     if(!iskernel_by_name[name]) {
-    //         continue;
-    //     }
-    //     outs() << "function " << name << "\n";
-    //     string structshimcode = augmentStructArgs(F);
-    //     structShimCodeByFunction[F] = structshimcode;
-    // }
-
     // dump function declarations
     cout << "beginning function declarations" << endl;
     for(auto it = M->begin(); it != M->end(); it++) {
@@ -1426,18 +1339,6 @@ std::string dumpModule(Module *M) {
     gencode += "\n";
     cout << "done writing function declarations" << endl;
     cout << endl;
-
-    // cout << "dumpvaluesymboltable" << endl;
-    // ValueSymbolTable *valueSymbolTable = &M->getValueSymbolTable();
-    // for(auto it=valueSymbolTable->begin(); it != valueSymbolTable->end(); it++) {
-    //     cout << "vst entry " << endl;
-    //     // Value *value = &*it;
-    //     StringMapEntry<Value *> *sme = &*it;
-    //     cout << string(sme->getKey()) << endl;
-    //     // sme->dump;
-    //     // value->dump();
-    // }
-    // return "";
 
     int i = 0;
     for(auto it = M->begin(); it != M->end(); it++) {
