@@ -185,7 +185,8 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
 void setKernelArgCharStar(char *memory_as_charstar) {
     COCL_PRINT(cout << "setKernelArgCharStar " << (void *)memory_as_charstar << endl);
     Memory *memory = findMemory(memory_as_charstar);
-    size_t offset = (char *)memory_as_charstar - (char *)memory;
+    size_t offset = memory->getOffset(memory_as_charstar);
+    // size_t offset = (char *)memory_as_charstar - (char *)memory;
     // Memory *pMemory = (Memory *)memory_as_charstar;
     cl_mem clmem = memory->clmem;
     cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;

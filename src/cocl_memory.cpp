@@ -37,9 +37,15 @@ using namespace easycl;
 namespace cocl {
     // we should index these, but a set is ok-ish for now. maybe
     set<Memory *>memories;
+    long long nextAllocPos = 1;
+    map< long long, Memory *>memoryByAllocPos;
 
     Memory::Memory(cl_mem clmem, size_t bytes) :
             clmem(clmem), bytes(bytes) {
+        fakePos = nextAllocPos;
+        nextAllocPos += bytes;
+        memoryByAllocPos[fakePos] = this;
+        memories.insert(this);
     }
 
     Memory *Memory::newDeviceAlloc(size_t bytes) {
@@ -49,7 +55,6 @@ namespace cocl {
         cl->checkError(err);
         Memory *memory = new Memory(clmem, bytes);
         COCL_PRINT(cout << "Memory::newDeviceAlloc bytes=" << bytes << " memory=" << (void *)memory << " clmem=" << (void*)memory->clmem << endl);
-        memories.insert(memory);
         return memory;
     }
 
@@ -57,19 +62,24 @@ namespace cocl {
         COCL_PRINT(cout << "~Memory releasing mem object memory=" << (void *)this << endl);
         cl_int err = clReleaseMemObject(clmem);
         cl->checkError(err);
+        // TODO: should remove from map and set too
     }
 
     Memory *findMemory(char *passedInAsCharStar) {
         // char *passedInAsCharStar = (char *)passedInPointer;
+        long long pos = (long long )passedInAsCharStar;
         for(auto it=memories.begin(), e=memories.end(); it != e; it++) {
             Memory *memory = *it;
-            if(passedInAsCharStar >= (char *)memory && passedInAsCharStar < (char *)memory + memory->bytes) {
+            if(pos >= memory->fakePos && pos < memory->fakePos + memory->bytes) {
                 COCL_PRINT(cout << "found memory: " << (void *)memory);
                 return memory;
             }
         }
         cout << "could not find memory for " << (void *)passedInAsCharStar << endl;
         throw runtime_error("could not find memory");
+    }
+    size_t Memory::getOffset(char *passedInAsCharStar) {
+        return (long long)passedInAsCharStar - fakePos;
     }
 }
 
@@ -199,7 +209,8 @@ size_t cuMemcpyHtoDAsync(CUdeviceptr dst, const void *src, size_t bytes, char *_
     // host => device
     COCL_PRINT(cout << "cuMemcpyHtoDAsync dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
     Memory *dstMemory = findMemory((char *)dst);
-    size_t offset = (char *)dst - (char *)dstMemory;
+    // size_t offset = (char *)dst - (char *)dstMemory;
+    size_t offset = dstMemory->getOffset((char *)dst);
     COCL_PRINT(cout << "memory " << (void *)dstMemory << " offset=" << offset << endl);
     // cout << "cuMemcpyHtoDAsync cl->default_queue=" << cl->default_queue << endl;
     // Memory *dstMemory = (Memory *)dst;
@@ -215,7 +226,8 @@ size_t  cuMemcpyDtoHAsync(void *dst, CUdeviceptr src, size_t bytes, char *_queue
     CLQueue *queue = (CLQueue*)_queue;
     COCL_PRINT(cout << "cuMemcpyDtoHAsync dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
     Memory *srcMemory = findMemory((char *)src);
-    size_t offset = (char *)src - (char *)srcMemory;
+    // size_t offset = (char *)src - (char *)srcMemory;
+    size_t offset = srcMemory->getOffset((char *)src);
     COCL_PRINT(cout << "memory " << (void *)srcMemory << " offset=" << offset << endl);
     // Memory *srcMemory = (Memory *)src;
     cl_int err = clEnqueueReadBuffer(queue->queue, srcMemory->clmem, CL_FALSE, offset,
@@ -251,11 +263,12 @@ size_t  cuMemcpyDtoH(void *host_dst, CUdeviceptr gpu_src, size_t size) {
 // }
 
 size_t cudaMalloc(void **_pMemory, size_t N) {
-    Memory **pMemory = (Memory **)_pMemory;
+    // Memory **pMemory = (Memory **)_pMemory;
     hostside_opencl_funcs_assure_initialized();
     Memory *memory = Memory::newDeviceAlloc(N);
-    COCL_PRINT(cout << "cudaMalloc using cl, size " << N << " memory=" << (void *)memory << endl);
-    *pMemory = memory;
+    COCL_PRINT(cout << "cudaMalloc using cl, size " << N << " memory=" << (void *)memory << " fakePos=" << memory->fakePos << endl);
+    // *pMemory = memory;
+    *_pMemory = (void *)memory->fakePos;
     return 0;
 }
 
@@ -265,7 +278,8 @@ size_t cuMemAlloc(CUdeviceptr*_pMemory, size_t bytes) {
 }
 
 size_t cudaFree(void *_memory) {
-    Memory *memory = (Memory *)_memory;
+    // Memory *memory = (Memory *)_memory;
+    Memory *memory = findMemory((char *)_memory);
     COCL_PRINT(cout << "cudafree using opencl memory=" << memory << endl);
     delete memory;
     return 0;
