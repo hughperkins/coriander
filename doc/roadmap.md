@@ -10,7 +10,16 @@
 
 ## Host-side
 
-- need to handle requests to copy from a hostside offset not equal to the start of an allocated region
+- handle linking OpenCL sourcecode across compilation units somehow
+
+## Host/device interface
+
+- add test of calling with struct containing pointers
+- dont copy structs to nopointers structs, for non-kernel calls
+
+## Testing
+
+- add asserts to the .cu tests
 
 ## Tensorflow
 
