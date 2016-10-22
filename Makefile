@@ -151,12 +151,6 @@ run-test-cocl-testcumemcpy: build/test-cocl-testcumemcpy
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-structs_with_pointers: build/test-cocl-structs_with_pointers
-	################################
-	# running:
-	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
-
 run-test-cocl-teststream: build/test-cocl-teststream
 	################################
 	# running:
@@ -243,7 +237,7 @@ clean-tests:
 	touch build/test~
 	rm build/test*
 
-run-tests: clean-tests all run-test-cocl-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-testevents run-test-cocl-testevents2 run-test-cocl-testcumemcpy run-test-cocl-teststream
+run-tests: clean-tests all run-test-cocl-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-testevents run-test-cocl-testevents2 run-test-cocl-testcumemcpy run-test-cocl-teststream run-test-cocl-testmemcpydevicetodevice run-test-cocl-testpartialcopy run-test-cocl-offsetkernelargs run-test-cocl-test_bitcast run-test-cocl-byvaluestructwithpointer run-test-cocl-test_types run-test-cocl-callinternal run-test-cocl-multi1
 
 run-tests-eigen: clean-eigen run-eigen-test_cuda_elementwise_small run-eigen-test_cuda_nullary run-eigen-test_cuda_elementwise
 

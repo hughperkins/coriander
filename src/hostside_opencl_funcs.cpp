@@ -99,8 +99,6 @@ size_t cuInit(unsigned int flags) {
     return 0;
 }
 
-// #include "/usr/local/include/cuda.h"
-
 // size_t cudaConfigureCall(
 //         unsigned long long grid_xy, unsigned int grid_z,
 //         unsigned long long block_xy, unsigned int block_z, size_t sharedMem, void *queue_as_voidstar) {
@@ -117,12 +115,6 @@ int cudaConfigureCall(
         queue = cl->default_queue;
         COCL_PRINT(cout << "using default_queue " << queue << endl);
     }
-    // COCL_PRINT(cout << "grid_xy " << grid_xy << " grid_z " << grid_z << endl);
-    // COCL_PRINT(cout << "block_xy " << block_xy << " grid_z " << block_z << endl);
-    // int grid_x = grid_xy & ((1ul << 31) - 1);
-    // int grid_y = grid_xy >> 32;
-    // int block_x = block_xy & ((1ul << 31) - 1);
-    // int block_y = block_xy >> 32;
     int grid_x = grid.x;
     int grid_y = grid.y;
     int grid_z = grid.z;
@@ -190,42 +182,8 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
 }
 
-// void setKernelArgFloatStarNoOffset(float *memory_as_floatstar) {
-//     COCL_PRINT(cout << "setKernelArgFloatStar " << (void *)memory_as_floatstar << endl);
-//     // Memory *memory = (Memory *)memory_as_floatstar;
-//     Memory *memory = findMemory((char *)memory_as_floatstar);
-//     size_t offset = (char *)memory_as_floatstar - (char *)memory;
-//     cl_mem clmem = memory->clmem;
-//     cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;
-//     assert(offset == 0);
-//     launchConfiguration.kernel->inout(&clmem);
-//     // launchConfiguration.kernel->in(offset);
-// }
-
-// void setKernelArgFloatStar(float *memory_as_floatstar) {
-//     COCL_PRINT(cout << "setKernelArgFloatStar " << (void *)memory_as_floatstar << endl);
-//     // Memory *memory = (Memory *)memory_as_floatstar;
-//     Memory *memory = findMemory((char *)memory_as_floatstar);
-//     size_t offset = (char *)memory_as_floatstar - (char *)memory;
-//     cl_mem clmem = memory->clmem;
-//     cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;
-//     assert(offset == 0);
-//     launchConfiguration.kernel->inout(&clmem);
-//     // launchConfiguration.kernel->in(offset);
-// }
-
-void setKernelArgIntStar(int *memory_as_intstar) {
-    COCL_PRINT(cout << "setKernelArgIntStar " << (void *)memory_as_intstar << endl);
-    Memory *memory = findMemory((char *)memory_as_intstar);
-    size_t offset = (char *)memory_as_intstar - (char *)memory;
-    cl_mem clmem = memory->clmem;
-    cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;
-    launchConfiguration.kernel->inout(&clmem);
-    launchConfiguration.kernel->in(offset);
-}
-
 void setKernelArgCharStar(char *memory_as_charstar) {
-    COCL_PRINT(cout << "setKernelArgCharStar " << memory_as_charstar << endl);
+    COCL_PRINT(cout << "setKernelArgCharStar " << (void *)memory_as_charstar << endl);
     Memory *memory = findMemory(memory_as_charstar);
     size_t offset = (char *)memory_as_charstar - (char *)memory;
     // Memory *pMemory = (Memory *)memory_as_charstar;
@@ -234,20 +192,6 @@ void setKernelArgCharStar(char *memory_as_charstar) {
     launchConfiguration.kernel->inout(&clmem);
     launchConfiguration.kernel->in(offset);
 }
-
-// void setKernelArgCharStar(char *clmem_as_charstar) {
-//     cout << "setKernelArgCharStar" << endl;
-//     cl_mem *p_mem = (cl_mem *)clmem_as_charstar;
-//     // cout << "setKernelArgFloatStar" << endl;
-//     kernel->inout(p_mem);
-// }
-
-// void setKernelArgStruct() {
-//     cout << "setKernelArgStruct" << endl;
-//     // cl_mem *p_mem = (cl_mem *)clmem_as_charstar;
-//     // cout << "setKernelArgFloatStar" << endl;
-//     // kernel->inout(p_mem);
-// }
 
 void setKernelArgInt64(int64_t value) {
     COCL_PRINT(cout << "setKernelArgInt64 " << value << endl);
