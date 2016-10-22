@@ -58,7 +58,7 @@ size_t cuDeviceGetAttribute(
         cout << "attribute " << attribute << endl;
         throw runtime_error("attribute not implemented");
     }
-    cout << "cuDeviceGetAttribute redirected att=" << attribute << " value=" << *value << endl;
+    // cout << "cuDeviceGetAttribute redirected att=" << attribute << " value=" << *value << endl;
     return 0;
 }
 

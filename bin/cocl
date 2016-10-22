@@ -26,7 +26,7 @@ while [[ x$1 != x ]]; do {
     # echo TWOLETTERS [$TWOLETTERS]
     case "${TWOLETTERS}" in
         -I)
-            echo got include
+            # echo got include
             # need to check if theres a space or not
             if [[ $1 == -I ]]; then {
                 INCLUDES="$INCLUDES -I$2"
@@ -215,8 +215,8 @@ if [[ ! -v COMPILE ]]; then {
 } fi
 
 # PASSTHRU="${PASSTHRU}" OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${COCL_HOME}/src/cocl.Makefile
-echo ${SCRIPT_DIR}/../share/cocl/cocl.Makefile
-echo PASSTHRU ${PASSTHRU}
+# echo ${SCRIPT_DIR}/../share/cocl/cocl.Makefile
+# echo PASSTHRU ${PASSTHRU}
 OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} PASSTHRU=${PASSTHRU} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${SCRIPT_DIR}/../share/cocl/cocl.Makefile
 
 if [[ -v COMPILE ]]; then {

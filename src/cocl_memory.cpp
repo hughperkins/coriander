@@ -30,9 +30,9 @@ using namespace std;
 using namespace cocl;
 using namespace easycl;
 
-#undef COCL_PRINT
-#define COCL_PRINT(stuff) \
-   stuff
+// #undef COCL_PRINT
+// #define COCL_PRINT(stuff) \
+//    stuff
 
 namespace cocl {
     // we should index these, but a set is ok-ish for now. maybe
@@ -179,7 +179,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
     cl_int err;
     if(cudaMemcpyKind == cudaMemcpyDeviceToHost) {
         // device => host
-        cout << "cudamemcpy device to host" << endl;
+        // cout << "cudamemcpy device to host" << endl;
         Memory *srcMemory = findMemory((char *)src);
         size_t offset = srcMemory->getOffset((char *)src);
         err = clEnqueueReadBuffer(cl->default_queue->queue, srcMemory->clmem, CL_TRUE, offset,
@@ -188,7 +188,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
         // cl->finish();
     } else if(cudaMemcpyKind == cudaMemcpyHostToDevice) {
         // host => device
-        cout << "cudamemcpy host to device" << endl;
+        // cout << "cudamemcpy host to device" << endl;
         Memory *dstMemory = findMemory((char *)dst);
         size_t offset = dstMemory->getOffset((char *)dst);
         err = clEnqueueWriteBuffer(cl->default_queue->queue, dstMemory->clmem, CL_TRUE, offset,
