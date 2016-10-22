@@ -11,7 +11,8 @@
 using namespace llvm;
 using namespace std;
 
-void mutateGlobalConsructorNumElements(GlobalVariable *var, int numElements) {
+
+void mutateGlobalConstructorNumElements(GlobalVariable *var, int numElements) {
     Type *constructorElementType = cast<ArrayType>(var->getType()->getElementType())->getElementType();
     Type *newVartype = PointerType::get(ArrayType::get(constructorElementType, numElements), 0);
     var->mutateType(newVartype);
@@ -20,8 +21,8 @@ void mutateGlobalConsructorNumElements(GlobalVariable *var, int numElements) {
 void appendGlobalConstructorCall(Module *M, std::string functionName) {
     GlobalVariable *ctors = cast<GlobalVariable>(M->getNamedValue("llvm.global_ctors"));
     int oldNumConstructors = cast<ArrayType>(ctors->getType()->getPointerElementType())->getNumElements();
-    outs() << "constructors " << oldNumConstructors << "\n";
-    mutateGlobalConsructorNumElements(ctors, oldNumConstructors + 1);
+    // outs() << "constructors " << oldNumConstructors << "\n";
+    mutateGlobalConstructorNumElements(ctors, oldNumConstructors + 1);
 
     ConstantArray *initializer = cast<ConstantArray>(ctors->getInitializer());
 
@@ -29,13 +30,14 @@ void appendGlobalConstructorCall(Module *M, std::string functionName) {
     for(int i = 0; i < oldNumConstructors; i++) {
         initializers[i] = initializer->getAggregateElement((unsigned int)i);
     }
-    Constant *structValues[3];
-    structValues[0] = ConstantInt::get(IntegerType::get(M->getContext(), 32), 1000000);
-    structValues[1] = M->getOrInsertFunction(
-        functionName,
-        Type::getVoidTy(M->getContext()),
-        NULL);
-    structValues[2] = ConstantPointerNull::get(PointerType::get(IntegerType::get(M->getContext(), 8), 0));
+    Constant *structValues[] = {
+        ConstantInt::get(IntegerType::get(M->getContext(), 32), 1000000),
+        M->getOrInsertFunction(
+            functionName,
+            Type::getVoidTy(M->getContext()),
+            NULL),
+        ConstantPointerNull::get(PointerType::get(IntegerType::get(M->getContext(), 8), 0))
+    };
     initializers[oldNumConstructors] = ConstantStruct::getAnon(ArrayRef<Constant *>(&structValues[0], &structValues[3]));
     Constant *newinit = ConstantArray::get(initializer->getType(), ArrayRef<Constant *>(&initializers[0], &initializers[oldNumConstructors + 1]));
     ctors->setInitializer(newinit);
@@ -67,9 +69,10 @@ Instruction *addStringInstr(Module *M, string name, string value) {
     int N = value.size() + 1;
     LLVMContext &context = M->getContext();
     ArrayType *arrayType = ArrayType::get(IntegerType::get(context, 8), N);
-    Value * indices[2];
-    indices[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
-    indices[1] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
+    Value * indices[] = {
+        ConstantInt::getSigned(IntegerType::get(context, 32), 0),
+        ConstantInt::getSigned(IntegerType::get(context, 32), 0)
+    };
     GetElementPtrInst *elem = GetElementPtrInst::CreateInBounds(arrayType, var, ArrayRef<Value *>(indices, 2));
     return elem;
 }
@@ -91,9 +94,10 @@ Instruction *addStringInstrExistingGlobal(Module *M, string name) {
         // outs() << "\n";
         // outs() << "numelements " << elemType->getNumElements() << "\n";
         // return 0;
-        Value * indices[2];
-        indices[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
-        indices[1] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
+        Value * indices[] = {
+            ConstantInt::getSigned(IntegerType::get(context, 32), 0),
+            ConstantInt::getSigned(IntegerType::get(context, 32), 0)
+        };
         GetElementPtrInst *elem = GetElementPtrInst::CreateInBounds(arrayType, var, ArrayRef<Value *>(indices, 2));
         return elem;
     } else {
