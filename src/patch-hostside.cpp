@@ -248,39 +248,21 @@ Instruction *addSetKernelArgInst_pointer(Instruction *lastInst, Value *value) {
     Module *M = lastInst->getModule();
 
     Type *elementType = value->getType()->getPointerElementType();
-    if(elementType->isFloatingPointTy()) {
-        Function *setKernelArgFloatStar = cast<Function>(M->getOrInsertFunction(
-            "_Z21setKernelArgFloatStarPf",
-            Type::getVoidTy(context),
-            PointerType::get(Type::getFloatTy(context), 0),
-            NULL));
-        CallInst *call = CallInst::Create(setKernelArgFloatStar, value);
-        call->insertAfter(lastInst);
-        lastInst = call;
-    } else if(IntegerType *elementTypeInt = dyn_cast<IntegerType>(elementType)) {
-        int bitLength = elementTypeInt->getBitWidth();
-        outs() << "bitLength " << bitLength << "\n";
-        string mangledName = "";
-        if(bitLength == 8) {
-            mangledName = "_Z20setKernelArgCharStarPc";
-        } else if(bitLength == 32) {
-            mangledName = "_Z19setKernelArgIntStarPi";
-        } else {
-            throw runtime_error("Not implemented: bitlength " + toString(bitLength));
-        }
-        Function *setKernelArgFloatStar = cast<Function>(M->getOrInsertFunction(
-            mangledName,
-            Type::getVoidTy(context),
-            PointerType::get(IntegerType::get(context, bitLength), 0),
-            NULL));
-        CallInst *call = CallInst::Create(setKernelArgFloatStar, value);
-        call->insertAfter(lastInst);
-        lastInst = call;
-    } else {
-        elementType->dump();
-        outs() << "\n";
-        throw std::runtime_error("Not implemented: sending this pointer type to kernel");
-    }
+    // we can probably generalize these to all just send as a pointer to char
+    // we'll need to cast them somehow first
+
+    BitCastInst *bitcast = new BitCastInst(value, PointerType::get(IntegerType::get(context, 8), 0));
+    bitcast->insertAfter(lastInst);
+    lastInst = bitcast;
+
+    Function *setKernelArgFloatStar = cast<Function>(M->getOrInsertFunction(
+        "_Z20setKernelArgCharStarPc",
+        Type::getVoidTy(context),
+        PointerType::get(IntegerType::get(context, 8), 0),
+        NULL));
+    CallInst *call = CallInst::Create(setKernelArgFloatStar, bitcast);
+    call->insertAfter(lastInst);
+    lastInst = call;
     return lastInst;
 }
 
