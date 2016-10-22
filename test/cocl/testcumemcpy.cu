@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <memory>
+#include <cassert>
 
 using namespace std;
 
@@ -24,16 +25,19 @@ int main(int argc, char *argv[]) {
     float hostFloats[4];
     cuMemcpyDtoH(hostFloats, gpuFloats, 4 * sizeof(float));
     cout << "hostFloats[2] " << hostFloats[2] << endl;
+    assert(hostFloats[2] == 123);
 
     setValue<<<dim3(32, 1, 1), dim3(32, 1, 1)>>>((float *)gpuFloats, 2, 222.0f);
     cuMemcpyDtoH(hostFloats, gpuFloats, 4 * sizeof(float));
     cout << "hostFloats[2] " << hostFloats[2] << endl;
+    assert(hostFloats[2] == 222);
 
     hostFloats[2] = 444.0f;
     cuMemcpyHtoD(gpuFloats, hostFloats, 4 * sizeof(float));
     hostFloats[2] = 555.0f;
     cuMemcpyDtoH(hostFloats, gpuFloats, 4 * sizeof(float));
     cout << "hostFloats[2] " << hostFloats[2] << endl;
+    assert(hostFloats[2] == 444);
 
     cuMemFree(gpuFloats);
 

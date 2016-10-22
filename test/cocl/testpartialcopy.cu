@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <memory>
+#include <cassert>
 
 using namespace std;
 
@@ -21,41 +22,46 @@ int main(int argc, char *argv[]) {
     CUstream stream;
     cuStreamCreate(&stream, 0);
 
-    float *hostfloats;
-    cuMemHostAlloc((void **)&hostfloats, N * sizeof(float), CU_MEMHOSTALLOC_PORTABLE);
+    float *hostFloats;
+    cuMemHostAlloc((void **)&hostFloats, N * sizeof(float), CU_MEMHOSTALLOC_PORTABLE);
 
-    CUdeviceptr devicefloats;
-    cuMemAlloc(&devicefloats, N * sizeof(float));
+    CUdeviceptr deviceFloats;
+    cuMemAlloc(&deviceFloats, N * sizeof(float));
 
-    hostfloats[128] = 123.456f;
-    hostfloats[129] = 444.0f;
-    hostfloats[130] = 321.0f;
-    hostfloats[131] = 111.0f;
+    hostFloats[128] = 123.456f;
+    hostFloats[129] = 444.0f;
+    hostFloats[130] = 321.0f;
+    hostFloats[131] = 111.0f;
 
     // now we will copy 16 bytes, starting at location 128...
     cuMemcpyHtoDAsync(
-        (CUdeviceptr)(((float *)devicefloats) + 64),
-        hostfloats + 128,
+        (CUdeviceptr)(((float *)deviceFloats) + 64),
+        hostFloats + 128,
         4 * sizeof(float),
         stream
     );
     cuStreamSynchronize(stream);
     // now copy back entire buffer
-    hostfloats[64] = 0.0f;
-    hostfloats[65] = 0.0f;
-    hostfloats[66] = 0.0f;
-    hostfloats[67] = 0.0f;
-    cuMemcpyDtoHAsync(hostfloats, devicefloats, N * sizeof(float), stream);
+    hostFloats[64] = 0.0f;
+    hostFloats[65] = 0.0f;
+    hostFloats[66] = 0.0f;
+    hostFloats[67] = 0.0f;
+    cuMemcpyDtoHAsync(hostFloats, deviceFloats, N * sizeof(float), stream);
     cuStreamSynchronize(stream);
 
     // and check the values...
-    cout << hostfloats[64] << endl;
-    cout << hostfloats[65] << endl;
-    cout << hostfloats[66] << endl;
-    cout << hostfloats[67] << endl;
+    cout << hostFloats[64] << endl;
+    cout << hostFloats[65] << endl;
+    cout << hostFloats[66] << endl;
+    cout << hostFloats[67] << endl;
 
-    cuMemFreeHost(hostfloats);
-    cuMemFree(devicefloats);
+    assert(hostFloats[64] == 123.456f);
+    assert(hostFloats[65] == 444.0f);
+    assert(hostFloats[66] == 321);
+    assert(hostFloats[67] == 111);
+
+    cuMemFreeHost(hostFloats);
+    cuMemFree(deviceFloats);
     cuStreamDestroy(stream);
 
     return 0;

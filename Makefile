@@ -96,9 +96,9 @@ build/eigen-%.o: test/eigen/%.cu
 	echo building $@ from $<
 	cocl -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
 
-build/test-%.o: test/%.cu
-	echo building $@ from $<
-	cocl -I$(EIGEN_HOME) -g -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
+# build/test-%.o: test/%.cu
+# 	echo building $@ from $<
+# 	cocl -I$(EIGEN_HOME) -g -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
 
 build/test-cocl-%.o: test/cocl/%.cu
 	echo building $@ from $<
@@ -121,7 +121,7 @@ build/eigen-%: build/eigen-%.o build/libcocl.a
 	g++ -o $@ $< -lcocl -lOpenCL -Lbuild -lEasyCL
 
 # run
-run-cuda_sample: build/test-cuda_sample
+run-test-cocl-cuda_sample: build/test-cocl-cuda_sample
 	################################
 	# running:
 	################################
@@ -217,9 +217,9 @@ run-eigen-cxx11_tensor_cuda: build/eigen-cxx11_tensor_cuda
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-cxx11_tensor_cuda
 
-run-tests: all run-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-testevents run-test-cocl-testevents2 run-test-cocl-testcumemcpy run-test-cocl-teststream run-eigen-test_cuda_elementwise_small run-eigen-test_cuda_nullary run-eigen-test_cuda_elementwise
+run-tests: all run-test-cocl-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-testevents run-test-cocl-testevents2 run-test-cocl-testcumemcpy run-test-cocl-teststream run-eigen-test_cuda_elementwise_small run-eigen-test_cuda_nullary run-eigen-test_cuda_elementwise
 
-run-test-all: run-tests run-eigen-test_cuda_elementwise_small run-eigen-test_cuda_nullary run-eigen-test_cuda_elementwise
+run-tests-all: run-tests run-eigen-test_cuda_elementwise_small run-eigen-test_cuda_nullary run-eigen-test_cuda_elementwise
 
 .SECONDARY:
 

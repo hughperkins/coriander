@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <memory>
+#include <cassert>
 
 using namespace std;
 
@@ -31,6 +32,7 @@ int main(int argc, char *argv[]) {
     cudaMemcpy(hostFloats, gpuFloats2, 4 * sizeof(float), cudaMemcpyDeviceToHost);
     cout << "This should be 123:" << endl;
     cout << "hostFloats[2] " << hostFloats[2] << endl;
+    assert(hostFloats[2] == 123);
 
     cudaFree(gpuFloats1);
 

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <memory>
+#include <cassert>
 
 using namespace std;
 
@@ -24,16 +25,19 @@ int main(int argc, char *argv[]) {
     float hostFloats[4];
     cudaMemcpy(hostFloats, gpuFloats, 4 * sizeof(float), cudaMemcpyDeviceToHost);
     cout << "hostFloats[2] " << hostFloats[2] << endl;
+    assert(hostFloats[2] == 123.0f);
 
     setValue<<<dim3(32, 1, 1), dim3(32, 1, 1)>>>(gpuFloats, 2, 222.0f);
     cudaMemcpy(hostFloats, gpuFloats, 4 * sizeof(float), cudaMemcpyDeviceToHost);
     cout << "hostFloats[2] " << hostFloats[2] << endl;
+    assert(hostFloats[2] == 222.0f);
 
     hostFloats[2] = 444.0f;
     cudaMemcpy(gpuFloats, hostFloats, 4 * sizeof(float), cudaMemcpyHostToDevice);
     hostFloats[2] = 555.0f;
     cudaMemcpy(hostFloats, gpuFloats, 4 * sizeof(float), cudaMemcpyDeviceToHost);
     cout << "hostFloats[2] " << hostFloats[2] << endl;
+    assert(hostFloats[2] == 444.0f);
 
     cudaFree(gpuFloats);
 

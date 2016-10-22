@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <memory>
+#include <cassert>
 
 using namespace std;
 
@@ -19,26 +20,28 @@ int main(int argc, char *argv[]) {
     CUstream stream;
     cuStreamCreate(&stream, 0);
 
-    float *hostfloats;
-    cuMemHostAlloc((void **)&hostfloats, N * sizeof(float), CU_MEMHOSTALLOC_PORTABLE);
+    float *hostFloats;
+    cuMemHostAlloc((void **)&hostFloats, N * sizeof(float), CU_MEMHOSTALLOC_PORTABLE);
 
-    CUdeviceptr devicefloats;
-    cuMemAlloc(&devicefloats, N * sizeof(float));
+    CUdeviceptr deviceFloats;
+    cuMemAlloc(&deviceFloats, N * sizeof(float));
 
-    hostfloats[2] = 4.0f;
-    cuMemcpyHtoDAsync(devicefloats, hostfloats, N * sizeof(float), stream);
-    incrValue<<<dim3(32, 1, 1), dim3(32, 1, 1), 0, stream>>>((float *)devicefloats, 2, 3.0f);
-    cuMemcpyDtoHAsync(hostfloats, devicefloats, N * sizeof(float), stream);
+    hostFloats[2] = 4.0f;
+    cuMemcpyHtoDAsync(deviceFloats, hostFloats, N * sizeof(float), stream);
+    incrValue<<<dim3(32, 1, 1), dim3(32, 1, 1), 0, stream>>>((float *)deviceFloats, 2, 3.0f);
+    cuMemcpyDtoHAsync(hostFloats, deviceFloats, N * sizeof(float), stream);
     cuStreamSynchronize(stream);
-    cout << "hostfloats[2] " << hostfloats[2] << endl;
+    cout << "hostFloats[2] " << hostFloats[2] << endl;
+    assert(hostFloats[2] == 7);
 
-    incrValue<<<dim3(32, 1, 1), dim3(32, 1, 1), 0, stream>>>((float *)devicefloats, 2, 5.0f);
-    cuMemcpyDtoHAsync(hostfloats, devicefloats, N * sizeof(float), stream);
+    incrValue<<<dim3(32, 1, 1), dim3(32, 1, 1), 0, stream>>>((float *)deviceFloats, 2, 5.0f);
+    cuMemcpyDtoHAsync(hostFloats, deviceFloats, N * sizeof(float), stream);
     cuStreamSynchronize(stream);
-    cout << "hostfloats[2] " << hostfloats[2] << endl;
+    cout << "hostFloats[2] " << hostFloats[2] << endl;
+    assert(hostFloats[2] == 12);
 
-    cuMemFreeHost(hostfloats);
-    cuMemFree(devicefloats);
+    cuMemFreeHost(hostFloats);
+    cuMemFree(deviceFloats);
     cuStreamDestroy(stream);
 
     return 0;
