@@ -28,9 +28,11 @@
 
 #include "CL/cl.h"
 #include "cocl/cocl.h"
+#include "cocl/cocl_memory.h"
 
 using namespace std;
 using namespace easycl;
+using namespace cocl;
 
 extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
@@ -190,23 +192,34 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
 
 void setKernelArgFloatStar(float *memory_as_floatstar) {
     COCL_PRINT(cout << "setKernelArgFloatStar " << memory_as_floatstar << endl);
-    Memory *memory = (Memory *)memory_as_floatstar;
+    // Memory *memory = (Memory *)memory_as_floatstar;
+    Memory *memory = findMemory((char *)memory_as_floatstar);
+    size_t offset = (char *)memory_as_floatstar - (char *)memory;
     cl_mem clmem = memory->clmem;
+    cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;
     launchConfiguration.kernel->inout(&clmem);
+    launchConfiguration.kernel->in(offset);
 }
 
 void setKernelArgIntStar(int *memory_as_intstar) {
-    COCL_PRINT(cout << "setKernelArgFloatStar " << memory_as_intstar << endl);
-    Memory *memory = (Memory *)memory_as_intstar;
+    COCL_PRINT(cout << "setKernelArgIntStar " << memory_as_intstar << endl);
+    Memory *memory = findMemory((char *)memory_as_intstar);
+    size_t offset = (char *)memory_as_intstar - (char *)memory;
     cl_mem clmem = memory->clmem;
+    cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;
     launchConfiguration.kernel->inout(&clmem);
+    launchConfiguration.kernel->in(offset);
 }
 
 void setKernelArgCharStar(char *memory_as_charstar) {
     COCL_PRINT(cout << "setKernelArgCharStar " << memory_as_charstar << endl);
-    Memory *pMemory = (Memory *)memory_as_charstar;
-    cl_mem clmem = pMemory->clmem;
+    Memory *memory = findMemory(memory_as_charstar);
+    size_t offset = (char *)memory_as_charstar - (char *)memory;
+    // Memory *pMemory = (Memory *)memory_as_charstar;
+    cl_mem clmem = memory->clmem;
+    cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;
     launchConfiguration.kernel->inout(&clmem);
+    launchConfiguration.kernel->in(offset);
 }
 
 // void setKernelArgCharStar(char *clmem_as_charstar) {

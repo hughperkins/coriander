@@ -59,8 +59,8 @@ namespace cocl {
         cl->checkError(err);
     }
 
-    Memory *findMemory(Memory *passedInPointer) {
-        char *passedInAsCharStar = (char *)passedInPointer;
+    Memory *findMemory(char *passedInAsCharStar) {
+        // char *passedInAsCharStar = (char *)passedInPointer;
         for(auto it=memories.begin(), e=memories.end(); it != e; it++) {
             Memory *memory = *it;
             if(passedInAsCharStar >= (char *)memory && passedInAsCharStar < (char *)memory + memory->bytes) {
@@ -68,7 +68,7 @@ namespace cocl {
                 return memory;
             }
         }
-        cout << "could not find memory for " << (void *)passedInPointer << endl;
+        cout << "could not find memory for " << (void *)passedInAsCharStar << endl;
         throw runtime_error("could not find memory");
     }
 }
@@ -198,7 +198,7 @@ size_t cuMemcpyHtoDAsync(CUdeviceptr dst, const void *src, size_t bytes, char *_
     CLQueue *queue = (CLQueue*)_queue;
     // host => device
     COCL_PRINT(cout << "cuMemcpyHtoDAsync dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
-    Memory *dstMemory = findMemory((Memory *)dst);
+    Memory *dstMemory = findMemory((char *)dst);
     size_t offset = (char *)dst - (char *)dstMemory;
     COCL_PRINT(cout << "memory " << (void *)dstMemory << " offset=" << offset << endl);
     // cout << "cuMemcpyHtoDAsync cl->default_queue=" << cl->default_queue << endl;
@@ -214,7 +214,7 @@ size_t cuMemcpyHtoDAsync(CUdeviceptr dst, const void *src, size_t bytes, char *_
 size_t  cuMemcpyDtoHAsync(void *dst, CUdeviceptr src, size_t bytes, char *_queue) {
     CLQueue *queue = (CLQueue*)_queue;
     COCL_PRINT(cout << "cuMemcpyDtoHAsync dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
-    Memory *srcMemory = findMemory((Memory *)src);
+    Memory *srcMemory = findMemory((char *)src);
     size_t offset = (char *)src - (char *)srcMemory;
     COCL_PRINT(cout << "memory " << (void *)srcMemory << " offset=" << offset << endl);
     // Memory *srcMemory = (Memory *)src;

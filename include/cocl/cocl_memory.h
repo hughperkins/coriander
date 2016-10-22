@@ -15,6 +15,7 @@ namespace cocl {
     };
 
     typedef Memory *PMemory;
+    Memory *findMemory(char *passedInPointer);
 }
 
 typedef long long CUdeviceptr;

@@ -1122,9 +1122,11 @@ std::string dumpFunctionDeclaration(Function *F) {
         string argName = dumpOperand(arg);
         // bool isstruct = false;
         string argdeclaration = "";
-        bool iskernel = iskernel_by_name[fname];
+        bool isKernel = iskernel_by_name[fname];
         bool is_struct_needs_cloning = false;
-        if(iskernel) {
+        bool ispointer = isa<PointerType>(argType);
+        cout << " arg ispointer " << ispointer << endl;
+        if(isKernel) {
             outs() << "    its a kernel function" << "\n";
             if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
                 Type *elemType = ptrType->getPointerElementType();
@@ -1176,6 +1178,11 @@ std::string dumpFunctionDeclaration(Function *F) {
                 structpointershimcode += argName + "[0]" + pointerInfo->path + " = " + argName + "_ptr" + toString(j) + ";\n";
                 j++;
             }
+        }
+        if(isKernel && ispointer) {
+            // add offset
+            declaration += ", long " + argName + "_offset";
+            structpointershimcode += "    " + argName + " = (" + dumpType(arg->getType()) + ")((global char *)" + argName + " + " + argName + "_offset);\n";
         }
         i++;
     }
