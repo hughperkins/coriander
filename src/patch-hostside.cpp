@@ -208,16 +208,19 @@ ostream &operator<<(ostream &os, const PointerInfo &pointerInfo) {
 
 void patchCudaLaunch(Function *F, CallInst *inst, vector<Instruction *> &to_replace_with_zero) {
     outs() << "cudaLaunch\n";
+
+    Module *M = inst->getModule();
+
     getLaunchTypes(inst, launchCallInfo.get());
     to_replace_with_zero.push_back(inst);
     outs() << "patching launch in " << string(F->getName()) << "\n";
 
-    outs() << "cudalaunch kernelanem " << launchCallInfo->kernelName << "\n";
-    Instruction *stringInstr = addStringInstr(F->getParent(), "s." + launchCallInfo->kernelName, launchCallInfo->kernelName);
-    stringInstr->insertBefore(inst);
+    string kernelName = launchCallInfo->kernelName;
+    Instruction *kernelNameValue = addStringInstr(M, "s." + kernelName, kernelName);
+    kernelNameValue->insertBefore(inst);
 
-    Instruction *clSourcecodeInstr = addStringInstrExistingGlobal(F->getParent(), sourcecode_stringname);
-    clSourcecodeInstr->insertBefore(inst);
+    Instruction *clSourcecodeValue = addStringInstrExistingGlobal(M, sourcecode_stringname);
+    clSourcecodeValue->insertBefore(inst);
 
     Function *configureKernel = cast<Function>(F->getParent()->getOrInsertFunction(
         "configureKernel",
@@ -225,13 +228,11 @@ void patchCudaLaunch(Function *F, CallInst *inst, vector<Instruction *> &to_repl
         PointerType::get(IntegerType::get(context, 8), 0),
         PointerType::get(IntegerType::get(context, 8), 0),
         NULL));
-    Value *args[2];
-    args[0] = stringInstr;
-    args[1] = clSourcecodeInstr;
-    CallInst *callLaunch = CallInst::Create(configureKernel, ArrayRef<Value *>(&args[0], &args[2]));
-    callLaunch->insertBefore(inst);
+    Value *args[] = {kernelNameValue, clSourcecodeValue};
+    CallInst *callConfigureKernel = CallInst::Create(configureKernel, ArrayRef<Value *>(&args[0], &args[2]));
+    callConfigureKernel->insertBefore(inst);
+    Instruction *lastInst = callConfigureKernel;
 
-    Instruction *lastInst = callLaunch;
     // pass args now
     int i = 0;
     for(auto argit=launchCallInfo->callValuesByValue.begin(); argit != launchCallInfo->callValuesByValue.end(); argit++) {
