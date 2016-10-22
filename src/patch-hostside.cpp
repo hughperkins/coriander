@@ -32,26 +32,22 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_os_ostream.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
-// #include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
 #include <map>
 #include <set>
-// #include <iostream>
 #include <stdexcept>
 #include <sstream>
 #include <fstream>
 
+#include "mutations.h"
 #include "ir-to-opencl-common.h"
 
 using namespace llvm;
 using namespace std;
 
-static llvm::LLVMContext TheContext;
-static llvm::IRBuilder<> Builder(TheContext);
-static std::unique_ptr<llvm::Module> TheModule;
-// static std::string deviceclfilename;
+static llvm::LLVMContext context;
 static std::string sourcecode_stringname;
 
 static std::map<Type *, Type *> pointerlessTypeByOriginalType;
@@ -200,15 +196,6 @@ void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
     info->callValuesAsPointers.push_back(alloca);
 }
 
-uint64_t readIntConstant_uint64(ConstantInt *constant) {
-    return constant->getZExtValue();
-}
-
-uint32_t readIntConstant_uint32(ConstantInt *constant) {
-    assert(constant->getBitWidth() <= 32);
-    return (uint32_t)constant->getZExtValue();
-}
-
 Type *cloneStructTypeNoPointers(StructType *inType);
 
 Type *cloneStructTypeNoPointers(StructType *inType) {
@@ -235,8 +222,8 @@ Type *cloneStructTypeNoPointers(StructType *inType) {
     if(newChildren.size() > 0) {
         newType = StructType::create(ArrayRef<Type *>(&newChildren[0], &newChildren[newChildren.size()]), newName);
     } else {
-        // newType = StructType::create(TheContext, newName);
-        newType = StructType::get(TheContext);
+        // newType = StructType::create(context, newName);
+        newType = StructType::get(context);
     }
     pointerlessTypeByOriginalType[inType] = newType;
     return newType;
@@ -256,15 +243,15 @@ Instruction *copyStructValuesNoPointers(Instruction *lastInst, Value *src, Value
                 continue;
             }
             Value *srcIndex[2];
-            srcIndex[0] = ConstantInt::getSigned(IntegerType::get(TheContext, 32), 0);
-            srcIndex[1] = ConstantInt::getSigned(IntegerType::get(TheContext, 32), srcidx);
+            srcIndex[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
+            srcIndex[1] = ConstantInt::getSigned(IntegerType::get(context, 32), srcidx);
             Instruction *childSrcInst = GetElementPtrInst::CreateInBounds(src, ArrayRef<Value *>(&srcIndex[0], &srcIndex[2]));
             childSrcInst->insertAfter(lastInst);
             lastInst = childSrcInst;
 
             Value *dstIndex[2];
-            dstIndex[0] = ConstantInt::getSigned(IntegerType::get(TheContext, 32), 0);
-            dstIndex[1] = ConstantInt::getSigned(IntegerType::get(TheContext, 32), dstidx);
+            dstIndex[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
+            dstIndex[1] = ConstantInt::getSigned(IntegerType::get(context, 32), dstidx);
             Instruction *childDstInst = GetElementPtrInst::CreateInBounds(dst, ArrayRef<Value *>(&dstIndex[0], &dstIndex[2]));
             childDstInst->insertAfter(lastInst);
             lastInst = childDstInst;
@@ -291,16 +278,16 @@ Instruction *copyStructValuesNoPointers(Instruction *lastInst, Value *src, Value
                 outs() << "numlemenets " << numElements << "\n";
                 for(int i=0; i < numElements; i++) {
                     Value *arrayindex[2];
-                    arrayindex[0] = ConstantInt::getSigned(IntegerType::get(TheContext, 32), 0);
-                    arrayindex[1] = ConstantInt::getSigned(IntegerType::get(TheContext, 32), i);
+                    arrayindex[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
+                    arrayindex[1] = ConstantInt::getSigned(IntegerType::get(context, 32), i);
                     Instruction *arrsrc = GetElementPtrInst::CreateInBounds(childSrcInst, ArrayRef<Value *>(&arrayindex[0], &arrayindex[2]));
                     arrsrc->insertAfter(lastInst);
                     lastInst = arrsrc;
 
 
                     // Value *dstIndex[2];
-                    // dstIndex[0] = ConstantInt::getSigned(IntegerType::get(TheContext, 32), i);
-                    // dstIndex[1] = ConstantInt::getSigned(IntegerType::get(TheContext, 32), dstidx);
+                    // dstIndex[0] = ConstantInt::getSigned(IntegerType::get(context, 32), i);
+                    // dstIndex[1] = ConstantInt::getSigned(IntegerType::get(context, 32), dstidx);
                     Instruction *arraydst = GetElementPtrInst::CreateInBounds(childDstInst, ArrayRef<Value *>(&arrayindex[0], &arrayindex[2]));
                     arraydst->insertAfter(lastInst);
                     lastInst = arraydst;
@@ -344,7 +331,7 @@ ostream &operator<<(ostream &os, const PointerInfo &pointerInfo) {
 
 void patchFunction(Function *F) {
     vector<Instruction *> to_replace_with_zero;
-    IntegerType *inttype = IntegerType::get(TheContext, 32);
+    IntegerType *inttype = IntegerType::get(context, 32);
     ConstantInt *constzero = ConstantInt::getSigned(inttype, 0);
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
@@ -373,9 +360,9 @@ void patchFunction(Function *F) {
 
                     Function *configureKernel = cast<Function>(F->getParent()->getOrInsertFunction(
                         "configureKernel",
-                        Type::getVoidTy(TheContext),
-                        PointerType::get(IntegerType::get(TheContext, 8), 0),
-                        PointerType::get(IntegerType::get(TheContext, 8), 0),
+                        Type::getVoidTy(context),
+                        PointerType::get(IntegerType::get(context, 8), 0),
+                        PointerType::get(IntegerType::get(context, 8), 0),
                         NULL));
                     Value *args[2];
                     args[0] = stringInstr;
@@ -412,8 +399,8 @@ void patchFunction(Function *F) {
                             }
                             Function *setKernelArgInt = cast<Function>(F->getParent()->getOrInsertFunction(
                                 mangledName,
-                                Type::getVoidTy(TheContext),
-                                IntegerType::get(TheContext, bitLength),
+                                Type::getVoidTy(context),
+                                IntegerType::get(context, bitLength),
                                 NULL));
                             CallInst *call = CallInst::Create(setKernelArgInt, value);
                             call->insertAfter(lastInst);
@@ -422,8 +409,8 @@ void patchFunction(Function *F) {
                             // outs() << "got a float" << "\n";
                             Function *setKernelArgFloat = cast<Function>(F->getParent()->getOrInsertFunction(
                                 "_Z17setKernelArgFloatf",
-                                Type::getVoidTy(TheContext),
-                                Type::getFloatTy(TheContext),
+                                Type::getVoidTy(context),
+                                Type::getFloatTy(context),
                                 NULL));
                             CallInst *call = CallInst::Create(setKernelArgFloat, value);
                             call->insertAfter(lastInst);
@@ -435,8 +422,8 @@ void patchFunction(Function *F) {
                                 // outs() << "got a float *" << "\n";
                                 Function *setKernelArgFloatStar = cast<Function>(F->getParent()->getOrInsertFunction(
                                     "_Z21setKernelArgFloatStarPf",
-                                    Type::getVoidTy(TheContext),
-                                    PointerType::get(Type::getFloatTy(TheContext), 0),
+                                    Type::getVoidTy(context),
+                                    PointerType::get(Type::getFloatTy(context), 0),
                                     NULL));
                                 CallInst *call = CallInst::Create(setKernelArgFloatStar, value);
                                 call->insertAfter(lastInst);
@@ -454,8 +441,8 @@ void patchFunction(Function *F) {
                                 }
                                 Function *setKernelArgFloatStar = cast<Function>(F->getParent()->getOrInsertFunction(
                                     mangledName,
-                                    Type::getVoidTy(TheContext),
-                                    PointerType::get(IntegerType::get(TheContext, bitLength), 0),
+                                    Type::getVoidTy(context),
+                                    PointerType::get(IntegerType::get(context, bitLength), 0),
                                     NULL));
                                 CallInst *call = CallInst::Create(setKernelArgFloatStar, value);
                                 call->insertAfter(lastInst);
@@ -504,7 +491,7 @@ void patchFunction(Function *F) {
                             // of the target for eigen shows it contains a float *.  that probably points into gpu
                             // memory already.  We'd probably better scan for that.
                             unique_ptr<StructInfo> structInfo(new StructInfo());
-                            walkStructType(TheModule.get(), structInfo.get(), 0, 0, vector<int>(), "", cast<StructType>(value->getType()));
+                            walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", cast<StructType>(value->getType()));
 
                             bool structHasPointers = structInfo->pointerInfos.size() > 0;
                             outs() << "struct has pointers? " << structHasPointers << "\n";
@@ -522,7 +509,7 @@ void patchFunction(Function *F) {
                             // - setKernelArgStruct(char *pCpuStruct, int structAllocateSize);
 
                             // Value * indices[1];
-                            // indices[0] = createInt32Constant(&TheContext, 0);
+                            // indices[0] = createInt32Constant(&context, 0);
                             // GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(value->getType(), value, ArrayRef<Value *>(&indices[0], &indices[1]));
                             // gep->insertAfter(lastInst);
                             // lastInst = gep;
@@ -536,9 +523,9 @@ void patchFunction(Function *F) {
 
                             Function *setKernelArgStruct = cast<Function>(F->getParent()->getOrInsertFunction(
                                 "_Z18setKernelArgStructPci",
-                                Type::getVoidTy(TheContext),
-                                PointerType::get(IntegerType::get(TheContext, 8), 0),
-                                IntegerType::get(TheContext, 32),
+                                Type::getVoidTy(context),
+                                PointerType::get(IntegerType::get(context, 8), 0),
+                                IntegerType::get(context, 32),
                                 NULL));
 
                             AllocaInst *alloca = new AllocaInst(newType, "newalloca");
@@ -547,13 +534,13 @@ void patchFunction(Function *F) {
 
                             lastInst = copyStructValuesNoPointers(lastInst, valueAsPointerInstr, alloca);
 
-                            BitCastInst *bitcast = new BitCastInst(alloca, PointerType::get(IntegerType::get(TheContext, 8), 0));
+                            BitCastInst *bitcast = new BitCastInst(alloca, PointerType::get(IntegerType::get(context, 8), 0));
                             bitcast->insertAfter(lastInst);
                             lastInst = bitcast;
 
                             Value *args[2];
                             args[0] = bitcast;
-                            args[1] = createInt32Constant(&TheContext, allocSize);
+                            args[1] = createInt32Constant(&context, allocSize);
 
                             CallInst *call = CallInst::Create(setKernelArgStruct, ArrayRef<Value *>(args));
                             call->insertAfter(lastInst);
@@ -570,14 +557,14 @@ void patchFunction(Function *F) {
                                 // create a GetElementPtr instruction?
                                 vector<Value *> indices;
                                 // add a leading 0:
-                                indices.push_back(createInt32Constant(&TheContext, 0));
+                                indices.push_back(createInt32Constant(&context, 0));
                                 for(auto idxit = pointerInfo->indices.begin(); idxit != pointerInfo->indices.end(); idxit++) {
                                     int idx = *idxit;
                                     outs() << "idx " << idx << "\n";
-                                    indices.push_back(createInt32Constant(&TheContext, idx));
+                                    indices.push_back(createInt32Constant(&context, idx));
                                 }
                                 // // add a trailing 0 ... :
-                                // indices.push_back(createInt32Constant(&TheContext, 0));
+                                // indices.push_back(createInt32Constant(&context, 0));
                                 // value->getType()->dump();
                                 // valueAsPointerInstr->dump();
                                 GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(value->getType(), valueAsPointerInstr, ArrayRef<Value *>(&indices[0], &indices[indices.size()]), "getfloatstaraddr");
@@ -597,8 +584,8 @@ void patchFunction(Function *F) {
                                     if(integerType->getBitWidth() == 8) {
                                         Function *setKernelArgCharStar = cast<Function>(F->getParent()->getOrInsertFunction(
                                             "_Z20setKernelArgCharStarPc",
-                                            Type::getVoidTy(TheContext),
-                                            PointerType::get(IntegerType::get(TheContext, 8), 0),
+                                            Type::getVoidTy(context),
+                                            PointerType::get(IntegerType::get(context, 8), 0),
                                             NULL));
                                         CallInst *call = CallInst::Create(setKernelArgCharStar, loadgep);
                                         call->insertAfter(lastInst);
@@ -610,8 +597,8 @@ void patchFunction(Function *F) {
                                     // we're just going to assume everything is a float* for now
                                     Function *setKernelArgFloatStar = cast<Function>(F->getParent()->getOrInsertFunction(
                                         "_Z21setKernelArgFloatStarPf",
-                                        Type::getVoidTy(TheContext),
-                                        PointerType::get(Type::getFloatTy(TheContext), 0),
+                                        Type::getVoidTy(context),
+                                        PointerType::get(Type::getFloatTy(context), 0),
                                         NULL));
                                     CallInst *call = CallInst::Create(setKernelArgFloatStar, loadgep);
                                     call->insertAfter(lastInst);
@@ -626,10 +613,10 @@ void patchFunction(Function *F) {
                             //     // outs() << "got a float *" << "\n";
                             //     Function *setKernelArgCharStar = cast<Function>(F->getParent()->getOrInsertFunction(
                             //         "_Z20setKernelArgCharStarPf",
-                            //         Type::getVoidTy(TheContext),
-                            //         PointerType::get(IntegerType::get(TheContext, 8), 0),
+                            //         Type::getVoidTy(context),
+                            //         PointerType::get(IntegerType::get(context, 8), 0),
                             //         NULL));
-                            //     BitCastInst *bitcast = new BitCastInst(value, PointerType::get(IntegerType::get(TheContext, 8), 0));
+                            //     BitCastInst *bitcast = new BitCastInst(value, PointerType::get(IntegerType::get(context, 8), 0));
                             //     bitcast->insertAfter(lastInst);
                             //     lastInst = bitcast;
                             //     CallInst *call = CallInst::Create(setKernelArgCharStar, bitcast);
@@ -645,7 +632,7 @@ void patchFunction(Function *F) {
                     // trigger the kernel...
                     Function *kernelGo = cast<Function>(F->getParent()->getOrInsertFunction(
                         "_Z8kernelGov",
-                        Type::getVoidTy(TheContext),
+                        Type::getVoidTy(context),
                         NULL));
                     CallInst *kernelGoInst = CallInst::Create(kernelGo);
                     kernelGoInst->insertAfter(lastInst);
@@ -727,7 +714,7 @@ void patchModule(string deviceclfilename, Module *M) {
 }
 
 int main(int argc, char *argv[]) {
-    SMDiagnostic Err;
+    SMDiagnostic smDiagnostic;
     if(argc != 4) {
         outs() << "Usage: " << argv[0] << " infile-rawhost.ll infile-device.cl outfile-patchedhost.ll" << "\n";
         return 1;
@@ -749,24 +736,20 @@ int main(int argc, char *argv[]) {
     //         debug = true;
     //     }
     // }
-    TheModule = parseIRFile(rawhostfilename, Err, TheContext);
-    if(!TheModule) {
-        Err.print(argv[0], errs());
+    std::unique_ptr<llvm::Module> module = parseIRFile(rawhostfilename, smDiagnostic, context);
+    if(!module) {
+        smDiagnostic.print(argv[0], errs());
         return 1;
     }
 
-    patchModule(deviceclfilename, TheModule.get());
+    patchModule(deviceclfilename, module.get());
 
     AssemblyAnnotationWriter assemblyAnnotationWriter;
     ofstream ofile;
     ofile.open(patchedhostfilename);
     raw_os_ostream my_raw_os_ostream(ofile);
-    verifyModule(*TheModule);
-    // outs() << "printing module" << "\n";
-    TheModule->print(my_raw_os_ostream, &assemblyAnnotationWriter);
-    // my_raw_os_ostream.close();
+    verifyModule(*module);
+    module->print(my_raw_os_ostream, &assemblyAnnotationWriter);
     ofile.close();
-    // TheModule->dump();
-//    dumpModule(TheModule.get());
     return 0;
 }

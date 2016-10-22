@@ -18,13 +18,21 @@ COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffu
 
 all: build/ir-to-opencl build/patch-hostside build/libcocl.a easycl
 
-build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h
+build/mutations.o: src/mutations.cpp src/mutations.h
 	mkdir -p build
-	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/ir-to-opencl -g -I$(LLVM_INCLUDE) src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp $(LINK_FLAGS)
+	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -c -o $@ -g -I$(LLVM_INCLUDE) $<
 
-build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h
+build/readIR.o: src/readIR.cpp src/readIR.h
 	mkdir -p build
-	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/patch-hostside -g -I$(LLVM_INCLUDE) src/patch-hostside.cpp src/ir-to-opencl-common.cpp $(LINK_FLAGS)
+	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -c -o $@ -g -I$(LLVM_INCLUDE) $<
+
+build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/readIR.o
+	mkdir -p build
+	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/ir-to-opencl -g -I$(LLVM_INCLUDE) src/ir-to-opencl.cpp build/readIR.o src/ir-to-opencl-common.cpp build/mutations.o $(LINK_FLAGS)
+
+build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/readIR.o
+	mkdir -p build
+	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/patch-hostside -g -I$(LLVM_INCLUDE) src/patch-hostside.cpp build/readIR.o build/mutations.o src/ir-to-opencl-common.cpp $(LINK_FLAGS)
 
 easycl:
 	git submodule update --init --recursive
@@ -37,12 +45,12 @@ build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp include/cocl/cocl*.
 build/cocl_%.o: src/cocl_%.cpp include/cocl/cocl*.h
 	$(CLANG) -c -o $@ -std=c++11 $(DCOCL_SPAM) -g -O2 -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
 
-build/libcocl.a: build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_error.o build/cocl_memory.o build/cocl_device.o build/cocl_properties.o build/cocl_streams.o build/cocl_context.o easycl
+build/libcocl.a: build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_error.o build/cocl_memory.o build/cocl_device.o build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o easycl
 	mkdir -p $(COCL_HOME)/build/easycl-extract
 	touch $(COCL_HOME)/build/easycl-extract/foo
 	rm $(COCL_HOME)/build/easycl-extract/*
 	(cd $(COCL_HOME)/build/easycl-extract/; ar x ../libEasyCL.a)
-	ar rcs $@ build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_device.o build/cocl_error.o build/cocl_memory.o build/cocl_properties.o build/cocl_streams.o build/cocl_context.o $(COCL_HOME)/build/easycl-extract/*.o
+	ar rcs $@ build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_device.o build/cocl_error.o build/cocl_memory.o build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o $(COCL_HOME)/build/easycl-extract/*.o
 
 clean:
 	rm -Rf build/* test/generated/* test/eigen/generated/* test/eigen/*.o test/*.o

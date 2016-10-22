@@ -44,9 +44,9 @@ using namespace std;
 
 #include "ir-to-opencl-common.h"
 
-static llvm::LLVMContext TheContext;
-static llvm::IRBuilder<> Builder(TheContext);
-static std::unique_ptr<llvm::Module> TheModule;
+static llvm::LLVMContext context;
+// static llvm::IRBuilder<> Builder(context);
+// static std::unique_ptr<llvm::Module> TheModule;
 static std::map<std::string, Value *> NamedValues;
 static std::map<string, bool> iskernel_by_name;
 static std::set<string> ignoredFunctionNames;
@@ -181,15 +181,7 @@ string dumpChainedInstruction(int level, Instruction * instr) {
     }
 }
 
-std::string getName(Value *value) {
-    if(!value->hasName()) {
-        value->dump();
-        throw runtime_error("value doesnt have name");
-    }
-    return value->getName();
-}
-
-string dumpConstant(Constant *constant) {
+    string dumpConstant(Constant *constant) {
     unsigned int valueTy = constant->getValueID();
     ostringstream oss;
     if(ConstantInt *constantInt = dyn_cast<ConstantInt>(constant)) {
@@ -1196,21 +1188,24 @@ std::string dumpFunctionDeclaration(Function *F) {
         string argName = dumpOperand(arg);
         bool isstruct = false;
         string argdeclaration = "";
-        if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
-            Type *elemType = ptrType->getPointerElementType();
-            if(StructType *structType = dyn_cast<StructType>(elemType)) {
-                outs() << "name " << getName(structType) << "\n";
-                if(getName(structType) != "struct.float4") {
-                    isstruct = true;
-                    argdeclaration = "global " + dumpTypeNoPointers(structType) + "* " + argName + "_nopointers";
+        if(iskernel_by_name[fname]) {
+            outs() << "    its a kernel function" << "\n";
+            if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
+                Type *elemType = ptrType->getPointerElementType();
+                if(StructType *structType = dyn_cast<StructType>(elemType)) {
+                    outs() << "    name " << getName(structType) << "\n";
+                    if(getName(structType) != "struct.float4") {
+                        isstruct = true;
+                        argdeclaration = "global " + dumpTypeNoPointers(structType) + "* " + argName + "_nopointers";
+                    }
                 }
             }
-        }
-        if(iskernel_by_name[fname] && !isstruct) {
-            if(argType->getTypeID() == Type::PointerTyID) {
-                Type *elementType = argType->getPointerElementType();
-                Type *newtype = PointerType::get(elementType, 1);
-                arg->mutateType(newtype);
+            if(!isstruct) {
+                if(argType->getTypeID() == Type::PointerTyID) {
+                    Type *elementType = argType->getPointerElementType();
+                    Type *newtype = PointerType::get(elementType, 1);
+                    arg->mutateType(newtype);
+                }
             }
         }
         if(!isstruct) {
@@ -1224,23 +1219,27 @@ std::string dumpFunctionDeclaration(Function *F) {
         // and add those pointers t othe argument list, with some appropriate shimcode
         // to copy those pointers into the struct, at the start of the kernel
         int j = 0;
-        if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
-            Type *elemType = ptrType->getPointerElementType();
-            if(StructType *structType = dyn_cast<StructType>(elemType)) {
-                if(getName(structType) != "struct.float4") {
-                    outs() << "got a structtype\n";
-                    // declare a pointerful struct, then copy the vlaues across, then copy the float *s in
-                    structpointershimcode += dumpType(structType) + " " + argName + "[1];\n";
-                    structpointershimcode += writeStructCopyCodeNoPointers(structType, argName + "_nopointers[0]", argName + "[0]");
-                    unique_ptr<StructInfo> structInfo(new StructInfo());
-                    walkStructType(TheModule.get(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
-                    for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
-                        PointerInfo *pointerInfo = pointerit->get();
-                        int offset = pointerInfo->offset;
-                        // Type *type = pointerInfo->type;
-                        declaration += ", global " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
-                        structpointershimcode += argName + "[0]" + pointerInfo->path + " = " + argName + "_ptr" + toString(j) + ";\n";
-                        j++;
+        argType->dump();
+        outs() << "\n";
+        if(iskernel_by_name[fname]) {
+            if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
+                Type *elemType = ptrType->getPointerElementType();
+                if(StructType *structType = dyn_cast<StructType>(elemType)) {
+                    if(getName(structType) != "struct.float4") {
+                        outs() << "got a structtype " << getName(structType) << "\n";
+                        // declare a pointerful struct, then copy the vlaues across, then copy the float *s in
+                        structpointershimcode += dumpType(structType) + " " + argName + "[1];\n";
+                        structpointershimcode += writeStructCopyCodeNoPointers(structType, argName + "_nopointers[0]", argName + "[0]");
+                        unique_ptr<StructInfo> structInfo(new StructInfo());
+                        walkStructType(F->getParent(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
+                        for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
+                            PointerInfo *pointerInfo = pointerit->get();
+                            int offset = pointerInfo->offset;
+                            // Type *type = pointerInfo->type;
+                            declaration += ", global " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
+                            structpointershimcode += argName + "[0]" + pointerInfo->path + " = " + argName + "_ptr" + toString(j) + ";\n";
+                            j++;
+                        }
                     }
                 }
             }
@@ -1465,7 +1464,7 @@ std::string dumpModule(Module *M) {
 }
 
 int main(int argc, char *argv[]) {
-    SMDiagnostic Err;
+    SMDiagnostic smDiagnostic;
     if(argc < 3) {
         cout << "Usage: " << argv[0] << " [--debug] <input ir file> <output cl file>" << endl;
         return 1;
@@ -1483,9 +1482,9 @@ int main(int argc, char *argv[]) {
             debug = true;
         }
     }
-    TheModule = parseIRFile(target, Err, TheContext);
-    if(!TheModule) {
-        Err.print(argv[0], errs());
+    std::unique_ptr<llvm::Module> M = parseIRFile(target, smDiagnostic, context);
+    if(!M) {
+        smDiagnostic.print(argv[0], errs());
         return 1;
     }
     ignoredFunctionNames.insert("llvm.ptx.read.tid.x");
@@ -1526,7 +1525,7 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["_ZSt3expf"] = "exp";
 
     try {
-        string gencode = dumpModule(TheModule.get());
+        string gencode = dumpModule(M.get());
         ofstream of;
         of.open(outputfilepath, ios_base::out);
         of << gencode;

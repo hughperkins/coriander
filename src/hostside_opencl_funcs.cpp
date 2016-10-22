@@ -16,6 +16,7 @@
 // #include "cocl_kernellaunch.h"
 #include "cocl/cocl.h"
 #include "cocl/cocl_memory.h"
+#include "cocl/cocl_clsources.h"
 
 #include <iostream>
 #include <memory>
@@ -136,7 +137,12 @@ int cudaConfigureCall(
 
 void configureKernel(
         const char *kernelName, const char *clSourcecodeString) {
-    // cout << "configureKernel (name=" << kernelName << ", source=" << clSourcecodeString << ")" << endl;
+    cout << "configureKernel (name=" << kernelName << endl;
+    cout << "clSources.size() " << getNumClSources() << endl;
+    // for(auto it=clSources.begin(); it != clSources.end(); it++) {
+    for(int i = 0; i < getNumClSources(); i++) {
+        cout << "clsource: [" << getClSource(i) << "]" << endl;
+    }
     hostside_opencl_funcs_assure_initialized();
     launchConfiguration.kernelName = kernelName;
     launchConfiguration.kernelSource = clSourcecodeString;
@@ -275,3 +281,5 @@ float2 make_float2(float x, float y) {
 double2 make_double2(double x, double y) {
     return double2(x,y);
 }
+
+MyClass hostsidefuncs(__FILE__);
