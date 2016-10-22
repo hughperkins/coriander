@@ -43,6 +43,7 @@ using namespace llvm;
 using namespace std;
 
 #include "ir-to-opencl-common.h"
+#include "struct_clone.h"
 
 static llvm::LLVMContext context;
 // static llvm::IRBuilder<> Builder(context);
@@ -1102,49 +1103,6 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
     return gencode;
 }
 
-string writeStructCopyCodeNoPointers(StructType *structType, string srcName, string destName) {
-    string gencode = "";
-    int srcidx = 0;
-    int dstidx = 0;
-    outs() << "writeStructCopyCodeNoPointers " << dumpType(structType) << "\n";
-    for(auto it=structType->element_begin(); it != structType->element_end(); it++) {
-        Type *childType = *it;
-        if(isa<PointerType>(childType)) {
-            // ignore
-            srcidx++;
-            dstidx++;
-            continue;
-        }
-        string childSrcName = srcName + ".f" + toString(srcidx);
-        string childDstName = destName + ".f" + toString(dstidx);
-        if(StructType *childStructType = dyn_cast<StructType>(childType)) {
-            gencode += writeStructCopyCodeNoPointers(childStructType, childSrcName, childDstName);
-            srcidx++;
-            dstidx++;
-        } else if(childType->getPrimitiveSizeInBits() > 0 ) {
-            gencode += childDstName + " = " + childSrcName + ";\n";
-            outs() << "copying " << dumpType(childType) << "\n";
-            srcidx++;
-            dstidx++;
-        } else if(ArrayType *arrayType = dyn_cast<ArrayType>(childType)) {
-            int numElements = arrayType->getNumElements();
-            outs() << "numlemenets " << numElements << "\n";
-            for(int i=0; i < numElements; i++) {
-                gencode += childDstName + "[" + toString(i) + "] = " + childSrcName + "[" + toString(i) +  "];\n";
-            }
-            srcidx++;
-            dstidx++;
-            // throw runtime_error("unhandled type " + dumpType(childType));
-        } else {
-            outs() << "unhandled type " + dumpType(childType) << "\n";
-            throw runtime_error("unhandled type " + dumpType(childType));
-            srcidx++;
-            dstidx++;
-        }
-    }
-    return gencode;
-}
-
 std::string dumpFunctionDeclaration(Function *F) {
     string declaration = "";
     Type *retType = F->getReturnType();
@@ -1171,8 +1129,12 @@ std::string dumpFunctionDeclaration(Function *F) {
                 if(StructType *structType = dyn_cast<StructType>(elemType)) {
                     outs() << "    name " << getName(structType) << "\n";
                     if(getName(structType) != "struct.float4") {
-                        isstruct = true;
-                        argdeclaration = "global " + dumpTypeNoPointers(structType) + "* " + argName + "_nopointers";
+                        unique_ptr<StructInfo> structInfo(new StructInfo());
+                        walkStructType(F->getParent(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
+                        if(structInfo->pointerInfos.size() > 0) { // struct has pointers...
+                            isstruct = true;
+                            argdeclaration = "global " + dumpTypeNoPointers(structType) + "* " + argName + "_nopointers";
+                        }
                     }
                 }
             }
@@ -1204,17 +1166,21 @@ std::string dumpFunctionDeclaration(Function *F) {
                     if(getName(structType) != "struct.float4") {
                         outs() << "got a structtype " << getName(structType) << "\n";
                         // declare a pointerful struct, then copy the vlaues across, then copy the float *s in
-                        structpointershimcode += dumpType(structType) + " " + argName + "[1];\n";
-                        structpointershimcode += writeStructCopyCodeNoPointers(structType, argName + "_nopointers[0]", argName + "[0]");
                         unique_ptr<StructInfo> structInfo(new StructInfo());
                         walkStructType(F->getParent(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
-                        for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
-                            PointerInfo *pointerInfo = pointerit->get();
-                            int offset = pointerInfo->offset;
-                            // Type *type = pointerInfo->type;
-                            declaration += ", global " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
-                            structpointershimcode += argName + "[0]" + pointerInfo->path + " = " + argName + "_ptr" + toString(j) + ";\n";
-                            j++;
+                        if(structInfo->pointerInfos.size() == 0) { // dont need any cloning/copying
+                            // do nothing I guess?
+                        } else { // the hard stuff: struct contains pointers
+                            structpointershimcode += dumpType(structType) + " " + argName + "[1];\n";
+                            structpointershimcode += writeStructCopyCodeNoPointers(structType, argName + "_nopointers[0]", argName + "[0]");
+                            for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
+                                PointerInfo *pointerInfo = pointerit->get();
+                                int offset = pointerInfo->offset;
+                                // Type *type = pointerInfo->type;
+                                declaration += ", global " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
+                                structpointershimcode += argName + "[0]" + pointerInfo->path + " = " + argName + "_ptr" + toString(j) + ";\n";
+                                j++;
+                            }
                         }
                     }
                 }

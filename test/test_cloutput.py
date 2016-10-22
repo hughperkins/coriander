@@ -123,12 +123,40 @@ def test_ternary(testcudakernel1, q, float_data, float_data_gpu):
     assert float_data[0] == float_data_orig[3]
 
 
-@pytest.mark.xfail(reason='all structs are passed across as just one for now; following the copy-by-value change')
-def test_structs(testcudakernel1, ctx, q, float_data, float_data_gpu, int_data, int_data_gpu):
+def test_structs(context, q, float_data, float_data_gpu, int_data, int_data_gpu):
+
+    code = """
+struct MyStruct {
+    int x;
+    float y;
+};
+
+__global__ void testStructs(MyStruct *structs, float *float_data, int *int_data) {
+    int_data[0] = structs[0].x;
+    float_data[0] = structs[0].y;
+    float_data[1] = structs[1].y;
+}
+"""
+    for file in os.listdir('/tmp'):
+        if file.startswith('test_cloutput'):
+            os.unlink('/tmp/%s' % file)
+    with open('/tmp/test_cloutput.cu', 'w') as f:
+        f.write(code)
+    print(subprocess.check_output([
+        'cocl',
+        '-c',
+        '/tmp/test_cloutput.cu'
+    ]))
+
+    with open('/tmp/test_cloutput-device.cl', 'r') as f:
+        sourcecode = f.read()
+
+    prog = cl.Program(context, sourcecode).build()
+
     # my_struct = np.dtype([("x", np.float32), ("y", np.int32)])  # I dont know why, but seems these are back to front...
-    my_struct = np.dtype([("x", np.float32), ("y", np.int32)])  # I dont know why, but seems these are back to front...
+    my_struct = np.dtype([("x", np.int32), ("y", np.float32)])
     my_struct, my_struct_c_decl = pyopencl.tools.match_dtype_to_c_struct(
-        ctx.devices[0], "MyStruct", my_struct)
+        context.devices[0], "MyStruct", my_struct)
     my_struct = cl.tools.get_or_register_dtype("MyStruct", my_struct)
     structs = np.empty(2, my_struct)
     structs[0]['x'] = 123
@@ -139,20 +167,20 @@ def test_structs(testcudakernel1, ctx, q, float_data, float_data_gpu, int_data, 
     # p = structs_gpu.map_to_host(q)
     # print('p', p)
     # q.finish()
-    testcudakernel1.__getattr__(test_common.mangle('testStructs', ['MyStruct *', 'float *', 'int *']))(
+    prog.__getattr__(test_common.mangle('testStructs', ['MyStruct *', 'float *', 'int *']))(
         q, (32,), (32,),
         structs_gpu.data, float_data_gpu, int_data_gpu)
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     cl.enqueue_copy(q, int_data, int_data_gpu)
     q.finish()
-    print(float_data[0])
-    print(float_data[1])
-    print(int_data[0])
-    print(int_data[1])
-    assert float_data[0] == 123
-    assert float_data[1] == 33
-    assert int_data[0] == 567
+    print('float_data[0]', float_data[0])
+    print('float_data[1]', float_data[1])
+    print('int_data[0]', int_data[0])
+    print('int_data[1]', int_data[1])
+    assert float_data[0] == 567
+    assert float_data[1] == 44
+    assert int_data[0] == 123
     # assert int_data[1] == 44
 
 

@@ -197,11 +197,11 @@ struct MyStruct {
     float y;
 };
 
-// __global__ void testStructs(MyStruct *structs, float *float_data, int *int_data) {
-//     int_data[0] = structs[0].x;
-//     float_data[0] = structs[0].y;
-//     float_data[1] = structs[1].y;
-// }
+__global__ void testStructs(MyStruct *structs, float *float_data, int *int_data) {
+    int_data[0] = structs[0].x;
+    float_data[0] = structs[0].y;
+    float_data[1] = structs[1].y;
+}
 
 // __global__ void testFloat4(float4 *data) {
 //     float4 myregister4 = data[1];

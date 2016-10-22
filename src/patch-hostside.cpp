@@ -276,6 +276,13 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
     bool structHasPointers = structInfo->pointerInfos.size() > 0;
     outs() << "struct has pointers? " << structHasPointers << "\n";
 
+    // if it doesnt contain pointers, we can just send it as a char *, after creating a pointer
+    // to it
+    // actually, we have a pointer already, ie valueAsPointerInstr
+    if(!structHasPointers) {
+        return addSetKernelArgInst_pointer(lastInst, valueAsPointerInstr);
+    }
+
     Type *newType = cloneStructTypeNoPointers(cast<StructType>(value->getType()));
 
     const DataLayout *dataLayout = &M->getDataLayout();
@@ -365,12 +372,16 @@ Instruction *addSetKernelArgInst(Instruction *lastInst, Value *value, Value *val
     Module *M = lastInst->getModule();
 
     if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
+        outs() << "    integer arg\n";
         lastInst = addSetKernelArgInst_int(lastInst, value, intType);
     } else if(value->getType()->isFloatingPointTy()) {
+        outs() << "    float arg\n";
         lastInst = addSetKernelArgInst_float(lastInst, value);
     } else if(value->getType()->isPointerTy()) {
+        outs() << "    pointer arg\n";
         lastInst = addSetKernelArgInst_pointer(lastInst, value);
     } else if(isa<StructType>(value->getType())) {
+        outs() << "    by-value struct arg\n";
         lastInst = addSetKernelArgInst_byvaluestruct(lastInst, value, valueAsPointerInstr);
     } else {
         value->dump();
