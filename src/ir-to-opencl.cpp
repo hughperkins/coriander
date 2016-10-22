@@ -1120,9 +1120,11 @@ std::string dumpFunctionDeclaration(Function *F) {
         storeValueName(arg);
         Type *argType = arg->getType();
         string argName = dumpOperand(arg);
-        bool isstruct = false;
+        // bool isstruct = false;
         string argdeclaration = "";
-        if(iskernel_by_name[fname]) {
+        bool iskernel = iskernel_by_name[fname];
+        bool is_struct_needs_cloning = false;
+        if(iskernel) {
             outs() << "    its a kernel function" << "\n";
             if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
                 Type *elemType = ptrType->getPointerElementType();
@@ -1132,13 +1134,14 @@ std::string dumpFunctionDeclaration(Function *F) {
                         unique_ptr<StructInfo> structInfo(new StructInfo());
                         walkStructType(F->getParent(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
                         if(structInfo->pointerInfos.size() > 0) { // struct has pointers...
-                            isstruct = true;
+                            is_struct_needs_cloning = true;
+                            // isstruct = true;
                             argdeclaration = "global " + dumpTypeNoPointers(structType) + "* " + argName + "_nopointers";
                         }
                     }
                 }
             }
-            if(!isstruct) {
+            if(!is_struct_needs_cloning) {
                 if(argType->getTypeID() == Type::PointerTyID) {
                     Type *elementType = argType->getPointerElementType();
                     Type *newtype = PointerType::get(elementType, 1);
@@ -1146,7 +1149,7 @@ std::string dumpFunctionDeclaration(Function *F) {
                 }
             }
         }
-        if(!isstruct) {
+        if(!is_struct_needs_cloning) {
             argdeclaration = dumpType(arg->getType()) + " " + argName;
         }
         if(i > 0) {
@@ -1159,31 +1162,19 @@ std::string dumpFunctionDeclaration(Function *F) {
         int j = 0;
         argType->dump();
         outs() << "\n";
-        if(iskernel_by_name[fname]) {
-            if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
-                Type *elemType = ptrType->getPointerElementType();
-                if(StructType *structType = dyn_cast<StructType>(elemType)) {
-                    if(getName(structType) != "struct.float4") {
-                        outs() << "got a structtype " << getName(structType) << "\n";
-                        // declare a pointerful struct, then copy the vlaues across, then copy the float *s in
-                        unique_ptr<StructInfo> structInfo(new StructInfo());
-                        walkStructType(F->getParent(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
-                        if(structInfo->pointerInfos.size() == 0) { // dont need any cloning/copying
-                            // do nothing I guess?
-                        } else { // the hard stuff: struct contains pointers
-                            structpointershimcode += dumpType(structType) + " " + argName + "[1];\n";
-                            structpointershimcode += writeStructCopyCodeNoPointers(structType, argName + "_nopointers[0]", argName + "[0]");
-                            for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
-                                PointerInfo *pointerInfo = pointerit->get();
-                                int offset = pointerInfo->offset;
-                                // Type *type = pointerInfo->type;
-                                declaration += ", global " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
-                                structpointershimcode += argName + "[0]" + pointerInfo->path + " = " + argName + "_ptr" + toString(j) + ";\n";
-                                j++;
-                            }
-                        }
-                    }
-                }
+        if(is_struct_needs_cloning) {
+            StructType *structType = cast<StructType>(cast<PointerType>(argType)->getPointerElementType());
+            // declare a pointerful struct, then copy the vlaues across, then copy the float *s in
+            unique_ptr<StructInfo> structInfo(new StructInfo());
+            walkStructType(F->getParent(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
+            structpointershimcode += dumpType(structType) + " " + argName + "[1];\n";
+            structpointershimcode += writeStructCopyCodeNoPointers(structType, argName + "_nopointers[0]", argName + "[0]");
+            for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
+                PointerInfo *pointerInfo = pointerit->get();
+                int offset = pointerInfo->offset;
+                declaration += ", global " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
+                structpointershimcode += argName + "[0]" + pointerInfo->path + " = " + argName + "_ptr" + toString(j) + ";\n";
+                j++;
             }
         }
         i++;
