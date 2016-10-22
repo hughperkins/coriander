@@ -170,7 +170,9 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
     if(cudaMemcpyKind == cudaMemcpyDeviceToHost) {
         // device => host
         cout << "cudamemcpy device to host" << endl;
-        Memory *srcMemory = (Memory *)src;
+        // Memory *srcMemory = (Memory *)src;
+        Memory *srcMemory = findMemory((char *)src);
+        size_t offset = srcMemory->getOffset((char *)src);
         err = clEnqueueReadBuffer(cl->default_queue->queue, srcMemory->clmem, CL_TRUE, 0,
                                          bytes, dst, 0, NULL, NULL);
         cl->checkError(err);
@@ -178,20 +180,26 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
     } else if(cudaMemcpyKind == cudaMemcpyHostToDevice) {
         // host => device
         cout << "cudamemcpy host to device" << endl;
-        Memory *dstMemory = (Memory *)dst;
+        // Memory *dstMemory = (Memory *)dst;
+        Memory *dstMemory = findMemory((char *)dst);
+        size_t offset = dstMemory->getOffset((char *)dst);
         err = clEnqueueWriteBuffer(cl->default_queue->queue, dstMemory->clmem, CL_TRUE, 0,
                                           bytes, src, 0, NULL, NULL);
         cl->checkError(err);
     } else if(cudaMemcpyKind == cudaMemcpyDeviceToDevice) {
         // device => device
-        Memory *srcMemory = (Memory *)src;
-        Memory *dstMemory = (Memory *)dst;
+        // Memory *srcMemory = (Memory *)src;
+        // Memory *dstMemory = (Memory *)dst;
+        Memory *srcMemory = findMemory((char *)src);
+        size_t src_offset = srcMemory->getOffset((char *)src);
+        Memory *dstMemory = findMemory((char *)dst);
+        size_t dst_offset = dstMemory->getOffset((char *)dst);
         err = clEnqueueCopyBuffer(
             cl->default_queue->queue,
             srcMemory->clmem,
             dstMemory->clmem,
-            0,
-            0,
+            src_offset,
+            dst_offset,
             bytes,
             0,
             0,
@@ -209,7 +217,6 @@ size_t cuMemcpyHtoDAsync(CUdeviceptr dst, const void *src, size_t bytes, char *_
     // host => device
     COCL_PRINT(cout << "cuMemcpyHtoDAsync dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
     Memory *dstMemory = findMemory((char *)dst);
-    // size_t offset = (char *)dst - (char *)dstMemory;
     size_t offset = dstMemory->getOffset((char *)dst);
     COCL_PRINT(cout << "memory " << (void *)dstMemory << " offset=" << offset << endl);
     // cout << "cuMemcpyHtoDAsync cl->default_queue=" << cl->default_queue << endl;
