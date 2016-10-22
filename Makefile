@@ -151,6 +151,12 @@ run-test-cocl-testcumemcpy: build/test-cocl-testcumemcpy
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
+run-test-cocl-structs_with_pointers: build/test-cocl-structs_with_pointers
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
 run-test-cocl-teststream: build/test-cocl-teststream
 	################################
 	# running:
