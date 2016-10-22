@@ -12,50 +12,6 @@ Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 
 - write a CUDA sourcecode file, or find an existing one
 - here's a simple example: [cuda_sample.cu](https://github.com/hughperkins/cuda-on-cl/blob/76a849d9510276bc67167c9a7676d64ff04c3e4a/test/cuda_sample.cu)
-```
-// a cuda app.  we will convert this to opencl, and run it :-)
-
-#include <iostream>
-#include <memory>
-
-using namespace std;
-
-#include <cuda_runtime.h>
-
-__global__ void setValue(float *data, int idx, float value) {
-    if(threadIdx.x == 0) {
-        data[idx] = value;
-    }
-}
-
-int main(int argc, char *argv[]) {
-    int N = 1024;
-
-    float *gpuFloats;
-    cudaMalloc((void**)(&gpuFloats), N * sizeof(float));
-
-    setValue<<<dim3(32, 1, 1), dim3(32, 1, 1)>>>(gpuFloats, 2, 123.0f);
-
-    float hostFloats[4];
-    cudaMemcpy(hostFloats, gpuFloats, 4 * sizeof(float), cudaMemcpyDeviceToHost);
-    cout << "hostFloats[2] " << hostFloats[2] << endl;
-
-    setValue<<<dim3(32, 1, 1), dim3(32, 1, 1)>>>(gpuFloats, 2, 222.0f);
-    cudaMemcpy(hostFloats, gpuFloats, 4 * sizeof(float), cudaMemcpyDeviceToHost);
-    cout << "hostFloats[2] " << hostFloats[2] << endl;
-
-    hostFloats[2] = 444.0f;
-    cudaMemcpy(gpuFloats, hostFloats, 4 * sizeof(float), cudaMemcpyHostToDevice);
-    hostFloats[2] = 555.0f;
-    cudaMemcpy(hostFloats, gpuFloats, 4 * sizeof(float), cudaMemcpyDeviceToHost);
-    cout << "hostFloats[2] " << hostFloats[2] << endl;
-
-    cudaFree(gpuFloats);
-
-    return 0;
-}
-```
-- let's save this file eg to `cuda_sample.cu`
 - Run `cocl` to compile it:
 ```
 $ cocl cuda_sample.cu
@@ -75,8 +31,6 @@ hostFloats[2] 123
 hostFloats[2] 222
 hostFloats[2] 444
 ```
-
-Thats it!  :-)  Youve run your first `cuda-on-cl` program :-)
 
 ### Two-step compilation
 
@@ -121,6 +75,7 @@ Behind the scenes, there are a few parts:
 ### Pre-requisites
 
 - Ubuntu 16.04
+- clang/llvm 3.8 (installed in 'Procedure' below)
 - OpenCL-enabled GPU, and appropriate OpenCL drivers installed for the GPU
 
 Other operating systems, and clang/llvm versions, might work too, but untested.  Your mileage may vary :-)
@@ -175,6 +130,9 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 
 ## News
 
+- Oct 22:
+  - arrays of structs can be passed to kernels again, as long as they contain no pointers
+    - (structs containing pointers can be passed only by-value)
 - Oct 20:
   - no longer need CUDA toolkit installed!
   - fix bug where `threadIdx.x` was being incorrectly written as `get_global_id` instead of `get_local_id` ...
