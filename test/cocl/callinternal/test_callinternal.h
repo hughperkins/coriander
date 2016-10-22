@@ -6,3 +6,5 @@ struct MyStruct {
 };
 
 __device__ void somefunc(struct MyStruct mystruct);
+
+__device__ void addfive(float *data);
