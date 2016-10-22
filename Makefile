@@ -40,14 +40,14 @@ build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-
 
 easycl:
 	git submodule update --init --recursive
-	cd build && cmake ../src/EasyCL -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_TESTS=OFF -DUSE_CLEW=OFF -DBUILD_SHARED=OFF
+	cd build && cmake ../src/EasyCL -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_CXX_FLAGS=-fPIC -DBUILD_TESTS=OFF -DUSE_CLEW=OFF -DBUILD_SHARED=OFF
 	cd build && make -j 4
 
 build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp include/cocl/cocl*.h
-	$(CLANG) -c -o $@ -std=c++11 -g -O2 -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
+	$(CLANG) -c -o $@ -std=c++11 -fPIC -g -O2 -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
 
 build/cocl_%.o: src/cocl_%.cpp include/cocl/cocl*.h
-	$(CLANG) -c -o $@ -std=c++11 $(DCOCL_SPAM) -g -O2 -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
+	$(CLANG) -c -o $@ -std=c++11 $(DCOCL_SPAM) -fPIC -g -O2 -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
 
 build/libcocl.a: build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_error.o build/cocl_memory.o build/cocl_device.o build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o easycl
 	mkdir -p $(COCL_HOME)/build/easycl-extract

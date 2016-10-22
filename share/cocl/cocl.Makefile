@@ -32,7 +32,7 @@ $(OUTPUTBASEPATH)-hostpatched.ll: $(OUTPUTBASEPATH)-hostraw.ll $(OUTPUTBASEPATH)
 	patch-hostside $< $(word 2,$^) $@
 
 $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX): $(OUTPUTBASEPATH)-hostpatched.ll
-	$(CLANG) -c $< -O3 $(OPT_G) -o $@
+	$(CLANG) $(PASSTHRU) -c $< -O3 $(OPT_G) -o $@
 
 # .INTERMEDIATE: $(OUTPUTBASEPATH)-hostpatched.ll
 

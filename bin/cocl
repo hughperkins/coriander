@@ -37,7 +37,7 @@ while [[ x$1 != x ]]; do {
             DONE=1
             ;;
         -D)
-            PASSTHRU="$PASSTHRU $1"
+            # PASSTHRU="$PASSTHRU $1"
             DONE=1
             ;;
         -G)
@@ -46,7 +46,7 @@ while [[ x$1 != x ]]; do {
             DONE=1
             ;;
         -U)
-            PASSTHRU="$PASSTHRU $1"
+            # PASSTHRU="$PASSTHRU $1"
             DONE=1
             ;;
         -x)
@@ -79,11 +79,11 @@ while [[ x$1 != x ]]; do {
                 shift
                 ;;
             -iquote)
-                PASSTHRU="$PASSTHRU $1 $2"
+                # PASSTHRU="$PASSTHRU $1 $2"
                 shift
                 ;;
             -isystem)
-                PASSTHRU="$PASSTHRU $1 $2"
+                # PASSTHRU="$PASSTHRU $1 $2"
                 shift
                 ;;
             -gencode)
@@ -113,7 +113,7 @@ while [[ x$1 != x ]]; do {
                 ;;
             -std)
                 # echo got -std
-                PASSTHRU="$PASSTHRU $1"
+                # PASSTHRU="$PASSTHRU $1"
                 ;;
             *)
                 # echo adding $1 as input file
@@ -216,7 +216,8 @@ if [[ ! -v COMPILE ]]; then {
 
 # PASSTHRU="${PASSTHRU}" OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${COCL_HOME}/src/cocl.Makefile
 echo ${SCRIPT_DIR}/../share/cocl/cocl.Makefile
-OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${SCRIPT_DIR}/../share/cocl/cocl.Makefile
+echo PASSTHRU ${PASSTHRU}
+OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} PASSTHRU=${PASSTHRU} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${SCRIPT_DIR}/../share/cocl/cocl.Makefile
 
 if [[ -v COMPILE ]]; then {
     set +x
