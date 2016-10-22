@@ -43,7 +43,9 @@ namespace cocl {
     Memory::Memory(cl_mem clmem, size_t bytes) :
             clmem(clmem), bytes(bytes) {
         fakePos = nextAllocPos;
-        nextAllocPos += bytes;
+        // we should align it actually.  on 128-bytes?
+        fakePos = ((fakePos + 127) / 128) * 128;
+        nextAllocPos = fakePos + bytes;
         memoryByAllocPos[fakePos] = this;
         memories.insert(this);
     }
