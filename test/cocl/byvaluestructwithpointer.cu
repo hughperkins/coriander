@@ -1,17 +1,18 @@
+#include <iostream>
+#include <memory>
+#include <cassert>
+
+using namespace std;
+
+#include <cuda.h>
+
 struct MyStruct {
     float *floats;
-    int intvalue;
+    float afloat;
 };
 
-__device__ void foo_dev2(MyStruct *mystruct, float *data);
-
-__device__ void foo_device(MyStruct *mystruct, float *data) {
-    data[0] = mystruct[0].floats[0];
-}
-
-__global__ void foo(MyStruct *mystruct, float *data) {
-    data[0] = mystruct[0].floats[0];
-    foo_dev2(mystruct, data);
+__global__ void getValue(struct MyStruct mystruct, float *data) {
+    data[0] = mystruct.floats[0] + 3.0f;
 }
 
 int main(int argc, char *argv[]) {
@@ -30,7 +31,9 @@ int main(int argc, char *argv[]) {
     cuMemAlloc(&deviceFloats1, N * sizeof(float));
     cuMemAlloc(&deviceFloats2, N * sizeof(float));
 
-    hostFloats1[128] = 123.456f;
+    MyStruct mystruct;
+    mystruct.floats = (float *)deviceFloats1;
+    hostFloats1[0] = 123;
 
     cuMemcpyHtoDAsync(
         (CUdeviceptr)(((float *)deviceFloats1)),
@@ -38,9 +41,8 @@ int main(int argc, char *argv[]) {
         N * sizeof(float),
         stream
     );
-    // cuStreamSynchronize(stream);
 
-    getValue<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(((float *)deviceFloats2) + 64, ((float *)deviceFloats1) + 128);
+    getValue<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(mystruct, ((float *)deviceFloats2) + 0);
 
     // now copy back entire buffer
     // hostFloats[64] = 0.0f;
@@ -48,9 +50,9 @@ int main(int argc, char *argv[]) {
     // cuStreamSynchronize(stream);
 
     // and check the values...
-    cout << hostFloats2[64] << endl;
+    cout << hostFloats2[0] << endl;
 
-    assert(hostFloats2[64] == 126.456f);
+    assert(hostFloats2[0] == 126);
 
     cuMemFreeHost(hostFloats1);
     cuMemFreeHost(hostFloats2);

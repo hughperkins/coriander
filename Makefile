@@ -187,6 +187,12 @@ run-test-cocl-test_bitcast: build/test-cocl-test_bitcast
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
+run-test-cocl-byvaluestructwithpointer: build/test-cocl-byvaluestructwithpointer
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
 run-test-cocl-test_types: build/test-cocl-test_types
 	################################
 	# running:
@@ -229,9 +235,19 @@ run-eigen-cxx11_tensor_cuda: build/eigen-cxx11_tensor_cuda
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-cxx11_tensor_cuda
 
-run-tests: all run-test-cocl-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-testevents run-test-cocl-testevents2 run-test-cocl-testcumemcpy run-test-cocl-teststream run-eigen-test_cuda_elementwise_small run-eigen-test_cuda_nullary run-eigen-test_cuda_elementwise
+clean-eigen:
+	touch build/eigen~
+	rm build/eigen*
 
-run-tests-all: run-tests run-eigen-test_cuda_elementwise_small run-eigen-test_cuda_nullary run-eigen-test_cuda_elementwise
+clean-tests:
+	touch build/test~
+	rm build/test*
+
+run-tests: clean-tests all run-test-cocl-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-testevents run-test-cocl-testevents2 run-test-cocl-testcumemcpy run-test-cocl-teststream
+
+run-tests-eigen: clean-eigen run-eigen-test_cuda_elementwise_small run-eigen-test_cuda_nullary run-eigen-test_cuda_elementwise
+
+run-tests-all: run-tests run-tests-eigen
 
 .SECONDARY:
 
@@ -270,4 +286,4 @@ install-dev:
 	ln -sf `pwd`/build/ir-to-opencl $(PREFIX)/bin/ir-to-opencl
 	ln -sf `pwd`/build/patch-hostside $(PREFIX)/bin/patch-hostside
 
-.PHONY: install uninstall install-dev
+.PHONY: install uninstall install-dev clean-eigen clean-tests

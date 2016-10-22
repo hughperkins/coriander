@@ -339,31 +339,32 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
         outs() << "loadgep type " << dumpType(loadgep->getType()) << "\n";
         Type *gepElementType = loadgep->getType()->getPointerElementType();
         outs() << "gepElementType " << dumpType(gepElementType) << "\n";
-        if(IntegerType *integerType = dyn_cast<IntegerType>(gepElementType)) {
-            if(integerType->getBitWidth() == 8) {
-                Function *setKernelArgCharStar = cast<Function>(M->getOrInsertFunction(
-                    "_Z20setKernelArgCharStarPc",
-                    Type::getVoidTy(context),
-                    PointerType::get(IntegerType::get(context, 8), 0),
-                    NULL));
-                CallInst *call = CallInst::Create(setKernelArgCharStar, loadgep);
-                call->insertAfter(lastInst);
-                lastInst = call;
-            } else {
-                throw runtime_error("integer type with bitwidth " + toString(integerType->getBitWidth()) + " not implemented for pointers in struct");
-            }
-        } else if(gepElementType->isFloatingPointTy()) {
-            Function *setKernelArgFloatStar = cast<Function>(M->getOrInsertFunction(
-                "_Z21setKernelArgFloatStarPf",
-                Type::getVoidTy(context),
-                PointerType::get(Type::getFloatTy(context), 0),
-                NULL));
-            CallInst *call = CallInst::Create(setKernelArgFloatStar, loadgep);
-            call->insertAfter(lastInst);
-            lastInst = call;
-        } else {
-            throw runtime_error("type " + dumpType(gepElementType) + " not implemented for pointers in structs");
-        }
+        lastInst = addSetKernelArgInst_pointer(lastInst, loadgep);
+        // if(IntegerType *integerType = dyn_cast<IntegerType>(gepElementType)) {
+        //     if(integerType->getBitWidth() == 8) {
+        //         Function *setKernelArgCharStar = cast<Function>(M->getOrInsertFunction(
+        //             "_Z28setKernelArgCharStarNoOffsetPc",
+        //             Type::getVoidTy(context),
+        //             PointerType::get(IntegerType::get(context, 8), 0),
+        //             NULL));
+        //         CallInst *call = CallInst::Create(setKernelArgCharStar, loadgep);
+        //         call->insertAfter(lastInst);
+        //         lastInst = call;
+        //     } else {
+        //         throw runtime_error("integer type with bitwidth " + toString(integerType->getBitWidth()) + " not implemented for pointers in struct");
+        //     }
+        // } else if(gepElementType->isFloatingPointTy()) {
+        //     Function *setKernelArgFloatStar = cast<Function>(M->getOrInsertFunction(
+        //         "_Z29setKernelArgFloatStarNoOffsetPf",
+        //         Type::getVoidTy(context),
+        //         PointerType::get(Type::getFloatTy(context), 0),
+        //         NULL));
+        //     CallInst *call = CallInst::Create(setKernelArgFloatStar, loadgep);
+        //     call->insertAfter(lastInst);
+        //     lastInst = call;
+        // } else {
+        //     throw runtime_error("type " + dumpType(gepElementType) + " not implemented for pointers in structs");
+        // }
     }
     return lastInst;
 }

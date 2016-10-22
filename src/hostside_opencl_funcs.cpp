@@ -190,19 +190,32 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
 }
 
-void setKernelArgFloatStar(float *memory_as_floatstar) {
-    COCL_PRINT(cout << "setKernelArgFloatStar " << memory_as_floatstar << endl);
-    // Memory *memory = (Memory *)memory_as_floatstar;
-    Memory *memory = findMemory((char *)memory_as_floatstar);
-    size_t offset = (char *)memory_as_floatstar - (char *)memory;
-    cl_mem clmem = memory->clmem;
-    cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;
-    launchConfiguration.kernel->inout(&clmem);
-    launchConfiguration.kernel->in(offset);
-}
+// void setKernelArgFloatStarNoOffset(float *memory_as_floatstar) {
+//     COCL_PRINT(cout << "setKernelArgFloatStar " << (void *)memory_as_floatstar << endl);
+//     // Memory *memory = (Memory *)memory_as_floatstar;
+//     Memory *memory = findMemory((char *)memory_as_floatstar);
+//     size_t offset = (char *)memory_as_floatstar - (char *)memory;
+//     cl_mem clmem = memory->clmem;
+//     cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;
+//     assert(offset == 0);
+//     launchConfiguration.kernel->inout(&clmem);
+//     // launchConfiguration.kernel->in(offset);
+// }
+
+// void setKernelArgFloatStar(float *memory_as_floatstar) {
+//     COCL_PRINT(cout << "setKernelArgFloatStar " << (void *)memory_as_floatstar << endl);
+//     // Memory *memory = (Memory *)memory_as_floatstar;
+//     Memory *memory = findMemory((char *)memory_as_floatstar);
+//     size_t offset = (char *)memory_as_floatstar - (char *)memory;
+//     cl_mem clmem = memory->clmem;
+//     cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;
+//     assert(offset == 0);
+//     launchConfiguration.kernel->inout(&clmem);
+//     // launchConfiguration.kernel->in(offset);
+// }
 
 void setKernelArgIntStar(int *memory_as_intstar) {
-    COCL_PRINT(cout << "setKernelArgIntStar " << memory_as_intstar << endl);
+    COCL_PRINT(cout << "setKernelArgIntStar " << (void *)memory_as_intstar << endl);
     Memory *memory = findMemory((char *)memory_as_intstar);
     size_t offset = (char *)memory_as_intstar - (char *)memory;
     cl_mem clmem = memory->clmem;

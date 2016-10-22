@@ -1175,14 +1175,20 @@ std::string dumpFunctionDeclaration(Function *F) {
                 PointerInfo *pointerInfo = pointerit->get();
                 int offset = pointerInfo->offset;
                 declaration += ", global " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
+                declaration += ", long " + argName + "_ptr_offset" + toString(j);
+                structpointershimcode = "    " + argName + "_ptr" + toString(j) + " = (global " + dumpType(pointerInfo->type) + ")((global char *)" + argName + "_ptr" + toString(j) + " + " + argName + "_ptr_offset" + toString(j) + ");\n" +
+                    structpointershimcode;
                 structpointershimcode += argName + "[0]" + pointerInfo->path + " = " + argName + "_ptr" + toString(j) + ";\n";
                 j++;
             }
         }
-        if(isKernel && ispointer) {
+        if(isKernel && ispointer && !is_struct_needs_cloning) {
+        // cout << "v2" << endl;
+        // if(isKernel && ispointer) {
             // add offset
             declaration += ", long " + argName + "_offset";
-            structpointershimcode += "    " + argName + " = (" + dumpType(arg->getType()) + ")((global char *)" + argName + " + " + argName + "_offset);\n";
+            structpointershimcode = "    " + argName + " = (" + dumpType(arg->getType()) + ")((global char *)" + argName + " + " + argName + "_offset);\n" +
+                structpointershimcode; // put at front of shim
         }
         i++;
     }
