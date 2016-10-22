@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     // now copy back entire buffer
     // hostFloats[64] = 0.0f;
     cuMemcpyDtoHAsync(hostFloats2, deviceFloats2, N * sizeof(float), stream);
-    // cuStreamSynchronize(stream);
+    cuStreamSynchronize(stream);
 
     // and check the values...
     cout << hostFloats2[0] << endl;
