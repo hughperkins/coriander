@@ -19,6 +19,7 @@
 #include "cocl/cocl_device.h"
 #include "cocl/cocl_error.h"
 #include "cocl/cocl_properties.h"
+#include "cocl/cocl_blas.h"
 #include "cocl/cocl_kernellaunch.h"
 // #include "cocl/EasyCL/EasyCL.h"
 #include "cocl/vector_types.h"

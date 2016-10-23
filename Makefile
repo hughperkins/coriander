@@ -40,21 +40,32 @@ build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-
 
 easycl:
 	git submodule update --init --recursive
-	cd build && cmake ../src/EasyCL -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_CXX_FLAGS=-fPIC -DBUILD_TESTS=OFF -DUSE_CLEW=OFF -DBUILD_SHARED=OFF
-	cd build && make -j 4
+	mkdir -p build/easycl
+	cd build/easycl && cmake ../../src/EasyCL -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_CXX_FLAGS=-fPIC -DBUILD_TESTS=OFF -DUSE_CLEW=OFF -DBUILD_SHARED=OFF
+	cd build/easycl && make -j 4
+
+clblast:
+	git submodule update --init --recursive
+	mkdir -p build/clblast
+	cd build/clblast && cmake ../../src/CLBlast -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_CXX_FLAGS=-fPIC -DBUILD_SHARED=OFF
+	cd build/clblast && make -j 4
 
 build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp include/cocl/cocl*.h
 	$(CLANG) -c -o $@ -std=c++11 -fPIC -g -O2 -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
 
 build/cocl_%.o: src/cocl_%.cpp include/cocl/cocl*.h
-	$(CLANG) -c -o $@ -std=c++11 $(DCOCL_SPAM) -fPIC -g -O2 -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
+	$(CLANG) -c -o $@ -std=c++11 $(DCOCL_SPAM) -fPIC -g -O2 -I$(COCL_HOME)/src/CLBlast/include -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
 
-build/libcocl.a: build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_error.o build/cocl_memory.o build/cocl_device.o build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o easycl
+build/libcocl.a: build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_blas.o build/cocl_error.o build/cocl_memory.o build/cocl_device.o build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o easycl
 	mkdir -p $(COCL_HOME)/build/easycl-extract
 	touch $(COCL_HOME)/build/easycl-extract/foo
 	rm $(COCL_HOME)/build/easycl-extract/*
-	(cd $(COCL_HOME)/build/easycl-extract/; ar x ../libEasyCL.a)
-	ar rcs $@ build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_device.o build/cocl_error.o build/cocl_memory.o build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o $(COCL_HOME)/build/easycl-extract/*.o
+	(cd $(COCL_HOME)/build/easycl-extract/; ar x ../easycl/libEasyCL.a)
+	mkdir -p $(COCL_HOME)/build/clblast-extract
+	touch $(COCL_HOME)/build/clblast-extract/foo
+	rm $(COCL_HOME)/build/clblast-extract/*
+	(cd $(COCL_HOME)/build/clblast-extract/; ar x ../clblast/libclblast.a)
+	ar rcs $@ build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_blas.o build/cocl_device.o build/cocl_error.o build/cocl_memory.o build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o $(COCL_HOME)/build/easycl-extract/*.o $(COCL_HOME)/build/clblast-extract/*.o
 
 clean:
 	rm -Rf build/* test/generated/* test/eigen/generated/* test/eigen/*.o test/*.o
@@ -206,6 +217,12 @@ run-test-cocl-testfloat4: build/test-cocl-testfloat4
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
 run-test-cocl-testneg: build/test-cocl-testneg
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
+run-test-cocl-testblas: build/test-cocl-testblas
 	################################
 	# running:
 	################################

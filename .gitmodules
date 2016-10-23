@@ -1,3 +1,6 @@
 [submodule "src/EasyCL"]
 	path = src/EasyCL
 	url = https://github.com/hughperkins/EasyCL
+[submodule "src/CLBlast"]
+	path = src/CLBlast
+	url = https://github.com/hughperkins/CLBlast
