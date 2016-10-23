@@ -97,8 +97,8 @@ std::string dumpValue(Value *value) {
 void declareGlobal(GlobalValue *global) {
     string gencode = "";
     if(GlobalVariable *var = dyn_cast<GlobalVariable>(global)) {
-        cout << "hasinitializer() " << var->hasInitializer() << endl;
-        cout << "name " << getName(global) << endl;
+        // cout << "hasinitializer() " << var->hasInitializer() << endl;
+        // cout << "name " << getName(global) << endl;
         string name = getName(global);
         if(name == "$str") {
             return;  // lazily skip $str for now...
@@ -110,11 +110,11 @@ void declareGlobal(GlobalValue *global) {
             if(addressspace == 3) { // shared/local => skip
                 return;
             } else {
-                cout << "updating addressspace to 4" << endl;
+                // cout << "updating addressspace to 4" << endl;
                 updateAddressSpace(var, 4);
             }
         }
-        cout << "declareGlobal name=" << name << " hasinitializer " << var->hasInitializer() << endl;
+        // cout << "declareGlobal name=" << name << " hasinitializer " << var->hasInitializer() << endl;
         if(var->hasInitializer()) {
             Constant *initializer = var->getInitializer();
             gencode += " = {";
@@ -140,7 +140,7 @@ void declareGlobal(GlobalValue *global) {
         throw runtime_error("unimplemented declareglobalvalue for this type");
     }
     gencode += ";\n";
-    cout << gencode << endl;
+    // cout << gencode << endl;
 
     globalDeclarations += gencode + "\n";
 }
@@ -231,7 +231,7 @@ string dumpChainedInstruction(int level, Instruction * instr) {
 
          return ourinstrstr;
     } else if(isa<UndefValue>(constant)) {
-        cout << "undef" << endl;
+        // cout << "undef" << endl;
         return "";
     } else {
         cout << "valueTy " << valueTy << endl;
@@ -250,19 +250,19 @@ string dumpOperand(Value *value) {
     if(Constant *constant = dyn_cast<Constant>(value)) {
         return dumpConstant(constant);
     }
-    cout << "isa phi " << isa<PHINode>(value) << endl;
-    cout << "isa basicblock " << isa<BasicBlock>(value) << endl;
+    // cout << "isa phi " << isa<PHINode>(value) << endl;
+    // cout << "isa basicblock " << isa<BasicBlock>(value) << endl;
     // cout << "isa label " << isa<LabelNode>(value) << endl;
     if(isa<BasicBlock>(value)) {
-        cout << "dumpoperand basicblock" << endl;
+        // cout << "dumpoperand basicblock" << endl;
         storeValueName(value);
         return nameByValue[value];
     }
     if(PHINode *phi = dyn_cast<PHINode>(value)) {
-        cout << "dumpoperand got a phi node" << endl;
+        // cout << "dumpoperand got a phi node" << endl;
         addPHIDeclaration(phi);
         string name = nameByValue[value];
-        cout << "phi name " << name << endl;
+        // cout << "phi name " << name << endl;
         return name;
     }
     value->dump();
@@ -313,11 +313,11 @@ std::string dumpAlloca(Instruction *alloca) {
     if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
         Type *ptrElementType = allocatypeptr->getPointerElementType();
         std::string typestring = dumpType(ptrElementType);
-        cout << "dumpAlloca typestring " << typestring << endl;
+        // cout << "dumpAlloca typestring " << typestring << endl;
         int count = readInt32Constant(alloca->getOperand(0));
         if(count == 1) {
             if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
-                cout << "arraytype" << endl;
+                // cout << "arraytype" << endl;
                 int innercount = arrayType->getNumElements();
                 Type *elementType = arrayType->getElementType();
                 return dumpType(elementType) + " " + dumpOperand(alloca) + "[" + toString(innercount) + "];\n";
@@ -371,7 +371,7 @@ void addSharedDeclaration(Value *value) {
             string typestr = dumpType(elementType);
             declaration += "    local " + typestr + " " + name + "[" + toString(length) + "];\n";
             if(debug) {
-                cout << declaration << endl;
+                // cout << declaration << endl;
             }
             nameByValue[value] = name;
             currentFunctionSharedDeclarations += declaration;
@@ -444,7 +444,7 @@ string dumpGetElementPtr(GetElementPtrInst *instr) {
     string rhs = dumpGetElementPtrRhs(instr);
     gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + rhs;
     gencode += ";\n";
-    cout << gencode << endl;
+    // cout << gencode << endl;
     return gencode;
 }
 
@@ -603,9 +603,9 @@ std::string dumpAddrSpaceCast(AddrSpaceCastInst *instr) {
 std::string dumpMemcpyCharCharLong(CallInst *instr) {
     std::string gencode = "";
     int totalLength = cast<ConstantInt>(instr->getOperand(2))->getSExtValue();
-    cout << "totalLength " << totalLength << endl;
+    // cout << "totalLength " << totalLength << endl;
     int align = cast<ConstantInt>(instr->getOperand(3))->getSExtValue();
-    cout << "align " << align << endl;
+    // cout << "align " << align << endl;
     string dstAddressSpaceStr = dumpAddressSpace(instr->getOperand(0)->getType());
     string srcAddressSpaceStr = dumpAddressSpace(instr->getOperand(1)->getType());
     string elementTypeString = "";
@@ -934,7 +934,7 @@ void addPHIDeclaration(PHINode *phi) {
     storeValueName(phi);
     string name = dumpOperand(phi);
     string declaration = dumpType(phi->getType()) + " " + dumpOperand(phi);
-    cout << declaration << endl;
+    // cout << declaration << endl;
     currentFunctionPhiDeclarationsByName[name] = declaration;
 }
 
@@ -946,13 +946,13 @@ std::string dumpInstruction(Instruction *instruction) {
 
     string instructioncode = "";
     if(debug) {
-        cout << resultType << " " << resultName << " =";
-        cout << " " << string(instruction->getOpcodeName());
+        // cout << resultType << " " << resultName << " =";
+        // cout << " " << string(instruction->getOpcodeName());
         for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
             Value *op = &*it->get();
-            cout << " " << dumpOperand(op);
+            // cout << " " << dumpOperand(op);
         }
-        cout << endl;
+        // cout << endl;
     }
     switch(opcode) {
         case Instruction::FAdd:
@@ -1078,7 +1078,7 @@ std::string dumpInstruction(Instruction *instruction) {
 
 std::string dumpBasicBlock(BasicBlock *basicBlock) {
     if(debug) {
-        cout << "basicblock" << endl;
+        // cout << "basicblock" << endl;
     //     cout << "hasname " << string(basicBlock->getName()) << endl;
     }
     string label = "";
@@ -1097,7 +1097,7 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
         Instruction *instruction = &*it;
         string instructioncode = dumpInstruction(instruction);
         if(debug) {
-            cout <<  instructioncode << endl;
+            // cout <<  instructioncode << endl;
         }
         if(instructioncode != "") {
             instructions_processed++;
@@ -1117,7 +1117,7 @@ std::string dumpFunctionDeclaration(Function *F) {
     }
     declaration += dumpType(retType) + " " + fname + "(";
     int i = 0;
-    cout << "dumping function " << fname << endl;
+    // cout << "dumping function " << fname << endl;
     structpointershimcode = "";
     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
         Argument *arg = &*it;
@@ -1129,7 +1129,7 @@ std::string dumpFunctionDeclaration(Function *F) {
         bool isKernel = iskernel_by_name[fname];
         bool is_struct_needs_cloning = false;
         bool ispointer = isa<PointerType>(argType);
-        cout << " arg ispointer " << ispointer << endl;
+        // cout << " arg ispointer " << ispointer << endl;
         if(isKernel) {
             outs() << "    its a kernel function" << "\n";
             if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
@@ -1205,7 +1205,7 @@ std::string dumpFunction(Function *F) {
     currentFunctionPhiDeclarationsByName.clear();
     string gencode = "";
     string declaration = dumpFunctionDeclaration(F);
-    cout << declaration << endl;
+    // cout << declaration << endl;
     string body = "";
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
@@ -1223,7 +1223,7 @@ std::string dumpFunction(Function *F) {
     gencode +=
         body +
     "}\n";
-    cout << gencode;
+    // cout << gencode;
     return gencode;
 }
 

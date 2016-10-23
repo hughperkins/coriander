@@ -106,14 +106,14 @@ int cudaConfigureCall(
         dim3 grid,
         dim3 block, long long sharedMem, char *queue_as_voidstar) {
     CLQueue *queue = (CLQueue *)queue_as_voidstar;
-    COCL_PRINT(cout << "cudaConfigureCall queue=" << queue << endl);
+    // COCL_PRINT(cout << "cudaConfigureCall queue=" << queue << endl);
     if(sharedMem != 0) {
         COCL_PRINT(cout << "cudaConfigureCall: Not implemented: non-zero shared memory" << endl);
         throw runtime_error("cudaConfigureCall: Not implemented: non-zero shared memory");
     }
     if(queue == 0) {
         queue = cl->default_queue;
-        COCL_PRINT(cout << "using default_queue " << queue << endl);
+        // COCL_PRINT(cout << "using default_queue " << queue << endl);
     }
     int grid_x = grid.x;
     int grid_y = grid.y;
@@ -210,7 +210,7 @@ void setKernelArgFloat(float value) {
 }
 
 void kernelGo() {
-    COCL_PRINT(cout << "kernelGo " << endl);
+    // COCL_PRINT(cout << "kernelGo " << endl);
     size_t global[3];
     for(int i = 0; i < 3; i++) {
         global[i] = launchConfiguration.grid[i] * launchConfiguration.block[i];
@@ -237,7 +237,7 @@ void kernelGo() {
     // cl->finish();
     // cout << ".. kernel finished" << endl;
     for(auto it=launchConfiguration.kernelArgsToBeReleased.begin(); it != launchConfiguration.kernelArgsToBeReleased.end(); it++) {
-        COCL_PRINT(cout << "release arg" << endl);
+        // COCL_PRINT(cout << "release arg" << endl);
         cl_mem memObject = *it;
         cl_int err = clReleaseMemObject(memObject);
         cl->checkError(err);

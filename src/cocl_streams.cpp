@@ -103,6 +103,15 @@ size_t cuStreamDestroy_v2(char *_queue) {
 }
 
 size_t cudaStreamQuery(char *_queue) {
-    CLQueue *queue = (CLQueue*)_queue;
-    throw runtime_error("not implemented");
+    // CLQueue *queue = (CLQueue*)_queue;
+    return cuStreamSynchronize(_queue);
+    // we're just going to run sync for now...
+    // throw runtime_error("not implemented");
+}
+
+size_t cuStreamQuery(char *_queue) {
+    // CLQueue *queue = (CLQueue*)_queue;
+    return cuStreamSynchronize(_queue);
+    // we're just going to run sync for now...
+    // throw runtime_error("not implemented");
 }
