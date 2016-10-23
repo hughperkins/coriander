@@ -199,6 +199,12 @@ run-test-cocl-callinternal: build/test-cocl-callinternal
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
+run-test-cocl-testfloat4: build/test-cocl-testfloat4
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
 run-test-cocl-multi1: build/test-cocl-multi1
 	################################
 	# running:

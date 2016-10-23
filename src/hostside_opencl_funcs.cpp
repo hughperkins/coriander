@@ -38,9 +38,9 @@ extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
 }
 
-// #undef COCL_PRINT
-// #define COCL_PRINT(stuff) \
-//    stuff
+#undef COCL_PRINT
+#define COCL_PRINT(stuff) \
+   stuff
 
 // stubs
 CUfunc_cache CU_FUNC_CACHE_PREFER_NONE;
@@ -72,7 +72,7 @@ namespace cocl {
 using namespace cocl;
 
 void hostside_opencl_funcs_init() {
-    COCL_PRINT(cout << "initialize cl context" << endl);
+    // COCL_PRINT(cout << "initialize cl context" << endl);
     cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
     ctx = cl->context;
     queue = cl->queue;
@@ -94,7 +94,7 @@ extern "C" {
 }
 
 size_t cuInit(unsigned int flags) {
-    COCL_PRINT(cout << "redirected cuInit()" << endl);
+    // COCL_PRINT(cout << "redirected cuInit()" << endl);
     hostside_opencl_funcs_assure_initialized();
     return 0;
 }
@@ -135,7 +135,7 @@ int cudaConfigureCall(
 
 void configureKernel(
         const char *kernelName, const char *clSourcecodeString) {
-    // cout << "configureKernel (name=" << kernelName << endl;
+    cout << "configureKernel (name=" << kernelName << endl;
     // cout << "clSources.size() " << getNumClSources() << endl;
     // for(auto it=clSources.begin(); it != clSources.end(); it++) {
     for(int i = 0; i < getNumClSources(); i++) {
@@ -189,7 +189,7 @@ void setKernelArgCharStar(char *memory_as_charstar) {
     // size_t offset = (char *)memory_as_charstar - (char *)memory;
     // Memory *pMemory = (Memory *)memory_as_charstar;
     cl_mem clmem = memory->clmem;
-    // cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;
+    cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;
     launchConfiguration.kernel->inout(&clmem);
     launchConfiguration.kernel->in(offset);
 }
@@ -214,10 +214,10 @@ void kernelGo() {
     size_t global[3];
     for(int i = 0; i < 3; i++) {
         global[i] = launchConfiguration.grid[i] * launchConfiguration.block[i];
-        COCL_PRINT(cout << "global[" << i << "]=" << global[i] << endl);
+        // COCL_PRINT(cout << "global[" << i << "]=" << global[i] << endl);
     }
     for(int i = 0; i < 3; i++) {
-        COCL_PRINT(cout << "block[" << i << "]=" << launchConfiguration.block[i] << endl);
+        // COCL_PRINT(cout << "block[" << i << "]=" << launchConfiguration.block[i] << endl);
     }
     // cout << "launching kernel, using OpenCL..." << endl;
     try {

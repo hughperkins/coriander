@@ -26,15 +26,37 @@
 
 #include "CL/cl.h"
 
+#include "pthread.h"
+
 using namespace std;
 using namespace cocl;
 using namespace easycl;
 
-// #undef COCL_PRINT
-// #define COCL_PRINT(stuff) \
-//    stuff
+namespace cocl {
+    pthread_mutex_t print_mutex = PTHREAD_MUTEX_INITIALIZER;
+}
+
+#undef COCL_PRINT
+#define COCL_PRINT(stuff) \
+    pthread_mutex_lock(&cocl::print_mutex); \
+    stuff ; \
+    pthread_mutex_unlock(&cocl::print_mutex);
 
 namespace cocl {
+    pthread_mutex_t mem_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+    class MemoryMutex {
+    public:
+        MemoryMutex() {
+            COCL_PRINT(cout << "locking mem mutex" << endl);
+            pthread_mutex_lock(&mem_mutex);
+        }
+        ~MemoryMutex() {
+            COCL_PRINT(cout << "releasing mem mutex" << endl);
+            pthread_mutex_unlock(&mem_mutex);
+        }
+    };
+
     // we should index these, but a set is ok-ish for now. maybe
     set<Memory *>memories;
     long long nextAllocPos = 1;
@@ -42,6 +64,7 @@ namespace cocl {
 
     Memory::Memory(cl_mem clmem, size_t bytes) :
             clmem(clmem), bytes(bytes) {
+        MemoryMutex memoryMutex;
         fakePos = nextAllocPos;
         // we should align it actually.  on 128-bytes?
         fakePos = ((fakePos + 127) / 128) * 128;
@@ -68,12 +91,13 @@ namespace cocl {
     }
 
     Memory *findMemory(char *passedInAsCharStar) {
+        MemoryMutex memoryMutex;
         // char *passedInAsCharStar = (char *)passedInPointer;
         long long pos = (long long )passedInAsCharStar;
         for(auto it=memories.begin(), e=memories.end(); it != e; it++) {
             Memory *memory = *it;
             if(pos >= memory->fakePos && pos < memory->fakePos + memory->bytes) {
-                COCL_PRINT(cout << "found memory: " << (void *)memory);
+                COCL_PRINT(cout << "found memory: " << (void *)memory << endl);
                 return memory;
             }
         }
@@ -252,7 +276,7 @@ size_t cuMemcpyHtoD(CUdeviceptr gpu_dst, const void *host_src, size_t size) {
 
 // => synchronous <=
 size_t  cuMemcpyDtoH(void *host_dst, CUdeviceptr gpu_src, size_t size) {
-    cout << "cumemcpyDtoH" << endl;
+    COCL_PRINT(cout << "cumemcpyDtoH" << endl);
     cudaMemcpy(host_dst, (void *)gpu_src, size, cudaMemcpyDeviceToHost);
     cl->finish();
     return 0;

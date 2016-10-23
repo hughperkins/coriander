@@ -685,6 +685,10 @@ std::string dumpCall(CallInst *instr) {
     if(functionName == "llvm.lifetime.end") {
         return "";  // just ignore for now
     }
+    if(functionName == "_Z11make_float4ffff") {
+        // change this into something like: (float4)(a, b, c, d)
+        functionName = "(float4)";
+    }
     if(functionName == "_GLOBAL__sub_I_struct_initializer.cu") {
         cerr << "WARNING: skipping _GLOBAL__sub_I_struct_initializer.cu" << endl;
         return "";
@@ -1377,6 +1381,7 @@ int main(int argc, char *argv[]) {
     ignoredFunctionNames.insert("llvm.memcpy.p0i8.p0i8.i32");
     ignoredFunctionNames.insert("llvm.lifetime.start");
     ignoredFunctionNames.insert("llvm.lifetime.end");
+    ignoredFunctionNames.insert("_Z11make_float4ffff");
     ignoredFunctionNames.insert("_GLOBAL__sub_I_struct_initializer.cu");
 
     knownFunctionsMap["_ZSt4sqrtf"] = "sqrt";
