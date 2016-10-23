@@ -132,6 +132,7 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 
 - Oct 23:
   - fixed `float4`s.  This is a critical bug-fix, without which Eigen componentwise works less well in Tensorflow :-P
+  - added BLAS, using Cedric Nugteren's [CLBlast](https://github.com/CNugteren/CLBlast))
 - Oct 22:
   - arrays of structs can be passed to kernels again, as long as they contain no pointers
     - (structs containing pointers can be passed only by-value)
