@@ -69,7 +69,7 @@ std::string dumpAddressSpace(llvm::Type *type) {
 }
 
 std::string dumpFunctionType(FunctionType *fn) {
-    outs() << "function" << "\n";
+    // outs() << "function" << "\n";
     std::string params_str = "";
     int i = 0;
     for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
@@ -80,7 +80,7 @@ std::string dumpFunctionType(FunctionType *fn) {
         params_str += dumpType(paramType);
         i++;
     }
-    outs() << "params_str " << params_str << "\n";
+    // outs() << "params_str " << params_str << "\n";
     return params_str;
 }
 
@@ -281,26 +281,26 @@ void walkType(Module *M, StructInfo *structInfo, int level, int offset, vector<i
     } else if(PointerType *pointerType = dyn_cast<PointerType>(type)) {
         Type *elementType = pointerType->getPointerElementType();
         int addressspace = pointerType->getAddressSpace();
-        outs() << getIndent(level) << "pointer type " << dumpType(elementType) << " addressspace " << addressspace << " offset=" << offset << "\n";
+        // outs() << getIndent(level) << "pointer type " << dumpType(elementType) << " addressspace " << addressspace << " offset=" << offset << "\n";
         // how to find out if this is gpu allocated or not?
         // let's just heuristically assume that all primitive*s are gpu allocated for now?
         // and lets assume that structs are just sent one at a time now, and any contained structs are one at a time
         // we can figure out how to generalize this later...
         // actually, anything except float *s, we're just going to leave as-is (or set to zero), for now
         if(elementType->getPrimitiveSizeInBits() != 0) {
-            outs() << "primitive type " << dumpType(pointerType) << "\n";
+            // outs() << "primitive type " << dumpType(pointerType) << "\n";
             structInfo->pointerInfos.push_back(unique_ptr<PointerInfo>(new PointerInfo(offset, pointerType, indices, path)));
         }
     } else if(ArrayType *arrayType = dyn_cast<ArrayType>(type)) {
         Type *elemType = arrayType->getElementType();
         int count = arrayType->getNumElements();
-        outs() << getIndent(level) << dumpType(elemType) << "[" << count << "] offset=" << offset << "\n";
+        // outs() << getIndent(level) << dumpType(elemType) << "[" << count << "] offset=" << offset << "\n";
     } else if(IntegerType *intType = dyn_cast<IntegerType>(type)) {
         int bitwidth = intType->getBitWidth();
-        outs() << getIndent(level) << "int" << bitwidth << " offset=" << offset << "\n";
+        // outs() << getIndent(level) << "int" << bitwidth << " offset=" << offset << "\n";
     } else if(type->getPrimitiveSizeInBits() != 0) {
         // int bitwidth = intType->getBitWidth();
-        outs() << getIndent(level) << " someprimitive " << " offset=" << offset << "\n";
+        // outs() << getIndent(level) << " someprimitive " << " offset=" << offset << "\n";
     } else {
         throw runtime_error("walktype type not handled: " + dumpType(type));
     }
@@ -312,8 +312,8 @@ void walkStructType(Module *M, StructInfo *structInfo, int level, int offset, ve
         // outs() << "walkvalue type is struct" << "\n";
         // walk each member of the struct
 
-    outs() << getIndent(level) << string(type->getName());
-    outs() << " offset=" << offset << " allocsize=" << M->getDataLayout().getTypeAllocSize(type) << "\n";
+    // outs() << getIndent(level) << string(type->getName());
+    // outs() << " offset=" << offset << " allocsize=" << M->getDataLayout().getTypeAllocSize(type) << "\n";
     int childoffset = offset;
     int i = 0;
     // Module *M = type->

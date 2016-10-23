@@ -143,7 +143,7 @@ void getLaunchTypes(CallInst *inst, LaunchCallInfo *info) {
     // - name of the kernel
     // - type of each of the kernel parameters (without the actual Value's)
     info->callTypes.clear();
-    outs() << "getLaunchTypes()\n";
+    // outs() << "getLaunchTypes()\n";
     Value *argOperand = inst->getArgOperand(0);
     if(ConstantExpr *expr = dyn_cast<ConstantExpr>(argOperand)) {
         Instruction *instr = expr->getAsInstruction();
@@ -156,7 +156,7 @@ void getLaunchTypes(CallInst *inst, LaunchCallInfo *info) {
             }
         }
         info->kernelName = instr->getOperand(0)->getName();
-        outs() << "got kernel name " << info->kernelName << "\n";
+        // outs() << "got kernel name " << info->kernelName << "\n";
     } else {
         throw runtime_error("getlaunchtypes, didnt get ConstantExpr");
     }
@@ -269,12 +269,12 @@ Instruction *addSetKernelArgInst_pointer(Instruction *lastInst, Value *value) {
 Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *value, Value *valueAsPointerInstr) {
     Module *M = lastInst->getModule();
 
-    outs() << "got a byvalue struct" << "\n";
+    // outs() << "got a byvalue struct" << "\n";
     unique_ptr<StructInfo> structInfo(new StructInfo());
     walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", cast<StructType>(value->getType()));
 
     bool structHasPointers = structInfo->pointerInfos.size() > 0;
-    outs() << "struct has pointers? " << structHasPointers << "\n";
+    // outs() << "struct has pointers? " << structHasPointers << "\n";
 
     // if it doesnt contain pointers, we can just send it as a char *, after creating a pointer
     // to it
@@ -287,8 +287,8 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
 
     const DataLayout *dataLayout = &M->getDataLayout();
     int allocSize = dataLayout->getTypeAllocSize(newType);
-    outs() << "original typeallocsize " << dataLayout->getTypeAllocSize(value->getType()) << "\n";
-    outs() << "pointerfree typeallocsize " << allocSize << "\n";
+    // outs() << "original typeallocsize " << dataLayout->getTypeAllocSize(value->getType()) << "\n";
+    // outs() << "pointerfree typeallocsize " << allocSize << "\n";
 
     Function *setKernelArgStruct = cast<Function>(M->getOrInsertFunction(
         "_Z18setKernelArgStructPci",
@@ -315,7 +315,7 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
     call->insertAfter(lastInst);
     lastInst = call;
 
-    outs() << "pointers in struct:" << "\n";
+    // outs() << "pointers in struct:" << "\n";
     for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
         PointerInfo *pointerInfo = pointerit->get();
         int offset = pointerInfo->offset;
@@ -324,11 +324,11 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
         indices.push_back(createInt32Constant(&context, 0));
         for(auto idxit = pointerInfo->indices.begin(); idxit != pointerInfo->indices.end(); idxit++) {
             int idx = *idxit;
-            outs() << "idx " << idx << "\n";
+            // outs() << "idx " << idx << "\n";
             indices.push_back(createInt32Constant(&context, idx));
         }
         GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(value->getType(), valueAsPointerInstr, ArrayRef<Value *>(&indices[0], &indices[indices.size()]), "getfloatstaraddr");
-        outs() << "gep type " << dumpType(gep->getType()) << "\n";
+        // outs() << "gep type " << dumpType(gep->getType()) << "\n";
         gep->insertAfter(lastInst);
         lastInst = gep;
 
@@ -336,9 +336,9 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
         loadgep->insertAfter(lastInst);
         lastInst = loadgep;
 
-        outs() << "loadgep type " << dumpType(loadgep->getType()) << "\n";
+        // outs() << "loadgep type " << dumpType(loadgep->getType()) << "\n";
         Type *gepElementType = loadgep->getType()->getPointerElementType();
-        outs() << "gepElementType " << dumpType(gepElementType) << "\n";
+        // outs() << "gepElementType " << dumpType(gepElementType) << "\n";
         lastInst = addSetKernelArgInst_pointer(lastInst, loadgep);
         // if(IntegerType *integerType = dyn_cast<IntegerType>(gepElementType)) {
         //     if(integerType->getBitWidth() == 8) {
@@ -373,16 +373,16 @@ Instruction *addSetKernelArgInst(Instruction *lastInst, Value *value, Value *val
     Module *M = lastInst->getModule();
 
     if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
-        outs() << "    integer arg\n";
+        // outs() << "    integer arg\n";
         lastInst = addSetKernelArgInst_int(lastInst, value, intType);
     } else if(value->getType()->isFloatingPointTy()) {
-        outs() << "    float arg\n";
+        // outs() << "    float arg\n";
         lastInst = addSetKernelArgInst_float(lastInst, value);
     } else if(value->getType()->isPointerTy()) {
-        outs() << "    pointer arg\n";
+        // outs() << "    pointer arg\n";
         lastInst = addSetKernelArgInst_pointer(lastInst, value);
     } else if(isa<StructType>(value->getType())) {
-        outs() << "    by-value struct arg\n";
+        // outs() << "    by-value struct arg\n";
         lastInst = addSetKernelArgInst_byvaluestruct(lastInst, value, valueAsPointerInstr);
     } else {
         value->dump();
@@ -393,13 +393,13 @@ Instruction *addSetKernelArgInst(Instruction *lastInst, Value *value, Value *val
 }
 
 void patchCudaLaunch(Function *F, CallInst *inst, vector<Instruction *> &to_replace_with_zero) {
-    outs() << "cudaLaunch\n";
+    // outs() << "cudaLaunch\n";
 
     Module *M = inst->getModule();
 
     getLaunchTypes(inst, launchCallInfo.get());
     to_replace_with_zero.push_back(inst);
-    outs() << "patching launch in " << string(F->getName()) << "\n";
+    // outs() << "patching launch in " << string(F->getName()) << "\n";
 
     string kernelName = launchCallInfo->kernelName;
     Instruction *kernelNameValue = addStringInstr(M, "s." + kernelName, kernelName);
@@ -460,9 +460,9 @@ void patchFunction(Function *F) {
                 if(calledFunctionName == "cudaLaunch") {
                     patchCudaLaunch(F, inst, to_replace_with_zero);
                 } else if(calledFunctionName == "cudaSetupArgument") {
-                    outs() << "cudaSetupArgument\n";
-                    inst->dump();
-                    outs() << "\n";
+                    // outs() << "cudaSetupArgument\n";
+                    // inst->dump();
+                    // outs() << "\n";
                     getLaunchArgValue(inst, launchCallInfo.get());
                     to_replace_with_zero.push_back(inst);
                 }

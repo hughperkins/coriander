@@ -42,7 +42,7 @@ Type *cloneStructTypeNoPointers(StructType *inType) {
             newChildren.push_back(childType);
         }
     }
-    outs() << "newchildren.size() " << newChildren.size() << "\n";
+    // outs() << "newchildren.size() " << newChildren.size() << "\n";
     Type *newType = 0;
     if(newChildren.size() > 0) {
         newType = StructType::create(ArrayRef<Type *>(&newChildren[0], &newChildren[newChildren.size()]), newName);
@@ -58,7 +58,7 @@ Instruction *copyStructValuesNoPointers(Instruction *lastInst, Value *src, Value
     int srcidx = 0;
     int dstidx = 0;
     Type *type = src->getType();
-    outs() << "copyStructValuesNoPointers " << dumpType(type) << "\n";
+    // outs() << "copyStructValuesNoPointers " << dumpType(type) << "\n";
     if(StructType *structType = dyn_cast<StructType>(src->getType()->getPointerElementType())) {
         for(auto it=structType->element_begin(); it != structType->element_end(); it++) {
             Type *childType = *it;
@@ -86,7 +86,7 @@ Instruction *copyStructValuesNoPointers(Instruction *lastInst, Value *src, Value
             // } else if(IntegerType *intType = dyn_cast<IntegerType>(childType)) {
             } else if(childType->getPrimitiveSizeInBits() > 0 ) {
                 // do we have to do `load` followed by `store`?
-                outs() << "copying " << dumpType(childType) << "\n";
+                // outs() << "copying " << dumpType(childType) << "\n";
                 // Instruction *alloca = new AllocaInst(intType, "allocateint");
                 // alloca->insertAfter(lastInst);
                 // lastInst = alloca;
@@ -100,7 +100,7 @@ Instruction *copyStructValuesNoPointers(Instruction *lastInst, Value *src, Value
                 lastInst = store;
             } else if(ArrayType *arrayType = dyn_cast<ArrayType>(childType)) {
                 int numElements = arrayType->getNumElements();
-                outs() << "numlemenets " << numElements << "\n";
+                // outs() << "numlemenets " << numElements << "\n";
                 for(int i=0; i < numElements; i++) {
                     Value *arrayindex[2];
                     arrayindex[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
@@ -160,7 +160,7 @@ void declareStructNoPointers(string name, StructType *type) {
         std::string memberName = "f" + toString(i);
         if(ArrayType *arraytype = dyn_cast<ArrayType>(elementType)) {
             Type *arrayelementtype = arraytype->getPointerElementType();
-            outs() << "arrayelementtype " << dumpType(arrayelementtype) << "\n";
+            // outs() << "arrayelementtype " << dumpType(arrayelementtype) << "\n";
             int numElements = arraytype->getNumElements();
             // // outs() << "numelements " << numElements << "\n";
             declaration += "    " + dumpType(arrayelementtype) + " ";
@@ -264,7 +264,7 @@ string writeStructCopyCodeNoPointers(StructType *structType, string srcName, str
     string gencode = "";
     int srcidx = 0;
     int dstidx = 0;
-    outs() << "writeStructCopyCodeNoPointers " << dumpType(structType) << "\n";
+    // outs() << "writeStructCopyCodeNoPointers " << dumpType(structType) << "\n";
     for(auto it=structType->element_begin(); it != structType->element_end(); it++) {
         Type *childType = *it;
         if(isa<PointerType>(childType)) {
@@ -281,12 +281,12 @@ string writeStructCopyCodeNoPointers(StructType *structType, string srcName, str
             dstidx++;
         } else if(childType->getPrimitiveSizeInBits() > 0 ) {
             gencode += childDstName + " = " + childSrcName + ";\n";
-            outs() << "copying " << dumpType(childType) << "\n";
+            // outs() << "copying " << dumpType(childType) << "\n";
             srcidx++;
             dstidx++;
         } else if(ArrayType *arrayType = dyn_cast<ArrayType>(childType)) {
             int numElements = arrayType->getNumElements();
-            outs() << "numlemenets " << numElements << "\n";
+            // outs() << "numlemenets " << numElements << "\n";
             for(int i=0; i < numElements; i++) {
                 gencode += childDstName + "[" + toString(i) + "] = " + childSrcName + "[" + toString(i) +  "];\n";
             }

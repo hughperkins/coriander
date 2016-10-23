@@ -58,9 +58,9 @@ GlobalVariable *addGlobalVariable(Module *M, string name, string value) {
 Instruction *addStringInstr(Module *M, string name, string value) {
     // check if already exists first
     GlobalVariable *probe = M->getNamedGlobal(name);
-    outs() << "addStringInstr probe=" << probe << "\n";
+    // outs() << "addStringInstr probe=" << probe << "\n";
     if(probe != 0) {
-        outs() << "string aleady exists, reusing  " << "\n";
+        // outs() << "string aleady exists, reusing  " << "\n";
         return addStringInstrExistingGlobal(M, name);
     }
 

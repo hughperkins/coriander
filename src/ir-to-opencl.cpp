@@ -85,20 +85,43 @@ void storeValueName(Value *value);
 
 std::string dumpValue(Value *value) {
     std::string gencode = "";
-    if(nameByValue.find(value) == nameByValue.end()) {
-        value->dump();
-        throw runtime_error("dumpvalue value not found");
+    if(nameByValue.find(value) != nameByValue.end()) {
+        string name = nameByValue[value];
+        gencode += name;
+        return gencode;
     }
-    string name = nameByValue[value];
-    gencode += name;
-    return gencode;
+
+    if(Constant *constant = dyn_cast<Constant>(value)) {
+        // cout << "its a constant" << endl;
+        if(ConstantInt *constInt = dyn_cast<ConstantInt>(constant)) {
+            // cout << "constant int" << endl;
+            int intvalue = readInt32Constant(constInt);
+            string asstring = toString(intvalue);
+            nameByValue[value] = asstring;
+            return asstring;
+        }
+        if(ConstantFP *constFP = dyn_cast<ConstantFP>(constant)) {
+            // cout << "constant float" << endl;
+            int floatvalue = readFloatConstant(constFP);
+            string asstring = toString(floatvalue);
+            if(asstring.find('.') == string::npos) {
+                asstring += ".0";
+            }
+            asstring += "f";
+            nameByValue[value] = asstring;
+            return asstring;
+        }
+    }
+
+    value->dump();
+    throw runtime_error("dumpvalue value not found");
 }
 
 void declareGlobal(GlobalValue *global) {
     string gencode = "";
     if(GlobalVariable *var = dyn_cast<GlobalVariable>(global)) {
         // cout << "hasinitializer() " << var->hasInitializer() << endl;
-        // cout << "name " << getName(global) << endl;
+        // s << "name " << getName(global) << endl;
         string name = getName(global);
         if(name == "$str") {
             return;  // lazily skip $str for now...
@@ -396,9 +419,9 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
     }
     for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
-        if(PointerType *ptrtype = dyn_cast<PointerType>(currentType)) {
-            outs() << "d " << d << " currenttype " << dumpType(currentType) << " addressspace " << ptrtype->getAddressSpace() << "\n";
-        }
+        // if(PointerType *ptrtype = dyn_cast<PointerType>(currentType)) {
+        //     outs() << "d " << d << " currenttype " << dumpType(currentType) << " addressspace " << ptrtype->getAddressSpace() << "\n";
+        // }
         if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
             if(d == 0) {
                 if(isa<ArrayType>(currentType->getPointerElementType())) {
@@ -1131,11 +1154,11 @@ std::string dumpFunctionDeclaration(Function *F) {
         bool ispointer = isa<PointerType>(argType);
         // cout << " arg ispointer " << ispointer << endl;
         if(isKernel) {
-            outs() << "    its a kernel function" << "\n";
+            // outs() << "    its a kernel function" << "\n";
             if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
                 Type *elemType = ptrType->getPointerElementType();
                 if(StructType *structType = dyn_cast<StructType>(elemType)) {
-                    outs() << "    name " << getName(structType) << "\n";
+                    // outs() << "    name " << getName(structType) << "\n";
                     if(getName(structType) != "struct.float4") {
                         unique_ptr<StructInfo> structInfo(new StructInfo());
                         walkStructType(F->getParent(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
@@ -1166,8 +1189,8 @@ std::string dumpFunctionDeclaration(Function *F) {
         // and add those pointers t othe argument list, with some appropriate shimcode
         // to copy those pointers into the struct, at the start of the kernel
         int j = 0;
-        argType->dump();
-        outs() << "\n";
+        // argType->dump();
+        // outs() << "\n";
         if(is_struct_needs_cloning) {
             StructType *structType = cast<StructType>(cast<PointerType>(argType)->getPointerElementType());
             // declare a pointerful struct, then copy the vlaues across, then copy the float *s in
@@ -1232,7 +1255,7 @@ std::string dumpModule(Module *M) {
 
     // get struct declarations
     // global_begin/end returns all the bits that start with '@', at the top of the .ll
-    cout << "begin declare global variables" << endl;
+    // cout << "begin declare global variables" << endl;
     for(auto it=M->global_begin(); it != M->global_end(); it++) {
         GlobalVariable *glob = &*it;
         string name = getName(glob);
@@ -1249,12 +1272,12 @@ std::string dumpModule(Module *M) {
             continue;
         }
         glob->dump();
-        cout << "name " << name << endl;
+        // cout << "name " << name << endl;
         declareGlobal(glob);
     }
-    cout << getDeclarationsToWrite() << endl;
-    cout << globalDeclarations << endl;
-    cout << "done declaring global variables" << endl;
+    // cout << getDeclarationsToWrite() << endl;
+    // cout << globalDeclarations << endl;
+    // cout << "done declaring global variables" << endl;
 
     // figure out which functions are kernels
     for(auto it=M->named_metadata_begin(); it != M->named_metadata_end(); it++) {
@@ -1291,7 +1314,7 @@ std::string dumpModule(Module *M) {
     }
 
     // dump function declarations
-    cout << "beginning function declarations" << endl;
+    // cout << "beginning function declarations" << endl;
     for(auto it = M->begin(); it != M->end(); it++) {
         Function *F = &*it;
         string name = getName(F);
@@ -1306,13 +1329,13 @@ std::string dumpModule(Module *M) {
         if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
                 knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
             string declaration = dumpFunctionDeclaration(F) + ";";
-            cout << declaration << endl;
+            // cout << declaration << endl;
             gencode += declaration + "\n";
         }
     }
     gencode += "\n";
-    cout << "done writing function declarations" << endl;
-    cout << endl;
+    // cout << "done writing function declarations" << endl;
+    // cout << endl;
 
     int i = 0;
     for(auto it = M->begin(); it != M->end(); it++) {
@@ -1347,7 +1370,7 @@ int main(int argc, char *argv[]) {
     string target = argv[argc - 2];
     string outputfilepath = argv[argc - 1];
     debug = false;
-    cout << "argc " << argc << " argv[1] " << argv[1] << endl;
+    // cout << "argc " << argc << " argv[1] " << argv[1] << endl;
     if(argc == 4) {
         if(string(argv[1]) != "--debug") {
             cout << "Usage: " << argv[0] << " [--debug] <input ir file> <output cl file>" << endl;
