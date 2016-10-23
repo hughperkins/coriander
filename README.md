@@ -72,8 +72,8 @@ Behind the scenes, there are a few parts:
 
 ## What it provides
 
-- compiler for host-side code, including memory allocation, kernel launches
-- compiler for device-side code, handling templated C++ code, and converting it into bog-standard OpenCL 1.2 code
+- compiler for host-side code, including memory allocation, copy, streams, kernel launches
+- compiler for device-side code, handling templated C++ code, converting it into bog-standard OpenCL 1.2 code
 - BLAS (using Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast))
 
 ## How to build
