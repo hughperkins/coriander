@@ -56,7 +56,7 @@ build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp include/cocl/cocl*.
 build/cocl_%.o: src/cocl_%.cpp include/cocl/cocl*.h
 	$(CLANG) -c -o $@ -std=c++11 $(DCOCL_SPAM) -fPIC -g -O2 -I$(COCL_HOME)/src/CLBlast/include -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
 
-build/libcocl.a: build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_blas.o build/cocl_error.o build/cocl_memory.o build/cocl_device.o build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o easycl
+build/libcocl.a: build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_blas.o build/cocl_error.o build/cocl_memory.o build/cocl_device.o build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o easycl clblast
 	mkdir -p $(COCL_HOME)/build/easycl-extract
 	touch $(COCL_HOME)/build/easycl-extract/foo
 	rm $(COCL_HOME)/build/easycl-extract/*
@@ -266,7 +266,7 @@ clean-tests:
 	touch build/test~
 	rm build/test*
 
-run-tests: clean-tests all run-test-cocl-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-testevents run-test-cocl-testevents2 run-test-cocl-testcumemcpy run-test-cocl-teststream run-test-cocl-testmemcpydevicetodevice run-test-cocl-testpartialcopy run-test-cocl-offsetkernelargs run-test-cocl-test_bitcast run-test-cocl-byvaluestructwithpointer run-test-cocl-test_types run-test-cocl-multi1
+run-tests: clean-tests all run-test-cocl-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-testevents run-test-cocl-testevents2 run-test-cocl-testcumemcpy run-test-cocl-teststream run-test-cocl-testmemcpydevicetodevice run-test-cocl-testpartialcopy run-test-cocl-offsetkernelargs run-test-cocl-test_bitcast run-test-cocl-byvaluestructwithpointer run-test-cocl-test_types run-test-cocl-multi1 run-test-cocl-testblas
 
 run-tests-eigen: clean-eigen run-eigen-test_cuda_elementwise_small run-eigen-test_cuda_nullary run-eigen-test_cuda_elementwise
 

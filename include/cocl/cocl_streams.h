@@ -14,3 +14,5 @@ extern "C" {
 
     size_t cudaStreamQuery(char *stream);
 }
+
+typedef char * cudaStream_t;

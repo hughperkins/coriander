@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
     float beta = 0;
       cublasSgemm(blas, CUBLAS_OP_N, CUBLAS_OP_N, M, N, K,
       &alpha,
-      deviceA, M, deviceB, K, &beta, deviceC, M);
+      (float *)deviceA, M, (float *)deviceB, K, &beta, (float *)deviceC, M);
 
     cublasDestroy(blas);
 

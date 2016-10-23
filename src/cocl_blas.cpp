@@ -11,7 +11,7 @@ using namespace cocl;
 
 size_t cublasCreate(cublasHandle_t *phandle) {
     cout << "cublasCreate redirect" << endl;
-    *phandle = 1;
+    *phandle = 0;
     return 0;
 }
 
@@ -34,8 +34,24 @@ static Transpose trans_cutocl(int trans) {
     }
 }
 
+std::size_t cublasSetPointerMode(cublasHandle_t handle, cublasPointerMode_t mode) {
+    cout << "cublasSetPointerMode redirect" << endl;
+    return 0;
+}
+
+std::size_t cublasGetPointerMode(cublasHandle_t handle, cublasPointerMode_t *mode) {
+    cout << "cublasGetPointerMode redirect" << endl;
+    *mode = 0;
+    return 0;
+}
+
+std::size_t cublasSetStream(cublasHandle_t handle, cudaStream_t streamId) {
+    cout << "cublasSetStream redirect" << endl;
+    return 0;
+}
+
 std::size_t cublasSgemm(cublasHandle_t blas, int transA, int transB, int M, int N, int K,
-     float *palpha, CUdeviceptr deviceA, int lda, CUdeviceptr deviceB, int ldb, float *pbeta, CUdeviceptr deviceC, int ldc) {
+     float *palpha, const float * deviceA, int lda, const float * deviceB, int ldb, float *pbeta, float * deviceC, int ldc) {
     cout << "sgemm redirect" << endl;
 
     Memory *AMemory = findMemory((char *)deviceA);
