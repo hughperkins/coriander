@@ -11,6 +11,8 @@ __global__ void getValue(float *data) {
     data[0] = pow(data[1], data[2]);
     data[4] = min(data[1], data[2]);
     data[5] = max(data[1], data[2]);
+    data[6] = ::max(data[1], data[2]);
+    // data[7] = std::max(data[1], data[2]);
 }
 
 int main(int argc, char *argv[]) {

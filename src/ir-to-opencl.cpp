@@ -1436,6 +1436,7 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["_Z3maxff"] = "max";
     knownFunctionsMap["fminf"] = "min";
     knownFunctionsMap["fmaxf"] = "max";
+    knownFunctionsMap["tanhf"] = "tanh";
 
     try {
         string gencode = dumpModule(M.get());
