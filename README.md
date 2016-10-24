@@ -136,6 +136,8 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 
 ## News
 
+- Oct 24:
+  - fixed `pow`, `min`, `max` (beta)
 - Oct 23:
   - fixed `float4`s.  This is a critical bug-fix, without which Eigen componentwise works less well in Tensorflow :-P
   - added BLAS, using Cedric Nugteren's [CLBlast](https://github.com/CNugteren/CLBlast))

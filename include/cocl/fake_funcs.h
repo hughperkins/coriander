@@ -84,13 +84,19 @@ template<class T> T arg (const std::complex<T>& x) {
 // #define tanh our_pretend_tanh
 // #define log our_pretend_log
 // #define exp our_pretend_exp
+#define max our_pretend_max
+#define min our_pretend_min
 
 extern "C" {
 double our_pretend_tanh(double in);
 double our_pretend_log(double in);
 double our_pretend_exp(double in);
+double our_pretend_max(double in1, double in2);
+double our_pretend_min(double in1, double in2);
 
 double tanh(double in);
 double log(double in);
 double exp(double in);
+// double max(double in);
+// double min(double in);
 }

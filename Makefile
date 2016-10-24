@@ -228,6 +228,12 @@ run-test-cocl-testblas: build/test-cocl-testblas
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
+run-test-cocl-testmath: build/test-cocl-testmath
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
 run-test-cocl-multi1: build/test-cocl-multi1
 	################################
 	# running:

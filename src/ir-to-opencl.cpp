@@ -1404,6 +1404,7 @@ int main(int argc, char *argv[]) {
     ignoredFunctionNames.insert("llvm.memcpy.p0i8.p0i8.i32");
     ignoredFunctionNames.insert("llvm.lifetime.start");
     ignoredFunctionNames.insert("llvm.lifetime.end");
+    ignoredFunctionNames.insert("pow");
     ignoredFunctionNames.insert("_Z11make_float4ffff");
     ignoredFunctionNames.insert("_GLOBAL__sub_I_struct_initializer.cu");
 
@@ -1422,6 +1423,9 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["_ZSt4tanhf"] = "tanh";
     knownFunctionsMap["_ZSt3logf"] = "log";
     knownFunctionsMap["_ZSt3expf"] = "exp";
+    knownFunctionsMap["_ZSt3powff"] = "pow";
+    knownFunctionsMap["our_pretend_min"] = "min";
+    knownFunctionsMap["our_pretend_max"] = "max";
 
     try {
         string gencode = dumpModule(M.get());
