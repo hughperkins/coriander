@@ -663,66 +663,74 @@ std::string dumpCall(CallInst *instr) {
     }
 
     string functionName = getName(instr->getCalledValue());
+    cout << "functionName " << functionName << endl;
     if(functionName == "llvm.ptx.read.tid.x") {
         return gencode + "get_local_id(0);\n";
-    }
-    if(functionName == "llvm.ptx.read.tid.y") {
+    } else if(functionName == "llvm.ptx.read.tid.y") {
         return gencode + "get_local_id(1);\n";
-    }
-    if(functionName == "llvm.ptx.read.tid.z") {
+    } else if(functionName == "llvm.ptx.read.tid.z") {
         return gencode + "get_local_id(2);\n";
-    }
-    if(functionName == "llvm.ptx.read.ctaid.x") {
+    } else if(functionName == "llvm.ptx.read.ctaid.x") {
         return gencode + "get_group_id(0);\n";
-    }
-    if(functionName == "llvm.ptx.read.ctaid.y") {
+    } else if(functionName == "llvm.ptx.read.ctaid.y") {
         return gencode + "get_group_id(1);\n";
-    }
-    if(functionName == "llvm.ptx.read.ctaid.z") {
+    } else if(functionName == "llvm.ptx.read.ctaid.z") {
         return gencode + "get_group_id(2);\n";
-    }
-    if(functionName == "llvm.ptx.read.nctaid.x") {
+    } else if(functionName == "llvm.ptx.read.nctaid.x") {
         return gencode + "get_num_groups(0);\n";
-    }
-    if(functionName == "llvm.ptx.read.nctaid.y") {
+    } else if(functionName == "llvm.ptx.read.nctaid.y") {
         return gencode + "get_num_groups(1);\n";
-    }
-    if(functionName == "llvm.ptx.read.nctaid.z") {
+    } else if(functionName == "llvm.ptx.read.nctaid.z") {
         return gencode + "get_num_groups(2);\n";
-    }
-    if(functionName == "llvm.ptx.read.ntid.x") {
+    } else if(functionName == "llvm.ptx.read.ntid.x") {
         return gencode + "get_local_size(0);\n";
-    }
-    if(functionName == "llvm.ptx.read.ntid.y") {
+    } else if(functionName == "llvm.ptx.read.ntid.y") {
         return gencode + "get_local_size(1);\n";
-    }
-    if(functionName == "llvm.ptx.read.ntid.z") {
+    } else if(functionName == "llvm.ptx.read.ntid.z") {
         return gencode + "get_local_size(2);\n";
-    }
-    if(functionName == "llvm.cuda.syncthreads") {
+    } else if(functionName == "llvm.cuda.syncthreads") {
         return gencode + "barrier(CLK_GLOBAL_MEM_FENCE);\n";
-    }
-    if(functionName == "llvm.lifetime.start") {
+    } else if(functionName == "llvm.lifetime.start") {
         return "";  // just ignore for now
-    }
-    if(functionName == "llvm.lifetime.end") {
+    } else if(functionName == "llvm.lifetime.end") {
         return "";  // just ignore for now
-    }
-    if(functionName == "_Z11make_float4ffff") {
+    } else if(functionName == "_Z11make_float4ffff") {
         // change this into something like: (float4)(a, b, c, d)
         functionName = "(float4)";
-    }
-    if(functionName == "_GLOBAL__sub_I_struct_initializer.cu") {
+    // } else if(functionName == "_ZSt3minIfERKT_S2_S2_") { // hack :-P
+    //     cout << "applying 'min' hack" << endl;
+    //     gencode = "";
+    //     string typestr = dumpType(cast<PointerType>(instr->getType())->getPointerElementType());
+    //     if(typestr != "void") {
+    //         gencode += typestr + " " + dumpOperand(instr) + " = ";
+    //     }
+    //     gencode += " min(";
+    //     gencode += dumpValue(instr->getOperand(0)) + "[0]";
+    //     gencode += ", ";
+    //     gencode += dumpValue(instr->getOperand(1)) + "[0]";
+    //     gencode += ");\n";
+    //     return gencode;
+    // } else if(functionName == "_ZSt3maxIfERKT_S2_S2_") { // hack :-P
+    //     cout << "applying 'max' hack" << endl;
+    //     gencode = "";
+    //     string typestr = dumpType(cast<PointerType>(instr->getType())->getPointerElementType());
+    //     if(typestr != "void") {
+    //         gencode += typestr + " " + dumpOperand(instr) + " = ";
+    //     }
+    //     gencode += " max(";
+    //     gencode += dumpValue(instr->getOperand(0)) + "[0]";
+    //     gencode += ", ";
+    //     gencode += dumpValue(instr->getOperand(1)) + "[0]";
+    //     gencode += ");\n";
+    //     return gencode;
+    } else if(functionName == "_GLOBAL__sub_I_struct_initializer.cu") {
         cerr << "WARNING: skipping _GLOBAL__sub_I_struct_initializer.cu" << endl;
         return "";
-    }
-    if(functionName == "__nvvm_reflect") {
+    } else if(functionName == "__nvvm_reflect") {
         return gencode + " 0;\n"; //ignore, (but pretend to return 0)
-    }
-    if(functionName == "llvm.memcpy.p0i8.p0i8.i64") {
+    } else if(functionName == "llvm.memcpy.p0i8.p0i8.i64") {
         return dumpMemcpyCharCharLong(instr);  // just ignore for now
-    }
-    if(knownFunctionsMap.find(functionName) != knownFunctionsMap.end()) {
+    } else if(knownFunctionsMap.find(functionName) != knownFunctionsMap.end()) {
         // cout << "replace " << functionName << " with " << knownFunctionsMap[functionName] << endl;
         functionName = knownFunctionsMap[functionName];
     }
@@ -1424,8 +1432,10 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["_ZSt3logf"] = "log";
     knownFunctionsMap["_ZSt3expf"] = "exp";
     knownFunctionsMap["_ZSt3powff"] = "pow";
-    knownFunctionsMap["our_pretend_min"] = "min";
-    knownFunctionsMap["our_pretend_max"] = "max";
+    knownFunctionsMap["_Z3minff"] = "min";
+    knownFunctionsMap["_Z3maxff"] = "max";
+    knownFunctionsMap["fminf"] = "min";
+    knownFunctionsMap["fmaxf"] = "max";
 
     try {
         string gencode = dumpModule(M.get());

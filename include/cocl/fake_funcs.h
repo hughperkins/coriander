@@ -84,19 +84,29 @@ template<class T> T arg (const std::complex<T>& x) {
 // #define tanh our_pretend_tanh
 // #define log our_pretend_log
 // #define exp our_pretend_exp
-#define max our_pretend_max
-#define min our_pretend_min
+namespace cocl {
+   // double max(double in1, double in2);
+   // double min(double in, double in2);
+}
+// using cocl::max;
+// using cocl::min;
 
 extern "C" {
-double our_pretend_tanh(double in);
-double our_pretend_log(double in);
-double our_pretend_exp(double in);
-double our_pretend_max(double in1, double in2);
-double our_pretend_min(double in1, double in2);
+// double our_pretend_tanh(double in);
+// double our_pretend_log(double in);
+// double our_pretend_exp(double in);
+// double our_pretend_max(double in1, double in2);
+// double our_pretend_min(double in1, double in2);
 
 double tanh(double in);
 double log(double in);
 double exp(double in);
-// double max(double in);
-// double min(double in);
 }
+
+double max(double in1, double in2);
+double min(double in1, double in2);
+float max(float in1, float in2);
+float min(float in1, float in2);
+
+// #define max cocl::max
+// #define min cocl::min
