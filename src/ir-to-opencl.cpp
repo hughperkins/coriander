@@ -1432,11 +1432,23 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["_ZSt3logf"] = "log";
     knownFunctionsMap["_ZSt3expf"] = "exp";
     knownFunctionsMap["_ZSt3powff"] = "pow";
-    knownFunctionsMap["_Z3minff"] = "min";
-    knownFunctionsMap["_Z3maxff"] = "max";
-    knownFunctionsMap["fminf"] = "min";
-    knownFunctionsMap["fmaxf"] = "max";
+    knownFunctionsMap["_Z3minff"] = "fmin";
+    knownFunctionsMap["_Z3maxff"] = "fmax";
+    knownFunctionsMap["fminf"] = "fmin";
+    knownFunctionsMap["fmaxf"] = "fmax";
     knownFunctionsMap["tanhf"] = "tanh";
+    knownFunctionsMap["expf"] = "exp";
+    knownFunctionsMap["fabsf"] = "fabs";
+    knownFunctionsMap["acosf"] = "acos";
+    knownFunctionsMap["asinf"] = "asin";
+    knownFunctionsMap["atanf"] = "atan";
+    knownFunctionsMap["cosf"] = "cos";
+    knownFunctionsMap["sinf"] = "sin";
+    knownFunctionsMap["tanf"] = "tan";
+    knownFunctionsMap["ceilf"] = "ceil";
+    knownFunctionsMap["floorf"] = "floor";
+    knownFunctionsMap["logf"] = "log";
+    knownFunctionsMap["sqrtf"] = "sqrt";
 
     try {
         string gencode = dumpModule(M.get());
