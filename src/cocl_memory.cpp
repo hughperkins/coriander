@@ -154,8 +154,26 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
         err = clEnqueueWriteBuffer(queue->queue, dstMemory->clmem, CL_FALSE, dst_offset,
                                           count, src, 0, NULL, NULL);
         cl->checkError(err);
+    } else if(cudaMemcpyKind == cudaMemcpyDeviceToDevice) {
+        Memory *dstMemory = findMemory((char *)dst);
+        size_t dst_offset = dstMemory->getOffset((char *)dst);
+
+        Memory *srcMemory = findMemory((char *)src);
+        size_t src_offset = srcMemory->getOffset((char *)src);
+
+        err = clEnqueueCopyBuffer(
+            queue->queue,
+            srcMemory->clmem,
+            dstMemory->clmem,
+            src_offset,
+            dst_offset,
+            count,
+            0,
+            0,
+            0);
+        cl->checkError(err);
     } else {
-        cout << "cudaMemcpyKind using opencl " << cudaMemcpyKind << endl;
+        cout << "cudaMemcpyAsync cudaMemcpyKind using opencl " << cudaMemcpyKind << endl;
         throw runtime_error("unhandled cudaMemcpyKind");
     }
 
@@ -236,7 +254,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
             0);
         cl->checkError(err);
     } else {
-        cout << "cudaMemcpyKind using opencl " << cudaMemcpyKind << endl;
+        cout << "cudaMemcpy cudaMemcpyKind using opencl " << cudaMemcpyKind << endl;
         throw runtime_error("unhandled cudaMemcpyKind");
     }
     return 0;
