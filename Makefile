@@ -16,7 +16,7 @@ LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
 # the llvm-config compile flags suppresses asserts
 COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -g -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++11
 
-all: build/ir-to-opencl build/patch-hostside build/libcocl.a easycl
+all: build/ir-to-opencl build/patch-hostside build/libcocl.a
 
 build/mutations.o: src/mutations.cpp src/mutations.h
 	mkdir -p build
@@ -38,14 +38,14 @@ build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-
 	mkdir -p build
 	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/patch-hostside -g -I$(LLVM_INCLUDE) src/patch-hostside.cpp build/readIR.o build/mutations.o build/struct_clone.o src/ir-to-opencl-common.cpp $(LINK_FLAGS)
 
-easycl:
-	git submodule update --init --recursive
-	mkdir -p build/easycl
-	cd build/easycl && cmake ../../src/EasyCL -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_CXX_FLAGS=-fPIC -DBUILD_TESTS=OFF -DUSE_CLEW=OFF -DBUILD_SHARED=OFF
-	cd build/easycl && make -j 4
+build/easycl-%.o: src/EasyCL/%.cpp
+	$(CLANG) -std=c++11 -fPIC -c -O2 -o $@ $<
+
+build/easycl-util-%.o: src/EasyCL/util/%.cpp
+	$(CLANG) -std=c++11 -fPIC -c -O2 -Isrc/EasyCL -o $@ $<
 
 clblast:
-	git submodule update --init --recursive
+	git submodule update --init --recursive src/CLBlast
 	mkdir -p build/clblast
 	cd build/clblast && cmake ../../src/CLBlast -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_CXX_FLAGS=-fPIC -DBUILD_SHARED=OFF
 	cd build/clblast && make -j 4
@@ -56,16 +56,15 @@ build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp include/cocl/cocl*.
 build/cocl_%.o: src/cocl_%.cpp include/cocl/cocl*.h
 	$(CLANG) -c -o $@ -std=c++11 $(DCOCL_SPAM) -fPIC -g -O2 -I$(COCL_HOME)/src/CLBlast/include -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
 
-build/libcocl.a: build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_blas.o build/cocl_error.o build/cocl_memory.o build/cocl_device.o build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o easycl clblast
-	mkdir -p $(COCL_HOME)/build/easycl-extract
-	touch $(COCL_HOME)/build/easycl-extract/foo
-	rm $(COCL_HOME)/build/easycl-extract/*
-	(cd $(COCL_HOME)/build/easycl-extract/; ar x ../easycl/libEasyCL.a)
+EASYCL_OBJS=build/easycl-EasyCL.o build/easycl-CLKernel.o build/easycl-CLWrapper.o build/easycl-platforminfo_helper.o build/easycl-deviceinfo_helper.o build/easycl-util-easycl_stringhelper.o
+COCL_OBJS=build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_blas.o build/cocl_device.o build/cocl_error.o build/cocl_memory.o build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o
+
+build/libcocl.a: $(COCL_OBJS) clblast $(EASYCL_OBJS)
 	mkdir -p $(COCL_HOME)/build/clblast-extract
 	touch $(COCL_HOME)/build/clblast-extract/foo
 	rm $(COCL_HOME)/build/clblast-extract/*
 	(cd $(COCL_HOME)/build/clblast-extract/; ar x ../clblast/libclblast.a)
-	ar rcs $@ build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_blas.o build/cocl_device.o build/cocl_error.o build/cocl_memory.o build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o $(COCL_HOME)/build/easycl-extract/*.o $(COCL_HOME)/build/clblast-extract/*.o
+	ar rcs $@ $(EASYCL_OBJS) $(COCL_OBJS) $(COCL_HOME)/build/clblast-extract/*.o
 
 clean:
 	rm -Rf build/* test/generated/* test/eigen/generated/* test/eigen/*.o test/*.o
@@ -117,19 +116,19 @@ build/test-cocl-%.o: test/cocl/%.cu
 
 # executables
 build/test-cocl-multi1: build/test-cocl-multi1-main.o build/test-cocl-multi1-k1.o build/test-cocl-multi1-k2.o build/libcocl.a
-	g++ -o $@ build/test-cocl-multi1-main.o build/test-cocl-multi1-k1.o build/test-cocl-multi1-k2.o -g -lcocl -lOpenCL -Lbuild -lEasyCL
+	g++ -o $@ build/test-cocl-multi1-main.o build/test-cocl-multi1-k1.o build/test-cocl-multi1-k2.o -g -lcocl -lOpenCL
 
 build/test-cocl-callinternal: build/test-cocl-callinternal-main.o build/test-cocl-callinternal-test_callinternal.o build/libcocl.a
-	g++ -o $@ build/test-cocl-callinternal-main.o build/test-cocl-callinternal-test_callinternal.o -g -lcocl -lOpenCL -Lbuild -lEasyCL
+	g++ -o $@ build/test-cocl-callinternal-main.o build/test-cocl-callinternal-test_callinternal.o -g -lcocl -lOpenCL
 
 build/test-%: build/test-%.o build/libcocl.a
-	g++ -o $@ $< -g -lcocl -lOpenCL -Lbuild -lEasyCL
+	g++ -o $@ $< -g -lcocl -lOpenCL
 
 build/test-cocl-%: build/test-cocl-%.o build/libcocl.a
-	g++ -o $@ $< -g -lcocl -lOpenCL -Lbuild -lEasyCL
+	g++ -o $@ $< -g -lcocl -lOpenCL
 
 build/eigen-%: build/eigen-%.o build/libcocl.a
-	g++ -o $@ $< -lcocl -lOpenCL -Lbuild -lEasyCL
+	g++ -o $@ $< -lcocl -lOpenCL
 
 # run
 run-test-cocl-cuda_sample: build/test-cocl-cuda_sample

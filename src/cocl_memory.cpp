@@ -36,11 +36,11 @@ namespace cocl {
     pthread_mutex_t print_mutex = PTHREAD_MUTEX_INITIALIZER;
 }
 
-// #undef COCL_PRINT
-// #define COCL_PRINT(stuff) \
-//     pthread_mutex_lock(&cocl::print_mutex); \
-//     stuff ; \
-//     pthread_mutex_unlock(&cocl::print_mutex);
+#undef COCL_PRINT
+#define COCL_PRINT(stuff) \
+    pthread_mutex_lock(&cocl::print_mutex); \
+    stuff ; \
+    pthread_mutex_unlock(&cocl::print_mutex);
 
 namespace cocl {
     pthread_mutex_t mem_mutex = PTHREAD_MUTEX_INITIALIZER;

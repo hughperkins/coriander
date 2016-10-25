@@ -22,15 +22,30 @@
 
 using namespace std;
 using namespace cocl;
+using namespace easycl;
+
+namespace cocl {
+    class CoclBlas {
+    public:
+        CoclBlas() {
+            queue = cl->default_queue;
+        }
+        CLQueue *queue;
+    };
+    static cublasPointerMode_t pointermode = CUBLAS_POINTER_MODE_HOST;
+}
 
 size_t cublasCreate(cublasHandle_t *phandle) {
-    cout << "cublasCreate redirect" << endl;
-    *phandle = 0;
+    cout << "cublasCreate redirect 3" << endl;
+    CoclBlas *coclBlas = new CoclBlas();
+    *phandle = (cublasHandle_t)coclBlas;
     return 0;
 }
 
 std::size_t cublasDestroy(cublasHandle_t handle) {
     cout << "cublasDestroy redirect" << endl;
+    CoclBlas *coclBlas = (CoclBlas *)handle;
+    delete coclBlas;
     return 0;
 }
 
@@ -50,23 +65,40 @@ static Transpose trans_cutocl(int trans) {
 
 std::size_t cublasSetPointerMode(cublasHandle_t handle, cublasPointerMode_t mode) {
     cout << "cublasSetPointerMode redirect" << endl;
+    if(mode == CUBLAS_POINTER_MODE_HOST) {
+        cout << "set to host" << endl;
+    } else if(mode == CUBLAS_POINTER_MODE_DEVICE) {
+        cout << "set to device`" << endl;
+    } else {
+        cout << "unknown pointermode " << mode << endl;
+        // since we do nothing with this mode currently, not really an error as such...
+    }
     return 0;
 }
 
 std::size_t cublasGetPointerMode(cublasHandle_t handle, cublasPointerMode_t *mode) {
     cout << "cublasGetPointerMode redirect" << endl;
-    *mode = 0;
+    *mode = ::pointermode;
     return 0;
 }
 
 std::size_t cublasSetStream(cublasHandle_t handle, cudaStream_t streamId) {
     cout << "cublasSetStream redirect" << endl;
+    CoclBlas *coclBlas = (CoclBlas *)handle;
+    CLQueue *queue = (CLQueue *)streamId;
+    if(queue == 0) {
+        cout << "using dfeault queue" << endl;
+        queue = cl->default_queue;
+    }
+    coclBlas->queue = queue;
     return 0;
 }
 
 std::size_t cublasSgemm(cublasHandle_t blas, int transA, int transB, int M, int N, int K,
      float *palpha, const float * deviceA, int lda, const float * deviceB, int ldb, float *pbeta, float * deviceC, int ldc) {
     cout << "sgemm redirect" << endl;
+
+    CoclBlas *coclBlas = (CoclBlas *)blas;
 
     Memory *AMemory = findMemory((char *)deviceA);
     size_t A_offset = AMemory->getOffset((char *)deviceA);
@@ -90,7 +122,7 @@ std::size_t cublasSgemm(cublasHandle_t blas, int transA, int transB, int M, int 
                                    BMemory->clmem, B_offset, ldb,
                                    *pbeta,
                                    CMemory->clmem, C_offset, ldc,
-                                   &cl->default_queue->queue, 0);
+                                   &coclBlas->queue->queue, 0);
     if(status != 0) {
         cout << "sgemm status code " << status << endl;
         throw runtime_error("Failed call to blas sgem");
