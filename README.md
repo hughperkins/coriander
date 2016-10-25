@@ -136,6 +136,8 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 
 ## News
 
+- Oct 25:
+  - BLAS wrapper handles memory offsets correctly now
 - Oct 24:
   - fixed `pow`, `min`, `max` (beta)
 - Oct 23:
