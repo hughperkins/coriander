@@ -4,6 +4,7 @@
 #include "cocl/cocl_streams.h"
 
 #include <cstdint>
+#include <stddef>
 
 typedef std::size_t cublasStatus_t;
 // typedef long long cublasHandle_t;

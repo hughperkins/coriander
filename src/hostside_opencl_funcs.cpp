@@ -191,7 +191,7 @@ void setKernelArgCharStar(char *memory_as_charstar) {
     cl_mem clmem = memory->clmem;
     cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;
     launchConfiguration.kernel->inout(&clmem);
-    launchConfiguration.kernel->in(offset);
+    launchConfiguration.kernel->in((int64_t)offset); // kernel expects a `long` which is 64-bit signed int
 }
 
 void setKernelArgInt64(int64_t value) {

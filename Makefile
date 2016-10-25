@@ -39,7 +39,7 @@ build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-
 	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/patch-hostside -g -I$(LLVM_INCLUDE) src/patch-hostside.cpp build/readIR.o build/mutations.o build/struct_clone.o src/ir-to-opencl-common.cpp $(LINK_FLAGS)
 
 build/easycl-%.o: src/EasyCL/%.cpp
-	$(CLANG) -std=c++11 -fPIC -c -O2 -o $@ $<
+	$(CLANG) -std=c++11 -fPIC -c -O2 -o $@ $< -Iinclude -Isrc/EasyCL
 
 build/easycl-util-%.o: src/EasyCL/util/%.cpp
 	$(CLANG) -std=c++11 -fPIC -c -O2 -Isrc/EasyCL -o $@ $<
