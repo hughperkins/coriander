@@ -29,6 +29,14 @@ void dump(float *M, int rows, int cols) {
     }
 }
 
+void fill(float *M, int rows, int cols, float val) {
+    for(int row=0; row < rows; row++) {
+        for(int col = 0; col < cols; col++) {
+            M[row * cols + col] = val;
+        }
+    }
+}
+
 void dumbMultiply(float *A, float *B, float *C, int M, int N, int K) {
     // assume row major
     for(int m=0; m < M; m++) {
@@ -61,13 +69,6 @@ int main(int argc, char *argv[]) {
 
     CUstream stream;
     cuStreamCreate(&stream, 0);
-
-    // float *hostA;
-    // float *hostB;
-    // float *hostC;
-    // cuMemHostAlloc((void **)&hostA, M * K * sizeof(float), CU_MEMHOSTALLOC_PORTABLE);
-    // cuMemHostAlloc((void **)&hostB, K * N * sizeof(float), CU_MEMHOSTALLOC_PORTABLE);
-    // cuMemHostAlloc((void **)&hostC, M * N * sizeof(float), CU_MEMHOSTALLOC_PORTABLE);
 
     float hostA[] = { 3, 5,
                       5, 8,
@@ -103,37 +104,22 @@ int main(int argc, char *argv[]) {
     int B_offset = 128;
     int C_offset = 32;
 
-    // A_offset = 0;
-    // B_offset = 0;
-    // C_offset = 0;
+    A_offset = 0;
+    B_offset = 0;
+    C_offset = 0;
 
-    // hostFloats1[0] = 123.456f;
-
-    cuMemcpyHtoDAsync(
-        (CUdeviceptr)(((float *)deviceA) + A_offset),
-        hostATrans,
-        M * K * sizeof(float),
-        stream
-    );
-    cuMemcpyHtoDAsync(
-        (CUdeviceptr)(((float *)deviceB) + B_offset),
-        hostBTrans,
-        K * N * sizeof(float),
-        stream
-    );
+    cuMemcpyHtoDAsync((CUdeviceptr)(((float *)deviceA) + A_offset), hostATrans, M * K * sizeof(float), stream);
+    cuMemcpyHtoDAsync((CUdeviceptr)(((float *)deviceB) + B_offset), hostBTrans, K * N * sizeof(float), stream);
 
     cublasHandle_t blas;
     cublasCreate(&blas);
+    cublasSetStream(blas, stream);
 
     float alpha = 1;
     float beta = 0;
       cublasSgemm(blas, CUBLAS_OP_N, CUBLAS_OP_N, M, N, K,
       &alpha,
       (float *)deviceA + A_offset, M, (float *)deviceB + B_offset, K, &beta, (float *)deviceC + C_offset, M);
-
-    cublasDestroy(blas);
-
-    // getValue<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>((float *)deviceFloats1);
 
     cuMemcpyDtoHAsync(hostCTrans, (CUdeviceptr)((float *)deviceC + C_offset), M * N * sizeof(float), stream);
     cuStreamSynchronize(stream);
@@ -151,12 +137,7 @@ int main(int argc, char *argv[]) {
 
     assertEqual(hostCCheck, hostC, M, N);
 
-    // for(int m=0; m < M; m++) {
-    //     for(int n = 0; n < N; n++) {
-    //         cout << " " << hostC[m * N + n];
-    //     }
-    //     cout << endl;
-    // }
+    cublasDestroy(blas);
 
     cuMemFree(deviceA);
     cuMemFree(deviceB);

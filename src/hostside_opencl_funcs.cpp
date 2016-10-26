@@ -38,9 +38,9 @@ extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
 }
 
-#undef COCL_PRINT
-#define COCL_PRINT(stuff) \
-   stuff
+// #undef COCL_PRINT
+// #define COCL_PRINT(stuff) \
+//    stuff
 
 // stubs
 CUfunc_cache CU_FUNC_CACHE_PREFER_NONE;
@@ -189,7 +189,7 @@ void setKernelArgCharStar(char *memory_as_charstar) {
     // size_t offset = (char *)memory_as_charstar - (char *)memory;
     // Memory *pMemory = (Memory *)memory_as_charstar;
     cl_mem clmem = memory->clmem;
-    cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;
+    // cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;
     launchConfiguration.kernel->inout(&clmem);
     launchConfiguration.kernel->in((int64_t)offset); // kernel expects a `long` which is 64-bit signed int
 }

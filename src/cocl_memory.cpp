@@ -36,11 +36,12 @@ namespace cocl {
     pthread_mutex_t print_mutex = PTHREAD_MUTEX_INITIALIZER;
 }
 
-#undef COCL_PRINT
-#define COCL_PRINT(stuff) \
-    pthread_mutex_lock(&cocl::print_mutex); \
-    stuff ; \
-    pthread_mutex_unlock(&cocl::print_mutex);
+// #undef COCL_PRINT
+// #define COCL_PRINT(stuff) \
+//     stuff ;
+
+    // pthread_mutex_lock(&cocl::print_mutex); \
+    // pthread_mutex_unlock(&cocl::print_mutex);
 
 namespace cocl {
     pthread_mutex_t mem_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -66,6 +67,7 @@ namespace cocl {
             clmem(clmem), bytes(bytes) {
         MemoryMutex memoryMutex;
         fakePos = nextAllocPos;
+        COCL_PRINT(cout << "Memory::Memory bytes=" << bytes << endl;)
         // we should align it actually.  on 128-bytes?
         fakePos = ((fakePos + 127) / 128) * 128;
         nextAllocPos = fakePos + bytes;
@@ -85,6 +87,8 @@ namespace cocl {
 
     Memory::~Memory() {
         COCL_PRINT(cout << "~Memory releasing mem object memory=" << (void *)this << endl);
+        memoryByAllocPos.erase(fakePos);
+        memories.erase(this);
         cl_int err = clReleaseMemObject(clmem);
         cl->checkError(err);
         // TODO: should remove from map and set too
@@ -94,8 +98,10 @@ namespace cocl {
         MemoryMutex memoryMutex;
         // char *passedInAsCharStar = (char *)passedInPointer;
         long long pos = (long long )passedInAsCharStar;
+        COCL_PRINT(cout << "findMemory pos=" << pos << endl;)
         for(auto it=memories.begin(), e=memories.end(); it != e; it++) {
             Memory *memory = *it;
+            COCL_PRINT(cout << "memory fakepos=" << memory->fakePos << " bytes " << memory->bytes << endl;)
             if(pos >= memory->fakePos && pos < memory->fakePos + memory->bytes) {
                 COCL_PRINT(cout << "found memory: " << (void *)memory << endl);
                 return memory;
@@ -267,7 +273,13 @@ size_t cuMemcpyHtoDAsync(CUdeviceptr dst, const void *src, size_t bytes, char *_
     Memory *dstMemory = findMemory((char *)dst);
     size_t offset = dstMemory->getOffset((char *)dst);
     COCL_PRINT(cout << "memory " << (void *)dstMemory << " offset=" << offset << endl);
-    cl_int err = clEnqueueWriteBuffer(queue->queue, dstMemory->clmem, CL_FALSE, offset,
+    cl_int err;
+    // // adding this barrier to try to solve crash bug on intel beignet:
+    // cl_int err = clEnqueueBarrierWithWaitList(
+    //     queue->queue, 0, 0, 0
+    // );
+    // cl->checkError(err);
+    err = clEnqueueWriteBuffer(queue->queue, dstMemory->clmem, CL_FALSE, offset,
                                       bytes, src, 0, NULL, NULL);
     cl->checkError(err);
     return 0;
@@ -275,12 +287,20 @@ size_t cuMemcpyHtoDAsync(CUdeviceptr dst, const void *src, size_t bytes, char *_
 
 size_t  cuMemcpyDtoHAsync(void *dst, CUdeviceptr src, size_t bytes, char *_queue) {
     CLQueue *queue = (CLQueue*)_queue;
-    COCL_PRINT(cout << "cuMemcpyDtoHAsync dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
+    COCL_PRINT(cout << "cuMemcpyDtoHAsync queue=" << (void *)queue << " dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
     Memory *srcMemory = findMemory((char *)src);
     size_t offset = srcMemory->getOffset((char *)src);
     COCL_PRINT(cout << "memory " << (void *)srcMemory << " offset=" << offset << endl);
-    cl_int err = clEnqueueReadBuffer(queue->queue, srcMemory->clmem, CL_FALSE, offset,
+    // adding this because otherwise seems I need to call synchronize, on intel hd beignet, before
+    // copying data back (even though the copy should wait, by virtue of being on the same queue, I think)
+    // this error shows up only in testblas, for now
+    cl_int err = clEnqueueBarrierWithWaitList(
+        queue->queue, 0, 0, 0
+    );
+    cl->checkError(err);
+    err = clEnqueueReadBuffer(queue->queue, srcMemory->clmem, CL_FALSE, offset,
                                      bytes, dst, 0, NULL, NULL);
+    // cout << "queued buffer read device => host" << endl;
     cl->checkError(err);
     return 0;
 }

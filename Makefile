@@ -73,15 +73,15 @@ clean:
 
 # deviceside goes directly from .cu => -device.ll
 
-test/generated/%-device.ll: test/%.cu include/fake_funcs.h build/ir-to-opencl
-	echo building $@ from $<
-	mkdir -p test/generated
-	$(CLANG) -include include/fake_funcs.h $< --cuda-device-only -emit-llvm -std=c++11 -I/usr/include/x86_64-linux-gnu -O3 -S -o $@
+# test/generated/%-device.ll: test/%.cu include/fake_funcs.h build/ir-to-opencl
+# 	echo building $@ from $<
+# 	mkdir -p test/generated
+# 	$(CLANG) -include include/fake_funcs.h $< --cuda-device-only -emit-llvm -std=c++11 -I/usr/include/x86_64-linux-gnu -O3 -S -o $@
 
-test/eigen/generated/%-device.ll: test/eigen/%.cu include/fake_funcs.h build/ir-to-opencl
-	echo building $@ from $<
-	mkdir -p test/eigen/generated
-	$(CLANG) -x cuda -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -D__CUDA_ARCH__=300 -include include/fake_funcs.h -Iinclude -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -Itest/eigen -I/usr/include/x86_64-linux-gnu $< --cuda-device-only -emit-llvm -O3 -S -o $@
+# test/eigen/generated/%-device.ll: test/eigen/%.cu include/fake_funcs.h build/ir-to-opencl
+# 	echo building $@ from $<
+# 	mkdir -p test/eigen/generated
+# 	$(CLANG) -x cuda -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -D__CUDA_ARCH__=300 -include include/fake_funcs.h -Iinclude -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -Itest/eigen -I/usr/include/x86_64-linux-gnu $< --cuda-device-only -emit-llvm -O3 -S -o $@
 
 # opencl (from the -device.ll)
 
@@ -89,9 +89,9 @@ test/eigen/generated/%-device.ll: test/eigen/%.cu include/fake_funcs.h build/ir-
 	echo building $@ from $<
 	build/ir-to-opencl $(DEBUG) $< $@
 
-test/generated/%-device.cl: test/%-device.ll build/ir-to-opencl
-	echo building $@ from $<
-	build/ir-to-opencl $(DEBUG) $< $@
+# test/generated/%-device.cl: test/%-device.ll build/ir-to-opencl
+# 	echo building $@ from $<
+# 	build/ir-to-opencl $(DEBUG) $< $@
 
 # cocl
 build/test-cocl-multi1-%.o: test/cocl/multi1/%.cu
@@ -112,7 +112,7 @@ build/eigen-%.o: test/eigen/%.cu
 
 build/test-cocl-%.o: test/cocl/%.cu
 	echo building $@ from $<
-	cocl -I$(EIGEN_HOME) -g -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
+	cocl -g -c -o $@ $<
 
 # executables
 build/test-cocl-multi1: build/test-cocl-multi1-main.o build/test-cocl-multi1-k1.o build/test-cocl-multi1-k2.o build/libcocl.a

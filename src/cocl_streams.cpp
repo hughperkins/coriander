@@ -32,6 +32,10 @@ using namespace std;
 using namespace cocl;
 using namespace easycl;
 
+// #undef COCL_PRINT
+// #define COCL_PRINT(stuff) \
+//     stuff ;
+
 size_t cuStreamWaitEvent(char *_queue, Event *event, unsigned int flags) {
     CLQueue *queue = (CLQueue*)_queue;
     COCL_PRINT(cout << "cuStreamWaitEvent redirected queue=" << queue << " event=" << event << " flags=" << flags << endl);

@@ -36,14 +36,14 @@ namespace cocl {
 }
 
 size_t cublasCreate(cublasHandle_t *phandle) {
-    cout << "cublasCreate redirect 3" << endl;
+    // cout << "cublasCreate redirect 3" << endl;
     CoclBlas *coclBlas = new CoclBlas();
     *phandle = (cublasHandle_t)coclBlas;
     return 0;
 }
 
 std::size_t cublasDestroy(cublasHandle_t handle) {
-    cout << "cublasDestroy redirect" << endl;
+    // cout << "cublasDestroy redirect" << endl;
     CoclBlas *coclBlas = (CoclBlas *)handle;
     delete coclBlas;
     return 0;
@@ -51,7 +51,7 @@ std::size_t cublasDestroy(cublasHandle_t handle) {
 
 static Transpose trans_cutocl(int trans) {
     if(trans == CUBLAS_OP_N) {
-        cout << "trans no" << endl;
+        // cout << "trans no" << endl;
         return kNo;
     } else if(trans == CUBLAS_OP_Y) {
         return kYes;
@@ -66,9 +66,9 @@ static Transpose trans_cutocl(int trans) {
 std::size_t cublasSetPointerMode(cublasHandle_t handle, cublasPointerMode_t mode) {
     cout << "cublasSetPointerMode redirect" << endl;
     if(mode == CUBLAS_POINTER_MODE_HOST) {
-        cout << "set to host" << endl;
+        // cout << "set to host" << endl;
     } else if(mode == CUBLAS_POINTER_MODE_DEVICE) {
-        cout << "set to device`" << endl;
+        // cout << "set to device`" << endl;
     } else {
         cout << "unknown pointermode " << mode << endl;
         // since we do nothing with this mode currently, not really an error as such...
@@ -77,17 +77,17 @@ std::size_t cublasSetPointerMode(cublasHandle_t handle, cublasPointerMode_t mode
 }
 
 std::size_t cublasGetPointerMode(cublasHandle_t handle, cublasPointerMode_t *mode) {
-    cout << "cublasGetPointerMode redirect" << endl;
+    // cout << "cublasGetPointerMode redirect" << endl;
     *mode = ::pointermode;
     return 0;
 }
 
 std::size_t cublasSetStream(cublasHandle_t handle, cudaStream_t streamId) {
-    cout << "cublasSetStream redirect" << endl;
+    // cout << "cublasSetStream redirect" << endl;
     CoclBlas *coclBlas = (CoclBlas *)handle;
     CLQueue *queue = (CLQueue *)streamId;
     if(queue == 0) {
-        cout << "using dfeault queue" << endl;
+        // cout << "using dfeault queue" << endl;
         queue = cl->default_queue;
     }
     coclBlas->queue = queue;
@@ -96,7 +96,7 @@ std::size_t cublasSetStream(cublasHandle_t handle, cudaStream_t streamId) {
 
 std::size_t cublasSgemm(cublasHandle_t blas, int transA, int transB, int M, int N, int K,
      float *palpha, const float * deviceA, int lda, const float * deviceB, int ldb, float *pbeta, float * deviceC, int ldc) {
-    cout << "sgemm redirect" << endl;
+    // cout << "sgemm redirect" << endl;
 
     CoclBlas *coclBlas = (CoclBlas *)blas;
 
@@ -109,13 +109,13 @@ std::size_t cublasSgemm(cublasHandle_t blas, int transA, int transB, int M, int 
 
     Memory *CMemory = findMemory((char *)deviceC);
     size_t C_offset = CMemory->getOffset((char *)deviceC) >> 2;
-    cout << "offsets " << A_offset << " " << B_offset << " " << C_offset << endl;
-    cout << "sizes " << AMemory->bytes<< " " << BMemory->bytes << " " << CMemory->bytes << endl;
+    // cout << "offsets " << A_offset << " " << B_offset << " " << C_offset << endl;
+    // cout << "sizes " << AMemory->bytes<< " " << BMemory->bytes << " " << CMemory->bytes << endl;
 
     Transpose transAcl = trans_cutocl(transA);
     Transpose transBcl = trans_cutocl(transB);
 
-    // I guess we use default_queue?
+    // cout << "run sgemm on queue " << (void *)coclBlas->queue->queue << " " << (void *)coclBlas->queue << endl;
     StatusCode status = CLBlastSgemm(kColMajor, transAcl, transBcl,
                                    M, N, K,
                                    *palpha,
@@ -128,6 +128,5 @@ std::size_t cublasSgemm(cublasHandle_t blas, int transA, int transB, int M, int 
         cout << "sgemm status code " << status << endl;
         throw runtime_error("Failed call to blas sgem");
     }
-
     return 0;
 }
