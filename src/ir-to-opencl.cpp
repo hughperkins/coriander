@@ -44,6 +44,7 @@ using namespace std;
 
 #include "ir-to-opencl-common.h"
 #include "struct_clone.h"
+#include "local_config.h"
 
 static llvm::LLVMContext context;
 static std::map<std::string, Value *> NamedValues;
@@ -685,7 +686,7 @@ std::string dumpCall(CallInst *instr) {
     }
 
     string functionName = getName(instr->getCalledValue());
-    cout << "functionName " << functionName << endl;
+    COCL_PRINT(cout << "functionName " << functionName << endl);
     if(functionName == "llvm.ptx.read.tid.x") {
         return gencode + "get_local_id(0);\n";
     } else if(functionName == "llvm.ptx.read.tid.y") {
@@ -1140,7 +1141,7 @@ std::string dumpInstruction(Instruction *instruction) {
             cout << "opcode string " << instruction->getOpcodeName() << endl;
             throw runtime_error("unknown opcode");
     }
-    cout << instructioncode << endl;
+    COCL_PRINT(cout << instructioncode << endl);
     return instructioncode;
 }
 
@@ -1388,7 +1389,7 @@ std::string dumpModule(Module *M) {
         nextNameIdx = 0;
         Function *F = &*it;
         string name = getName(F);
-        cout << "dumping functoin " << name << endl;
+        COCL_PRINT(cout << "dumping functoin " << name << endl);
         // hack for tensorflow: remove anything with 4Half in it, which one we dont use and two copies pointers inside
         // pointers to structs, as kernel parameters...
         if(name.find("_4half") != string::npos) {
@@ -1498,7 +1499,7 @@ int main(int argc, char *argv[]) {
     try {
         string gencode = "";
         gencode += cl_add_definitions;
-        cout << "cl_add_definitions " << cl_add_definitions << endl;
+        COCL_PRINT(cout << "cl_add_definitions " << cl_add_definitions << endl);
         gencode += dumpModule(M.get());
         ofstream of;
         of.open(outputfilepath, ios_base::out);
