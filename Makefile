@@ -70,31 +70,11 @@ build/libcocl.a: $(COCL_OBJS) clblast $(EASYCL_OBJS)
 	ar rcs $@ $(EASYCL_OBJS) $(COCL_OBJS) $(COCL_HOME)/build/clblast-extract/*.o
 
 clean:
-	rm -Rf build/* test/generated/* test/eigen/generated/* test/eigen/*.o test/*.o
-
-# IR
-
-# deviceside goes directly from .cu => -device.ll
-
-# test/generated/%-device.ll: test/%.cu include/fake_funcs.h build/ir-to-opencl
-# 	echo building $@ from $<
-# 	mkdir -p test/generated
-# 	$(CLANG) -include include/fake_funcs.h $< --cuda-device-only -emit-llvm -std=c++11 -I/usr/include/x86_64-linux-gnu -O3 -S -o $@
-
-# test/eigen/generated/%-device.ll: test/eigen/%.cu include/fake_funcs.h build/ir-to-opencl
-# 	echo building $@ from $<
-# 	mkdir -p test/eigen/generated
-# 	$(CLANG) -x cuda -std=c++11 -DEIGEN_TEST_FUNC=cuda_elementwise_small -D__CUDA_ARCH__=300 -include include/fake_funcs.h -Iinclude -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -Itest/eigen -I/usr/include/x86_64-linux-gnu $< --cuda-device-only -emit-llvm -O3 -S -o $@
-
-# opencl (from the -device.ll)
+	rm -Rf build/* test/generated/* test/*.o
 
 %-device.cl: %-device.ll build/ir-to-opencl
 	echo building $@ from $<
 	build/ir-to-opencl $(DEBUG) $< $@
-
-# test/generated/%-device.cl: test/%-device.ll build/ir-to-opencl
-# 	echo building $@ from $<
-# 	build/ir-to-opencl $(DEBUG) $< $@
 
 # cocl
 build/test-cocl-multi1-%.o: test/cocl/multi1/%.cu
@@ -104,14 +84,6 @@ build/test-cocl-multi1-%.o: test/cocl/multi1/%.cu
 build/test-cocl-callinternal-%.o: test/cocl/callinternal/%.cu
 	echo building $@ from $<
 	cocl -c -o $@ $<
-
-build/eigen-%.o: test/eigen/%.cu
-	echo building $@ from $<
-	cocl -I$(EIGEN_HOME) -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
-
-# build/test-%.o: test/%.cu
-# 	echo building $@ from $<
-# 	cocl -I$(EIGEN_HOME) -g -I$(EIGEN_HOME)/test -I$(COCL_HOME)/test/eigen -c -o $@ $<
 
 build/test-cocl-%.o: test/cocl/%.cu
 	echo building $@ from $<
@@ -248,49 +220,11 @@ run-test-cocl-multi1: build/test-cocl-multi1
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-eigen-test_cuda_elementwise_small: build/eigen-test_cuda_elementwise_small
-	################################
-	# running:
-	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
-
-run-eigen-test_cuda_nullary: build/eigen-test_cuda_nullary
-	################################
-	# running:
-	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
-
-run-eigen-test_cuda_elementwise: build/eigen-test_cuda_elementwise
-	################################
-	# running:
-	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
-
-run-eigen-reduction: build/eigen-reduction
-	################################
-	# running:
-	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
-
-run-eigen-cxx11_tensor_cuda: build/eigen-cxx11_tensor_cuda
-	################################
-	# running:
-	################################
-	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) build/eigen-cxx11_tensor_cuda
-
-clean-eigen:
-	touch build/eigen~
-	rm build/eigen*
-
 clean-tests:
 	touch build/test~
 	rm build/test*
 
 run-tests: clean-tests all run-test-cocl-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-testevents run-test-cocl-testevents2 run-test-cocl-testcumemcpy run-test-cocl-teststream run-test-cocl-testmemcpydevicetodevice run-test-cocl-testpartialcopy run-test-cocl-offsetkernelargs run-test-cocl-test_bitcast run-test-cocl-byvaluestructwithpointer run-test-cocl-test_types run-test-cocl-multi1 run-test-cocl-testblas
-
-run-tests-eigen: clean-eigen run-eigen-test_cuda_elementwise_small run-eigen-test_cuda_nullary run-eigen-test_cuda_elementwise
-
-run-tests-all: run-tests run-tests-eigen
 
 .SECONDARY:
 

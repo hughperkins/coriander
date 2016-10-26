@@ -104,31 +104,28 @@ Simply run:
 ```
 make run-tests
 ```
-... to run all non-eigen tests.  If you want to run eigen tests too, you need to:
-- clone Eigen repository into `/usr/local/eigen`
-- run:
-```
-make run-tests-all
-```
 
 You can run a test by name, eg:
 ```
-make run-eigen-test_cuda_elementwise
+make run-test-cocl-offsetkernelargs
 ```
 Result:
 ```
 ################################
 # running:
 ################################
-LD_LIBRARY_PATH=build: build/eigen-test_cuda_elementwise
-Initializing random number generator with seed 1476930631
-Repeating each test 10 times
+LD_LIBRARY_PATH=build: build/test-cocl-offsetkernelargs
 Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
+126.456
 ```
 
-- the tests prefixed `cocl` are at [test/cocl](test/cocl)
-- the tests prefixed `eigen` are at [test/eigen](test/eigen)
+- tests are at [test/cocl](test/cocl)
+
+## Related projects
+
+- Eigen-CL: Minimally-tweaked fork of Eigen, which can be compiled/run using cuda-on-cl, on an OpenCL device, https://bitbucket.org/hughperkins/eigen/commits/branch/eigen-cl
+- Tensorflow-CL: Fork of Tensorflow, that can be built and run on an OpenCL-1.2 enabled GPU, using cuda-on-cl, https://github.com/hughperkins/tensorflow-cl
 
 ## License
 
@@ -139,6 +136,7 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 - Oct 26:
   - fixed a bug where BLAS results were empty on HD5500, using beignet 1.2
   - added `__shfl_down` shim
+  - moved Eigen tests into a new Eigen fork, https://bitbucket.org/hughperkins/eigen/commits/branch/eigen-cl
 - Oct 25:
   - BLAS wrapper handles memory offsets correctly now
 - Oct 24:
