@@ -70,11 +70,11 @@ unsigned int y;
 unsigned int z;
 };
 
-inline long long __double_as_longlong(double val) {
+__host__ __device__ inline long long __double_as_longlong(double val) {
     return (long long)val;
 }
 
-inline double __longlong_as_double(long long val) {
+__host__ __device__ inline double __longlong_as_double(long long val) {
     return (double)val;
 }
 
@@ -88,7 +88,7 @@ inline double __longlong_as_double(long long val) {
 //     // return atomic::exchange(p, val)
 // }
 
-__attribute__((host)) inline unsigned long long atomicExch(volatile unsigned long long *p, unsigned long long val) {
+__host__ inline unsigned long long atomicExch(volatile unsigned long long *p, unsigned long long val) {
     throw std::runtime_error("not implemented: atomicExch on host");
     // std::atomic<T> global;
     // return atomic::exchange(p, val)
@@ -122,11 +122,11 @@ extern "C" {
 
 void syncthreads();
 
-int __shfl_xor(int a, int b); // just declare it for now, to get Eigen compiling. Figure out what to do with it
+__device__ __host__ int __shfl_xor(int a, int b); // just declare it for now, to get Eigen compiling. Figure out what to do with it
 // later...
 
 // ditto
-int __umulhi(int magic, int n);
+__device__ __host__ int __umulhi(int magic, int n);
 
 typedef unsigned int CUjit_option;
 

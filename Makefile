@@ -257,6 +257,12 @@ run-eigen-test_cuda_elementwise: build/eigen-test_cuda_elementwise
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
+run-eigen-reduction: build/eigen-reduction
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
 run-eigen-cxx11_tensor_cuda: build/eigen-cxx11_tensor_cuda
 	################################
 	# running:

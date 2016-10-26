@@ -110,3 +110,31 @@ float min(float in1, float in2);
 
 // #define max cocl::max
 // #define min cocl::min
+
+// #define atomicCAS atomic_cmpxchg
+
+template<typename T>
+__device__ T atomicCAS(T* address, T compare, T val);
+template<typename T>
+__device__ T atomicAdd(T* address, T val);
+template<typename T>
+__device__ T atomicInc(T* address, T val);
+template<typename T>
+__device__ T atomicExch(T* address, T val);
+
+__device__ void __threadfence();
+template<typename T>
+__device__ T __shfl_down(T val, int offset);
+template<typename T>
+__device__ T __shfl_down(T val, int offset, int warpSize);
+
+#ifdef __CUDA_ARCH__
+#pragma message "adding asserts"
+#define NDEBUG
+// #include "assert.h"
+// #undef assert
+// #define assert(x)
+// assert(false);
+// #define __assert_fail(a,b,c,d)
+//void assert(expr);
+#endif // __CUDA_ARCH__
