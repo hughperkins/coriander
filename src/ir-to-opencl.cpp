@@ -244,6 +244,8 @@ string dumpChainedInstruction(int level, Instruction * instr) {
         string floatvaluestr = oss.str();
         if(floatvaluestr == "inf") {
             return "INFINITY";
+        } else if(floatvaluestr == "-inf") {
+            return "-INFINITY";
         }
         if(single_precision) {
             if(floatvaluestr.find('.') == string::npos) {
