@@ -136,6 +136,9 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 
 ## News
 
+- Oct 26:
+  - fixed a bug where BLAS results were empty on HD5500, using beignet 1.2
+  - added `__shfl_down` shim
 - Oct 25:
   - BLAS wrapper handles memory offsets correctly now
 - Oct 24:
