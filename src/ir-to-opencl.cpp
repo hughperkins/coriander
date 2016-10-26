@@ -46,8 +46,6 @@ using namespace std;
 #include "struct_clone.h"
 
 static llvm::LLVMContext context;
-// static llvm::IRBuilder<> Builder(context);
-// static std::unique_ptr<llvm::Module> TheModule;
 static std::map<std::string, Value *> NamedValues;
 static std::map<string, bool> iskernel_by_name;
 static std::set<string> ignoredFunctionNames;
@@ -57,7 +55,6 @@ map<Value *, string> nameByValue;
 static int nextNameIdx;
 static string currentFunctionSharedDeclarations = "";
 static map<string, string> currentFunctionPhiDeclarationsByName;
-//set<string> currentFunction
 static string globalDeclarations = "";
 static string structpointershimcode = "";
 
@@ -113,8 +110,13 @@ std::string dumpValue(Value *value) {
         }
     }
 
-    value->dump();
-    throw runtime_error("dumpvalue value not found");
+    // just declare it, and return that?
+    storeValueName(value);
+    currentFunctionSharedDeclarations += dumpType(value->getType()) + " " + nameByValue[value] + ";\n";
+    return nameByValue[value];
+
+    // value->dump();
+    // throw runtime_error("dumpvalue value not found");
 }
 
 void declareGlobal(GlobalValue *global) {
@@ -256,6 +258,9 @@ string dumpChainedInstruction(int level, Instruction * instr) {
     } else if(isa<UndefValue>(constant)) {
         // cout << "undef" << endl;
         return "";
+    } else if(isa<ConstantPointerNull>(constant)) {
+        // cout << "undef" << endl;
+        return "0";
     } else {
         cout << "valueTy " << valueTy << endl;
         oss << "unknown";
@@ -288,8 +293,12 @@ string dumpOperand(Value *value) {
         // cout << "phi name " << name << endl;
         return name;
     }
-    value->dump();
-    throw runtime_error("No way found to dump operand");
+    // lets just declare it???
+    storeValueName(value);
+    currentFunctionSharedDeclarations += dumpType(value->getType()) + " " + nameByValue[value] + ";\n";
+    return nameByValue[value];
+    // value->dump();
+    // throw runtime_error("No way found to dump operand");
 }
 
 void storeValueName(Value *value) {
@@ -689,6 +698,20 @@ std::string dumpCall(CallInst *instr) {
     } else if(functionName == "llvm.ptx.read.ntid.z") {
         return gencode + "get_local_size(2);\n";
     } else if(functionName == "llvm.cuda.syncthreads") {
+        return gencode + "barrier(CLK_GLOBAL_MEM_FENCE);\n";
+    } else if(functionName == "_Z13__threadfencev") {
+        // Not sure if this is correct?
+        // seems to be correct-ish???
+        // what I understand:
+        // (from https://stackoverflow.com/questions/5232689/cuda-threadfence/5233737#5233737 )
+        // threadfence orders writes to memory, so if you do:
+        // - write data
+        // - threadfence
+        // - write flag
+        // => then if another thread sees the flag, the data that was written is guaranteed to be visible
+        // to it too
+        // I *think* that barrier(CLK_GLOBAL_MEM_FENCE) achieves the same thing, though it might be
+        // a bit too "strong" (ie slow)?
         return gencode + "barrier(CLK_GLOBAL_MEM_FENCE);\n";
     } else if(functionName == "llvm.lifetime.start") {
         return "";  // just ignore for now
@@ -1104,6 +1127,7 @@ std::string dumpInstruction(Instruction *instruction) {
             cout << "opcode string " << instruction->getOpcodeName() << endl;
             throw runtime_error("unknown opcode");
     }
+    cout << instructioncode << endl;
     return instructioncode;
 }
 
@@ -1351,6 +1375,7 @@ std::string dumpModule(Module *M) {
         nextNameIdx = 0;
         Function *F = &*it;
         string name = getName(F);
+        cout << "dumping functoin " << name << endl;
         // hack for tensorflow: remove anything with 4Half in it, which one we dont use and two copies pointers inside
         // pointers to structs, as kernel parameters...
         if(name.find("_4half") != string::npos) {
@@ -1415,6 +1440,7 @@ int main(int argc, char *argv[]) {
     ignoredFunctionNames.insert("pow");
     ignoredFunctionNames.insert("_Z11make_float4ffff");
     ignoredFunctionNames.insert("_GLOBAL__sub_I_struct_initializer.cu");
+    ignoredFunctionNames.insert("_Z13__threadfencev");
 
     knownFunctionsMap["_ZSt4sqrtf"] = "sqrt";
     knownFunctionsMap["llvm.nvvm.sqrt.rn.d"] = "sqrt";
@@ -1449,6 +1475,13 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["floorf"] = "floor";
     knownFunctionsMap["logf"] = "log";
     knownFunctionsMap["sqrtf"] = "sqrt";
+
+    knownFunctionsMap["_Z9atomicCASIjET_PS0_S0_S0_"] = "atomic_cmpxchg";   // int
+    knownFunctionsMap["_Z10atomicExchIjET_PS0_S0_"] = "atomic_xchg";  // ints
+    knownFunctionsMap["_Z10atomicExchIfET_PS0_S0_"] = "atomic_xchg";   // floats
+    knownFunctionsMap["_Z9atomicIncIjET_PS0_S0_"] = "atomic_inc";   // int
+
+// float _Z11__shfl_downIfET_S0_ii(float v0, int v1, int v2) {
 
     try {
         string gencode = dumpModule(M.get());
