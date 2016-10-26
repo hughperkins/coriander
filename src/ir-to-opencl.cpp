@@ -92,6 +92,25 @@ inline float __shfl_down(float v0, int v1, int v2) {
     warpsrc = warpsrc >= 32 ? warpid : warpsrc;
     return mem[warpstart + warpsrc];
 }
+
+// based on https://community.amd.com/thread/167462
+inline int __atomic_inc(global volatile int *ptr, int val) {
+    while( true ){
+        int old = *ptr;
+        if( old >= val ) {
+            if(old == atomic_cmpxchg(ptr, old, 0)) {
+               break;
+            }
+        }
+        else {
+            if(old == atomic_cmpxchg(ptr, old, old+1)) {
+                break;
+            }
+        }
+    }
+    return 0;
+}
+
 )";
 
 std::string dumpValue(Value *value) {
@@ -1495,7 +1514,7 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["_Z9atomicCASIjET_PS0_S0_S0_"] = "atomic_cmpxchg";   // int
     knownFunctionsMap["_Z10atomicExchIjET_PS0_S0_"] = "atomic_xchg";  // ints
     knownFunctionsMap["_Z10atomicExchIfET_PS0_S0_"] = "atomic_xchg";   // floats
-    knownFunctionsMap["_Z9atomicIncIjET_PS0_S0_"] = "atomic_inc";   // int
+    knownFunctionsMap["_Z9atomicIncIjET_PS0_S0_"] = "__atomic_inc";   // int
     knownFunctionsMap["_Z11__shfl_downIfET_S0_ii"] = "__shfl_down";   // float, and see cl_add_definitions, at top
 
     try {
