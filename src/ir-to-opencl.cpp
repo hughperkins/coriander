@@ -82,7 +82,7 @@ void addPHIDeclaration(PHINode *phi);
 void storeValueName(Value *value);
 
 static string cl_add_definitions = R"(
-inline float __shfl_down(float v0, int v1, int v2) {
+inline float __shfl_down_3(float v0, int v1, int v2) {
     local float mem[1024];
     int tid = get_local_id(0);
     int warpid = tid % 32;
@@ -92,6 +92,10 @@ inline float __shfl_down(float v0, int v1, int v2) {
     int warpsrc = warpid + v1;
     warpsrc = warpsrc >= 32 ? warpid : warpsrc;
     return mem[warpstart + warpsrc];
+}
+
+inline float __shfl_down_2(float v0, int v1) {
+    return __shfl_down_3(v0, v1, 32);
 }
 
 // based on https://community.amd.com/thread/167462
@@ -148,6 +152,9 @@ std::string dumpValue(Value *value) {
     storeValueName(value);
     functionNeededForwardDeclarations.insert(value);
     // currentFunctionSharedDeclarations += dumpType(value->getType()) + " " + nameByValue[value] + ";\n";
+    COCL_PRINT(cout << "adding to needs forward declaration " << nameByValue[value] << endl);
+    value->dump();
+    outs() << "\n";
     return nameByValue[value];
 
     // value->dump();
@@ -332,7 +339,8 @@ string dumpOperand(Value *value) {
     }
     // lets just declare it???
     storeValueName(value);
-    currentFunctionSharedDeclarations += dumpType(value->getType()) + " " + nameByValue[value] + ";\n";
+    functionNeededForwardDeclarations.insert(value);
+    // currentFunctionSharedDeclarations += dumpType(value->getType()) + " " + nameByValue[value] + ";\n";
     return nameByValue[value];
     // value->dump();
     // throw runtime_error("No way found to dump operand");
@@ -714,7 +722,7 @@ std::string dumpCall(CallInst *instr) {
     // }
 
     string functionName = getName(instr->getCalledValue());
-    COCL_PRINT(cout << "functionName " << functionName << endl);
+    // COCL_PRINT(cout << "functionName " << functionName << endl);
     if(functionName == "llvm.ptx.read.tid.x") {
         return gencode + "get_local_id(0);\n";
     } else if(functionName == "llvm.ptx.read.tid.y") {
@@ -967,6 +975,7 @@ std::string dumpPhi(BranchInst *branchInstr, BasicBlock *nextBlock) {
             BasicBlock *ourBlock = branchInstr->getParent();
             Value *sourceValue = phi->getIncomingValueForBlock(ourBlock);
             string sourceValueCode = dumpOperand(sourceValue);
+            COCL_PRINT(cout << "adding phi " << sourceValueCode << endl);
             if(sourceValueCode == "") { // this is a hack really..
                 continue;  // assume its an undef. which it might be
             }
@@ -1177,16 +1186,18 @@ std::string dumpInstruction(Instruction *instruction) {
     }
     string typestr = dumpType(instruction->getType());
     if(typestr != "void") {
-        if(functionNeededForwardDeclarations.find(instruction) != functionNeededForwardDeclarations.end()) {
-            currentFunctionSharedDeclarations += typestr + " " + dumpOperand(instruction);
-        } else {
-            gencode += typestr + " ";
-        }
+        // if(functionNeededForwardDeclarations.find(instruction) != functionNeededForwardDeclarations.end()) {
+        //     COCL_PRINT(cout << "needs forward delcaration " << typestr << " " << dumpOperand(instruction) << endl);
+        //     currentFunctionSharedDeclarations += typestr + " " + dumpOperand(instruction) + ";\n";
+        // } else {
+        //     gencode += typestr + " ";
+        // }
+        functionNeededForwardDeclarations.insert(instruction);
         gencode += dumpOperand(instruction) + " = ";
     }
 
     gencode += instructioncode;
-    COCL_PRINT(cout << gencode << endl);
+    // COCL_PRINT(cout << gencode << endl);
     return gencode;
 }
 
@@ -1317,6 +1328,7 @@ std::string dumpFunctionDeclaration(Function *F) {
 std::string dumpFunction(Function *F) {
     currentFunctionSharedDeclarations = "";
     currentFunctionPhiDeclarationsByName.clear();
+    functionNeededForwardDeclarations.clear();
     string gencode = "";
     string declaration = dumpFunctionDeclaration(F);
     // cout << declaration << endl;
@@ -1331,6 +1343,14 @@ std::string dumpFunction(Function *F) {
     for(auto it=currentFunctionPhiDeclarationsByName.begin(); it != currentFunctionPhiDeclarationsByName.end(); it++){
         gencode += "    " + it->second + ";\n";
     }
+    for(auto it=functionNeededForwardDeclarations.begin(); it != functionNeededForwardDeclarations.end(); it++){
+        Value *value = *it;
+        gencode += "    " + dumpType(value->getType()) + " " + dumpOperand(value) + ";\n";
+    }
+        // if(functionNeededForwardDeclarations.find(instruction) != functionNeededForwardDeclarations.end()) {
+        // COCL_PRINT(cout << gencode << endl);
+    // }
+
     if(structpointershimcode != "") {
         gencode += structpointershimcode + "\n";
     }
@@ -1434,7 +1454,7 @@ std::string dumpModule(Module *M) {
         nextNameIdx = 0;
         Function *F = &*it;
         string name = getName(F);
-        COCL_PRINT(cout << "dumping functoin " << name << endl);
+        // COCL_PRINT(cout << "dumping functoin " << name << endl);
         // hack for tensorflow: remove anything with 4Half in it, which one we dont use and two copies pointers inside
         // pointers to structs, as kernel parameters...
         if(name.find("_4half") != string::npos) {
@@ -1539,12 +1559,13 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["_Z10atomicExchIjET_PS0_S0_"] = "atomic_xchg";  // ints
     knownFunctionsMap["_Z10atomicExchIfET_PS0_S0_"] = "atomic_xchg";   // floats
     knownFunctionsMap["_Z9atomicIncIjET_PS0_S0_"] = "__atomic_inc";   // int
-    knownFunctionsMap["_Z11__shfl_downIfET_S0_ii"] = "__shfl_down";   // float, and see cl_add_definitions, at top
+    knownFunctionsMap["_Z11__shfl_downIfET_S0_ii"] = "__shfl_down_3";   // float, and see cl_add_definitions, at top
+    knownFunctionsMap["_Z11__shfl_downIfET_S0_i"] = "__shfl_down_2";   // float, and see cl_add_definitions, at top
 
     try {
         string gencode = "";
         gencode += cl_add_definitions;
-        COCL_PRINT(cout << "cl_add_definitions " << cl_add_definitions << endl);
+        // COCL_PRINT(cout << "cl_add_definitions " << cl_add_definitions << endl);
         gencode += dumpModule(M.get());
         ofstream of;
         of.open(outputfilepath, ios_base::out);
