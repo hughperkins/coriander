@@ -80,3 +80,5 @@ generated/
 
 # temp files
 ~*
+
+local_config.h
