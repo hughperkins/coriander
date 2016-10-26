@@ -58,6 +58,7 @@ static string currentFunctionSharedDeclarations = "";
 static map<string, string> currentFunctionPhiDeclarationsByName;
 static string globalDeclarations = "";
 static string structpointershimcode = "";
+static set<Value *> functionNeededForwardDeclarations;
 
 static bool debug;
 bool single_precision = true;
@@ -143,9 +144,10 @@ std::string dumpValue(Value *value) {
         }
     }
 
-    // just declare it, and return that?
+    // mark it as needing to be declared, then return it
     storeValueName(value);
-    currentFunctionSharedDeclarations += dumpType(value->getType()) + " " + nameByValue[value] + ";\n";
+    functionNeededForwardDeclarations.insert(value);
+    // currentFunctionSharedDeclarations += dumpType(value->getType()) + " " + nameByValue[value] + ";\n";
     return nameByValue[value];
 
     // value->dump();
@@ -410,8 +412,9 @@ string dumpLoad(LoadInst *instr) {
     string gencode = "";
     string rhs = dumpOperand(instr->getOperand(0)) + "[0]";
     copyAddressSpace(instr->getOperand(0), instr);
-    string typestr = dumpType(instr->getType());
-    gencode += typestr + " " + dumpOperand(instr) + " = " + rhs + ";\n";
+    // string typestr = dumpType(instr->getType());
+    // gencode += typestr + " " + dumpOperand(instr) + " = " +
+    gencode += rhs + ";\n";
     return gencode;
 }
 
@@ -509,7 +512,8 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
 string dumpGetElementPtr(GetElementPtrInst *instr) {
     string gencode = "";
     string rhs = dumpGetElementPtrRhs(instr);
-    gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + rhs;
+    // gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + 
+    gencode += rhs;
     gencode += ";\n";
     // cout << gencode << endl;
     return gencode;
@@ -564,7 +568,8 @@ std::string dumpInsertValue(InsertValueInst *instr) {
     }
     gencode += lhs + " = " + dumpOperand(instr->getOperand(1)) + ";\n";
     if(!declaredVar) {
-        gencode += "    " + dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand + ";\n";
+        currentFunctionSharedDeclarations += "    " + dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand + ";\n";
+        // gencode += "    " + dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand + ";\n";
     }
     return gencode;
 }
@@ -609,14 +614,15 @@ std::string dumpExtractValue(ExtractValueInst *instr) {
         }
         currentType = newType;
     }
-    gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + lhs + ";\n";
+    // gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
+    gencode += lhs + ";\n";
     return gencode;
 }
 
 std::string dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
     string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    // string typestr = dumpType(instr->getType());
+    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     Value *op1 = instr->getOperand(0);
     gencode += dumpValue(op1) + " ";
     gencode += opstring + " ";
@@ -644,9 +650,10 @@ std::string dumpBitCastRhs(BitCastInst *instr) {
 std::string dumpBitCast(BitCastInst *instr) {
     string gencode = "";
     string rhs = dumpBitCastRhs(instr);
-    gencode += dumpType(instr->getType()) + " ";
-    string instrop = dumpOperand(instr);
-    gencode += instrop + " = " + rhs + ";\n";
+    // gencode += dumpType(instr->getType()) + " ";
+    // string instrop = dumpOperand(instr);
+    // gencode += instrop + " = " +
+    gencode += rhs + ";\n";
     return gencode;
 }
 
@@ -662,7 +669,7 @@ std::string dumpAddrSpaceCast(AddrSpaceCastInst *instr) {
     string gencode = "";
     copyAddressSpace(instr->getOperand(0), instr);
     string rhs = dumpAddrSpaceCastRhs(instr);
-    gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
+    // gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
     gencode += rhs + ";\n";
     return gencode;
 }
@@ -701,10 +708,10 @@ std::string dumpMemcpyCharCharLong(CallInst *instr) {
 
 std::string dumpCall(CallInst *instr) {
     string gencode = "";
-    string typestr = dumpType(instr->getType());
-    if(typestr != "void") {
-        gencode += typestr + " " + dumpOperand(instr) + " = ";
-    }
+    // string typestr = dumpType(instr->getType());
+    // if(typestr != "void") {
+    //     gencode += typestr + " " + dumpOperand(instr) + " = ";
+    // }
 
     string functionName = getName(instr->getCalledValue());
     COCL_PRINT(cout << "functionName " << functionName << endl);
@@ -808,40 +815,40 @@ std::string dumpCall(CallInst *instr) {
 
 std::string dumpFPExt(CastInst *instr) {
     string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    // string typestr = dumpType(instr->getType());
+    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += dumpValue(instr->getOperand(0)) + ";\n";
     return gencode;
 }
 
 std::string dumpZExt(CastInst *instr) {
     string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    // string typestr = dumpType(instr->getType());
+    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += dumpValue(instr->getOperand(0)) + ";\n";
     return gencode;
 }
 
 std::string dumpSExt(CastInst *instr) {
     string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    // string typestr = dumpType(instr->getType());
+    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += dumpValue(instr->getOperand(0)) + ";\n";
     return gencode;
 }
 
 std::string dumpUIToFP(UIToFPInst *instr) {
     string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    // string typestr = dumpType(instr->getType());
+    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += dumpValue(instr->getOperand(0)) + ";\n";
     return gencode;
 }
 
 std::string dumpSIToFP(SIToFPInst *instr) {
     string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    // string typestr = dumpType(instr->getType());
+    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += dumpValue(instr->getOperand(0)) + ";\n";
     return gencode;
 }
@@ -849,7 +856,7 @@ std::string dumpSIToFP(SIToFPInst *instr) {
 std::string dumpInttoPtr(IntToPtrInst *instr) {
     string gencode = "";
     string typestr = dumpType(instr->getType());
-    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0)) + ";\n";
     return gencode;
 }
@@ -858,8 +865,8 @@ std::string dumpFPTrunc(CastInst *instr) {
     // since this is float point trunc, lets just assume we're going from double to float
     // fix any exceptiosn to this rule later
     string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    // string typestr = dumpType(instr->getType());
+    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += "(float)" + dumpValue(instr->getOperand(0)) + ";\n";
     return gencode;
 }
@@ -867,15 +874,15 @@ std::string dumpFPTrunc(CastInst *instr) {
 std::string dumpTrunc(CastInst *instr) {
     string gencode = "";
     string typestr = dumpType(instr->getType());
-    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0)) + ";\n";
     return gencode;
 }
 
 std::string dumpIcmp(ICmpInst *instr) {
     string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    // string typestr = dumpType(instr->getType());
+    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     CmpInst::Predicate predicate = instr->getSignedPredicate();  // note: we should detect signedness...
     string predicate_string = "";
     switch(predicate) {
@@ -909,8 +916,8 @@ std::string dumpIcmp(ICmpInst *instr) {
 
 std::string dumpFcmp(FCmpInst *instr) {
     string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += typestr + " " + dumpOperand(instr) + " = ";
+    // string typestr = dumpType(instr->getType());
+    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     CmpInst::Predicate predicate = instr->getPredicate();
     string predicate_string = "";
     switch(predicate) {
@@ -1011,7 +1018,7 @@ std::string dumpBranch(BranchInst *instr) {
 std::string dumpSelect(SelectInst *instr) {
     string gencode = "";
     copyAddressSpace(instr->getOperand(1), instr);
-    gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
+    // gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
     gencode += dumpOperand(instr->getCondition()) + " ? ";
     gencode += dumpOperand(instr->getOperand(1)) + " : ";
     gencode += dumpOperand(instr->getOperand(2)) + ";\n";
@@ -1033,6 +1040,7 @@ std::string dumpInstruction(Instruction *instruction) {
     string resultName = nameByValue[instruction];
     string resultType = dumpType(instruction->getType());
 
+    string gencode = "";
     string instructioncode = "";
     if(debug) {
         // cout << resultType << " " << resultName << " =";
@@ -1139,31 +1147,47 @@ std::string dumpInstruction(Instruction *instruction) {
             break;
         case Instruction::InsertValue:
             instructioncode = dumpInsertValue(cast<InsertValueInst>(instruction));
-            break;
+            return instructioncode;
+            // break;
         case Instruction::ExtractValue:
             instructioncode = dumpExtractValue(cast<ExtractValueInst>(instruction));
             break;
         case Instruction::Alloca:
             instructioncode = dumpAlloca(cast<AllocaInst>(instruction));
-            break;
+            return instructioncode;
+            // break;
         case Instruction::Br:
             instructioncode = dumpBranch(cast<BranchInst>(instruction));
-            break;
+            return instructioncode;
+            // break;
         case Instruction::Select:
             instructioncode = dumpSelect(cast<SelectInst>(instruction));
             break;
         case Instruction::Ret:
             instructioncode = dumpReturn(cast<ReturnInst>(instruction));
-            break;
+            return instructioncode;
+            // break;
         case Instruction::PHI:
             addPHIDeclaration(cast<PHINode>(instruction));
-            break;
+            return "";
+            // break;
         default:
             cout << "opcode string " << instruction->getOpcodeName() << endl;
             throw runtime_error("unknown opcode");
     }
-    COCL_PRINT(cout << instructioncode << endl);
-    return instructioncode;
+    string typestr = dumpType(instruction->getType());
+    if(typestr != "void") {
+        if(functionNeededForwardDeclarations.find(instruction) != functionNeededForwardDeclarations.end()) {
+            currentFunctionSharedDeclarations += typestr + " " + dumpOperand(instruction);
+        } else {
+            gencode += typestr + " ";
+        }
+        gencode += dumpOperand(instruction) + " = ";
+    }
+
+    gencode += instructioncode;
+    COCL_PRINT(cout << gencode << endl);
+    return gencode;
 }
 
 std::string dumpBasicBlock(BasicBlock *basicBlock) {
