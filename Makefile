@@ -221,6 +221,12 @@ run-test-cocl-testneg: build/test-cocl-testneg
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
+run-test-cocl-testshfl: build/test-cocl-testshfl
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
 run-test-cocl-testblas: build/test-cocl-testblas
 	################################
 	# running:

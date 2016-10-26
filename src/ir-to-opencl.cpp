@@ -79,6 +79,19 @@ std::string getName(Function *value);
 void addPHIDeclaration(PHINode *phi);
 void storeValueName(Value *value);
 
+static string cl_add_definitions = R"(
+inline float __shfl_down(float v0, int v1, int v2) {
+    local float mem[1024];
+    int tid = get_local_id(0);
+    int warpid = tid % 32;
+    int warpstart = tid - warpid;
+    mem[tid] = v0;
+    //barrier(CLK_LOCAL_MEM_FENCE);
+    int warpsrc = warpid + v1;
+    warpsrc = warpsrc >= 32 ? warpid : warpsrc;
+    return mem[warpstart + warpsrc];
+}
+)";
 
 std::string dumpValue(Value *value) {
     std::string gencode = "";
@@ -1480,11 +1493,13 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["_Z10atomicExchIjET_PS0_S0_"] = "atomic_xchg";  // ints
     knownFunctionsMap["_Z10atomicExchIfET_PS0_S0_"] = "atomic_xchg";   // floats
     knownFunctionsMap["_Z9atomicIncIjET_PS0_S0_"] = "atomic_inc";   // int
-
-// float _Z11__shfl_downIfET_S0_ii(float v0, int v1, int v2) {
+    knownFunctionsMap["_Z11__shfl_downIfET_S0_ii"] = "__shfl_down";   // float, and see cl_add_definitions, at top
 
     try {
-        string gencode = dumpModule(M.get());
+        string gencode = "";
+        gencode += cl_add_definitions;
+        cout << "cl_add_definitions " << cl_add_definitions << endl;
+        gencode += dumpModule(M.get());
         ofstream of;
         of.open(outputfilepath, ios_base::out);
         of << gencode;
