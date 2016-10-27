@@ -1055,7 +1055,7 @@ std::string dumpInstruction(Instruction *instruction) {
     string resultType = dumpType(instruction->getType());
 
     string gencode = "";
-    string instructioncode = "";
+    string instructionCode = "";
     if(debug) {
         // cout << resultType << " " << resultName << " =";
         // cout << " " << string(instruction->getOpcodeName());
@@ -1067,119 +1067,119 @@ std::string dumpInstruction(Instruction *instruction) {
     }
     switch(opcode) {
         case Instruction::FAdd:
-            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
             break;
         case Instruction::FSub:
-            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "-");
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "-");
             break;
         case Instruction::FMul:
-            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "*");
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "*");
             break;
         case Instruction::FDiv:
-            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
             break;
         case Instruction::Sub:
-            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "-");
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "-");
             break;
         case Instruction::Add:
-            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
             break;
         case Instruction::Mul:
-            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "*");
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "*");
             break;
         case Instruction::SDiv:
-            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
             break;
         case Instruction::SRem:
-            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "%");
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "%");
             break;
         case Instruction::And:
-            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "&");
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "&");
             break;
         case Instruction::Or:
-            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "|");
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "|");
             break;
         case Instruction::Xor:
-            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "^");
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "^");
             break;
         case Instruction::LShr:
-            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
             break;
         case Instruction::Shl:
-            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "<<");
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "<<");
             break;
         case Instruction::AShr:
-            instructioncode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
             break;
         case Instruction::Store:
-            instructioncode = dumpStore(cast<StoreInst>(instruction));
+            instructionCode = dumpStore(cast<StoreInst>(instruction));
             break;
         case Instruction::Call:
-            instructioncode = dumpCall(cast<CallInst>(instruction));
+            instructionCode = dumpCall(cast<CallInst>(instruction));
             break;
         case Instruction::Load:
-            instructioncode = dumpLoad(cast<LoadInst>(instruction));
+            instructionCode = dumpLoad(cast<LoadInst>(instruction));
             break;
         case Instruction::ICmp:
-            instructioncode = dumpIcmp(cast<ICmpInst>(instruction));
+            instructionCode = dumpIcmp(cast<ICmpInst>(instruction));
             break;
         case Instruction::FCmp:
-            instructioncode = dumpFcmp(cast<FCmpInst>(instruction));
+            instructionCode = dumpFcmp(cast<FCmpInst>(instruction));
             break;
         case Instruction::SExt:
-            instructioncode = dumpSExt(cast<CastInst>(instruction));
+            instructionCode = dumpSExt(cast<CastInst>(instruction));
             break;
         case Instruction::ZExt:
-            instructioncode = dumpZExt(cast<CastInst>(instruction));
+            instructionCode = dumpZExt(cast<CastInst>(instruction));
             break;
         case Instruction::FPExt:
-            instructioncode = dumpFPExt(cast<CastInst>(instruction));
+            instructionCode = dumpFPExt(cast<CastInst>(instruction));
             break;
         case Instruction::FPTrunc:
-            instructioncode = dumpFPTrunc(cast<CastInst>(instruction));
+            instructionCode = dumpFPTrunc(cast<CastInst>(instruction));
             break;
         case Instruction::Trunc:
-            instructioncode = dumpTrunc(cast<CastInst>(instruction));
+            instructionCode = dumpTrunc(cast<CastInst>(instruction));
             break;
         case Instruction::BitCast:
-            instructioncode = dumpBitCast(cast<BitCastInst>(instruction));
+            instructionCode = dumpBitCast(cast<BitCastInst>(instruction));
             break;
         case Instruction::AddrSpaceCast:
-            instructioncode = dumpAddrSpaceCast(cast<AddrSpaceCastInst>(instruction));
+            instructionCode = dumpAddrSpaceCast(cast<AddrSpaceCastInst>(instruction));
             break;
         case Instruction::IntToPtr:
-            instructioncode = dumpInttoPtr(cast<IntToPtrInst>(instruction));
+            instructionCode = dumpInttoPtr(cast<IntToPtrInst>(instruction));
             break;
         case Instruction::UIToFP:
-            instructioncode = dumpUIToFP(cast<UIToFPInst>(instruction));
+            instructionCode = dumpUIToFP(cast<UIToFPInst>(instruction));
             break;
         case Instruction::SIToFP:
-            instructioncode = dumpSIToFP(cast<SIToFPInst>(instruction));
+            instructionCode = dumpSIToFP(cast<SIToFPInst>(instruction));
             break;
         case Instruction::GetElementPtr:
-            instructioncode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
+            instructionCode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
             break;
         case Instruction::InsertValue:
-            instructioncode = dumpInsertValue(cast<InsertValueInst>(instruction));
-            return instructioncode;
+            instructionCode = dumpInsertValue(cast<InsertValueInst>(instruction));
+            return instructionCode;
             // break;
         case Instruction::ExtractValue:
-            instructioncode = dumpExtractValue(cast<ExtractValueInst>(instruction));
+            instructionCode = dumpExtractValue(cast<ExtractValueInst>(instruction));
             break;
         case Instruction::Alloca:
-            instructioncode = dumpAlloca(cast<AllocaInst>(instruction));
-            return instructioncode + ";\n";
+            instructionCode = dumpAlloca(cast<AllocaInst>(instruction));
+            return instructionCode + ";\n";
             // break;
         case Instruction::Br:
-            instructioncode = dumpBranch(cast<BranchInst>(instruction));
-            return instructioncode;
+            instructionCode = dumpBranch(cast<BranchInst>(instruction));
+            return instructionCode;
             // break;
         case Instruction::Select:
-            instructioncode = dumpSelect(cast<SelectInst>(instruction));
+            instructionCode = dumpSelect(cast<SelectInst>(instruction));
             break;
         case Instruction::Ret:
-            instructioncode = dumpReturn(cast<ReturnInst>(instruction));
-            return instructioncode + ";\n";
+            instructionCode = dumpReturn(cast<ReturnInst>(instruction));
+            return instructionCode + ";\n";
             // break;
         case Instruction::PHI:
             addPHIDeclaration(cast<PHINode>(instruction));
@@ -1190,19 +1190,27 @@ std::string dumpInstruction(Instruction *instruction) {
             throw runtime_error("unknown opcode");
     }
     string typestr = dumpType(instruction->getType());
-    if(typestr != "void") {
-        // if(functionNeededForwardDeclarations.find(instruction) != functionNeededForwardDeclarations.end()) {
-        //     COCL_PRINT(cout << "needs forward delcaration " << typestr << " " << dumpOperand(instruction) << endl);
-        //     currentFunctionSharedDeclarations += typestr + " " + dumpOperand(instruction) + ";\n";
-        // } else {
-        //     gencode += typestr + " ";
-        // }
-        functionNeededForwardDeclarations.insert(instruction);
-        gencode += dumpOperand(instruction) + " = ";
+    COCL_PRINT(cout << dumpOperand(instruction) << " has one use? " << instruction->hasOneUse() << endl);
+    COCL_PRINT(cout << instructionCode << endl);
+    if(instruction->hasOneUse()) {
+        if(instructionCode[0] != '(' || instructionCode[instructionCode.size() - 1] != ')') {
+            instructionCode= "(" + instructionCode + ")";
+        }
+        nameByValue[instruction] = instructionCode;
+        return "";
+    } else {
+        if(typestr != "void") {
+            // if(functionNeededForwardDeclarations.find(instruction) != functionNeededForwardDeclarations.end()) {
+            //     COCL_PRINT(cout << "needs forward delcaration " << typestr << " " << dumpOperand(instruction) << endl);
+            //     currentFunctionSharedDeclarations += typestr + " " + dumpOperand(instruction) + ";\n";
+            // } else {
+            //     gencode += typestr + " ";
+            // }
+            functionNeededForwardDeclarations.insert(instruction);
+            gencode += dumpOperand(instruction) + " = ";
+        }
+        gencode += instructionCode + ";\n";
     }
-
-    COCL_PRINT(cout << instructioncode << endl);
-    gencode += instructioncode + ";\n";
     return gencode;
 }
 
@@ -1225,13 +1233,13 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
     gencode += "    " + label + ":;\n";
     for(BasicBlock::iterator it=basicBlock->begin(), e=basicBlock->end(); it != e; it++) {
         Instruction *instruction = &*it;
-        string instructioncode = dumpInstruction(instruction);
+        string instructionCode = dumpInstruction(instruction);
         if(debug) {
-            // cout <<  instructioncode << endl;
+            // cout <<  instructionCode << endl;
         }
-        if(instructioncode != "") {
+        if(instructionCode != "") {
             instructions_processed++;
-            gencode += "    " + instructioncode;
+            gencode += "    " + instructionCode;
         }
     }
     return gencode;
