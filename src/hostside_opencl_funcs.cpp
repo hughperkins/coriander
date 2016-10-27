@@ -186,6 +186,20 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
 void setKernelArgCharStar(char *memory_as_charstar) {
     COCL_PRINT(cout << "setKernelArgCharStar " << (void *)memory_as_charstar << endl);
     Memory *memory = findMemory(memory_as_charstar);
+    cl_int err;
+    if(memory == 0) {
+        // lets just mak ea new buffer...
+        cl_mem gpu_struct = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, 4,
+                                               NULL, &err);
+        cl->checkError(err);
+        // err = clEnqueueWriteBuffer(launchConfiguration.queue->queue, gpu_struct, CL_TRUE, 0,
+        //                                   structAllocateSize, pCpuStruct, 0, NULL, NULL);
+        // cl->checkError(err);
+        launchConfiguration.kernelArgsToBeReleased.push_back(gpu_struct);
+        launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
+        launchConfiguration.kernel->in((int64_t)0);
+        return;
+    }
     size_t offset = memory->getOffset(memory_as_charstar);
     // size_t offset = (char *)memory_as_charstar - (char *)memory;
     // Memory *pMemory = (Memory *)memory_as_charstar;

@@ -376,11 +376,11 @@ std::string dumpReturn(ReturnInst *retInst) {
     std::string gencode = "";
     Value *retValue = retInst->getReturnValue();
     if(retValue != 0) {
-        gencode += "return " + dumpOperand(retValue) + ";\n";
+        gencode += "return " + dumpOperand(retValue);
     } else {
         // we still need to have "return" if no value, since some loops terminate with a `return` in the middle
         // of the codeblock.  Or rather, they dont terminate, if we dont write out a `return` :-P
-        gencode += "return;\n";
+        gencode += "return";
     }
     return gencode;
 }
@@ -417,18 +417,19 @@ std::string dumpAlloca(Instruction *alloca) {
 }
 
 string dumpLoad(LoadInst *instr) {
-    string gencode = "";
+    // string gencode = "";
     string rhs = dumpOperand(instr->getOperand(0)) + "[0]";
     copyAddressSpace(instr->getOperand(0), instr);
+    return rhs;
     // string typestr = dumpType(instr->getType());
     // gencode += typestr + " " + dumpOperand(instr) + " = " +
-    gencode += rhs + ";\n";
-    return gencode;
+    // gencode += rhs;
+    // return gencode;
 }
 
 string dumpStore(StoreInst *instr) {
     string gencode = "";
-    gencode += dumpOperand(instr->getOperand(1)) + "[0] = " + dumpOperand(instr->getOperand(0)) + ";\n";
+    gencode += dumpOperand(instr->getOperand(1)) + "[0] = " + dumpOperand(instr->getOperand(0));
     return gencode;
 }
 
@@ -518,13 +519,14 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
 }
 
 string dumpGetElementPtr(GetElementPtrInst *instr) {
-    string gencode = "";
-    string rhs = dumpGetElementPtrRhs(instr);
+    return dumpGetElementPtrRhs(instr);
+    // string gencode = "";
+    // string rhs = dumpGetElementPtrRhs(instr);
     // gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + 
-    gencode += rhs;
-    gencode += ";\n";
+    // gencode += rhs;
+    // gencode += ";\n";
     // cout << gencode << endl;
-    return gencode;
+    // return gencode;
 }
 
 std::string dumpInsertValue(InsertValueInst *instr) {
@@ -576,8 +578,8 @@ std::string dumpInsertValue(InsertValueInst *instr) {
     }
     gencode += lhs + " = " + dumpOperand(instr->getOperand(1)) + ";\n";
     if(!declaredVar) {
-        currentFunctionSharedDeclarations += "    " + dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand + ";\n";
-        // gencode += "    " + dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand + ";\n";
+        // currentFunctionSharedDeclarations += "    " + dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand + ";\n";
+        gencode += "    " + dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand + ";\n";
     }
     return gencode;
 }
@@ -623,7 +625,7 @@ std::string dumpExtractValue(ExtractValueInst *instr) {
         currentType = newType;
     }
     // gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
-    gencode += lhs + ";\n";
+    gencode += lhs;
     return gencode;
 }
 
@@ -635,7 +637,8 @@ std::string dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
     gencode += dumpValue(op1) + " ";
     gencode += opstring + " ";
     Value *op2 = instr->getOperand(1);
-    gencode += dumpOperand(op2) + ";\n";
+    gencode += dumpOperand(op2);
+    COCL_PRINT(cout << "dumpbinaryoperator " << gencode << endl);
     return gencode;
 }
 
@@ -656,13 +659,14 @@ std::string dumpBitCastRhs(BitCastInst *instr) {
 }
 
 std::string dumpBitCast(BitCastInst *instr) {
-    string gencode = "";
-    string rhs = dumpBitCastRhs(instr);
+    return dumpBitCastRhs(instr);
+    // string gencode = "";
+    // string rhs = dumpBitCastRhs(instr);
     // gencode += dumpType(instr->getType()) + " ";
     // string instrop = dumpOperand(instr);
     // gencode += instrop + " = " +
-    gencode += rhs + ";\n";
-    return gencode;
+    // gencode += rhs + ";\n";
+    // return gencode;
 }
 
 std::string dumpAddrSpaceCastRhs(AddrSpaceCastInst *instr) {
@@ -674,12 +678,13 @@ std::string dumpAddrSpaceCastRhs(AddrSpaceCastInst *instr) {
 }
 
 std::string dumpAddrSpaceCast(AddrSpaceCastInst *instr) {
-    string gencode = "";
+    // string gencode = "";
     copyAddressSpace(instr->getOperand(0), instr);
-    string rhs = dumpAddrSpaceCastRhs(instr);
+    return dumpAddrSpaceCastRhs(instr);
+    // string rhs = dumpAddrSpaceCastRhs(instr);
     // gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
-    gencode += rhs + ";\n";
-    return gencode;
+    // gencode += rhs + ";\n";
+    // return gencode;
 }
 
 std::string dumpMemcpyCharCharLong(CallInst *instr) {
@@ -724,31 +729,31 @@ std::string dumpCall(CallInst *instr) {
     string functionName = getName(instr->getCalledValue());
     // COCL_PRINT(cout << "functionName " << functionName << endl);
     if(functionName == "llvm.ptx.read.tid.x") {
-        return gencode + "get_local_id(0);\n";
+        return gencode + "get_local_id(0)";
     } else if(functionName == "llvm.ptx.read.tid.y") {
-        return gencode + "get_local_id(1);\n";
+        return gencode + "get_local_id(1)";
     } else if(functionName == "llvm.ptx.read.tid.z") {
-        return gencode + "get_local_id(2);\n";
+        return gencode + "get_local_id(2)";
     } else if(functionName == "llvm.ptx.read.ctaid.x") {
-        return gencode + "get_group_id(0);\n";
+        return gencode + "get_group_id(0)";
     } else if(functionName == "llvm.ptx.read.ctaid.y") {
-        return gencode + "get_group_id(1);\n";
+        return gencode + "get_group_id(1)";
     } else if(functionName == "llvm.ptx.read.ctaid.z") {
-        return gencode + "get_group_id(2);\n";
+        return gencode + "get_group_id(2)";
     } else if(functionName == "llvm.ptx.read.nctaid.x") {
-        return gencode + "get_num_groups(0);\n";
+        return gencode + "get_num_groups(0)";
     } else if(functionName == "llvm.ptx.read.nctaid.y") {
-        return gencode + "get_num_groups(1);\n";
+        return gencode + "get_num_groups(1)";
     } else if(functionName == "llvm.ptx.read.nctaid.z") {
-        return gencode + "get_num_groups(2);\n";
+        return gencode + "get_num_groups(2)";
     } else if(functionName == "llvm.ptx.read.ntid.x") {
-        return gencode + "get_local_size(0);\n";
+        return gencode + "get_local_size(0)";
     } else if(functionName == "llvm.ptx.read.ntid.y") {
-        return gencode + "get_local_size(1);\n";
+        return gencode + "get_local_size(1)";
     } else if(functionName == "llvm.ptx.read.ntid.z") {
-        return gencode + "get_local_size(2);\n";
+        return gencode + "get_local_size(2)";
     } else if(functionName == "llvm.cuda.syncthreads") {
-        return gencode + "barrier(CLK_GLOBAL_MEM_FENCE);\n";
+        return gencode + "barrier(CLK_GLOBAL_MEM_FENCE)";
     } else if(functionName == "_Z13__threadfencev") {
         // Not sure if this is correct?
         // seems to be correct-ish???
@@ -762,7 +767,7 @@ std::string dumpCall(CallInst *instr) {
         // to it too
         // I *think* that barrier(CLK_GLOBAL_MEM_FENCE) achieves the same thing, though it might be
         // a bit too "strong" (ie slow)?
-        return gencode + "barrier(CLK_GLOBAL_MEM_FENCE);\n";
+        return gencode + "barrier(CLK_GLOBAL_MEM_FENCE)";
     } else if(functionName == "llvm.lifetime.start") {
         return "";  // just ignore for now
     } else if(functionName == "llvm.lifetime.end") {
@@ -800,7 +805,7 @@ std::string dumpCall(CallInst *instr) {
         cerr << "WARNING: skipping _GLOBAL__sub_I_struct_initializer.cu" << endl;
         return "";
     } else if(functionName == "__nvvm_reflect") {
-        return gencode + " 0;\n"; //ignore, (but pretend to return 0)
+        return gencode + " 0"; //ignore, (but pretend to return 0)
     } else if(functionName == "llvm.memcpy.p0i8.p0i8.i64") {
         return dumpMemcpyCharCharLong(instr);  // just ignore for now
     } else if(knownFunctionsMap.find(functionName) != knownFunctionsMap.end()) {
@@ -817,7 +822,7 @@ std::string dumpCall(CallInst *instr) {
         gencode += dumpValue(op);
         i++;
     }
-    gencode += ");\n";
+    gencode += ")";
     return gencode;
 }
 
@@ -825,7 +830,7 @@ std::string dumpFPExt(CastInst *instr) {
     string gencode = "";
     // string typestr = dumpType(instr->getType());
     // gencode += typestr + " " + dumpOperand(instr) + " = ";
-    gencode += dumpValue(instr->getOperand(0)) + ";\n";
+    gencode += dumpValue(instr->getOperand(0));
     return gencode;
 }
 
@@ -833,7 +838,7 @@ std::string dumpZExt(CastInst *instr) {
     string gencode = "";
     // string typestr = dumpType(instr->getType());
     // gencode += typestr + " " + dumpOperand(instr) + " = ";
-    gencode += dumpValue(instr->getOperand(0)) + ";\n";
+    gencode += dumpValue(instr->getOperand(0));
     return gencode;
 }
 
@@ -841,7 +846,7 @@ std::string dumpSExt(CastInst *instr) {
     string gencode = "";
     // string typestr = dumpType(instr->getType());
     // gencode += typestr + " " + dumpOperand(instr) + " = ";
-    gencode += dumpValue(instr->getOperand(0)) + ";\n";
+    gencode += dumpValue(instr->getOperand(0));
     return gencode;
 }
 
@@ -849,7 +854,7 @@ std::string dumpUIToFP(UIToFPInst *instr) {
     string gencode = "";
     // string typestr = dumpType(instr->getType());
     // gencode += typestr + " " + dumpOperand(instr) + " = ";
-    gencode += dumpValue(instr->getOperand(0)) + ";\n";
+    gencode += dumpValue(instr->getOperand(0));
     return gencode;
 }
 
@@ -857,7 +862,7 @@ std::string dumpSIToFP(SIToFPInst *instr) {
     string gencode = "";
     // string typestr = dumpType(instr->getType());
     // gencode += typestr + " " + dumpOperand(instr) + " = ";
-    gencode += dumpValue(instr->getOperand(0)) + ";\n";
+    gencode += dumpValue(instr->getOperand(0));
     return gencode;
 }
 
@@ -865,7 +870,7 @@ std::string dumpInttoPtr(IntToPtrInst *instr) {
     string gencode = "";
     string typestr = dumpType(instr->getType());
     // gencode += typestr + " " + dumpOperand(instr) + " = ";
-    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0)) + ";\n";
+    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
     return gencode;
 }
 
@@ -875,7 +880,7 @@ std::string dumpFPTrunc(CastInst *instr) {
     string gencode = "";
     // string typestr = dumpType(instr->getType());
     // gencode += typestr + " " + dumpOperand(instr) + " = ";
-    gencode += "(float)" + dumpValue(instr->getOperand(0)) + ";\n";
+    gencode += "(float)" + dumpValue(instr->getOperand(0));
     return gencode;
 }
 
@@ -883,7 +888,7 @@ std::string dumpTrunc(CastInst *instr) {
     string gencode = "";
     string typestr = dumpType(instr->getType());
     // gencode += typestr + " " + dumpOperand(instr) + " = ";
-    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0)) + ";\n";
+    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
     return gencode;
 }
 
@@ -918,7 +923,7 @@ std::string dumpIcmp(ICmpInst *instr) {
     }
     gencode += dumpOperand(instr->getOperand(0));
     gencode += " " + predicate_string + " ";
-    gencode += dumpOperand(instr->getOperand(1)) + ";\n";
+    gencode += dumpOperand(instr->getOperand(1));
     return gencode;
 }
 
@@ -959,7 +964,7 @@ std::string dumpFcmp(FCmpInst *instr) {
     }
     gencode += dumpOperand(instr->getOperand(0));
     gencode += " " + predicate_string + " ";
-    gencode += dumpOperand(instr->getOperand(1)) + ";\n";
+    gencode += dumpOperand(instr->getOperand(1));
     return gencode;
 }
 
@@ -1030,7 +1035,7 @@ std::string dumpSelect(SelectInst *instr) {
     // gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
     gencode += dumpOperand(instr->getCondition()) + " ? ";
     gencode += dumpOperand(instr->getOperand(1)) + " : ";
-    gencode += dumpOperand(instr->getOperand(2)) + ";\n";
+    gencode += dumpOperand(instr->getOperand(2));
     return gencode;
 }
 
@@ -1163,7 +1168,7 @@ std::string dumpInstruction(Instruction *instruction) {
             break;
         case Instruction::Alloca:
             instructioncode = dumpAlloca(cast<AllocaInst>(instruction));
-            return instructioncode;
+            return instructioncode + ";\n";
             // break;
         case Instruction::Br:
             instructioncode = dumpBranch(cast<BranchInst>(instruction));
@@ -1174,7 +1179,7 @@ std::string dumpInstruction(Instruction *instruction) {
             break;
         case Instruction::Ret:
             instructioncode = dumpReturn(cast<ReturnInst>(instruction));
-            return instructioncode;
+            return instructioncode + ";\n";
             // break;
         case Instruction::PHI:
             addPHIDeclaration(cast<PHINode>(instruction));
@@ -1196,8 +1201,8 @@ std::string dumpInstruction(Instruction *instruction) {
         gencode += dumpOperand(instruction) + " = ";
     }
 
-    gencode += instructioncode;
-    // COCL_PRINT(cout << gencode << endl);
+    COCL_PRINT(cout << instructioncode << endl);
+    gencode += instructioncode + ";\n";
     return gencode;
 }
 
@@ -1331,7 +1336,7 @@ std::string dumpFunction(Function *F) {
     functionNeededForwardDeclarations.clear();
     string gencode = "";
     string declaration = dumpFunctionDeclaration(F);
-    // cout << declaration << endl;
+    COCL_PRINT(cout << declaration << endl);
     string body = "";
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;

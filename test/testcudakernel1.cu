@@ -203,16 +203,16 @@ __global__ void testStructs(MyStruct *structs, float *float_data, int *int_data)
     float_data[1] = structs[1].y;
 }
 
-// __global__ void testFloat4(float4 *data) {
-//     float4 myregister4 = data[1];
-//     float *myregisterfloat = (float *)&myregister4;
-//     myregisterfloat[1] = myregisterfloat[2] * myregisterfloat[3];
-//     data[0] = myregister4;
-// }
+__global__ void testFloat4(float4 *data) {
+    float4 myregister4 = data[1];
+    float *myregisterfloat = (float *)&myregister4;
+    myregisterfloat[1] = myregisterfloat[2] * myregisterfloat[3];
+    data[0] = myregister4;
+}
 
-// __global__ void testFloat4_test2(float4 *data) {
-//     data[0] = data[1];
-// }
+__global__ void testFloat4_test2(float4 *data) {
+    data[0] = data[1];
+}
 
 // __global__ void testFloat4_test3(float4 *data) {
 //     float4 privateFloats[32];

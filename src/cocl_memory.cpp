@@ -110,7 +110,8 @@ namespace cocl {
             }
         }
         cout << "could not find memory for " << (void *)passedInAsCharStar << endl;
-        throw runtime_error("could not find memory");
+        return 0;
+        // throw runtime_error("could not find memory");
     }
     size_t Memory::getOffset(char *passedInAsCharStar) {
         return (long long)passedInAsCharStar - fakePos;
