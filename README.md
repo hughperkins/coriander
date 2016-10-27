@@ -110,13 +110,13 @@ There are two sets of tests:
 pip install -r test/requirements.txt
 ```
 
-- python tests are at [test](test)
-
 #### Procedure
 
 ```
 py.test -svx
 ```
+
+- python tests are at [test](test)
 
 ### End-to-end tests
 
