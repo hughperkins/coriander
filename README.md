@@ -98,7 +98,27 @@ sudo make install
 
 ## Test
 
-### Pre-requisites
+There are two sets of tests:
+- low-level tests, using `py.test`
+- end-to-end tests
+
+### Tests from python
+
+#### Pre-requisites
+
+```
+pip install -r test/requirements.txt
+```
+
+- python tests are at [test](test)
+
+#### Procedure
+
+```
+py.test -svx
+```
+
+### End-to-end tests
 
 Simply run:
 ```
@@ -119,8 +139,7 @@ Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 126.456
 ```
-
-- tests are at [test/cocl](test/cocl)
+- end-to-end tests are at [test/cocl](test/cocl)
 
 ## Related projects
 
