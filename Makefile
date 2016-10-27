@@ -238,13 +238,6 @@ install: build/ir-to-opencl build/patch-hostside build/libcocl.a
 	mkdir -p $(PREFIX)/include/cocl
 	install -m 0644 include/cocl/*.h $(PREFIX)/include/cocl/
 	install -m 0644 include/cocl/*.hpp $(PREFIX)/include/cocl/
-	# install -m 0644 include/cocl/cuda.h $(PREFIX)/include/cocl/
-	# install -m 0644 include/cocl/cuda_runtime.h $(PREFIX)/include/cocl/
-	# install -m 0644 include/cocl/vector_types.h $(PREFIX)/include/cocl/
-	# install -m 0644 include/cocl/math_constants.h $(PREFIX)/include/cocl/
-	# install -m 0644 include/cocl/cocl_*.h $(PREFIX)/include/cocl/
-	# install -m 0644 include/cocl/__clang_cuda_runtime_wrapper.h $(PREFIX)/include/cocl/
-	# install -m 0644 include/cocl/fake_funcs.h $(PREFIX)/include/cocl/
 
 uninstall:
 	rm -Rf $(PREFIX)/include/cocl
