@@ -44,7 +44,7 @@ using namespace std;
 
 #include "ir-to-opencl-common.h"
 #include "struct_clone.h"
-#include "local_config.h"
+#include "cocl/local_config.h"
 
 static llvm::LLVMContext context;
 static std::map<std::string, Value *> NamedValues;

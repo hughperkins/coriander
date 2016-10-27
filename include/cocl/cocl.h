@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cocl/local_config.h"
+
 #include <stdexcept>
 #include <cmath>
 #include <random>

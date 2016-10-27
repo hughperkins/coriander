@@ -16,28 +16,28 @@ LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
 # the llvm-config compile flags suppresses asserts
 COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -g -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++11
 
-all: local_config.h build/ir-to-opencl build/patch-hostside build/libcocl.a
+all: include/cocl/local_config.h build/ir-to-opencl build/patch-hostside build/libcocl.a
 
-local_config.h: local_config.h.templ
-	cp local_config.h.templ local_config.h
+include/cocl/local_config.h: include/cocl/local_config.h.templ
+	cp include/cocl/local_config.h.templ include/cocl/local_config.h
 
-build/mutations.o: src/mutations.cpp src/mutations.h local_config.h
+build/mutations.o: src/mutations.cpp src/mutations.h include/cocl/local_config.h
 	mkdir -p build
 	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -c -o $@ -g -I$(LLVM_INCLUDE) $<
 
-build/readIR.o: src/readIR.cpp src/readIR.h local_config.h
+build/readIR.o: src/readIR.cpp src/readIR.h include/cocl/local_config.h
 	mkdir -p build
 	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -c -o $@ -g -I$(LLVM_INCLUDE) $<
 
-build/struct_clone.o: src/struct_clone.cpp src/struct_clone.h local_config.h
+build/struct_clone.o: src/struct_clone.cpp src/struct_clone.h include/cocl/local_config.h
 	mkdir -p build
 	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -c -o $@ -g -I$(LLVM_INCLUDE) $<
 
-build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/readIR.o build/struct_clone.o local_config.h
+build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/readIR.o build/struct_clone.o include/cocl/local_config.h
 	mkdir -p build
-	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/ir-to-opencl -g -I. -I$(LLVM_INCLUDE) src/ir-to-opencl.cpp build/struct_clone.o build/readIR.o src/ir-to-opencl-common.cpp build/mutations.o $(LINK_FLAGS)
+	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/ir-to-opencl -g -I. -Iinclude -I$(LLVM_INCLUDE) src/ir-to-opencl.cpp build/struct_clone.o build/readIR.o src/ir-to-opencl-common.cpp build/mutations.o $(LINK_FLAGS)
 
-build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/struct_clone.o build/readIR.o build/struct_clone.o local_config.h
+build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/struct_clone.o build/readIR.o build/struct_clone.o include/cocl/local_config.h
 	mkdir -p build
 	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/patch-hostside -g -I$(LLVM_INCLUDE) src/patch-hostside.cpp build/readIR.o build/mutations.o build/struct_clone.o src/ir-to-opencl-common.cpp $(LINK_FLAGS)
 
@@ -236,14 +236,15 @@ install: build/ir-to-opencl build/patch-hostside build/libcocl.a
 	install -m 0644 share/cocl/cocl.Makefile $(PREFIX)/share/cocl/cocl.Makefile
 	install -m 0755 bin/cocl $(PREFIX)/bin
 	mkdir -p $(PREFIX)/include/cocl
-	install -m 0644 include/cocl/cocl.h $(PREFIX)/include/cocl/
-	install -m 0644 include/cocl/cuda.h $(PREFIX)/include/cocl/
-	install -m 0644 include/cocl/cuda_runtime.h $(PREFIX)/include/cocl/
-	install -m 0644 include/cocl/vector_types.h $(PREFIX)/include/cocl/
-	install -m 0644 include/cocl/math_constants.h $(PREFIX)/include/cocl/
-	install -m 0644 include/cocl/cocl_*.h $(PREFIX)/include/cocl/
-	install -m 0644 include/cocl/__clang_cuda_runtime_wrapper.h $(PREFIX)/include/cocl/
-	install -m 0644 include/cocl/fake_funcs.h $(PREFIX)/include/cocl/
+	install -m 0644 include/cocl/*.h $(PREFIX)/include/cocl/
+	install -m 0644 include/cocl/*.hpp $(PREFIX)/include/cocl/
+	# install -m 0644 include/cocl/cuda.h $(PREFIX)/include/cocl/
+	# install -m 0644 include/cocl/cuda_runtime.h $(PREFIX)/include/cocl/
+	# install -m 0644 include/cocl/vector_types.h $(PREFIX)/include/cocl/
+	# install -m 0644 include/cocl/math_constants.h $(PREFIX)/include/cocl/
+	# install -m 0644 include/cocl/cocl_*.h $(PREFIX)/include/cocl/
+	# install -m 0644 include/cocl/__clang_cuda_runtime_wrapper.h $(PREFIX)/include/cocl/
+	# install -m 0644 include/cocl/fake_funcs.h $(PREFIX)/include/cocl/
 
 uninstall:
 	rm -Rf $(PREFIX)/include/cocl

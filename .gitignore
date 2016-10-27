@@ -81,4 +81,4 @@ generated/
 # temp files
 ~*
 
-local_config.h
+include/cocl/local_config.h
