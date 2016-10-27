@@ -17,6 +17,7 @@
 #include "cocl/cocl.h"
 #include "cocl/cocl_memory.h"
 #include "cocl/cocl_clsources.h"
+#include "cocl/local_config.h"
 
 #include <iostream>
 #include <memory>

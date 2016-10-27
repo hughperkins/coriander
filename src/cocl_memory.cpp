@@ -16,6 +16,8 @@
 
 #include "cocl/hostside_opencl_funcs.h"
 
+#include "cocl/local_config.h"
+
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -103,7 +105,7 @@ namespace cocl {
             Memory *memory = *it;
             COCL_PRINT(cout << "memory fakepos=" << memory->fakePos << " bytes " << memory->bytes << endl;)
             if(pos >= memory->fakePos && pos < memory->fakePos + memory->bytes) {
-                COCL_PRINT(cout << "found memory: " << (void *)memory << endl);
+                COCL_PRINT(cout << "found memory: " << (void *)memory << " fakepos=" << memory->fakePos << " bytes=" << memory->bytes << endl);
                 return memory;
             }
         }
