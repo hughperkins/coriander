@@ -202,6 +202,12 @@ run-test-cocl-testshfl: build/test-cocl-testshfl
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
+run-test-cocl-testnullpointer: build/test-cocl-testnullpointer
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
 run-test-cocl-testblas: build/test-cocl-testblas
 	################################
 	# running:
@@ -224,7 +230,11 @@ clean-tests:
 	touch build/test~
 	rm build/test*
 
-run-tests: clean-tests all run-test-cocl-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-testevents run-test-cocl-testevents2 run-test-cocl-testcumemcpy run-test-cocl-teststream run-test-cocl-testmemcpydevicetodevice run-test-cocl-testpartialcopy run-test-cocl-offsetkernelargs run-test-cocl-test_bitcast run-test-cocl-byvaluestructwithpointer run-test-cocl-test_types run-test-cocl-multi1 run-test-cocl-testblas
+run-tests: clean-tests all run-test-cocl-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-testevents run-test-cocl-testevents2 \
+	run-test-cocl-testcumemcpy run-test-cocl-teststream run-test-cocl-testmemcpydevicetodevice run-test-cocl-testpartialcopy \
+	run-test-cocl-offsetkernelargs run-test-cocl-test_bitcast run-test-cocl-byvaluestructwithpointer run-test-cocl-test_types \
+	run-test-cocl-testnullpointer run-test-cocl-testshfl run-test-cocl-testneg
+	run-test-cocl-multi1 run-test-cocl-testblas run-test-cocl-testmath run-test-cocl-testfloat4
 
 .SECONDARY:
 

@@ -172,6 +172,9 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     // (we assume hte struct is passed by-value, so we dont have to actually copy it back afterwards)
     COCL_PRINT(cout << "setKernelArgStruct structsize=" << structAllocateSize << endl);
     // int idx = 
+    if(structAllocateSize < 4) {
+        structAllocateSize = 4;
+    }
     cl_int err;
     cl_mem gpu_struct = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, structAllocateSize,
                                            NULL, &err);
@@ -192,19 +195,13 @@ void setKernelArgCharStar(char *memory_as_charstar) {
         cl_mem gpu_struct = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, 4,
                                                NULL, &err);
         cl->checkError(err);
-        // err = clEnqueueWriteBuffer(launchConfiguration.queue->queue, gpu_struct, CL_TRUE, 0,
-        //                                   structAllocateSize, pCpuStruct, 0, NULL, NULL);
-        // cl->checkError(err);
         launchConfiguration.kernelArgsToBeReleased.push_back(gpu_struct);
         launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
         launchConfiguration.kernel->in((int64_t)-1); // `-1` means `null pointer`
         return;
     }
     size_t offset = memory->getOffset(memory_as_charstar);
-    // size_t offset = (char *)memory_as_charstar - (char *)memory;
-    // Memory *pMemory = (Memory *)memory_as_charstar;
     cl_mem clmem = memory->clmem;
-    // cout << "memory " << (void *)memory << " clmem " << (void *)clmem << " offset=" << offset << endl;
     launchConfiguration.kernel->inout(&clmem);
     launchConfiguration.kernel->in((int64_t)offset); // kernel expects a `long` which is 64-bit signed int
 }

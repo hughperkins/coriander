@@ -6,7 +6,7 @@
 
 #include <string>
 
-void mutateGlobalConsructorNumElements(llvm::GlobalVariable *var, int numElements);
+void mutateGlobalConstructorNumElements(llvm::GlobalVariable *var, int numElements);
 void appendGlobalConstructorCall(llvm::Module *M, std::string functionName);
 llvm::GlobalVariable *addGlobalVariable(llvm::Module *M, std::string name, std::string value);
 llvm::Instruction *addStringInstr(llvm::Module *M, std::string name, std::string value);

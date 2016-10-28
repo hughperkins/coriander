@@ -1247,6 +1247,18 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
     return gencode;
 }
 
+string createOffsetDeclaration(string argName) {
+     return ", long " + argName + "_offset";
+}
+
+string createOffsetShim(Type *argType, string argName) {
+    string shim = "    " + argName + " = (" + dumpType(argType) + ")((global char *)" + argName + " + " + argName + "_offset);\n";
+    shim += "    if(" + argName + "_offset == -1) {\n";
+    shim += "        " + argName + " = 0;\n";
+    shim += "    }\n";
+    return shim;
+}
+
 std::string dumpFunctionDeclaration(Function *F) {
     string declaration = "";
     Type *retType = F->getReturnType();
@@ -1309,27 +1321,24 @@ std::string dumpFunctionDeclaration(Function *F) {
             structpointershimcode += writeStructCopyCodeNoPointers(structType, argName + "_nopointers[0]", argName + "[0]");
             for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
                 PointerInfo *pointerInfo = pointerit->get();
+                pointerInfo->type = PointerType::get(pointerInfo->type->getPointerElementType(), 1);
                 int offset = pointerInfo->offset;
-                declaration += ", global " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
-                declaration += ", long " + argName + "_ptr_offset" + toString(j);
-                string ourshim = "    " + argName + "_ptr" + toString(j) + " = (global " + dumpType(pointerInfo->type) + ")((global char *)" + argName + "_ptr" + toString(j) + " + " + argName + "_ptr_offset" + toString(j) + ");\n";
-                ourshim += "    if(" + argName + "_ptr_offset" + toString(j) + " == -1) {\n";
-                ourshim += "        " + argName + "_ptr" + toString(j) + " = 0;\n";
-                ourshim += "    }\n";
-                structpointershimcode = ourshim + structpointershimcode;
-                structpointershimcode += argName + "[0]" + pointerInfo->path + " = " + argName + "_ptr" + toString(j) + ";\n";
+                string pointerArgName = argName + "_ptr" + toString(j);
+                declaration += ", " + dumpType(pointerInfo->type) + " " + pointerArgName;
+                declaration += createOffsetDeclaration(pointerArgName);
+                structpointershimcode = 
+                    createOffsetShim(pointerInfo->type, pointerArgName) +
+                    structpointershimcode +
+                    argName + "[0]" + pointerInfo->path + " = " + pointerArgName + ";\n";
                 j++;
             }
         }
         if(isKernel && ispointer && !is_struct_needs_cloning) {
             // add offset
-            declaration += ", long " + argName + "_offset";
-            string ourshim = "";
-            ourshim += "    " + argName + " = (" + dumpType(arg->getType()) + ")((global char *)" + argName + " + " + argName + "_offset);\n";
-            ourshim += "    if(" + argName + "_offset == -1) {\n";
-            ourshim += "        " + argName + " = 0;\n";
-            ourshim += "    }\n";
-            structpointershimcode = ourshim + structpointershimcode; // put at front of shim
+            declaration += createOffsetDeclaration(argName);
+            structpointershimcode = 
+                createOffsetShim(arg->getType(), argName) +
+                structpointershimcode;
         }
         i++;
     }

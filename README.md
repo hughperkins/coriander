@@ -154,6 +154,7 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 
 - Oct 28:
   - denormalized generated OpenCL out of SSA form, to make it more human-readable
+  - added support to pass null pointers into kernels
 - Oct 26:
   - fixed a bug where BLAS results were empty on HD5500, using beignet 1.2
   - added `__shfl_down` shim
