@@ -131,7 +131,7 @@ template<typename T>
 __device__ T __shfl_xor(T val, int offset, int warpSize);
 
 #ifdef __CUDA_ARCH__
-#pragma message "adding asserts"
+// #pragma message "adding asserts"
 #define NDEBUG
 // #include "assert.h"
 // #undef assert
