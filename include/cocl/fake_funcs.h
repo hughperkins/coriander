@@ -118,6 +118,8 @@ __device__ T atomicCAS(T* address, T compare, T val);
 template<typename T>
 __device__ T atomicAdd(T* address, T val);
 template<typename T>
+__device__ T atomicMax(T* address, T val);
+template<typename T>
 __device__ T atomicInc(T* address, T val);
 template<typename T>
 __device__ T atomicExch(T* address, T val);
@@ -130,6 +132,13 @@ __device__ T __shfl_down(T val, int offset, int warpSize);
 template<typename T>
 __device__ T __shfl_xor(T val, int offset, int warpSize);
 
+inline float __int_as_float(int val) {
+    return *(float *)&val;
+}
+inline int __float_as_int(float val) {
+    return *(int *)&val;
+}
+
 #ifdef __CUDA_ARCH__
 // #pragma message "adding asserts"
 #define NDEBUG
@@ -140,3 +149,5 @@ __device__ T __shfl_xor(T val, int offset, int warpSize);
 // #define __assert_fail(a,b,c,d)
 //void assert(expr);
 #endif // __CUDA_ARCH__
+
+#define __forceinline__ inline

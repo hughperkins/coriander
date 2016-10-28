@@ -55,6 +55,7 @@ using namespace std;
 
 static llvm::LLVMContext context;
 static std::string sourcecode_stringname;
+static string deviceclfilename;
 
 bool single_precision = true;
 
@@ -373,7 +374,7 @@ void patchCudaLaunch(Function *F, CallInst *inst, vector<Instruction *> &to_repl
     // outs() << "patching launch in " << string(F->getName()) << "\n";
 
     string kernelName = launchCallInfo->kernelName;
-    Instruction *kernelNameValue = addStringInstr(M, "s." + kernelName, kernelName);
+    Instruction *kernelNameValue = addStringInstr(M, "s." + ::deviceclfilename + "." + kernelName, kernelName);
     kernelNameValue->insertBefore(inst);
 
     Instruction *clSourcecodeValue = addStringInstrExistingGlobal(M, sourcecode_stringname);
@@ -449,12 +450,12 @@ void patchFunction(Function *F) {
 
 
 void patchModule(string deviceclfilename, Module *M) {
-    ifstream f_in(deviceclfilename);
+    ifstream f_in(::deviceclfilename);
     string cl_sourcecode(
         (std::istreambuf_iterator<char>(f_in)),
         (std::istreambuf_iterator<char>()));
 
-    sourcecode_stringname = "__opencl_sourcecode" + deviceclfilename;
+    sourcecode_stringname = "__opencl_sourcecode" + ::deviceclfilename;
     addGlobalVariable(M, sourcecode_stringname, cl_sourcecode);
 
     vector<Function *> functionsToRemove;
@@ -474,11 +475,11 @@ int main(int argc, char *argv[]) {
     }
 
     string rawhostfilename = argv[1];
-    string deviceclfilename = argv[2];
+    ::deviceclfilename = argv[2];
     string patchedhostfilename = argv[3];
-    outs() << "reading rawhost ll file " << rawhostfilename << "\n";
-    outs() << "reading device cl file " << deviceclfilename << "\n";
-    outs() << "outputing to patchedhost file " << patchedhostfilename << "\n";
+    // outs() << "reading rawhost ll file " << rawhostfilename << "\n";
+    // outs() << "reading device cl file " << deviceclfilename << "\n";
+    // outs() << "outputing to patchedhost file " << patchedhostfilename << "\n";
 
     // debug = false;
     // if(argc == 3) {
@@ -495,7 +496,15 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    patchModule(deviceclfilename, module.get());
+    try {
+        patchModule(deviceclfilename, module.get());
+    } catch(const runtime_error &e) {
+        outs() << "exception whilst doing:\n";
+        outs() << "reading rawhost ll file " << rawhostfilename << "\n";
+        outs() << "reading device cl file " << deviceclfilename << "\n";
+        outs() << "outputing to patchedhost file " << patchedhostfilename << "\n";
+        throw e;
+    }
 
     AssemblyAnnotationWriter assemblyAnnotationWriter;
     ofstream ofile;

@@ -20,7 +20,7 @@ COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffu
 all: $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX)
 
 $(OUTPUTBASEPATH)-device.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/cocl/fake_funcs.h
-	$(CLANG) $(PASSTHRU) -x cuda -std=c++11 -D__CUDA_ARCH__=300 -I/usr/local/include/cocl -include /usr/local/include/cocl/cocl.h -include $(COCL_HOME)/include/cocl/fake_funcs.h -include $(COCL_HOME)/include/cocl/cocl_deviceside.h -I$(COCL_HOME)/include $(INCLUDES) $< --cuda-device-only -emit-llvm -I/usr/include/x86_64-linux-gnu -O2 -S -o $@
+	$(CLANG) $(PASSTHRU) -x cuda -std=c++11 --cuda-gpu-arch=sm_30 -D__CUDA_ARCH__=300 -I/usr/local/include/cocl -include /usr/local/include/cocl/cocl.h -include $(COCL_HOME)/include/cocl/fake_funcs.h -include $(COCL_HOME)/include/cocl/cocl_deviceside.h -I$(COCL_HOME)/include $(INCLUDES) $< --cuda-device-only -emit-llvm -I/usr/include/x86_64-linux-gnu -O2 -S -o $@
 
 $(OUTPUTBASEPATH)-device.cl: $(OUTPUTBASEPATH)-device.ll
 	ir-to-opencl $(DEBUG) $< $@
