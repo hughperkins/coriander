@@ -144,16 +144,13 @@ std::string dumpValue(Value *value) {
     }
 
     if(Constant *constant = dyn_cast<Constant>(value)) {
-        // cout << "its a constant" << endl;
         if(ConstantInt *constInt = dyn_cast<ConstantInt>(constant)) {
-            // cout << "constant int" << endl;
             int intvalue = readInt32Constant(constInt);
             string asstring = toString(intvalue);
             nameByValue[value] = asstring;
             return asstring;
         }
         if(ConstantFP *constFP = dyn_cast<ConstantFP>(constant)) {
-            // cout << "constant float" << endl;
             int floatvalue = readFloatConstant(constFP);
             string asstring = toString(floatvalue);
             if(asstring.find('.') == string::npos) {
@@ -168,37 +165,28 @@ std::string dumpValue(Value *value) {
     // mark it as needing to be declared, then return it
     storeValueName(value);
     functionNeededForwardDeclarations.insert(value);
-    // currentFunctionSharedDeclarations += dumpType(value->getType()) + " " + nameByValue[value] + ";\n";
     COCL_PRINT(cout << "adding to needs forward declaration " << nameByValue[value] << endl);
     value->dump();
     outs() << "\n";
     return nameByValue[value];
-
-    // value->dump();
-    // throw runtime_error("dumpvalue value not found");
 }
 
 void declareGlobal(GlobalValue *global) {
     string gencode = "";
     if(GlobalVariable *var = dyn_cast<GlobalVariable>(global)) {
-        // cout << "hasinitializer() " << var->hasInitializer() << endl;
-        // s << "name " << getName(global) << endl;
         string name = getName(global);
         if(name == "$str") {
             return;  // lazily skip $str for now...
         }
-        // name = replace(name, '$', '_');
         gencode += "constant " + dumpType(global->getType()->getPointerElementType()) + " " + name;
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
             int addressspace = pointerType->getAddressSpace();
             if(addressspace == 3) { // shared/local => skip
                 return;
             } else {
-                // cout << "updating addressspace to 4" << endl;
                 updateAddressSpace(var, 4);
             }
         }
-        // cout << "declareGlobal name=" << name << " hasinitializer " << var->hasInitializer() << endl;
         if(var->hasInitializer()) {
             Constant *initializer = var->getInitializer();
             gencode += " = {";
@@ -317,10 +305,8 @@ string dumpChainedInstruction(int level, Instruction * instr) {
 
          return ourinstrstr;
     } else if(isa<UndefValue>(constant)) {
-        // cout << "undef" << endl;
         return "";
     } else if(isa<ConstantPointerNull>(constant)) {
-        // cout << "undef" << endl;
         return "0";
     } else {
         cout << "valueTy " << valueTy << endl;
@@ -339,28 +325,19 @@ string dumpOperand(Value *value) {
     if(Constant *constant = dyn_cast<Constant>(value)) {
         return dumpConstant(constant);
     }
-    // cout << "isa phi " << isa<PHINode>(value) << endl;
-    // cout << "isa basicblock " << isa<BasicBlock>(value) << endl;
-    // cout << "isa label " << isa<LabelNode>(value) << endl;
     if(isa<BasicBlock>(value)) {
-        // cout << "dumpoperand basicblock" << endl;
         storeValueName(value);
         return nameByValue[value];
     }
     if(PHINode *phi = dyn_cast<PHINode>(value)) {
-        // cout << "dumpoperand got a phi node" << endl;
         addPHIDeclaration(phi);
         string name = nameByValue[value];
-        // cout << "phi name " << name << endl;
         return name;
     }
     // lets just declare it???
     storeValueName(value);
     functionNeededForwardDeclarations.insert(value);
-    // currentFunctionSharedDeclarations += dumpType(value->getType()) + " " + nameByValue[value] + ";\n";
     return nameByValue[value];
-    // value->dump();
-    // throw runtime_error("No way found to dump operand");
 }
 
 void storeValueName(Value *value) {
@@ -407,11 +384,9 @@ std::string dumpAlloca(Instruction *alloca) {
     if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
         Type *ptrElementType = allocatypeptr->getPointerElementType();
         std::string typestring = dumpType(ptrElementType);
-        // cout << "dumpAlloca typestring " << typestring << endl;
         int count = readInt32Constant(alloca->getOperand(0));
         if(count == 1) {
             if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
-                // cout << "arraytype" << endl;
                 int innercount = arrayType->getNumElements();
                 Type *elementType = arrayType->getElementType();
                 return dumpType(elementType) + " " + dumpOperand(alloca) + "[" + toString(innercount) + "];\n";
@@ -420,7 +395,6 @@ std::string dumpAlloca(Instruction *alloca) {
                 if(isa<PointerType>(ptrElementType)) {
                     gencode += "global ";
                     updateAddressSpace(alloca, 1);
-                    // return "global " + dumpType(elementType) + " " + dumpOperand(alloca) + "[" + toString(innercount) + "];\n";
                 }
                 return gencode + typestring + " " + dumpOperand(alloca) + "[1];\n";
             }
@@ -434,14 +408,9 @@ std::string dumpAlloca(Instruction *alloca) {
 }
 
 string dumpLoad(LoadInst *instr) {
-    // string gencode = "";
     string rhs = dumpOperand(instr->getOperand(0)) + "[0]";
     copyAddressSpace(instr->getOperand(0), instr);
     return rhs;
-    // string typestr = dumpType(instr->getType());
-    // gencode += typestr + " " + dumpOperand(instr) + " = " +
-    // gencode += rhs;
-    // return gencode;
 }
 
 string dumpStore(StoreInst *instr) {
@@ -461,16 +430,11 @@ void addSharedDeclaration(Value *value) {
         string name = getName(glob);
         string declaration = "";
         Type *type = glob->getType();
-        // type->dump();
         if(ArrayType *arraytype = dyn_cast<ArrayType>(type->getPointerElementType())) {
-            // arraytype->dump();
             int length = arraytype->getNumElements();
             Type *elementType = arraytype->getElementType();
             string typestr = dumpType(elementType);
             declaration += "    local " + typestr + " " + name + "[" + toString(length) + "];\n";
-            if(debug) {
-                // cout << declaration << endl;
-            }
             nameByValue[value] = name;
             currentFunctionSharedDeclarations += declaration;
         }
@@ -494,9 +458,6 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
     }
     for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
-        // if(PointerType *ptrtype = dyn_cast<PointerType>(currentType)) {
-        //     outs() << "d " << d << " currenttype " << dumpType(currentType) << " addressspace " << ptrtype->getAddressSpace() << "\n";
-        // }
         if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
             if(d == 0) {
                 if(isa<ArrayType>(currentType->getPointerElementType())) {
@@ -541,13 +502,6 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
 
 string dumpGetElementPtr(GetElementPtrInst *instr) {
     return dumpGetElementPtrRhs(instr);
-    // string gencode = "";
-    // string rhs = dumpGetElementPtrRhs(instr);
-    // gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + 
-    // gencode += rhs;
-    // gencode += ";\n";
-    // cout << gencode << endl;
-    // return gencode;
 }
 
 std::string dumpInsertValue(InsertValueInst *instr) {
@@ -599,7 +553,6 @@ std::string dumpInsertValue(InsertValueInst *instr) {
     }
     gencode += lhs + " = " + dumpOperand(instr->getOperand(1)) + ";\n";
     if(!declaredVar) {
-        // currentFunctionSharedDeclarations += "    " + dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand + ";\n";
         gencode += "    " + dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand + ";\n";
     }
     return gencode;
@@ -645,21 +598,17 @@ std::string dumpExtractValue(ExtractValueInst *instr) {
         }
         currentType = newType;
     }
-    // gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
     gencode += lhs;
     return gencode;
 }
 
 std::string dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
     string gencode = "";
-    // string typestr = dumpType(instr->getType());
-    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     Value *op1 = instr->getOperand(0);
     gencode += dumpValue(op1) + " ";
     gencode += opstring + " ";
     Value *op2 = instr->getOperand(1);
     gencode += dumpOperand(op2);
-    // COCL_PRINT(cout << "dumpbinaryoperator " << gencode << endl);
     return gencode;
 }
 
@@ -681,13 +630,6 @@ std::string dumpBitCastRhs(BitCastInst *instr) {
 
 std::string dumpBitCast(BitCastInst *instr) {
     return dumpBitCastRhs(instr);
-    // string gencode = "";
-    // string rhs = dumpBitCastRhs(instr);
-    // gencode += dumpType(instr->getType()) + " ";
-    // string instrop = dumpOperand(instr);
-    // gencode += instrop + " = " +
-    // gencode += rhs + ";\n";
-    // return gencode;
 }
 
 std::string dumpAddrSpaceCastRhs(AddrSpaceCastInst *instr) {
@@ -699,13 +641,8 @@ std::string dumpAddrSpaceCastRhs(AddrSpaceCastInst *instr) {
 }
 
 std::string dumpAddrSpaceCast(AddrSpaceCastInst *instr) {
-    // string gencode = "";
     copyAddressSpace(instr->getOperand(0), instr);
     return dumpAddrSpaceCastRhs(instr);
-    // string rhs = dumpAddrSpaceCastRhs(instr);
-    // gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
-    // gencode += rhs + ";\n";
-    // return gencode;
 }
 
 std::string dumpMemcpyCharCharLong(CallInst *instr) {
@@ -742,13 +679,7 @@ std::string dumpMemcpyCharCharLong(CallInst *instr) {
 
 std::string dumpCall(CallInst *instr) {
     string gencode = "";
-    // string typestr = dumpType(instr->getType());
-    // if(typestr != "void") {
-    //     gencode += typestr + " " + dumpOperand(instr) + " = ";
-    // }
-
     string functionName = getName(instr->getCalledValue());
-    // COCL_PRINT(cout << "functionName " << functionName << endl);
     if(functionName == "llvm.ptx.read.tid.x") {
         return gencode + "get_local_id(0)";
     } else if(functionName == "llvm.ptx.read.tid.y") {
@@ -796,32 +727,6 @@ std::string dumpCall(CallInst *instr) {
     } else if(functionName == "_Z11make_float4ffff") {
         // change this into something like: (float4)(a, b, c, d)
         functionName = "(float4)";
-    // } else if(functionName == "_ZSt3minIfERKT_S2_S2_") { // hack :-P
-    //     cout << "applying 'min' hack" << endl;
-    //     gencode = "";
-    //     string typestr = dumpType(cast<PointerType>(instr->getType())->getPointerElementType());
-    //     if(typestr != "void") {
-    //         gencode += typestr + " " + dumpOperand(instr) + " = ";
-    //     }
-    //     gencode += " min(";
-    //     gencode += dumpValue(instr->getOperand(0)) + "[0]";
-    //     gencode += ", ";
-    //     gencode += dumpValue(instr->getOperand(1)) + "[0]";
-    //     gencode += ");\n";
-    //     return gencode;
-    // } else if(functionName == "_ZSt3maxIfERKT_S2_S2_") { // hack :-P
-    //     cout << "applying 'max' hack" << endl;
-    //     gencode = "";
-    //     string typestr = dumpType(cast<PointerType>(instr->getType())->getPointerElementType());
-    //     if(typestr != "void") {
-    //         gencode += typestr + " " + dumpOperand(instr) + " = ";
-    //     }
-    //     gencode += " max(";
-    //     gencode += dumpValue(instr->getOperand(0)) + "[0]";
-    //     gencode += ", ";
-    //     gencode += dumpValue(instr->getOperand(1)) + "[0]";
-    //     gencode += ");\n";
-    //     return gencode;
     } else if(functionName == "_GLOBAL__sub_I_struct_initializer.cu") {
         cerr << "WARNING: skipping _GLOBAL__sub_I_struct_initializer.cu" << endl;
         return "";
@@ -830,7 +735,6 @@ std::string dumpCall(CallInst *instr) {
     } else if(functionName == "llvm.memcpy.p0i8.p0i8.i64") {
         return dumpMemcpyCharCharLong(instr);  // just ignore for now
     } else if(knownFunctionsMap.find(functionName) != knownFunctionsMap.end()) {
-        // cout << "replace " << functionName << " with " << knownFunctionsMap[functionName] << endl;
         functionName = knownFunctionsMap[functionName];
     }
     gencode += functionName + "(";
@@ -849,40 +753,30 @@ std::string dumpCall(CallInst *instr) {
 
 std::string dumpFPExt(CastInst *instr) {
     string gencode = "";
-    // string typestr = dumpType(instr->getType());
-    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += dumpValue(instr->getOperand(0));
     return gencode;
 }
 
 std::string dumpZExt(CastInst *instr) {
     string gencode = "";
-    // string typestr = dumpType(instr->getType());
-    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += dumpValue(instr->getOperand(0));
     return gencode;
 }
 
 std::string dumpSExt(CastInst *instr) {
     string gencode = "";
-    // string typestr = dumpType(instr->getType());
-    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += dumpValue(instr->getOperand(0));
     return gencode;
 }
 
 std::string dumpUIToFP(UIToFPInst *instr) {
     string gencode = "";
-    // string typestr = dumpType(instr->getType());
-    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += dumpValue(instr->getOperand(0));
     return gencode;
 }
 
 std::string dumpSIToFP(SIToFPInst *instr) {
     string gencode = "";
-    // string typestr = dumpType(instr->getType());
-    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += dumpValue(instr->getOperand(0));
     return gencode;
 }
@@ -890,7 +784,6 @@ std::string dumpSIToFP(SIToFPInst *instr) {
 std::string dumpInttoPtr(IntToPtrInst *instr) {
     string gencode = "";
     string typestr = dumpType(instr->getType());
-    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
     return gencode;
 }
@@ -899,8 +792,6 @@ std::string dumpFPTrunc(CastInst *instr) {
     // since this is float point trunc, lets just assume we're going from double to float
     // fix any exceptiosn to this rule later
     string gencode = "";
-    // string typestr = dumpType(instr->getType());
-    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += "(float)" + dumpValue(instr->getOperand(0));
     return gencode;
 }
@@ -908,15 +799,12 @@ std::string dumpFPTrunc(CastInst *instr) {
 std::string dumpTrunc(CastInst *instr) {
     string gencode = "";
     string typestr = dumpType(instr->getType());
-    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
     return gencode;
 }
 
 std::string dumpIcmp(ICmpInst *instr) {
     string gencode = "";
-    // string typestr = dumpType(instr->getType());
-    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     CmpInst::Predicate predicate = instr->getSignedPredicate();  // note: we should detect signedness...
     string predicate_string = "";
     switch(predicate) {
@@ -954,8 +842,6 @@ std::string dumpIcmp(ICmpInst *instr) {
 
 std::string dumpFcmp(FCmpInst *instr) {
     string gencode = "";
-    // string typestr = dumpType(instr->getType());
-    // gencode += typestr + " " + dumpOperand(instr) + " = ";
     CmpInst::Predicate predicate = instr->getPredicate();
     string predicate_string = "";
     switch(predicate) {
@@ -992,10 +878,8 @@ std::string dumpFcmp(FCmpInst *instr) {
     op0 = stripOuterParams(op0);
     op1 = stripOuterParams(op1);
     gencode += op0;
-    // gencode += dumpOperand(instr->getOperand(0));
     gencode += " " + predicate_string + " ";
     gencode += op1;
-    // gencode += dumpOperand(instr->getOperand(1));
     return gencode;
 }
 
@@ -1067,7 +951,6 @@ std::string dumpBranch(BranchInst *instr) {
 std::string dumpSelect(SelectInst *instr) {
     string gencode = "";
     copyAddressSpace(instr->getOperand(1), instr);
-    // gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + " = ";
     gencode += dumpOperand(instr->getCondition()) + " ? ";
     gencode += dumpOperand(instr->getOperand(1)) + " : ";
     gencode += dumpOperand(instr->getOperand(2));
@@ -1075,16 +958,10 @@ std::string dumpSelect(SelectInst *instr) {
 }
 
 void addPHIDeclaration(PHINode *phi) {
-    // currentFunctionPhiDeclarationsByName
-    // string phistr = dumpOperand(phi);
-    // COCL_PRINT(cout << "addphideclaration phistr [" << phistr << "]" << endl);
-    // if(!phi->hasOneUse()) {
-        storeValueName(phi);
-        string name = nameByValue[phi];
-        string declaration = dumpType(phi->getType()) + " " + dumpOperand(phi);
-        currentFunctionPhiDeclarationsByName[name] = declaration;
-    // }
-    // cout << declaration << endl;
+    storeValueName(phi);
+    string name = nameByValue[phi];
+    string declaration = dumpType(phi->getType()) + " " + dumpOperand(phi);
+    currentFunctionPhiDeclarationsByName[name] = declaration;
 }
 
 bool isSingleExpression(string instructionCode) {
@@ -1266,11 +1143,8 @@ std::string dumpInstruction(Instruction *instruction) {
             throw runtime_error("unknown opcode");
     }
     string typestr = dumpType(instruction->getType());
-    // COCL_PRINT(cout << dumpOperand(instruction) << " has one use? " << instruction->hasOneUse() << endl);
-    // COCL_PRINT(cout << instructionCode << endl);
     Use *use = 0;
     User *use_user = 0;
-    // bool useIsAStore = false;
     bool weArePointer = isa<PointerType>(instruction->getType());
     bool useIsPointer = false;
     bool useIsAStore = false;
@@ -1279,45 +1153,20 @@ std::string dumpInstruction(Instruction *instruction) {
     if(instruction->hasOneUse()) {
         use = &*instruction->use_begin();
         use_user = use->getUser();
-        // use_user->dump();
-        // outs() << "\n";
-        // cout << "isa store " << isa<StoreInst>(use_user) << endl;
         useIsAStore = isa<StoreInst>(use_user);
         useIsPointer = isa<PointerType>(use_user->getType());
         useIsExtractValue = isa<ExtractValueInst>(use_user);
         useIsAPhi = isa<PHINode>(use_user);
-        // cout << "we are pointer " << weArePointer << " useispointer " << useIsPointer << endl;
     }
     if(!useIsAPhi && !useIsExtractValue && instruction->hasOneUse()) { // } && !useIsAStore) {
-        // if(instructionCode[0] != '(' || instructionCode[instructionCode.size() - 1] != ')') {
-        //     int numExpressions = countExpressions(instructionCode);
-        //     if(numExpressions > 1) {
         if(!isSingleExpression(instructionCode)) {
             instructionCode= "(" + instructionCode + ")";
         }
-            // instructionCode = stripParentheses(instructionCode);
-        // }
         nameByValue[instruction] = instructionCode;
-        // valuesAreExpressions.insert(instruction);
         return "";
     } else {
         if(typestr != "void") {
             instructionCode = stripOuterParams(instructionCode);
-            // if(functionNeededForwardDeclarations.find(instruction) != functionNeededForwardDeclarations.end()) {
-            //     COCL_PRINT(cout << "needs forward delcaration " << typestr << " " << dumpOperand(instruction) << endl);
-            //     currentFunctionSharedDeclarations += typestr + " " + dumpOperand(instruction) + ";\n";
-            // } else {
-            //     gencode += typestr + " ";
-            // }
-            // string innerString = instructionCode.substr(1, instructionCode.size() - 2);
-            // COCL_PRINT(cout << "innerString [" << innerString << "]" << endl);
-            // if(isValidExpression(innerString)) {
-            //     COCL_PRINT(cout << "stripping braces" << endl);
-            //     instructionCode = innerString;
-            // }
-            // if(instructionCode[0] == '(' && instructionCode[instructionCode.size() - 1] == ')' &&
-                // isSingleExpression(instructionCode.substr(1, instructionCode.size() - 2))) {
-            // }
             functionNeededForwardDeclarations.insert(instruction);
             gencode += dumpOperand(instruction) + " = ";
         }
@@ -1327,10 +1176,6 @@ std::string dumpInstruction(Instruction *instruction) {
 }
 
 std::string dumpBasicBlock(BasicBlock *basicBlock) {
-    if(debug) {
-        // cout << "basicblock" << endl;
-    //     cout << "hasname " << string(basicBlock->getName()) << endl;
-    }
     string label = "";
     if(nameByValue.find(basicBlock) != nameByValue.end()) {
         label = nameByValue[basicBlock];
