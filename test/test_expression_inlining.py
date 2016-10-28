@@ -43,7 +43,7 @@ __global__ void myKernel(float *data) {
         'cocl',
         '-c',
         '/tmp/%s.cu' % basename
-    ]))
+    ]).decode('utf-8'))
 
     with open('/tmp/%s-device.cl' % basename, 'r') as f:
         sourcecode = f.read()

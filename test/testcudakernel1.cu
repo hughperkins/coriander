@@ -120,52 +120,6 @@ __global__ void testsyncthreads(float *data) {
     data[tid + 1] += 2;
 }
 
-__global__ void testDoWhile(int *data, int N) {
-    int p = threadIdx.x;
-    do {
-        p++;
-    } while(data[p] != 0);
-}
-
-__global__ void testWhile(int *data, int N) {
-    int p = threadIdx.x;
-    while(data[p] != 0) {
-        p++;
-    }
-}
-
-__global__ void testIf(int *data, int N) {
-    int tid = threadIdx.x;
-    if(tid < N) {
-        data[tid] *= 2;
-    }
-}
-
-__global__ void testIfElse(int *data, int N) {
-    int tid = threadIdx.x;
-    if(tid < N) {
-        data[tid] *= 2;
-        data[tid + 3] *= 2;
-    } else {
-        data[tid] -= 20;
-        data[tid + 5] -= 20;
-    }
-}
-
-__global__ void testTernary(float *data) {
-    data[0] = data[1] > 0 ? data[2] : data[3];
-}
-
-__global__ void testFor(float *data, int N) {
-    if(threadIdx.x == 0) {
-        float sum = 0.0f;
-        for(int i = 0; i < N; i++) {
-            sum += data[i];
-        }
-        data[0] = sum;
-    }
-}
-
 void myprintint(int value) {
     cout << "myprintint " << value << endl;
 }

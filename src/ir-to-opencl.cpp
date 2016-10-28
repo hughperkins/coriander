@@ -59,6 +59,7 @@ static map<string, string> currentFunctionPhiDeclarationsByName;
 static string globalDeclarations = "";
 static string structpointershimcode = "";
 static set<Value *> functionNeededForwardDeclarations;
+// static set<Value *>valuesAreExpressions;
 
 static bool debug;
 bool single_precision = true;
@@ -117,6 +118,22 @@ inline int __atomic_inc(global volatile int *ptr, int val) {
 }
 
 )";
+
+bool isValidExpression(string instructionCode);
+bool isSingleExpression(string instructionCode);
+
+std::string stripOuterParams(string instructionCode) {
+    if(instructionCode[0] != '(' || instructionCode[instructionCode.size() - 1] != ')') {
+        return instructionCode;
+    }
+    string innerString = instructionCode.substr(1, instructionCode.size() - 2);
+    COCL_PRINT(cout << "innerString [" << innerString << "]" << endl);
+    if(isValidExpression(innerString)) {
+        COCL_PRINT(cout << "stripping braces" << endl);
+        instructionCode = innerString;
+    }
+    return instructionCode;
+}
 
 std::string dumpValue(Value *value) {
     std::string gencode = "";
@@ -429,7 +446,9 @@ string dumpLoad(LoadInst *instr) {
 
 string dumpStore(StoreInst *instr) {
     string gencode = "";
-    gencode += dumpOperand(instr->getOperand(1)) + "[0] = " + dumpOperand(instr->getOperand(0));
+    string rhs = dumpOperand(instr->getOperand(0));
+    rhs = stripOuterParams(rhs);
+    gencode += dumpOperand(instr->getOperand(1)) + "[0] = " + rhs;
     return gencode;
 }
 
@@ -484,7 +503,9 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
                     rhs = "(&" + rhs + ")";
                 }
             }
-            rhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
+            string idxstring = dumpOperand(instr->getOperand(d + 1));
+            idxstring = stripOuterParams(idxstring);
+            rhs += string("[") + idxstring + "]";
             newType = currentType->getPointerElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
             string structName = getName(structtype);
@@ -638,7 +659,7 @@ std::string dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
     gencode += opstring + " ";
     Value *op2 = instr->getOperand(1);
     gencode += dumpOperand(op2);
-    COCL_PRINT(cout << "dumpbinaryoperator " << gencode << endl);
+    // COCL_PRINT(cout << "dumpbinaryoperator " << gencode << endl);
     return gencode;
 }
 
@@ -921,9 +942,13 @@ std::string dumpIcmp(ICmpInst *instr) {
             cout << "predicate " << predicate << endl;
             throw runtime_error("predicate not supported");
     }
-    gencode += dumpOperand(instr->getOperand(0));
+    string op0 = dumpOperand(instr->getOperand(0));
+    string op1 = dumpOperand(instr->getOperand(1));
+    op0 = stripOuterParams(op0);
+    op1 = stripOuterParams(op1);
+    gencode += op0;
     gencode += " " + predicate_string + " ";
-    gencode += dumpOperand(instr->getOperand(1));
+    gencode += op1;
     return gencode;
 }
 
@@ -962,9 +987,15 @@ std::string dumpFcmp(FCmpInst *instr) {
             cout << "predicate " << predicate << endl;
             throw runtime_error("predicate not supported");
     }
-    gencode += dumpOperand(instr->getOperand(0));
+    string op0 = dumpOperand(instr->getOperand(0));
+    string op1 = dumpOperand(instr->getOperand(1));
+    op0 = stripOuterParams(op0);
+    op1 = stripOuterParams(op1);
+    gencode += op0;
+    // gencode += dumpOperand(instr->getOperand(0));
     gencode += " " + predicate_string + " ";
-    gencode += dumpOperand(instr->getOperand(1));
+    gencode += op1;
+    // gencode += dumpOperand(instr->getOperand(1));
     return gencode;
 }
 
@@ -996,7 +1027,11 @@ std::string dumpPhi(BranchInst *branchInstr, BasicBlock *nextBlock) {
 std::string dumpBranch(BranchInst *instr) {
     string gencode = "";
     if(instr->isConditional()) {
-        gencode += "if(" + dumpOperand(instr->getCondition()) + ") {\n";
+        string conditionstring = dumpOperand(instr->getCondition());
+        if(!isSingleExpression(conditionstring)) {
+            conditionstring = "(" + conditionstring + ")";
+        }
+        gencode += "if " + conditionstring + " {\n";
         string phicode = dumpPhi(instr, instr->getSuccessor(0));
         if(phicode != "") {
             gencode += "        " + phicode;
@@ -1041,11 +1076,51 @@ std::string dumpSelect(SelectInst *instr) {
 
 void addPHIDeclaration(PHINode *phi) {
     // currentFunctionPhiDeclarationsByName
-    storeValueName(phi);
-    string name = dumpOperand(phi);
-    string declaration = dumpType(phi->getType()) + " " + dumpOperand(phi);
+    // string phistr = dumpOperand(phi);
+    // COCL_PRINT(cout << "addphideclaration phistr [" << phistr << "]" << endl);
+    // if(!phi->hasOneUse()) {
+        storeValueName(phi);
+        string name = nameByValue[phi];
+        string declaration = dumpType(phi->getType()) + " " + dumpOperand(phi);
+        currentFunctionPhiDeclarationsByName[name] = declaration;
+    // }
     // cout << declaration << endl;
-    currentFunctionPhiDeclarationsByName[name] = declaration;
+}
+
+bool isSingleExpression(string instructionCode) {
+    int depth = 0;
+    int len = instructionCode.size();
+    for(int pos = 0; pos < len; pos++) {
+        char thischar = instructionCode[pos];
+        if(thischar == '(') {
+            depth++;
+        } else if(thischar == ')') {
+            depth--;
+            if(depth == 0 && pos != len - 1) {
+                return false;
+            }
+        } else if(depth == 0 && thischar != '[' && thischar != ']' && (thischar < 'a' || thischar > 'z') && (thischar < 'A' || thischar > 'Z') && (thischar < '0' || thischar > '9')) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isValidExpression(string instructionCode) {
+    int depth = 0;
+    int len = instructionCode.size();
+    for(int pos = 0; pos < len; pos++) {
+        char thischar = instructionCode[pos];
+        if(thischar == '(') {
+            depth++;
+        } else if(thischar == ')') {
+            depth--;
+            if(depth < 0) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 std::string dumpInstruction(Instruction *instruction) {
@@ -1056,15 +1131,15 @@ std::string dumpInstruction(Instruction *instruction) {
 
     string gencode = "";
     string instructionCode = "";
-    if(debug) {
-        // cout << resultType << " " << resultName << " =";
-        // cout << " " << string(instruction->getOpcodeName());
+    // if(debug) {
+        COCL_PRINT(cout << resultType << " " << resultName << " =");
+        COCL_PRINT(cout << " " << string(instruction->getOpcodeName()));
         for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
             Value *op = &*it->get();
-            // cout << " " << dumpOperand(op);
+            COCL_PRINT(cout << " " << dumpOperand(op));
         }
-        // cout << endl;
-    }
+        COCL_PRINT(cout << endl);
+    // }
     switch(opcode) {
         case Instruction::FAdd:
             instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
@@ -1175,6 +1250,7 @@ std::string dumpInstruction(Instruction *instruction) {
             return instructionCode;
             // break;
         case Instruction::Select:
+            COCL_PRINT(cout << "its a select" << endl);
             instructionCode = dumpSelect(cast<SelectInst>(instruction));
             break;
         case Instruction::Ret:
@@ -1190,21 +1266,57 @@ std::string dumpInstruction(Instruction *instruction) {
             throw runtime_error("unknown opcode");
     }
     string typestr = dumpType(instruction->getType());
-    COCL_PRINT(cout << dumpOperand(instruction) << " has one use? " << instruction->hasOneUse() << endl);
-    COCL_PRINT(cout << instructionCode << endl);
+    // COCL_PRINT(cout << dumpOperand(instruction) << " has one use? " << instruction->hasOneUse() << endl);
+    // COCL_PRINT(cout << instructionCode << endl);
+    Use *use = 0;
+    User *use_user = 0;
+    // bool useIsAStore = false;
+    bool weArePointer = isa<PointerType>(instruction->getType());
+    bool useIsPointer = false;
+    bool useIsAStore = false;
+    bool useIsExtractValue = false;
+    bool useIsAPhi = false;
     if(instruction->hasOneUse()) {
-        if(instructionCode[0] != '(' || instructionCode[instructionCode.size() - 1] != ')') {
+        use = &*instruction->use_begin();
+        use_user = use->getUser();
+        // use_user->dump();
+        // outs() << "\n";
+        // cout << "isa store " << isa<StoreInst>(use_user) << endl;
+        useIsAStore = isa<StoreInst>(use_user);
+        useIsPointer = isa<PointerType>(use_user->getType());
+        useIsExtractValue = isa<ExtractValueInst>(use_user);
+        useIsAPhi = isa<PHINode>(use_user);
+        // cout << "we are pointer " << weArePointer << " useispointer " << useIsPointer << endl;
+    }
+    if(!useIsAPhi && !useIsExtractValue && instruction->hasOneUse()) { // } && !useIsAStore) {
+        // if(instructionCode[0] != '(' || instructionCode[instructionCode.size() - 1] != ')') {
+        //     int numExpressions = countExpressions(instructionCode);
+        //     if(numExpressions > 1) {
+        if(!isSingleExpression(instructionCode)) {
             instructionCode= "(" + instructionCode + ")";
         }
+            // instructionCode = stripParentheses(instructionCode);
+        // }
         nameByValue[instruction] = instructionCode;
+        // valuesAreExpressions.insert(instruction);
         return "";
     } else {
         if(typestr != "void") {
+            instructionCode = stripOuterParams(instructionCode);
             // if(functionNeededForwardDeclarations.find(instruction) != functionNeededForwardDeclarations.end()) {
             //     COCL_PRINT(cout << "needs forward delcaration " << typestr << " " << dumpOperand(instruction) << endl);
             //     currentFunctionSharedDeclarations += typestr + " " + dumpOperand(instruction) + ";\n";
             // } else {
             //     gencode += typestr + " ";
+            // }
+            // string innerString = instructionCode.substr(1, instructionCode.size() - 2);
+            // COCL_PRINT(cout << "innerString [" << innerString << "]" << endl);
+            // if(isValidExpression(innerString)) {
+            //     COCL_PRINT(cout << "stripping braces" << endl);
+            //     instructionCode = innerString;
+            // }
+            // if(instructionCode[0] == '(' && instructionCode[instructionCode.size() - 1] == ')' &&
+                // isSingleExpression(instructionCode.substr(1, instructionCode.size() - 2))) {
             // }
             functionNeededForwardDeclarations.insert(instruction);
             gencode += dumpOperand(instruction) + " = ";
@@ -1371,6 +1483,7 @@ std::string dumpFunction(Function *F) {
         body +
     "}\n";
     // cout << gencode;
+    COCL_PRINT(cout << endl);
     return gencode;
 }
 

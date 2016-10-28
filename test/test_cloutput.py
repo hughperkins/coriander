@@ -94,32 +94,57 @@ def test_use_template1(testcudakernel1, q, int_data, int_data_gpu, float_data, f
     assert int_data[0] == int_data_orig[1] + int_data_orig[2]
 
 
-def test_testFor(testcudakernel1, q, float_data, float_data_gpu):
-    float_data_orig = np.copy(float_data)
+def compile_code(context, kernelSource):
+    for file in os.listdir('/tmp'):
+        if file.startswith('testprog'):
+            os.unlink('/tmp/%s' % file)
+    with open('/tmp/testprog.cu', 'w') as f:
+        f.write(kernelSource)
+    print(subprocess.check_output([
+        'cocl',
+        '-c',
+        '/tmp/testprog.cu'
+    ]).decode('utf-8'))
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_sourcecode = f.read()
+    prog = cl.Program(context, cl_sourcecode).build()
+    return prog
 
-    testcudakernel1.__getattr__(test_common.mangle('testFor', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(32))
-    cl.enqueue_copy(q, float_data, float_data_gpu)
-    q.finish()
-    assert abs(float_data[0] - sum(float_data_orig[0:32])) < 1e-4
 
-
-def test_ternary(testcudakernel1, q, float_data, float_data_gpu):
+def test_ternary(context, q, float_data, float_data_gpu):
+    kernelSource = """
+__global__ void setValue(float *data, int idx, float value) {
+    if(threadIdx.x == 0) {
+        data[idx] = value;
+    }
+}
+__global__ void testTernary(float *data) {
+    data[0] = data[1] > 0 ? data[2] : data[3];
+}
+"""
+    prog = compile_code(context, kernelSource)
     float_data_orig = np.copy(float_data)
 
     def set_float_value(gpu_buffer, idx, value):
-        testcudakernel1.__getattr__(test_common.mangle('setValue', ['float *', 'int', 'float']))(
+        prog.__getattr__(test_common.mangle('setValue', ['float *', 'int', 'float']))(
             q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(idx), np.float32(value))
 
+    cl.enqueue_copy(q, float_data_gpu, float_data)
+    print('float_data[:8]', float_data[:8])
     set_float_value(float_data_gpu, 1, 10)
-    testcudakernel1.__getattr__(test_common.mangle('testTernary', ['float *']))(q, (32,), (32,), float_data_gpu, np.int64(0))
+    prog.__getattr__(test_common.mangle('testTernary', ['float *']))(q, (32,), (32,), float_data_gpu, np.int64(0))
+    q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
+    print('float_data[:8]', float_data[:8])
     assert float_data[0] == float_data_orig[2]
 
     set_float_value(float_data_gpu, 1, -2)
-    testcudakernel1.__getattr__(test_common.mangle('testTernary', ['float *']))(q, (32,), (32,), float_data_gpu, np.int64(0))
+    prog.__getattr__(test_common.mangle('testTernary', ['float *']))(q, (32,), (32,), float_data_gpu, np.int64(0))
+    q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
+    print('float_data[:8]', float_data[:8])
     assert float_data[0] == float_data_orig[3]
 
 
