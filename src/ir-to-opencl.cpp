@@ -84,8 +84,9 @@ void addPHIDeclaration(PHINode *phi);
 void storeValueName(Value *value);
 
 static string cl_add_definitions = R"(
-inline float __shfl_down_3(float v0, int v1, int v2) {
-    local float mem[1024];
+inline float __shfl_down_3(local int *scratch, float v0, int v1, int v2) {
+    // local float mem[1024];
+    local float *mem = (local float *)scratch;
     int tid = get_local_id(0);
     int warpid = tid % 32;
     int warpstart = tid - warpid;
@@ -96,8 +97,8 @@ inline float __shfl_down_3(float v0, int v1, int v2) {
     return mem[warpstart + warpsrc];
 }
 
-inline float __shfl_down_2(float v0, int v1) {
-    return __shfl_down_3(v0, v1, 32);
+inline float __shfl_down_2(local int *scratch, float v0, int v1) {
+    return __shfl_down_3(scratch, v0, v1, 32);
 }
 
 // based on https://community.amd.com/thread/167462
@@ -724,6 +725,7 @@ std::string dumpMemcpyCharCharLong(CallInst *instr) {
 std::string dumpCall(CallInst *instr) {
     string gencode = "";
     string functionName = getName(instr->getCalledValue());
+    bool internalfunc = false;
     if(functionName == "llvm.ptx.read.tid.x") {
         return gencode + "get_local_id(0)";
     } else if(functionName == "llvm.ptx.read.tid.y") {
@@ -748,8 +750,34 @@ std::string dumpCall(CallInst *instr) {
         return gencode + "get_local_size(1)";
     } else if(functionName == "llvm.ptx.read.ntid.z") {
         return gencode + "get_local_size(2)";
-    } else if(functionName == "llvm.cuda.syncthreads") {
+    } else if(functionName == "llvm.cuda.syncthreads" || functionName == "_Z11syncthreadsv") {
         return gencode + "barrier(CLK_GLOBAL_MEM_FENCE)";
+    } else if(functionName == "_Z11__shfl_downIfET_S0_ii") {
+        gencode += "__shfl_down_3(scratch, ";
+        int i = 0;
+        for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
+            Value *op = &*it->get();
+            if(i > 0) {
+                gencode += ", ";
+            }
+            gencode += dumpValue(op);
+            i++;
+        }
+        gencode += ")";
+        return gencode;
+    } else if(functionName == "_Z11__shfl_downIfET_S0_i") {
+        gencode += "__shfl_down_2(scratch, ";
+        int i = 0;
+        for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
+            Value *op = &*it->get();
+            if(i > 0) {
+                gencode += ", ";
+            }
+            gencode += dumpValue(op);
+            i++;
+        }
+        gencode += ")";
+        return gencode;
     } else if(functionName == "_Z13__threadfencev") {
         // Not sure if this is correct?
         // seems to be correct-ish???
@@ -771,6 +799,7 @@ std::string dumpCall(CallInst *instr) {
     } else if(functionName == "_Z11make_float4ffff") {
         // change this into something like: (float4)(a, b, c, d)
         functionName = "(float4)";
+        internalfunc = true;
     } else if(functionName == "_GLOBAL__sub_I_struct_initializer.cu") {
         cerr << "WARNING: skipping _GLOBAL__sub_I_struct_initializer.cu" << endl;
         return "";
@@ -780,6 +809,7 @@ std::string dumpCall(CallInst *instr) {
         return dumpMemcpyCharCharLong(instr);  // just ignore for now
     } else if(knownFunctionsMap.find(functionName) != knownFunctionsMap.end()) {
         functionName = knownFunctionsMap[functionName];
+        internalfunc = true;
     }
     gencode += functionName + "(";
     int i = 0;
@@ -790,6 +820,9 @@ std::string dumpCall(CallInst *instr) {
         }
         gencode += dumpValue(op);
         i++;
+    }
+    if(!internalfunc) {
+        gencode += ", scratch";
     }
     gencode += ")";
     return gencode;
@@ -1345,6 +1378,10 @@ std::string dumpFunctionDeclaration(Function *F) {
         }
         i++;
     }
+    if(i > 0) {
+        declaration += ", ";
+    }
+    declaration += "local int *scratch";
     declaration += ")";
     return declaration;
 }
@@ -1527,6 +1564,7 @@ int main(int argc, char *argv[]) {
     ignoredFunctionNames.insert("llvm.ptx.read.tid.y");
     ignoredFunctionNames.insert("llvm.ptx.read.tid.z");
     ignoredFunctionNames.insert("llvm.cuda.syncthreads");
+    ignoredFunctionNames.insert("_Z11syncthreadsv");
     ignoredFunctionNames.insert("_ZL21__nvvm_reflect_anchorv");
     ignoredFunctionNames.insert("__nvvm_reflect");
     ignoredFunctionNames.insert("llvm.ptx.read.ctaid.x");
@@ -1546,6 +1584,8 @@ int main(int argc, char *argv[]) {
     ignoredFunctionNames.insert("_Z11make_float4ffff");
     ignoredFunctionNames.insert("_GLOBAL__sub_I_struct_initializer.cu");
     ignoredFunctionNames.insert("_Z13__threadfencev");
+    ignoredFunctionNames.insert("_Z11__shfl_downIfET_S0_ii"); // 3 args, int
+    ignoredFunctionNames.insert("_Z11__shfl_downIfET_S0_i");  // 2 args, int
 
     knownFunctionsMap["_ZSt4sqrtf"] = "sqrt";
     knownFunctionsMap["llvm.nvvm.sqrt.rn.d"] = "sqrt";
@@ -1580,13 +1620,14 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["floorf"] = "floor";
     knownFunctionsMap["logf"] = "log";
     knownFunctionsMap["sqrtf"] = "sqrt";
+    // knownFunctoinsMap["_Z11syncthreadsv"] = "";
 
     knownFunctionsMap["_Z9atomicCASIjET_PS0_S0_S0_"] = "atomic_cmpxchg";   // int
     knownFunctionsMap["_Z10atomicExchIjET_PS0_S0_"] = "atomic_xchg";  // ints
     knownFunctionsMap["_Z10atomicExchIfET_PS0_S0_"] = "atomic_xchg";   // floats
     knownFunctionsMap["_Z9atomicIncIjET_PS0_S0_"] = "__atomic_inc";   // int
-    knownFunctionsMap["_Z11__shfl_downIfET_S0_ii"] = "__shfl_down_3";   // float, and see cl_add_definitions, at top
-    knownFunctionsMap["_Z11__shfl_downIfET_S0_i"] = "__shfl_down_2";   // float, and see cl_add_definitions, at top
+    // knownFunctionsMap["_Z11__shfl_downIfET_S0_ii"] = "__shfl_down_3";   // float, and see cl_add_definitions, at top
+    // knownFunctionsMap["_Z11__shfl_downIfET_S0_i"] = "__shfl_down_2";   // float, and see cl_add_definitions, at top
     knownFunctionsMap["_Z9atomicAddIfET_PS0_S0_"] = "__atomic_add"; // float
 
     try {

@@ -87,7 +87,7 @@ def test_testFor(context, q, float_data, float_data_gpu):
     prog = compile_code(context, sourcecode)
     float_data_orig = np.copy(float_data)
 
-    prog.__getattr__(test_common.mangle('testFor', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(32))
+    prog.__getattr__(test_common.mangle('testFor', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(32), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     assert abs(float_data[0] - sum(float_data_orig[0:32])) < 1e-4

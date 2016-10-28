@@ -71,7 +71,7 @@ def test_program_compiles(extract_value):
 
 
 def test_copy_float(extract_value, q, float_data, float_data_gpu):
-    extract_value.__getattr__(test_common.mangle('test_floats', ['float *']))(q, (32,), (32,), float_data_gpu, np.int64(0))
+    extract_value.__getattr__(test_common.mangle('test_floats', ['float *']))(q, (32,), (32,), float_data_gpu, np.int64(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     assert float_data[0] == float_data[1]

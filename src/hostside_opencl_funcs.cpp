@@ -137,6 +137,9 @@ int cudaConfigureCall(
 void configureKernel(
         const char *kernelName, const char *clSourcecodeString) {
     COCL_PRINT(cout << "configureKernel (name=" << kernelName << endl);
+    // send in scratch buffer, local ints
+    // make it have one int per core
+
     // cout << "clSources.size() " << getNumClSources() << endl;
     // for(auto it=clSources.begin(); it != clSources.end(); it++) {
     for(int i = 0; i < getNumClSources(); i++) {
@@ -232,6 +235,10 @@ void kernelGo() {
         // COCL_PRINT(cout << "block[" << i << "]=" << launchConfiguration.block[i] << endl);
     }
     // cout << "launching kernel, using OpenCL..." << endl;
+    int workgroupSize = launchConfiguration.block[0] * launchConfiguration.block[1] * launchConfiguration.block[2];
+    COCL_PRINT(cout << "workgroupSize=" << workgroupSize << endl);
+    launchConfiguration.kernel->localInts(workgroupSize);
+
     try {
         launchConfiguration.kernel->run(launchConfiguration.queue, 3, global, launchConfiguration.block);
     } catch(runtime_error &e) {

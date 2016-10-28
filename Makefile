@@ -233,7 +233,7 @@ clean-tests:
 run-tests: clean-tests all run-test-cocl-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-testevents run-test-cocl-testevents2 \
 	run-test-cocl-testcumemcpy run-test-cocl-teststream run-test-cocl-testmemcpydevicetodevice run-test-cocl-testpartialcopy \
 	run-test-cocl-offsetkernelargs run-test-cocl-test_bitcast run-test-cocl-byvaluestructwithpointer run-test-cocl-test_types \
-	run-test-cocl-testnullpointer run-test-cocl-testshfl run-test-cocl-testneg
+	run-test-cocl-testnullpointer run-test-cocl-testshfl run-test-cocl-testneg \
 	run-test-cocl-multi1 run-test-cocl-testblas run-test-cocl-testmath run-test-cocl-testfloat4
 
 .SECONDARY:
