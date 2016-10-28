@@ -127,6 +127,8 @@ template<typename T>
 __device__ T __shfl_down(T val, int offset);
 template<typename T>
 __device__ T __shfl_down(T val, int offset, int warpSize);
+template<typename T>
+__device__ T __shfl_xor(T val, int offset, int warpSize);
 
 #ifdef __CUDA_ARCH__
 #pragma message "adding asserts"
