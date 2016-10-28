@@ -212,8 +212,6 @@ void declareGlobal(GlobalValue *global) {
         throw runtime_error("unimplemented declareglobalvalue for this type");
     }
     gencode += ";\n";
-    // cout << gencode << endl;
-
     globalDeclarations += gencode + "\n";
 }
 
@@ -648,9 +646,7 @@ std::string dumpAddrSpaceCast(AddrSpaceCastInst *instr) {
 std::string dumpMemcpyCharCharLong(CallInst *instr) {
     std::string gencode = "";
     int totalLength = cast<ConstantInt>(instr->getOperand(2))->getSExtValue();
-    // cout << "totalLength " << totalLength << endl;
     int align = cast<ConstantInt>(instr->getOperand(3))->getSExtValue();
-    // cout << "align " << align << endl;
     string dstAddressSpaceStr = dumpAddressSpace(instr->getOperand(0)->getType());
     string srcAddressSpaceStr = dumpAddressSpace(instr->getOperand(1)->getType());
     string elementTypeString = "";
@@ -1191,9 +1187,6 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
     for(BasicBlock::iterator it=basicBlock->begin(), e=basicBlock->end(); it != e; it++) {
         Instruction *instruction = &*it;
         string instructionCode = dumpInstruction(instruction);
-        if(debug) {
-            // cout <<  instructionCode << endl;
-        }
         if(instructionCode != "") {
             instructions_processed++;
             gencode += "    " + instructionCode;
@@ -1212,31 +1205,25 @@ std::string dumpFunctionDeclaration(Function *F) {
     }
     declaration += dumpType(retType) + " " + fname + "(";
     int i = 0;
-    // cout << "dumping function " << fname << endl;
     structpointershimcode = "";
     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
         Argument *arg = &*it;
         storeValueName(arg);
         Type *argType = arg->getType();
         string argName = dumpOperand(arg);
-        // bool isstruct = false;
         string argdeclaration = "";
         bool isKernel = iskernel_by_name[fname];
         bool is_struct_needs_cloning = false;
         bool ispointer = isa<PointerType>(argType);
-        // cout << " arg ispointer " << ispointer << endl;
         if(isKernel) {
-            // outs() << "    its a kernel function" << "\n";
             if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
                 Type *elemType = ptrType->getPointerElementType();
                 if(StructType *structType = dyn_cast<StructType>(elemType)) {
-                    // outs() << "    name " << getName(structType) << "\n";
                     if(getName(structType) != "struct.float4") {
                         unique_ptr<StructInfo> structInfo(new StructInfo());
                         walkStructType(F->getParent(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
                         if(structInfo->pointerInfos.size() > 0) { // struct has pointers...
                             is_struct_needs_cloning = true;
-                            // isstruct = true;
                             argdeclaration = "global " + dumpTypeNoPointers(structType) + "* " + argName + "_nopointers";
                         }
                     }
@@ -1261,8 +1248,6 @@ std::string dumpFunctionDeclaration(Function *F) {
         // and add those pointers t othe argument list, with some appropriate shimcode
         // to copy those pointers into the struct, at the start of the kernel
         int j = 0;
-        // argType->dump();
-        // outs() << "\n";
         if(is_struct_needs_cloning) {
             StructType *structType = cast<StructType>(cast<PointerType>(argType)->getPointerElementType());
             // declare a pointerful struct, then copy the vlaues across, then copy the float *s in
@@ -1282,8 +1267,6 @@ std::string dumpFunctionDeclaration(Function *F) {
             }
         }
         if(isKernel && ispointer && !is_struct_needs_cloning) {
-        // cout << "v2" << endl;
-        // if(isKernel && ispointer) {
             // add offset
             declaration += ", long " + argName + "_offset";
             structpointershimcode = "    " + argName + " = (" + dumpType(arg->getType()) + ")((global char *)" + argName + " + " + argName + "_offset);\n" +
@@ -1317,9 +1300,6 @@ std::string dumpFunction(Function *F) {
         Value *value = *it;
         gencode += "    " + dumpType(value->getType()) + " " + dumpOperand(value) + ";\n";
     }
-        // if(functionNeededForwardDeclarations.find(instruction) != functionNeededForwardDeclarations.end()) {
-        // COCL_PRINT(cout << gencode << endl);
-    // }
 
     if(structpointershimcode != "") {
         gencode += structpointershimcode + "\n";
@@ -1327,7 +1307,6 @@ std::string dumpFunction(Function *F) {
     gencode +=
         body +
     "}\n";
-    // cout << gencode;
     COCL_PRINT(cout << endl);
     return gencode;
 }
@@ -1354,12 +1333,8 @@ std::string dumpModule(Module *M) {
             continue;
         }
         glob->dump();
-        // cout << "name " << name << endl;
         declareGlobal(glob);
     }
-    // cout << getDeclarationsToWrite() << endl;
-    // cout << globalDeclarations << endl;
-    // cout << "done declaring global variables" << endl;
 
     // figure out which functions are kernels
     for(auto it=M->named_metadata_begin(); it != M->named_metadata_end(); it++) {
