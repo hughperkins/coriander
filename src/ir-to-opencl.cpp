@@ -59,6 +59,7 @@ static map<string, string> currentFunctionPhiDeclarationsByName;
 static string globalDeclarations = "";
 static string structpointershimcode = "";
 static set<Value *> functionNeededForwardDeclarations;
+static map<BasicBlock *, int> functionBlockIndex;
 // static set<Value *>valuesAreExpressions;
 
 static bool debug;
@@ -957,24 +958,51 @@ std::string dumpBranch(BranchInst *instr) {
         if(!isSingleExpression(conditionstring)) {
             conditionstring = "(" + conditionstring + ")";
         }
-        gencode += "if " + conditionstring + " {\n";
+        // gencode += "if " + conditionstring + " {\n";
+        string trueSection = "";
+        bool needTrueSection = false;
         string phicode = dumpPhi(instr, instr->getSuccessor(0));
         if(phicode != "") {
-            gencode += "        " + phicode;
+            trueSection += "        " + phicode;
+            needTrueSection = true;
         }
-        gencode += "        goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
+        if(instr->getNextNode() == 0 && functionBlockIndex[instr->getSuccessor(0)] != functionBlockIndex[instr->getParent()] + 1) {
+            trueSection += "        goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
+            needTrueSection = true;
+        }
+        string falseSection = "";
+        bool needFalseSection = false;
         if(instr->getNumSuccessors() == 1) {
         } else if(instr->getNumSuccessors() == 2) {
-            gencode += "    } else {\n";
+            // gencode += "    } else {\n";
             string phicode = dumpPhi(instr, instr->getSuccessor(1));
             if(phicode != "") {
-                gencode += "        " + phicode;
+                falseSection += "        " + phicode;
+                needFalseSection = true;
             }
-            gencode += "        goto " + dumpOperand(instr->getSuccessor(1)) + ";\n";
+            if(instr->getNextNode() == 0 && functionBlockIndex[instr->getSuccessor(1)] != functionBlockIndex[instr->getParent()] + 1) {
+                falseSection += "        goto " + dumpOperand(instr->getSuccessor(1)) + ";\n";
+                needFalseSection = true;
+            }
         } else {
             throw runtime_error("not implemented for this numsuccessors br");
         }
-        gencode += "    }\n";
+
+        if(needTrueSection) {
+            gencode += "if " + conditionstring + " {\n";
+            gencode += trueSection;
+            if(needFalseSection) {
+                gencode += "    } else {\n";
+                gencode += falseSection;
+            }
+            gencode += "    }\n";
+        } else if(needFalseSection) {
+            gencode += "if(!" + conditionstring + ") {\n";
+            gencode += falseSection;
+            gencode += "    }\n";
+        }
+
+        // gencode += "    }\n";
     } else {
         if(instr->getNumSuccessors() == 1) {
             BasicBlock *nextBlock = instr->getSuccessor(0);
@@ -982,7 +1010,15 @@ std::string dumpBranch(BranchInst *instr) {
             if(phicode != "") {
                 gencode += "    " + phicode;
             }
-            gencode += "    goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
+            bool needGoto = true;
+            if(instr->getNextNode() == 0) {
+                if(functionBlockIndex[nextBlock] == functionBlockIndex[instr->getParent()] + 1) {
+                    needGoto = false;
+                }
+            }
+            if(needGoto) {
+                gencode += "    goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
+            }
         } else {
             throw runtime_error("not implemented sucessors != 1 for unconditional br");
         }
@@ -1295,6 +1331,15 @@ std::string dumpFunction(Function *F) {
     string gencode = "";
     string declaration = dumpFunctionDeclaration(F);
     COCL_PRINT(cout << declaration << endl);
+
+    functionBlockIndex.clear();
+    int i = 0;
+    for(auto it=F->begin(); it != F->end(); it++) {
+        BasicBlock *basicBlock = &*it;
+        functionBlockIndex[basicBlock] = i;
+        i++;
+    }
+
     string body = "";
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
