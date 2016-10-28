@@ -135,6 +135,47 @@ std::string stripOuterParams(string instructionCode) {
     return instructionCode;
 }
 
+bool isSingleExpression(string instructionCode) {
+    int depth = 0;
+    int len = instructionCode.size();
+    for(int pos = 0; pos < len; pos++) {
+        char thischar = instructionCode[pos];
+        if(thischar == '(') {
+            depth++;
+        } else if(thischar == ')') {
+            depth--;
+            if(depth == 0 && pos != len - 1) {
+                return false;
+            }
+        } else if(depth == 0 &&
+                thischar != '[' && thischar != ']' &&
+                thischar != '_' &&
+                (thischar < 'a' || thischar > 'z') &&
+                (thischar < 'A' || thischar > 'Z') &&
+                (thischar < '0' || thischar > '9')) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isValidExpression(string instructionCode) {
+    int depth = 0;
+    int len = instructionCode.size();
+    for(int pos = 0; pos < len; pos++) {
+        char thischar = instructionCode[pos];
+        if(thischar == '(') {
+            depth++;
+        } else if(thischar == ')') {
+            depth--;
+            if(depth < 0) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 std::string dumpValue(Value *value) {
     std::string gencode = "";
     if(nameByValue.find(value) != nameByValue.end()) {
@@ -958,42 +999,6 @@ void addPHIDeclaration(PHINode *phi) {
     string name = nameByValue[phi];
     string declaration = dumpType(phi->getType()) + " " + dumpOperand(phi);
     currentFunctionPhiDeclarationsByName[name] = declaration;
-}
-
-bool isSingleExpression(string instructionCode) {
-    int depth = 0;
-    int len = instructionCode.size();
-    for(int pos = 0; pos < len; pos++) {
-        char thischar = instructionCode[pos];
-        if(thischar == '(') {
-            depth++;
-        } else if(thischar == ')') {
-            depth--;
-            if(depth == 0 && pos != len - 1) {
-                return false;
-            }
-        } else if(depth == 0 && thischar != '[' && thischar != ']' && (thischar < 'a' || thischar > 'z') && (thischar < 'A' || thischar > 'Z') && (thischar < '0' || thischar > '9')) {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool isValidExpression(string instructionCode) {
-    int depth = 0;
-    int len = instructionCode.size();
-    for(int pos = 0; pos < len; pos++) {
-        char thischar = instructionCode[pos];
-        if(thischar == '(') {
-            depth++;
-        } else if(thischar == ')') {
-            depth--;
-            if(depth < 0) {
-                return false;
-            }
-        }
-    }
-    return true;
 }
 
 std::string dumpInstruction(Instruction *instruction) {
