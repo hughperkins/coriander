@@ -118,6 +118,12 @@ inline int __atomic_inc(global volatile int *ptr, int val) {
     return 0;
 }
 
+//float __atomic_add(global volatile float *ptr, float val);
+
+inline float __atomic_add(global volatile float *ptr, float val) { // we need to actually implement this
+    return 555;
+}
+
 )";
 
 bool isValidExpression(string instructionCode);
@@ -1306,8 +1312,11 @@ std::string dumpFunctionDeclaration(Function *F) {
                 int offset = pointerInfo->offset;
                 declaration += ", global " + dumpType(pointerInfo->type) + " " + argName + "_ptr" + toString(j);
                 declaration += ", long " + argName + "_ptr_offset" + toString(j);
-                structpointershimcode = "    " + argName + "_ptr" + toString(j) + " = (global " + dumpType(pointerInfo->type) + ")((global char *)" + argName + "_ptr" + toString(j) + " + " + argName + "_ptr_offset" + toString(j) + ");\n" +
-                    structpointershimcode;
+                string ourshim = "    " + argName + "_ptr" + toString(j) + " = (global " + dumpType(pointerInfo->type) + ")((global char *)" + argName + "_ptr" + toString(j) + " + " + argName + "_ptr_offset" + toString(j) + ");\n";
+                ourshim += "    if(" + argName + "_ptr_offset" + toString(j) + " == -1) {\n";
+                ourshim += "        " + argName + "_ptr" + toString(j) + " = 0;\n";
+                ourshim += "    }\n";
+                structpointershimcode = ourshim + structpointershimcode;
                 structpointershimcode += argName + "[0]" + pointerInfo->path + " = " + argName + "_ptr" + toString(j) + ";\n";
                 j++;
             }
@@ -1315,8 +1324,12 @@ std::string dumpFunctionDeclaration(Function *F) {
         if(isKernel && ispointer && !is_struct_needs_cloning) {
             // add offset
             declaration += ", long " + argName + "_offset";
-            structpointershimcode = "    " + argName + " = (" + dumpType(arg->getType()) + ")((global char *)" + argName + " + " + argName + "_offset);\n" +
-                structpointershimcode; // put at front of shim
+            string ourshim = "";
+            ourshim += "    " + argName + " = (" + dumpType(arg->getType()) + ")((global char *)" + argName + " + " + argName + "_offset);\n";
+            ourshim += "    if(" + argName + "_offset == -1) {\n";
+            ourshim += "        " + argName + " = 0;\n";
+            ourshim += "    }\n";
+            structpointershimcode = ourshim + structpointershimcode; // put at front of shim
         }
         i++;
     }
@@ -1562,6 +1575,7 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["_Z9atomicIncIjET_PS0_S0_"] = "__atomic_inc";   // int
     knownFunctionsMap["_Z11__shfl_downIfET_S0_ii"] = "__shfl_down_3";   // float, and see cl_add_definitions, at top
     knownFunctionsMap["_Z11__shfl_downIfET_S0_i"] = "__shfl_down_2";   // float, and see cl_add_definitions, at top
+    knownFunctionsMap["_Z9atomicAddIfET_PS0_S0_"] = "__atomic_add"; // float
 
     try {
         string gencode = "";

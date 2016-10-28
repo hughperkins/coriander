@@ -197,7 +197,7 @@ void setKernelArgCharStar(char *memory_as_charstar) {
         // cl->checkError(err);
         launchConfiguration.kernelArgsToBeReleased.push_back(gpu_struct);
         launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
-        launchConfiguration.kernel->in((int64_t)0);
+        launchConfiguration.kernel->in((int64_t)-1); // `-1` means `null pointer`
         return;
     }
     size_t offset = memory->getOffset(memory_as_charstar);
