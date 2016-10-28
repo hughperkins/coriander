@@ -136,7 +136,7 @@ int cudaConfigureCall(
 
 void configureKernel(
         const char *kernelName, const char *clSourcecodeString) {
-    cout << "configureKernel (name=" << kernelName << endl;
+    COCL_PRINT(cout << "configureKernel (name=" << kernelName << endl);
     // cout << "clSources.size() " << getNumClSources() << endl;
     // for(auto it=clSources.begin(); it != clSources.end(); it++) {
     for(int i = 0; i < getNumClSources(); i++) {
