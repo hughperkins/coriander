@@ -61,19 +61,12 @@ bool single_precision = true;
 class LaunchCallInfo {
 public:
     LaunchCallInfo() {
-        // launchInstruction = 0;
-        // kernelName = "";
-        // for(int i = 0; i < 3; i++) {
-        //     grid[i] = 0;
-        //     block[i] = 0;
-        // }
         grid_xy_value = 0;
         grid_z_value = 0;
         block_xy_value = 0;
         block_z_value = 0;
     }
     std::string kernelName = "";
-    // CallInst *launchInstruction;
     vector<Type *> callTypes;
     vector<Value *> callValuesByValue;
     vector<Value *> callValuesAsPointers;
@@ -81,8 +74,6 @@ public:
     Value *grid_z_value;
     Value *block_xy_value;
     Value *block_z_value;
-    // int grid[3];
-    // int block[3];
 };
 
 static unique_ptr<LaunchCallInfo> launchCallInfo(new LaunchCallInfo);
@@ -91,25 +82,6 @@ ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
     raw_os_ostream my_raw_os_ostream(os);
     my_raw_os_ostream << "LaunchCallInfo " << info.kernelName;
     my_raw_os_ostream << "<<<";
-
-    // my_raw_os_ostream << "dim3(";
-    // for(int j = 0; j < 3; j++) {
-    //     if(j > 0) {
-    //         my_raw_os_ostream << ", ";
-    //     }
-    //     my_raw_os_ostream << info.grid[j];
-    // }
-    // my_raw_os_ostream << ")";
-    // my_raw_os_ostream << ", ";
-
-    // my_raw_os_ostream << "dim3(";
-    // for(int j = 0; j < 3; j++) {
-    //     if(j > 0) {
-    //         my_raw_os_ostream << ", ";
-    //     }
-    //     my_raw_os_ostream << info.block[j];
-    // }
-    // my_raw_os_ostream << ")";
 
     my_raw_os_ostream << ">>>";
     my_raw_os_ostream << "(";
@@ -133,7 +105,6 @@ ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
         my_raw_os_ostream << dumpType(value->getType());
         i ++;
     }
-    // my_raw_os_ostream << "\n";
     return os;
 }
 
