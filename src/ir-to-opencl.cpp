@@ -1090,6 +1090,9 @@ std::string dumpInstruction(Instruction *instruction) {
         case Instruction::SDiv:
             instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
             break;
+        case Instruction::UDiv:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
+            break;
         case Instruction::SRem:
             instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "%");
             break;
