@@ -869,8 +869,13 @@ std::string dumpIcmp(ICmpInst *instr) {
     }
     string op0 = dumpOperand(instr->getOperand(0));
     string op1 = dumpOperand(instr->getOperand(1));
-    op0 = stripOuterParams(op0);
-    op1 = stripOuterParams(op1);
+    // handle case like `a & 3 == 0`
+    if(op0.find('&') == string::npos) {
+        op0 = stripOuterParams(op0);
+    }
+    if(op1.find('&') == string::npos) {
+        op1 = stripOuterParams(op1);
+    }
     gencode += op0;
     gencode += " " + predicate_string + " ";
     gencode += op1;
