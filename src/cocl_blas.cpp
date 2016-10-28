@@ -64,7 +64,7 @@ static Transpose trans_cutocl(int trans) {
 }
 
 std::size_t cublasSetPointerMode(cublasHandle_t handle, cublasPointerMode_t mode) {
-    cout << "cublasSetPointerMode redirect" << endl;
+    // cout << "cublasSetPointerMode redirect" << endl;
     if(mode == CUBLAS_POINTER_MODE_HOST) {
         // cout << "set to host" << endl;
     } else if(mode == CUBLAS_POINTER_MODE_DEVICE) {
