@@ -1,5 +1,27 @@
 # Older News
 
+- Oct 22:
+  - arrays of structs can be passed to kernels again, as long as they contain no pointers
+    - (structs containing pointers can be passed only by-value)
+  - possible to call kernels with offsets added now, as in eg [test/cocl/offsetkernelargs.cu](test/cocl/offsetkernelargs.cu)
+- Oct 20:
+  - fix bug where `threadIdx.x` was being incorrectly written as `get_global_id` instead of `get_local_id` ...
+     - magically, the `test_cuda_elementwise` kernel works much better now :-)
+- Oct 18:
+  - installs to `/usr/local` now
+  - `libcocl.a` contains `libEasyCL.a` now, no need for `libEasyCL.so` at runtime
+  - fixed bug with linking multiple compiled `.cu` files causing error about 'multiple definitions of __opencl_source'
+- Oct 16:
+  - added streams, including kernel launch on non-default stream
+  - removed pinned memory: `cuMemHostAlloc` now just calls `malloc`, see [design.md](doc/design.md) for analysis and thoughts on this.  Let me know if you have any ideas (eg via an issue).
+  - added ability to copy to/from device memory, with an offset added
+- Oct 15:
+  - fixed critical bug where `return;` wasnt being written out.  Which didnt matter when that was at the end of a kernel.  But mattered more when that was the only exit condition for a kernel :-P
+  - added event handling
+  - ~~added pinned memory handling~~
+  - added a bunch of api call implementations for getting information about the driver (mostly stubbed out for now...)
+- Oct 10:
+  - [test/eigen/test_cuda_elementwise_small.cu](https://github.com/hughperkins/cuda-on-cl/blob/a8f6aa55eb678e534cc7d17a3db26c6b8762d683/test/eigen/test_cuda_elementwise_small.cu) builds and runs ok now
 - Oct 8:
   - [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc) compiles completely into compileable OpenCL now [https://github.com/hughperkins/cuda-on-cl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl](https://github.com/hughperkins/cuda-on-cl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl)
   - implemented `cudaMalloc`, `cudaMemcpy`, `cudaFree` (using opencl)
