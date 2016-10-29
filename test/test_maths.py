@@ -67,3 +67,25 @@ __global__ void myKernel(float *data) {
     assert float_data[5] > 100000000
     assert float_data[6] > 100000000
     assert float_data[7] < -100000000
+
+
+def test_pow(context, q, float_data, float_data_gpu):
+
+    code = """
+__global__ void myKernel(float *data) {
+    data[0] = pow(data[1], data[2]);
+}
+"""
+    prog = test_common.compile_code(cl, context, code)
+    float_data[1] = 1.5
+    float_data[2] = 4.6
+    cl.enqueue_copy(q, float_data_gpu, float_data)
+    prog.__getattr__(test_common.mangle('myKernel', ['float *']))(
+        q, (32,), (32,),
+        float_data_gpu, np.int64(0), cl.LocalMemory(4))
+    q.finish()
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    print('float_data[0]', float_data[0])
+    expected = pow(float_data[1], float_data[2])
+    assert float_data[0], expected

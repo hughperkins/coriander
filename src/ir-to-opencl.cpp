@@ -135,9 +135,9 @@ std::string stripOuterParams(string instructionCode) {
         return instructionCode;
     }
     string innerString = instructionCode.substr(1, instructionCode.size() - 2);
-    COCL_PRINT(cout << "innerString [" << innerString << "]" << endl);
+    // COCL_PRINT(cout << "innerString [" << innerString << "]" << endl);
     if(isValidExpression(innerString)) {
-        COCL_PRINT(cout << "stripping braces" << endl);
+        // COCL_PRINT(cout << "stripping braces" << endl);
         instructionCode = innerString;
     }
     return instructionCode;
@@ -222,7 +222,7 @@ std::string dumpValue(Value *value) {
     // mark it as needing to be declared, then return it
     storeValueName(value);
     functionNeededForwardDeclarations.insert(value);
-    COCL_PRINT(cout << "adding to needs forward declaration " << nameByValue[value] << endl);
+    // COCL_PRINT(cout << "adding to needs forward declaration " << nameByValue[value] << endl);
     value->dump();
     outs() << "\n";
     return nameByValue[value];
@@ -768,7 +768,7 @@ std::string dumpCall(CallInst *instr) {
             if(i > 0) {
                 gencode += ", ";
             }
-            gencode += dumpValue(op);
+            gencode += stripOuterParams(dumpValue(op));
             i++;
         }
         gencode += ")";
@@ -781,7 +781,7 @@ std::string dumpCall(CallInst *instr) {
             if(i > 0) {
                 gencode += ", ";
             }
-            gencode += dumpValue(op);
+            gencode += stripOuterParams(dumpValue(op));
             i++;
         }
         gencode += ")";
@@ -826,7 +826,7 @@ std::string dumpCall(CallInst *instr) {
         if(i > 0) {
             gencode += ", ";
         }
-        gencode += dumpValue(op);
+        gencode += stripOuterParams(dumpValue(op));
         i++;
     }
     if(!internalfunc) {
@@ -985,7 +985,7 @@ std::string dumpPhi(BranchInst *branchInstr, BasicBlock *nextBlock) {
             BasicBlock *ourBlock = branchInstr->getParent();
             Value *sourceValue = phi->getIncomingValueForBlock(ourBlock);
             string sourceValueCode = dumpOperand(sourceValue);
-            COCL_PRINT(cout << "adding phi " << sourceValueCode << endl);
+            // COCL_PRINT(cout << "adding phi " << sourceValueCode << endl);
             if(sourceValueCode == "") { // this is a hack really..
                 continue;  // assume its an undef. which it might be
             }
@@ -1098,13 +1098,13 @@ std::string dumpInstruction(Instruction *instruction) {
     string gencode = "";
     string instructionCode = "";
     // if(debug) {
-        COCL_PRINT(cout << resultType << " " << resultName << " =");
-        COCL_PRINT(cout << " " << string(instruction->getOpcodeName()));
-        for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
-            Value *op = &*it->get();
-            COCL_PRINT(cout << " " << dumpOperand(op));
-        }
-        COCL_PRINT(cout << endl);
+        // COCL_PRINT(cout << resultType << " " << resultName << " =");
+        // COCL_PRINT(cout << " " << string(instruction->getOpcodeName()));
+        // for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
+        //     Value *op = &*it->get();
+        //     COCL_PRINT(cout << " " << dumpOperand(op));
+        // }
+        // COCL_PRINT(cout << endl);
     // }
     switch(opcode) {
         case Instruction::FAdd:
@@ -1219,7 +1219,7 @@ std::string dumpInstruction(Instruction *instruction) {
             return instructionCode;
             // break;
         case Instruction::Select:
-            COCL_PRINT(cout << "its a select" << endl);
+            // COCL_PRINT(cout << "its a select" << endl);
             instructionCode = dumpSelect(cast<SelectInst>(instruction));
             break;
         case Instruction::Ret:
@@ -1400,7 +1400,7 @@ std::string dumpFunction(Function *F) {
     functionNeededForwardDeclarations.clear();
     string gencode = "";
     string declaration = dumpFunctionDeclaration(F);
-    COCL_PRINT(cout << declaration << endl);
+    // COCL_PRINT(cout << declaration << endl);
 
     functionBlockIndex.clear();
     int i = 0;
@@ -1432,7 +1432,7 @@ std::string dumpFunction(Function *F) {
     gencode +=
         body +
     "}\n";
-    COCL_PRINT(cout << endl);
+    // COCL_PRINT(cout << endl);
     return gencode;
 }
 
@@ -1628,6 +1628,7 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["floorf"] = "floor";
     knownFunctionsMap["logf"] = "log";
     knownFunctionsMap["sqrtf"] = "sqrt";
+    knownFunctionsMap["pow"] = "pow"; // just so we dont try to pass `scratch` to it :-P
     // knownFunctoinsMap["_Z11syncthreadsv"] = "";
 
     knownFunctionsMap["_Z9atomicCASIjET_PS0_S0_S0_"] = "atomic_cmpxchg";   // int
