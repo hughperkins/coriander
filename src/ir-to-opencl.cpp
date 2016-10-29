@@ -204,6 +204,12 @@ std::string dumpValue(Value *value) {
             // COCL_PRINT(cout << "dumpValue, float" << endl);
             float floatvalue = readFloatConstant(constFP);
             string asstring = toString(floatvalue);
+            if(asstring == "inf") {
+                return "INFINITY";
+            }
+            if(asstring == "-inf") {
+                return "-INFINITY";
+            }
             if(asstring.find('.') == string::npos) {
                 asstring += ".0";
             }

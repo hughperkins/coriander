@@ -29,7 +29,7 @@ def test_floatconstants(context, q, float_data, float_data_gpu):
 
     code = """
 __device__ float4 getvals() {
-    return make_float4(0xFFF0000000000000, 0x7FF0000000000000, 0x7FF0000000000000, 0x7FF0000000000000);
+    return make_float4(0xFFF0000000000000, 0x7FF0000000000000, INFINITY, -INFINITY);
 }
 
 __global__ void myKernel(float *data) {
@@ -38,6 +38,10 @@ __global__ void myKernel(float *data) {
     float4 vals = getvals();
     data[2] = vals.x;
     data[3] = vals.y;
+    data[4] = vals.w;
+    data[5] = vals.z;
+    data[6] = INFINITY;
+    data[7] = -INFINITY;
 }
 """
     prog = test_common.compile_code(cl, context, code)
@@ -51,7 +55,15 @@ __global__ void myKernel(float *data) {
     print('float_data[1]', float_data[1])
     print('float_data[2]', float_data[2])
     print('float_data[3]', float_data[3])
+    print('float_data[4]', float_data[4])
+    print('float_data[5]', float_data[5])
+    print('float_data[6]', float_data[6])
+    print('float_data[7]', float_data[7])
     assert float_data[0] > 100000000
     assert float_data[1] > 100000000
     assert float_data[2] > 100000000
     assert float_data[3] > 100000000
+    assert float_data[4] < -100000000
+    assert float_data[5] > 100000000
+    assert float_data[6] > 100000000
+    assert float_data[7] < -100000000
