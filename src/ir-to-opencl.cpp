@@ -194,13 +194,15 @@ std::string dumpValue(Value *value) {
 
     if(Constant *constant = dyn_cast<Constant>(value)) {
         if(ConstantInt *constInt = dyn_cast<ConstantInt>(constant)) {
+            // COCL_PRINT(cout << "dumpValue, constint" << endl);
             int intvalue = readInt32Constant(constInt);
             string asstring = toString(intvalue);
             nameByValue[value] = asstring;
             return asstring;
         }
         if(ConstantFP *constFP = dyn_cast<ConstantFP>(constant)) {
-            int floatvalue = readFloatConstant(constFP);
+            // COCL_PRINT(cout << "dumpValue, float" << endl);
+            float floatvalue = readFloatConstant(constFP);
             string asstring = toString(floatvalue);
             if(asstring.find('.') == string::npos) {
                 asstring += ".0";
