@@ -88,4 +88,56 @@ __global__ void myKernel(float *data) {
     q.finish()
     print('float_data[0]', float_data[0])
     expected = pow(float_data[1], float_data[2])
-    assert float_data[0], expected
+    assert float_data[0] == expected
+
+
+def test_fptosi(context, q, float_data, float_data_gpu, int_data, int_data_gpu):
+
+    code = """
+__global__ void myKernel(float *float_data, int *int_data) {
+    int_data[0] = (int)float_data[0];
+}
+"""
+    prog = test_common.compile_code(cl, context, code)
+    float_data[0] = 4.7
+    float_data[1] = 1.5
+    float_data[2] = 4.6
+    cl.enqueue_copy(q, float_data_gpu, float_data)
+    prog.__getattr__(test_common.mangle('myKernel', ['float *', 'int *']))(
+        q, (32,), (32,),
+        float_data_gpu, np.int64(0),
+        int_data_gpu, np.int64(0),
+        cl.LocalMemory(4))
+    q.finish()
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    cl.enqueue_copy(q, int_data, int_data_gpu)
+    q.finish()
+    print('int_data[0]', int_data[0])
+    # expected = pow(float_data[1], float_data[2])
+    assert int_data[0] == 4
+
+
+def test_sitofp(context, q, float_data, float_data_gpu, int_data, int_data_gpu):
+
+    code = """
+__global__ void myKernel(float *float_data, int *int_data) {
+    float_data[0] = (float)int_data[0];
+}
+"""
+    prog = test_common.compile_code(cl, context, code)
+    int_data[0] = 5
+    int_data[1] = 2
+    int_data[2] = 4
+    cl.enqueue_copy(q, int_data_gpu, int_data)
+    prog.__getattr__(test_common.mangle('myKernel', ['float *', 'int *']))(
+        q, (32,), (32,),
+        float_data_gpu, np.int64(0),
+        int_data_gpu, np.int64(0),
+        cl.LocalMemory(4))
+    q.finish()
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    cl.enqueue_copy(q, int_data, int_data_gpu)
+    q.finish()
+    print('float_data[0]', float_data[0])
+    # expected = pow(float_data[1], float_data[2])
+    assert float_data[0] == 5

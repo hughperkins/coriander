@@ -854,15 +854,31 @@ std::string dumpSExt(CastInst *instr) {
     return gencode;
 }
 
+std::string dumpFPToUI(FPToUIInst *instr) {
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
+    return gencode;
+}
+
+std::string dumpFPToSI(FPToSIInst *instr) {
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
+    return gencode;
+}
+
 std::string dumpUIToFP(UIToFPInst *instr) {
     string gencode = "";
-    gencode += dumpValue(instr->getOperand(0));
+    string typestr = dumpType(instr->getType());
+    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
     return gencode;
 }
 
 std::string dumpSIToFP(SIToFPInst *instr) {
     string gencode = "";
-    gencode += dumpValue(instr->getOperand(0));
+    string typestr = dumpType(instr->getType());
+    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
     return gencode;
 }
 
@@ -877,7 +893,8 @@ std::string dumpFPTrunc(CastInst *instr) {
     // since this is float point trunc, lets just assume we're going from double to float
     // fix any exceptiosn to this rule later
     string gencode = "";
-    gencode += "(float)" + dumpValue(instr->getOperand(0));
+    string typestr = dumpType(instr->getType());
+    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
     return gencode;
 }
 
@@ -1199,6 +1216,12 @@ std::string dumpInstruction(Instruction *instruction) {
             break;
         case Instruction::SIToFP:
             instructionCode = dumpSIToFP(cast<SIToFPInst>(instruction));
+            break;
+        case Instruction::FPToUI:
+            instructionCode = dumpFPToUI(cast<FPToUIInst>(instruction));
+            break;
+        case Instruction::FPToSI:
+            instructionCode = dumpFPToSI(cast<FPToSIInst>(instruction));
             break;
         case Instruction::GetElementPtr:
             instructionCode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
