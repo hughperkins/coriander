@@ -73,20 +73,16 @@ clean:
 	rm -Rf build/* test/generated/* test/*.o
 
 %-device.cl: %-device.ll build/ir-to-opencl
-	echo building $@ from $<
 	build/ir-to-opencl $(DEBUG) $< $@
 
 # cocl
 build/test-cocl-multi1-%.o: test/cocl/multi1/%.cu
-	echo building $@ from $<
 	cocl -c -o $@ $<
 
 build/test-cocl-callinternal-%.o: test/cocl/callinternal/%.cu
-	echo building $@ from $<
 	cocl -c -o $@ $<
 
 build/test-cocl-%.o: test/cocl/%.cu
-	echo building $@ from $<
 	cocl -g -c -o $@ $<
 
 # executables

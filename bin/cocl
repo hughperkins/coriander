@@ -219,15 +219,15 @@ if [[ ! -v COMPILE ]]; then {
 # echo PASSTHRU ${PASSTHRU}
 OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} PASSTHRU=${PASSTHRU} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${SCRIPT_DIR}/../share/cocl/cocl.Makefile
 
-if [[ -v COMPILE ]]; then {
-    set +x
-    echo ""
-    echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}"
-    echo ""
-} else {
-    g++ -o ${OUTPUTBASEPATH}${FINALPOSTFIX} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} -L${COCL_HOME}/build -lcocl -lOpenCL
-    set +x
-    echo ""
-    echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}${FINALPOSTFIX}"
-    echo ""
-} fi
+# if [[ -v COMPILE ]]; then {
+#     set +x
+#     echo ""
+#     echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}"
+#     echo ""
+# } else {
+#     g++ -o ${OUTPUTBASEPATH}${FINALPOSTFIX} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} -L${COCL_HOME}/build -lcocl -lOpenCL
+#     set +x
+#     echo ""
+#     echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}${FINALPOSTFIX}"
+#     echo ""
+# } fi
