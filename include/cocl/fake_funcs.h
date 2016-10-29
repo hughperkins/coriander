@@ -139,6 +139,9 @@ inline int __float_as_int(float val) {
     return *(int *)&val;
 }
 
+int __clzll(long long x);
+long long __umul64hi(unsigned long long x, unsigned long long y);
+
 #ifdef __CUDA_ARCH__
 // #pragma message "adding asserts"
 #define NDEBUG
