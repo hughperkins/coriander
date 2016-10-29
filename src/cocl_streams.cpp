@@ -15,8 +15,9 @@
 #include "cocl/cocl_streams.h"
 
 #include "cocl/cocl_events.h"
-
 #include "cocl/hostside_opencl_funcs.h"
+#include "cocl/local_config.h"
+#include "cocl/cocl_context.h"
 
 #include "EasyCL.h"
 
@@ -25,6 +26,8 @@
 #include <vector>
 #include <map>
 #include <set>
+
+#include "pthread.h"
 
 #include "CL/cl.h"
 
@@ -36,8 +39,38 @@ using namespace easycl;
 // #define COCL_PRINT(stuff) \
 //     stuff ;
 
+namespace cocl {
+    void coclCallback(cl_event event, cl_int status, void *userdata) {
+        ThreadVars *v = getThreadVars();
+        EasyCL *cl = v->getCl();
+        cout << "coclCallback running " << endl;
+        cl->checkError(status);
+        CoclCallbackInfo *info = (CoclCallbackInfo *)userdata;
+        clReleaseEvent(event);
+        info->callback(info->_queue, 0, info->userdata);
+        delete info;
+    }
+
+    CoclStream::CoclStream(EasyCL *cl) {
+        this->clqueue = cl->newQueue();
+    }
+    CoclStream::~CoclStream() {
+        delete clqueue;
+    }
+    // StreamLock::StreamLock(CoclStream *stream) {
+    //     this->stream = stream;
+    //     pthread_mutex_lock(&stream->mutex);
+    // }
+    // StreamLock::~StreamLock() {
+    //     pthread_mutex_unlock(&stream->mutex);
+    // }
+}
+
 size_t cuStreamWaitEvent(char *_queue, Event *event, unsigned int flags) {
-    CLQueue *queue = (CLQueue*)_queue;
+    CoclStream *stream = (CoclStream *)_queue;
+    // StreamLock streamlock(stream);
+    CLQueue *queue = stream->clqueue;
+    // CLQueue *queue = (CLQueue*)_queue;
     COCL_PRINT(cout << "cuStreamWaitEvent redirected queue=" << queue << " event=" << event << " flags=" << flags << endl);
     if(queue == 0) {
         cout << "cuStreamWaitEvent stream==0 not implemented" << std::endl;
@@ -69,7 +102,12 @@ size_t cuStreamWaitEvent(char *_queue, Event *event, unsigned int flags) {
 }
 
 size_t cudaStreamSynchronize(char *_queue) {
-    CLQueue *queue = (CLQueue*)_queue;
+    CoclStream *stream = (CoclStream *)_queue;
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getCl();
+    // StreamLock streamlock(stream);
+    CLQueue *queue = stream->clqueue;
+    // CLQueue *queue = (CLQueue*)_queue;
     COCL_PRINT(cout << "cudaStreamSynchronize queue=" << queue << endl);
     hostside_opencl_funcs_assure_initialized();
 
@@ -89,58 +127,43 @@ size_t cuStreamSynchronize(char *_queue) {
     return cudaStreamSynchronize(_queue);
 }
 
-size_t cuStreamCreate(char **_pqueue, unsigned int flags) {
-    CLQueue **pqueue = (CLQueue**)_pqueue;
-    hostside_opencl_funcs_assure_initialized();
-    CLQueue *queue = cl->newQueue();
-    COCL_PRINT(cout << "cuStreamCreate redirected new queue " << queue << endl);
-    *pqueue = queue;
+size_t cuStreamCreate(char **_pstream, unsigned int flags) {
+    CoclStream **pstream = (CoclStream**)_pstream;
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getCl();
+    // hostside_opencl_funcs_assure_initialized();
+    // CLQueue *clqueue = cl->newQueue();
+    CoclStream *coclStream = new CoclStream(cl);
+    COCL_PRINT(cout << "cuStreamCreate redirected new stream " << (void *)coclStream << endl);
+    // coclStream->clqueue = clqueue;
+    *pstream = coclStream;
     // cout << "done assign" << endl;
     return 0;
 }
 
 size_t cuStreamDestroy_v2(char *_queue) {
-    CLQueue *queue = (CLQueue*)_queue;
-    COCL_PRINT(cout << "cuStreamDestroy_v2 redirected queue=" << queue << endl);
-    delete queue;
+    CoclStream *stream = (CoclStream *)_queue;
+    // StreamLock streamlock(stream);
+    COCL_PRINT(cout << "cuStreamDestroy_v2 redirected stream=" << (void *)stream << endl);
+    delete stream;
     return 0;
 }
 
 size_t cudaStreamQuery(char *_queue) {
-    // CLQueue *queue = (CLQueue*)_queue;
     return cuStreamSynchronize(_queue);
-    // we're just going to run sync for now...
-    // throw runtime_error("not implemented");
 }
 
 size_t cuStreamQuery(char *_queue) {
-    // CLQueue *queue = (CLQueue*)_queue;
     return cuStreamSynchronize(_queue);
-    // we're just going to run sync for now...
-    // throw runtime_error("not implemented");
 }
-
-namespace cocl {
-    class CoclCallbackInfo {
-    public:
-        cudacallbacktype callback;
-        void *userdata;
-        char *_queue;
-    };
-    void coclCallback(cl_event event, cl_int status, void *userdata) {
-        cout << "coclCallback running " << endl;
-        cl->checkError(status);
-        CoclCallbackInfo *info = (CoclCallbackInfo *)userdata;
-        clReleaseEvent(event);
-        info->callback(info->_queue, 0, info->userdata);
-        delete info;
-    }
-}
-    typedef void (*cudacallbacktype)(char *stream, size_t status, void*userdata);
-
 
 size_t cudaStreamAddCallback(char *_queue, cudacallbacktype callback, void *userdata, int flags) {
-    CLQueue *queue = (CLQueue*)_queue;
+    CoclStream *stream = (CoclStream *)_queue;
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getCl();
+    // StreamLock streamlock(stream);
+    CLQueue *queue = stream->clqueue;
+    // CLQueue *queue = (CLQueue*)_queue;
     // we need to queue an event, and attach the callback to that;
     cl_int err;
     cl_event event;

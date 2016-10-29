@@ -76,159 +76,159 @@ clean:
 	build/ir-to-opencl $(DEBUG) $< $@
 
 # cocl
-build/test-cocl-multi1-%.o: test/cocl/multi1/%.cu
+build/test-multi1-%.o: test/cocl/multi1/%.cu
 	cocl -c -o $@ $<
 
-build/test-cocl-callinternal-%.o: test/cocl/callinternal/%.cu
+build/test-callinternal-%.o: test/cocl/callinternal/%.cu
 	cocl -c -o $@ $<
 
-build/test-cocl-%.o: test/cocl/%.cu
+build/test-%.o: test/cocl/%.cu
 	cocl -g -c -o $@ $<
 
 # executables
-build/test-cocl-multi1: build/test-cocl-multi1-main.o build/test-cocl-multi1-k1.o build/test-cocl-multi1-k2.o build/libcocl.a
-	g++ -o $@ build/test-cocl-multi1-main.o build/test-cocl-multi1-k1.o build/test-cocl-multi1-k2.o -g -lcocl -lOpenCL
+build/test-multi1: build/test-multi1-main.o build/test-multi1-k1.o build/test-multi1-k2.o build/libcocl.a
+	g++ -o $@ build/test-multi1-main.o build/test-multi1-k1.o build/test-multi1-k2.o -g -lcocl -lOpenCL -lpthread
 
-build/test-cocl-callinternal: build/test-cocl-callinternal-main.o build/test-cocl-callinternal-test_callinternal.o build/libcocl.a
-	g++ -o $@ build/test-cocl-callinternal-main.o build/test-cocl-callinternal-test_callinternal.o -g -lcocl -lOpenCL
+build/test-callinternal: build/test-callinternal-main.o build/test-callinternal-test_callinternal.o build/libcocl.a
+	g++ -o $@ build/test-callinternal-main.o build/test-callinternal-test_callinternal.o -g -lcocl -lOpenCL -lpthread
 
 build/test-%: build/test-%.o build/libcocl.a
-	g++ -o $@ $< -g -lcocl -lOpenCL
-
-build/test-cocl-%: build/test-cocl-%.o build/libcocl.a
-	g++ -o $@ $< -g -lcocl -lOpenCL
-
-build/eigen-%: build/eigen-%.o build/libcocl.a
-	g++ -o $@ $< -lcocl -lOpenCL
+	g++ -o $@ $< -g -lcocl -lOpenCL -lpthread
 
 # run
-run-test-cocl-cuda_sample: build/test-cocl-cuda_sample
+run-test-cuda_sample: build/test-cuda_sample
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-test_memhostalloc: build/test-cocl-test_memhostalloc
+run-test-test_memhostalloc: build/test-test_memhostalloc
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-testevents: build/test-cocl-testevents
+run-test-testevents: build/test-testevents
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-testevents2: build/test-cocl-testevents2
+run-test-testevents2: build/test-testevents2
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-testcumemcpy: build/test-cocl-testcumemcpy
+run-test-testcumemcpy: build/test-testcumemcpy
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-teststream: build/test-cocl-teststream
+run-test-teststream: build/test-teststream
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-testmemcpydevicetodevice: build/test-cocl-testmemcpydevicetodevice
+run-test-testmemcpydevicetodevice: build/test-testmemcpydevicetodevice
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-testpartialcopy: build/test-cocl-testpartialcopy
+run-test-testpartialcopy: build/test-testpartialcopy
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-offsetkernelargs: build/test-cocl-offsetkernelargs
+run-test-offsetkernelargs: build/test-offsetkernelargs
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-test_bitcast: build/test-cocl-test_bitcast
+run-test-test_bitcast: build/test-test_bitcast
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-byvaluestructwithpointer: build/test-cocl-byvaluestructwithpointer
+run-test-byvaluestructwithpointer: build/test-byvaluestructwithpointer
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-test_types: build/test-cocl-test_types
+run-test-test_types: build/test-test_types
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-callinternal: build/test-cocl-callinternal
+run-test-callinternal: build/test-callinternal
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-testfloat4: build/test-cocl-testfloat4
+run-test-testfloat4: build/test-testfloat4
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-testneg: build/test-cocl-testneg
+run-test-multithreading: build/test-multithreading
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-testshfl: build/test-cocl-testshfl
+run-test-testneg: build/test-testneg
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-test_callbacks: build/test-cocl-test_callbacks
+run-test-testshfl: build/test-testshfl
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-testnullpointer: build/test-cocl-testnullpointer
+run-test-test_callbacks: build/test-test_callbacks
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-test_kernelcachedok: build/test-cocl-test_kernelcachedok
+run-test-testnullpointer: build/test-testnullpointer
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-testblas: build/test-cocl-testblas
+run-test-test_kernelcachedok: build/test-test_kernelcachedok
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-testmath: build/test-cocl-testmath
+run-test-testblas: build/test-testblas
 	################################
 	# running:
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
-run-test-cocl-multi1: build/test-cocl-multi1
+run-test-testmath: build/test-testmath
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
+run-test-multi1: build/test-multi1
 	################################
 	# running:
 	################################
@@ -238,12 +238,12 @@ clean-tests:
 	touch build/test~
 	rm build/test*
 
-run-tests: clean-tests all run-test-cocl-cuda_sample run-test-cocl-test_memhostalloc run-test-cocl-testevents run-test-cocl-testevents2 \
-	run-test-cocl-testcumemcpy run-test-cocl-teststream run-test-cocl-testmemcpydevicetodevice run-test-cocl-testpartialcopy \
-	run-test-cocl-offsetkernelargs run-test-cocl-test_bitcast run-test-cocl-byvaluestructwithpointer run-test-cocl-test_types \
-	run-test-cocl-testnullpointer run-test-cocl-testshfl run-test-cocl-testneg \
-	run-test-cocl-multi1 run-test-cocl-testblas run-test-cocl-testmath run-test-cocl-testfloat4 \
-	run-test-cocl-test_callbacks run-test-cocl-test_kernelcachedok
+run-tests: clean-tests all run-test-cuda_sample run-test-test_memhostalloc run-test-testevents run-test-testevents2 \
+	run-test-testcumemcpy run-test-teststream run-test-testmemcpydevicetodevice run-test-testpartialcopy \
+	run-test-offsetkernelargs run-test-test_bitcast run-test-byvaluestructwithpointer run-test-test_types \
+	run-test-testnullpointer run-test-testshfl run-test-testneg \
+	run-test-multi1 run-test-testblas run-test-testmath run-test-testfloat4 \
+	run-test-test_callbacks run-test-test_kernelcachedok
 
 .SECONDARY:
 

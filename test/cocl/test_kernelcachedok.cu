@@ -31,6 +31,7 @@ void testfloatstar() {
     getValue<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(((float *)deviceFloats1), 0);
     getValue<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(((float *)deviceFloats1), 0);
     getValue<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(((float *)deviceFloats1), 0);
+    cuStreamSynchronize(stream);
 
     cout << "num kernels cached " << cocl::getNumCachedKernels() << endl;
     cout << "num kernel calls " << cocl::getNumKernelCalls() << endl;

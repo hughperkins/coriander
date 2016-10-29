@@ -15,6 +15,7 @@
 #include "cocl/cocl_error.h"
 
 #include "cocl/cocl_defs.h"
+#include "cocl/local_config.h"
 
 #include <iostream>
 using namespace std;

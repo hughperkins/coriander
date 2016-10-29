@@ -215,7 +215,7 @@
 #define __CUDACC__
 #define __NVCC__
 
-#define __device__ __attribute__((device))
+// #define __device__ __attribute__((device))
 
 #if defined(__CUDA_ARCH__)
 // We need to emit IR declaration for non-existing __nvvm_reflect() to

@@ -15,6 +15,8 @@
 #include "cocl/cocl_properties.h"
 
 #include "cocl/hostside_opencl_funcs.h"
+#include "cocl/local_config.h"
+#include "cocl/cocl_context.h"
 
 #include <iostream>
 #include <memory>
@@ -32,6 +34,8 @@ using namespace easycl;
 
 size_t cuDeviceGetAttribute(
        int *value, int attribute, CUdevice device) {
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getCl();
     // COCL_PRINT(cout << "cuDeviceGetAttribute redirected" << endl);
     if(CU_DEVICE_ATTRIBUTE_ECC_ENABLED == attribute) {
         *value = 0;
@@ -67,6 +71,8 @@ cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
 
 size_t cuDeviceGetName(char *buf, int bufsize, CUdevice device) {
     COCL_PRINT(cout << "cuDeviceGetName redirected" << endl);
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getCl();
     string name = getDeviceInfoString(cl->device, CL_DEVICE_NAME);
     sprintf(buf, "%s", name.c_str());
     // sprintf(buf, "an opencl device");
@@ -95,6 +101,8 @@ size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, CUdevice device) 
 size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
     COCL_PRINT(cout << "cudaGetDeviceProperties stub device=" << device << endl);
     // prop->totalGlobalMem = deviceinfo_helper->getDeviceInfoInt64(cl->device, CL_DEVICE_MAX_MEM_ALLOC_SIZE);
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getCl();
     prop->totalGlobalMem = getDeviceInfoInt64(cl->device, CL_DEVICE_GLOBAL_MEM_SIZE);
     prop->sharedMemPerBlock = cl->getLocalMemorySize();
     prop->regsPerBlock = 64;

@@ -14,6 +14,7 @@
 
 #include "cocl/cocl_blas.h"
 
+#include "cocl/cocl_context.h"
 #include "cocl/hostside_opencl_funcs.h"
 #include "EasyCL.h"
 
@@ -27,9 +28,11 @@ using namespace easycl;
 namespace cocl {
     class CoclBlas {
     public:
-        CoclBlas() {
+        CoclBlas(EasyCL *cl) {
+            this->cl = cl;
             queue = cl->default_queue;
         }
+        EasyCL *cl;
         CLQueue *queue;
     };
     static cublasPointerMode_t pointermode = CUBLAS_POINTER_MODE_HOST;
@@ -37,7 +40,10 @@ namespace cocl {
 
 size_t cublasCreate(cublasHandle_t *phandle) {
     // cout << "cublasCreate redirect 3" << endl;
-    CoclBlas *coclBlas = new CoclBlas();
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getCl();
+    // cl_context *ctx = cl->context;
+    CoclBlas *coclBlas = new CoclBlas(cl);
     *phandle = (cublasHandle_t)coclBlas;
     return 0;
 }
@@ -84,12 +90,15 @@ std::size_t cublasGetPointerMode(cublasHandle_t handle, cublasPointerMode_t *mod
 
 std::size_t cublasSetStream(cublasHandle_t handle, cudaStream_t streamId) {
     // cout << "cublasSetStream redirect" << endl;
+    ThreadVars *v = getThreadVars();
     CoclBlas *coclBlas = (CoclBlas *)handle;
-    CLQueue *queue = (CLQueue *)streamId;
-    if(queue == 0) {
+    CoclStream *coclStream = (CoclStream *)streamId;
+    if(coclStream == 0) {
         // cout << "using dfeault queue" << endl;
-        queue = cl->default_queue;
+        coclStream = v->currentContext->default_stream.get();
     }
+    CLQueue *queue = coclStream->clqueue;
+    // CLQueue *queue = (CLQueue *)streamId;
     coclBlas->queue = queue;
     return 0;
 }

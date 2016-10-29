@@ -17,6 +17,7 @@
 #include "cocl/cocl.h"
 #include "cocl/cocl_memory.h"
 #include "cocl/cocl_clsources.h"
+#include "cocl/cocl_streams.h"
 #include "cocl/local_config.h"
 
 #include <iostream>
@@ -51,12 +52,14 @@ CUfunc_cache CU_FUNC_CACHE_PREFER_L1;
 CUfunc_cache CU_FUNC_CACHE_PREFER_EQUAL;
 
 namespace cocl {
+    pthread_mutex_t launchMutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
     class LaunchConfiguration {
     public:
         size_t grid[3];
         size_t block[3];
         CLKernel *kernel;
         CLQueue *queue = 0;  // NOT owned by us
+        CoclStream *coclStream = 0; // NOT owned
 
         vector<cl_mem> kernelArgsToBeReleased;
         std::string kernelName = "";;
@@ -64,28 +67,44 @@ namespace cocl {
     };
     LaunchConfiguration launchConfiguration;
 
-    unique_ptr<EasyCL> cl;
-    cl_context *ctx;
-    cl_command_queue *queue;
+    // unique_ptr<EasyCL> cl;
+    // pthread_mutex_t clByDeviceMutex = PTHREAD_MUTEX_INITIALIZER;
+    // map<int, EasyCL *>clByDevice;
+    // class ClByDeviceMutex {
+    // public:
+    //     ClByDeviceMutex() {
+    //         pthread_mutex_lock(&clByDeviceMutex);
+    //     }
+    //     ~ClByDeviceMutex() {
+    //         pthread_mutex_unlock(&clByDeviceMutex);
+    //     }
+    // };
+    // cl_context *ctx;
+    // cl_command_queue *queue;
+    // CoclStream *defaultCoclStream = 0;
 
-    bool initialized = false;
+    // CoclStream *getDefaultCoclStream() {
+    //     return defaultCoclStream;
+    // }
+    // bool initialized = false;
 }
 
 using namespace cocl;
 
 void hostside_opencl_funcs_init() {
     // COCL_PRINT(cout << "initialize cl context" << endl);
-    cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
-    ctx = cl->context;
-    queue = cl->queue;
+    // cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
+    // ctx = cl->context;
+    // queue = cl->queue;
+    // defaultCoclStream = new CoclStream(cl.get());
 }
 
 void hostside_opencl_funcs_assure_initialized(void) {
     // yes this is not threadsafe.  or anything safe really...
-    if(!initialized) {
-        hostside_opencl_funcs_init();
-        initialized = true;
-    }
+    // if(!initialized) {
+    //     hostside_opencl_funcs_init();
+    //     initialized = true;
+    // }
 }
 
 extern "C" {
@@ -97,7 +116,7 @@ extern "C" {
 
 size_t cuInit(unsigned int flags) {
     // COCL_PRINT(cout << "redirected cuInit()" << endl);
-    hostside_opencl_funcs_assure_initialized();
+    // hostside_opencl_funcs_assure_initialized();
     return 0;
 }
 
@@ -107,15 +126,21 @@ size_t cuInit(unsigned int flags) {
 int cudaConfigureCall(
         dim3 grid,
         dim3 block, long long sharedMem, char *queue_as_voidstar) {
-    CLQueue *queue = (CLQueue *)queue_as_voidstar;
+    pthread_mutex_lock(&launchMutex);
+    CoclStream *coclStream = (CoclStream *)queue_as_voidstar;
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getCl();
+    if(coclStream == 0) {
+        coclStream = v->currentContext->default_stream.get();
+        // coclStream = defaultCoclStream;
+        // throw runtime_error("not implemented: default stream");
+        // COCL_PRINT(cout << "using default_queue " << queue << endl);
+    }
+    CLQueue *clqueue = coclStream->clqueue;
     // COCL_PRINT(cout << "cudaConfigureCall queue=" << queue << endl);
     if(sharedMem != 0) {
         COCL_PRINT(cout << "cudaConfigureCall: Not implemented: non-zero shared memory" << endl);
         throw runtime_error("cudaConfigureCall: Not implemented: non-zero shared memory");
-    }
-    if(queue == 0) {
-        queue = cl->default_queue;
-        // COCL_PRINT(cout << "using default_queue " << queue << endl);
     }
     int grid_x = grid.x;
     int grid_y = grid.y;
@@ -125,7 +150,8 @@ int cudaConfigureCall(
     int block_z = block.z;
     COCL_PRINT(cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl);
     COCL_PRINT(cout << "block(" << block_x << ", " << block_y << ", " << block_z << ")" << endl);
-    launchConfiguration.queue = queue;
+    launchConfiguration.queue = clqueue;
+    launchConfiguration.coclStream = coclStream;
     launchConfiguration.grid[0] = grid_x;
     launchConfiguration.grid[1] = grid_y;
     launchConfiguration.grid[2] = grid_z;
@@ -136,52 +162,54 @@ int cudaConfigureCall(
 }
 
 namespace cocl {
-    pthread_mutex_t kernelByNameMutex = PTHREAD_MUTEX_INITIALIZER;
-    map<string, CLKernel *>kernelByName;
-    volatile int numKernelCalls = 0;
+    // pthread_mutex_t kernelByNameMutex = PTHREAD_MUTEX_INITIALIZER;
+    // map<string, CLKernel *>kernelByName;
+    // volatile int numKernelCalls = 0;
 
-    class KernelByNameMutex {
-    public:
-        KernelByNameMutex() {
-            // COCL_PRINT(cout << "locking KernelByNameMutex mutex" << endl);
-            pthread_mutex_lock(&kernelByNameMutex);
-        }
-        ~KernelByNameMutex() {
-            // COCL_PRINT(cout << "releasing KernelByNameMutex mutex" << endl);
-            pthread_mutex_unlock(&kernelByNameMutex);
-        }
-    };
+    // class KernelByNameMutex {
+    // public:
+    //     KernelByNameMutex() {
+    //         // COCL_PRINT(cout << "locking KernelByNameMutex mutex" << endl);
+    //         pthread_mutex_lock(&kernelByNameMutex);
+    //     }
+    //     ~KernelByNameMutex() {
+    //         // COCL_PRINT(cout << "releasing KernelByNameMutex mutex" << endl);
+    //         pthread_mutex_unlock(&kernelByNameMutex);
+    //     }
+    // };
 
     int getNumCachedKernels() {
-        KernelByNameMutex mutex;
-        return kernelByName.size();
+        // KernelByNameMutex mutex;
+        return getThreadVars()->kernelByName.size();
     }
 
     int getNumKernelCalls() {
-        KernelByNameMutex mutex;
-        return numKernelCalls;
+        // KernelByNameMutex mutex;
+        return getThreadVars()->numKernelCalls;
     }
 
     CLKernel *getKernelForName(string name, string sourcecode) {
-        KernelByNameMutex mutex;
-        numKernelCalls++;
-        if(kernelByName.find(name) != kernelByName.end()) {
-            return kernelByName[name];
+        // KernelByNameMutex mutex;
+        ThreadVars *v = getThreadVars();
+        EasyCL *cl = v->getCl();
+        v->numKernelCalls++;
+        if(v->kernelByName.find(name) != v->kernelByName.end()) {
+            return v->kernelByName[name];
         }
         // compile the kernel.  we are still locking the mutex, but I cnat think of a better
         // way right now...
         COCL_PRINT(cout << "building kernel " << name << endl);
         CLKernel *kernel = cl->buildKernelFromString(sourcecode, name, "", "__internal__");
         COCL_PRINT(cout << " ... built" << endl);
-        kernelByName[name ] = kernel;
+        v->kernelByName[name ] = kernel;
         cl->storeKernel(name, kernel, true);  // this will cause the kernel to be deleted with cl.  Not clean yet, but a start
         return kernel;
     }
 }
 
-void configureKernel(
-        const char *kernelName, const char *clSourcecodeString) {
-    COCL_PRINT(cout << "configureKernel (name=" << kernelName << endl);
+void configureKernel(const char *kernelName, const char *clSourcecodeString) {
+    pthread_mutex_lock(&launchMutex);
+    COCL_PRINT(cout << "configureKernel name=" << kernelName << endl);
     // send in scratch buffer, local ints
     // make it have one int per core
 
@@ -190,7 +218,7 @@ void configureKernel(
     for(int i = 0; i < getNumClSources(); i++) {
         // cout << "clsource: [" << getClSource(i) << "]" << endl;
     }
-    hostside_opencl_funcs_assure_initialized();
+    // hostside_opencl_funcs_assure_initialized();
     launchConfiguration.kernelName = kernelName;
     launchConfiguration.kernelSource = clSourcecodeString;
     try {
@@ -205,11 +233,18 @@ void configureKernel(
         f << launchConfiguration.kernelSource << endl;
         f << e.what() << endl;
         f.close();
+        pthread_mutex_unlock(&launchMutex);
+        pthread_mutex_unlock(&launchMutex);
         throw e;
     }
+    pthread_mutex_unlock(&launchMutex);
 }
 
 void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
+    pthread_mutex_lock(&launchMutex);
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getCl();
+    cl_context *ctx = cl->context;
     // we're going to:
     // allocate a cl_mem for the struct
     // copy the cpu struct to the cl_mem
@@ -232,11 +267,16 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     cl->checkError(err);
     launchConfiguration.kernelArgsToBeReleased.push_back(gpu_struct);
     launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
+    pthread_mutex_unlock(&launchMutex);
 }
 
 void setKernelArgCharStar(char *memory_as_charstar) {
+    pthread_mutex_lock(&launchMutex);
     COCL_PRINT(cout << "setKernelArgCharStar " << (void *)memory_as_charstar << endl);
     Memory *memory = findMemory(memory_as_charstar);
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getCl();
+    cl_context *ctx = cl->context;
     cl_int err;
     if(memory == 0) {
         // lets just mak ea new buffer...
@@ -246,31 +286,42 @@ void setKernelArgCharStar(char *memory_as_charstar) {
         launchConfiguration.kernelArgsToBeReleased.push_back(gpu_struct);
         launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
         launchConfiguration.kernel->in((int64_t)-1); // `-1` means `null pointer`
-        return;
+    } else {
+        size_t offset = memory->getOffset(memory_as_charstar);
+        cl_mem clmem = memory->clmem;
+        launchConfiguration.kernel->inout(&clmem);
+        launchConfiguration.kernel->in((int64_t)offset); // kernel expects a `long` which is 64-bit signed int
     }
-    size_t offset = memory->getOffset(memory_as_charstar);
-    cl_mem clmem = memory->clmem;
-    launchConfiguration.kernel->inout(&clmem);
-    launchConfiguration.kernel->in((int64_t)offset); // kernel expects a `long` which is 64-bit signed int
+    pthread_mutex_unlock(&launchMutex);
 }
 
 void setKernelArgInt64(int64_t value) {
+    pthread_mutex_lock(&launchMutex);
     COCL_PRINT(cout << "setKernelArgInt64 " << value << endl);
     launchConfiguration.kernel->in(value);
+    pthread_mutex_unlock(&launchMutex);
 }
 
 void setKernelArgInt32(int value) {
+    pthread_mutex_lock(&launchMutex);
     COCL_PRINT(cout << "setKernelArgInt32 " << value << endl);
     launchConfiguration.kernel->in(value);
+    pthread_mutex_unlock(&launchMutex);
 }
 
 void setKernelArgFloat(float value) {
+    pthread_mutex_lock(&launchMutex);
     COCL_PRINT(cout << "setKernelArgFloat " << value << endl);
     launchConfiguration.kernel->in(value);
+    pthread_mutex_unlock(&launchMutex);
 }
 
 void kernelGo() {
+    pthread_mutex_lock(&launchMutex);
     COCL_PRINT(cout << "kernelGo " << endl);
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getCl();
+    cl_context *ctx = cl->context;
     size_t global[3];
     for(int i = 0; i < 3; i++) {
         global[i] = launchConfiguration.grid[i] * launchConfiguration.block[i];
@@ -295,6 +346,8 @@ void kernelGo() {
         f << launchConfiguration.kernelName << endl;
         f << launchConfiguration.kernelSource << endl;
         f.close();
+        pthread_mutex_unlock(&launchMutex);
+        pthread_mutex_unlock(&launchMutex);
         throw e;
     }
     COCL_PRINT(cout << ".. kernel queued" << endl);
@@ -307,6 +360,8 @@ void kernelGo() {
         cl->checkError(err);
     }
     launchConfiguration.kernelArgsToBeReleased.clear();
+    pthread_mutex_unlock(&launchMutex);
+    pthread_mutex_unlock(&launchMutex);
 }
 
 float4 make_float4(float x, float y, float z, float w) {

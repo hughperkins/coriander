@@ -12,13 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "cocl/cocl_context.h"
+
 #include "cocl/hostside_opencl_funcs.h"
+#include "cocl/local_config.h"
+#include "cocl/cocl_streams.h"
 
 #include <iostream>
 #include <memory>
 #include <vector>
 #include <map>
 #include <set>
+#include "pthread.h"
 
 #include "CL/cl.h"
 
@@ -29,18 +34,46 @@ using namespace cocl;
 using namespace easycl;
 
 namespace cocl {
-    class Context {
-    public:
-        Context() {
-            COCL_PRINT(cout << "Context " << this << endl);
-        }
-        ~Context() {
-            COCL_PRINT(cout << "~Context() " << this << endl);
-        }
-    };
-    typedef Context *PContext;
+    static pthread_key_t key;
+    static pthread_once_t key_once = PTHREAD_ONCE_INIT;
 
-    Context *currentContext = 0;
+    static void make_key() {
+        (void) pthread_key_create(&key, NULL);
+    }
+
+    Context::Context() {
+        COCL_PRINT(cout << "Context " << this << endl);
+    }
+    Context::~Context() {
+        COCL_PRINT(cout << "~Context() " << this << endl);
+    }
+
+    ThreadVars::ThreadVars() {
+        // currentContext = new Context();
+    }
+    ThreadVars::~ThreadVars() {
+        // if()
+    }
+    EasyCL *ThreadVars::getCl() {
+        if(currentContext == 0) {
+            currentContext = new Context();
+            currentContext->cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
+            currentContext->default_stream.reset(new CoclStream(currentContext->cl.get()));
+        }
+        return currentContext->cl.get();
+    }
+
+    // ThreadVars::currentContext = 0;
+
+    ThreadVars *getThreadVars() {
+        pthread_once(&key_once, make_key);
+        ThreadVars *threadVars = (ThreadVars *)pthread_getspecific(key);
+        if(threadVars == 0) {
+            threadVars = new ThreadVars();
+            pthread_setspecific(key, threadVars);
+        }
+        return threadVars;
+    }
 }
 
 extern "C" {
@@ -52,6 +85,8 @@ extern "C" {
 
 size_t cuCtxSynchronize(void) {
     COCL_PRINT(cout << "cuCtxSynchronize redirected" << endl);
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getCl();
     cl->finish();
     return 0;
 }
@@ -59,14 +94,16 @@ size_t cuCtxSynchronize(void) {
 size_t cuCtxGetCurrent(char **_ppContext) {
     Context **ppContext = (Context **)_ppContext;
     // cout << "cuCtxGetCurrent redirected" << endl;
-    *ppContext = currentContext;
+    ThreadVars *threadVars = getThreadVars();
+    *ppContext = threadVars->currentContext;
     return 0;
 }
 
 size_t cuCtxSetCurrent(char *_pContext) {
     COCL_PRINT(cout << "cuCtxSetCurrent redirected" << endl);
     Context *pContext = (Context *)_pContext;
-    currentContext = pContext;
+    ThreadVars *threadVars = getThreadVars();
+    threadVars->currentContext = pContext;
     return 0;
 }
 
@@ -74,7 +111,8 @@ size_t cuCtxCreate_v2 (char **_ppContext, unsigned int flags, long long device) 
     COCL_PRINT(cout << "cuCtxCreate_v2 redirected device=" << device << " flags=" << device << " context=" << (void *)*_ppContext << endl);
     Context **ppContext = (Context **)_ppContext;
     Context *newContext = new Context();
-    currentContext = newContext;
+    ThreadVars *threadVars = getThreadVars();
+    threadVars->currentContext = newContext;
     *ppContext = newContext;
     return 0;
 }

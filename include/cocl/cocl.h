@@ -6,8 +6,15 @@
 #include <cmath>
 #include <random>
 
+#ifdef __CUDACC__
 #define __device__ __attribute__((device))
 #define __host__ __attribute__((host))
+#else
+#define __host__
+#define __device__
+#endif
+
+// #define __host__ __attribute__((host))
 #define __global__ __attribute__((global))
 #define __constant__ __attribute__((constant))
 #define __shared__ __attribute__((shared))

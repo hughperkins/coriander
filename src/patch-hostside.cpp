@@ -71,6 +71,7 @@ public:
     vector<Type *> callTypes;
     vector<Value *> callValuesByValue;
     vector<Value *> callValuesAsPointers;
+    Value *stream;
     Value *grid_xy_value;
     Value *grid_z_value;
     Value *block_xy_value;
@@ -111,7 +112,7 @@ ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
 
 void getLaunchTypes(CallInst *inst, LaunchCallInfo *info) {
     // input to this is a cudaLaunch instruction
-    // output is:
+    // sideeffect is to populate in info:
     // - name of the kernel
     // - type of each of the kernel parameters (without the actual Value's)
     info->callTypes.clear();
@@ -300,7 +301,6 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
             indices.push_back(createInt32Constant(&context, idx));
         }
         GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(value->getType(), valueAsPointerInstr, ArrayRef<Value *>(&indices[0], &indices[indices.size()]), "getfloatstaraddr");
-        // outs() << "gep type " << dumpType(gep->getType()) << "\n";
         gep->insertAfter(lastInst);
         lastInst = gep;
 
@@ -308,35 +308,8 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
         loadgep->insertAfter(lastInst);
         lastInst = loadgep;
 
-        // outs() << "loadgep type " << dumpType(loadgep->getType()) << "\n";
         Type *gepElementType = loadgep->getType()->getPointerElementType();
-        // outs() << "gepElementType " << dumpType(gepElementType) << "\n";
         lastInst = addSetKernelArgInst_pointer(lastInst, loadgep);
-        // if(IntegerType *integerType = dyn_cast<IntegerType>(gepElementType)) {
-        //     if(integerType->getBitWidth() == 8) {
-        //         Function *setKernelArgCharStar = cast<Function>(M->getOrInsertFunction(
-        //             "_Z28setKernelArgCharStarNoOffsetPc",
-        //             Type::getVoidTy(context),
-        //             PointerType::get(IntegerType::get(context, 8), 0),
-        //             NULL));
-        //         CallInst *call = CallInst::Create(setKernelArgCharStar, loadgep);
-        //         call->insertAfter(lastInst);
-        //         lastInst = call;
-        //     } else {
-        //         throw runtime_error("integer type with bitwidth " + toString(integerType->getBitWidth()) + " not implemented for pointers in struct");
-        //     }
-        // } else if(gepElementType->isFloatingPointTy()) {
-        //     Function *setKernelArgFloatStar = cast<Function>(M->getOrInsertFunction(
-        //         "_Z29setKernelArgFloatStarNoOffsetPf",
-        //         Type::getVoidTy(context),
-        //         PointerType::get(Type::getFloatTy(context), 0),
-        //         NULL));
-        //     CallInst *call = CallInst::Create(setKernelArgFloatStar, loadgep);
-        //     call->insertAfter(lastInst);
-        //     lastInst = call;
-        // } else {
-        //     throw runtime_error("type " + dumpType(gepElementType) + " not implemented for pointers in structs");
-        // }
     }
     return lastInst;
 }
@@ -345,16 +318,12 @@ Instruction *addSetKernelArgInst(Instruction *lastInst, Value *value, Value *val
     Module *M = lastInst->getModule();
 
     if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
-        // outs() << "    integer arg\n";
         lastInst = addSetKernelArgInst_int(lastInst, value, intType);
     } else if(value->getType()->isFloatingPointTy()) {
-        // outs() << "    float arg\n";
         lastInst = addSetKernelArgInst_float(lastInst, value);
     } else if(value->getType()->isPointerTy()) {
-        // outs() << "    pointer arg\n";
         lastInst = addSetKernelArgInst_pointer(lastInst, value);
     } else if(isa<StructType>(value->getType())) {
-        // outs() << "    by-value struct arg\n";
         lastInst = addSetKernelArgInst_byvaluestruct(lastInst, value, valueAsPointerInstr);
     } else {
         value->dump();
@@ -432,9 +401,6 @@ void patchFunction(Function *F) {
                 if(calledFunctionName == "cudaLaunch") {
                     patchCudaLaunch(F, inst, to_replace_with_zero);
                 } else if(calledFunctionName == "cudaSetupArgument") {
-                    // outs() << "cudaSetupArgument\n";
-                    // inst->dump();
-                    // outs() << "\n";
                     getLaunchArgValue(inst, launchCallInfo.get());
                     to_replace_with_zero.push_back(inst);
                 }
