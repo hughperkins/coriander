@@ -132,8 +132,8 @@ size_t cuMemFreeHost(void *hostPointer) {
 
 size_t cuMemGetInfo(size_t *free, size_t *total) {
     COCL_PRINT(cout << "cuMemGetInfo redirected" << endl);
-    *free = 1024 * 1024;
-    *total = 1024 * 1024;
+    *free = getDeviceInfoInt64(cl->device, CL_DEVICE_MAX_MEM_ALLOC_SIZE);
+    *total = getDeviceInfoInt64(cl->device, CL_DEVICE_GLOBAL_MEM_SIZE);
     return 0;
 }
 

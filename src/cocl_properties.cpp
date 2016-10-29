@@ -22,12 +22,13 @@
 #include <map>
 #include <set>
 
-// #include "EasyCL.h"
+#include "EasyCL.h"
 
 #include "CL/cl.h"
 
 using namespace std;
 using namespace cocl;
+using namespace easycl;
 
 size_t cuDeviceGetAttribute(
        int *value, int attribute, CUdevice device) {
@@ -43,17 +44,17 @@ size_t cuDeviceGetAttribute(
     } else if(CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR == attribute) {
         *value = 65536;
     } else if(CU_DEVICE_ATTRIBUTE_SHARED_MEMORY_PER_BLOCK == attribute) {
-        *value = 65536;
+        *value = cl->getLocalMemorySize();
     } else if(CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT == attribute) {
-        *value = 16;
+        *value = cl->getComputeUnits();
     } else if(CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK == attribute) {
         *value = 64;
     } else if(CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR == attribute) {
         *value = 128;
     } else if(CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_BLOCK == attribute) {
-        *value = 40000;
+        *value = getDeviceInfoInt64(cl->device, CL_DEVICE_LOCAL_MEM_SIZE);
     } else if(CU_DEVICE_ATTRIBUTE_WARP_SIZE == attribute) {
-        *value = 32;
+        *value = 32;  // should do like: if amd then 64, else 32
     } else {
         cout << "attribute " << attribute << endl;
         throw runtime_error("attribute not implemented");
@@ -66,7 +67,9 @@ cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
 
 size_t cuDeviceGetName(char *buf, int bufsize, CUdevice device) {
     COCL_PRINT(cout << "cuDeviceGetName redirected" << endl);
-    sprintf(buf, "an opencl device");
+    string name = getDeviceInfoString(cl->device, CL_DEVICE_NAME);
+    sprintf(buf, "%s", name.c_str());
+    // sprintf(buf, "an opencl device");
     return 0;
 }
 
@@ -91,25 +94,26 @@ size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, CUdevice device) 
 
 size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
     COCL_PRINT(cout << "cudaGetDeviceProperties stub device=" << device << endl);
-    prop->totalGlobalMem = 1024 * 1024 * 1024;
-    prop->sharedMemPerBlock = 65536;
+    // prop->totalGlobalMem = deviceinfo_helper->getDeviceInfoInt64(cl->device, CL_DEVICE_MAX_MEM_ALLOC_SIZE);
+    prop->totalGlobalMem = getDeviceInfoInt64(cl->device, CL_DEVICE_GLOBAL_MEM_SIZE);
+    prop->sharedMemPerBlock = cl->getLocalMemorySize();
     prop->regsPerBlock = 64;
     prop->warpSize = 32;
     // prop->memPitch = 4; // whats this?
-    prop->maxThreadsPerBlock = 128;
+    prop->maxThreadsPerBlock = getDeviceInfoInt(cl->device, CL_DEVICE_MAX_WORK_GROUP_SIZE);
     prop->maxThreadsDim[0] = 1024;
     prop->maxThreadsDim[1] = 1024;
     prop->maxThreadsDim[2] = 1024;
     prop->totalConstMem = 16 * 1024;
     prop->major = 3;
     prop->minor = 0;
-    prop->clockRate = 900 * 1000 * 1000;
+    prop->clockRate = getDeviceInfoInt(cl->device, CL_DEVICE_MAX_CLOCK_FREQUENCY) * 1000 * 1000;
     // prop->textureAlignment = 128;  // whats this?
     // prop->deviceOverlap = 0; // whats this?
-    prop->multiProcessorCount = 3;
+    prop->multiProcessorCount = getDeviceInfoInt(cl->device, CL_DEVICE_MAX_COMPUTE_UNITS);
     prop->kernelExecTimeoutEnabled = true;
-    prop->integrated = true;
-    prop->canMapHostMemory = false;
+    prop->integrated = !getDeviceInfoBool(cl->device, CL_DEVICE_HOST_UNIFIED_MEMORY);
+    prop->canMapHostMemory = getDeviceInfoBool(cl->device, CL_DEVICE_HOST_UNIFIED_MEMORY);
     // prop->computeMode = 0;  //whats this?
     // prop->concurrentKernels = 1;
     // prop->ECCEnabled = false;
