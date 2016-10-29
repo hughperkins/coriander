@@ -13,6 +13,9 @@ extern "C" {
     size_t cuStreamWaitEvent(char *queue, cocl::Event *event, unsigned int flags);
 
     size_t cudaStreamQuery(char *stream);
+
+    typedef void (*cudacallbacktype)(char *stream, size_t status, void*userdata);
+    size_t cudaStreamAddCallback(char *stream, cudacallbacktype callback, void *userdata, int flags);
 }
 
 typedef char * cudaStream_t;

@@ -119,3 +119,44 @@ size_t cuStreamQuery(char *_queue) {
     // we're just going to run sync for now...
     // throw runtime_error("not implemented");
 }
+
+namespace cocl {
+    class CoclCallbackInfo {
+    public:
+        cudacallbacktype callback;
+        void *userdata;
+        char *_queue;
+    };
+    void coclCallback(cl_event event, cl_int status, void *userdata) {
+        // cout << "coclCallback running " << endl;
+        CoclCallbackInfo *info = (CoclCallbackInfo *)userdata;
+        clReleaseEvent(event);
+        info->callback(info->_queue, status, info->userdata);
+        delete info;
+    }
+}
+    typedef void (*cudacallbacktype)(char *stream, size_t status, void*userdata);
+
+
+size_t cudaStreamAddCallback(char *_queue, cudacallbacktype callback, void *userdata, int flags) {
+    CLQueue *queue = (CLQueue*)_queue;
+    // we need to queue an event, and attach the callback to that;
+    cl_int err;
+    cl_event event;
+    err= clEnqueueBarrierWithWaitList(queue->queue,
+        0,
+        0,
+        &event
+        );
+    cl->checkError(err);
+    CoclCallbackInfo *info = new CoclCallbackInfo();
+    // cout << "created info" << endl;
+    info->callback = callback;
+    info->userdata = userdata;
+    info->_queue = _queue;
+    // cout << "calling seteventcallback" << endl;
+    err = clSetEventCallback(event, CL_COMPLETE, cocl::coclCallback, info);
+    // cout << "called clseteventcallback" << endl;
+    cl->checkError(err);
+    return 0;
+}
