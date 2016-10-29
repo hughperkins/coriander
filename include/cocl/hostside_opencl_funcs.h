@@ -38,6 +38,9 @@ namespace cocl {
     extern cl_context *ctx;
     // extern cl_command_queue *queue;
 
+    int getNumCachedKernels(); // this should be per-context or something, though right now, it is not yet
+    int getNumKernelCalls();
+
     // extern std::vector<cl_mem> kernelArgsToBeReleased;
     // extern std::vector<cl_mem> kernelArgsToBeRemapped;
 }

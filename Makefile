@@ -210,6 +210,12 @@ run-test-cocl-testnullpointer: build/test-cocl-testnullpointer
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
+run-test-cocl-test_kernelcachedok: build/test-cocl-test_kernelcachedok
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
 run-test-cocl-testblas: build/test-cocl-testblas
 	################################
 	# running:
@@ -237,7 +243,7 @@ run-tests: clean-tests all run-test-cocl-cuda_sample run-test-cocl-test_memhosta
 	run-test-cocl-offsetkernelargs run-test-cocl-test_bitcast run-test-cocl-byvaluestructwithpointer run-test-cocl-test_types \
 	run-test-cocl-testnullpointer run-test-cocl-testshfl run-test-cocl-testneg \
 	run-test-cocl-multi1 run-test-cocl-testblas run-test-cocl-testmath run-test-cocl-testfloat4 \
-	run-test-cocl-test_callbacks
+	run-test-cocl-test_callbacks run-test-cocl-test_kernelcachedok
 
 .SECONDARY:
 

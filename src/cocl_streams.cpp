@@ -128,10 +128,11 @@ namespace cocl {
         char *_queue;
     };
     void coclCallback(cl_event event, cl_int status, void *userdata) {
-        // cout << "coclCallback running " << endl;
+        cout << "coclCallback running " << endl;
+        cl->checkError(status);
         CoclCallbackInfo *info = (CoclCallbackInfo *)userdata;
         clReleaseEvent(event);
-        info->callback(info->_queue, status, info->userdata);
+        info->callback(info->_queue, 0, info->userdata);
         delete info;
     }
 }

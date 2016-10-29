@@ -24,6 +24,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include "pthread.h"
 
 #include "EasyCL.h"
 
@@ -54,7 +55,7 @@ namespace cocl {
     public:
         size_t grid[3];
         size_t block[3];
-        unique_ptr<CLKernel> kernel;
+        CLKernel *kernel;
         CLQueue *queue = 0;  // NOT owned by us
 
         vector<cl_mem> kernelArgsToBeReleased;
@@ -134,6 +135,50 @@ int cudaConfigureCall(
     return 0;
 }
 
+namespace cocl {
+    pthread_mutex_t kernelByNameMutex = PTHREAD_MUTEX_INITIALIZER;
+    map<string, CLKernel *>kernelByName;
+    volatile int numKernelCalls = 0;
+
+    class KernelByNameMutex {
+    public:
+        KernelByNameMutex() {
+            // COCL_PRINT(cout << "locking KernelByNameMutex mutex" << endl);
+            pthread_mutex_lock(&kernelByNameMutex);
+        }
+        ~KernelByNameMutex() {
+            // COCL_PRINT(cout << "releasing KernelByNameMutex mutex" << endl);
+            pthread_mutex_unlock(&kernelByNameMutex);
+        }
+    };
+
+    int getNumCachedKernels() {
+        KernelByNameMutex mutex;
+        return kernelByName.size();
+    }
+
+    int getNumKernelCalls() {
+        KernelByNameMutex mutex;
+        return numKernelCalls;
+    }
+
+    CLKernel *getKernelForName(string name, string sourcecode) {
+        KernelByNameMutex mutex;
+        numKernelCalls++;
+        if(kernelByName.find(name) != kernelByName.end()) {
+            return kernelByName[name];
+        }
+        // compile the kernel.  we are still locking the mutex, but I cnat think of a better
+        // way right now...
+        COCL_PRINT(cout << "building kernel " << name << endl);
+        CLKernel *kernel = cl->buildKernelFromString(sourcecode, name, "", "__internal__");
+        COCL_PRINT(cout << " ... built" << endl);
+        kernelByName[name ] = kernel;
+        cl->storeKernel(name, kernel, true);  // this will cause the kernel to be deleted with cl.  Not clean yet, but a start
+        return kernel;
+    }
+}
+
 void configureKernel(
         const char *kernelName, const char *clSourcecodeString) {
     COCL_PRINT(cout << "configureKernel (name=" << kernelName << endl);
@@ -149,7 +194,7 @@ void configureKernel(
     launchConfiguration.kernelName = kernelName;
     launchConfiguration.kernelSource = clSourcecodeString;
     try {
-        launchConfiguration.kernel.reset(cl->buildKernelFromString(clSourcecodeString, kernelName, "", "__internal__"));
+        launchConfiguration.kernel = getKernelForName(kernelName, clSourcecodeString);
     } catch(runtime_error &e) {
         cout << "kernel failed to build" << endl;
         cout << "kernel name: [" << launchConfiguration.kernelName << "]" << endl;
@@ -225,7 +270,7 @@ void setKernelArgFloat(float value) {
 }
 
 void kernelGo() {
-    // COCL_PRINT(cout << "kernelGo " << endl);
+    COCL_PRINT(cout << "kernelGo " << endl);
     size_t global[3];
     for(int i = 0; i < 3; i++) {
         global[i] = launchConfiguration.grid[i] * launchConfiguration.block[i];
