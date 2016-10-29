@@ -152,6 +152,11 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 
 ## News
 
+- Oct 29:
+  - negative infinity float constants handled correctly now (pre-requisite for `reduce_min` working in tensorflow)
+  - properties now return correct device name, total memory, and a few other device parameters
+  - added callbacks
+  - remember to cache the kernels between calls :-P  (this should make things run quite a lot faster now...)
 - Oct 28:
   - denormalized generated OpenCL out of SSA form, to make it more human-readable
   - added support to pass null pointers into kernels
