@@ -32,7 +32,7 @@ size_t cudaGetDevice(CUdevice *device) {
 size_t cudaGetDeviceCount (int *count) {
     COCL_PRINT(cout << "cudaGetDeviceCount" << endl);
     // *count = easycl::DevicesInfo::getNumGpus();
-    *count = 0;  // we need a bunch of work to iplement more thna 1 device...
+    *count = 1;  // we need a bunch of work to iplement more thna 1 device...
     return 0;
 }
 

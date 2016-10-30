@@ -102,14 +102,22 @@ size_t cuStreamWaitEvent(char *_queue, Event *event, unsigned int flags) {
 }
 
 size_t cudaStreamSynchronize(char *_queue) {
+    cout << "cudaStreamSynchronize()" << endl;
     CoclStream *stream = (CoclStream *)_queue;
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getCl();
+    if(stream == 0) {
+        stream = v->currentContext->default_stream.get();
+    }
+    cout << "got stream " << (void *)stream << endl;
+    // cout << "got v" << endl;
+    // cout << "got cl" << endl;
     // StreamLock streamlock(stream);
     CLQueue *queue = stream->clqueue;
+    cout << "got queu" << endl;
     // CLQueue *queue = (CLQueue*)_queue;
     COCL_PRINT(cout << "cudaStreamSynchronize queue=" << queue << endl);
-    hostside_opencl_funcs_assure_initialized();
+    // hostside_opencl_funcs_assure_initialized();
 
     // assert(stream == 0);
 
@@ -124,6 +132,7 @@ size_t cudaStreamSynchronize(char *_queue) {
 
 size_t cuStreamSynchronize(char *_queue) {
     // CLQueue *queue = (CLQueue*)_queue;
+    // cout << "cuStreamSynchronize()" << endl;
     return cudaStreamSynchronize(_queue);
 }
 
