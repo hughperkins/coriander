@@ -10,14 +10,14 @@ def mangle(name, param_types):
     for param in param_types:
         if param.replace(' ', '') == 'float*':
             mangled += 'Pf'
+        elif param.replace(' ', '') == 'double*':
+            mangled += 'Pd'
         elif param.replace(' ', '') == 'int*':
             mangled += 'Pi'
         elif param.replace(' ', '') == 'int':
             mangled += 'i'
         elif param.replace(' ', '') == 'float':
             mangled += 'f'
-        elif param.replace(' ', '') == 'double':
-            mangled += 'd'
         elif param.endswith('*'):
             # assume pointer to struct
             param = param.replace(' ', '').replace('*', '')

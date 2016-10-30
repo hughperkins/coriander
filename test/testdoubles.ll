@@ -20,11 +20,11 @@ define void @_Z8myKernelPd(double* nocapture %data) #1 {
   %1 = getelementptr inbounds double, double* %data, i64 1
   store double 0x43DFFC0000000000, double* %1, align 8, !tbaa !7
   %2 = getelementptr inbounds double, double* %data, i64 6
-  store double 0xFFF0000000000000, double* %2, align 8, !tbaa !7
+  store double 0xFFF0000000000000, double* %2, align 8, !tbaa !7   ; -INFINITY
   %3 = getelementptr inbounds double, double* %data, i64 7
-  store double 0x7FF0000000000000, double* %3, align 8, !tbaa !7
+  store double 0x7FF0000000000000, double* %3, align 8, !tbaa !7   ; INFINITY
   %4 = getelementptr inbounds double, double* %data, i64 8
-  store double 0xFFEFFFFFFFFFFFFF, double* %4, align 8, !tbaa !7
+  store double 0xFFEFFFFFFFFFFFFF, double* %4, align 8, !tbaa !7   ; -INFINITY
   ret void
 }
 

@@ -14,8 +14,6 @@ limitations under the License.
 """
 import numpy as np
 import pyopencl as cl
-import pytest
-import math
 import os
 import subprocess
 from test import test_common
@@ -42,7 +40,7 @@ __global__ void myKernel(float *data) {
     data[5] = vals.z;
     data[6] = INFINITY;
     data[7] = -INFINITY;
-    data[8] = 0xFFEFFFFFFFFFFFFF;
+    // data[8] = 0xFFEFFFFFFFFFFFFF;
 }
 """
     prog = test_common.compile_code(cl, context, code)
@@ -60,7 +58,7 @@ __global__ void myKernel(float *data) {
     print('float_data[5]', float_data[5])
     print('float_data[6]', float_data[6])
     print('float_data[7]', float_data[7])
-    print('float_data[8]', float_data[8])
+    # print('float_data[8]', float_data[8])
     assert float_data[0] > 100000000
     assert float_data[1] > 100000000
     assert float_data[2] > 100000000
@@ -79,7 +77,7 @@ __global__ void myKernel(double *data) {
     data[1] = 9218868437227405312.0f; // 0x7FF0000000000000
     data[6] = INFINITY;
     data[7] = -INFINITY;
-    data[8] = 0xFFEFFFFFFFFFFFFF;
+    // data[8] = 0xFFEFFFFFFFFFFFFF;
 }
 """
     prog = test_common.compile_code(cl, context, code)
@@ -91,19 +89,10 @@ __global__ void myKernel(double *data) {
     q.finish()
     print('float_data[0]', float_data[0])
     print('float_data[1]', float_data[1])
-    print('float_data[2]', float_data[2])
-    print('float_data[3]', float_data[3])
-    print('float_data[4]', float_data[4])
-    print('float_data[5]', float_data[5])
     print('float_data[6]', float_data[6])
     print('float_data[7]', float_data[7])
-    print('float_data[8]', float_data[8])
     assert float_data[0] > 100000000
     assert float_data[1] > 100000000
-    assert float_data[2] > 100000000
-    assert float_data[3] > 100000000
-    assert float_data[4] < -100000000
-    assert float_data[5] > 100000000
     assert float_data[6] > 100000000
     assert float_data[7] < -100000000
 

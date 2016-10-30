@@ -162,6 +162,8 @@ __global__ void testTernary(float *data) {
     assert float_data[0] == float_data_orig[3]
 
 
+# Note: this test seems to fail on HD5500, but ok on 940M
+# The generated opencl code seems correct, so...
 def test_structs(context, q, float_data, float_data_gpu, int_data, int_data_gpu):
 
     code = """
@@ -176,24 +178,10 @@ __global__ void testStructs(MyStruct *structs, float *float_data, int *int_data)
     float_data[1] = structs[1].myfloat;
 }
 """
-    for file in os.listdir('/tmp'):
-        if file.startswith('test_cloutput'):
-            os.unlink('/tmp/%s' % file)
-    with open('/tmp/test_cloutput.cu', 'w') as f:
-        f.write(code)
-    print(subprocess.check_output([
-        'cocl',
-        '-c',
-        '/tmp/test_cloutput.cu'
-    ]))
+    prog = compile_code(context, code)
 
-    with open('/tmp/test_cloutput-device.cl', 'r') as f:
-        sourcecode = f.read()
-
-    prog = cl.Program(context, sourcecode).build()
-
-    my_struct = np.dtype([("myfloat", np.float32), ("myint", np.int32)])  # I dont know why, but seems these are back to front...
-    # my_struct = np.dtype([("myint", np.int32), ("myfloat", np.float32)])
+    # my_struct = np.dtype([("myfloat", np.float32), ("myint", np.int32)])  # I dont know why, but seems these are back to front...
+    my_struct = np.dtype([("myint", np.int32), ("myfloat", np.float32)])  # seems these are wrong way around on HD5500.  Works ok on 940M
     my_struct, my_struct_c_decl = pyopencl.tools.match_dtype_to_c_struct(
         context.devices[0], "MyStruct", my_struct)
     my_struct = cl.tools.get_or_register_dtype("MyStruct", my_struct)
@@ -217,9 +205,9 @@ __global__ void testStructs(MyStruct *structs, float *float_data, int *int_data)
     print('int_data[1]', int_data[1])
     print('float_data[0]', float_data[0])
     print('float_data[1]', float_data[1])
+    assert int_data[0] == 123
     assert float_data[0] == 567
     assert float_data[1] == 44
-    assert int_data[0] == 123
     # assert int_data[1] == 44
 
 

@@ -66,8 +66,33 @@ int readInt32Constant(Value *value) {
 
 float readFloatConstant(Value *value) {
     // cout << endl;
-    // cout << "float constant as double " << cast<ConstantFP>(value)->getValueAPF().convertToDouble() << endl;
-    // cout << "float constant as float " << cast<ConstantFP>(value)->getValueAPF().convertToFloat() << endl;
-    // cout << "float constant as float, via double " << (float)cast<ConstantFP>(value)->getValueAPF().convertToDouble() << endl;
-    return (float)cast<ConstantFP>(value)->getValueAPF().convertToDouble();
+    // cout << "isa double " << (value->getType()->getTypeID() == Type::DoubleTyID) << endl;
+    // cout << "isa float " << (value->getType()->getTypeID() == Type::FloatTyID) << endl;
+    const APFloat *apf = &cast<ConstantFP>(value)->getValueAPF();
+    // cout << "is negative " << apf->isNegative() << " isinfinity " << apf->isInfinity() << " isLargest " << apf->isLargest() << endl;
+    // double valueasdouble = apf->convertToDouble();
+    // float valueasfloat = apf->convertToFloat();
+    // float valueasdoubletofloat = (float)valueasdouble;
+    // if(apf->isInfinity()) {
+    //     if(apf->isNegative()) {
+
+    //     }
+    // }
+    float res = 0;
+    switch(value->getType()->getTypeID()) {
+        case Type::FloatTyID:
+            res = apf->convertToFloat();
+            break;
+        case Type::DoubleTyID:
+            res = (float)apf->convertToDouble();
+            break;
+        default:
+            throw runtime_error("unrecognized type");
+    }
+    return res;
+    // cout << "float constant as double " << valueasdouble << endl;
+    // cout << "float constant as float " << valueasfloat << endl;
+    // cout << "float constant as float, via double " << valueasdoubletofloat << endl;
+    // cout << "res " << res << endl;
+    // return valueasdoubletofloat;
 }
