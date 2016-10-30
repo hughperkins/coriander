@@ -2,6 +2,7 @@
 
 #include <cstddef>
 
+#include "CL/cl.h"
 #include "cocl_defs.h"
 
 // #define CoclDeviceType int
@@ -19,3 +20,7 @@ extern "C" {
 }
 
 typedef int CUdevice_attribute;
+
+namespace cocl {
+    cl_device_id getDeviceByIdx(int gpu);
+}

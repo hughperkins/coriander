@@ -59,7 +59,8 @@ build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp include/cocl/cocl*.
 build/cocl_%.o: src/cocl_%.cpp include/cocl/cocl*.h include/cocl/local_config.h
 	$(CLANG) -c -o $@ -std=c++11 $(DCOCL_SPAM) -fPIC -g -O2 -I$(COCL_HOME)/src/CLBlast/include -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
 
-EASYCL_OBJS=build/easycl-EasyCL.o build/easycl-CLKernel.o build/easycl-CLWrapper.o build/easycl-platforminfo_helper.o build/easycl-deviceinfo_helper.o build/easycl-util-easycl_stringhelper.o
+EASYCL_OBJS=build/easycl-EasyCL.o build/easycl-CLKernel.o build/easycl-CLWrapper.o build/easycl-platforminfo_helper.o \
+	build/easycl-deviceinfo_helper.o build/easycl-util-easycl_stringhelper.o build/easycl-DevicesInfo.o build/easycl-DeviceInfo.o
 COCL_OBJS=build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_blas.o build/cocl_device.o build/cocl_error.o build/cocl_memory.o build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o
 
 build/libcocl.a: $(COCL_OBJS) clblast $(EASYCL_OBJS)
@@ -187,6 +188,12 @@ run-test-multithreading: build/test-multithreading
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
 run-test-properties: build/test-properties
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
+run-test-context: build/test-context
 	################################
 	# running:
 	################################

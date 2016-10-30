@@ -42,7 +42,7 @@ using namespace easycl;
 namespace cocl {
     void coclCallback(cl_event event, cl_int status, void *userdata) {
         ThreadVars *v = getThreadVars();
-        EasyCL *cl = v->getCl();
+        EasyCL *cl = v->getContext()->getCl();
         cout << "coclCallback running " << endl;
         cl->checkError(status);
         CoclCallbackInfo *info = (CoclCallbackInfo *)userdata;
@@ -105,7 +105,7 @@ size_t cudaStreamSynchronize(char *_queue) {
     cout << "cudaStreamSynchronize()" << endl;
     CoclStream *stream = (CoclStream *)_queue;
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     if(stream == 0) {
         stream = v->currentContext->default_stream.get();
     }
@@ -137,9 +137,11 @@ size_t cuStreamSynchronize(char *_queue) {
 }
 
 size_t cuStreamCreate(char **_pstream, unsigned int flags) {
+    COCL_PRINT(cout << "cuStreamCreate redirected" << endl);
     CoclStream **pstream = (CoclStream**)_pstream;
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    COCL_PRINT(cout << "cuStreamCreate current context=" << (void *)v->currentContext << endl);
+    EasyCL *cl = v->getContext()->getCl();
     // hostside_opencl_funcs_assure_initialized();
     // CLQueue *clqueue = cl->newQueue();
     CoclStream *coclStream = new CoclStream(cl);
@@ -169,7 +171,7 @@ size_t cuStreamQuery(char *_queue) {
 size_t cudaStreamAddCallback(char *_queue, cudacallbacktype callback, void *userdata, int flags) {
     CoclStream *stream = (CoclStream *)_queue;
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     // StreamLock streamlock(stream);
     CLQueue *queue = stream->clqueue;
     // CLQueue *queue = (CLQueue*)_queue;

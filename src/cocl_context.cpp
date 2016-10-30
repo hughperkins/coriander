@@ -43,8 +43,13 @@ namespace cocl {
         (void) pthread_key_create(&key, NULL);
     }
 
-    Context::Context() {
-        COCL_PRINT(cout << "Context " << this << endl);
+    Context::Context(int device) : device(device) {
+        COCL_PRINT(cout << "Context() " << this << endl);
+        pthread_mutex_lock(&clcontextcreation_mutex);
+        // int deviceId = getThreadVars()->currentDevice;
+        cl.reset(EasyCL::createForIndexedGpu(device));
+        pthread_mutex_unlock(&clcontextcreation_mutex);
+        default_stream.reset(new CoclStream(cl.get()));
     }
     Context::~Context() {
         COCL_PRINT(cout << "~Context() " << this << endl);
@@ -56,15 +61,12 @@ namespace cocl {
     ThreadVars::~ThreadVars() {
         // if()
     }
-    EasyCL *ThreadVars::getCl() {
+    Context *ThreadVars::getContext() {
         if(currentContext == 0) {
-            currentContext = new Context();
-            pthread_mutex_lock(&clcontextcreation_mutex);
-            currentContext->cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
-            pthread_mutex_unlock(&clcontextcreation_mutex);
-            currentContext->default_stream.reset(new CoclStream(currentContext->cl.get()));
+            COCL_PRINT(cout << "creating default context" << endl);
+            currentContext = new Context(currentDevice);
         }
-        return currentContext->cl.get();
+        return currentContext;
     }
 
     // ThreadVars::currentContext = 0;
@@ -90,7 +92,7 @@ extern "C" {
 size_t cuCtxSynchronize(void) {
     COCL_PRINT(cout << "cuCtxSynchronize redirected" << endl);
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     cl->finish();
     return 0;
 }
@@ -100,11 +102,12 @@ size_t cuCtxGetCurrent(char **_ppContext) {
     // cout << "cuCtxGetCurrent redirected" << endl;
     ThreadVars *threadVars = getThreadVars();
     *ppContext = threadVars->currentContext;
+    // COCL_PRINT(cout << "cuCtxGetCurrent context=" << (void *)threadVars->currentContext << endl);
     return 0;
 }
 
 size_t cuCtxSetCurrent(char *_pContext) {
-    COCL_PRINT(cout << "cuCtxSetCurrent redirected" << endl);
+    COCL_PRINT(cout << "cuCtxSetCurrent redirected context=" << (void *)_pContext << endl);
     Context *pContext = (Context *)_pContext;
     ThreadVars *threadVars = getThreadVars();
     threadVars->currentContext = pContext;
@@ -112,11 +115,12 @@ size_t cuCtxSetCurrent(char *_pContext) {
 }
 
 size_t cuCtxCreate_v2 (char **_ppContext, unsigned int flags, long long device) {
-    COCL_PRINT(cout << "cuCtxCreate_v2 redirected device=" << device << " flags=" << device << " context=" << (void *)*_ppContext << endl);
+    COCL_PRINT(cout << "cuCtxCreate_v2 redirected device=" << device << " flags=" << flags << endl);
     Context **ppContext = (Context **)_ppContext;
-    Context *newContext = new Context();
+    Context *newContext = new Context(device);
     ThreadVars *threadVars = getThreadVars();
     threadVars->currentContext = newContext;
+    COCL_PRINT(cout << "cuCtxCreate_v2 new context=" << (void *)newContext << endl);
     *ppContext = newContext;
     return 0;
 }

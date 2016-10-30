@@ -15,5 +15,9 @@ int main(int argc, char *argv[]) {
     cudaDeviceProp prop;
     cudaGetDeviceProperties(&prop, 0);
     cout << "maxworkgroupsize " << prop.maxThreadsPerBlock << endl;
+    size_t free;
+    size_t total;
+    cuMemGetInfo(&free, &total);
+    cout << "free " << free << " total " << total << endl;
     return 0;
 }

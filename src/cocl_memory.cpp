@@ -18,6 +18,7 @@
 #include "cocl/cocl_streams.h"
 #include "cocl/local_config.h"
 #include "cocl/cocl_context.h"
+#include "cocl/cocl_device.h"
 
 #include <iostream>
 #include <memory>
@@ -67,34 +68,34 @@ namespace cocl {
             clmem(clmem), bytes(bytes) {
         // MemoryMutex memoryMutex;
         ThreadVars *v = getThreadVars();
-        fakePos = v->nextAllocPos;
+        fakePos = v->getContext()->nextAllocPos;
         // COCL_PRINT(cout << "Memory::Memory bytes=" << bytes << endl;)
         // we should align it actually.  on 128-bytes?
         fakePos = ((fakePos + 127) / 128) * 128;
-        v->nextAllocPos = fakePos + bytes;
-        v->memoryByAllocPos[fakePos] = this;
-        v->memories.insert(this);
+        v->getContext()->nextAllocPos = fakePos + bytes;
+        v->getContext()->memoryByAllocPos[fakePos] = this;
+        v->getContext()->memories.insert(this);
     }
 
     Memory *Memory::newDeviceAlloc(size_t bytes) {
         ThreadVars *v = getThreadVars();
-        EasyCL *cl = v->getCl();
+        EasyCL *cl = v->getContext()->getCl();
         cl_int err;
         cl_mem clmem = clCreateBuffer(*cl->context, CL_MEM_READ_WRITE, bytes,
                                                NULL, &err);
         cl->checkError(err);
         Memory *memory = new Memory(clmem, bytes);
-        // COCL_PRINT(cout << "Memory::newDeviceAlloc bytes=" << bytes << " memory=" << (void *)memory << " clmem=" << (void*)memory->clmem << endl);
+        COCL_PRINT(cout << "Memory::newDeviceAlloc context=" << (void *)v->currentContext << " bytes=" << bytes << " memory=" << (void *)memory << " clmem=" << (void*)memory->clmem << endl);
         return memory;
     }
 
     Memory::~Memory() {
         // COCL_PRINT(cout << "~Memory releasing mem object memory=" << (void *)this << endl);
         ThreadVars *v = getThreadVars();
-        v->memoryByAllocPos.erase(fakePos);
-        v->memories.erase(this);
+        v->getContext()->memoryByAllocPos.erase(fakePos);
+        v->getContext()->memories.erase(this);
         cl_int err = clReleaseMemObject(clmem);
-        v->getCl()->checkError(err);
+        v->getContext()->getCl()->checkError(err);
         // TODO: should remove from map and set too
     }
 
@@ -104,15 +105,15 @@ namespace cocl {
         // char *passedInAsCharStar = (char *)passedInPointer;
         long long pos = (long long )passedInAsCharStar;
         // COCL_PRINT(cout << "findMemory pos=" << pos << endl;)
-        for(auto it=v->memories.begin(), e=v->memories.end(); it != e; it++) {
+        for(auto it=v->getContext()->memories.begin(), e=v->getContext()->memories.end(); it != e; it++) {
             Memory *memory = *it;
             // COCL_PRINT(cout << "memory fakepos=" << memory->fakePos << " bytes " << memory->bytes << endl;)
             if(pos >= memory->fakePos && pos < memory->fakePos + memory->bytes) {
-                // COCL_PRINT(cout << "found memory: " << (void *)memory << " fakepos=" << memory->fakePos << " bytes=" << memory->bytes << endl);
+                COCL_PRINT(cout << "found memory: " << (void *)memory << " fakepos=" << memory->fakePos << " bytes=" << memory->bytes << endl);
                 return memory;
             }
         }
-        // cout << "could not find memory for " << (void *)passedInAsCharStar << endl;
+        cout << "could not find memory for " << (void *)passedInAsCharStar << endl;
         return 0;
         // throw runtime_error("could not find memory");
     }
@@ -134,24 +135,24 @@ size_t cuMemFreeHost(void *hostPointer) {
 }
 
 size_t cuMemGetInfo(size_t *free, size_t *total) {
-    // COCL_PRINT(cout << "cuMemGetInfo redirected" << endl);
+    COCL_PRINT(cout << "cuMemGetInfo redirected" << endl);
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
-    *free = getDeviceInfoInt64(cl->device, CL_DEVICE_MAX_MEM_ALLOC_SIZE);
-    *total = getDeviceInfoInt64(cl->device, CL_DEVICE_GLOBAL_MEM_SIZE);
+    cl_device_id deviceid = getDeviceByIdx(v->currentDevice);
+    *free = getDeviceInfoInt64(deviceid, CL_DEVICE_MAX_MEM_ALLOC_SIZE);
+    *total = getDeviceInfoInt64(deviceid, CL_DEVICE_GLOBAL_MEM_SIZE);
     return 0;
 }
 
 size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMemcpyKind, char *_queue) {
     // CLQueue *queue = (CLQueue *)_queue;
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     CoclStream *coclStream = (CoclStream *)_queue;
-    // COCL_PRINT(cout << "cudaMemcpyAsync count=" << count << " cudaMemcpyKind=" << cudaMemcpyKind << " queue=" << queue << endl);
+    COCL_PRINT(cout << "cudaMemcpyAsync count=" << count << " cudaMemcpyKind=" << cudaMemcpyKind << " context=" << (void *)v->currentContext << endl);
 
     if(coclStream == 0) {
+        COCL_PRINT(cout << "using default queue" << endl);
         coclStream = v->currentContext->default_stream.get();
-        // COCL_PRINT(cout << "using default queue" << endl);
     }
     CLQueue *queue = coclStream->clqueue;
     cl_int err;
@@ -159,6 +160,10 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
         // device => host
         // Memory *srcMemory = (Memory *)src;
         Memory *srcMemory = findMemory((char *)src);
+        if(srcMemory == 0) {
+            cout << "coudlnt find memory for src " << (void *)src << endl;
+            throw runtime_error("couldnt find memory for src");
+        }
         size_t src_offset = srcMemory->getOffset((char *)src);
         err = clEnqueueReadBuffer(queue->queue, srcMemory->clmem, CL_FALSE, src_offset,
                                          count, dst, 0, NULL, NULL);
@@ -168,6 +173,10 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
         // host => device
         // Memory *dstMemory = (Memory*)dst;
         Memory *dstMemory = findMemory((char *)dst);
+        if(dstMemory == 0) {
+            cout << "coudlnt find memory for dst " << (void *)dst << endl;
+            throw runtime_error("couldnt find memory for dst");
+        }
         size_t dst_offset = dstMemory->getOffset((char *)dst);
         err = clEnqueueWriteBuffer(queue->queue, dstMemory->clmem, CL_FALSE, dst_offset,
                                           count, src, 0, NULL, NULL);
@@ -178,6 +187,14 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
 
         Memory *srcMemory = findMemory((char *)src);
         size_t src_offset = srcMemory->getOffset((char *)src);
+        if(dstMemory == 0) {
+            cout << "coudlnt find memory for dst " << (void *)dst << endl;
+            throw runtime_error("couldnt find memory for dst");
+        }
+        if(srcMemory == 0) {
+            cout << "coudlnt find memory for src " << (void *)src << endl;
+            throw runtime_error("couldnt find memory for src");
+        }
 
         err = clEnqueueCopyBuffer(
             queue->queue,
@@ -213,7 +230,7 @@ size_t cuMemsetD8(CUdeviceptr location, unsigned char value, uint32_t count) {
     // Memory *memory = (Memory *)location;
     // use default queue??
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     Memory *memory = findMemory((char *)location);
     size_t offset = memory->getOffset((char *)location);
     cl_int err = clEnqueueFillBuffer(v->currentContext->default_stream.get()->clqueue->queue, memory->clmem, &value, sizeof(unsigned char), offset, count * sizeof(unsigned char), 0, 0, 0);
@@ -225,7 +242,7 @@ size_t cuMemsetD32(CUdeviceptr location, unsigned int value, uint32_t count) {
     // Memory *memory = (Memory *)location;
     Memory *memory = findMemory((char *)location);
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     size_t offset = memory->getOffset((char *)location);
     // COCL_PRINT(cout << "cuMemsetD32 redirected value " << value << " count=" << count << " location=" << location << " memory=" << (void *)memory << endl);
     cl_int err = clEnqueueFillBuffer(v->currentContext->default_stream.get()->clqueue->queue, memory->clmem, &value, sizeof(int), offset, count * sizeof(int), 0, 0, 0);
@@ -236,8 +253,11 @@ size_t cuMemsetD32(CUdeviceptr location, unsigned int value, uint32_t count) {
 size_t cuDeviceTotalMem(uint64_t *value, CUdeviceptr device) {
     // COCL_PRINT(cout << "cuDeviceTotalMem redirected" << endl);
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
-    *value = getDeviceInfoInt64(cl->device, CL_DEVICE_GLOBAL_MEM_SIZE);;
+    cl_device_id deviceid = getDeviceByIdx(v->currentDevice);
+    // *free = getDeviceInfoInt64(deviceid, CL_DEVICE_MAX_MEM_ALLOC_SIZE);
+    *value = getDeviceInfoInt64(deviceid, CL_DEVICE_GLOBAL_MEM_SIZE);
+    // EasyCL *cl = v->getCl();
+    // *value = getDeviceInfoInt64(cl->device, CL_DEVICE_GLOBAL_MEM_SIZE);;
     return 0;
 }
 
@@ -245,7 +265,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
     // COCL_PRINT(cout << "cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << " count=" << bytes << endl);
     cl_int err;
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     if(cudaMemcpyKind == cudaMemcpyDeviceToHost) {
         // device => host
         // cout << "cudamemcpy device to host" << endl;
@@ -291,7 +311,7 @@ size_t cuMemcpyHtoDAsync(CUdeviceptr dst, const void *src, size_t bytes, char *_
     CoclStream *coclStream = (CoclStream *)_queue;
     CLQueue *queue = coclStream->clqueue;
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     // CLQueue *queue = (CLQueue*)_queue;
     // host => device
     // COCL_PRINT(cout << "cuMemcpyHtoDAsync dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
@@ -314,7 +334,7 @@ size_t  cuMemcpyDtoHAsync(void *dst, CUdeviceptr src, size_t bytes, char *_queue
     CoclStream *coclStream = (CoclStream *)_queue;
     CLQueue *queue = coclStream->clqueue;
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     // CLQueue *queue = (CLQueue*)_queue;
     // COCL_PRINT(cout << "cuMemcpyDtoHAsync queue=" << (void *)queue << " dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
     Memory *srcMemory = findMemory((char *)src);
@@ -338,7 +358,7 @@ size_t  cuMemcpyDtoHAsync(void *dst, CUdeviceptr src, size_t bytes, char *_queue
 size_t cuMemcpyHtoD(CUdeviceptr gpu_dst, const void *host_src, size_t size) {
     cudaMemcpy((void *)gpu_dst, host_src, size, cudaMemcpyHostToDevice);
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     cl->finish();
     return 0;
 }
@@ -347,7 +367,7 @@ size_t cuMemcpyHtoD(CUdeviceptr gpu_dst, const void *host_src, size_t size) {
 size_t  cuMemcpyDtoH(void *host_dst, CUdeviceptr gpu_src, size_t size) {
     // COCL_PRINT(cout << "cumemcpyDtoH" << endl);
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     cudaMemcpy(host_dst, (void *)gpu_src, size, cudaMemcpyDeviceToHost);
     cl->finish();
     return 0;

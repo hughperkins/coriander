@@ -129,7 +129,7 @@ int cudaConfigureCall(
     pthread_mutex_lock(&launchMutex);
     CoclStream *coclStream = (CoclStream *)queue_as_voidstar;
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     if(coclStream == 0) {
         coclStream = v->currentContext->default_stream.get();
         // coclStream = defaultCoclStream;
@@ -180,28 +180,28 @@ namespace cocl {
 
     int getNumCachedKernels() {
         // KernelByNameMutex mutex;
-        return getThreadVars()->kernelByName.size();
+        return getThreadVars()->getContext()->kernelByName.size();
     }
 
     int getNumKernelCalls() {
         // KernelByNameMutex mutex;
-        return getThreadVars()->numKernelCalls;
+        return getThreadVars()->getContext()->numKernelCalls;
     }
 
     CLKernel *getKernelForName(string name, string sourcecode) {
         // KernelByNameMutex mutex;
         ThreadVars *v = getThreadVars();
-        EasyCL *cl = v->getCl();
-        v->numKernelCalls++;
-        if(v->kernelByName.find(name) != v->kernelByName.end()) {
-            return v->kernelByName[name];
+        EasyCL *cl = v->getContext()->getCl();
+        v->getContext()->numKernelCalls++;
+        if(v->getContext()->kernelByName.find(name) != v->getContext()->kernelByName.end()) {
+            return v->getContext()->kernelByName[name];
         }
         // compile the kernel.  we are still locking the mutex, but I cnat think of a better
         // way right now...
         COCL_PRINT(cout << "building kernel " << name << endl);
         CLKernel *kernel = cl->buildKernelFromString(sourcecode, name, "", "__internal__");
         COCL_PRINT(cout << " ... built" << endl);
-        v->kernelByName[name ] = kernel;
+        v->getContext()->kernelByName[name ] = kernel;
         cl->storeKernel(name, kernel, true);  // this will cause the kernel to be deleted with cl.  Not clean yet, but a start
         return kernel;
     }
@@ -243,7 +243,7 @@ void configureKernel(const char *kernelName, const char *clSourcecodeString) {
 void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     pthread_mutex_lock(&launchMutex);
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     cl_context *ctx = cl->context;
     // we're going to:
     // allocate a cl_mem for the struct
@@ -275,7 +275,7 @@ void setKernelArgCharStar(char *memory_as_charstar) {
     COCL_PRINT(cout << "setKernelArgCharStar " << (void *)memory_as_charstar << endl);
     Memory *memory = findMemory(memory_as_charstar);
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     cl_context *ctx = cl->context;
     cl_int err;
     if(memory == 0) {
@@ -320,7 +320,7 @@ void kernelGo() {
     pthread_mutex_lock(&launchMutex);
     COCL_PRINT(cout << "kernelGo " << endl);
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     cl_context *ctx = cl->context;
     size_t global[3];
     for(int i = 0; i < 3; i++) {

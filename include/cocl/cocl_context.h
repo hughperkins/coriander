@@ -31,11 +31,20 @@ namespace cocl {
 
     class Context {
     public:
-        Context();
+        Context(int device);
         ~Context();
-        int deviceIdx = 0;
         std::unique_ptr<easycl::EasyCL> cl;
         std::unique_ptr<cocl::CoclStream> default_stream;
+        std::map<std::string, easycl::CLKernel *> kernelByName;
+        std::set<cocl::Memory *>memories;
+        long long nextAllocPos = 1;
+        std::map< long long, cocl::Memory *>memoryByAllocPos;
+        int numKernelCalls = 0;
+        const int device;
+        easycl::EasyCL *getCl() {
+            return cl.get();
+        }
+        // bool inUse = false;
     };
     // typedef Context *PContext;
 
@@ -43,15 +52,10 @@ namespace cocl {
     public:
         ThreadVars();
         ~ThreadVars();
-        easycl::EasyCL *getCl();
+        Context *getContext();
+        int currentDevice = 0;
         cocl::Context *currentContext = 0;
-        std::map<int, easycl::EasyCL*> clByDeviceIdx;
-        std::map<std::string, easycl::CLKernel *> kernelByName;
-        int numKernelCalls = 0;
-
-        std::set<cocl::Memory *>memories;
-        long long nextAllocPos = 1;
-        std::map< long long, cocl::Memory *>memoryByAllocPos;
+        // std::map<int, easycl::EasyCL*> clByDeviceIdx;
     };
 
     ThreadVars *getThreadVars();

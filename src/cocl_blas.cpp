@@ -41,7 +41,7 @@ namespace cocl {
 size_t cublasCreate(cublasHandle_t *phandle) {
     // cout << "cublasCreate redirect 3" << endl;
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getCl();
+    EasyCL *cl = v->getContext()->getCl();
     // cl_context *ctx = cl->context;
     CoclBlas *coclBlas = new CoclBlas(cl);
     *phandle = (cublasHandle_t)coclBlas;
@@ -95,7 +95,7 @@ std::size_t cublasSetStream(cublasHandle_t handle, cudaStream_t streamId) {
     CoclStream *coclStream = (CoclStream *)streamId;
     if(coclStream == 0) {
         // cout << "using dfeault queue" << endl;
-        coclStream = v->currentContext->default_stream.get();
+        coclStream = v->getContext()->default_stream.get();
     }
     CLQueue *queue = coclStream->clqueue;
     // CLQueue *queue = (CLQueue *)streamId;
