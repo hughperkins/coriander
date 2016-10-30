@@ -1,8 +1,6 @@
 # In theory we should use eg cmake, but this gives us more control for now,
 # and we only have like ~4 sourcecode files for now anyway
 
-EIGEN_HOME=/usr/local/eigen
-
 CLANG=clang++-3.8
 LLVM_CONFIG=llvm-config-3.8
 LLVM_INCLUDE=/usr/include/llvm-3.8
@@ -16,7 +14,7 @@ LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
 # the llvm-config compile flags suppresses asserts
 COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -g -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++11
 
-all: include/cocl/local_config.h build/ir-to-opencl build/patch-hostside build/libcocl.so build/clblast/libclblast.so
+all: clblast include/cocl/local_config.h build/ir-to-opencl build/patch-hostside build/libcocl.so build/clblast/libclblast.so
 
 include/cocl/local_config.h: include/cocl/local_config.h.templ
 	cp include/cocl/local_config.h.templ include/cocl/local_config.h
@@ -48,9 +46,8 @@ build/easycl-util-%.o: src/EasyCL/util/%.cpp
 	$(CLANG) -std=c++11 -fPIC -c -O2 -Isrc/EasyCL -o $@ $<
 
 clblast:
-	git submodule update --init --recursive src/CLBlast
 	mkdir -p build/clblast
-	cd build/clblast && cmake ../../src/CLBlast -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_CXX_FLAGS=-fPIC -DBUILD_SHARED=ON
+	cd build/clblast && cmake ../../src/CLBlast -DCMAKE_INSTALL_PREFIX=$(PREFIX) -DCMAKE_CXX_FLAGS=-fPIC -DBUILD_SHARED=ON
 	cd build/clblast && make -j 4
 
 build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp include/cocl/cocl*.h include/cocl/local_config.h
@@ -102,157 +99,157 @@ run-test-cuda_sample: build/test-cuda_sample
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-test_memhostalloc: build/test-test_memhostalloc
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-testevents: build/test-testevents
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-testevents2: build/test-testevents2
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-testcumemcpy: build/test-testcumemcpy
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-teststream: build/test-teststream
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-testmemcpydevicetodevice: build/test-testmemcpydevicetodevice
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-testpartialcopy: build/test-testpartialcopy
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-offsetkernelargs: build/test-offsetkernelargs
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-test_bitcast: build/test-test_bitcast
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-byvaluestructwithpointer: build/test-byvaluestructwithpointer
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-test_types: build/test-test_types
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-callinternal: build/test-callinternal
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-testfloat4: build/test-testfloat4
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-multithreading: build/test-multithreading
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-properties: build/test-properties
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-context: build/test-context
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-multigpu: build/test-multigpu
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-testneg: build/test-testneg
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-testshfl: build/test-testshfl
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-test_callbacks: build/test-test_callbacks
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-testnullpointer: build/test-testnullpointer
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-test_kernelcachedok: build/test-test_kernelcachedok
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-testblas: build/test-testblas
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-testmath: build/test-testmath
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 run-test-multi1: build/test-multi1
 	################################
 	# running:
 	################################
-	LD_LIBRARY_PATH=/usr/local/lib $<
+	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
 clean-tests:
 	touch build/test~
@@ -286,6 +283,7 @@ uninstall:
 	rm -R $(PREFIX)/bin/ir-to-opencl
 	rm -R $(PREFIX)/bin/patch-hostside
 	rm $(PREFIX)/lib/libcocl.so
+	rm $(PREFIX)/lib/libclblast.so
 
 install-dev:
 	mkdir -p $(PREFIX)/share
@@ -294,6 +292,7 @@ install-dev:
 	ln -nsf `pwd`/share/cocl $(PREFIX)/share/cocl
 	ln -nsf `pwd`/include/cocl $(PREFIX)/include/cocl
 	ln -sf `pwd`/build/libcocl.so $(PREFIX)/lib/libcocl.so
+	ln -sf `pwd`/build/libclblast.so $(PREFIX)/lib/libclblast.so
 	ln -sf `pwd`/build/ir-to-opencl $(PREFIX)/bin/ir-to-opencl
 	ln -sf `pwd`/build/patch-hostside $(PREFIX)/bin/patch-hostside
 
