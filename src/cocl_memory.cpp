@@ -85,7 +85,7 @@ namespace cocl {
         cl_int err;
         cl_mem clmem = clCreateBuffer(*cl->context, CL_MEM_READ_WRITE, bytes,
                                                NULL, &err);
-        cl->checkError(err);
+        EasyCL::checkError(err);
         Memory *memory = new Memory(clmem, bytes);
         COCL_PRINT(cout << "Memory::newDeviceAlloc context=" << (void *)v->currentContext << " bytes=" << bytes << " memory=" << (void *)memory << " clmem=" << (void*)memory->clmem << endl);
         return memory;
@@ -171,7 +171,7 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
         size_t src_offset = srcMemory->getOffset((char *)src);
         err = clEnqueueReadBuffer(queue->queue, srcMemory->clmem, CL_FALSE, src_offset,
                                          count, dst, 0, NULL, NULL);
-        cl->checkError(err);
+        EasyCL::checkError(err);
         // cl->finish();
     } else if(cudaMemcpyKind == cudaMemcpyHostToDevice) {
         // host => device
@@ -184,7 +184,7 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
         size_t dst_offset = dstMemory->getOffset((char *)dst);
         err = clEnqueueWriteBuffer(queue->queue, dstMemory->clmem, CL_FALSE, dst_offset,
                                           count, src, 0, NULL, NULL);
-        cl->checkError(err);
+        EasyCL::checkError(err);
     } else if(cudaMemcpyKind == cudaMemcpyDeviceToDevice) {
         Memory *dstMemory = findMemory((char *)dst);
         size_t dst_offset = dstMemory->getOffset((char *)dst);
@@ -210,7 +210,7 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
             0,
             0,
             0);
-        cl->checkError(err);
+        EasyCL::checkError(err);
     } else {
         // cout << "cudaMemcpyAsync cudaMemcpyKind using opencl " << cudaMemcpyKind << endl;
         throw runtime_error("unhandled cudaMemcpyKind");
@@ -238,7 +238,7 @@ size_t cuMemsetD8(CUdeviceptr location, unsigned char value, uint32_t count) {
     Memory *memory = findMemory((char *)location);
     size_t offset = memory->getOffset((char *)location);
     cl_int err = clEnqueueFillBuffer(v->currentContext->default_stream.get()->clqueue->queue, memory->clmem, &value, sizeof(unsigned char), offset, count * sizeof(unsigned char), 0, 0, 0);
-    cl->checkError(err);
+    EasyCL::checkError(err);
     return 0;
 }
 
@@ -250,7 +250,7 @@ size_t cuMemsetD32(CUdeviceptr location, unsigned int value, uint32_t count) {
     size_t offset = memory->getOffset((char *)location);
     // COCL_PRINT(cout << "cuMemsetD32 redirected value " << value << " count=" << count << " location=" << location << " memory=" << (void *)memory << endl);
     cl_int err = clEnqueueFillBuffer(v->currentContext->default_stream.get()->clqueue->queue, memory->clmem, &value, sizeof(int), offset, count * sizeof(int), 0, 0, 0);
-    cl->checkError(err);
+    EasyCL::checkError(err);
     return 0;
 }
 
@@ -277,7 +277,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
         size_t offset = srcMemory->getOffset((char *)src);
         err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, srcMemory->clmem, CL_TRUE, offset,
                                          bytes, dst, 0, NULL, NULL);
-        cl->checkError(err);
+        EasyCL::checkError(err);
         // cl->finish();
     } else if(cudaMemcpyKind == cudaMemcpyHostToDevice) {
         // host => device
@@ -286,7 +286,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
         size_t offset = dstMemory->getOffset((char *)dst);
         err = clEnqueueWriteBuffer(v->currentContext->default_stream.get()->clqueue->queue, dstMemory->clmem, CL_TRUE, offset,
                                           bytes, src, 0, NULL, NULL);
-        cl->checkError(err);
+        EasyCL::checkError(err);
     } else if(cudaMemcpyKind == cudaMemcpyDeviceToDevice) {
         // device => device
         Memory *srcMemory = findMemory((char *)src);
@@ -303,7 +303,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
             0,
             0,
             0);
-        cl->checkError(err);
+        EasyCL::checkError(err);
     } else {
         cout << "cudaMemcpy cudaMemcpyKind using opencl " << cudaMemcpyKind << endl;
         throw runtime_error("unhandled cudaMemcpyKind");
@@ -327,10 +327,10 @@ size_t cuMemcpyHtoDAsync(CUdeviceptr dst, const void *src, size_t bytes, char *_
     // cl_int err = clEnqueueBarrierWithWaitList(
     //     queue->queue, 0, 0, 0
     // );
-    // cl->checkError(err);
+    // EasyCL::checkError(err);
     err = clEnqueueWriteBuffer(queue->queue, dstMemory->clmem, CL_FALSE, offset,
                                       bytes, src, 0, NULL, NULL);
-    cl->checkError(err);
+    EasyCL::checkError(err);
     return 0;
 }
 
@@ -350,11 +350,11 @@ size_t  cuMemcpyDtoHAsync(void *dst, CUdeviceptr src, size_t bytes, char *_queue
     cl_int err = clEnqueueBarrierWithWaitList(
         queue->queue, 0, 0, 0
     );
-    cl->checkError(err);
+    EasyCL::checkError(err);
     err = clEnqueueReadBuffer(queue->queue, srcMemory->clmem, CL_FALSE, offset,
                                      bytes, dst, 0, NULL, NULL);
     // cout << "queued buffer read device => host" << endl;
-    cl->checkError(err);
+    EasyCL::checkError(err);
     return 0;
 }
 

@@ -270,10 +270,10 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     cl_int err;
     cl_mem gpu_struct = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, structAllocateSize,
                                            NULL, &err);
-    cl->checkError(err);
+    EasyCL::checkError(err);
     err = clEnqueueWriteBuffer(launchConfiguration.queue->queue, gpu_struct, CL_TRUE, 0,
                                       structAllocateSize, pCpuStruct, 0, NULL, NULL);
-    cl->checkError(err);
+    EasyCL::checkError(err);
     launchConfiguration.kernelArgsToBeReleased.push_back(gpu_struct);
     launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
     COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
@@ -294,7 +294,7 @@ void setKernelArgCharStar(char *memory_as_charstar) {
         // lets just mak ea new buffer...
         cl_mem gpu_struct = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, 4,
                                                NULL, &err);
-        cl->checkError(err);
+        EasyCL::checkError(err);
         launchConfiguration.kernelArgsToBeReleased.push_back(gpu_struct);
         launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
         launchConfiguration.kernel->in((int64_t)-1); // `-1` means `null pointer`
@@ -383,7 +383,7 @@ void kernelGo() {
         // COCL_PRINT(cout << "release arg" << endl);
         cl_mem memObject = *it;
         cl_int err = clReleaseMemObject(memObject);
-        cl->checkError(err);
+        EasyCL::checkError(err);
     }
     launchConfiguration.kernelArgsToBeReleased.clear();
     // cout << "released args done" << endl;

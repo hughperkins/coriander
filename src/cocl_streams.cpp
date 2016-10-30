@@ -44,7 +44,7 @@ namespace cocl {
         ThreadVars *v = getThreadVars();
         EasyCL *cl = v->getContext()->getCl();
         // cout << "coclCallback running " << endl;
-        cl->checkError(status);
+        EasyCL::checkError(status);
         CoclCallbackInfo *info = (CoclCallbackInfo *)userdata;
         clReleaseEvent(event);
         info->callback(info->_queue, 0, info->userdata);
@@ -183,7 +183,7 @@ size_t cudaStreamAddCallback(char *_queue, cudacallbacktype callback, void *user
         0,
         &event
         );
-    cl->checkError(err);
+    EasyCL::checkError(err);
     CoclCallbackInfo *info = new CoclCallbackInfo();
     // cout << "created info" << endl;
     info->callback = callback;
@@ -192,6 +192,6 @@ size_t cudaStreamAddCallback(char *_queue, cudacallbacktype callback, void *user
     // cout << "calling seteventcallback" << endl;
     err = clSetEventCallback(event, CL_COMPLETE, cocl::coclCallback, info);
     // cout << "called clseteventcallback" << endl;
-    cl->checkError(err);
+    EasyCL::checkError(err);
     return 0;
 }

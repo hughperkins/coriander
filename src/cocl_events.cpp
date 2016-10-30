@@ -69,7 +69,7 @@ size_t cuEventSynchronize(Event *event) {
     EasyCL *cl = v->getContext()->getCl();
     // cl_context *ctx = cl->context;
     cl_int err = clWaitForEvents(1, &event->event);
-    cl->checkError(err);
+    EasyCL::checkError(err);
     return 0;
 }
 
@@ -101,7 +101,7 @@ size_t cuEventQuery(Event *event) {
         &res,
         0);
     COCL_PRINT(cout << "clGetEventInfo: " << res << endl);
-    cl->checkError(err);
+    EasyCL::checkError(err);
     if(res == CL_COMPLETE) { // success
         return 0;
     } else if(res > 0) { // not finished yet
