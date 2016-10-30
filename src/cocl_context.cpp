@@ -92,11 +92,17 @@ namespace cocl {
     }
 }
 
-extern "C" {
-    size_t cuCtxSynchronize(void);
-    size_t cuCtxCreate_v2(char **pcontext, unsigned int flags, long long device);
-    size_t cuCtxGetCurrent(char **pcontext);
-    size_t cuCtxSetCurrent(char *context);
+// extern "C" {
+//     size_t cuCtxSynchronize(void);
+//     size_t cuCtxCreate_v2(char **pcontext, unsigned int flags, long long device);
+//     size_t cuCtxGetCurrent(char **pcontext);
+//     size_t cuCtxSetCurrent(char *context);
+// }
+
+size_t cuCtxGetDevice(CUdevice *pdevice) {
+    COCL_PRINT(cout << "cuCtxGetDevice redirected" << endl);
+    throw runtime_error("cuctxgetdevice not implemented");
+    return 0;
 }
 
 size_t cuCtxSynchronize(void) {
