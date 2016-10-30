@@ -199,6 +199,12 @@ run-test-context: build/test-context
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
+run-test-multigpu: build/test-multigpu
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
 run-test-testneg: build/test-testneg
 	################################
 	# running:
