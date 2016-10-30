@@ -41,8 +41,6 @@ using namespace easycl;
 
 namespace cocl {
     void coclCallback(cl_event event, cl_int status, void *userdata) {
-        ThreadVars *v = getThreadVars();
-        EasyCL *cl = v->getContext()->getCl();
         // cout << "coclCallback running " << endl;
         EasyCL::checkError(status);
         CoclCallbackInfo *info = (CoclCallbackInfo *)userdata;
@@ -170,8 +168,6 @@ size_t cuStreamQuery(char *_queue) {
 
 size_t cudaStreamAddCallback(char *_queue, cudacallbacktype callback, void *userdata, int flags) {
     CoclStream *stream = (CoclStream *)_queue;
-    ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getContext()->getCl();
     // StreamLock streamlock(stream);
     CLQueue *queue = stream->clqueue;
     // CLQueue *queue = (CLQueue*)_queue;
