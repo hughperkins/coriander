@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cocl/cocl_device.h"
+
 #include <map>
 #include <set>
 #include <memory>
@@ -10,6 +12,7 @@ extern "C" {
     size_t cuCtxCreate_v2(char **pcontext, unsigned int flags, long long device);
     size_t cuCtxGetCurrent(char **pcontext);
     size_t cuCtxSetCurrent(char *context);
+    size_t cuCtxGetDevice(CUdevice *pdevice);
 }
 
 // numbers are arbitrary.  symbols must match the projects we are trying to build
