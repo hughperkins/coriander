@@ -79,6 +79,8 @@ namespace cocl {
 
     Memory *Memory::newDeviceAlloc(size_t bytes) {
         ThreadVars *v = getThreadVars();
+        Context *context = v->getContext();
+        ContextMutex contextMutex(context);
         EasyCL *cl = v->getContext()->getCl();
         cl_int err;
         cl_mem clmem = clCreateBuffer(*cl->context, CL_MEM_READ_WRITE, bytes,
@@ -101,6 +103,8 @@ namespace cocl {
 
     Memory *findMemory(char *passedInAsCharStar) {
         ThreadVars *v = getThreadVars();
+        Context *context = v->getContext();
+        ContextMutex contextMutex(context);
         // MemoryMutex memoryMutex;
         // char *passedInAsCharStar = (char *)passedInPointer;
         long long pos = (long long )passedInAsCharStar;
@@ -113,7 +117,7 @@ namespace cocl {
                 return memory;
             }
         }
-        cout << "could not find memory for " << (void *)passedInAsCharStar << endl;
+        // cout << "could not find memory for " << (void *)passedInAsCharStar << endl;
         return 0;
         // throw runtime_error("could not find memory");
     }

@@ -110,15 +110,6 @@ size_t cuCtxSetCurrent(char *_pContext) {
     COCL_PRINT(cout << "cuCtxSetCurrent redirected context=" << (void *)_pContext << endl);
     Context *context = (Context *)_pContext;
     ThreadVars *threadVars = getThreadVars();
-    if(context != 0) {
-        if(context->inUse) {
-            throw runtime_error("context already locked");
-        }
-        context->inUse = true;
-    }
-    if(threadVars->currentContext != 0) {
-        threadVars->currentContext->inUse = false;
-    }
     threadVars->currentContext = context;
     return 0;
 }

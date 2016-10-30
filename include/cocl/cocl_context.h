@@ -3,6 +3,7 @@
 #include <map>
 #include <set>
 #include <memory>
+#include "pthread.h"
 
 extern "C" {
     size_t cuCtxSynchronize(void);
@@ -41,10 +42,20 @@ namespace cocl {
         std::map< long long, cocl::Memory *>memoryByAllocPos;
         int numKernelCalls = 0;
         const int device;
+        pthread_mutex_t mutex;
         easycl::EasyCL *getCl() {
             return cl.get();
         }
-        volatile bool inUse = false;
+    };
+    class ContextMutex {
+    public:
+        ContextMutex(Context *context) : context(context) {
+            pthread_mutex_lock(&context->mutex);
+        }
+        ~ContextMutex() {
+            pthread_mutex_unlock(&context->mutex);
+        }
+        Context *context;
     };
     // typedef Context *PContext;
 
