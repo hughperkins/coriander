@@ -46,13 +46,13 @@ void *thread_func(void *data) {
     int i = (size_t)data;
     print("thread " + toString(i));
 
+    cuCtxSetCurrent(context[i]);
+
     float *hostFloats1;
     CUdeviceptr deviceFloats1;
 
     cuMemHostAlloc((void **)&hostFloats1, N * sizeof(float), CU_MEMHOSTALLOC_PORTABLE);
     cuMemAlloc(&deviceFloats1, N * sizeof(float));
-
-    cuCtxSetCurrent(context[i]);
 
     CUstream stream;
     cuStreamCreate(&stream, 0);
@@ -79,7 +79,9 @@ void testfloatstar() {
 
     for(int i = 0; i < deviceCount; i++) {
         cuCtxCreate_v2(&context[i], 0, i);
+        cout << "created context " << (void *)context[i] << endl;
     }
+    cout << "created contexts" << endl;
 
     pthread_t threads[ deviceCount ];
     for(long long i = 0; i < deviceCount; i++) {
@@ -94,8 +96,11 @@ void testfloatstar() {
     print("num kernels cached " + toString(cocl::getNumCachedKernels()));
     print("num kernels calls " + toString(cocl::getNumKernelCalls()));
 
-    assert(cocl::getNumCachedKernels() == 1);
-    assert(cocl::getNumKernelCalls() == 40);
+    for(int i = 0; i < deviceCount; i++) {
+        cuCtxSetCurrent(context[i]);
+        assert(cocl::getNumCachedKernels() == 1);
+        assert(cocl::getNumKernelCalls() == 10);
+    }
 
     delete[] context;
 }

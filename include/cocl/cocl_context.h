@@ -42,19 +42,15 @@ namespace cocl {
         std::map< long long, cocl::Memory *>memoryByAllocPos;
         int numKernelCalls = 0;
         const int device;
-        pthread_mutex_t mutex;
+        pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
         easycl::EasyCL *getCl() {
             return cl.get();
         }
     };
     class ContextMutex {
     public:
-        ContextMutex(Context *context) : context(context) {
-            pthread_mutex_lock(&context->mutex);
-        }
-        ~ContextMutex() {
-            pthread_mutex_unlock(&context->mutex);
-        }
+        ContextMutex(Context *context);
+        ~ContextMutex();
         Context *context;
     };
     // typedef Context *PContext;

@@ -126,7 +126,9 @@ size_t cuInit(unsigned int flags) {
 int cudaConfigureCall(
         dim3 grid,
         dim3 block, long long sharedMem, char *queue_as_voidstar) {
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
+    COCL_PRINT(cout << "... locked launch mutex " << (void *)getThreadVars() << endl);
     CoclStream *coclStream = (CoclStream *)queue_as_voidstar;
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getContext()->getCl();
@@ -208,7 +210,9 @@ namespace cocl {
 }
 
 void configureKernel(const char *kernelName, const char *clSourcecodeString) {
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
+    COCL_PRINT(cout << "... locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "configureKernel name=" << kernelName << endl);
     // send in scratch buffer, local ints
     // make it have one int per core
@@ -233,15 +237,20 @@ void configureKernel(const char *kernelName, const char *clSourcecodeString) {
         f << launchConfiguration.kernelSource << endl;
         f << e.what() << endl;
         f.close();
+    COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
+    COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
         pthread_mutex_unlock(&launchMutex);
         pthread_mutex_unlock(&launchMutex);
         throw e;
     }
+    COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);
 }
 
 void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
+    COCL_PRINT(cout << "...lcoked launch mutex " << (void *)getThreadVars() << endl);
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getContext()->getCl();
     cl_context *ctx = cl->context;
@@ -267,11 +276,14 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     cl->checkError(err);
     launchConfiguration.kernelArgsToBeReleased.push_back(gpu_struct);
     launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
+    COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);
 }
 
 void setKernelArgCharStar(char *memory_as_charstar) {
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
+    COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "setKernelArgCharStar " << (void *)memory_as_charstar << endl);
     Memory *memory = findMemory(memory_as_charstar);
     ThreadVars *v = getThreadVars();
@@ -292,32 +304,44 @@ void setKernelArgCharStar(char *memory_as_charstar) {
         launchConfiguration.kernel->inout(&clmem);
         launchConfiguration.kernel->in((int64_t)offset); // kernel expects a `long` which is 64-bit signed int
     }
+    COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);
 }
 
 void setKernelArgInt64(int64_t value) {
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
+    COCL_PRINT(cout << "...loocked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "setKernelArgInt64 " << value << endl);
     launchConfiguration.kernel->in(value);
+    COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);
 }
 
 void setKernelArgInt32(int value) {
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
+    COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "setKernelArgInt32 " << value << endl);
     launchConfiguration.kernel->in(value);
+    COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);
 }
 
 void setKernelArgFloat(float value) {
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
+    COCL_PRINT(cout << "... locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "setKernelArgFloat " << value << endl);
     launchConfiguration.kernel->in(value);
+    COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);
 }
 
 void kernelGo() {
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
+    COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "kernelGo " << endl);
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getContext()->getCl();
@@ -363,7 +387,9 @@ void kernelGo() {
     }
     launchConfiguration.kernelArgsToBeReleased.clear();
     // cout << "released args done" << endl;
+    COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);
+    COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);
     // cout << "unlocked both mutexes" << endl;
 }

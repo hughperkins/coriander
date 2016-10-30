@@ -125,8 +125,10 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
     // prop->deviceOverlap = 0; // whats this?
     prop->multiProcessorCount = getDeviceInfoInt(deviceid, CL_DEVICE_MAX_COMPUTE_UNITS);
     prop->kernelExecTimeoutEnabled = true;
-    prop->integrated = !getDeviceInfoBool(deviceid, CL_DEVICE_HOST_UNIFIED_MEMORY);
-    prop->canMapHostMemory = getDeviceInfoBool(deviceid, CL_DEVICE_HOST_UNIFIED_MEMORY);
+    prop->integrated = false;
+    prop->canMapHostMemory = true;  // I dont want this changing across devices for now, neough bugs for now...
+    // prop->integrated = !getDeviceInfoBool(deviceid, CL_DEVICE_HOST_UNIFIED_MEMORY);
+    // prop->canMapHostMemory = getDeviceInfoBool(deviceid, CL_DEVICE_HOST_UNIFIED_MEMORY);
     // prop->computeMode = 0;  //whats this?
     // prop->concurrentKernels = 1;
     // prop->ECCEnabled = false;
