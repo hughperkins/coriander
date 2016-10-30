@@ -43,7 +43,7 @@ namespace cocl {
     void coclCallback(cl_event event, cl_int status, void *userdata) {
         ThreadVars *v = getThreadVars();
         EasyCL *cl = v->getContext()->getCl();
-        cout << "coclCallback running " << endl;
+        // cout << "coclCallback running " << endl;
         cl->checkError(status);
         CoclCallbackInfo *info = (CoclCallbackInfo *)userdata;
         clReleaseEvent(event);
@@ -102,19 +102,19 @@ size_t cuStreamWaitEvent(char *_queue, Event *event, unsigned int flags) {
 }
 
 size_t cudaStreamSynchronize(char *_queue) {
-    cout << "cudaStreamSynchronize()" << endl;
+    // cout << "cudaStreamSynchronize()" << endl;
     CoclStream *stream = (CoclStream *)_queue;
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getContext()->getCl();
     if(stream == 0) {
         stream = v->currentContext->default_stream.get();
     }
-    cout << "got stream " << (void *)stream << endl;
+    // cout << "got stream " << (void *)stream << endl;
     // cout << "got v" << endl;
     // cout << "got cl" << endl;
     // StreamLock streamlock(stream);
     CLQueue *queue = stream->clqueue;
-    cout << "got queu" << endl;
+    // cout << "got queu" << endl;
     // CLQueue *queue = (CLQueue*)_queue;
     COCL_PRINT(cout << "cudaStreamSynchronize queue=" << queue << endl);
     // hostside_opencl_funcs_assure_initialized();

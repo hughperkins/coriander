@@ -198,9 +198,9 @@ namespace cocl {
         }
         // compile the kernel.  we are still locking the mutex, but I cnat think of a better
         // way right now...
-        COCL_PRINT(cout << "building kernel " << name << endl);
+        cout << "building kernel " << name << endl;
         CLKernel *kernel = cl->buildKernelFromString(sourcecode, name, "", "__internal__");
-        COCL_PRINT(cout << " ... built" << endl);
+        cout << " ... built" << endl;
         v->getContext()->kernelByName[name ] = kernel;
         cl->storeKernel(name, kernel, true);  // this will cause the kernel to be deleted with cl.  Not clean yet, but a start
         return kernel;
