@@ -22,6 +22,8 @@
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Module.h"
 
+#include <iostream>
+
 using namespace std;
 using namespace llvm;
 
@@ -63,5 +65,9 @@ int readInt32Constant(Value *value) {
 }
 
 float readFloatConstant(Value *value) {
-    return cast<ConstantFP>(value)->getValueAPF().convertToFloat();
+    // cout << endl;
+    // cout << "float constant as double " << cast<ConstantFP>(value)->getValueAPF().convertToDouble() << endl;
+    // cout << "float constant as float " << cast<ConstantFP>(value)->getValueAPF().convertToFloat() << endl;
+    // cout << "float constant as float, via double " << (float)cast<ConstantFP>(value)->getValueAPF().convertToDouble() << endl;
+    return (float)cast<ConstantFP>(value)->getValueAPF().convertToDouble();
 }

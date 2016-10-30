@@ -16,6 +16,8 @@ def mangle(name, param_types):
             mangled += 'i'
         elif param.replace(' ', '') == 'float':
             mangled += 'f'
+        elif param.replace(' ', '') == 'double':
+            mangled += 'd'
         elif param.endswith('*'):
             # assume pointer to struct
             param = param.replace(' ', '').replace('*', '')
