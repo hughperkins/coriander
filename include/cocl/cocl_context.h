@@ -44,7 +44,7 @@ namespace cocl {
         easycl::EasyCL *getCl() {
             return cl.get();
         }
-        // bool inUse = false;
+        volatile bool inUse = false;
     };
     // typedef Context *PContext;
 

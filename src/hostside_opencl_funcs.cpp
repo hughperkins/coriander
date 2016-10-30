@@ -351,9 +351,9 @@ void kernelGo() {
         throw e;
     }
     COCL_PRINT(cout << ".. kernel queued" << endl);
-    cout << "trying cl->finihs()" << endl;
+    // cout << "trying cl->finihs()" << endl;
     cl->finish();
-    cout << "cl->finihs() done" << endl;
+    // cout << "cl->finihs() done" << endl;
     // cout << ".. kernel finished" << endl;
     for(auto it=launchConfiguration.kernelArgsToBeReleased.begin(); it != launchConfiguration.kernelArgsToBeReleased.end(); it++) {
         // COCL_PRINT(cout << "release arg" << endl);
@@ -362,10 +362,10 @@ void kernelGo() {
         cl->checkError(err);
     }
     launchConfiguration.kernelArgsToBeReleased.clear();
-    cout << "released args done" << endl;
+    // cout << "released args done" << endl;
     pthread_mutex_unlock(&launchMutex);
     pthread_mutex_unlock(&launchMutex);
-    cout << "unlocked both mutexes" << endl;
+    // cout << "unlocked both mutexes" << endl;
 }
 
 float4 make_float4(float x, float y, float z, float w) {
