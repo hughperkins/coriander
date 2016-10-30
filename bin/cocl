@@ -40,6 +40,10 @@ while [[ x$1 != x ]]; do {
             # PASSTHRU="$PASSTHRU $1"
             DONE=1
             ;;
+        -O)
+            # ignore...
+            DONE=1
+            ;;
         -G)
             # PASSTHRU="$PASSTHRU $1"
             # ignore
