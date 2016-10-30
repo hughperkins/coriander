@@ -258,10 +258,7 @@ size_t cuDeviceTotalMem(uint64_t *value, CUdeviceptr device) {
     // COCL_PRINT(cout << "cuDeviceTotalMem redirected" << endl);
     ThreadVars *v = getThreadVars();
     cl_device_id deviceid = getDeviceByIdx(v->currentDevice);
-    // *free = getDeviceInfoInt64(deviceid, CL_DEVICE_MAX_MEM_ALLOC_SIZE);
     *value = getDeviceInfoInt64(deviceid, CL_DEVICE_GLOBAL_MEM_SIZE);
-    // EasyCL *cl = v->getCl();
-    // *value = getDeviceInfoInt64(cl->device, CL_DEVICE_GLOBAL_MEM_SIZE);;
     return 0;
 }
 
