@@ -52,7 +52,8 @@ static std::map<string, bool> iskernel_by_name;
 static std::set<string> ignoredFunctionNames;
 static std::map<string, string> knownFunctionsMap; // from cuda to opencl, eg tid.x => get_global_id
 
-map<Value *, string> nameByValue;
+map<Value *, string> nameByValue; // name here might be an entire subepxression
+map<Value *, string> origNameByValue; //origName here is just like v18, or v19, no expressions; its for debugging
 static int nextNameIdx;
 static string currentFunctionSharedDeclarations = "";
 static map<string, string> currentFunctionPhiDeclarationsByName;
@@ -63,6 +64,9 @@ static map<BasicBlock *, int> functionBlockIndex;
 // static set<Value *>valuesAreExpressions;
 
 static bool debug;
+
+extern bool single_precision;
+
 bool single_precision = true;
 
 static int instructions_processed = 0;
@@ -198,6 +202,7 @@ std::string dumpValue(Value *value) {
             int intvalue = readInt32Constant(constInt);
             string asstring = toString(intvalue);
             nameByValue[value] = asstring;
+            origNameByValue[value] = asstring;
             return asstring;
         }
         if(ConstantFP *constFP = dyn_cast<ConstantFP>(constant)) {
@@ -215,12 +220,14 @@ std::string dumpValue(Value *value) {
             }
             asstring += "f";
             nameByValue[value] = asstring;
+            origNameByValue[value] = asstring;
             return asstring;
         }
     }
 
     // mark it as needing to be declared, then return it
     storeValueName(value);
+    // origNameByValue[value] = nameByValue[value];
     functionNeededForwardDeclarations.insert(value);
     // COCL_PRINT(cout << "adding to needs forward declaration " << nameByValue[value] << endl);
     value->dump();
@@ -281,6 +288,7 @@ string dumpChainedNextOp(int level, Value *op0) {
     } else if(Constant*constant = dyn_cast<Constant>(op0)) {
         string constantstring = dumpConstant(constant);
         nameByValue[op0] = constantstring;
+        origNameByValue[op0] = constantstring;
         return constantstring;
     } else {
         op0->dump();
@@ -326,7 +334,8 @@ string dumpChainedInstruction(int level, Instruction * instr) {
         nameByValue[constant] = dcires;
         return dcires;
     } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
-        float floatvalue = constantFP->getValueAPF().convertToFloat();
+        float floatvalue = readFloatConstant(constantFP);
+        // float floatvalue = constantFP->getValueAPF().convertToFloat();
         ostringstream oss;
         oss << floatvalue;
         string floatvaluestr = oss.str();
@@ -418,6 +427,7 @@ void storeValueName(Value *value) {
         oss << "v" << idx;
         string name = oss.str();
         nameByValue[value] = name;
+        origNameByValue[value] = name;
     }
 }
 
@@ -1123,6 +1133,20 @@ std::string dumpInstruction(Instruction *instruction) {
         // }
         // COCL_PRINT(cout << endl);
     // }
+    // lets dump the original isntruction, commented out
+    string originalinstruction ="";
+    originalinstruction += resultType + " " + resultName + " =";
+    originalinstruction += " " + string(instruction->getOpcodeName());
+    for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
+        Value *op = &*it->get();
+        originalinstruction += " ";
+        if(origNameByValue.find(op) != origNameByValue.end()) {
+            originalinstruction += origNameByValue[op];
+        } else {
+            originalinstruction += "<unk>";
+        }
+    }
+    // gencode += "/* " + originalinstruction + " */\n    ";
     switch(opcode) {
         case Instruction::FAdd:
             instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
@@ -1278,8 +1302,10 @@ std::string dumpInstruction(Instruction *instruction) {
             instructionCode= "(" + instructionCode + ")";
         }
         nameByValue[instruction] = instructionCode;
-        return "";
+        return "/* " + originalinstruction + " */\n";
+        // return "";
     } else {
+        gencode += "/* " + originalinstruction + " */\n    ";
         if(typestr != "void") {
             instructionCode = stripOuterParams(instructionCode);
             functionNeededForwardDeclarations.insert(instruction);
