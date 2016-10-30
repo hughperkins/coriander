@@ -46,6 +46,10 @@ void *thread_func(void *data) {
     cuMemAlloc(&deviceFloats1, N * sizeof(float));
 
     getValue<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(((float *)deviceFloats1), 0);
+    getValue<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(((float *)deviceFloats1), 0);
+    getValue<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(((float *)deviceFloats1), 0);
+    getValue<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(((float *)deviceFloats1), 0);
+    cuStreamSynchronize(stream);
 
     print("num kernels cached " + toString(cocl::getNumCachedKernels()));
     print("num kernels calls " + toString(cocl::getNumKernelCalls()));

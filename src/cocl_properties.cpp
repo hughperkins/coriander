@@ -36,7 +36,7 @@ size_t cuDeviceGetAttribute(
        int *value, int attribute, CUdevice device) {
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getCl();
-    // COCL_PRINT(cout << "cuDeviceGetAttribute redirected" << endl);
+    COCL_PRINT(cout << "cuDeviceGetAttribute redirected" << endl);
     if(CU_DEVICE_ATTRIBUTE_ECC_ENABLED == attribute) {
         *value = 0;
     } else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X == attribute) {

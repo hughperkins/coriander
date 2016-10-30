@@ -37,6 +37,8 @@ namespace cocl {
     static pthread_key_t key;
     static pthread_once_t key_once = PTHREAD_ONCE_INIT;
 
+    pthread_mutex_t clcontextcreation_mutex = PTHREAD_MUTEX_INITIALIZER;
+
     static void make_key() {
         (void) pthread_key_create(&key, NULL);
     }
@@ -57,7 +59,9 @@ namespace cocl {
     EasyCL *ThreadVars::getCl() {
         if(currentContext == 0) {
             currentContext = new Context();
+            pthread_mutex_lock(&clcontextcreation_mutex);
             currentContext->cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
+            pthread_mutex_unlock(&clcontextcreation_mutex);
             currentContext->default_stream.reset(new CoclStream(currentContext->cl.get()));
         }
         return currentContext->cl.get();

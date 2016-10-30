@@ -186,6 +186,12 @@ run-test-multithreading: build/test-multithreading
 	################################
 	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
 
+run-test-properties: build/test-properties
+	################################
+	# running:
+	################################
+	LD_LIBRARY_PATH=build:$(LD_LIBRARY_PATH) $<
+
 run-test-testneg: build/test-testneg
 	################################
 	# running:

@@ -6,7 +6,7 @@
 #include <cmath>
 #include <random>
 
-#ifdef __CUDACC__
+#if defined(__CUDACC__) || defined(__CUDA_ARCH__)
 #define __device__ __attribute__((device))
 #define __host__ __attribute__((host))
 #else

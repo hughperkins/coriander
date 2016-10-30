@@ -42,18 +42,6 @@ __global__ void use_blockdim(float *data) {
     data[blkid] = 123.0f;
 }
 
-template< typename T >
-__device__ T addNumbers(T one, T two) {
-    return one + two;
-}
-
-__global__ void use_template1(float *data, int *intdata) {
-    if(threadIdx.x == 0) {
-        data[0] = addNumbers(data[1], data[2]);
-        intdata[0] = addNumbers(intdata[1], intdata[2]);
-    }
-}
-
 __host__ float someHostFunction(float input) {
     cout << "You called: someHostFunction()" << endl;
     return input * 100.0f;

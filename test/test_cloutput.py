@@ -21,6 +21,23 @@ import subprocess
 from test import test_common
 
 
+def compile_code(context, kernelSource):
+    for file in os.listdir('/tmp'):
+        if file.startswith('testprog'):
+            os.unlink('/tmp/%s' % file)
+    with open('/tmp/testprog.cu', 'w') as f:
+        f.write(kernelSource)
+    print(subprocess.check_output([
+        'cocl',
+        '-c',
+        '/tmp/testprog.cu'
+    ]).decode('utf-8'))
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_sourcecode = f.read()
+    prog = cl.Program(context, cl_sourcecode).build()
+    return prog
+
+
 @pytest.fixture(scope='module')
 def testcudakernel1_cl():
     # cl_path = 'test/generated/testcudakernel1-device.cl'
@@ -82,33 +99,30 @@ def test_use_tid2(testcudakernel1, q, int_data, int_data_gpu):
     assert int_data[31] == int_data_orig[31] + 31
 
 
-def test_use_template1(testcudakernel1, q, int_data, int_data_gpu, float_data, float_data_gpu):
+def test_use_template1(context, q, int_data, int_data_gpu, float_data, float_data_gpu):
+    code = """
+template< typename T >
+__device__ T addNumbers(T one, T two) {
+    return one + two;
+}
+
+__global__ void use_template1(float *data, int *intdata) {
+    if(threadIdx.x == 0 && blockIdx.x == 0) {
+        data[0] = addNumbers(data[1], data[2]);
+        intdata[0] = addNumbers(intdata[1], intdata[2]);
+    }
+}
+"""
+    prog = compile_code(context, code)
     float_data_orig = np.copy(float_data)
     int_data_orig = np.copy(int_data)
 
-    testcudakernel1.__getattr__(test_common.mangle('use_template1', ['float *', 'int *']))(q, (32,), (32,), float_data_gpu, np.int64(0), int_data_gpu, np.int64(0), cl.LocalMemory(4))
+    prog.__getattr__(test_common.mangle('use_template1', ['float *', 'int *']))(q, (32,), (32,), float_data_gpu, np.int64(0), int_data_gpu, np.int64(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     cl.enqueue_copy(q, int_data, int_data_gpu)
     q.finish()
     assert float_data[0] == float_data_orig[1] + float_data_orig[2]
     assert int_data[0] == int_data_orig[1] + int_data_orig[2]
-
-
-def compile_code(context, kernelSource):
-    for file in os.listdir('/tmp'):
-        if file.startswith('testprog'):
-            os.unlink('/tmp/%s' % file)
-    with open('/tmp/testprog.cu', 'w') as f:
-        f.write(kernelSource)
-    print(subprocess.check_output([
-        'cocl',
-        '-c',
-        '/tmp/testprog.cu'
-    ]).decode('utf-8'))
-    with open('/tmp/testprog-device.cl', 'r') as f:
-        cl_sourcecode = f.read()
-    prog = cl.Program(context, cl_sourcecode).build()
-    return prog
 
 
 def test_ternary(context, q, float_data, float_data_gpu):
