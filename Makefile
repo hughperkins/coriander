@@ -67,7 +67,7 @@ build/libclew.so: build/clew-clew.o
 	g++ -o build/libclew.so -shared $^ -ldl
 
 build/libeasycl.so: $(EASYCL_OBJS) build/libclew.so
-	g++ -o build/libeasycl.so -shared $(EASYCL_OBJS) -Lbuild -lclew
+	g++ -o build/libeasycl.so -Wl,-rpath,\$${ORIGIN} -shared $(EASYCL_OBJS) -Lbuild -lclew
 
 build/clblast/libclblast.so: build/libclew.so
 	mkdir -p build/clblast
@@ -78,7 +78,7 @@ build/clblast/libclblast.so: build/libclew.so
 	cd build/clblast && make -j 4
 
 build/libcocl.so: $(COCL_OBJS) build/libeasycl.so build/clblast/libclblast.so
-	g++ -o build/libcocl.so -shared $(COCL_OBJS) -Lbuild -Lbuild/clblast -lclblast -leasycl -lclew
+	g++ -o build/libcocl.so -Wl,-rpath,\$${ORIGIN} -shared $(COCL_OBJS) -Lbuild -Lbuild/clblast -lclblast -leasycl -lclew
 
 clean:
 	rm -Rf build/* test/generated/* test/*.o
