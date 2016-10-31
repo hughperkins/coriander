@@ -78,7 +78,7 @@ build/clblast/libclblast.so: build/libclew.so
 	cd build/clblast && make -j 4
 
 build/libcocl.so: $(COCL_OBJS) build/libeasycl.so build/clblast/libclblast.so
-	g++ -o build/libcocl.so -shared $(COCL_OBJS) -Lbuild -lclblast -leasycl -lclew
+	g++ -o build/libcocl.so -shared $(COCL_OBJS) -Lbuild -Lbuild/clblast -lclblast -leasycl -lclew
 
 clean:
 	rm -Rf build/* test/generated/* test/*.o
