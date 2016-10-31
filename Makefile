@@ -40,10 +40,13 @@ build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-
 	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/patch-hostside -g -I$(LLVM_INCLUDE) src/patch-hostside.cpp build/readIR.o build/mutations.o build/struct_clone.o src/ir-to-opencl-common.cpp $(LINK_FLAGS)
 
 build/easycl-%.o: src/EasyCL/%.cpp
-	$(CLANG) -std=c++11 -fPIC -c -O2 -o $@ $< -Iinclude -Isrc/EasyCL
+	$(CLANG) -DUSE_CLEW -Isrc/EasyCL/thirdparty/clew/include -std=c++11 -fPIC -c -O2 -o $@ $< -Iinclude -Isrc/EasyCL
 
 build/easycl-util-%.o: src/EasyCL/util/%.cpp
-	$(CLANG) -std=c++11 -fPIC -c -O2 -Isrc/EasyCL -o $@ $<
+	$(CLANG) -DUSE_CLEW -std=c++11 -fPIC -c -O2 -Isrc/EasyCL -o $@ $<
+
+build/clew-%.o: src/EasyCL/thirdparty/clew/src/%.c
+	$(CLANG) -std=c++11 -fPIC -c -O2 -Isrc/EasyCL/thirdparty/clew/include -o $@ $<
 
 clblast:
 	mkdir -p build/clblast
@@ -57,15 +60,13 @@ build/cocl_%.o: src/cocl_%.cpp include/cocl/cocl*.h include/cocl/local_config.h
 	$(CLANG) -c -o $@ -std=c++11 $(DCOCL_SPAM) -fPIC -g -O2 -I$(COCL_HOME)/src/CLBlast/include -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
 
 EASYCL_OBJS=build/easycl-EasyCL.o build/easycl-CLKernel.o build/easycl-CLWrapper.o build/easycl-platforminfo_helper.o \
-	build/easycl-deviceinfo_helper.o build/easycl-util-easycl_stringhelper.o build/easycl-DevicesInfo.o build/easycl-DeviceInfo.o
-COCL_OBJS=build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_blas.o build/cocl_device.o build/cocl_error.o build/cocl_memory.o build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o
+	build/easycl-deviceinfo_helper.o build/easycl-util-easycl_stringhelper.o build/easycl-DevicesInfo.o build/easycl-DeviceInfo.o \
+	build/clew-clew.o
+
+COCL_OBJS=build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_blas.o build/cocl_device.o build/cocl_error.o build/cocl_memory.o \
+	build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o
 
 build/libcocl.so: $(COCL_OBJS) clblast $(EASYCL_OBJS)
-	# mkdir -p $(COCL_HOME)/build/clblast-extract
-	# touch $(COCL_HOME)/build/clblast-extract/foo
-	# rm $(COCL_HOME)/build/clblast-extract/*
-	# (cd $(COCL_HOME)/build/clblast-extract/; ar x ../clblast/libclblast.a)
-	# ar rcs $@ $(EASYCL_OBJS) $(COCL_OBJS) $(COCL_HOME)/build/
 	g++ -o build/libcocl.so -shared $(COCL_OBJS) $(EASYCL_OBJS)
 
 clean:
@@ -76,23 +77,23 @@ clean:
 
 # cocl
 build/test-multi1-%.o: test/cocl/multi1/%.cu
-	cocl -c -o $@ $<
+	$(COCL_HOME)/bin/cocl -c -o $@ $<
 
 build/test-callinternal-%.o: test/cocl/callinternal/%.cu
-	cocl -c -o $@ $<
+	$(COCL_HOME)/bin/cocl -c -o $@ $<
 
 build/test-%.o: test/cocl/%.cu
-	cocl -g -c -o $@ $<
+	$(COCL_HOME)/bin/cocl -g -c -o $@ $<
 
 # executables
 build/test-multi1: build/test-multi1-main.o build/test-multi1-k1.o build/test-multi1-k2.o build/libcocl.so
-	g++ -o $@ build/test-multi1-main.o build/test-multi1-k1.o build/test-multi1-k2.o -g -lcocl -lclblast -lOpenCL -lpthread
+	g++ -o $@ build/test-multi1-main.o build/test-multi1-k1.o build/test-multi1-k2.o -g -lcocl -lclblast -lpthread
 
 build/test-callinternal: build/test-callinternal-main.o build/test-callinternal-test_callinternal.o build/libcocl.so
-	g++ -o $@ build/test-callinternal-main.o build/test-callinternal-test_callinternal.o -g -lcocl -lclblast -lOpenCL -lpthread
+	g++ -o $@ build/test-callinternal-main.o build/test-callinternal-test_callinternal.o -g -lcocl -lclblast -lpthread
 
 build/test-%: build/test-%.o build/libcocl.so
-	g++ -o $@ $< -g -lcocl -lclblast -lOpenCL -lpthread
+	g++ -o $@ $< -g -lcocl -lclblast -lpthread
 
 # run
 run-test-cuda_sample: build/test-cuda_sample
@@ -292,7 +293,7 @@ install-dev:
 	ln -nsf `pwd`/share/cocl $(PREFIX)/share/cocl
 	ln -nsf `pwd`/include/cocl $(PREFIX)/include/cocl
 	ln -sf `pwd`/build/libcocl.so $(PREFIX)/lib/libcocl.so
-	ln -sf `pwd`/build/libclblast.so $(PREFIX)/lib/libclblast.so
+	ln -sf `pwd`/build/clblast/libclblast.so $(PREFIX)/lib/libclblast.so
 	ln -sf `pwd`/build/ir-to-opencl $(PREFIX)/bin/ir-to-opencl
 	ln -sf `pwd`/build/patch-hostside $(PREFIX)/bin/patch-hostside
 

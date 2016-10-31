@@ -4,13 +4,9 @@
 # INPUTBASEPATH should point to the input filename, without suffix, eg test/test_cuda_sample
 # OUTPUTBASEPATH should point to the output filename, without suffix
 
-# EIGEN_HOME=/usr/local/eigen
-
 CLANG=clang++-3.8
 LLVM_CONFIG=llvm-config-3.8
 LLVM_INCLUDE=/usr/include/llvm-3.8
-
-COCL_SPAM=1
 
 # COMPILE_FLAGS=`$(LLVM_CONFIG) --cxxflags` -std=c++11
 LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
@@ -20,13 +16,13 @@ COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffu
 all: $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX)
 
 $(OUTPUTBASEPATH)-device.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/cocl/fake_funcs.h
-	$(CLANG) $(PASSTHRU) -x cuda -std=c++11 --cuda-gpu-arch=sm_30 -D__CUDA_ARCH__=300 -I/usr/local/include/cocl -include /usr/local/include/cocl/cocl.h -include $(COCL_HOME)/include/cocl/fake_funcs.h -include $(COCL_HOME)/include/cocl/cocl_deviceside.h -I$(COCL_HOME)/include $(INCLUDES) $< --cuda-device-only -emit-llvm -I/usr/include/x86_64-linux-gnu -O2 -S -o $@
+	$(CLANG) $(PASSTHRU) -x cuda -std=c++11 --cuda-gpu-arch=sm_30 -D__CUDA_ARCH__=300 -I$(COCL_HOME)/include/cocl -include $(COCL_HOME)/include/cocl/cocl.h -include $(COCL_HOME)/include/cocl/fake_funcs.h -include $(COCL_HOME)/include/cocl/cocl_deviceside.h -I$(COCL_HOME)/include $(INCLUDES) $< --cuda-device-only -emit-llvm -I/usr/include/x86_64-linux-gnu -O2 -S -o $@
 
 $(OUTPUTBASEPATH)-device.cl: $(OUTPUTBASEPATH)-device.ll
 	ir-to-opencl $(DEBUG) $< $@
 
 $(OUTPUTBASEPATH)-hostraw.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/cocl/fake_funcs.h
-	$(CLANG) $(PASSTHRU) $(INCLUDES) -x cuda -std=c++11 -I/usr/local/include/cocl -I$(COCL_HOME)/src/EasyCL -include /usr/local/include/cocl/cocl.h -include $(COCL_HOME)/include/cocl/fake_funcs.h -include $(COCL_HOME)/include/cocl/cocl_hostside.h $< --cuda-host-only -emit-llvm  -O3 -S -o $@
+	$(CLANG) $(PASSTHRU) $(INCLUDES) -x cuda -std=c++11 -I$(COCL_HOME)/include -I$(COCL_HOME)/include/cocl -I$(COCL_HOME)/src/EasyCL -include $(COCL_HOME)/include/cocl/cocl.h -include $(COCL_HOME)/include/cocl/fake_funcs.h -include $(COCL_HOME)/include/cocl/cocl_hostside.h $< --cuda-host-only -emit-llvm  -O3 -S -o $@
 
 $(OUTPUTBASEPATH)-hostpatched.ll: $(OUTPUTBASEPATH)-hostraw.ll $(OUTPUTBASEPATH)-device.cl
 	patch-hostside $< $(word 2,$^) $@
