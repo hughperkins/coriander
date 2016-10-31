@@ -1,20 +1,20 @@
 # In theory we should use eg cmake, but this gives us more control for now,
 # and we only have like ~4 sourcecode files for now anyway
 
-CLANG=clang++-3.8
-LLVM_CONFIG=llvm-config-3.8
-LLVM_INCLUDE=/usr/include/llvm-3.8
+CLANG := clang++-3.8
+LLVM_CONFIG := llvm-config-3.8
+LLVM_INCLUDE := /usr/include/llvm-3.8
 
-COCL_HOME=`pwd`
+COCL_HOME := $(shell pwd)
 
-PREFIX=/usr/local
+PREFIX := /usr/local
 
 # COMPILE_FLAGS=`$(LLVM_CONFIG) --cxxflags` -std=c++11
-LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
+LINK_FLAGS := `$(LLVM_CONFIG) --ldflags --system-libs --libs all`
 # the llvm-config compile flags suppresses asserts
-COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -g -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++11
+COMPILE_FLAGS := -I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -g -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++11
 
-all: clblast include/cocl/local_config.h build/ir-to-opencl build/patch-hostside build/libcocl.so build/clblast/libclblast.so
+all: include/cocl/local_config.h build/ir-to-opencl build/patch-hostside build/libcocl.so build/clblast/libclblast.so build/libclew.so
 
 include/cocl/local_config.h: include/cocl/local_config.h.templ
 	cp include/cocl/local_config.h.templ include/cocl/local_config.h
@@ -48,26 +48,37 @@ build/easycl-util-%.o: src/EasyCL/util/%.cpp
 build/clew-%.o: src/EasyCL/thirdparty/clew/src/%.c
 	$(CLANG) -std=c++11 -fPIC -c -O2 -Isrc/EasyCL/thirdparty/clew/include -o $@ $<
 
-clblast:
-	mkdir -p build/clblast
-	cd build/clblast && cmake ../../src/CLBlast -DCMAKE_INSTALL_PREFIX=$(PREFIX) -DCMAKE_CXX_FLAGS=-fPIC -DBUILD_SHARED=ON
-	cd build/clblast && make -j 4
-
 build/hostside_opencl_funcs.o: src/hostside_opencl_funcs.cpp include/cocl/cocl*.h include/cocl/local_config.h
-	$(CLANG) -c -o $@ -std=c++11 -fPIC -g -O2 -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
+	$(CLANG) -DUSE_CLEW -c -o $@ -std=c++11 -fPIC -g -O2 -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $< \
+		-I$(COCL_HOME)/src/EasyCL/thirdparty/clew/include
 
 build/cocl_%.o: src/cocl_%.cpp include/cocl/cocl*.h include/cocl/local_config.h
-	$(CLANG) -c -o $@ -std=c++11 $(DCOCL_SPAM) -fPIC -g -O2 -I$(COCL_HOME)/src/CLBlast/include -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
+	$(CLANG) -DUSE_CLEW -I$(COCL_HOME)/src/EasyCL/thirdparty/clew/include/proxy-opencl/ \
+		 -I$(COCL_HOME)/src/EasyCL/thirdparty/clew/include -c -o $@ -std=c++11 $(DCOCL_SPAM) \
+		-fPIC -g -O2 -I$(COCL_HOME)/src/CLBlast/include -I$(COCL_HOME)/include -I$(COCL_HOME)/src/EasyCL $<
 
 EASYCL_OBJS=build/easycl-EasyCL.o build/easycl-CLKernel.o build/easycl-CLWrapper.o build/easycl-platforminfo_helper.o \
 	build/easycl-deviceinfo_helper.o build/easycl-util-easycl_stringhelper.o build/easycl-DevicesInfo.o build/easycl-DeviceInfo.o \
-	build/clew-clew.o
 
 COCL_OBJS=build/hostside_opencl_funcs.o build/cocl_events.o build/cocl_blas.o build/cocl_device.o build/cocl_error.o build/cocl_memory.o \
 	build/cocl_properties.o build/cocl_streams.o build/cocl_clsources.o build/cocl_context.o
 
-build/libcocl.so: $(COCL_OBJS) clblast $(EASYCL_OBJS)
-	g++ -o build/libcocl.so -shared $(COCL_OBJS) $(EASYCL_OBJS)
+build/libclew.so: build/clew-clew.o
+	g++ -o build/libclew.so -shared $^ -ldl
+
+build/libeasycl.so: $(EASYCL_OBJS) build/libclew.so
+	g++ -o build/libeasycl.so -shared $(EASYCL_OBJS) -Lbuild -lclew
+
+build/clblast/libclblast.so: build/libclew.so
+	mkdir -p build/clblast
+	cd build/clblast && cmake ../../src/CLBlast -DCMAKE_INSTALL_PREFIX=$(PREFIX) -DCMAKE_CXX_FLAGS=-fPIC -DBUILD_SHARED=ON \
+		-DOPENCL_INCLUDE_DIRS=$(COCL_HOME)/src/EasyCL/thirdparty/clew/include/proxy-opencl/ \
+		-DOPENCL_LIBRARIES=$(COCL_HOME)/build/libclew.so \
+		-DCMAKE_CXX_FLAGS=-I$(COCL_HOME)/src/EasyCL/thirdparty/clew/include
+	cd build/clblast && make -j 4
+
+build/libcocl.so: $(COCL_OBJS) build/libeasycl.so build/clblast/libclblast.so
+	g++ -o build/libcocl.so -shared $(COCL_OBJS) -Lbuild -lclblast -leasycl -lclew
 
 clean:
 	rm -Rf build/* test/generated/* test/*.o
@@ -83,7 +94,7 @@ build/test-callinternal-%.o: test/cocl/callinternal/%.cu
 	$(COCL_HOME)/bin/cocl -c -o $@ $<
 
 build/test-%.o: test/cocl/%.cu
-	$(COCL_HOME)/bin/cocl -g -c -o $@ $<
+	$(COCL_HOME)/bin/cocl -I$(COCL_HOME)/src/EasyCL -g -c -o $@ $<
 
 # executables
 build/test-multi1: build/test-multi1-main.o build/test-multi1-k1.o build/test-multi1-k2.o build/libcocl.so
@@ -93,7 +104,7 @@ build/test-callinternal: build/test-callinternal-main.o build/test-callinternal-
 	g++ -o $@ build/test-callinternal-main.o build/test-callinternal-test_callinternal.o -g -lcocl -lclblast -lpthread
 
 build/test-%: build/test-%.o build/libcocl.so
-	g++ -o $@ $< -g -lcocl -lclblast -lpthread
+	g++ -o $@ $< -g -lcocl -lclblast -lpthread -Lbuild -leasycl -lclew
 
 # run
 run-test-cuda_sample: build/test-cuda_sample

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "CL/cl.h"
+// #include "CL/cl.h"
+#include "EasyCL.h"
 
 namespace cocl {
     class Event {

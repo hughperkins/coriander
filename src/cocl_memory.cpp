@@ -28,7 +28,7 @@
 
 #include "EasyCL.h"
 
-#include "CL/cl.h"
+// #include "CL/cl.h"
 
 #include "pthread.h"
 

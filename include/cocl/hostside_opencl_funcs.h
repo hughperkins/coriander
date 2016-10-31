@@ -18,9 +18,9 @@
 // #include <map>
 // #include <set>
 
-// #include "EasyCL.h"
+#include "EasyCL.h"
 
-#include "CL/cl.h"
+// #include "CL/cl.h"
 
 #include "cocl/cocl_defs.h"
 

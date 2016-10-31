@@ -2,7 +2,9 @@
 
 #include <cstddef>
 
-#include "CL/cl.h"
+#include "EasyCL.h"
+
+// #include "CL/cl.h"
 #include "cocl_defs.h"
 
 // #define CoclDeviceType int

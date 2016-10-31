@@ -29,7 +29,7 @@
 
 #include "EasyCL.h"
 
-#include "CL/cl.h"
+// #include "CL/cl.h"
 #include "cocl/cocl.h"
 #include "cocl/cocl_memory.h"
 
