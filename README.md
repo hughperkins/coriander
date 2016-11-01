@@ -22,9 +22,9 @@ $ cocl cuda_sample.cu
     ./cuda_sample.cu compiled into ./cuda_sample
 
 ```
-Run:
+Run.  You'll need to add libclew.so, libclblast.co, libeasycl.so to the LD_LIBRARY_PATH:
 ```
-$ ./cuda_sample
+$ LD_LIBRARY_PATH=/usr/local/lib ./cuda_sample
 Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 hostFloats[2] 123
@@ -42,7 +42,7 @@ g++ -o teststream teststream.o -lcocl -lOpenCL
 ```
 Result is the same:
 ```
-$ ./cuda_sample
+$ LD_LIBRARY_PATH=/usr/local/lib ./cuda_sample
 Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 hostFloats[2] 123
@@ -152,6 +152,8 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 
 ## News
 
+- Nov 1:
+  - turned on rpath, switched from static to shared compilation
 - Oct 29:
   - negative infinity float constants handled correctly now (pre-requisite for `reduce_min` working in tensorflow)
   - properties now return correct device name, total memory, and a few other device parameters

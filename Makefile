@@ -71,7 +71,7 @@ build/libeasycl.so: $(EASYCL_OBJS) build/libclew.so
 
 build/clblast/libclblast.so: build/libclew.so
 	mkdir -p build/clblast
-	cd build/clblast && cmake ../../src/CLBlast -DCMAKE_INSTALL_PREFIX=$(PREFIX) -DCMAKE_CXX_FLAGS=-fPIC -DBUILD_SHARED=ON \
+	cd build/clblast && cmake ../../src/CLBlast -DCMAKE_INSTALL_PREFIX=$(PREFIX) -DCMAKE_CXX_FLAGS=-fPIC -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,\$${ORIGIN} -Wl,-rpath,\$${ORIGIN}/.." -DBUILD_SHARED=ON \
 		-DOPENCL_INCLUDE_DIRS=$(COCL_HOME)/src/EasyCL/thirdparty/clew/include/proxy-opencl/ \
 		-DOPENCL_LIBRARIES=$(COCL_HOME)/build/libclew.so \
 		-DCMAKE_CXX_FLAGS=-I$(COCL_HOME)/src/EasyCL/thirdparty/clew/include
@@ -280,6 +280,8 @@ install: build/ir-to-opencl build/patch-hostside build/libcocl.so
 	install -m 0755 build/ir-to-opencl $(PREFIX)/bin
 	install -m 0755 build/patch-hostside $(PREFIX)/bin
 	install -m 0644 build/libcocl.so $(PREFIX)/lib
+	install -m 0644 build/libclew.so $(PREFIX)/lib
+	install -m 0644 build/libeasycl.so $(PREFIX)/lib
 	install -m 0644 build/clblast/libclblast.so $(PREFIX)/lib
 	mkdir -p $(PREFIX)/share/cocl
 	install -m 0644 share/cocl/cocl.Makefile $(PREFIX)/share/cocl/cocl.Makefile
@@ -287,6 +289,7 @@ install: build/ir-to-opencl build/patch-hostside build/libcocl.so
 	mkdir -p $(PREFIX)/include/cocl
 	install -m 0644 include/cocl/*.h $(PREFIX)/include/cocl/
 	install -m 0644 include/cocl/*.hpp $(PREFIX)/include/cocl/
+	install -m 0644 src/EasyCL/thirdparty/clew/include/clew.h $(PREFIX)/include/
 
 uninstall:
 	rm -Rf $(PREFIX)/include/cocl
@@ -301,11 +304,15 @@ install-dev:
 	mkdir -p $(PREFIX)/share
 	mkdir -p $(PREFIX)/include
 	ln -sf `pwd`/bin/cocl $(PREFIX)/bin/cocl
-	ln -nsf `pwd`/share/cocl $(PREFIX)/share/cocl
-	ln -nsf `pwd`/include/cocl $(PREFIX)/include/cocl
+	ln -Tnsf `pwd`/share/cocl $(PREFIX)/share/cocl
+	ln -Tnsf `pwd`/include/cocl $(PREFIX)/include/cocl
 	ln -sf `pwd`/build/libcocl.so $(PREFIX)/lib/libcocl.so
+	ln -sf `pwd`/build/libclew.so $(PREFIX)/lib/libclew.so
+	ln -sf `pwd`/build/libeasycl.so $(PREFIX)/lib/libeasycl.so
 	ln -sf `pwd`/build/clblast/libclblast.so $(PREFIX)/lib/libclblast.so
 	ln -sf `pwd`/build/ir-to-opencl $(PREFIX)/bin/ir-to-opencl
 	ln -sf `pwd`/build/patch-hostside $(PREFIX)/bin/patch-hostside
+	ln -sf `pwd`/src/EasyCL/thirdparty/clew/include/clew.h $(PREFIX)/include
+	ln -sf `pwd`/src/EasyCL/ $(PREFIX)/include/
 
 .PHONY: install uninstall install-dev clean-eigen clean-tests

@@ -8,6 +8,16 @@ export CLANG=clang++-3.8
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export COCL_HOME=$(dirname ${SCRIPT_DIR})
 
+if [[ -f ${COCL_HOME}/bin/ir-to-opencl ]]; then {
+    export COCL_BIN=${COCL_HOME}/bin
+} else {
+    export COCL_BIN=${COCL_HOME}/build
+} fi
+
+# echo COCL_HOME $COCL_HOME
+# echo COCL_BIN $COCL_BIN
+# echo PWD $PWD
+
 # Using this weird bash, compared to other possibilities because:
 # - getopts cant handle long options
 # - would rather not make cocl dependent on python (although I know that tensorflow already is)
@@ -223,15 +233,16 @@ if [[ ! -v COMPILE ]]; then {
 # echo PASSTHRU ${PASSTHRU}
 OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} PASSTHRU=${PASSTHRU} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${SCRIPT_DIR}/../share/cocl/cocl.Makefile
 
-# if [[ -v COMPILE ]]; then {
+if [[ ! -v COMPILE ]]; then {
+    g++ -o ${OUTPUTBASEPATH}${FINALPOSTFIX} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} -L${COCL_HOME}/build -lcocl -lOpenCL -leasycl -lclew -lpthread
+} fi
+
 #     set +x
 #     echo ""
 #     echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}"
 #     echo ""
 # } else {
-#     g++ -o ${OUTPUTBASEPATH}${FINALPOSTFIX} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} -L${COCL_HOME}/build -lcocl -lOpenCL
 #     set +x
 #     echo ""
 #     echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}${FINALPOSTFIX}"
 #     echo ""
-# } fi
