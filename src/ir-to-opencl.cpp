@@ -42,6 +42,7 @@
 using namespace llvm;
 using namespace std;
 
+#include "argparsecpp.h"
 #include "ir-to-opencl-common.h"
 #include "struct_clone.h"
 #include "cocl/local_config.h"
@@ -63,12 +64,10 @@ static set<Value *> functionNeededForwardDeclarations;
 static map<BasicBlock *, int> functionBlockIndex;
 // static set<Value *>valuesAreExpressions;
 
-static bool debug;
-
+static bool debug = false;
+static bool add_ir_to_cl = false;
 extern bool single_precision;
-
 bool single_precision = true;
-
 static int instructions_processed = 0;
 
 std::string dumpInstruction(llvm::Instruction *instruction);
@@ -1302,10 +1301,16 @@ std::string dumpInstruction(Instruction *instruction) {
             instructionCode= "(" + instructionCode + ")";
         }
         nameByValue[instruction] = instructionCode;
-        return "/* " + originalinstruction + " */\n";
+        if(add_ir_to_cl) {
+            return "/* " + originalinstruction + " */\n";
+        } else {
+            return "";
+        }
         // return "";
     } else {
-        gencode += "/* " + originalinstruction + " */\n    ";
+        if(add_ir_to_cl) {
+            gencode += "/* " + originalinstruction + " */\n    ";
+        }
         if(typestr != "void") {
             instructionCode = stripOuterParams(instructionCode);
             functionNeededForwardDeclarations.insert(instruction);
@@ -1595,23 +1600,17 @@ std::string dumpModule(Module *M) {
 
 int main(int argc, char *argv[]) {
     SMDiagnostic smDiagnostic;
-    if(argc < 3) {
-        cout << "Usage: " << argv[0] << " [--debug] <input ir file> <output cl file>" << endl;
-        return 1;
+    string target;
+    string outputfilepath;
+    argparsecpp::ArgumentParser parser;
+    parser.add_string_argument("--inputfile", &target)->required();
+    parser.add_string_argument("--outputfile", &outputfilepath)->required();
+    parser.add_bool_argument("--debug", &debug);
+    parser.add_bool_argument("--add_ir_to_cl", &add_ir_to_cl);
+    if(!parser.parse_args(argc, argv)) {
+        return -1;
     }
-    string target = argv[argc - 2];
-    string outputfilepath = argv[argc - 1];
-    debug = false;
-    // cout << "argc " << argc << " argv[1] " << argv[1] << endl;
-    if(argc == 4) {
-        if(string(argv[1]) != "--debug") {
-            cout << "Usage: " << argv[0] << " [--debug] <input ir file> <output cl file>" << endl;
-            return 1;
-        } else {
-            cout << "enabling debug mode" << endl;
-            debug = true;
-        }
-    }
+
     std::unique_ptr<llvm::Module> M = parseIRFile(target, smDiagnostic, context);
     if(!M) {
         smDiagnostic.print(argv[0], errs());

@@ -31,9 +31,12 @@ build/struct_clone.o: src/struct_clone.cpp src/struct_clone.h include/cocl/local
 	mkdir -p build
 	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -c -o $@ -g -I$(LLVM_INCLUDE) $<
 
-build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/readIR.o build/struct_clone.o include/cocl/local_config.h
+build/argparsecpp.o: third_party/argparsecpp/argparsecpp.cpp third_party/argparsecpp/argparsecpp.h
+	g++ -std=c++11 -c -fPIC -o $@ $< -I third_party/argparsecpp
+
+build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/readIR.o build/struct_clone.o include/cocl/local_config.h build/argparsecpp.o
 	mkdir -p build
-	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/ir-to-opencl -g -I. -Iinclude -I$(LLVM_INCLUDE) src/ir-to-opencl.cpp build/struct_clone.o build/readIR.o src/ir-to-opencl-common.cpp build/mutations.o $(LINK_FLAGS)
+	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/ir-to-opencl -g -I. -Ithird_party/argparsecpp -Iinclude -I$(LLVM_INCLUDE) src/ir-to-opencl.cpp build/struct_clone.o build/readIR.o src/ir-to-opencl-common.cpp build/mutations.o build/argparsecpp.o $(LINK_FLAGS)
 
 build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/struct_clone.o build/readIR.o build/struct_clone.o include/cocl/local_config.h
 	mkdir -p build
@@ -262,9 +265,6 @@ run-test-multi1: build/test-multi1
 	# running:
 	################################
 	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
-
-build/test_options: test/test_options.cpp src/options.cpp include/cocl/options.h
-	g++ -std=c++11 -fPIC -Iinclude -o build/test_options test/test_options.cpp src/options.cpp
 
 clean-tests:
 	touch build/test~

@@ -1,12 +1,18 @@
-// I sort of hummed and ha'd for ages pondering how to do commandline options.
-// lots of people use boost, but I dislike depending on boost; its hard to build boost things on windows, was
-// my last experience, not sure if thats still the case
-// getopt seems not portable, or cant handle long arguments
-// since one can write a parser quite quickly, seems that will be most portbale
-// I might facotrize it out into a separate repo, since I hate having to procrastinate for ages on such a simple
-// thing as reading commandline options...
+// Copyright Hugh Perkins 2016
 
-// this is modeled off Python's `argparse`
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// loosely modeled off Python's `argparse`
 
 #pragma once
 
@@ -17,7 +23,7 @@
 #include <memory>
 
 
-namespace cocl {
+namespace argparsecpp {
     class Option {
     public:
         virtual  bool needsValue() = 0;
@@ -69,7 +75,7 @@ namespace cocl {
         Option *add_bool_argument(std::string option, bool *var);
         Option *add_float_argument(std::string option, float *var);
         Option *add_string_argument(std::string option, std::string *var);
-        bool parse(int argc, char *argv[]);
+        bool parse_args(int argc, char *argv[]);
         void print_usage();
     };
 }
