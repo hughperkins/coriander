@@ -130,11 +130,17 @@ def test_pow(context, q, float_data, float_data_gpu):
     code = """
 __global__ void myKernel(float *data) {
     data[0] = pow(data[1], data[2]);
+    data[3] = pow(data[4], data[5]);
+    data[5] = pow(data[7], data[8]);
 }
 """
     prog = test_common.compile_code(cl, context, code)
     float_data[1] = 1.5
     float_data[2] = 4.6
+    float_data[4] = -1.5
+    float_data[5] = 4.6
+    float_data[7] = 1.5
+    float_data[8] = -4.6
     cl.enqueue_copy(q, float_data_gpu, float_data)
     prog.__getattr__(test_common.mangle('myKernel', ['float *']))(
         q, (32,), (32,),
@@ -143,8 +149,35 @@ __global__ void myKernel(float *data) {
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     print('float_data[0]', float_data[0])
+    print('float_data[3]', float_data[3])
+    print('float_data[6]', float_data[6])
     expected = pow(float_data[1], float_data[2])
     assert abs(float_data[0] - expected) <= 1e-4
+
+
+def test_sqrt(context, q, float_data, float_data_gpu):
+
+    code = """
+__global__ void myKernel(float *data) {
+    data[threadIdx.x] = sqrt(data[threadIdx.x]);
+}
+"""
+    prog = test_common.compile_code(cl, context, code)
+    # float_data[1] = 1.5
+    # float_data[2] = 4.6
+    # float_data[4] = -1.5
+    # float_data[5] = 4.6
+    # float_data[7] = 1.5
+    # float_data[8] = -4.6
+    cl.enqueue_copy(q, float_data_gpu, float_data)
+    prog.__getattr__(test_common.mangle('myKernel', ['float *']))(
+        q, (32,), (32,),
+        float_data_gpu, np.int64(0), cl.LocalMemory(4))
+    q.finish()
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    for i in range(8):
+        print('float_data[]', i, float_data[i])
 
 
 def test_fptosi(context, q, float_data, float_data_gpu, int_data, int_data_gpu):

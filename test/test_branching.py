@@ -36,13 +36,6 @@ __global__ void testWhile(int *data, int N) {
     }
 }
 
-__global__ void testIf(int *data, int N) {
-    int tid = threadIdx.x;
-    if(tid < N) {
-        data[tid] *= 2;
-    }
-}
-
 __global__ void testIfElse(int *data, int N) {
     int tid = threadIdx.x;
     if(tid < N) {
@@ -54,15 +47,6 @@ __global__ void testIfElse(int *data, int N) {
     }
 }
 
-__global__ void testFor(float *data, int N) {
-    if(threadIdx.x == 0) {
-        float sum = 0.0f;
-        for(int i = 0; i < N; i++) {
-            sum += data[i];
-        }
-        data[0] = sum;
-    }
-}
 """
 
 
@@ -83,11 +67,97 @@ def compile_code(context, kernelSource):
     return prog
 
 
-def test_testFor(context, q, float_data, float_data_gpu):
+def test_test_if(context, q, float_data, float_data_gpu):
+    sourcecode = """
+__global__ void testIf(float *data, int N) {
+    int tid = threadIdx.x;
+    if(tid < N) {
+        data[tid] *= 2;
+    }
+}
+"""
     prog = compile_code(context, sourcecode)
     float_data_orig = np.copy(float_data)
 
-    prog.__getattr__(test_common.mangle('testFor', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(32), cl.LocalMemory(4))
+    N = 2
+    prog.__getattr__(test_common.mangle('testIf', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
-    assert abs(float_data[0] - sum(float_data_orig[0:32])) < 1e-4
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_code = f.read()
+    print('cl_code', cl_code)
+    for i in range(10):
+        if i < N:
+            assert float_data[i] == float_data_orig[i] * 2
+        else:
+            assert float_data[i] == float_data_orig[i]
+
+
+def test_test_for(context, q, float_data, float_data_gpu):
+    sourcecode = """
+__global__ void testFor(float *data, int N) {
+    if(threadIdx.x == 0) {
+        float sum = 0.0f;
+        for(int i = 0; i < N; i++) {
+            sum += data[i];
+        }
+        data[0] = sum;
+    }
+}
+"""
+    prog = compile_code(context, sourcecode)
+    float_data_orig = np.copy(float_data)
+
+    N = 4
+    prog.__getattr__(test_common.mangle('testFor', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(N), cl.LocalMemory(4))
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_code = f.read()
+    print('cl_code', cl_code)
+
+    sum = 0
+    for i in range(N):
+        sum += float_data_orig[i]
+    assert abs(float_data[0] - sum) <= 1e-4
+
+
+def test_nested_for(context, q, float_data, float_data_gpu):
+    source = """
+__device__ void myfunc(float *data, int a, int b) {
+    data[1] = data[2];
+    float sum = 0;
+    for(int i = 0; i < a; i++) {
+        for(int j = 0; j < b; j++) {
+            sum += data[i * 17 + j * 7];
+        }
+    }
+    data[0] = sum;
+}
+
+__global__ void mykernel(float *data, int a, int b) {
+    myfunc(data, a, b);
+}
+"""
+    prog = compile_code(context, source)
+    float_data_orig = np.copy(float_data)
+
+    a = 2
+    b = 3
+    prog.__getattr__(test_common.mangle('mykernel', ['float *', 'int', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(a), np.int32(b), cl.LocalMemory(4))
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_code = f.read()
+    print('cl_code', cl_code)
+
+    sum = 0
+    for i in range(a):
+        for j in range(b):
+            sum += float_data_orig[i * 17 + j * 7]
+
+    print('float_data[0]', float_data[0])
+    print('float_data[1]', float_data[1])
+    assert float_data[1] == float_data_orig[2]
+    assert abs(float_data[0] - sum) <= 1e-4
+    # assert abs(float_data[0] - sum(float_data_orig[0:32])) < 1e-4
