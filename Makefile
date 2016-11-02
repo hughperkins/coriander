@@ -263,7 +263,7 @@ run-test-multi1: build/test-multi1
 	################################
 	LD_LIBRARY_PATH=$(COCL_HOME)/build:$(COCL_HOME)/build/clblast $<
 
-build/test_options: test/test_options.cpp src/options.cpp include/options.h
+build/test_options: test/test_options.cpp src/options.cpp include/cocl/options.h
 	g++ -std=c++11 -fPIC -Iinclude -o build/test_options test/test_options.cpp src/options.cpp
 
 clean-tests:
