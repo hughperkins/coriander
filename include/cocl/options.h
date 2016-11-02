@@ -6,6 +6,8 @@
 // I might facotrize it out into a separate repo, since I hate having to procrastinate for ages on such a simple
 // thing as reading commandline options...
 
+// this is modeled off Python's `argparse`
+
 #pragma once
 
 #include <string>
@@ -20,6 +22,16 @@ namespace cocl {
     public:
         virtual  bool needsValue() = 0;
         virtual void parse(std::string valueAsString = "") = 0;
+        Option *required() {
+            this->_required = true;
+            return this;
+        }
+        Option *help(std::string help) {
+            this->_help = help;
+            return this;
+        }
+        bool _required = false;
+        std::string _help = "";
     };
     class OptionBool : public Option {
     public:
@@ -53,10 +65,11 @@ namespace cocl {
     class ArgumentParser {
     public:
         std::map<std::string, std::unique_ptr<Option> > options;
-        void add_int_argument(std::string option, int *var, std::string help = "");
-        void add_bool_argument(std::string option, bool *var, std::string help = "");
-        void add_float_argument(std::string option, float *var, std::string help = "");
-        void add_string_argument(std::string option, std::string *var, std::string help = "");
+        Option *add_int_argument(std::string option, int *var);
+        Option *add_bool_argument(std::string option, bool *var);
+        Option *add_float_argument(std::string option, float *var);
+        Option *add_string_argument(std::string option, std::string *var);
         bool parse(int argc, char *argv[]);
+        void print_usage();
     };
 }

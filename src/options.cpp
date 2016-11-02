@@ -2,6 +2,7 @@
 
 #include <string>
 #include <map>
+#include <set>
 #include <cstdlib>
 #include <cmath>
 #include <memory>
@@ -30,32 +31,58 @@ namespace cocl {
         *target = atoi(valueString.c_str());
     }
 
-    void ArgumentParser::add_int_argument(std::string option, int *var, std::string help) {
+    Option *ArgumentParser::add_int_argument(std::string option, int *var) {
         std::unique_ptr<Option> option_(new OptionInt(var));
         options[option] = std::move(option_);
+        return options[option].get();
     }
-    void ArgumentParser::add_bool_argument(std::string option, bool *var, std::string help) {
+    Option *ArgumentParser::add_bool_argument(std::string option, bool *var) {
         std::unique_ptr<Option> option_(new OptionBool(var));
         options[option] = std::move(option_);
+        return options[option].get();
     }
-    void ArgumentParser::add_float_argument(std::string option, float *var, std::string help) {
+    Option *ArgumentParser::add_float_argument(std::string option, float *var) {
         std::unique_ptr<Option> option_(new OptionFloat(var));
         options[option] = std::move(option_);
+        return options[option].get();
     }
-    void ArgumentParser::add_string_argument(std::string option, std::string *var, std::string help) {
+    Option *ArgumentParser::add_string_argument(std::string option, std::string *var) {
         std::unique_ptr<Option> option_(new OptionString(var));
         options[option] = std::move(option_);
+        return options[option].get();
+    }
+    void ArgumentParser::print_usage() {
+        std::cout << std::endl;
+        std::cout << "Usage:" << std::endl;
+        for(auto it=options.begin(); it != options.end(); it++) {
+            Option *option = it->second.get();
+            std::string arg = it->first;
+            std::cout << "  " << arg;
+            if(option->_required) {
+                std::cout << " (required)";
+            }
+            std::cout << "   " + option->_help << std::endl;
+        }
+        std::cout << std::endl;
     }
     bool ArgumentParser::parse(int argc, char *argv[]) {
+        std::set<std::string> seenOptions;
         for(int i = 1; i < argc; i++) {
             std::string thisArg = argv[i];
+            if(thisArg == "-h" || thisArg == "-?" || thisArg == "--help") {
+                print_usage();
+                return false;
+            }
             if(options.find(thisArg) == options.end()) {
+                print_usage();
                 std::cout << "unknown option " << thisArg << std::endl;
                 return false;
             }
+            seenOptions.insert(thisArg);
             Option *option = options[thisArg].get();
             if(option->needsValue()) {
                 if(i + 1 >= argc) {
+                    print_usage();
                     std::cout << "no value found for optoin " << thisArg << std::endl;
                     return false;
                 }
@@ -66,5 +93,19 @@ namespace cocl {
                 option->parse("");
             }
         }
+        // check for required options
+        for(auto it=options.begin(); it != options.end(); it++) {
+            Option *option = it->second.get();
+            std::string arg = it->first;
+            if(option->_required) {
+                if(seenOptions.find(arg) == seenOptions.end()) {
+                    print_usage();
+                    std::cout << "Please provide a value for " + arg << std::endl;
+                    std::cout << std::endl;
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
