@@ -458,20 +458,20 @@ std::string dumpAlloca(Instruction *alloca) {
             } else {
                 // if the elementType is a pointer, assume its global?
                 if(isa<PointerType>(ptrElementType)) {
-                    cout << "dumpAlloca, for pointer" << endl;
+                    // cout << "dumpAlloca, for pointer" << endl;
                     // find the store
                     int numUses = alloca->getNumUses();
-                    cout << "numUses " << numUses << endl;
+                    // cout << "numUses " << numUses << endl;
                     for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
                         User *user = *it;
                         // Value *useValue = use->
                         // cout << "user " << endl;
                         if(StoreInst *store = dyn_cast<StoreInst>(user)) {
-                            cout << " got a store" << endl;
-                            user->dump();
-                            cout << endl;
+                            // cout << " got a store" << endl;
+                            // user->dump();
+                            // cout << endl;
                             int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
-                            cout << "addessspace " << storeop0space << endl;
+                            // cout << "addessspace " << storeop0space << endl;
                             if(storeop0space == 1) {
                                 gencode += "global ";
                                 updateAddressSpace(alloca, 1);
@@ -937,6 +937,13 @@ std::string dumpTrunc(CastInst *instr) {
     return gencode;
 }
 
+std::string dumpPtrToInt(PtrToIntInst *instr) {
+    string gencode = "";
+    string typestr = dumpType(instr->getType());
+    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
+    return gencode;
+}
+
 std::string dumpIcmp(ICmpInst *instr) {
     string gencode = "";
     CmpInst::Predicate predicate = instr->getSignedPredicate();  // note: we should detect signedness...
@@ -1247,6 +1254,9 @@ std::string dumpInstruction(Instruction *instruction) {
             break;
         case Instruction::Trunc:
             instructionCode = dumpTrunc(cast<CastInst>(instruction));
+            break;
+        case Instruction::PtrToInt:
+            instructionCode = dumpPtrToInt(cast<PtrToIntInst>(instruction));
             break;
         case Instruction::BitCast:
             instructionCode = dumpBitCast(cast<BitCastInst>(instruction));

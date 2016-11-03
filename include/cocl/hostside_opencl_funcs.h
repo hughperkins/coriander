@@ -32,24 +32,17 @@ namespace easycl {
 namespace cocl {
     class CoclStream;
 
-    // extern size_t grid[3];
-    // extern size_t block[3];
-    // extern std::unique_ptr<easycl::CLKernel> kernel;
-
-    // extern std::unique_ptr<easycl::EasyCL> cl;
-    // extern cl_context *ctx;
-    // extern cl_command_queue *queue;
-
     int getNumCachedKernels(); // this should be per-context or something, though right now, it is not yet
     int getNumKernelCalls();
-
-    // extern std::vector<cl_mem> kernelArgsToBeReleased;
-    // extern std::vector<cl_mem> kernelArgsToBeRemapped;
-
-    // CoclStream *getDefaultCoclStream();
 }
 
 extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
 }
 
+extern "C" {
+    void configureKernel(
+        const char *kernelName, const char *llsourcecode, const char *clSourcecodeString);
+
+    size_t cuInit(unsigned int flags);
+}

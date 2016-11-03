@@ -92,27 +92,7 @@ namespace cocl {
 
 using namespace cocl;
 
-void hostside_opencl_funcs_init() {
-    // COCL_PRINT(cout << "initialize cl context" << endl);
-    // cl.reset(EasyCL::createForFirstGpuOtherwiseCpu());
-    // ctx = cl->context;
-    // queue = cl->queue;
-    // defaultCoclStream = new CoclStream(cl.get());
-}
-
 void hostside_opencl_funcs_assure_initialized(void) {
-    // yes this is not threadsafe.  or anything safe really...
-    // if(!initialized) {
-    //     hostside_opencl_funcs_init();
-    //     initialized = true;
-    // }
-}
-
-extern "C" {
-    void configureKernel(
-        const char *kernelName, const char *clSourcecodeString);
-
-    size_t cuInit(unsigned int flags);
 }
 
 size_t cuInit(unsigned int flags) {
@@ -201,13 +181,11 @@ namespace cocl {
         }
         // compile the kernel.  we are still locking the mutex, but I cnat think of a better
         // way right now...
-        cout << "building kernel y " << name << endl;
+        cout << "building kernel " << name << endl;
 
-        cout << "load env " << (void *)getenv("LOAD") << endl;
-        bool load = getenv("LOAD") != 0;
         string filename = "/tmp/out.cl";
-        if(load) {
-            cout << "loading kernel" << endl;
+        if(getenv("COCL_LOAD_KERNEL") != 0) {
+            cout << "loading kernel from " << filename << endl;
             ifstream f;
             f.open(filename, ios_base::in);
             // f << launchConfiguration.kernelName << endl;
@@ -219,10 +197,10 @@ namespace cocl {
             }
             // cout << sourcecode << endl;
             f.close();
-        } else {
-            cout << "saving kernel" << endl;
-             ofstream f;
-           f.open(filename, ios_base::out);
+        } else if(getenv("COCL_DUMP_KERNEL") != 0) {
+            cout << "saving kernel to " << filename << endl;
+            ofstream f;
+            f.open(filename, ios_base::out);
             // f << launchConfiguration.kernelName << endl;
             f << sourcecode << endl;
             f.close();
@@ -236,7 +214,8 @@ namespace cocl {
     }
 }
 
-void configureKernel(const char *kernelName, const char *clSourcecodeString) {
+void configureKernel(const char *kernelName, const char *devicellsourcecode, const char *clSourcecodeString) {
+    // we just ignore the devicellsourcecode mostly, but might be useful for debugging
     // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "... locked launch mutex " << (void *)getThreadVars() << endl);
@@ -258,10 +237,22 @@ void configureKernel(const char *kernelName, const char *clSourcecodeString) {
         cout << "kernel failed to build" << endl;
         cout << "kernel name: [" << launchConfiguration.kernelName << "]" << endl;
         cout << "saving kernel soucecode to /tmp/failed-kernel.cl" << endl;
+        cout << "saving kernel ll sourcecode to /tmp/failed-kernel.ll" << endl;
+        cout << "saving meta info to /tmp/failed-kernel-meta.txt" << endl;
         ofstream f;
         f.open("/tmp/failed-kernel.cl", ios_base::out);
-        f << launchConfiguration.kernelName << endl;
+        // f << launchConfiguration.kernelName << endl;
         f << launchConfiguration.kernelSource << endl;
+        // f << e.what() << endl;
+        f.close();
+        f.open("/tmp/failed-kernel.ll", ios_base::out);
+        // f << launchConfiguration.kernelName << endl;
+        f << devicellsourcecode << endl;
+        // f << e.what() << endl;
+        f.close();
+        f.open("/tmp/failed-kernel-meta.txt", ios_base::out);
+        // f << launchConfiguration.kernelName << endl;
+        f << "kernel name: " << launchConfiguration.kernelName << endl;
         f << e.what() << endl;
         f.close();
     // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);

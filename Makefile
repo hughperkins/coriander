@@ -45,9 +45,13 @@ build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp  build/hand
 		build/handle_branching.o \
 		$(LINK_FLAGS)
 
-build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/struct_clone.o build/readIR.o build/struct_clone.o include/cocl/local_config.h
+build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o \
+		build/struct_clone.o build/readIR.o build/struct_clone.o include/cocl/local_config.h build/argparsecpp.o
 	mkdir -p build
-	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/patch-hostside -g -I$(LLVM_INCLUDE) src/patch-hostside.cpp build/readIR.o build/mutations.o build/struct_clone.o src/ir-to-opencl-common.cpp $(LINK_FLAGS)
+	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/patch-hostside -g \
+		-Ithird_party/argparsecpp -I$(LLVM_INCLUDE) src/patch-hostside.cpp \
+		build/readIR.o build/mutations.o build/struct_clone.o src/ir-to-opencl-common.cpp build/argparsecpp.o \
+		$(LINK_FLAGS)
 
 build/easycl-%.o: src/EasyCL/%.cpp
 	$(CLANG) -DUSE_CLEW -Isrc/EasyCL/thirdparty/clew/include -std=c++11 -fPIC -c -O2 -o $@ $< -Iinclude -Isrc/EasyCL

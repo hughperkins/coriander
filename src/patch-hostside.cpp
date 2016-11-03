@@ -49,12 +49,15 @@
 #include "mutations.h"
 #include "struct_clone.h"
 #include "ir-to-opencl-common.h"
+#include "argparsecpp.h"
 
 using namespace llvm;
 using namespace std;
 
 static llvm::LLVMContext context;
 static std::string sourcecode_stringname;
+static std::string devicellcode_stringname;
+static string devicellfilename;
 static string deviceclfilename;
 
 bool single_precision = true;
@@ -346,6 +349,10 @@ void patchCudaLaunch(Function *F, CallInst *inst, vector<Instruction *> &to_repl
     Instruction *kernelNameValue = addStringInstr(M, "s." + ::deviceclfilename + "." + kernelName, kernelName);
     kernelNameValue->insertBefore(inst);
 
+    // this isnt actually needed for running, but hopefully useful for debugging
+    Instruction *llSourcecodeValue = addStringInstrExistingGlobal(M, devicellcode_stringname);
+    llSourcecodeValue->insertBefore(inst);
+
     Instruction *clSourcecodeValue = addStringInstrExistingGlobal(M, sourcecode_stringname);
     clSourcecodeValue->insertBefore(inst);
 
@@ -354,9 +361,10 @@ void patchCudaLaunch(Function *F, CallInst *inst, vector<Instruction *> &to_repl
         Type::getVoidTy(context),
         PointerType::get(IntegerType::get(context, 8), 0),
         PointerType::get(IntegerType::get(context, 8), 0),
+        PointerType::get(IntegerType::get(context, 8), 0),
         NULL));
-    Value *args[] = {kernelNameValue, clSourcecodeValue};
-    CallInst *callConfigureKernel = CallInst::Create(configureKernel, ArrayRef<Value *>(&args[0], &args[2]));
+    Value *args[] = {kernelNameValue, llSourcecodeValue, clSourcecodeValue};
+    CallInst *callConfigureKernel = CallInst::Create(configureKernel, ArrayRef<Value *>(&args[0], &args[3]));
     callConfigureKernel->insertBefore(inst);
     Instruction *lastInst = callConfigureKernel;
 
@@ -416,13 +424,20 @@ void patchFunction(Function *F) {
 
 
 void patchModule(string deviceclfilename, Module *M) {
-    ifstream f_in(::deviceclfilename);
+    ifstream f_incl(::deviceclfilename);
     string cl_sourcecode(
-        (std::istreambuf_iterator<char>(f_in)),
+        (std::istreambuf_iterator<char>(f_incl)),
+        (std::istreambuf_iterator<char>()));
+
+    ifstream f_inll(::devicellfilename);
+    string devicell_sourcecode(
+        (std::istreambuf_iterator<char>(f_inll)),
         (std::istreambuf_iterator<char>()));
 
     sourcecode_stringname = "__opencl_sourcecode" + ::deviceclfilename;
+    devicellcode_stringname = "__devicell_sourcecode" + ::devicellfilename;
     addGlobalVariable(M, sourcecode_stringname, cl_sourcecode);
+    addGlobalVariable(M, devicellcode_stringname, devicell_sourcecode);
 
     vector<Function *> functionsToRemove;
     for(auto it = M->begin(); it != M->end(); it++) {
@@ -435,27 +450,20 @@ void patchModule(string deviceclfilename, Module *M) {
 
 int main(int argc, char *argv[]) {
     SMDiagnostic smDiagnostic;
-    if(argc != 4) {
-        outs() << "Usage: " << argv[0] << " infile-rawhost.ll infile-device.cl outfile-patchedhost.ll" << "\n";
-        return 1;
+    argparsecpp::ArgumentParser parser;
+
+    // string devicellfilename;
+    string rawhostfilename;
+    string patchedhostfilename;
+
+    parser.add_string_argument("--hostrawfile", &rawhostfilename)->required()->help("input file");
+    parser.add_string_argument("--deviceclfile", &::deviceclfilename)->required()->help("input file");
+    parser.add_string_argument("--devicellfile", &::devicellfilename)->required()->help("input file");
+    parser.add_string_argument("--hostpatchedfile", &patchedhostfilename)->required()->help("output file");
+    if(!parser.parse_args(argc, argv)) {
+        return -1;
     }
 
-    string rawhostfilename = argv[1];
-    ::deviceclfilename = argv[2];
-    string patchedhostfilename = argv[3];
-    // outs() << "reading rawhost ll file " << rawhostfilename << "\n";
-    // outs() << "reading device cl file " << deviceclfilename << "\n";
-    // outs() << "outputing to patchedhost file " << patchedhostfilename << "\n";
-
-    // debug = false;
-    // if(argc == 3) {
-    //     if(string(argv[1]) != "--debug") {
-    //         outs() << "Usage: " << argv[0] << " [--debug] target.ll" << "\n";
-    //         return 1;
-    //     } else {
-    //         debug = true;
-    //     }
-    // }
     std::unique_ptr<llvm::Module> module = parseIRFile(rawhostfilename, smDiagnostic, context);
     if(!module) {
         smDiagnostic.print(argv[0], errs());
@@ -468,7 +476,7 @@ int main(int argc, char *argv[]) {
         outs() << "exception whilst doing:\n";
         outs() << "reading rawhost ll file " << rawhostfilename << "\n";
         outs() << "reading device cl file " << deviceclfilename << "\n";
-        outs() << "outputing to patchedhost file " << patchedhostfilename << "\n";
+        outs() << "outputing to hostpatched file " << patchedhostfilename << "\n";
         throw e;
     }
 
