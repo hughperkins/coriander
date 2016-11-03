@@ -15,6 +15,8 @@ limitations under the License.
 import subprocess
 import pyopencl as cl
 import pytest
+import os
+from os import path
 
 
 @pytest.fixture(scope='module')
@@ -26,8 +28,10 @@ def test_classes_cl():
     #     'make',
     #     cl_filepath
     # ]).decode('utf-8'))
+    if not path.isdir('test/generated'):
+        os.makedirs('test/generated')
     print(subprocess.check_output([
-        'cocl',
+        'bin/cocl',
         '-c', '-o', 'test/generated/test_classes.o',
         'test/test_classes.cu'
         # cl_filepath

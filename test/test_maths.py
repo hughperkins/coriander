@@ -102,9 +102,9 @@ def test_ieeefloats():
     we're going to create an ll file, and convert to cl, and see what pops out
     """
     print(subprocess.check_output([
-        'ir-to-opencl',
-        'test/testdoubles.ll',
-        '/tmp/out.cl'
+        'build/ir-to-opencl',
+        '--inputfile', 'test/testdoubles.ll',
+        '--outputfile', '/tmp/out.cl'
     ]).decode('utf-8'))
     with open('/tmp/out.cl') as f:
         content = f.read()

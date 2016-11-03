@@ -40,7 +40,7 @@ __global__ void myKernel(float *data) {
     with open('/tmp/%s.cu' % basename, 'w') as f:
         f.write(code)
     print(subprocess.check_output([
-        'cocl',
+        'bin/cocl',
         '-c',
         '/tmp/%s.cu' % basename
     ]).decode('utf-8'))

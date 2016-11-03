@@ -34,7 +34,7 @@ def compile_code(cl, context, kernelSource):
     with open('/tmp/testprog.cu', 'w') as f:
         f.write(kernelSource)
     print(subprocess.check_output([
-        'cocl',
+        'bin/cocl',
         '-c',
         '/tmp/testprog.cu'
     ]).decode('utf-8'))

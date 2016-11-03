@@ -38,8 +38,8 @@ def dotdotdot_cl():
     print(subprocess.check_output([
         'build/ir-to-opencl',
         '--debug',
-        ll_filepath,
-        cl_filepath
+        '--inputfile', ll_filepath,
+        '--outputfile', cl_filepath
     ]).decode('utf-8'))
     return cl_filepath
 

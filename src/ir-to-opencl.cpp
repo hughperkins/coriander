@@ -46,6 +46,7 @@ using namespace std;
 #include "ir-to-opencl-common.h"
 #include "struct_clone.h"
 #include "cocl/local_config.h"
+#include "handle_branching.h"
 
 static llvm::LLVMContext context;
 static std::map<std::string, Value *> NamedValues;
@@ -1028,7 +1029,7 @@ std::string dumpBranch(BranchInst *instr) {
     string gencode = "";
     if(instr->isConditional()) {
         string conditionstring = dumpOperand(instr->getCondition());
-        if(!isSingleExpression(conditionstring)) {
+        if(!isSingleExpression(conditionstring) || conditionstring[0] != '(') {
             conditionstring = "(" + conditionstring + ")";
         }
         // gencode += "if " + conditionstring + " {\n";
@@ -1455,6 +1456,7 @@ std::string dumpFunction(Function *F) {
     string gencode = "";
     string declaration = dumpFunctionDeclaration(F);
     // COCL_PRINT(cout << declaration << endl);
+    handle_branching_simplify(F);
 
     functionBlockIndex.clear();
     int i = 0;
@@ -1676,6 +1678,7 @@ int main(int argc, char *argv[]) {
     knownFunctionsMap["floorf"] = "floor";
     knownFunctionsMap["logf"] = "log";
     knownFunctionsMap["sqrtf"] = "sqrt";
+    knownFunctionsMap["sqrt"] = "sqrt";
     knownFunctionsMap["pow"] = "pow"; // just so we dont try to pass `scratch` to it :-P
     // knownFunctoinsMap["_Z11syncthreadsv"] = "";
 

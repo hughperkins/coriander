@@ -26,7 +26,7 @@ def test_local_cl():
     #     cl_filepath
     # ]).decode('utf-8'))
     print(subprocess.check_output([
-        'cocl', '-c', '-o', 'test/generated/test_local.o',
+        'bin/cocl', '-c', '-o', 'test/generated/test_local.o',
         'test/test_local.cu'
     ]).decode('utf-8'))
     return cl_filepath

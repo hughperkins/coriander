@@ -34,9 +34,16 @@ build/struct_clone.o: src/struct_clone.cpp src/struct_clone.h include/cocl/local
 build/argparsecpp.o: third_party/argparsecpp/argparsecpp.cpp third_party/argparsecpp/argparsecpp.h
 	g++ -std=c++11 -c -fPIC -o $@ $< -I third_party/argparsecpp
 
-build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/readIR.o build/struct_clone.o include/cocl/local_config.h build/argparsecpp.o
+build/handle_branching.o: src/handle_branching.cpp src/handle_branching.h
+	$(CLANG) -std=c++11 $(COMPILE_FLAGS) -c -fPIC -o $@ $< -I src
+
+build/ir-to-opencl: src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp  build/handle_branching.o src/ir-to-opencl-common.h build/mutations.o \
+		build/readIR.o build/struct_clone.o include/cocl/local_config.h build/argparsecpp.o
 	mkdir -p build
-	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/ir-to-opencl -g -I. -Ithird_party/argparsecpp -Iinclude -I$(LLVM_INCLUDE) src/ir-to-opencl.cpp build/struct_clone.o build/readIR.o src/ir-to-opencl-common.cpp build/mutations.o build/argparsecpp.o $(LINK_FLAGS)
+	$(CLANG) $(COMPILE_FLAGS) -fcxx-exceptions -o build/ir-to-opencl -g -I. -Ithird_party/argparsecpp -Iinclude -I$(LLVM_INCLUDE) \
+		src/ir-to-opencl.cpp build/struct_clone.o build/readIR.o src/ir-to-opencl-common.cpp build/mutations.o build/argparsecpp.o \
+		build/handle_branching.o \
+		$(LINK_FLAGS)
 
 build/patch-hostside: src/patch-hostside.cpp src/ir-to-opencl-common.cpp src/ir-to-opencl-common.h build/mutations.o build/struct_clone.o build/readIR.o build/struct_clone.o include/cocl/local_config.h
 	mkdir -p build

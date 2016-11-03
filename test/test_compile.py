@@ -20,7 +20,7 @@ def test_compile(context, cl_filepath):
     # ]).decode('utf-8'))
 
     print(subprocess.check_output([
-        'cocl', '-c', '-o', cl_filepath.replace('-device.cl', '.o'),
+        'bin/cocl', '-c', '-o', cl_filepath.replace('-device.cl', '.o'),
         cl_filepath.replace('/generated', '').replace('-device.cl', '.cu')
     ]).decode('utf-8'))
 

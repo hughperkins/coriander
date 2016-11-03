@@ -28,7 +28,7 @@ def compile_code(context, kernelSource):
     with open('/tmp/testprog.cu', 'w') as f:
         f.write(kernelSource)
     print(subprocess.check_output([
-        'cocl',
+        'bin/cocl',
         '-c',
         '/tmp/testprog.cu'
     ]).decode('utf-8'))
@@ -50,7 +50,7 @@ def testcudakernel1_cl():
         if file.startswith('testcudakernel'):
             os.unlink('test/generated/%s' % file)
     print(subprocess.check_output([
-        'cocl',
+        'bin/cocl',
         '-c', '-o', 'test/generated/testcudakernel1.o',
         'test/testcudakernel1.cu'
     ]).decode('utf-8'))

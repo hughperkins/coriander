@@ -57,7 +57,7 @@ def compile_code(context, kernelSource):
     with open('/tmp/testprog.cu', 'w') as f:
         f.write(kernelSource)
     print(subprocess.check_output([
-        'cocl',
+        'bin/cocl',
         '-c',
         '/tmp/testprog.cu'
     ]).decode('utf-8'))
@@ -93,6 +93,28 @@ __global__ void testIf(float *data, int N) {
             assert float_data[i] == float_data_orig[i]
 
 
+def test_test_inlines(context, q, float_data, float_data_gpu):
+    sourcecode = """
+__device__ void somefunc(float *data) {
+    data[0] = 3.4;
+}
+
+__global__ void testInline(float *data, int N) {
+    somefunc(data);
+}
+"""
+    prog = compile_code(context, sourcecode)
+    float_data_orig = np.copy(float_data)
+
+    N = 4
+    prog.__getattr__(test_common.mangle('testInline', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(N), cl.LocalMemory(4))
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_code = f.read()
+    print('cl_code', cl_code)
+
+
 def test_test_for(context, q, float_data, float_data_gpu):
     sourcecode = """
 __global__ void testFor(float *data, int N) {
@@ -110,6 +132,41 @@ __global__ void testFor(float *data, int N) {
 
     N = 4
     prog.__getattr__(test_common.mangle('testFor', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(N), cl.LocalMemory(4))
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_code = f.read()
+    print('cl_code', cl_code)
+
+    sum = 0
+    for i in range(N):
+        sum += float_data_orig[i]
+    assert abs(float_data[0] - sum) <= 1e-4
+
+
+def test_test_two_fors(context, q, float_data, float_data_gpu):
+    sourcecode = """
+__global__ void testTwoFors(float *data, int N) {
+    if(threadIdx.x == 0) {
+        float sum = 0.0f;
+        for(int i = 0; i < N; i++) {
+            sum += data[i];
+        }
+        int end = N * 3;
+        float sum2 = 0;
+        for(int i = 8; i < end; i++) {
+            sum2 += data[i + 7];
+        }
+        data[0] = sum;
+        data[1] = sum2;
+    }
+}
+"""
+    prog = compile_code(context, sourcecode)
+    float_data_orig = np.copy(float_data)
+
+    N = 4
+    prog.__getattr__(test_common.mangle('testTwoFors', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
