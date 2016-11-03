@@ -458,10 +458,32 @@ std::string dumpAlloca(Instruction *alloca) {
             } else {
                 // if the elementType is a pointer, assume its global?
                 if(isa<PointerType>(ptrElementType)) {
-                    gencode += "global ";
-                    updateAddressSpace(alloca, 1);
+                    cout << "dumpAlloca, for pointer" << endl;
+                    // find the store
+                    int numUses = alloca->getNumUses();
+                    cout << "numUses " << numUses << endl;
+                    for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
+                        User *user = *it;
+                        // Value *useValue = use->
+                        // cout << "user " << endl;
+                        if(StoreInst *store = dyn_cast<StoreInst>(user)) {
+                            cout << " got a store" << endl;
+                            user->dump();
+                            cout << endl;
+                            int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
+                            cout << "addessspace " << storeop0space << endl;
+                            if(storeop0space == 1) {
+                                gencode += "global ";
+                                updateAddressSpace(alloca, 1);
+                            }
+                            // copyAddressSpace(user, alloca);
+                            // typestring = dumpType(ptrElementType);
+                        }
+                    }
+                    // gencode += "global ";
+                    // updateAddressSpace(alloca, 1);
                 }
-                return gencode + typestring + " " + dumpOperand(alloca) + "[1];\n";
+                return gencode + typestring + " " + dumpOperand(alloca) + "[1]";
             }
         } else {
             throw runtime_error("not implemented: alloca for count != 1");
