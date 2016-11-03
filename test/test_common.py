@@ -42,3 +42,23 @@ def compile_code(cl, context, kernelSource):
         cl_sourcecode = f.read()
     prog = cl.Program(context, cl_sourcecode).build()
     return prog
+
+
+def compile_code_v2(cl, context, kernelSource):
+    """
+    returns dict
+    """
+    for file in os.listdir('/tmp'):
+        if file.startswith('testprog'):
+            os.unlink('/tmp/%s' % file)
+    with open('/tmp/testprog.cu', 'w') as f:
+        f.write(kernelSource)
+    print(subprocess.check_output([
+        'bin/cocl',
+        '-c',
+        '/tmp/testprog.cu'
+    ]).decode('utf-8'))
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_sourcecode = f.read()
+    prog = cl.Program(context, cl_sourcecode).build()
+    return {'prog': prog, 'cl_sourcecode': cl_sourcecode}

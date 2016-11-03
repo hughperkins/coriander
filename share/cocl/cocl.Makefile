@@ -15,11 +15,11 @@ COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffu
 
 all: $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX)
 
-$(OUTPUTBASEPATH)-device-noopt.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/cocl/fake_funcs.h
-	$(CLANG) $(PASSTHRU) -x cuda -std=c++11 --cuda-gpu-arch=sm_30 -D__CUDA_ARCH__=300 -I$(COCL_HOME)/include/EasyCL -I$(COCL_HOME)/include/cocl -I$(COCL_HOME)/src/EasyCL -I$(COCL_HOME)/src/EasyCL/thirdparty/clew/include -include $(COCL_HOME)/include/cocl/cocl.h -include $(COCL_HOME)/include/cocl/fake_funcs.h -include $(COCL_HOME)/include/cocl/cocl_deviceside.h -I$(COCL_HOME)/include $(INCLUDES) $< --cuda-device-only -emit-llvm -I/usr/include/x86_64-linux-gnu -O0 -S -o $@
+$(OUTPUTBASEPATH)-device.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/cocl/fake_funcs.h
+	$(CLANG) $(PASSTHRU) -x cuda -std=c++11 --cuda-gpu-arch=sm_30 -D__CUDA_ARCH__=300 -I$(COCL_HOME)/include/EasyCL -I$(COCL_HOME)/include/cocl -I$(COCL_HOME)/src/EasyCL -I$(COCL_HOME)/src/EasyCL/thirdparty/clew/include -include $(COCL_HOME)/include/cocl/cocl.h -include $(COCL_HOME)/include/cocl/fake_funcs.h -include $(COCL_HOME)/include/cocl/cocl_deviceside.h -I$(COCL_HOME)/include $(INCLUDES) $< --cuda-device-only -emit-llvm -I/usr/include/x86_64-linux-gnu -O2 -S -o $@
 
-$(OUTPUTBASEPATH)-device.ll: $(OUTPUTBASEPATH)-device-noopt.ll
-	opt-3.8 -inline -instcombine -S -o $@ $<
+#$(OUTPUTBASEPATH)-device.ll: $(OUTPUTBASEPATH)-device-noopt.ll
+#	opt-3.8 -inline -instcombine -S -o $@ $<
 
 $(OUTPUTBASEPATH)-device.cl: $(OUTPUTBASEPATH)-device.ll
 	$(COCL_BIN)/ir-to-opencl $(DEBUG) --inputfile $< --outputfile $@
