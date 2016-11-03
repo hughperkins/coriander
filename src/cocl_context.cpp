@@ -56,12 +56,12 @@ namespace cocl {
     }
 
     ContextMutex::ContextMutex(Context *context) : context(context) {
-        COCL_PRINT(cout << "locking context mutex " << (void *)getThreadVars() << endl);
+        // COCL_PRINT(cout << "locking context mutex " << (void *)getThreadVars() << endl);
         pthread_mutex_lock(&context->mutex);
-        COCL_PRINT(cout << "... got context mutex " << (void *)getThreadVars() << endl);
+        // COCL_PRINT(cout << "... got context mutex " << (void *)getThreadVars() << endl);
     }
     ContextMutex::~ContextMutex() {
-        COCL_PRINT(cout << "releasing mutex " << (void *)getThreadVars() << endl);
+        // COCL_PRINT(cout << "releasing mutex " << (void *)getThreadVars() << endl);
         pthread_mutex_unlock(&context->mutex);
     }
 
