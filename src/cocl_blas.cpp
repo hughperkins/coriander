@@ -25,6 +25,10 @@ using namespace std;
 using namespace cocl;
 using namespace easycl;
 
+namespace clblast {
+    StatusCode CacheClearAll();
+}
+
 namespace cocl {
     class CoclBlas {
     public:
@@ -50,6 +54,9 @@ size_t cublasCreate(cublasHandle_t *phandle) {
 
 std::size_t cublasDestroy(cublasHandle_t handle) {
     // cout << "cublasDestroy redirect" << endl;
+    cout << "clearing clblast cache..." << endl;
+    clblast::CacheClearAll();
+    cout << "... cache cleared" << endl;
     CoclBlas *coclBlas = (CoclBlas *)handle;
     delete coclBlas;
     return 0;

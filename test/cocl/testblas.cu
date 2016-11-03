@@ -143,6 +143,7 @@ int main(int argc, char *argv[]) {
     cuMemFree(deviceB);
     cuMemFree(deviceC);
     cuStreamDestroy(stream);
+    cout << "finished testblas" << endl;
 
     return 0;
 }
