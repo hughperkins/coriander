@@ -296,6 +296,7 @@ bool huntFors(Block *block) {
     return numChanges > 0;
 }
 void handle_branching_simplify(Function *F) {
+    resetNextId();
     blocks.clear();
     blockByBasicBlock.clear();
     cout << "simplify " << string(F->getName()) << endl;
@@ -388,20 +389,20 @@ void handle_branching_simplify(Function *F) {
         madeChanges = false;
         if(mergeSequences(root.get())) {
             madeChanges = true;
-            seen.clear();
-            root->dump(seen, "");
+            // seen.clear();
+            // root->dump(seen, "");
         }
 
         if(huntTrueIfs(root.get())) {
             madeChanges = true;
-            seen.clear();
-            root->dump(seen, "");
+            // seen.clear();
+            // root->dump(seen, "");
         }
 
         if(huntFors(root.get())) {
             madeChanges = true;
-            seen.clear();
-            root->dump(seen, "");
+            // seen.clear();
+            // root->dump(seen, "");
         }
 
         // if(huntWhiles(root.get())) {
@@ -413,6 +414,8 @@ void handle_branching_simplify(Function *F) {
         // seen.clear();
         // root->dump(seen, "");
     }
+    seen.clear();
+    root->dump(seen, "");
 
 }
 

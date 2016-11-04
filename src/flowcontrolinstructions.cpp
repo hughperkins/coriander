@@ -26,6 +26,10 @@ using namespace cocl;
 using namespace cocl::flowcontrol;
 using namespace llvm;
 
+void resetNextId() {
+    nextId = 0;
+}
+
 Block::Block() {
     this->id = nextId;
     nextId++;
