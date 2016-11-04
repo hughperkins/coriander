@@ -34,7 +34,7 @@ build/struct_clone.o: src/struct_clone.cpp src/struct_clone.h include/cocl/local
 build/argparsecpp.o: third_party/argparsecpp/argparsecpp.cpp third_party/argparsecpp/argparsecpp.h
 	g++ -std=c++11 -c -fPIC -o $@ $< -I third_party/argparsecpp
 
-build/handle_branching.o: src/handle_branching.cpp src/handle_branching.h
+build/handle_branching.o: src/handle_branching.cpp src/handle_branching.h src/flowcontrolinstructions.h
 	$(CLANG) -std=c++11 $(COMPILE_FLAGS) -c -fPIC -o $@ $< -I src
 
 build/flowcontrolinstructions.o: src/flowcontrolinstructions.cpp src/flowcontrolinstructions.h

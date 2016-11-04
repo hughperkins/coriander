@@ -50,6 +50,23 @@ void Block::replaceIncoming(Block *oldIncoming, Block *newIncoming) {
     }
     throw runtime_error("illegal parameters");
 }
+void Block::removeIncoming(Block *targetIncoming) {
+    int id = 0;
+    bool found = false;
+    for(auto it=incoming.begin(); it != incoming.end(); it++) {
+        Block *block = *it;
+        if(block == targetIncoming) {
+            found = true;
+            break;
+        }
+        id++;
+    }
+    if(found) {
+        incoming.erase(incoming.begin() + id);
+        return;
+    }
+    throw runtime_error("illegal parameters");
+}
 
 string RootBlock::blockType() const {
     return "RootBlock";
@@ -61,7 +78,13 @@ void RootBlock::dump(set<const Block *> &seen, string indent) const {
         first->dump(seen, indent + "  ");
     }
 }
-void RootBlock::replaceChild(Block *oldChild, Block *newChild) {
+void RootBlock::replaceSuccessor(Block *oldChild, Block *newChild) {
+    throw runtime_error("illegal parameters");
+    // assert(first == oldChild);
+    // first = newChild;
+}
+void RootBlock::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
+    // throw runtime_error("illegal parameters");
     assert(first == oldChild);
     first = newChild;
 }
@@ -88,7 +111,22 @@ Block *For::getSuccessor(int idx) {
     }
     return next;
 }
-void For::replaceChild(Block *oldChild, Block *newChild) {
+void For::replaceSuccessor(Block *oldChild, Block *newChild) {
+    if(next == oldChild) {
+        next = newChild;
+        return;
+    }
+    throw runtime_error("couldnt find old child");
+}
+void For::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
+    if(preBlock == oldChild) {
+        preBlock = newChild;
+        return;
+    }
+    if(bodyBlock == oldChild) {
+        bodyBlock = newChild;
+        return;
+    }
     if(next == oldChild) {
         next = newChild;
         return;
@@ -131,8 +169,34 @@ void If::dump(set<const Block *> &seen, string indent) const {
             cout << indent << "    (*" << falseBlock->id << endl;
         }
     }
+    if(next != 0) {
+        if(seen.find(next) == seen.end()) {
+            next->dump(seen, indent);
+        } else {
+            cout << "(*" << next->id << endl;
+        }
+    }
 }
-void If::replaceChild(Block *oldChild, Block *newChild) {
+void If::replaceSuccessor(Block *oldChild, Block *newChild) {
+    if(next == oldChild) {
+        next = newChild;
+        return;
+    }
+    // if(trueBlock == oldChild) {
+    //     trueBlock = newChild;
+    //     return;
+    // }
+    // if(falseBlock == oldChild) {
+    //     falseBlock = newChild;
+    //     return;
+    // }
+    throw runtime_error("couldnt find old child");
+}
+void If::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
+    if(next == oldChild) {
+        next = newChild;
+        return;
+    }
     if(trueBlock == oldChild) {
         trueBlock = newChild;
         return;
@@ -144,29 +208,33 @@ void If::replaceChild(Block *oldChild, Block *newChild) {
     throw runtime_error("couldnt find old child");
 }
 int If::numSuccessors() {
-    int count = 0;
-    if(trueBlock != 0) {
-        count++;
+    // int count = 0;
+    // if(trueBlock != 0) {
+    //     count++;
+    // }
+    // if(falseBlock != 0) {
+    //     count++;
+    // }
+    if(next != 0) {
+        return 1;
     }
-    if(falseBlock != 0) {
-        count++;
-    }
-    return count;
+    return 0;
 }
 Block *If::getSuccessor(int idx) {
-    if(idx == 0) {
-        if(trueBlock != 0) {
-            return trueBlock;
-        } else {
-            return falseBlock;
-        }
-    }
-    if(idx == 1) {
-        if(trueBlock != 0) {
-            return falseBlock;
-        }
-    }
-    throw runtime_error("illegal request");
+    // if(idx == 0) {
+    //     if(trueBlock != 0) {
+    //         return trueBlock;
+    //     } else {
+    //         return falseBlock;
+    //     }
+    // }
+    // if(idx == 1) {
+    //     if(trueBlock != 0) {
+    //         return falseBlock;
+    //     }
+    // }
+    return next;
+    // throw runtime_error("illegal request");
 }
 
 string ConditionalBranch::blockType() const {
@@ -190,7 +258,18 @@ void ConditionalBranch::dump(set<const Block *> &seen, string indent) const {
         }
     }
 }
-void ConditionalBranch::replaceChild(Block *oldChild, Block *newChild) {
+void ConditionalBranch::replaceSuccessor(Block *oldChild, Block *newChild) {
+    if(trueNext == oldChild) {
+        trueNext = newChild;
+        return;
+    }
+    if(falseNext == oldChild) {
+        falseNext = newChild;
+        return;
+    }
+    throw runtime_error("couldnt find old child");
+}
+void ConditionalBranch::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
     if(trueNext == oldChild) {
         trueNext = newChild;
         return;
@@ -242,7 +321,14 @@ void BasicBlockBlock::dump(set<const Block *> &seen, string indent) const {
         cout << indent << "(*" << next->id << endl;
     }
 }
-void BasicBlockBlock::replaceChild(Block *oldChild, Block *newChild) {
+void BasicBlockBlock::replaceSuccessor(Block *oldChild, Block *newChild) {
+    if(next == oldChild) {
+        next = newChild;
+        return;
+    }
+    throw runtime_error("couldnt find old child");
+}
+void BasicBlockBlock::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
     if(next == oldChild) {
         next = newChild;
         return;
@@ -282,7 +368,7 @@ void Sequence::dump(set<const Block *> &seen, string indent) const {
         }
     }
 }
-void Sequence::replaceChild(Block *oldChild, Block *newChild) {
+void Sequence::replaceSuccessor(Block *oldChild, Block *newChild) {
     // int i = 0;
     if(next == oldChild) {
         next = newChild;
@@ -303,6 +389,27 @@ void Sequence::replaceChild(Block *oldChild, Block *newChild) {
     // }
     throw runtime_error("couldnt find old child");
 }
+void Sequence::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
+    if(next == oldChild) {
+        next = newChild;
+        return;
+    }
+    int i = 0;
+    bool foundChild = false;
+    for(auto it = children.begin(); it != children.end(); it++) {
+        Block *child = *it;
+        if(child == oldChild) {
+            foundChild = true;
+            break;
+        }
+        i++;
+    }
+    if(foundChild) {
+        children[i] = newChild;
+        return;
+    }
+    throw runtime_error("couldnt find old child");
+}
 int Sequence::numSuccessors() {
     int count = 0;
     if(next != 0) {
@@ -320,7 +427,10 @@ string ReturnBlock::blockType() const {
 void ReturnBlock::dump(set<const Block *> &seen, string indent) const {
     cout << indent << "ReturnBlock " << this->id << endl;
 }
-void ReturnBlock::replaceChild(Block *oldChild, Block *newChild) {
+void ReturnBlock::replaceSuccessor(Block *oldChild, Block *newChild) {
+    throw runtime_error("couldnt find old child");
+}
+void ReturnBlock::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
     throw runtime_error("couldnt find old child");
 }
 int ReturnBlock::numSuccessors() {

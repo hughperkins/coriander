@@ -51,6 +51,26 @@ namespace cocl {
 
 vector<unique_ptr<Block> > blocks; // doesnt include the root. I guess. ???
 map<BasicBlock *, Block *> blockByBasicBlock;
+
+template<typename T>
+void vectorErase(vector<T> &targetvector, T &element) {
+    int i = 0;
+    bool found = false;
+    for(auto it=targetvector.begin(); it != targetvector.end(); it++) {
+        const T &thiselement = *it;
+        if(thiselement == element) {
+            found = true;
+            break;
+        }
+        i++;
+    }
+    if(found) {
+        targetvector.erase(targetvector.begin() + i);
+        return;
+    }
+    throw runtime_error("couldnt find element to erease");
+}
+
 void eraseBlock(Block *block) {
     int id = 0;
     bool found = false;
@@ -68,6 +88,23 @@ void eraseBlock(Block *block) {
     }
     throw runtime_error("couldnt find block to erease");
 }
+
+void swapChildInParents(Block *oldChild, Block *newChild) {
+    for(auto it=oldChild->incoming.begin(); it != oldChild->incoming.end(); it++) {
+        Block *incoming = *it;
+        newChild->incoming.push_back(incoming);
+        incoming->replaceChildOrSuccessor(oldChild, newChild);
+    }
+    oldChild->incoming.clear();
+}
+
+// void swapParentInChildren(Block *oldParent, Block *newParent) {
+//     if(oldParent->numSuccessors() != 1) {
+//         throw runtime_error("not yet implemented: more than one child");
+//     }
+//     Block *successor = oldParent->getSuccessor(0);
+//     successor->replaceIncoming(oldParent, newParent);
+// }
 
 bool mergeSequences(Block *root) {
     // basically we look for any block with one single incoming, and that incoming is a basicblockblock
@@ -88,29 +125,27 @@ bool mergeSequences(Block *root) {
             if(block->numSuccessors() != 1) {
                 continue;
             }
+            if(parent->getSuccessor(0) != block) {
+                continue;
+            }
             // so merge...
             cout << "merging ... " << block->id << ", " << parent->id << endl;
             unique_ptr<Sequence> sequence(new Sequence());
             sequence->children.push_back(parent);
             sequence->children.push_back(block);
-            for(auto parentincit = parent->incoming.begin(); parentincit != parent->incoming.end(); parentincit++) {
-                Block *parentinc = *parentincit;
-                sequence->incoming.push_back(parentinc);
-                parentinc->replaceChild(parent, sequence.get());
-            }
-            parent->incoming.clear();
+            swapChildInParents(parent, sequence.get());
             parent->incoming.push_back(sequence.get());
-            parent->replaceChild(block, 0);
-            // parentBlockBlock->next = 0;
+            parent->replaceSuccessor(block, 0);
             block->incoming.clear();
             block->incoming.push_back(sequence.get());
             Block *blockSuccessor = block->getSuccessor(0);
             blockSuccessor->replaceIncoming(block, sequence.get());
             sequence->next = blockSuccessor;
-            block->replaceChild(blockSuccessor, 0);
+            block->replaceSuccessor(blockSuccessor, 0);
             blocks.push_back(std::move(sequence));
             didAMerge = true;
             numChanges++;
+            return true;
         }
     }
     return numChanges > 0;
@@ -120,7 +155,7 @@ bool huntTrueIfs(Block *block) {
     // (something)
     // ConditionalBlock
     // true: BlockA => BlockB
-    // false: BlockB
+    // false: BlockB (constraint: 1 successor exactly)
     int numChanges = 0;
     bool foundFor = true;
     while(foundFor) {
@@ -131,16 +166,62 @@ bool huntTrueIfs(Block *block) {
                 Block *trueChild = cond->trueNext;
                 Block *falseChild = cond->falseNext;
                 if(trueChild->numSuccessors() != 1) {
+                    cout << "truechild numsuccessors not 1" << endl;
+                    continue;
+                }
+                if(trueChild->incoming.size() != 1) {
+                    cout << "truechild incoming not 1" << endl;
                     continue;
                 }
                 if(trueChild->getSuccessor(0) != falseChild) {
+                    cout << "truechild successor not falsechild" << endl;
                     continue;
                 }
+                // if(falseChild->incoming.size() != 1) {
+                //     continue;
+                // }
+                // if(falseChild->numSuccessors() != 1) {
+                //     continue;
+                // }
+                // if(falseChild->getSuccessor(0) == trueChild) {
+                //     continue;
+                // }
+                // if(falseChild->getSuccessor(0) == cond) {
+                //     continue;
+                // }
                 cout << "found a true-if" << endl;
                 cout << "cond: " << cond->id << endl;
                 cout << "true: " << trueChild->id << endl;
                 cout << "false: " << falseChild->id << endl;
-                // unique_ptr<If
+
+                unique_ptr<If> ifBlock(new If());
+                swapChildInParents(cond, ifBlock.get());
+                ifBlock->condition = cond->condition;
+                ifBlock->trueBlock = trueChild;
+                ifBlock->falseBlock = 0;
+                ifBlock->next = falseChild;
+
+                trueChild->incoming.clear();
+                trueChild->incoming.push_back(ifBlock.get());
+                trueChild->replaceSuccessor(falseChild, 0);
+
+                falseChild->replaceIncoming(trueChild, ifBlock.get());
+                falseChild->removeIncoming(cond);
+                // falseChild->incoming.clear();
+                // falseChild->incoming.push_back(ifBlock.get());
+
+                // falseChild has one successor
+                // we need to swap its successor to be linked into ifBlock
+                // Block *successor = falseChild->getSuccessor(0);
+                // successor->replaceIncoming(falseChild, ifBlock.get());
+                // successor->removeIncoming(trueChild);
+
+                // falseChild->replaceSuccessor
+                eraseBlock(cond);
+                blocks.push_back(std::move(ifBlock));
+                foundFor = true;
+                numChanges++;
+                return true;
             }
         }
     }
@@ -184,23 +265,21 @@ bool huntFors(Block *block) {
                 cout << "condiiotn: " << block->id << endl;
                 cout << "body: " << child->id << endl;
                 cout << "next: " << cond->falseNext->id << endl;
-        //             class For : public Block {
-        // Block *preBlock = 0;
-        // Value *condition = 0;
-        // Block *bodyBlock = 0;
-        // Block *next = 0;
+
                 unique_ptr<For> forBlock(new For());
+                // swapChildInParents(parent, forBlock.get());
+                // vectorErase(forBlock->incoming, child);
                 for(auto parentincit = parent->incoming.begin(); parentincit != parent->incoming.end(); parentincit++) {
                     Block *parentinc = *parentincit;
                     if(parentinc != child) {
                         cout << "parentinc " << parentinc->id << endl;
                         forBlock->incoming.push_back(parentinc);
-                        parentinc->replaceChild(parent, forBlock.get());
+                        parentinc->replaceSuccessor(parent, forBlock.get());
                     }
                 }
                 parent->incoming.clear();
-                parent->replaceChild(cond, 0);
-                child->replaceChild(parent, 0);
+                parent->replaceSuccessor(cond, 0);
+                child->replaceSuccessor(parent, 0);
                 child->incoming.clear();
                 forBlock->next = cond->falseNext;
                 forBlock->preBlock = parent;

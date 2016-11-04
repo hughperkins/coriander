@@ -35,10 +35,12 @@ public:
     Block();
     virtual std::string blockType() const;
     virtual void dump(std::set<const Block *> &seen, std::string indent = "") const = 0;
-    virtual void replaceChild(Block *oldChild, Block *newChild) = 0;
+    virtual void replaceSuccessor(Block *oldSuccessor, Block *newSuccessor) = 0;
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild) = 0;
     virtual int numSuccessors() = 0;
     virtual Block *getSuccessor(int idx) = 0;
     void replaceIncoming(Block *oldIncoming, Block *newIncoming);
+    void removeIncoming(Block *targetIncoming);
 };
 
 class RootBlock : public Block {
@@ -46,7 +48,8 @@ public:
     Block *first = 0;
     virtual std::string blockType() const;
     virtual void dump(std::set<const Block *> &seen, std::string indent = "") const;
-    void replaceChild(Block *oldChild, Block *newChild);
+    virtual void replaceSuccessor(Block *oldChild, Block *newChild);
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
 };
@@ -59,7 +62,8 @@ public:
     Block *next = 0;
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
-    void replaceChild(Block *oldChild, Block *newChild);
+    void replaceSuccessor(Block *oldChild, Block *newChild);
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual void dump(std::set<const Block *> &seen, std::string indent) const;
 };
 
@@ -68,9 +72,11 @@ public:
     llvm::Value *condition = 0;
     Block *trueBlock = 0;
     Block *falseBlock = 0;
+    Block *next = 0;
     virtual std::string blockType() const;
     virtual void dump(std::set<const Block *> &seen, std::string indent) const;
-    void replaceChild(Block *oldChild, Block *newChild);
+    virtual void replaceSuccessor(Block *oldChild, Block *newChild);
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
 };
@@ -82,7 +88,8 @@ public:
     Block *falseNext = 0;
     virtual std::string blockType() const;
     virtual void dump(std::set<const Block *> &seen, std::string indent) const;
-    void replaceChild(Block *oldChild, Block *newChild);
+    virtual void replaceSuccessor(Block *oldChild, Block *newChild);
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
 };
@@ -94,7 +101,8 @@ public:
     Block *next; // initially will probalby point to a Branch block
     virtual std::string blockType() const;
     virtual void dump(std::set<const Block *> &seen, std::string indent) const;
-    void replaceChild(Block *oldChild, Block *newChild);
+    virtual void replaceSuccessor(Block *oldChild, Block *newChild);
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
 };
@@ -105,7 +113,8 @@ public:
     Block *next = 0;
     virtual std::string blockType() const;
     virtual void dump(std::set<const Block *> &seen, std::string indent) const;
-    void replaceChild(Block *oldChild, Block *newChild);
+    virtual void replaceSuccessor(Block *oldChild, Block *newChild);
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
 };
@@ -114,7 +123,8 @@ class ReturnBlock : public Block {
 public:
     virtual std::string blockType() const;
     virtual void dump(std::set<const Block *> &seen, std::string indent) const;
-    void replaceChild(Block *oldChild, Block *newChild);
+    virtual void replaceSuccessor(Block *oldChild, Block *newChild);
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
 };
