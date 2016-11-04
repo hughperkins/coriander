@@ -43,6 +43,7 @@ public:
     virtual Block *getSuccessor(int idx) = 0;
     void replaceIncoming(Block *oldIncoming, Block *newIncoming);
     void removeIncoming(Block *targetIncoming);
+    virtual std::string generateCl(std::string indent) = 0;
 };
 
 class RootBlock : public Block {
@@ -54,6 +55,7 @@ public:
     virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
+    virtual std::string generateCl(std::string indent);
 };
 
 class For : public Block {
@@ -67,6 +69,7 @@ public:
     void replaceSuccessor(Block *oldChild, Block *newChild);
     virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual void dump(std::set<const Block *> &seen, std::string indent) const;
+    virtual std::string generateCl(std::string indent) { return ""; }
 };
 
 class If : public Block {
@@ -81,6 +84,7 @@ public:
     virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
+    virtual std::string generateCl(std::string indent);
 };
 
 class DoWhile : public Block {
@@ -94,6 +98,7 @@ public:
     virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
+    virtual std::string generateCl(std::string indent) { return ""; }
 };
 
 class ConditionalBranch : public Block {
@@ -107,12 +112,13 @@ public:
     virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
+    virtual std::string generateCl(std::string indent) { return ""; }
 };
 
 class BasicBlockBlock : public Block {
 public:
     llvm::BasicBlock *basicBlock = 0;
-    std::vector<llvm::Value *> instructions;
+    std::vector<llvm::Instruction *> instructions;
     Block *next; // initially will probalby point to a Branch block
     virtual std::string blockType() const;
     virtual void dump(std::set<const Block *> &seen, std::string indent) const;
@@ -120,6 +126,7 @@ public:
     virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
+    virtual std::string generateCl(std::string indent);
 };
 
 class Sequence : public Block {
@@ -132,16 +139,19 @@ public:
     virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
+    virtual std::string generateCl(std::string indent);
 };
 
 class ReturnBlock : public Block {
 public:
+    llvm::Instruction *retInst = 0;
     virtual std::string blockType() const;
     virtual void dump(std::set<const Block *> &seen, std::string indent) const;
     virtual void replaceSuccessor(Block *oldChild, Block *newChild);
     virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
+    virtual std::string generateCl(std::string indent);
 };
 
 } // flowcontrol

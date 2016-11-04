@@ -14,6 +14,14 @@
 
 // input: IR from cuda compilation
 
+#include "ir-to-opencl.h"
+
+#include "argparsecpp.h"
+#include "ir-to-opencl-common.h"
+#include "struct_clone.h"
+#include "cocl/local_config.h"
+#include "handle_branching.h"
+
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/IR/DerivedTypes.h"
@@ -42,12 +50,6 @@
 using namespace llvm;
 using namespace std;
 
-#include "argparsecpp.h"
-#include "ir-to-opencl-common.h"
-#include "struct_clone.h"
-#include "cocl/local_config.h"
-#include "handle_branching.h"
-
 static llvm::LLVMContext context;
 static std::map<std::string, Value *> NamedValues;
 static std::map<string, bool> iskernel_by_name;
@@ -71,21 +73,6 @@ extern bool single_precision;
 bool single_precision = true;
 static int instructions_processed = 0;
 
-std::string dumpInstruction(llvm::Instruction *instruction);
-std::string dumpOperand(llvm::Value *value);
-string dumpConstant(Constant *constant);
-string dumpGetElementPtr(GetElementPtrInst *instr);
-string dumpGetElementPtrRhs(GetElementPtrInst *instr);
-string dumpChainedInstruction(int level, Instruction * instr);
-std::string dumpBitCastRhs(BitCastInst *instr);
-std::string dumpAddrSpaceCastRhs(AddrSpaceCastInst *instr);
-void updateAddressSpace(Value *value, int newSpace);
-void copyAddressSpace(Value *src, Value *dest);
-std::string getName(Value *value);
-std::string getName(StructType *value);
-std::string getName(Function *value);
-void addPHIDeclaration(PHINode *phi);
-void storeValueName(Value *value);
 
 static string cl_add_definitions = R"(
 inline float __shfl_down_3(local int *scratch, float v0, int v1, int v2) {
@@ -1145,7 +1132,7 @@ void addPHIDeclaration(PHINode *phi) {
     currentFunctionPhiDeclarationsByName[name] = declaration;
 }
 
-std::string dumpInstruction(Instruction *instruction) {
+std::string dumpInstruction(string indent, Instruction *instruction) {
     auto opcode = instruction->getOpcode();
     storeValueName(instruction);
     string resultName = nameByValue[instruction];
@@ -1335,21 +1322,21 @@ std::string dumpInstruction(Instruction *instruction) {
         }
         nameByValue[instruction] = instructionCode;
         if(add_ir_to_cl) {
-            return "/* " + originalinstruction + " */\n";
+            return "/* " + originalinstruction + " */\n" + indent;
         } else {
             return "";
         }
         // return "";
     } else {
         if(add_ir_to_cl) {
-            gencode += "/* " + originalinstruction + " */\n    ";
+            gencode += "/* " + originalinstruction + " */\n" + indent;
         }
         if(typestr != "void") {
             instructionCode = stripOuterParams(instructionCode);
             functionNeededForwardDeclarations.insert(instruction);
             gencode += dumpOperand(instruction) + " = ";
         }
-        gencode += instructionCode + ";\n";
+        gencode += indent + instructionCode + ";\n";
     }
     return gencode;
 }
@@ -1369,7 +1356,7 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
     gencode += "    " + label + ":;\n";
     for(BasicBlock::iterator it=basicBlock->begin(), e=basicBlock->end(); it != e; it++) {
         Instruction *instruction = &*it;
-        string instructionCode = dumpInstruction(instruction);
+        string instructionCode = dumpInstruction("    ", instruction);
         if(instructionCode != "") {
             instructions_processed++;
             gencode += "    " + instructionCode;

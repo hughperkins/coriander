@@ -408,6 +408,11 @@ bool huntFors(Block *block) {
 void verify(Block *) {
 
 }
+
+void writeOpenCL(Block *root) {
+    string cl = root->generateCl("    ");
+    cout << "cl: [" << cl << "]" << endl;
+}
 void handle_branching_simplify(Function *F) {
     resetNextId();
     blocks.clear();
@@ -457,6 +462,7 @@ void handle_branching_simplify(Function *F) {
             unique_ptr<ReturnBlock> retBlock(new ReturnBlock());
             block->next = retBlock.get();
             block->next->incoming.push_back(block);
+            retBlock->retInst = lastInst;
             blocks.push_back(std::move(retBlock));
         } else if(BranchInst* branchInst = dyn_cast<BranchInst>(lastInst)) {
             // cout << "its a branch" << endl;
@@ -475,6 +481,7 @@ void handle_branching_simplify(Function *F) {
                 unique_ptr<ConditionalBranch> conditionalBranch(new ConditionalBranch());
                 BasicBlock *trueBasicBlock = branchInst->getSuccessor(0);
                 Block *trueBlock = blockByBasicBlock[trueBasicBlock];
+                conditionalBranch->condition = branchInst->getCondition();
                 conditionalBranch->trueNext = trueBlock;
                 conditionalBranch->trueNext->incoming.push_back(conditionalBranch.get());
                 conditionalBranch->falseNext = 0;
@@ -548,6 +555,7 @@ void handle_branching_simplify(Function *F) {
     seen.clear();
     root->dump(seen, "");
 
+    writeOpenCL(root.get());
 }
 
 } // namespace cocl

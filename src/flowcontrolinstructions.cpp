@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "flowcontrolinstructions.h"
+#include "ir-to-opencl.h"
 
 #include <iostream>
 
@@ -72,6 +73,11 @@ void Block::removeIncoming(Block *targetIncoming) {
     throw runtime_error("illegal parameters");
 }
 
+std::string RootBlock::generateCl(std::string indent) {
+    string gencode = "";
+    gencode += first->generateCl(indent);
+    return gencode;
+}
 string RootBlock::blockType() const {
     return "RootBlock";
 }
@@ -153,6 +159,20 @@ void For::dump(set<const Block *> &seen, string indent) const {
     }
 }
 
+std::string If::generateCl(std::string indent) {
+    string gencode = "";
+    cout << "condition " << (void *)condition << endl;
+    gencode += indent + "if(" + dumpOperand(condition) + ") {\n";
+    gencode += trueBlock->generateCl(indent + "    ");
+    if(falseBlock != 0) {
+        gencode += indent + "} else {\n";
+        gencode += falseBlock->generateCl(indent + "    ");
+        gencode += indent + "}\n";
+    } else {
+        gencode += indent + "}\n";
+    }
+    return gencode;
+}
 string If::blockType() const {
     return "If";
 }
@@ -310,6 +330,14 @@ Block *ConditionalBranch::getSuccessor(int idx) {
     throw runtime_error("illegal request");
 }
 
+std::string BasicBlockBlock::generateCl(std::string indent) {
+    string gencode = "";
+    for(auto it=instructions.begin(); it != instructions.end(); it++) {
+        Instruction *inst = *it;
+        gencode += dumpInstruction(indent, inst);
+    }
+    return gencode;
+}
 string BasicBlockBlock::blockType() const {
     return "BasicBlockBlock";
 }
@@ -350,6 +378,17 @@ Block *BasicBlockBlock::getSuccessor(int idx) {
     return next;
 }
 
+std::string Sequence::generateCl(std::string indent) {
+    string gencode = "";
+    for(auto it=children.begin(); it != children.end(); it++) {
+        Block *child = *it;
+        gencode += child->generateCl(indent);
+    }
+    if(next != 0) {
+        gencode += next->generateCl(indent);
+    }
+    return gencode;
+}
 string Sequence::blockType() const {
     return "Sequence";
 }
@@ -425,6 +464,11 @@ Block *Sequence::getSuccessor(int idx) {
     return next;
 }
 
+std::string ReturnBlock::generateCl(std::string indent) {
+    string gencode = "";
+    gencode += dumpInstruction(indent, retInst);
+    return gencode;
+}
 string ReturnBlock::blockType() const {
     return "ReturnBlock";
 }
