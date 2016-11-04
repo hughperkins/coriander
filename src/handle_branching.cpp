@@ -166,33 +166,14 @@ bool huntTrueIfs(Block *block) {
                 Block *trueChild = cond->trueNext;
                 Block *falseChild = cond->falseNext;
                 if(trueChild->numSuccessors() != 1) {
-                    // cout << "truechild numsuccessors not 1" << endl;
                     continue;
                 }
                 if(trueChild->incoming.size() != 1) {
-                    // cout << "truechild incoming not 1" << endl;
                     continue;
                 }
                 if(trueChild->getSuccessor(0) != falseChild) {
-                    // cout << "truechild successor not falsechild" << endl;
                     continue;
                 }
-                // if(falseChild->incoming.size() != 1) {
-                //     continue;
-                // }
-                // if(falseChild->numSuccessors() != 1) {
-                //     continue;
-                // }
-                // if(falseChild->getSuccessor(0) == trueChild) {
-                //     continue;
-                // }
-                // if(falseChild->getSuccessor(0) == cond) {
-                //     continue;
-                // }
-                // cout << "found a true-if" << endl;
-                // cout << "cond: " << cond->id << endl;
-                // cout << "true: " << trueChild->id << endl;
-                // cout << "false: " << falseChild->id << endl;
 
                 unique_ptr<If> ifBlock(new If());
                 swapChildInParents(cond, ifBlock.get());
@@ -207,16 +188,70 @@ bool huntTrueIfs(Block *block) {
 
                 falseChild->replaceIncoming(trueChild, ifBlock.get());
                 falseChild->removeIncoming(cond);
-                // falseChild->incoming.clear();
-                // falseChild->incoming.push_back(ifBlock.get());
 
-                // falseChild has one successor
-                // we need to swap its successor to be linked into ifBlock
-                // Block *successor = falseChild->getSuccessor(0);
-                // successor->replaceIncoming(falseChild, ifBlock.get());
-                // successor->removeIncoming(trueChild);
+                eraseBlock(cond);
+                blocks.push_back(std::move(ifBlock));
+                foundFor = true;
+                numChanges++;
+                return true;
+            }
+        }
+    }
+    return numChanges > 0;
+}
+bool huntTrueIfElses(Block *block) {
+    // an 'if' looks like (we're handling only the 'true' case ):
+    // (something)
+    // ConditionalBlock
+    // true: BlockA => BlockC
+    // false: BlockB => blockC
+    int numChanges = 0;
+    bool foundFor = true;
+    while(foundFor) {
+        foundFor = false;
+        for(auto it = blocks.begin(); it != blocks.end(); it++) {
+            Block *block = it->get();
+            if(ConditionalBranch *cond = dynamic_cast<ConditionalBranch *>(block)) {
+                Block *trueChild = cond->trueNext;
+                Block *falseChild = cond->falseNext;
+                if(trueChild->numSuccessors() != 1) {
+                    continue;
+                }
+                if(trueChild->incoming.size() != 1) {
+                    continue;
+                }
 
-                // falseChild->replaceSuccessor
+                if(falseChild->numSuccessors() != 1) {
+                    continue;
+                }
+                if(falseChild->incoming.size() != 1) {
+                    continue;
+                }
+
+                if(falseChild->getSuccessor(0) != trueChild->getSuccessor(0)) {
+                    continue;
+                }
+
+                Block *successor = falseChild->getSuccessor(0);
+                unique_ptr<If> ifBlock(new If());
+                swapChildInParents(cond, ifBlock.get());
+                ifBlock->condition = cond->condition;
+                ifBlock->trueBlock = trueChild;
+                ifBlock->falseBlock = falseChild;
+                ifBlock->next = successor;
+
+                trueChild->incoming.clear();
+                trueChild->incoming.push_back(ifBlock.get());
+                trueChild->replaceSuccessor(successor, 0);
+
+                falseChild->incoming.clear();
+                falseChild->incoming.push_back(ifBlock.get());
+                falseChild->replaceSuccessor(successor, 0);
+
+                successor->removeIncoming(trueChild);
+                successor->removeIncoming(falseChild);
+                successor->incoming.push_back(ifBlock.get());
+
                 eraseBlock(cond);
                 blocks.push_back(std::move(ifBlock));
                 foundFor = true;
@@ -394,6 +429,12 @@ void handle_branching_simplify(Function *F) {
         }
 
         if(huntTrueIfs(root.get())) {
+            madeChanges = true;
+            // seen.clear();
+            // root->dump(seen, "");
+        }
+
+        if(huntTrueIfElses(root.get())) {
             madeChanges = true;
             // seen.clear();
             // root->dump(seen, "");
