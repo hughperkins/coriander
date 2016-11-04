@@ -345,43 +345,57 @@ bool huntFors(Block *block) {
                 if(cond->incoming.size() != 1) {
                     continue;
                 }
-                Block *parent = cond->incoming[0];
-                Block *child = cond->trueNext;
-                if(child->incoming.size() != 1) {
+                //Block *pre = cond->trueNext;
+                Block *pre = cond->incoming[0];
+                Block *body = cond->trueNext;
+                // if(pre->incoming.size() != 1) {
+                //     continue;
+                // }
+                if(pre->numSuccessors() != 1) {
                     continue;
                 }
-                if(child->numSuccessors() != 1) {
+                if(body->numSuccessors() != 1) {
                     continue;
                 }
-                if(child->getSuccessor(0) != parent) {
+                if(body->getSuccessor(0) != pre) {
                     continue;
                 }
-                // cout << "found a for :-)" << endl;
-                // cout << "pre: " << parent->id << endl;
-                // cout << "condiiotn: " << block->id << endl;
-                // cout << "body: " << child->id << endl;
-                // cout << "next: " << cond->falseNext->id << endl;
+                cout << "found a for :-)" << endl;
+                cout << "pre: " << pre->id << endl;
+                cout << "condition: " << cond->id << endl;
+                cout << "body: " << body->id << endl;
+                cout << "next: " << cond->falseNext->id << endl;
 
                 unique_ptr<For> forBlock(new For());
+                forBlock->preBlock = pre;
+                forBlock->condition = cond->condition;
+                forBlock->body = body;
+                forBlock->next = cond->falseNext;
+
+                migrateIncoming(pre, forBlock.get());
+                forBlock->removeIncoming(body);
+
                 // migrateIncoming(parent, forBlock.get());
                 // vectorErase(forBlock->incoming, child);
-                for(auto parentincit = parent->incoming.begin(); parentincit != parent->incoming.end(); parentincit++) {
-                    Block *parentinc = *parentincit;
-                    if(parentinc != child) {
-                        // cout << "parentinc " << parentinc->id << endl;
-                        forBlock->incoming.push_back(parentinc);
-                        parentinc->replaceSuccessor(parent, forBlock.get());
-                    }
-                }
-                parent->incoming.clear();
-                parent->replaceSuccessor(cond, 0);
-                child->replaceSuccessor(parent, 0);
-                child->incoming.clear();
-                forBlock->next = cond->falseNext;
-                forBlock->preBlock = parent;
-                forBlock->body = child;
-                forBlock->condition = cond->condition;
-                cond->falseNext->replaceIncoming(cond, forBlock.get());
+                // for(auto parentincit = parent->incoming.begin(); parentincit != parent->incoming.end(); parentincit++) {
+                //     Block *parentinc = *parentincit;
+                //     if(parentinc != child) {
+                //         // cout << "parentinc " << parentinc->id << endl;
+                //         forBlock->incoming.push_back(parentinc);
+                //         parentinc->replaceSuccessor(parent, forBlock.get());
+                //     }
+                // }
+
+                pre->incoming.clear();
+                pre->replaceSuccessor(cond, 0);
+                pre->incoming.push_back(forBlock.get());
+
+                body->replaceSuccessor(forBlock.get(), 0); // since we moved it earlier...
+                body->incoming.clear();
+                body->incoming.push_back(forBlock.get());
+
+                forBlock->next->replaceIncoming(cond, forBlock.get());
+
                 eraseBlock(cond);
                 blocks.push_back(std::move(forBlock));
                 foundFor = true;
@@ -504,18 +518,18 @@ void handle_branching_simplify(Function *F) {
             // root->dump(seen, "");
         }
 
+        // seen.clear();
+        // root->dump(seen, "");
         if(huntFors(root.get())) {
             madeChanges = true;
             // seen.clear();
             // root->dump(seen, "");
         }
 
-        seen.clear();
-        root->dump(seen, "");
         if(huntDoWhiles(root.get())) {
             madeChanges = true;
-            seen.clear();
-            root->dump(seen, "");
+            // seen.clear();
+            // root->dump(seen, "");
         }
 
         // if(huntWhiles(root.get())) {
