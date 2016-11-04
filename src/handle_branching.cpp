@@ -437,6 +437,10 @@ void handle_branching_simplify(Function *F) {
         blocks.push_back(std::move(block));
     }
 
+    if(F->begin() == F->end()) {
+        cout << "empty function" << endl;
+        return;
+    }
     root->first = blockByBasicBlock[&F->getEntryBlock()];
     root->first->incoming.push_back(root.get());
     // go through, and start linking stuff togehter, now that we have a map from basic block to block
