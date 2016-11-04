@@ -40,6 +40,7 @@
 #include <fstream>
 
 #include <iostream>
+#include <cassert>
 
 using namespace std;
 using namespace llvm;
@@ -62,6 +63,7 @@ namespace cocl {
         }
         virtual void dump(set<const Block *> &seen, string indent = "") const = 0;
         vector<Block *>incoming;
+        virtual void replaceChild(Block *oldChild, Block *newChild) = 0;
     };
     class RootBlock : public Block {
     public:
@@ -75,6 +77,10 @@ namespace cocl {
             if(seen.find(first) == seen.end()) {
                 first->dump(seen, indent + "  ");
             }
+        }
+        void replaceChild(Block *oldChild, Block *newChild) {
+            assert(first == oldChild);
+            first = newChild;
         }
     };
     class If : public Block {
@@ -103,6 +109,17 @@ namespace cocl {
                 }
             }
         }
+        void replaceChild(Block *oldChild, Block *newChild) {
+            if(trueBlock == oldChild) {
+                trueBlock = newChild;
+                return;
+            }
+            if(falseBlock == oldChild) {
+                falseBlock = newChild;
+                return;
+            }
+            throw runtime_error("couldnt find old child");
+        }
     };
     class ConditionalBranch : public Block {
     public:
@@ -130,6 +147,17 @@ namespace cocl {
                 }
             }
         }
+        void replaceChild(Block *oldChild, Block *newChild) {
+            if(trueNext == oldChild) {
+                trueNext = newChild;
+                return;
+            }
+            if(falseNext == oldChild) {
+                falseNext = newChild;
+                return;
+            }
+            throw runtime_error("couldnt find old child");
+        }
     };
     class BasicBlockBlock : public Block {
     public:
@@ -142,11 +170,21 @@ namespace cocl {
         virtual void dump(set<const Block *> &seen, string indent) const {
             seen.insert(this);
             cout << indent << "BasicBlockBlock " << this->id << endl;
+            if(next == 0) {
+                return;
+            }
             if(seen.find(next) == seen.end()) {
                 next->dump(seen, indent);
             } else {
                 cout << indent << "  (*" << next->id << endl;
             }
+        }
+        void replaceChild(Block *oldChild, Block *newChild) {
+            if(next == oldChild) {
+                next = newChild;
+                return;
+            }
+            throw runtime_error("couldnt find old child");
         }
     };
     class Sequence : public Block {
@@ -167,6 +205,23 @@ namespace cocl {
                 }
             }
         }
+        void replaceChild(Block *oldChild, Block *newChild) {
+            int i = 0;
+            bool foundChild = false;
+            for(auto it = children.begin(); it != children.end(); it++) {
+                Block *child = *it;
+                if(child == oldChild) {
+                    foundChild = true;
+                    break;
+                }
+                i++;
+            }
+            if(foundChild) {
+                children[i] = newChild;
+                return;
+            }
+            throw runtime_error("couldnt find old child");
+        }
     };
     class ReturnBlock : public Block {
     public:
@@ -175,6 +230,9 @@ namespace cocl {
         }
         virtual void dump(set<const Block *> &seen, string indent) const {
             cout << indent << "ReturnBlock " << this->id << endl;
+        }
+        void replaceChild(Block *oldChild, Block *newChild) {
+            throw runtime_error("couldnt find old child");
         }
     };
     vector<unique_ptr<Block> > blocks; // doesnt include the root. I guess. ???
@@ -187,23 +245,26 @@ namespace cocl {
 
     void mergeSequences(Block *root) {
         // basically we look for any block with one single incoming, and that incoming is a basicblockblock
-        bool didAMerge = false;
+        bool didAMerge = true;
         while(didAMerge) {
+            didAMerge = false;
             for(auto it = blocks.begin(); it != blocks.end(); it++) {
                 Block *block = it->get();
                 if(block->incoming.size() == 1) {
-                    cout << "block " << block->id << " has only one incoming" << endl;
+                    // cout << "block " << block->id << " has only one incoming" << endl;
                     Block *parent = block->incoming[0];
                     if(BasicBlockBlock *parentBlockBlock = dynamic_cast<BasicBlockBlock*>(parent)) {
-                        cout << "its a blockblock" << endl;
+                        // cout << "its a blockblock" << endl;
                         if(BasicBlockBlock *thisBlockBlock = dynamic_cast<BasicBlockBlock*>(block)) {
                             // so merge...
+                            cout << "merging ... " << block->id << ", " << parent->id << endl;
                             unique_ptr<Sequence> sequence(new Sequence());
                             sequence->children.push_back(parent);
                             sequence->children.push_back(block);
                             for(auto parentincit = parent->incoming.begin(); parentincit != parent->incoming.end(); parentincit++) {
                                 Block *parentinc = *parentincit;
                                 sequence->incoming.push_back(parentinc);
+                                parentinc->replaceChild(parent, sequence.get());
                             }
                             parent->incoming.clear();
                             parent->incoming.push_back(sequence.get());
@@ -215,7 +276,7 @@ namespace cocl {
                             didAMerge = true;
                         }
                     } else {
-                        cout << "but not a basicblockblock" << endl;
+                        // cout << "but not a basicblockblock" << endl;
                     }
                 }
             }
@@ -304,9 +365,12 @@ namespace cocl {
             }
         }
 
+        set<const Block *>seen;
+        root->dump(seen, "");
+
         mergeSequences(root.get());
 
-        set<const Block *>seen;
+        seen.clear();
         root->dump(seen, "");
     }
 }
