@@ -129,7 +129,7 @@ bool mergeSequences(Block *root) {
                 continue;
             }
             // so merge...
-            cout << "merging ... " << block->id << ", " << parent->id << endl;
+            // cout << "merging ... " << block->id << ", " << parent->id << endl;
             unique_ptr<Sequence> sequence(new Sequence());
             sequence->children.push_back(parent);
             sequence->children.push_back(block);
@@ -166,15 +166,15 @@ bool huntTrueIfs(Block *block) {
                 Block *trueChild = cond->trueNext;
                 Block *falseChild = cond->falseNext;
                 if(trueChild->numSuccessors() != 1) {
-                    cout << "truechild numsuccessors not 1" << endl;
+                    // cout << "truechild numsuccessors not 1" << endl;
                     continue;
                 }
                 if(trueChild->incoming.size() != 1) {
-                    cout << "truechild incoming not 1" << endl;
+                    // cout << "truechild incoming not 1" << endl;
                     continue;
                 }
                 if(trueChild->getSuccessor(0) != falseChild) {
-                    cout << "truechild successor not falsechild" << endl;
+                    // cout << "truechild successor not falsechild" << endl;
                     continue;
                 }
                 // if(falseChild->incoming.size() != 1) {
@@ -189,10 +189,10 @@ bool huntTrueIfs(Block *block) {
                 // if(falseChild->getSuccessor(0) == cond) {
                 //     continue;
                 // }
-                cout << "found a true-if" << endl;
-                cout << "cond: " << cond->id << endl;
-                cout << "true: " << trueChild->id << endl;
-                cout << "false: " << falseChild->id << endl;
+                // cout << "found a true-if" << endl;
+                // cout << "cond: " << cond->id << endl;
+                // cout << "true: " << trueChild->id << endl;
+                // cout << "false: " << falseChild->id << endl;
 
                 unique_ptr<If> ifBlock(new If());
                 swapChildInParents(cond, ifBlock.get());
@@ -260,11 +260,11 @@ bool huntFors(Block *block) {
                 if(child->getSuccessor(0) != parent) {
                     continue;
                 }
-                cout << "found a for :-)" << endl;
-                cout << "pre: " << parent->id << endl;
-                cout << "condiiotn: " << block->id << endl;
-                cout << "body: " << child->id << endl;
-                cout << "next: " << cond->falseNext->id << endl;
+                // cout << "found a for :-)" << endl;
+                // cout << "pre: " << parent->id << endl;
+                // cout << "condiiotn: " << block->id << endl;
+                // cout << "body: " << child->id << endl;
+                // cout << "next: " << cond->falseNext->id << endl;
 
                 unique_ptr<For> forBlock(new For());
                 // swapChildInParents(parent, forBlock.get());
@@ -272,7 +272,7 @@ bool huntFors(Block *block) {
                 for(auto parentincit = parent->incoming.begin(); parentincit != parent->incoming.end(); parentincit++) {
                     Block *parentinc = *parentincit;
                     if(parentinc != child) {
-                        cout << "parentinc " << parentinc->id << endl;
+                        // cout << "parentinc " << parentinc->id << endl;
                         forBlock->incoming.push_back(parentinc);
                         parentinc->replaceSuccessor(parent, forBlock.get());
                     }
@@ -302,7 +302,7 @@ void handle_branching_simplify(Function *F) {
     cout << "simplify " << string(F->getName()) << endl;
     unique_ptr<RootBlock> root(new RootBlock());
     for(auto it=F->begin(); it != F->end(); it++) {
-        cout << "block" << endl;
+        // cout << "block" << endl;
         BasicBlock *basicBlock = &*it;
         unique_ptr<BasicBlockBlock> block(new BasicBlockBlock());
         block->basicBlock = basicBlock;
@@ -332,21 +332,21 @@ void handle_branching_simplify(Function *F) {
         BasicBlockBlock *block = dynamic_cast<BasicBlockBlock *>(blockByBasicBlock[basicBlock]);
         // I think that each block has to end initially either with a branch or a return?
         Instruction *lastInst = basicBlock->getTerminator();
-        cout << "lastinst:" << endl;
-        lastInst->dump();
-        cout << endl;
+        // cout << "lastinst:" << endl;
+        // lastInst->dump();
+        // cout << endl;
         if(isa<ReturnInst>(lastInst)) {
-            cout << "finishes in ret" << endl;
+            // cout << "finishes in ret" << endl;
             unique_ptr<ReturnBlock> retBlock(new ReturnBlock());
             block->next = retBlock.get();
             block->next->incoming.push_back(block);
             blocks.push_back(std::move(retBlock));
         } else if(BranchInst* branchInst = dyn_cast<BranchInst>(lastInst)) {
-            cout << "its a branch" << endl;
+            // cout << "its a branch" << endl;
             // if its unconditional, we just link directly to the next block
             // otherwise we link to a ConditionalBranch block
             if(branchInst->isUnconditional()) {
-                cout << "unconditonal branch" << endl;
+                // cout << "unconditonal branch" << endl;
                 BasicBlock *next = branchInst->getSuccessor(0);
                 Block *nextBlock = blockByBasicBlock[next];
                 block->next = nextBlock;
@@ -354,7 +354,7 @@ void handle_branching_simplify(Function *F) {
             } else {
                 // conditional
                 // create a ConditionalBranch block
-                cout << "conditonal branch" << endl;
+                // cout << "conditonal branch" << endl;
                 unique_ptr<ConditionalBranch> conditionalBranch(new ConditionalBranch());
                 BasicBlock *trueBasicBlock = branchInst->getSuccessor(0);
                 Block *trueBlock = blockByBasicBlock[trueBasicBlock];
