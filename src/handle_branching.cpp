@@ -64,6 +64,25 @@ namespace cocl {
         virtual void dump(set<const Block *> &seen, string indent = "") const = 0;
         vector<Block *>incoming;
         virtual void replaceChild(Block *oldChild, Block *newChild) = 0;
+        virtual int numSuccessors() = 0;
+        virtual Block *getSuccessor(int idx) = 0;
+        void replaceIncoming(Block *oldIncoming, Block *newIncoming) {
+            int id = 0;
+            bool found = false;
+            for(auto it=incoming.begin(); it != incoming.end(); it++) {
+                Block *block = *it;
+                if(block == oldIncoming) {
+                    found = true;
+                    break;
+                }
+                id++;
+            }
+            if(found) {
+                incoming[id] = newIncoming;
+                return;
+            }
+            throw runtime_error("illegal parameters");
+        }
     };
     class RootBlock : public Block {
     public:
@@ -81,6 +100,56 @@ namespace cocl {
         void replaceChild(Block *oldChild, Block *newChild) {
             assert(first == oldChild);
             first = newChild;
+        }
+        virtual int numSuccessors() {
+            if(first != 0) {
+                return 1;
+            }
+            return 0;
+        }
+        virtual Block *getSuccessor(int idx) {
+            return first;
+        }
+    };
+    class For : public Block {
+    public:
+        Block *preBlock = 0;
+        Value *condition = 0;
+        Block *bodyBlock = 0;
+        Block *next = 0;
+        virtual int numSuccessors() {
+            if(next != 0) {
+                return 1;
+            }
+            return 0;
+        }
+        virtual Block *getSuccessor(int idx) {
+            if(idx > 0) {
+                throw runtime_error("illegal request");
+            }
+            return next;
+        }
+        void replaceChild(Block *oldChild, Block *newChild) {
+            if(next == oldChild) {
+                next = newChild;
+                return;
+            }
+            throw runtime_error("couldnt find old child");
+        }
+        virtual void dump(set<const Block *> &seen, string indent) const {
+            seen.insert(this);
+            cout << indent << "For " << this->id << endl;
+            cout << indent << "  Pre:" << endl;
+            preBlock->dump(seen, indent + "    ");
+            cout << indent << "  Body:" << endl;
+            bodyBlock->dump(seen, indent + "    ");
+            if(next != 0) {
+                if(seen.find(next) == seen.end()) {
+                    next->dump(seen, indent);
+                } else {
+                    cout << "(*" << next->id << endl;
+                }
+            }
         }
     };
     class If : public Block {
@@ -120,6 +189,31 @@ namespace cocl {
             }
             throw runtime_error("couldnt find old child");
         }
+        virtual int numSuccessors() {
+            int count = 0;
+            if(trueBlock != 0) {
+                count++;
+            }
+            if(falseBlock != 0) {
+                count++;
+            }
+            return count;
+        }
+        virtual Block *getSuccessor(int idx) {
+            if(idx == 0) {
+                if(trueBlock != 0) {
+                    return trueBlock;
+                } else {
+                    return falseBlock;
+                }
+            }
+            if(idx == 1) {
+                if(trueBlock != 0) {
+                    return falseBlock;
+                }
+            }
+            throw runtime_error("illegal request");
+        }
     };
     class ConditionalBranch : public Block {
     public:
@@ -158,6 +252,31 @@ namespace cocl {
             }
             throw runtime_error("couldnt find old child");
         }
+        virtual int numSuccessors() {
+            int count = 0;
+            if(trueNext != 0) {
+                count++;
+            }
+            if(falseNext != 0) {
+                count++;
+            }
+            return count;
+        }
+        virtual Block *getSuccessor(int idx) {
+            if(idx == 0) {
+                if(trueNext != 0) {
+                    return trueNext;
+                } else {
+                    return falseNext;
+                }
+            }
+            if(idx == 1) {
+                if(trueNext != 0) {
+                    return falseNext;
+                }
+            }
+            throw runtime_error("illegal request");
+        }
     };
     class BasicBlockBlock : public Block {
     public:
@@ -185,6 +304,16 @@ namespace cocl {
                 return;
             }
             throw runtime_error("couldnt find old child");
+        }
+        virtual int numSuccessors() {
+            int count = 0;
+            if(next != 0) {
+                count++;
+            }
+            return count;
+        }
+        virtual Block *getSuccessor(int idx) {
+            return next;
         }
     };
     class Sequence : public Block {
@@ -214,21 +343,35 @@ namespace cocl {
             }
         }
         void replaceChild(Block *oldChild, Block *newChild) {
-            int i = 0;
-            bool foundChild = false;
-            for(auto it = children.begin(); it != children.end(); it++) {
-                Block *child = *it;
-                if(child == oldChild) {
-                    foundChild = true;
-                    break;
-                }
-                i++;
-            }
-            if(foundChild) {
-                children[i] = newChild;
+            // int i = 0;
+            if(next == oldChild) {
+                next = newChild;
                 return;
             }
+            // bool foundChild = false;
+            // for(auto it = children.begin(); it != children.end(); it++) {
+            //     Block *child = *it;
+            //     if(child == oldChild) {
+            //         foundChild = true;
+            //         break;
+            //     }
+            //     i++;
+            // }
+            // if(foundChild) {
+            //     children[i] = newChild;
+            //     return;
+            // }
             throw runtime_error("couldnt find old child");
+        }
+        virtual int numSuccessors() {
+            int count = 0;
+            if(next != 0) {
+                count++;
+            }
+            return count;
+        }
+        virtual Block *getSuccessor(int idx) {
+            return next;
         }
     };
     class ReturnBlock : public Block {
@@ -242,9 +385,32 @@ namespace cocl {
         void replaceChild(Block *oldChild, Block *newChild) {
             throw runtime_error("couldnt find old child");
         }
+        virtual int numSuccessors() {
+            return 0;
+        }
+        virtual Block *getSuccessor(int idx) {
+            throw runtime_error("illegal request");
+        }
     };
     vector<unique_ptr<Block> > blocks; // doesnt include the root. I guess. ???
     map<BasicBlock *, Block *> blockByBasicBlock;
+    void eraseBlock(Block *block) {
+        int id = 0;
+        bool found = false;
+        for(auto it=blocks.begin(); it != blocks.end(); it++) {
+            Block *thisblock = it->get();
+            if(thisblock == block) {
+                found = true;
+                break;
+            }
+            id++;
+        }
+        if(found) {
+            blocks.erase(blocks.begin() + id);
+            return;
+        }
+        throw runtime_error("couldnt find block to erease");
+    }
 
     // void dumpBlock(Block *block) {
     //     cout << "dumping block" << endl;
@@ -279,6 +445,7 @@ namespace cocl {
                             parentBlockBlock->next = 0;
                             block->incoming.clear();
                             block->incoming.push_back(sequence.get());
+                            thisBlockBlock->next->replaceIncoming(thisBlockBlock, sequence.get());
                             sequence->next = thisBlockBlock->next;
                             thisBlockBlock->next = 0;
                             blocks.push_back(std::move(sequence));
@@ -291,7 +458,79 @@ namespace cocl {
             }
         }
     }
-
+    void huntIfs(Block *block) {
+        // an 'if' looks like (we're handling only the 'true' case):
+        // (something)
+        // ConditionalBlock
+        // true: SomeSingleBlock => nextBlock
+        // false: NextBlock
+    }
+    void huntWhiles(Block *block) {
+        // BlockA
+        // ConditonalBlock
+        // true: BlockA
+        // false: BlockB
+    }
+    void huntFors(Block *block) {
+        //BlockA
+        //ConditionalBlock
+        // true: BlockB => blockA
+        // false: blockC
+        // blockC
+        bool foundFor = true;
+        while(foundFor) {
+            foundFor = false;
+            for(auto it = blocks.begin(); it != blocks.end(); it++) {
+                Block *block = it->get();
+                if(ConditionalBranch *cond = dynamic_cast<ConditionalBranch *>(block)) {
+                    if(cond->incoming.size() != 1) {
+                        continue;
+                    }
+                    Block *parent = cond->incoming[0];
+                    Block *child = cond->trueNext;
+                    if(child->incoming.size() != 1) {
+                        continue;
+                    }
+                    if(child->numSuccessors() != 1) {
+                        continue;
+                    }
+                    if(child->getSuccessor(0) != parent) {
+                        continue;
+                    }
+                    cout << "found a for :-)" << endl;
+                    cout << "pre: " << parent->id << endl;
+                    cout << "condiiotn: " << block->id << endl;
+                    cout << "body: " << child->id << endl;
+                    cout << "next: " << cond->falseNext->id << endl;
+            //             class For : public Block {
+            // Block *preBlock = 0;
+            // Value *condition = 0;
+            // Block *bodyBlock = 0;
+            // Block *next = 0;
+                    unique_ptr<For> forBlock(new For());
+                    for(auto parentincit = parent->incoming.begin(); parentincit != parent->incoming.end(); parentincit++) {
+                        Block *parentinc = *parentincit;
+                        if(parentinc != child) {
+                            cout << "parentinc " << parentinc->id << endl;
+                            forBlock->incoming.push_back(parentinc);
+                            parentinc->replaceChild(parent, forBlock.get());
+                        }
+                    }
+                    parent->incoming.clear();
+                    parent->replaceChild(cond, 0);
+                    child->replaceChild(parent, 0);
+                    child->incoming.clear();
+                    forBlock->next = cond->falseNext;
+                    forBlock->preBlock = parent;
+                    forBlock->bodyBlock = child;
+                    forBlock->condition = cond->condition;
+                    eraseBlock(cond);
+                    blocks.push_back(std::move(forBlock));
+                    foundFor = true;
+                }
+            }
+        }
+    }
     void handle_branching_simplify(Function *F) {
         cout << "simplify " << string(F->getName()) << endl;
         unique_ptr<RootBlock> root(new RootBlock());
@@ -378,6 +617,13 @@ namespace cocl {
         root->dump(seen, "");
 
         mergeSequences(root.get());
+
+        seen.clear();
+        root->dump(seen, "");
+
+        huntIfs(root.get());
+        huntWhiles(root.get());
+        huntFors(root.get());
 
         seen.clear();
         root->dump(seen, "");
