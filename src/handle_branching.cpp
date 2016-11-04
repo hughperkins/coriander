@@ -89,7 +89,7 @@ void eraseBlock(Block *block) {
     throw runtime_error("couldnt find block to erease");
 }
 
-void swapChildInParents(Block *oldChild, Block *newChild) {
+void migrateIncoming(Block *oldChild, Block *newChild) {
     for(auto it=oldChild->incoming.begin(); it != oldChild->incoming.end(); it++) {
         Block *incoming = *it;
         newChild->incoming.push_back(incoming);
@@ -129,11 +129,11 @@ bool mergeSequences(Block *root) {
                 continue;
             }
             // so merge...
-            // cout << "merging ... " << block->id << ", " << parent->id << endl;
+            cout << "merging ... " << block->id << ", " << parent->id << endl;
             unique_ptr<Sequence> sequence(new Sequence());
             sequence->children.push_back(parent);
             sequence->children.push_back(block);
-            swapChildInParents(parent, sequence.get());
+            migrateIncoming(parent, sequence.get());
             parent->incoming.push_back(sequence.get());
             parent->replaceSuccessor(block, 0);
             block->incoming.clear();
@@ -176,7 +176,7 @@ bool huntTrueIfs(Block *block) {
                 }
 
                 unique_ptr<If> ifBlock(new If());
-                swapChildInParents(cond, ifBlock.get());
+                migrateIncoming(cond, ifBlock.get());
                 ifBlock->condition = cond->condition;
                 ifBlock->trueBlock = trueChild;
                 ifBlock->falseBlock = 0;
@@ -234,7 +234,7 @@ bool huntTrueIfElses(Block *block) {
 
                 Block *successor = falseChild->getSuccessor(0);
                 unique_ptr<If> ifBlock(new If());
-                swapChildInParents(cond, ifBlock.get());
+                migrateIncoming(cond, ifBlock.get());
                 ifBlock->condition = cond->condition;
                 ifBlock->trueBlock = trueChild;
                 ifBlock->falseBlock = falseChild;
@@ -254,6 +254,67 @@ bool huntTrueIfElses(Block *block) {
 
                 eraseBlock(cond);
                 blocks.push_back(std::move(ifBlock));
+                foundFor = true;
+                numChanges++;
+                return true;
+            }
+        }
+    }
+    return numChanges > 0;
+}
+bool huntDoWhiles(Block *block) {
+    // an 'if' looks like (we're handling only the 'true' case ):
+    // (something)
+    // BlockA
+    // ConditionalBlock
+    // true: blockA
+    // false: (doesnt matter)
+    int numChanges = 0;
+    bool foundFor = true;
+    while(foundFor) {
+        foundFor = false;
+        for(auto it = blocks.begin(); it != blocks.end(); it++) {
+            Block *block = it->get();
+            if(ConditionalBranch *cond = dynamic_cast<ConditionalBranch *>(block)) {
+                Block *trueChild = cond->trueNext;
+                Block *falseChild = cond->falseNext;
+                if(trueChild->numSuccessors() != 1) {
+                    continue;
+                }
+                if(trueChild->getSuccessor(0) != cond) {
+                    continue;
+                }
+                cout << "creating dowhile" << endl;
+
+                Block *body = trueChild;
+                unique_ptr<DoWhile> doWhile(new DoWhile());
+
+                doWhile->body = body;
+                doWhile->condition = cond->condition;
+                doWhile->next = falseChild;
+                cout << "body: " << body->id << endl;
+                cout << "cond: " << cond->id << endl;
+                cout << "next: " << doWhile->next->id << endl;
+
+                migrateIncoming(body, doWhile.get());
+                doWhile->removeIncoming(cond);
+
+                body->incoming.clear();
+                body->incoming.push_back(doWhile.get());
+                body->replaceSuccessor(cond, 0);
+
+                falseChild->removeIncoming(cond);
+                falseChild->incoming.push_back(doWhile.get());
+
+                // // check a bit
+                // for(auto i=doWhile->incoming.begin(); i != doWhile->end(); i++) {
+                //     Block *inc = *i;
+                //     assert(ppinc->numSuccessors() == 1);
+                //     assert(inc->getSuccessor(0) == doWhile);
+                // }
+
+                eraseBlock(cond);
+                blocks.push_back(std::move(doWhile));
                 foundFor = true;
                 numChanges++;
                 return true;
@@ -302,7 +363,7 @@ bool huntFors(Block *block) {
                 // cout << "next: " << cond->falseNext->id << endl;
 
                 unique_ptr<For> forBlock(new For());
-                // swapChildInParents(parent, forBlock.get());
+                // migrateIncoming(parent, forBlock.get());
                 // vectorErase(forBlock->incoming, child);
                 for(auto parentincit = parent->incoming.begin(); parentincit != parent->incoming.end(); parentincit++) {
                     Block *parentinc = *parentincit;
@@ -318,7 +379,7 @@ bool huntFors(Block *block) {
                 child->incoming.clear();
                 forBlock->next = cond->falseNext;
                 forBlock->preBlock = parent;
-                forBlock->bodyBlock = child;
+                forBlock->body = child;
                 forBlock->condition = cond->condition;
                 cond->falseNext->replaceIncoming(cond, forBlock.get());
                 eraseBlock(cond);
@@ -329,6 +390,9 @@ bool huntFors(Block *block) {
         }
     }
     return numChanges > 0;
+}
+void verify(Block *) {
+
 }
 void handle_branching_simplify(Function *F) {
     resetNextId();
@@ -444,6 +508,14 @@ void handle_branching_simplify(Function *F) {
             madeChanges = true;
             // seen.clear();
             // root->dump(seen, "");
+        }
+
+        seen.clear();
+        root->dump(seen, "");
+        if(huntDoWhiles(root.get())) {
+            madeChanges = true;
+            seen.clear();
+            root->dump(seen, "");
         }
 
         // if(huntWhiles(root.get())) {

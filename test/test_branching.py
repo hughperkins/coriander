@@ -121,6 +121,32 @@ __global__ void testIfElse(float *data, int N) {
             assert abs(float_data[i] - float_data_orig[i] - 5) <= 1e-4
 
 
+def test_test_do_while(context, q, float_data, float_data_gpu):
+    sourcecode = """
+__global__ void testIfElse(float *data, int N) {
+    int tid = threadIdx.x;
+    int i = 0;
+    float sum = 0;
+    do {
+        sum += data[i];
+        i++;
+    } while(sum < 15);
+    data[0] = sum;
+}
+"""
+    prog = compile_code(context, sourcecode)
+    float_data_orig = np.copy(float_data)
+
+    N = 2
+    prog.__getattr__(test_common.mangle('testIfElse', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(N), cl.LocalMemory(4))
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_code = f.read()
+    print('cl_code', cl_code)
+    print(float_data[0])
+
+
 def test_test_inlines(context, q, float_data, float_data_gpu):
     sourcecode = """
 __device__ void somefunc(float *data) {

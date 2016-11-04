@@ -60,7 +60,7 @@ class For : public Block {
 public:
     Block *preBlock = 0;
     llvm::Value *condition = 0;
-    Block *bodyBlock = 0;
+    Block *body = 0;
     Block *next = 0;
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
@@ -74,6 +74,19 @@ public:
     llvm::Value *condition = 0;
     Block *trueBlock = 0;
     Block *falseBlock = 0;
+    Block *next = 0;
+    virtual std::string blockType() const;
+    virtual void dump(std::set<const Block *> &seen, std::string indent) const;
+    virtual void replaceSuccessor(Block *oldChild, Block *newChild);
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
+    virtual int numSuccessors();
+    virtual Block *getSuccessor(int idx);
+};
+
+class DoWhile : public Block {
+public:
+    llvm::Value *condition = 0;
+    Block *body = 0;
     Block *next = 0;
     virtual std::string blockType() const;
     virtual void dump(std::set<const Block *> &seen, std::string indent) const;

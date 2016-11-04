@@ -127,8 +127,8 @@ void For::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
         preBlock = newChild;
         return;
     }
-    if(bodyBlock == oldChild) {
-        bodyBlock = newChild;
+    if(body == oldChild) {
+        body = newChild;
         return;
     }
     if(next == oldChild) {
@@ -143,7 +143,7 @@ void For::dump(set<const Block *> &seen, string indent) const {
     cout << indent << "  Pre:" << endl;
     preBlock->dump(seen, indent + "    ");
     cout << indent << "  Body:" << endl;
-    bodyBlock->dump(seen, indent + "    ");
+    body->dump(seen, indent + "    ");
     if(next != 0) {
         if(seen.find(next) == seen.end()) {
             next->dump(seen, indent);
@@ -442,6 +442,53 @@ int ReturnBlock::numSuccessors() {
 }
 Block *ReturnBlock::getSuccessor(int idx) {
     throw runtime_error("illegal request");
+}
+
+string DoWhile::blockType() const {
+    return "DoWhile";
+}
+int DoWhile::numSuccessors() {
+    if(next != 0) {
+        return 1;
+    }
+    return 0;
+}
+Block *DoWhile::getSuccessor(int idx) {
+    if(idx > 0) {
+        throw runtime_error("illegal request");
+    }
+    return next;
+}
+void DoWhile::replaceSuccessor(Block *oldChild, Block *newChild) {
+    if(next == oldChild) {
+        next = newChild;
+        return;
+    }
+    throw runtime_error("couldnt find old child");
+}
+void DoWhile::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
+    if(body == oldChild) {
+        body = newChild;
+        return;
+    }
+    if(next == oldChild) {
+        next = newChild;
+        return;
+    }
+    throw runtime_error("couldnt find old child");
+}
+void DoWhile::dump(set<const Block *> &seen, string indent) const {
+    seen.insert(this);
+    cout << indent << "DoWhile " << this->id << endl;
+    cout << indent << "  Body:" << endl;
+    body->dump(seen, indent + "    ");
+    if(next != 0) {
+        if(seen.find(next) == seen.end()) {
+            next->dump(seen, indent);
+        } else {
+            cout << "(*" << next->id << endl;
+        }
+    }
 }
 
 } // flowcontrol
