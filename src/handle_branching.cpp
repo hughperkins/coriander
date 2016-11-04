@@ -176,7 +176,7 @@ namespace cocl {
             if(seen.find(next) == seen.end()) {
                 next->dump(seen, indent);
             } else {
-                cout << indent << "  (*" << next->id << endl;
+                cout << indent << "(*" << next->id << endl;
             }
         }
         void replaceChild(Block *oldChild, Block *newChild) {
@@ -190,6 +190,7 @@ namespace cocl {
     class Sequence : public Block {
     public:
         vector<Block *> children;
+        Block *next = 0;
         virtual string blockType() const {
             return "Sequence";
         }
@@ -202,6 +203,13 @@ namespace cocl {
                     child->dump(seen, indent + "  ");
                 } else {
                     cout << indent << "  (*" << child->id << endl;
+                }
+            }
+            if(next != 0) {
+                if(seen.find(next) == seen.end()) {
+                    next->dump(seen, indent + "");
+                } else {
+                    cout << indent << "(*" << next->id << endl;
                 }
             }
         }
@@ -271,6 +279,7 @@ namespace cocl {
                             parentBlockBlock->next = 0;
                             block->incoming.clear();
                             block->incoming.push_back(sequence.get());
+                            sequence->next = thisBlockBlock->next;
                             thisBlockBlock->next = 0;
                             blocks.push_back(std::move(sequence));
                             didAMerge = true;
