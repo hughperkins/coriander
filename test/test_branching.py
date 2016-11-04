@@ -118,7 +118,7 @@ __global__ void testIfElse(float *data, int N) {
         if i < N:
             assert float_data[i] == float_data_orig[i] * 2
         else:
-            assert float_data[i] == float_data_orig[i] + 5
+            assert abs(float_data[i] - float_data_orig[i] - 5) <= 1e-4
 
 
 def test_test_inlines(context, q, float_data, float_data_gpu):
