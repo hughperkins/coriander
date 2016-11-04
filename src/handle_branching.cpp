@@ -102,13 +102,14 @@ namespace cocl {
             first = newChild;
         }
         virtual int numSuccessors() {
-            if(first != 0) {
-                return 1;
-            }
+            // if(first != 0) {
+            //     return 1;
+            // }
             return 0;
         }
         virtual Block *getSuccessor(int idx) {
-            return first;
+            throw runtime_error("illegal parameters");
+            // return first;
         }
     };
     class For : public Block {
@@ -417,46 +418,51 @@ namespace cocl {
     //     block->dump();
     // }
 
-    void mergeSequences(Block *root) {
+    int mergeSequences(Block *root) {
         // basically we look for any block with one single incoming, and that incoming is a basicblockblock
         bool didAMerge = true;
+        int numChanges = 0;
         while(didAMerge) {
             didAMerge = false;
             for(auto it = blocks.begin(); it != blocks.end(); it++) {
                 Block *block = it->get();
-                if(block->incoming.size() == 1) {
-                    // cout << "block " << block->id << " has only one incoming" << endl;
-                    Block *parent = block->incoming[0];
-                    if(BasicBlockBlock *parentBlockBlock = dynamic_cast<BasicBlockBlock*>(parent)) {
-                        // cout << "its a blockblock" << endl;
-                        if(BasicBlockBlock *thisBlockBlock = dynamic_cast<BasicBlockBlock*>(block)) {
-                            // so merge...
-                            cout << "merging ... " << block->id << ", " << parent->id << endl;
-                            unique_ptr<Sequence> sequence(new Sequence());
-                            sequence->children.push_back(parent);
-                            sequence->children.push_back(block);
-                            for(auto parentincit = parent->incoming.begin(); parentincit != parent->incoming.end(); parentincit++) {
-                                Block *parentinc = *parentincit;
-                                sequence->incoming.push_back(parentinc);
-                                parentinc->replaceChild(parent, sequence.get());
-                            }
-                            parent->incoming.clear();
-                            parent->incoming.push_back(sequence.get());
-                            parentBlockBlock->next = 0;
-                            block->incoming.clear();
-                            block->incoming.push_back(sequence.get());
-                            thisBlockBlock->next->replaceIncoming(thisBlockBlock, sequence.get());
-                            sequence->next = thisBlockBlock->next;
-                            thisBlockBlock->next = 0;
-                            blocks.push_back(std::move(sequence));
-                            didAMerge = true;
-                        }
-                    } else {
-                        // cout << "but not a basicblockblock" << endl;
-                    }
+                if(block->incoming.size() != 1) {
+                    continue;
                 }
+                // cout << "block " << block->id << " has only one incoming" << endl;
+                Block *parent = block->incoming[0];
+                if(parent->numSuccessors() != 1) {
+                    continue;
+                }
+                if(block->numSuccessors() != 1) {
+                    continue;
+                }
+                // so merge...
+                cout << "merging ... " << block->id << ", " << parent->id << endl;
+                unique_ptr<Sequence> sequence(new Sequence());
+                sequence->children.push_back(parent);
+                sequence->children.push_back(block);
+                for(auto parentincit = parent->incoming.begin(); parentincit != parent->incoming.end(); parentincit++) {
+                    Block *parentinc = *parentincit;
+                    sequence->incoming.push_back(parentinc);
+                    parentinc->replaceChild(parent, sequence.get());
+                }
+                parent->incoming.clear();
+                parent->incoming.push_back(sequence.get());
+                parent->replaceChild(block, 0);
+                // parentBlockBlock->next = 0;
+                block->incoming.clear();
+                block->incoming.push_back(sequence.get());
+                Block *blockSuccessor = block->getSuccessor(0);
+                blockSuccessor->replaceIncoming(block, sequence.get());
+                sequence->next = blockSuccessor;
+                block->replaceChild(blockSuccessor, 0);
+                blocks.push_back(std::move(sequence));
+                didAMerge = true;
+                numChanges++;
             }
         }
+        return numChanges;
     }
     void huntIfs(Block *block) {
         // an 'if' looks like (we're handling only the 'true' case):
@@ -471,12 +477,13 @@ namespace cocl {
         // true: BlockA
         // false: BlockB
     }
-    void huntFors(Block *block) {
+    int huntFors(Block *block) {
         //BlockA
         //ConditionalBlock
         // true: BlockB => blockA
         // false: blockC
         // blockC
+        int numChanges = 0;
         bool foundFor = true;
         while(foundFor) {
             foundFor = false;
@@ -524,12 +531,15 @@ namespace cocl {
                     forBlock->preBlock = parent;
                     forBlock->bodyBlock = child;
                     forBlock->condition = cond->condition;
+                    cond->falseNext->replaceIncoming(cond, forBlock.get());
                     eraseBlock(cond);
                     blocks.push_back(std::move(forBlock));
                     foundFor = true;
+                    numChanges++;
                 }
             }
         }
+        return numChanges;
     }
     void handle_branching_simplify(Function *F) {
         cout << "simplify " << string(F->getName()) << endl;
@@ -616,14 +626,21 @@ namespace cocl {
         set<const Block *>seen;
         root->dump(seen, "");
 
-        mergeSequences(root.get());
+        int numChanges = 1;
+        while(numChanges > 0) {
+            numChanges = 0;
+            numChanges += mergeSequences(root.get());
 
-        seen.clear();
-        root->dump(seen, "");
+            seen.clear();
+            root->dump(seen, "");
 
-        huntIfs(root.get());
-        huntWhiles(root.get());
-        huntFors(root.get());
+            huntIfs(root.get());
+            huntWhiles(root.get());
+            numChanges += huntFors(root.get());
+
+            seen.clear();
+            root->dump(seen, "");
+        }
 
         seen.clear();
         root->dump(seen, "");
