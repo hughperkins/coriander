@@ -81,6 +81,7 @@ public:
     Block *trueBlock = 0;
     Block *falseBlock = 0;
     Block *next = 0;
+    bool invertCondition = false;
     virtual std::string blockType() const;
     virtual void dump(std::set<const Block *> &seen, std::string indent) const;
     virtual void replaceSuccessor(Block *oldChild, Block *newChild);

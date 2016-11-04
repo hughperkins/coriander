@@ -202,6 +202,57 @@ bool huntTrueIfs(Block *block) {
     }
     return numChanges > 0;
 }
+bool huntFalseIfs(Block *block) {
+    // an 'if' looks like (we're handling only the 'false' case ):
+    // (something)
+    // ConditionalBlock
+    // false: BlockA => BlockB
+    // true: BlockB (constraint: 1 successor exactly)
+    int numChanges = 0;
+    bool foundFor = true;
+    while(foundFor) {
+        foundFor = false;
+        for(auto it = blocks.begin(); it != blocks.end(); it++) {
+            Block *block = it->get();
+            if(ConditionalBranch *cond = dynamic_cast<ConditionalBranch *>(block)) {
+                Block *falseChild = cond->trueNext;
+                Block *trueChild = cond->falseNext;
+                if(trueChild->numSuccessors() != 1) {
+                    continue;
+                }
+                if(trueChild->incoming.size() != 1) {
+                    continue;
+                }
+                if(trueChild->getSuccessor(0) != falseChild) {
+                    continue;
+                }
+
+                unique_ptr<If> ifBlock(new If());
+                migrateIncoming(cond, ifBlock.get());
+                ifBlock->condition = cond->condition;
+                ifBlock->trueBlock = trueChild;
+                ifBlock->falseBlock = 0;
+                ifBlock->next = falseChild;
+                ifBlock->invertCondition = true;
+
+                trueChild->incoming.clear();
+                trueChild->incoming.push_back(ifBlock.get());
+                trueChild->replaceSuccessor(falseChild, 0);
+
+                falseChild->replaceIncoming(trueChild, ifBlock.get());
+                falseChild->removeIncoming(cond);
+
+                eraseBlock(cond);
+                blocks.push_back(std::move(ifBlock));
+                foundFor = true;
+                numChanges++;
+
+                return true;
+            }
+        }
+    }
+    return numChanges > 0;
+}
 bool huntTrueIfElses(Block *block) {
     // an 'if' looks like (we're handling only the 'true' case ):
     // (something)
@@ -557,6 +608,12 @@ string handle_branching_simplify(Function *F) {
         }
 
         if(huntTrueIfs(root.get())) {
+            madeChanges = true;
+            // seen.clear();
+            // root->dump(seen, "");
+        }
+
+        if(huntFalseIfs(root.get())) {
             madeChanges = true;
             // seen.clear();
             // root->dump(seen, "");

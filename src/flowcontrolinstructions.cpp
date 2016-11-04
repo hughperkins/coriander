@@ -174,7 +174,11 @@ void For::dump(set<const Block *> &seen, string indent) const {
 std::string If::generateCl(std::string indent) {
     string gencode = "";
     cout << "condition " << (void *)condition << endl;
-    gencode += indent + "if(" + dumpOperand(condition) + ") {\n";
+    if(invertCondition) {
+        gencode += indent + "if(!" + dumpOperand(condition) + ") {\n";
+    } else {
+        gencode += indent + "if(" + dumpOperand(condition) + ") {\n";
+    }
     gencode += trueBlock->generateCl(indent + "    ");
     if(falseBlock != 0) {
         gencode += indent + "} else {\n";
