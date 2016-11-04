@@ -296,6 +296,8 @@ bool huntFors(Block *block) {
     return numChanges > 0;
 }
 void handle_branching_simplify(Function *F) {
+    blocks.clear();
+    blockByBasicBlock.clear();
     cout << "simplify " << string(F->getName()) << endl;
     unique_ptr<RootBlock> root(new RootBlock());
     for(auto it=F->begin(); it != F->end(); it++) {
