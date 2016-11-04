@@ -351,6 +351,12 @@ std::string BasicBlockBlock::generateCl(std::string indent) {
         Instruction *inst = *it;
         gencode += dumpInstruction(indent, inst);
     }
+    // phis...
+    for(auto it=migratedIntoOutgoingPhis.begin(); it != migratedIntoOutgoingPhis.end(); it++) {
+        PHINode *phi = it->first;
+        Value *value = it->second;
+        gencode += dumpOperand((PHINode *)phi) + " = " + dumpOperand(value) + ";\n";
+    }
     if(next != 0) {
         gencode += next->generateCl(indent);
     }
@@ -510,7 +516,7 @@ std::string DoWhile::generateCl(std::string indent) {
     string gencode = "";
     gencode += indent + "do {\n";
     gencode += body->generateCl(indent + "    ");
-    gencode += indent + "} while(" + dumpOperand(condition) + ")\n";
+    gencode += indent + "} while(" + dumpOperand(condition) + ");\n";
     if(next != 0) {
         gencode += next->generateCl(indent);
     }

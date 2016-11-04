@@ -25,5 +25,5 @@
 // }
 
 namespace cocl {
-    void handle_branching_simplify(llvm::Function *F);
+    std::string handle_branching_simplify(llvm::Function *F);
 }

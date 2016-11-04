@@ -14,6 +14,8 @@
 
 #include "handle_branching.h"
 #include "flowcontrolinstructions.h"
+#include "ir-to-opencl.h"
+#include "ir-to-opencl-common.h"
 
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
@@ -50,7 +52,8 @@ using namespace cocl::flowcontrol;
 namespace cocl {
 
 vector<unique_ptr<Block> > blocks; // doesnt include the root. I guess. ???
-map<BasicBlock *, Block *> blockByBasicBlock;
+map<BasicBlock *, BasicBlockBlock *> blockByBasicBlock;
+set<PHINode *> phis;
 
 template<typename T>
 void vectorErase(vector<T> &targetvector, T &element) {
@@ -409,13 +412,47 @@ void verify(Block *) {
 
 }
 
-void writeOpenCL(Block *root) {
-    string cl = root->generateCl("    ");
-    cout << "cl: [" << cl << "]" << endl;
+string handlePhis(Block *root) {
+    string phiDeclarations = "";
+    for(auto it = blocks.begin(); it != blocks.end(); it++) {
+        Block *block = it->get();
+        cout << "block " << block->blockType() << " " << block->id << endl;
+        if(BasicBlockBlock *basicBlockBlock = dynamic_cast<BasicBlockBlock *>(block)) {
+            for(auto it2 = basicBlockBlock->originalIncomingPhis.begin(); it2 != basicBlockBlock->originalIncomingPhis.end(); it2++) {
+                PHINode *phi = *it2;
+                phi->dump();
+                cout << endl;
+                phiDeclarations += dumpType(phi->getType()) + " " + dumpOperand(phi) + ";\n";
+                int numIncoming = phi->getNumIncomingValues();
+                cout << "numincoming: " << numIncoming << endl;
+                for(int i = 0; i < numIncoming; i++) {
+                    BasicBlock *incomingBasicBlock = phi->getIncomingBlock(i);
+                    BasicBlockBlock *incomingBlock = blockByBasicBlock[incomingBasicBlock];
+                    cout << "  incoming block: " << incomingBlock->id << endl;
+                    incomingBlock->migratedIntoOutgoingPhis[phi] = phi->getIncomingValue(i);
+                }
+            }
+        }
+    }
+    cout << "phi declarations: [\n" << phiDeclarations << "]" << endl;
+    return phiDeclarations;
 }
-void handle_branching_simplify(Function *F) {
+
+string writeOpenCL(Block *root) {
+    string cl = root->generateCl("    ");
+    // string phiDeclarations = "";
+    // for(auto it=phis.begin(); it != phis.end(); it++) {
+    //     PHINode *phi = *it;
+    //     phiDeclarations += addPHIDeclaration(phi) + "\n";
+    // }
+    // cl = phiDeclarations + cl;
+    cout << "cl: [\n" << cl << "]" << endl;
+    return cl;
+}
+string handle_branching_simplify(Function *F) {
     resetNextId();
     blocks.clear();
+    phis.clear();
     blockByBasicBlock.clear();
     cout << "simplify " << string(F->getName()) << endl;
     unique_ptr<RootBlock> root(new RootBlock());
@@ -430,7 +467,9 @@ void handle_branching_simplify(Function *F) {
             if(isa<BranchInst>(inst)) {
                 continue;
             }
-            if(isa<PHINode>(inst)) {
+            if(PHINode *phi = dyn_cast<PHINode>(inst)) {
+                phis.insert(phi);
+                block->originalIncomingPhis.push_back(phi);
                 continue;
             }
             if(isa<ReturnInst>(inst)) {
@@ -444,7 +483,7 @@ void handle_branching_simplify(Function *F) {
 
     if(F->begin() == F->end()) {
         cout << "empty function" << endl;
-        return;
+        return "";
     }
     root->first = blockByBasicBlock[&F->getEntryBlock()];
     root->first->incoming.push_back(root.get());
@@ -555,7 +594,10 @@ void handle_branching_simplify(Function *F) {
     seen.clear();
     root->dump(seen, "");
 
-    writeOpenCL(root.get());
+    string phiDeclarations = handlePhis(root.get());
+
+    string cl = writeOpenCL(root.get());
+    return phiDeclarations + cl;
 }
 
 } // namespace cocl

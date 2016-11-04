@@ -1475,7 +1475,7 @@ std::string dumpFunction(Function *F) {
     string gencode = "";
     string declaration = dumpFunctionDeclaration(F);
     // COCL_PRINT(cout << declaration << endl);
-    cocl::handle_branching_simplify(F);
+    string bodyCl = cocl::handle_branching_simplify(F);
 
     functionBlockIndex.clear();
     int i = 0;
@@ -1485,17 +1485,17 @@ std::string dumpFunction(Function *F) {
         i++;
     }
 
-    string body = "";
-    for(auto it=F->begin(); it != F->end(); it++) {
-        BasicBlock *basicBlock = &*it;
-        body += dumpBasicBlock(basicBlock);
-    }
+    // string body = "";
+    // for(auto it=F->begin(); it != F->end(); it++) {
+    //     BasicBlock *basicBlock = &*it;
+    //     body += dumpBasicBlock(basicBlock);
+    // }
     gencode =
         declaration + " {\n" +
         currentFunctionSharedDeclarations;
-    for(auto it=currentFunctionPhiDeclarationsByName.begin(); it != currentFunctionPhiDeclarationsByName.end(); it++){
-        gencode += "    " + it->second + ";\n";
-    }
+    // for(auto it=currentFunctionPhiDeclarationsByName.begin(); it != currentFunctionPhiDeclarationsByName.end(); it++){
+    //     gencode += "    " + it->second + ";\n";
+    // }
     for(auto it=functionNeededForwardDeclarations.begin(); it != functionNeededForwardDeclarations.end(); it++){
         Value *value = *it;
         gencode += "    " + dumpType(value->getType()) + " " + dumpOperand(value) + ";\n";
@@ -1505,7 +1505,7 @@ std::string dumpFunction(Function *F) {
         gencode += structpointershimcode + "\n";
     }
     gencode +=
-        body +
+        bodyCl +
     "}\n";
     // COCL_PRINT(cout << endl);
     return gencode;

@@ -16,6 +16,7 @@
 
 #include "llvm/IR/Value.h"
 #include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Instructions.h"
 
 #include <vector>
 #include <string>
@@ -124,6 +125,8 @@ class BasicBlockBlock : public Block {
 public:
     llvm::BasicBlock *basicBlock = 0;
     std::vector<llvm::Instruction *> instructions;
+    std::vector<llvm::PHINode *>originalIncomingPhis;
+    std::map<llvm::PHINode *, llvm::Value *> migratedIntoOutgoingPhis;
     Block *next; // initially will probalby point to a Branch block
     virtual std::string blockType() const;
     virtual void dump(std::set<const Block *> &seen, std::string indent) const;
