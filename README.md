@@ -152,6 +152,8 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 
 ## News
 
+- Nov 4:
+  - merged in changes that remove `label`s and gotos, and replace them with `if`s, `while`s, `for`s.  This is a bit flaky/beta/duct-tape, but the unit tests do all pass...
 - Nov 1:
   - turned on rpath, switched from static to shared compilation
 - Oct 29:
