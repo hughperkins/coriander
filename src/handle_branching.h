@@ -10,4 +10,6 @@
 //     class Function;
 // }
 
-void handle_branching_simplify(llvm::Function *F);
+namespace cocl {
+    void handle_branching_simplify(llvm::Function *F);
+}

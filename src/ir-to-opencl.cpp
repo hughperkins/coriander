@@ -1488,7 +1488,7 @@ std::string dumpFunction(Function *F) {
     string gencode = "";
     string declaration = dumpFunctionDeclaration(F);
     // COCL_PRINT(cout << declaration << endl);
-    handle_branching_simplify(F);
+    cocl::handle_branching_simplify(F);
 
     functionBlockIndex.clear();
     int i = 0;
