@@ -14,20 +14,22 @@
 
 #pragma once
 
-// this si going to try to convert branch instructions into `if`s and stuff
-// input: not sure :-P
-// output: ditto :-P
-
+#include <vector>
 #include "flowcontrolinstructions.h"
 
-#include "llvm/IR/Function.h"
-
-// namespace llvm {
-//     class Function;
-// }
-
 namespace cocl {
-    void eraseBlock(flowcontrol::Block *block);
-    std::string handle_branching_simplify(llvm::Function *F);
-    extern std::vector<std::unique_ptr<flowcontrol::Block> > blocks;;
-}
+
+template<typename T>
+void vectorErase(std::vector<T> &targetvector, T &element);
+void eraseBlock(flowcontrol::Block *block);
+void migrateIncoming(flowcontrol::Block *oldChild, flowcontrol::Block *newChild);
+bool mergeSequences(flowcontrol::Block *root);
+bool huntTrueIfs(flowcontrol::Block *block);
+bool huntFalseIfs(flowcontrol::Block *block);
+bool huntTrueIfElses(flowcontrol::Block *block);
+bool huntDoWhiles(flowcontrol::Block *block);
+void huntWhiles(flowcontrol::Block *block);
+bool huntFors(flowcontrol::Block *block);
+void runTransforms(flowcontrol::Block *block);
+
+} // namespace cocl

@@ -359,7 +359,9 @@ std::string BasicBlockBlock::generateCl(std::string indent) {
     for(auto it=migratedIntoOutgoingPhis.begin(); it != migratedIntoOutgoingPhis.end(); it++) {
         PHINode *phi = it->first;
         Value *value = it->second;
+        copyAddressSpace(value, phi);
         gencode += dumpOperand((PHINode *)phi) + " = " + dumpOperand(value) + ";\n";
+        addPHIDeclaration(phi);
     }
     if(next != 0) {
         gencode += next->generateCl(indent);
