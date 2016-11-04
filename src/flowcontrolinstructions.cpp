@@ -109,6 +109,18 @@ Block *RootBlock::getSuccessor(int idx) {
     // return first;
 }
 
+std::string For::generateCl(std::string indent) {
+    string gencode = "";
+    gencode += indent + "for(\n";
+    gencode += preBlock->generateCl(indent + "    ");
+    gencode += indent + "    ; " + dumpOperand(condition) + ";) {\n";
+    gencode += body->generateCl(indent + "    ");
+    gencode += indent + "}\n";
+    if(next != 0) {
+        gencode += next->generateCl(indent);
+    }
+    return gencode;
+}
 int For::numSuccessors() {
     if(next != 0) {
         return 1;
@@ -170,6 +182,9 @@ std::string If::generateCl(std::string indent) {
         gencode += indent + "}\n";
     } else {
         gencode += indent + "}\n";
+    }
+    if(next != 0) {
+        gencode += next->generateCl(indent);
     }
     return gencode;
 }
@@ -335,6 +350,9 @@ std::string BasicBlockBlock::generateCl(std::string indent) {
     for(auto it=instructions.begin(); it != instructions.end(); it++) {
         Instruction *inst = *it;
         gencode += dumpInstruction(indent, inst);
+    }
+    if(next != 0) {
+        gencode += next->generateCl(indent);
     }
     return gencode;
 }

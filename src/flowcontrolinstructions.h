@@ -20,6 +20,8 @@
 #include <vector>
 #include <string>
 #include <set>
+#include <iostream>
+#include <stdexcept>
 
 namespace cocl {
 namespace flowcontrol {
@@ -69,7 +71,7 @@ public:
     void replaceSuccessor(Block *oldChild, Block *newChild);
     virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual void dump(std::set<const Block *> &seen, std::string indent) const;
-    virtual std::string generateCl(std::string indent) { return ""; }
+    virtual std::string generateCl(std::string indent);
 };
 
 class If : public Block {
@@ -112,7 +114,10 @@ public:
     virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
-    virtual std::string generateCl(std::string indent) { return ""; }
+    virtual std::string generateCl(std::string indent) {
+        std::cout << "ConditionalBranch not wiped it seems" << std::endl;
+        throw std::runtime_error("we're trying to get rid of these...");
+    }
 };
 
 class BasicBlockBlock : public Block {
