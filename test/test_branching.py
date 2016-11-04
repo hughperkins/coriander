@@ -93,6 +93,34 @@ __global__ void testIf(float *data, int N) {
             assert float_data[i] == float_data_orig[i]
 
 
+def test_test_if_else(context, q, float_data, float_data_gpu):
+    sourcecode = """
+__global__ void testIfElse(float *data, int N) {
+    int tid = threadIdx.x;
+    if(tid < N) {
+        data[tid] *= 2;
+    } else {
+        data[tid] += 5;
+    }
+}
+"""
+    prog = compile_code(context, sourcecode)
+    float_data_orig = np.copy(float_data)
+
+    N = 2
+    prog.__getattr__(test_common.mangle('testIfElse', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(N), cl.LocalMemory(4))
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_code = f.read()
+    print('cl_code', cl_code)
+    for i in range(10):
+        if i < N:
+            assert float_data[i] == float_data_orig[i] * 2
+        else:
+            assert float_data[i] == float_data_orig[i] + 5
+
+
 def test_test_inlines(context, q, float_data, float_data_gpu):
     sourcecode = """
 __device__ void somefunc(float *data) {
