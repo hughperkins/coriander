@@ -506,6 +506,16 @@ Block *ReturnBlock::getSuccessor(int idx) {
     throw runtime_error("illegal request");
 }
 
+std::string DoWhile::generateCl(std::string indent) {
+    string gencode = "";
+    gencode += indent + "do {\n";
+    gencode += body->generateCl(indent + "    ");
+    gencode += indent + "} while(" + dumpOperand(condition) + ")\n";
+    if(next != 0) {
+        gencode += next->generateCl(indent);
+    }
+    return gencode;
+}
 string DoWhile::blockType() const {
     return "DoWhile";
 }

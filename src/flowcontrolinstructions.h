@@ -100,7 +100,7 @@ public:
     virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
     virtual int numSuccessors();
     virtual Block *getSuccessor(int idx);
-    virtual std::string generateCl(std::string indent) { return ""; }
+    virtual std::string generateCl(std::string indent);
 };
 
 class ConditionalBranch : public Block {
