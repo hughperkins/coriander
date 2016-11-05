@@ -28,6 +28,8 @@ namespace cocl {
 namespace flowcontrol {
 
 void resetNextId();
+int getNextId();
+void incNextId();
 
 // a Block has one or more links to child blocks
 // a Block can be linked to by one or more blocks
