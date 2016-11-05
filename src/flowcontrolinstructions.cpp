@@ -80,12 +80,21 @@ void Block::removeIncoming(Block *targetIncoming) {
     }
     throw runtime_error("illegal parameters");
 }
+std::string Block::getLabel() const {
+        return "label" + toString(id);
+}
 
 std::string RootBlock::generateCl(std::string indent, bool noLabel) {
     dumped = true;
     string gencode = "";
     gencode += first->generateCl(indent);
     return gencode;
+}
+void RootBlock::walk(std::function<void(Block *block)> fn) {
+    fn(this);
+    if(first != 0) {
+        first->walk(fn);
+    }
 }
 string RootBlock::blockType() const {
     return "RootBlock";
@@ -130,6 +139,18 @@ std::string For::generateCl(std::string indent, bool noLabel) {
         gencode += next->generateCl(indent);
     }
     return gencode;
+}
+void For::walk(std::function<void(Block *block)> fn) {
+    fn(this);
+    if(preBlock != 0) {
+        preBlock->walk(fn);
+    }
+    if(body != 0) {
+        body->walk(fn);
+    }
+    if(next != 0) {
+        next->walk(fn);
+    }
 }
 int For::numSuccessors() {
     if(next != 0) {
@@ -184,7 +205,7 @@ void For::dump(set<const Block *> &seen, string indent) const {
 std::string If::generateCl(std::string indent, bool noLabel) {
     dumped = true;
     string gencode = "";
-    cout << "condition " << (void *)condition << endl;
+    // cout << "condition " << (void *)condition << endl;
     if(invertCondition) {
         gencode += indent + "if(!" + dumpOperand(condition) + ") {\n";
     } else {
@@ -202,6 +223,18 @@ std::string If::generateCl(std::string indent, bool noLabel) {
         gencode += next->generateCl(indent);
     }
     return gencode;
+}
+void If::walk(std::function<void(Block *block)> fn) {
+    fn(this);
+    if(trueBlock != 0) {
+        trueBlock->walk(fn);
+    }
+    if(falseBlock != 0) {
+        falseBlock->walk(fn);
+    }
+    if(next != 0) {
+        next->walk(fn);
+    }
 }
 string If::blockType() const {
     return "If";
@@ -294,7 +327,7 @@ Block *If::getSuccessor(int idx) {
 std::string ConditionalBranch::generateCl(std::string indent, bool noLabel) {
     dumped = true;
     string gencode = "";
-    cout << "condition " << (void *)condition << endl;
+    // cout << "condition " << (void *)condition << endl;
     bool invertCondition = false;
     if(trueNext == 0) {
         invertCondition = true;
@@ -316,6 +349,15 @@ std::string ConditionalBranch::generateCl(std::string indent, bool noLabel) {
         gencode += indent + "}\n";
     }
     return gencode;
+}
+void ConditionalBranch::walk(std::function<void(Block *block)> fn) {
+    fn(this);
+    if(trueNext != 0) {
+        trueNext->walk(fn);
+    }
+    if(falseNext != 0) {
+        falseNext->walk(fn);
+    }
 }
 string ConditionalBranch::blockType() const {
     return "ConditionalBranch";
@@ -414,6 +456,12 @@ std::string BasicBlockBlock::generateCl(std::string indent, bool noLabel) {
     }
     return gencode;
 }
+void BasicBlockBlock::walk(std::function<void(Block *block)> fn) {
+    fn(this);
+    if(next != 0) {
+        next->walk(fn);
+    }
+}
 std::string BasicBlockBlock::getLabel() const {
     return "label" + toString(id);
 }
@@ -468,6 +516,16 @@ std::string Sequence::generateCl(std::string indent, bool noLabel) {
         gencode += next->generateCl(indent);
     }
     return gencode;
+}
+void Sequence::walk(std::function<void(Block *block)> fn) {
+    fn(this);
+    for(auto it=children.begin(); it != children.end(); it++) {
+        Block *child = *it;
+        child->walk(fn);
+    }
+    if(next != 0) {
+        next->walk(fn);
+    }
 }
 string Sequence::blockType() const {
     return "Sequence";
@@ -550,6 +608,9 @@ std::string ReturnBlock::generateCl(std::string indent, bool noLabel) {
     gencode += dumpInstruction(indent, retInst);
     return gencode;
 }
+void ReturnBlock::walk(std::function<void(Block *block)> fn) {
+    fn(this);
+}
 string ReturnBlock::blockType() const {
     return "ReturnBlock";
 }
@@ -579,6 +640,15 @@ std::string DoWhile::generateCl(std::string indent, bool noLabel) {
         gencode += next->generateCl(indent);
     }
     return gencode;
+}
+void DoWhile::walk(std::function<void(Block *block)> fn) {
+    fn(this);
+    if(body != 0) {
+        body->walk(fn);
+    }
+    if(next != 0) {
+        next->walk(fn);
+    }
 }
 string DoWhile::blockType() const {
     return "DoWhile";

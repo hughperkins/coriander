@@ -411,8 +411,12 @@ bool huntFors(Block *block) {
     return numChanges > 0;
 }
 
+
+
 void runTransforms(Block *root) {
+    //walk(root);
     set<const Block *>seen;
+    // seen->
     root->dump(seen, "");
 
     // int numChanges = 1;

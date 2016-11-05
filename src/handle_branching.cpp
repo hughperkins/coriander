@@ -82,25 +82,25 @@ string handlePhis(Block *root) {
     string phiDeclarations = "";
     for(auto it = blocks.begin(); it != blocks.end(); it++) {
         Block *block = it->get();
-        cout << "block " << block->blockType() << " " << block->id << endl;
+        // cout << "block " << block->blockType() << " " << block->id << endl;
         if(BasicBlockBlock *basicBlockBlock = dynamic_cast<BasicBlockBlock *>(block)) {
             for(auto it2 = basicBlockBlock->originalIncomingPhis.begin(); it2 != basicBlockBlock->originalIncomingPhis.end(); it2++) {
                 PHINode *phi = *it2;
-                phi->dump();
-                cout << endl;
+                // phi->dump();
+                // cout << endl;
                 phiDeclarations += dumpType(phi->getType()) + " " + dumpOperand(phi) + ";\n";
                 int numIncoming = phi->getNumIncomingValues();
-                cout << "numincoming: " << numIncoming << endl;
+                // cout << "numincoming: " << numIncoming << endl;
                 for(int i = 0; i < numIncoming; i++) {
                     BasicBlock *incomingBasicBlock = phi->getIncomingBlock(i);
                     BasicBlockBlock *incomingBlock = blockByBasicBlock[incomingBasicBlock];
-                    cout << "  incoming block: " << incomingBlock->id << endl;
+                    // cout << "  incoming block: " << incomingBlock->id << endl;
                     incomingBlock->migratedIntoOutgoingPhis[phi] = phi->getIncomingValue(i);
                 }
             }
         }
     }
-    cout << "phi declarations: [\n" << phiDeclarations << "]" << endl;
+    // cout << "phi declarations: [\n" << phiDeclarations << "]" << endl;
     return phiDeclarations;
 }
 
@@ -137,7 +137,7 @@ std::unique_ptr<RootBlock> load_branching_tree(Function *F) {
     }
 
     if(F->begin() == F->end()) {
-        cout << "empty function" << endl;
+        // cout << "empty function" << endl;
         return root;
         // return "";
     }
@@ -209,13 +209,18 @@ void addLabels() {
         Block *block = it->get();
         if(ConditionalBranch *branch = dynamic_cast<ConditionalBranch *>(block)) {
             if(branch->trueNext != 0) {
-                BasicBlockBlock *next = dynamic_cast<BasicBlockBlock *>(branch->trueNext);
-                next->needsLabel = true;
+                // cout << "truenext type " << branch->trueNext->blockType() << endl;
+                // BasicBlockBlock *next = dynamic_cast<BasicBlockBlock *>(branch->trueNext);
+                // cout << "next " << (void *)next << endl;
+                // next->needsLabel = true;
             }
             if(branch->falseNext != 0) {
-                BasicBlockBlock *next = dynamic_cast<BasicBlockBlock *>(branch->falseNext);
-                next->needsLabel = true;
+                // cout << "falseNext type " << branch->falseNext->blockType() << endl;
+                // BasicBlockBlock *next = dynamic_cast<BasicBlockBlock *>(branch->falseNext);
+                // cout << "next " << (void *)next << endl;
+                // next->needsLabel = true;
             }
+            // cout << "after add labels for cond " << branch->id << endl;
         }
     }
 }
@@ -245,7 +250,7 @@ string branching_write_cl(RootBlock *root) {
     markBlocksUnwritten();
     string cl = root->generateCl("    ");
     cl += dumpUnwrittenBlocks();
-    cout << "cl: [\n" << cl << "]" << endl;
+    // cout << "cl: [\n" << cl << "]" << endl;
     return cl;
 }
 

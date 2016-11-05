@@ -27,6 +27,8 @@ namespace cocl {
         int currentGpuIndex = 0;
         cl_platform_id platform_ids[10];
         cl_uint num_platforms;
+        // error = clGetPlatformIDs(0, 0, &num_platforms);
+        // cout << "Num OpenCL platforms: " << num_platforms << endl;
         error = clGetPlatformIDs(10, platform_ids, &num_platforms);
         if (error != CL_SUCCESS) {
            throw std::runtime_error("Error getting OpenCL platforms ids, OpenCL errorcode: opencl error " + toString(error));
