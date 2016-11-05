@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
+option(BUILD_TESTS "Build tests" OFF)
+
 set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/platforminfo_helper.cpp src/EasyCL/EasyCL.cpp
     src/EasyCL/deviceinfo_helper.cpp src/EasyCL/util/easycl_stringhelper.cpp src/EasyCL/DevicesInfo.cpp src/EasyCL/DeviceInfo.cpp)
 
@@ -107,4 +109,17 @@ target_include_directories(clblast PRIVATE src/CLBlast/include)
 # ==================================================================================================
 # tests
 
-add_cocl_executable(testblas test/cocl/testblas.cu)
+if(BUILD_TESTS)
+    set(TESTS testblas cuda_sample context byvaluestructwithpointer multigpu multithreading
+        offsetkernelargs properties test_bitcast test_callbacks testcumemcpy testevents2
+        testevents testfloat4 test_kernelcachedok testmath testmemcpydevicetodevice test_memhostalloc
+        testneg testnullpointer testpartialcopy testshfl teststream test_types
+    )
+
+    foreach(TEST ${TESTS})
+        add_cocl_executable(${TEST} test/cocl/${TEST}.cu)
+        add_custom_target(run-${TEST}
+            COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TEST}
+        )
+    endforeach()
+endif(BUILD_TESTS)
