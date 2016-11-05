@@ -6,27 +6,6 @@ set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/plat
 set(COCL_SRCS src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cpp src/cocl_device.cpp src/cocl_error.cpp
     src/cocl_memory.cpp src/cocl_properties.cpp src/cocl_streams.cpp src/cocl_clsources.cpp src/cocl_context.cpp)
 
-# include_directories(src/EasyCL/thirdparty/clew/include/proxy-opencl)
-# include_directories(src/EasyCL/thirdparty/clew/include)
-# include_directories(src/EasyCL)
-# include_directories(include)
-# # include_directories(/usr/include/llvm-3.8)
-# include_directories(/usr/lib/llvm-3.8/include)
-
-# reference http://llvm.org/docs/CMake.html#embedding
-# include(/usr/lib/llvm-3.8/share/clang/cmake/ClangTargets.cmake)
-
-# SET(CMAKE_MODULE_PATH
-# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "/usr/share/llvm-3.8/cmake")
-
-# set(LLVM_INSTALL_PREFIX /usr/share/llvm-3.8)
-# set(LLVM_CMAKE_DIR /usr/share/llvm-3.8)
-# include(/usr/share/llvm-3.8/cmake/LLVMConfig.cmake)
-# find_package(LLVM REQUIRED CONFIG)
-
-# message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-# message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
-
 set(CMAKE_CC_FLAGS "-fPIC")
 set(LLVM_COMPILE_FLAGS "-fvisibility-inlines-hidden -ffunction-sections -fdata-sections")
 set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC ${LLVM_COMPILE_FLAGS}")
@@ -34,54 +13,9 @@ add_definitions(-DUSE_CLEW)  # turns off direct linking with libOpenCL.so, all g
 # for llvm:
 add_definitions(-D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS)
 
-# set(LLVM_LIBRARIES_PATH /usr/lib/llvm-3.8/lib)
-# set (LLVM_LIBS
-#     ${LLVM_LIBRARIES_PATH}/libLLVMSupport.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMCore.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMMC.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMTarget.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMAnalysis.a
-#     # ${LLVM_LIBRARIES_PATH}/libLLVMipa.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMTransformUtils.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMInstCombine.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMScalarOpts.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMCodeGen.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMExecutionEngine.a
-#     # ${LLVM_LIBRARIES_PATH}/libLLVMJIT.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMX86Utils.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMX86Info.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMMCParser.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMX86AsmParser.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMX86AsmPrinter.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMAsmPrinter.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMSelectionDAG.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMX86CodeGen.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMX86Disassembler.a
-#     ${LLVM_LIBRARIES_PATH}/libLLVMInterpreter.a
-# )
 set (LLVM_LIBS /usr/lib/llvm-3.8/lib/libLLVM.so)
 
-# execute_process(
-#   COMMAND llvm-config-3.8 --ldflags --system-libs --libs
-#   OUTPUT_VARIABLE LLVM_LINK_FLAGS
-# )
-# execute_process(
-#   COMMAND llvm-config-3.8 --ldflags
-#   OUTPUT_VARIABLE LLVM_LDFLAGS
-#   OUTPUT_STRIP_TRAILING_WHITESPACE
-# )
-# execute_process(
-#   COMMAND llvm-config-3.8 --libs
-#   OUTPUT_VARIABLE LLVM_LIBS
-#   OUTPUT_STRIP_TRAILING_WHITESPACE
-# )
-# message("LLVM_LDFLAGS ${LLVM_LDFLAGS}")
-# message("LLVM_LIBS ${LLVM_LIBS}")
-# set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath,$ORIGIN ${LLVM_LINK_FLAGS}")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
-# message("CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS}")
-
-# llvm_map_components_to_libnames(llvm_libs support core irreader)
 
 add_executable(ir-to-opencl
     src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/mutations.cpp src/readIR.cpp src/struct_clone.cpp
