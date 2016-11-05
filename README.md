@@ -24,7 +24,7 @@ $ cocl cuda_sample.cu
 ```
 Run.  You'll need to add libclew.so, libclblast.co, libeasycl.so to the LD_LIBRARY_PATH:
 ```
-$ LD_LIBRARY_PATH=/usr/local/lib ./cuda_sample
+$ ./cuda_sample
 Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 hostFloats[2] 123
@@ -38,11 +38,11 @@ If you want, you can compile in two steps:
 
 ```
 cocl -c teststream.cu
-g++ -o teststream teststream.o -lcocl -lOpenCL
+g++ -o teststream teststream.o -lcocl -lclblast -leasycl -lclew
 ```
 Result is the same:
 ```
-$ LD_LIBRARY_PATH=/usr/local/lib ./cuda_sample
+$ ./cuda_sample
 Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 hostFloats[2] 123
@@ -92,6 +92,9 @@ Other operating systems, and clang/llvm versions, might work too, but untested. 
 sudo apt-get install git cmake llvm-3.8-dev clang-3.8-dev libc6-dev-i386 make gcc g++
 git clone --recursive https://github.com/hughperkins/cuda-on-cl
 cd cuda-on-cl
+mkdir build
+cd build
+cmake ..
 make -j 4
 sudo make install
 ```
@@ -122,12 +125,14 @@ py.test -svx
 
 Simply run:
 ```
+cd build
 make run-tests
 ```
 
 You can run a test by name, eg:
 ```
-make run-test-cocl-offsetkernelargs
+cd build
+make run-offsetkernelargs
 ```
 Result:
 ```
@@ -161,6 +166,8 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 
 ## News
 
+- Nov 5:
+  - switched from `Makefile` to `CMakeLists.txt` => build/install instructions have changed, see above
 - Nov 4:
   - merged in changes that remove `label`s and gotos, and replace them with `if`s, `while`s, `for`s.  This is a bit flaky/beta/duct-tape, but the unit tests do all pass...
 - Nov 1:
