@@ -120,6 +120,7 @@ if(BUILD_TESTS)
         add_cocl_executable(${TEST} test/cocl/${TEST}.cu)
         add_custom_target(run-${TEST}
             COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TEST}
+            DEPENDS ${TEST}
         )
         set(TEST_TARGETS ${TEST_TARGETS} run-${TEST})
     endforeach()
