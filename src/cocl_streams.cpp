@@ -19,7 +19,7 @@
 #include "cocl/local_config.h"
 #include "cocl/cocl_context.h"
 
-#include "EasyCL.h"
+#include "EasyCL/EasyCL.h"
 
 #include <iostream>
 #include <memory>

@@ -54,6 +54,8 @@ target_link_libraries(easycl clew)
 
 add_library(cocl SHARED ${COCL_SRCS})
 target_include_directories(cocl PRIVATE src/CLBlast/include)
+target_include_directories(cocl PRIVATE include)
+target_include_directories(cocl PRIVATE src)
 target_link_libraries(cocl easycl)
 
 # # target_include_directories(cocl PRIVATE src/CLBlast/include)
@@ -136,7 +138,7 @@ FILE(GLOB EASYCL_HEADERS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/*.h)
 
 INSTALL(FILES ${COCL_HEADERS} DESTINATION include/cocl)
 INSTALL(FILES ${CLEW_HEADERS} DESTINATION include)
-INSTALL(FILES ${EASYCL_HEADERS_ROOT} DESTINATION include/easycl)
+INSTALL(FILES ${EASYCL_HEADERS_ROOT} DESTINATION include/EasyCL)
 install(TARGETS easycl clew clblast cocl ir-to-opencl patch-hostside EXPORT cocl-targets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib

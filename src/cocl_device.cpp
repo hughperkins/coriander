@@ -3,7 +3,7 @@
 #include "cocl/cocl_context.h"
 #include "cocl/local_config.h"
 
-#include "EasyCL.h"
+#include "EasyCL/EasyCL.h"
 
 #include <iostream>
 using namespace std;

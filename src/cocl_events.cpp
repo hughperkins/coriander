@@ -21,7 +21,7 @@
 #include "cocl/cocl_streams.h"
 #include "cocl/cocl_context.h"
 
-#include "EasyCL.h"
+#include "EasyCL/EasyCL.h"
 
 #include <iostream>
 #include <memory>

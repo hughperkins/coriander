@@ -28,7 +28,7 @@
 #include <cstdlib>
 #include "pthread.h"
 
-#include "EasyCL.h"
+#include "EasyCL/EasyCL.h"
 
 // #include "CL/cl.h"
 #include "cocl/cocl.h"
