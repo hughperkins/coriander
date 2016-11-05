@@ -115,14 +115,6 @@ void If::replaceSuccessor(Block *oldChild, Block *newChild) {
         next = newChild;
         return;
     }
-    // if(trueBlock == oldChild) {
-    //     trueBlock = newChild;
-    //     return;
-    // }
-    // if(falseBlock == oldChild) {
-    //     falseBlock = newChild;
-    //     return;
-    // }
     throw runtime_error("couldnt find old child");
 }
 void If::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
@@ -141,33 +133,13 @@ void If::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
     throw runtime_error("couldnt find old child");
 }
 int If::numSuccessors() {
-    // int count = 0;
-    // if(trueBlock != 0) {
-    //     count++;
-    // }
-    // if(falseBlock != 0) {
-    //     count++;
-    // }
     if(next != 0) {
         return 1;
     }
     return 0;
 }
 Block *If::getSuccessor(int idx) {
-    // if(idx == 0) {
-    //     if(trueBlock != 0) {
-    //         return trueBlock;
-    //     } else {
-    //         return falseBlock;
-    //     }
-    // }
-    // if(idx == 1) {
-    //     if(trueBlock != 0) {
-    //         return falseBlock;
-    //     }
-    // }
     return next;
-    // throw runtime_error("illegal request");
 }
 
 } // flowcontrol

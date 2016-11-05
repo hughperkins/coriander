@@ -60,23 +60,16 @@ void RootBlock::dump(set<const Block *> &seen, string indent) const {
 }
 void RootBlock::replaceSuccessor(Block *oldChild, Block *newChild) {
     throw runtime_error("illegal parameters");
-    // assert(first == oldChild);
-    // first = newChild;
 }
 void RootBlock::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
-    // throw runtime_error("illegal parameters");
     assert(first == oldChild);
     first = newChild;
 }
 int RootBlock::numSuccessors() {
-    // if(first != 0) {
-    //     return 1;
-    // }
     return 0;
 }
 Block *RootBlock::getSuccessor(int idx) {
     throw runtime_error("illegal parameters");
-    // return first;
 }
 
 } // flowcontrol

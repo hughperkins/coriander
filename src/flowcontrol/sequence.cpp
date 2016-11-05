@@ -83,19 +83,6 @@ void Sequence::replaceSuccessor(Block *oldChild, Block *newChild) {
         next = newChild;
         return;
     }
-    // bool foundChild = false;
-    // for(auto it = children.begin(); it != children.end(); it++) {
-    //     Block *child = *it;
-    //     if(child == oldChild) {
-    //         foundChild = true;
-    //         break;
-    //     }
-    //     i++;
-    // }
-    // if(foundChild) {
-    //     children[i] = newChild;
-    //     return;
-    // }
     throw runtime_error("couldnt find old child");
 }
 void Sequence::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
