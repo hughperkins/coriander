@@ -54,6 +54,7 @@ static llvm::LLVMContext context;
 static std::map<std::string, Value *> NamedValues;
 static std::map<string, bool> iskernel_by_name;
 static std::set<string> ignoredFunctionNames;
+static std::set<string> ignoredGlobalVariables;
 static std::map<string, string> knownFunctionsMap; // from cuda to opencl, eg tid.x => get_global_id
 
 map<Value *, string> nameByValue; // name here might be an entire subepxression
@@ -1517,7 +1518,7 @@ std::string dumpFunction(Function *F) {
     return gencode;
 }
 
-std::string dumpModule(Module *M) {
+std::string dumpModule(Module *M, string specificFunction = "") {
     string gencode;
 
     // get struct declarations
@@ -1536,6 +1537,9 @@ std::string dumpModule(Module *M) {
         if(name == "llvm.global_ctors") {
             // we should handle these sooner or later, but skip for now
             cerr << "warning: skipping @llvm.global_ctors" << endl;
+            continue;
+        }
+        if(ignoredGlobalVariables.find(name) != ignoredGlobalVariables.end()) {
             continue;
         }
         glob->dump();
@@ -1584,6 +1588,9 @@ std::string dumpModule(Module *M) {
         if(iskernel_by_name[name]) {
             continue;  // no point in declaring kernels I think
         }
+        if(specificFunction != "" && name != specificFunction) {
+            continue;
+        }
         // hack for tensorflow: remove anything with 4Half in it, which one we dont use and two copies pointers inside
         // pointers to structs, as kernel parameters...
         if(name.find("_4half") != string::npos) {
@@ -1612,14 +1619,20 @@ std::string dumpModule(Module *M) {
         if(name.find("_4half") != string::npos) {
             continue;
         }
-        if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
-                knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
-            if(i > 0) {
-                gencode += "\n";
-            }
-            gencode += dumpFunction(F);
-            i++;
+        if(ignoredFunctionNames.find(name) != ignoredFunctionNames.end()) {
+            continue;
         }
+        if(knownFunctionsMap.find(name) != knownFunctionsMap.end()) {
+            continue;
+        }
+        if(specificFunction != "" and name != specificFunction) {
+            continue;
+        }
+        if(i > 0) {
+            gencode += "\n";
+        }
+        gencode += dumpFunction(F);
+        i++;
     }
     gencode = getDeclarationsToWrite() + "\n" + globalDeclarations + "\n" + gencode;
     return gencode;
@@ -1630,6 +1643,7 @@ int main(int argc, char *argv[]) {
     string target;
     string outputfilepath;
     bool noRunBranchingTransforms = false;
+    string specificFunction = "";
 
     argparsecpp::ArgumentParser parser;
     parser.add_string_argument("--inputfile", &target)->required();
@@ -1637,6 +1651,7 @@ int main(int argc, char *argv[]) {
     parser.add_bool_argument("--debug", &debug);
     parser.add_bool_argument("--add_ir_to_cl", &add_ir_to_cl);
     parser.add_bool_argument("--no_branching_transforms", &noRunBranchingTransforms);
+    parser.add_string_argument("--specific_function", &specificFunction)->help("Mostly for dev/debug, just process one specific function");
     if(!parser.parse_args(argc, argv)) {
         return -1;
     }
@@ -1719,11 +1734,16 @@ int main(int argc, char *argv[]) {
     // knownFunctionsMap["_Z11__shfl_downIfET_S0_i"] = "__shfl_down_2";   // float, and see cl_add_definitions, at top
     knownFunctionsMap["_Z9atomicAddIfET_PS0_S0_"] = "__atomic_add"; // float
 
+    ignoredGlobalVariables.insert("blockIdx");
+    ignoredGlobalVariables.insert("threadIdx");
+    ignoredGlobalVariables.insert("gridDim");
+    ignoredGlobalVariables.insert("blockDim");
+
     try {
         string gencode = "";
         gencode += cl_add_definitions;
         // COCL_PRINT(cout << "cl_add_definitions " << cl_add_definitions << endl);
-        gencode += dumpModule(M.get());
+        gencode += dumpModule(M.get(), specificFunction);
         ofstream of;
         of.open(outputfilepath, ios_base::out);
         of << gencode;
