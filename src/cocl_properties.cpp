@@ -106,6 +106,8 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
     COCL_PRINT(cout << "cudaGetDeviceProperties stub device=" << device << endl);
     // prop->totalGlobalMem = deviceinfo_helper->getDeviceInfoInt64(cl->device, CL_DEVICE_MAX_MEM_ALLOC_SIZE);
     ThreadVars *v = getThreadVars();
+    // cout << "initing clew..." << endl;
+    clewInit();
     cl_device_id deviceid = getDeviceByIdx(v->currentDevice);
     // EasyCL *cl = v->getCl();
     prop->totalGlobalMem = getDeviceInfoInt64(deviceid, CL_DEVICE_GLOBAL_MEM_SIZE);
