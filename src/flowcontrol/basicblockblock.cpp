@@ -25,6 +25,12 @@ using namespace std;
 namespace cocl {
 namespace flowcontrol {
 
+int BasicBlockBlock::getNumChildren() {
+    return 0;
+}
+Block *BasicBlockBlock::getChild(int idx) {
+    throw runtime_error("illegal request");
+}
 std::string BasicBlockBlock::generateCl(std::string indent, bool noLabel) {
     dumped = true;
     string gencode = "";

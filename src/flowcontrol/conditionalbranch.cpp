@@ -24,6 +24,25 @@ using namespace std;
 namespace cocl {
 namespace flowcontrol {
 
+int ConditionalBranch::getNumChildren() {
+    int count = 0;
+    if(trueNext != 0) {
+        count++;
+    }
+    if(falseNext != 0) {
+        count++;
+    }
+    return count;
+}
+Block *ConditionalBranch::getChild(int idx) {
+    if(trueNext != 0) {
+        if(idx == 0) {
+            return trueNext;
+        }
+        return falseNext;
+    }
+    return falseNext;
+}
 std::string ConditionalBranch::generateCl(std::string indent, bool noLabel) {
     dumped = true;
     string gencode = "";

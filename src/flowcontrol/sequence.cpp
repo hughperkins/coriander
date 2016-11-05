@@ -24,6 +24,15 @@ using namespace llvm;
 namespace cocl {
 namespace flowcontrol {
 
+int Sequence::getNumChildren() {
+    return children.size();
+}
+Block *Sequence::getChild(int idx) {
+    if(idx < children.size()) {
+        return children[idx];
+    }
+    throw runtime_error("illegal request");
+}
 std::string Sequence::generateCl(std::string indent, bool noLabel) {
     dumped = true;
     string gencode = "";

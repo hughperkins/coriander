@@ -47,8 +47,8 @@ public:
     virtual void dump(std::set<const Block *> &seen, std::string indent = "") const = 0;
     virtual void replaceSuccessor(Block *oldSuccessor, Block *newSuccessor) = 0;
     virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild) = 0;
-    // virtual int getNumChildren() = 0;
-    // virtual Block *getChild(int idx) = 0;
+    virtual int getNumChildren() = 0;
+    virtual Block *getChild(int idx) = 0;
     virtual int numSuccessors() = 0;
     virtual Block *getSuccessor(int idx) = 0;
     void replaceIncoming(Block *oldIncoming, Block *newIncoming);
@@ -61,8 +61,8 @@ class RootBlock : public Block {
 public:
     Block *first = 0;
     virtual void walk(std::function<void(Block *block)> fn) override;
-    // virtual int getNumChildren();
-    // virtual Block *getChild(int idx);
+    virtual int getNumChildren() override;
+    virtual Block *getChild(int idx) override;
     virtual std::string blockType() const override;
     virtual void dump(std::set<const Block *> &seen, std::string indent = "") const  override;
     virtual void replaceSuccessor(Block *oldChild, Block *newChild) override;
@@ -79,8 +79,8 @@ public:
     Block *body = 0;
     Block *next = 0;
     virtual void walk(std::function<void(Block *block)> fn) override;
-    // virtual int getNumChildren();
-    // virtual Block *getChild(int idx);
+    virtual int getNumChildren() override;
+    virtual Block *getChild(int idx) override;
     virtual int numSuccessors() override;
     virtual Block *getSuccessor(int idx) override;
     void replaceSuccessor(Block *oldChild, Block *newChild) override;
@@ -97,8 +97,8 @@ public:
     Block *next = 0;
     bool invertCondition = false;
     virtual void walk(std::function<void(Block *block)> fn) override;
-    // virtual int getNumChildren();
-    // virtual Block *getChild(int idx);
+    virtual int getNumChildren() override;
+    virtual Block *getChild(int idx) override;
     virtual std::string blockType() const override;
     virtual void dump(std::set<const Block *> &seen, std::string indent) const override;
     virtual void replaceSuccessor(Block *oldChild, Block *newChild) override;
@@ -114,8 +114,8 @@ public:
     Block *body = 0;
     Block *next = 0;
     virtual void walk(std::function<void(Block *block)> fn) override;
-    // virtual int getNumChildren();
-    // virtual Block *getChild(int idx);
+    virtual int getNumChildren() override;
+    virtual Block *getChild(int idx) override;
     virtual std::string blockType() const override;
     virtual void dump(std::set<const Block *> &seen, std::string indent) const override;
     virtual void replaceSuccessor(Block *oldChild, Block *newChild) override;
@@ -131,8 +131,8 @@ public:
     Block *trueNext = 0;
     Block *falseNext = 0;
     virtual void walk(std::function<void(Block *block)> fn) override;
-    // virtual int getNumChildren();
-    // virtual Block *getChild(int idx);
+    virtual int getNumChildren() override;
+    virtual Block *getChild(int idx) override;
     virtual std::string blockType() const override;
     virtual void dump(std::set<const Block *> &seen, std::string indent) const override;
     virtual void replaceSuccessor(Block *oldChild, Block *newChild) override;
@@ -154,8 +154,8 @@ public:
     std::vector<llvm::PHINode *>originalIncomingPhis;
     std::map<llvm::PHINode *, llvm::Value *> migratedIntoOutgoingPhis;
     Block *next; // initially will probalby point to a Branch block
-    // virtual int getNumChildren();
-    // virtual Block *getChild(int idx);
+    virtual int getNumChildren() override;
+    virtual Block *getChild(int idx) override;
     virtual void walk(std::function<void(Block *block)> fn) override;
     virtual std::string getLabel() const override;
     virtual std::string blockType() const override;
@@ -171,8 +171,8 @@ class Sequence : public Block {
 public:
     std::vector<Block *> children;
     Block *next = 0;
-    // virtual int getNumChildren();
-    // virtual Block *getChild(int idx);
+    virtual int getNumChildren() override;
+    virtual Block *getChild(int idx) override;
     virtual void walk(std::function<void(Block *block)> fn) override;
     virtual std::string blockType() const override;
     virtual void dump(std::set<const Block *> &seen, std::string indent) const override;
@@ -186,8 +186,8 @@ public:
 class ReturnBlock : public Block {
 public:
     llvm::Instruction *retInst = 0;
-    // virtual int getNumChildren();
-    // virtual Block *getChild(int idx);
+    virtual int getNumChildren() override;
+    virtual Block *getChild(int idx) override;
     virtual void walk(std::function<void(Block *block)> fn) override;
     virtual std::string blockType() const override;
     virtual void dump(std::set<const Block *> &seen, std::string indent) const override;

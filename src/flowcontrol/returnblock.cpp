@@ -24,6 +24,12 @@ using namespace llvm;
 namespace cocl {
 namespace flowcontrol {
 
+int ReturnBlock::getNumChildren() {
+    return 0;
+}
+Block *ReturnBlock::getChild(int idx) {
+    throw runtime_error("illegal request");
+}
 std::string ReturnBlock::generateCl(std::string indent, bool noLabel) {
     dumped = true;
     string gencode = "";
