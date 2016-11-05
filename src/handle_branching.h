@@ -29,5 +29,9 @@
 namespace cocl {
     void eraseBlock(flowcontrol::Block *block);
     std::string handle_branching_simplify(llvm::Function *F);
+    std::unique_ptr<flowcontrol::RootBlock> load_branching_tree(llvm::Function *F);
+    void run_branching_transforms(flowcontrol::RootBlock *root);
+    std::string branching_write_cl(flowcontrol::RootBlock *root);
+
     extern std::vector<std::unique_ptr<flowcontrol::Block> > blocks;;
 }

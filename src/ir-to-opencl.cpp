@@ -68,6 +68,7 @@ static set<Value *> functionNeededForwardDeclarations;
 // static set<Value *>valuesAreExpressions;
 
 static bool debug = false;
+static bool runBranchingTransforms = true;
 static bool add_ir_to_cl = false;
 extern bool single_precision;
 bool single_precision = true;
@@ -1475,7 +1476,12 @@ std::string dumpFunction(Function *F) {
     string gencode = "";
     string declaration = dumpFunctionDeclaration(F);
     // COCL_PRINT(cout << declaration << endl);
-    string bodyCl = cocl::handle_branching_simplify(F);
+    std::unique_ptr<cocl::flowcontrol::RootBlock> root = cocl::load_branching_tree(F);
+    if(runBranchingTransforms) {
+        cout << "running branching transforms..." << endl;
+        cocl::run_branching_transforms(root.get());
+    }
+    string bodyCl = cocl::branching_write_cl(root.get());
 
     // functionBlockIndex.clear();
     // int i = 0;
@@ -1623,14 +1629,18 @@ int main(int argc, char *argv[]) {
     SMDiagnostic smDiagnostic;
     string target;
     string outputfilepath;
+    bool noRunBranchingTransforms = false;
+
     argparsecpp::ArgumentParser parser;
     parser.add_string_argument("--inputfile", &target)->required();
     parser.add_string_argument("--outputfile", &outputfilepath)->required();
     parser.add_bool_argument("--debug", &debug);
     parser.add_bool_argument("--add_ir_to_cl", &add_ir_to_cl);
+    parser.add_bool_argument("--no_branching_transforms", &noRunBranchingTransforms);
     if(!parser.parse_args(argc, argv)) {
         return -1;
     }
+    runBranchingTransforms = !noRunBranchingTransforms;
 
     std::unique_ptr<llvm::Module> M = parseIRFile(target, smDiagnostic, context);
     if(!M) {

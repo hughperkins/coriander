@@ -115,7 +115,7 @@ string writeOpenCL(Block *root) {
     cout << "cl: [\n" << cl << "]" << endl;
     return cl;
 }
-string handle_branching_simplify(Function *F) {
+std::unique_ptr<RootBlock> load_branching_tree(Function *F) {
     resetNextId();
     blocks.clear();
     phis.clear();
@@ -149,7 +149,8 @@ string handle_branching_simplify(Function *F) {
 
     if(F->begin() == F->end()) {
         cout << "empty function" << endl;
-        return "";
+        return root;
+        // return "";
     }
     root->first = blockByBasicBlock[&F->getEntryBlock()];
     root->first->incoming.push_back(root.get());
@@ -208,13 +209,15 @@ string handle_branching_simplify(Function *F) {
             throw runtime_error("dont know how we got here...");
         }
     }
+    return root;
+}
+void run_branching_transforms(RootBlock *root) {
+    runTransforms(root);
+}
+string branching_write_cl(RootBlock *root) {
+    string phiDeclarations = handlePhis(root);
 
-    runTransforms(root.get());
-
-    string phiDeclarations = handlePhis(root.get());
-
-    string cl = writeOpenCL(root.get());
-
+    string cl = writeOpenCL(root);
     return cl;
 }
 
