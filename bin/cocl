@@ -240,8 +240,8 @@ if [[ ! -v COMPILE ]]; then {
 OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} FINALPOSTFIX=${FINALPOSTFIX} PASSTHRU=${PASSTHRU} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${SCRIPT_DIR}/../share/cocl/cocl.Makefile
 
 if [[ ! -v COMPILE ]]; then {
-    echo linking...
-    echo COCL_LIB ${COCL_LIB}
+    # echo linking...
+    # echo COCL_LIB ${COCL_LIB}
     OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} PASSTHRU=${PASSTHRU} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${SCRIPT_DIR}/../share/cocl/cocl.Makefile ${OUTPUTBASEPATH}${FINALPOSTFIX}
     # g++  -Wl,-rpath,/usr/local/lib -Wl,-rpath,$$ORIGIN -Wl,-rpath,$$ORIGIN/clblast -o ${OUTPUTBASEPATH}${FINALPOSTFIX} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} -L${COCL_HOME}/build -L${COCL_HOME}/build/clblast -lcocl -lclblast -lOpenCL -leasycl -lclew -lpthread
 } fi

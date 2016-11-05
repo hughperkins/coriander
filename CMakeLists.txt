@@ -127,3 +127,50 @@ if(BUILD_TESTS)
     add_custom_target(run-tests
         DEPENDS ${TEST_TARGETS})
 endif(BUILD_TESTS)
+
+install(TARGETS easycl clew clblast cocl EXPORT cocl-targets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+)
+install(EXPORT cocl-targets DESTINATION lib/cocl)
+
+########### Add uninstall target ###############
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake"
+  IMMEDIATE @ONLY)
+ADD_CUSTOM_TARGET(uninstall
+  "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake") 
+
+# FILE(GLOB HEADERS_ROOT *.h)
+# FILE(GLOB HEADERS_TEMPLATES templates/*.h)
+# FILE(GLOB HEADERS_UTIL util/*.h)
+# INSTALL(FILES ${HEADERS_ROOT} DESTINATION include/easycl)
+# INSTALL(FILES ${HEADERS_TEMPLATES} DESTINATION include/easycl/templates)
+# INSTALL(FILES ${HEADERS_UTIL} DESTINATION include/easycl/util)
+# INSTALL(PROGRAMS easycl_activate.sh DESTINATION bin)
+# INSTALL(EXPORT EasyCL-targets DESTINATION lib/EasyCL)
+# if(BUILD_TESTS)
+#    INSTALL(FILES ${CLFILES} DESTINATION bin)
+#    INSTALL(TARGETS easycl_gtest easycl_unittests gpuinfo
+#       LIBRARY DESTINATION lib
+#       ARCHIVE DESTINATION lib
+#       RUNTIME DESTINATION bin
+#   )
+# endif(BUILD_TESTS)
+
+  # install -m 0755 build/ir-to-opencl $(PREFIX)/bin
+  # install -m 0755 build/patch-hostside $(PREFIX)/bin
+  # install -m 0644 build/libcocl.so $(PREFIX)/lib
+  # install -m 0644 build/libclew.so $(PREFIX)/lib
+  # install -m 0644 build/libeasycl.so $(PREFIX)/lib
+  # install -m 0644 build/clblast/libclblast.so $(PREFIX)/lib
+  # mkdir -p $(PREFIX)/share/cocl
+  # install -m 0644 share/cocl/cocl.Makefile $(PREFIX)/share/cocl/cocl.Makefile
+  # install -m 0755 bin/cocl $(PREFIX)/bin
+  # mkdir -p $(PREFIX)/include/cocl
+  # install -m 0644 include/cocl/*.h $(PREFIX)/include/cocl/
+  # install -m 0644 include/cocl/*.hpp $(PREFIX)/include/cocl/
+  # install -m 0644 src/EasyCL/thirdparty/clew/include/clew.h $(PREFIX)/include/
+  # 
