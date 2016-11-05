@@ -19,6 +19,7 @@ import pytest
 import os
 import subprocess
 from test import test_common
+from test.test_common import compile_code
 
 
 sourcecode = """
@@ -50,21 +51,21 @@ __global__ void testIfElse(int *data, int N) {
 """
 
 
-def compile_code(context, kernelSource):
-    for file in os.listdir('/tmp'):
-        if file.startswith('testprog'):
-            os.unlink('/tmp/%s' % file)
-    with open('/tmp/testprog.cu', 'w') as f:
-        f.write(kernelSource)
-    print(subprocess.check_output([
-        'bin/cocl',
-        '-c',
-        '/tmp/testprog.cu'
-    ]).decode('utf-8'))
-    with open('/tmp/testprog-device.cl', 'r') as f:
-        cl_sourcecode = f.read()
-    prog = cl.Program(context, cl_sourcecode).build()
-    return prog
+# def compile_code(context, kernelSource):
+#     for file in os.listdir('/tmp'):
+#         if file.startswith('testprog'):
+#             os.unlink('/tmp/%s' % file)
+#     with open('/tmp/testprog.cu', 'w') as f:
+#         f.write(kernelSource)
+#     print(subprocess.check_output([
+#         'bin/cocl',
+#         '-c',
+#         '/tmp/testprog.cu'
+#     ]).decode('utf-8'))
+#     with open('/tmp/testprog-device.cl', 'r') as f:
+#         cl_sourcecode = f.read()
+#     prog = cl.Program(context, cl_sourcecode).build()
+#     return prog
 
 
 def test_test_if(context, q, float_data, float_data_gpu):
@@ -76,7 +77,7 @@ __global__ void testIf(float *data, int N) {
     }
 }
 """
-    prog = compile_code(context, sourcecode)
+    prog = compile_code(cl, context, sourcecode)
     float_data_orig = np.copy(float_data)
 
     N = 2
@@ -104,7 +105,7 @@ __global__ void testIfElse(float *data, int N) {
     }
 }
 """
-    prog = compile_code(context, sourcecode)
+    prog = compile_code(cl, context, sourcecode)
     float_data_orig = np.copy(float_data)
 
     N = 2
@@ -134,7 +135,7 @@ __global__ void testIfElse(float *data, int N) {
     data[0] = sum;
 }
 """
-    prog = compile_code(context, sourcecode)
+    prog = compile_code(cl, context, sourcecode)
     float_data_orig = np.copy(float_data)
 
     N = 2
@@ -157,7 +158,7 @@ __global__ void testInline(float *data, int N) {
     somefunc(data);
 }
 """
-    prog = compile_code(context, sourcecode)
+    prog = compile_code(cl, context, sourcecode)
     float_data_orig = np.copy(float_data)
 
     N = 4
@@ -181,7 +182,7 @@ __global__ void testFor(float *data, int N) {
     }
 }
 """
-    prog = compile_code(context, sourcecode)
+    prog = compile_code(cl, context, sourcecode)
     float_data_orig = np.copy(float_data)
 
     N = 4
@@ -216,7 +217,7 @@ __global__ void testTwoFors(float *data, int N) {
     }
 }
 """
-    prog = compile_code(context, sourcecode)
+    prog = compile_code(cl, context, sourcecode)
     float_data_orig = np.copy(float_data)
 
     N = 4
@@ -250,7 +251,7 @@ __global__ void mykernel(float *data, int a, int b) {
     myfunc(data, a, b);
 }
 """
-    prog = compile_code(context, source)
+    prog = compile_code(cl, context, source)
     float_data_orig = np.copy(float_data)
 
     a = 2
@@ -272,3 +273,35 @@ __global__ void mykernel(float *data, int a, int b) {
     assert float_data[1] == float_data_orig[2]
     assert abs(float_data[0] - sum) <= 1e-4
     # assert abs(float_data[0] - sum(float_data_orig[0:32])) < 1e-4
+
+
+def test_conditional_branch(context, q, float_data, float_data_gpu):
+    """
+    Just use normal if...else, but turn off branching transformations, and check
+    opencl works ok
+    """
+    sourcecode = """
+__global__ void testIfElse(float *data, int N) {
+    int tid = threadIdx.x;
+    if(tid < N) {
+        data[tid] *= 2;
+    } else {
+        data[tid] += 5;
+    }
+}
+"""
+    prog = compile_code(cl, context, sourcecode, branching_transformations=False)
+    float_data_orig = np.copy(float_data)
+
+    N = 2
+    prog.__getattr__(test_common.mangle('testIfElse', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(N), cl.LocalMemory(4))
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_code = f.read()
+    print('cl_code', cl_code)
+    for i in range(10):
+        if i < N:
+            assert float_data[i] == float_data_orig[i] * 2
+        else:
+            assert abs(float_data[i] - float_data_orig[i] - 5) <= 1e-4

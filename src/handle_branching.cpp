@@ -104,17 +104,6 @@ string handlePhis(Block *root) {
     return phiDeclarations;
 }
 
-string writeOpenCL(Block *root) {
-    string cl = root->generateCl("    ");
-    // string phiDeclarations = "";
-    // for(auto it=phis.begin(); it != phis.end(); it++) {
-    //     PHINode *phi = *it;
-    //     phiDeclarations += addPHIDeclaration(phi) + "\n";
-    // }
-    // cl = phiDeclarations + cl;
-    cout << "cl: [\n" << cl << "]" << endl;
-    return cl;
-}
 std::unique_ptr<RootBlock> load_branching_tree(Function *F) {
     resetNextId();
     blocks.clear();
@@ -214,10 +203,49 @@ std::unique_ptr<RootBlock> load_branching_tree(Function *F) {
 void run_branching_transforms(RootBlock *root) {
     runTransforms(root);
 }
+void addLabels() {
+    // find any conditionalbranch, and set `needsLabel` to true for its destinations
+    for(auto it=blocks.begin(); it != blocks.end(); it++) {
+        Block *block = it->get();
+        if(ConditionalBranch *branch = dynamic_cast<ConditionalBranch *>(block)) {
+            if(branch->trueNext != 0) {
+                BasicBlockBlock *next = dynamic_cast<BasicBlockBlock *>(branch->trueNext);
+                next->needsLabel = true;
+            }
+            if(branch->falseNext != 0) {
+                BasicBlockBlock *next = dynamic_cast<BasicBlockBlock *>(branch->falseNext);
+                next->needsLabel = true;
+            }
+        }
+    }
+}
+void markBlocksUnwritten() {
+    // will tag each block as not having being dumped
+    // after dumping, we'll dump any that weren't dumped yet
+    for(auto it=blocks.begin(); it != blocks.end(); it++) {
+        Block *block = it->get();
+        block->dumped = false;
+    }
+}
+string dumpUnwrittenBlocks() {
+    string gencode = "";
+    for(auto it=blocks.begin(); it != blocks.end(); it++) {
+        Block *block = it->get();
+        if(!block->dumped) {
+            block->dumped = true;
+            gencode += block->generateCl("    ");
+        }
+    }
+    return gencode;
+}
 string branching_write_cl(RootBlock *root) {
     string phiDeclarations = handlePhis(root);
 
-    string cl = writeOpenCL(root);
+    addLabels();
+    markBlocksUnwritten();
+    string cl = root->generateCl("    ");
+    cl += dumpUnwrittenBlocks();
+    cout << "cl: [\n" << cl << "]" << endl;
     return cl;
 }
 

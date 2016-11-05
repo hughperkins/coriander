@@ -27,17 +27,23 @@ def mangle(name, param_types):
     return mangled
 
 
-def compile_code(cl, context, kernelSource):
+def compile_code(cl, context, kernelSource, branching_transformations=True):
     for file in os.listdir('/tmp'):
         if file.startswith('testprog'):
             os.unlink('/tmp/%s' % file)
     with open('/tmp/testprog.cu', 'w') as f:
         f.write(kernelSource)
-    print(subprocess.check_output([
+    args = []
+    if not branching_transformations:
+        args.append('--no_branching_transforms')
+    res = subprocess.run([
         'bin/cocl',
         '-c',
         '/tmp/testprog.cu'
-    ]).decode('utf-8'))
+    ] + args, stdout=subprocess.PIPE)
+    print(' '.join(res.args))
+    print(res.stdout.decode('utf-8'))
+    assert res.returncode == 0
     with open('/tmp/testprog-device.cl', 'r') as f:
         cl_sourcecode = f.read()
     prog = cl.Program(context, cl_sourcecode).build()

@@ -27,6 +27,7 @@ if [[ -f ${COCL_HOME}/bin/ir-to-opencl ]]; then {
 
 # echo args "$@"
 PASSTHRU=
+export IROOPENCLARGS=
 while [[ x$1 != x ]]; do {
     # echo 1 $1
     arr1=(${1//=/ })
@@ -99,6 +100,9 @@ while [[ x$1 != x ]]; do {
             -isystem)
                 # PASSTHRU="$PASSTHRU $1 $2"
                 shift
+                ;;
+            --no_branching_transforms)
+                IROOPENCLARGS="${IROOPENCLARGS} --no_branching_transforms"
                 ;;
             -gencode)
                 # echo ignoring -gencode

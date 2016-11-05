@@ -36,6 +36,7 @@ class Block {
 public:
     int id;
     std::vector<Block *>incoming;
+    bool dumped = false;
 
     Block();
     virtual std::string blockType() const;
@@ -46,19 +47,22 @@ public:
     virtual Block *getSuccessor(int idx) = 0;
     void replaceIncoming(Block *oldIncoming, Block *newIncoming);
     void removeIncoming(Block *targetIncoming);
-    virtual std::string generateCl(std::string indent) = 0;
+    virtual std::string generateCl(std::string indent, bool noLabel=false) = 0;
+    virtual std::string getLabel() const {
+        throw std::runtime_error("Not implemented, getLabel for this node type " + blockType());
+    }
 };
 
 class RootBlock : public Block {
 public:
     Block *first = 0;
-    virtual std::string blockType() const;
-    virtual void dump(std::set<const Block *> &seen, std::string indent = "") const;
-    virtual void replaceSuccessor(Block *oldChild, Block *newChild);
-    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
-    virtual int numSuccessors();
-    virtual Block *getSuccessor(int idx);
-    virtual std::string generateCl(std::string indent);
+    virtual std::string blockType() const override;
+    virtual void dump(std::set<const Block *> &seen, std::string indent = "") const  override;
+    virtual void replaceSuccessor(Block *oldChild, Block *newChild) override;
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild) override;
+    virtual int numSuccessors() override;
+    virtual Block *getSuccessor(int idx) override;
+    virtual std::string generateCl(std::string indent, bool noLabel=false) override;
 };
 
 class For : public Block {
@@ -67,12 +71,12 @@ public:
     llvm::Value *condition = 0;
     Block *body = 0;
     Block *next = 0;
-    virtual int numSuccessors();
-    virtual Block *getSuccessor(int idx);
-    void replaceSuccessor(Block *oldChild, Block *newChild);
-    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
-    virtual void dump(std::set<const Block *> &seen, std::string indent) const;
-    virtual std::string generateCl(std::string indent);
+    virtual int numSuccessors() override;
+    virtual Block *getSuccessor(int idx) override;
+    void replaceSuccessor(Block *oldChild, Block *newChild) override;
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild) override;
+    virtual void dump(std::set<const Block *> &seen, std::string indent) const override;
+    virtual std::string generateCl(std::string indent, bool noLabel=false) override;
 };
 
 class If : public Block {
@@ -82,13 +86,13 @@ public:
     Block *falseBlock = 0;
     Block *next = 0;
     bool invertCondition = false;
-    virtual std::string blockType() const;
-    virtual void dump(std::set<const Block *> &seen, std::string indent) const;
-    virtual void replaceSuccessor(Block *oldChild, Block *newChild);
-    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
-    virtual int numSuccessors();
-    virtual Block *getSuccessor(int idx);
-    virtual std::string generateCl(std::string indent);
+    virtual std::string blockType() const override;
+    virtual void dump(std::set<const Block *> &seen, std::string indent) const override;
+    virtual void replaceSuccessor(Block *oldChild, Block *newChild) override;
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild) override;
+    virtual int numSuccessors() override;
+    virtual Block *getSuccessor(int idx) override;
+    virtual std::string generateCl(std::string indent, bool noLabel=false) override;
 };
 
 class DoWhile : public Block {
@@ -96,13 +100,13 @@ public:
     llvm::Value *condition = 0;
     Block *body = 0;
     Block *next = 0;
-    virtual std::string blockType() const;
-    virtual void dump(std::set<const Block *> &seen, std::string indent) const;
-    virtual void replaceSuccessor(Block *oldChild, Block *newChild);
-    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
-    virtual int numSuccessors();
-    virtual Block *getSuccessor(int idx);
-    virtual std::string generateCl(std::string indent);
+    virtual std::string blockType() const override;
+    virtual void dump(std::set<const Block *> &seen, std::string indent) const override;
+    virtual void replaceSuccessor(Block *oldChild, Block *newChild) override;
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild) override;
+    virtual int numSuccessors() override;
+    virtual Block *getSuccessor(int idx) override;
+    virtual std::string generateCl(std::string indent, bool noLabel=false) override;
 };
 
 class ConditionalBranch : public Block {
@@ -110,57 +114,60 @@ public:
     llvm::Value *condition = 0;
     Block *trueNext = 0;
     Block *falseNext = 0;
-    virtual std::string blockType() const;
-    virtual void dump(std::set<const Block *> &seen, std::string indent) const;
-    virtual void replaceSuccessor(Block *oldChild, Block *newChild);
-    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
-    virtual int numSuccessors();
-    virtual Block *getSuccessor(int idx);
-    virtual std::string generateCl(std::string indent) {
-        std::cout << "ConditionalBranch not wiped it seems" << std::endl;
-        throw std::runtime_error("we're trying to get rid of these...");
-    }
+    virtual std::string blockType() const override;
+    virtual void dump(std::set<const Block *> &seen, std::string indent) const override;
+    virtual void replaceSuccessor(Block *oldChild, Block *newChild) override;
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild) override;
+    virtual int numSuccessors() override;
+    virtual Block *getSuccessor(int idx) override;
+    virtual std::string generateCl(std::string indent, bool noLabel=false) override;
+    // virtual std::string generateCl(std::string indent) {
+    //     std::cout << "ConditionalBranch not wiped it seems" << std::endl;
+    //     throw std::runtime_error("we're trying to get rid of these...");
+    // }
 };
 
 class BasicBlockBlock : public Block {
 public:
+    bool needsLabel = true;
     llvm::BasicBlock *basicBlock = 0;
     std::vector<llvm::Instruction *> instructions;
     std::vector<llvm::PHINode *>originalIncomingPhis;
     std::map<llvm::PHINode *, llvm::Value *> migratedIntoOutgoingPhis;
     Block *next; // initially will probalby point to a Branch block
-    virtual std::string blockType() const;
-    virtual void dump(std::set<const Block *> &seen, std::string indent) const;
-    virtual void replaceSuccessor(Block *oldChild, Block *newChild);
-    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
-    virtual int numSuccessors();
-    virtual Block *getSuccessor(int idx);
-    virtual std::string generateCl(std::string indent);
+    virtual std::string getLabel() const override;
+    virtual std::string blockType() const override;
+    virtual void dump(std::set<const Block *> &seen, std::string indent) const override;
+    virtual void replaceSuccessor(Block *oldChild, Block *newChild) override;
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild) override;
+    virtual int numSuccessors() override;
+    virtual Block *getSuccessor(int idx) override;
+    virtual std::string generateCl(std::string indent, bool noLabel=false) override;
 };
 
 class Sequence : public Block {
 public:
     std::vector<Block *> children;
     Block *next = 0;
-    virtual std::string blockType() const;
-    virtual void dump(std::set<const Block *> &seen, std::string indent) const;
-    virtual void replaceSuccessor(Block *oldChild, Block *newChild);
-    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
-    virtual int numSuccessors();
-    virtual Block *getSuccessor(int idx);
-    virtual std::string generateCl(std::string indent);
+    virtual std::string blockType() const override;
+    virtual void dump(std::set<const Block *> &seen, std::string indent) const override;
+    virtual void replaceSuccessor(Block *oldChild, Block *newChild) override;
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild) override;
+    virtual int numSuccessors() override;
+    virtual Block *getSuccessor(int idx) override;
+    virtual std::string generateCl(std::string indent, bool noLabel=false) override;
 };
 
 class ReturnBlock : public Block {
 public:
     llvm::Instruction *retInst = 0;
-    virtual std::string blockType() const;
-    virtual void dump(std::set<const Block *> &seen, std::string indent) const;
-    virtual void replaceSuccessor(Block *oldChild, Block *newChild);
-    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild);
-    virtual int numSuccessors();
-    virtual Block *getSuccessor(int idx);
-    virtual std::string generateCl(std::string indent);
+    virtual std::string blockType() const override;
+    virtual void dump(std::set<const Block *> &seen, std::string indent) const override;
+    virtual void replaceSuccessor(Block *oldChild, Block *newChild) override;
+    virtual void replaceChildOrSuccessor(Block *oldChild, Block *newChild) override;
+    virtual int numSuccessors() override;
+    virtual Block *getSuccessor(int idx) override;
+    virtual std::string generateCl(std::string indent, bool noLabel=false) override;
 };
 
 } // flowcontrol

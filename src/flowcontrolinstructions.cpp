@@ -16,6 +16,7 @@
 #include "ir-to-opencl.h"
 
 #include <iostream>
+#include <sstream>
 
 namespace cocl {
 namespace flowcontrol {
@@ -26,6 +27,13 @@ using namespace std;
 using namespace cocl;
 using namespace cocl::flowcontrol;
 using namespace llvm;
+
+template<typename T>
+inline string toString(T val) {
+    ostringstream oss;
+    oss << val;
+    return oss.str();
+}
 
 void resetNextId() {
     nextId = 0;
@@ -73,7 +81,8 @@ void Block::removeIncoming(Block *targetIncoming) {
     throw runtime_error("illegal parameters");
 }
 
-std::string RootBlock::generateCl(std::string indent) {
+std::string RootBlock::generateCl(std::string indent, bool noLabel) {
+    dumped = true;
     string gencode = "";
     gencode += first->generateCl(indent);
     return gencode;
@@ -109,10 +118,11 @@ Block *RootBlock::getSuccessor(int idx) {
     // return first;
 }
 
-std::string For::generateCl(std::string indent) {
+std::string For::generateCl(std::string indent, bool noLabel) {
+    dumped = true;
     string gencode = "";
     gencode += indent + "for(\n";
-    gencode += preBlock->generateCl(indent + "    ");
+    gencode += preBlock->generateCl(indent + "    ", true);
     gencode += indent + "    ; " + dumpOperand(condition) + ";) {\n";
     gencode += body->generateCl(indent + "    ");
     gencode += indent + "}\n";
@@ -171,7 +181,8 @@ void For::dump(set<const Block *> &seen, string indent) const {
     }
 }
 
-std::string If::generateCl(std::string indent) {
+std::string If::generateCl(std::string indent, bool noLabel) {
+    dumped = true;
     string gencode = "";
     cout << "condition " << (void *)condition << endl;
     if(invertCondition) {
@@ -280,6 +291,32 @@ Block *If::getSuccessor(int idx) {
     // throw runtime_error("illegal request");
 }
 
+std::string ConditionalBranch::generateCl(std::string indent, bool noLabel) {
+    dumped = true;
+    string gencode = "";
+    cout << "condition " << (void *)condition << endl;
+    bool invertCondition = false;
+    if(trueNext == 0) {
+        invertCondition = true;
+    }
+    if(invertCondition) {
+        gencode += indent + "if(!" + dumpOperand(condition) + ") {\n";
+    } else {
+        gencode += indent + "if(" + dumpOperand(condition) + ") {\n";
+    }
+    if(invertCondition) {
+        gencode += indent + "    goto " + falseNext->getLabel() + ";\n";
+        gencode += indent + "}\n";
+    } else {
+        gencode += indent + "    goto " + trueNext->getLabel() + ";\n";
+        if(falseNext != 0) {
+            gencode += indent + "} else {\n";
+            gencode += indent + "    goto " + falseNext->getLabel() + ";\n";
+        }
+        gencode += indent + "}\n";
+    }
+    return gencode;
+}
 string ConditionalBranch::blockType() const {
     return "ConditionalBranch";
 }
@@ -349,8 +386,13 @@ Block *ConditionalBranch::getSuccessor(int idx) {
     throw runtime_error("illegal request");
 }
 
-std::string BasicBlockBlock::generateCl(std::string indent) {
+std::string BasicBlockBlock::generateCl(std::string indent, bool noLabel) {
+    dumped = true;
     string gencode = "";
+    if(needsLabel && !noLabel) {
+        gencode += "\n";
+        gencode += indent + getLabel() + ":;\n";
+    }
     for(auto it=instructions.begin(); it != instructions.end(); it++) {
         Instruction *inst = *it;
         gencode += dumpInstruction(indent, inst);
@@ -364,9 +406,16 @@ std::string BasicBlockBlock::generateCl(std::string indent) {
         addPHIDeclaration(phi);
     }
     if(next != 0) {
-        gencode += next->generateCl(indent);
+        if(!next->dumped) {
+            gencode += next->generateCl(indent);
+        } else {
+            gencode += indent + "goto " + next->getLabel() + ";\n";
+        }
     }
     return gencode;
+}
+std::string BasicBlockBlock::getLabel() const {
+    return "label" + toString(id);
 }
 string BasicBlockBlock::blockType() const {
     return "BasicBlockBlock";
@@ -408,7 +457,8 @@ Block *BasicBlockBlock::getSuccessor(int idx) {
     return next;
 }
 
-std::string Sequence::generateCl(std::string indent) {
+std::string Sequence::generateCl(std::string indent, bool noLabel) {
+    dumped = true;
     string gencode = "";
     for(auto it=children.begin(); it != children.end(); it++) {
         Block *child = *it;
@@ -494,7 +544,8 @@ Block *Sequence::getSuccessor(int idx) {
     return next;
 }
 
-std::string ReturnBlock::generateCl(std::string indent) {
+std::string ReturnBlock::generateCl(std::string indent, bool noLabel) {
+    dumped = true;
     string gencode = "";
     gencode += dumpInstruction(indent, retInst);
     return gencode;
@@ -518,7 +569,8 @@ Block *ReturnBlock::getSuccessor(int idx) {
     throw runtime_error("illegal request");
 }
 
-std::string DoWhile::generateCl(std::string indent) {
+std::string DoWhile::generateCl(std::string indent, bool noLabel) {
+    dumped = true;
     string gencode = "";
     gencode += indent + "do {\n";
     gencode += body->generateCl(indent + "    ");
