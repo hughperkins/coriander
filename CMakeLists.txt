@@ -121,5 +121,8 @@ if(BUILD_TESTS)
         add_custom_target(run-${TEST}
             COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TEST}
         )
+        set(TEST_TARGETS ${TEST_TARGETS} run-${TEST})
     endforeach()
+    add_custom_target(run-tests
+        DEPENDS ${TEST_TARGETS})
 endif(BUILD_TESTS)
