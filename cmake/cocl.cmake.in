@@ -1,0 +1,16 @@
+macro(add_cocl_executable OUTPUT SRCFILE)
+    get_directory_property(CURRENT_INCLUDE INCLUDE_DIRECTORIES)
+    STRING(REGEX MATCHALL "[^;]+" CURRENT_INCLUDE "${CURRENT_INCLUDE}")
+    foreach(INCDIR ${CURRENT_INCLUDE})
+        SET(INCLUDE_ARGS ${INCLUDE_ARGS} -I ${INCDIR})
+    endforeach()
+
+    add_custom_command(
+        OUTPUT ${OUTPUT}
+        COMMENT "@CMAKE_INSTALL_PREFIX@/bin/cocl ${INCLUDE_ARGS} ${SRCFILE} -o ${OUTPUT}"
+        COMMAND @CMAKE_INSTALL_PREFIX@/bin/cocl ${INCLUDE_ARGS} ${SRCFILE} -o ${OUTPUT}
+    )
+    add_custom_target(build_${OUTPUT} ALL
+        DEPENDS ${OUTPUT}
+    )
+endmacro(add_cocl_executable)
