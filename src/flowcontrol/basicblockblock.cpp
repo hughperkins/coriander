@@ -76,7 +76,7 @@ string BasicBlockBlock::blockType() const {
 }
 void BasicBlockBlock::dump(set<const Block *> &seen, string indent) const {
     seen.insert(this);
-    cout << indent << "BasicBlockBlock " << this->id << gotoFreeString() << isExitString() << endl;
+    cout << indent << "BasicBlockBlock " << this->id << gotoFreeString() << isExitString() << uncontainedJumpsString() << endl;
     if(next == 0) {
         return;
     }

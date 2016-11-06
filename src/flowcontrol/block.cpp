@@ -28,6 +28,7 @@ namespace flowcontrol {
 Block::Block() {
     this->id = getNextId();
     incNextId();
+    containedNodes.insert(this->id);
 }
 string Block::blockType() const {
     return "Block";

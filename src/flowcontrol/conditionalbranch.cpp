@@ -83,7 +83,7 @@ string ConditionalBranch::blockType() const {
 }
 void ConditionalBranch::dump(set<const Block *> &seen, string indent) const {
     seen.insert(this);
-    cout << indent << "ConditionalBranch " << this->id << gotoFreeString() << isExitString() << endl;
+    cout << indent << "ConditionalBranch " << this->id << gotoFreeString() << isExitString() << uncontainedJumpsString() << endl;
     cout << indent << "  True:" << endl;
     if(seen.find(trueNext) == seen.end()) {
         trueNext->dump(seen, indent + "    ");

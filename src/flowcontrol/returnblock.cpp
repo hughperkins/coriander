@@ -47,7 +47,7 @@ string ReturnBlock::blockType() const {
     return "ReturnBlock";
 }
 void ReturnBlock::dump(set<const Block *> &seen, string indent) const {
-    cout << indent << "*** ReturnBlock " << this->id << gotoFreeString() << isExitString() << endl;
+    cout << indent << "*** ReturnBlock " << this->id << gotoFreeString() << isExitString() << uncontainedJumpsString() << endl;
 }
 void ReturnBlock::replaceSuccessor(Block *oldChild, Block *newChild) {
     throw runtime_error("couldnt find old child");

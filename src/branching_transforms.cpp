@@ -463,7 +463,7 @@ bool huntExitConditionals(Block *block) {
     //   false: exit node
     // or:
     // cond:
-    //    false: (something)
+    //    false: (something, => but must have no branches that leave <=)
     //    true: exit node
     // resulting if is *not* goto-free, but at least removes a conditional branch fro mthe system
     // in this functiion we handle the first case: false causes exit

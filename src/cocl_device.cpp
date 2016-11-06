@@ -1,7 +1,6 @@
 #include "cocl/cocl_device.h"
 
 #include "cocl/cocl_context.h"
-#include "cocl/local_config.h"
 
 #include "EasyCL/EasyCL.h"
 

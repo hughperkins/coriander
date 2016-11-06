@@ -15,7 +15,6 @@
 #include "cocl/cocl_context.h"
 
 #include "cocl/hostside_opencl_funcs.h"
-#include "cocl/local_config.h"
 #include "cocl/cocl_streams.h"
 
 #include <iostream>

@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 option(BUILD_TESTS "Build tests" OFF)
+option(COCL_SPAM "Lots of scrolly debug text.  Mostly for maintainer usage" OFF)
 
 set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/platforminfo_helper.cpp src/EasyCL/EasyCL.cpp
     src/EasyCL/deviceinfo_helper.cpp src/EasyCL/util/easycl_stringhelper.cpp src/EasyCL/DevicesInfo.cpp src/EasyCL/DeviceInfo.cpp)
@@ -14,6 +15,9 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC ${LLVM_COMPILE_FLAGS}")
 add_definitions(-DUSE_CLEW)  # turns off direct linking with libOpenCL.so, all goes via clew dynamic loader (no need to link with libOpenCL at build time)
 # for llvm:
 add_definitions(-D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS)
+if(COCL_SPAM)
+    add_definitions(-DCOCL_SPAM)
+endif()
 
 set (LLVM_LIBS /usr/lib/llvm-3.8/lib/libLLVM.so)
 

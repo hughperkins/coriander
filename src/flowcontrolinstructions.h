@@ -38,6 +38,8 @@ class Block {
 public:
     int id;
     std::vector<Block *>incoming;
+    std::set<int>containedNodes; // this node and its children (doesnt include successors)
+    std::set<int>uncontainedJumps; // any branch instructions that point to outside of this node or its childdren (branche sto successors count as 'outside')
     bool dumped = false;
     bool gotoFree = false;
     bool isExit = false;  // does entering this block definitively lead to exit, no matter how any of the subblock
@@ -66,6 +68,12 @@ public:
     std::string isExitString() const {
         if(isExit) {
             return " [EXIT]";
+        }
+        return "";
+    }
+    std::string uncontainedJumpsString() const {
+        if(!uncontainedJumps.empty()) {
+            return " [No uncontained jumps]";
         }
         return "";
     }

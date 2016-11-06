@@ -87,7 +87,7 @@ string If::blockType() const {
 }
 void If::dump(set<const Block *> &seen, string indent) const {
     seen.insert(this);
-    cout << indent << "If " << this->id << gotoFreeString() << isExitString() << endl;
+    cout << indent << "If " << this->id << gotoFreeString() << isExitString() << uncontainedJumpsString() << endl;
     cout << indent << "  True:" << endl;
     if(seen.find(trueBlock) == seen.end()) {
         trueBlock->dump(seen, indent + "    ");

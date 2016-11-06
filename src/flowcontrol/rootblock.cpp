@@ -53,7 +53,7 @@ string RootBlock::blockType() const {
 }
 void RootBlock::dump(set<const Block *> &seen, string indent) const {
     seen.insert(this);
-    cout << indent << "RootBlock " << this->id << gotoFreeString() << endl;
+    cout << indent << "RootBlock " << this->id << gotoFreeString() << uncontainedJumpsString() << endl;
     if(seen.find(first) == seen.end()) {
         first->dump(seen, indent + "  ");
     }

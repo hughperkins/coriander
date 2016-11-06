@@ -19,7 +19,6 @@
 #include "argparsecpp.h"
 #include "ir-to-opencl-common.h"
 #include "struct_clone.h"
-#include "cocl/local_config.h"
 #include "handle_branching.h"
 #include "branching_transforms.h"
 
