@@ -189,6 +189,9 @@ bool huntTrueIfs(Block *block) {
                 if(trueChild->getSuccessor(0) != falseChild) {
                     continue;
                 }
+                if(!trueChild->gotoFree) {
+                    continue;
+                }
 
                 unique_ptr<If> ifBlock(new If());
                 migrateIncoming(cond, ifBlock.get());
@@ -209,6 +212,7 @@ bool huntTrueIfs(Block *block) {
                 falseChild->removeIncoming(cond);
 
                 eraseBlock(cond);
+                ifBlock->gotoFree = true;
                 blocks.push_back(std::move(ifBlock));
                 foundFor = true;
                 numChanges++;
