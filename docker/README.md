@@ -11,6 +11,17 @@ hacking around the CMakeLists.txt file etc...)
 
 - have installed docker
 
+### Non-nvidia platforms
+
+- You can build.  But you wont be able to run.  Since no OpenCL driver...
+
+To build:
+```
+git clone --recursive https://github.com/hughperkins/cuda-on-cl
+cd cuda-on-cl/docker
+docker build ./ -t cocl
+```
+
 ### NVIDIA platforms
 
 #### Pre-requisites
