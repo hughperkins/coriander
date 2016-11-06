@@ -22,6 +22,8 @@ cd cuda-on-cl/docker
 docker build ./ -t cocl
 ```
 
+Update: bhack informed me of a project to let one run docker containers on beignet https://github.com/chihchun/opencl-docker
+
 ### NVIDIA platforms
 
 #### Pre-requisites
