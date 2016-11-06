@@ -16,6 +16,8 @@ Dockerfiles for Beignet and NVIDIA systems.
 
 #### Procedure:
 ```
+git clone --recursive https://github.com/hughperkins/cuda-on-cl
+cd cuda-on-cl/docker
 docker build ./ --file Dockerfile-beignet -t coclbeignet
 sudo docker run --device /dev/dri:/dev/dri -it coclbeignet
 ```
