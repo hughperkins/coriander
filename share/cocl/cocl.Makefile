@@ -35,7 +35,7 @@ $(OUTPUTBASEPATH)-hostpatched.ll: $(OUTPUTBASEPATH)-hostraw.ll $(OUTPUTBASEPATH)
 		--hostpatchedfile $@
 
 $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX): $(OUTPUTBASEPATH)-hostpatched.ll
-	$(CLANG) $(PASSTHRU) -c $< -O3 $(OPT_G) -o $@
+	$(CLANG) $(PASSTHRU) -DUSE_CLEW -c $< -O3 $(OPT_G) -o $@
 
 $(OUTPUTBASEPATH)$(FINALPOSTFIX): $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX) ${COCL_LIB}/libclew.so ${COCL_LIB}/libcocl.so ${COCL_LIB}/libclblast.so
 	g++ -Wl,-rpath,$(COCL_LIB) -Wl,-rpath,$$ORIGIN -o $@ $< -L${COCL_LIB} -lcocl -lclblast -leasycl -lclew -lpthread
