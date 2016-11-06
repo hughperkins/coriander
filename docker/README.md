@@ -11,18 +11,21 @@ hacking around the CMakeLists.txt file etc...)
 
 - have installed docker
 
-### Non-nvidia platforms
+### Beignet platform
 
-- You can build.  But you wont be able to run.  Since no OpenCL driver...
+#### Pre-requisites
 
-To build:
+- have ubuntu with an Intel HD GPU device
+
+#### Procedure:
 ```
-git clone --recursive https://github.com/hughperkins/cuda-on-cl
-cd cuda-on-cl/docker
-docker build ./ -t cocl
+docker build ./ --file Dockerfile-beignet -t coclbeignet
+sudo docker run --device /dev/dri:/dev/dri -it coclbeignet
 ```
 
-Update: bhack informed me of a project to let one run docker containers on beignet https://github.com/chihchun/opencl-docker
+(Based on https://github.com/chihchun/opencl-docker, following heads-up from bhack)
+
+<img src="https://github.com/hughperkins/cuda-on-cl/tree/master/doc/img/dockerfile_beignet_cudasample.png?raw=true" width="600" />
 
 ### NVIDIA platforms
 
@@ -54,3 +57,12 @@ cp /cuda-on-cl/test/cuda_sample.cu .
 cocl cuda_sample.cu
 ./cuda_sample
 ```
+
+### Other platforms
+
+- You'll need to find a way of using docker with your gpu driver.
+- Then copy and hack one of the existing dockerfiles to work with your device/driver.
+
+You might find some options at: https://github.com/chihchun/opencl-docker
+
+Update: bhack informed me of a project to let one run docker containers on beignet https://github.com/chihchun/opencl-docker
