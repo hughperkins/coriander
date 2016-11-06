@@ -24,7 +24,7 @@ using namespace llvm;
 namespace cocl {
 namespace flowcontrol {
 
-int Sequence::getNumChildren() {
+int Sequence::getNumChildren() const {
     return children.size();
 }
 Block *Sequence::getChild(int idx) {
@@ -60,7 +60,7 @@ string Sequence::blockType() const {
 }
 void Sequence::dump(set<const Block *> &seen, string indent) const {
     seen.insert(this);
-    cout << indent << "Sequence " << this->id << endl;
+    cout << indent << "Sequence " << this->id << gotoFreeString() << " succ=" << numSuccessors() << " inc=" << incoming.size() << endl;
     for(auto it = children.begin(); it != children.end(); it++) {
         Block *child = *it;
         if(seen.find(child) == seen.end()) {
@@ -106,7 +106,7 @@ void Sequence::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
     }
     throw runtime_error("couldnt find old child");
 }
-int Sequence::numSuccessors() {
+int Sequence::numSuccessors() const {
     int count = 0;
     if(next != 0) {
         count++;

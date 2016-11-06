@@ -24,7 +24,7 @@ using namespace llvm;
 namespace cocl {
 namespace flowcontrol {
 
-int DoWhile::getNumChildren() {
+int DoWhile::getNumChildren() const {
     return 1;
 }
 Block *DoWhile::getChild(int idx) {
@@ -56,7 +56,7 @@ void DoWhile::walk(std::function<void(Block *block)> fn) {
 string DoWhile::blockType() const {
     return "DoWhile";
 }
-int DoWhile::numSuccessors() {
+int DoWhile::numSuccessors() const {
     if(next != 0) {
         return 1;
     }
@@ -88,7 +88,7 @@ void DoWhile::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
 }
 void DoWhile::dump(set<const Block *> &seen, string indent) const {
     seen.insert(this);
-    cout << indent << "DoWhile " << this->id << endl;
+    cout << indent << "DoWhile " << this->id << gotoFreeString() << endl;
     cout << indent << "  Body:" << endl;
     body->dump(seen, indent + "    ");
     if(next != 0) {

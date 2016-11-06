@@ -24,7 +24,7 @@ using namespace llvm;
 namespace cocl {
 namespace flowcontrol {
 
-int RootBlock::getNumChildren() {
+int RootBlock::getNumChildren() const {
     if(first != 0) {
         return 1;
     }
@@ -53,7 +53,7 @@ string RootBlock::blockType() const {
 }
 void RootBlock::dump(set<const Block *> &seen, string indent) const {
     seen.insert(this);
-    cout << indent << "RootBlock " << this->id << endl;
+    cout << indent << "RootBlock " << this->id << gotoFreeString() << endl;
     if(seen.find(first) == seen.end()) {
         first->dump(seen, indent + "  ");
     }
@@ -65,7 +65,7 @@ void RootBlock::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
     assert(first == oldChild);
     first = newChild;
 }
-int RootBlock::numSuccessors() {
+int RootBlock::numSuccessors() const {
     return 0;
 }
 Block *RootBlock::getSuccessor(int idx) {

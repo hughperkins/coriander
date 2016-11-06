@@ -254,6 +254,10 @@ bool huntFalseIfs(Block *block) {
                 ifBlock->falseBlock = 0;
                 ifBlock->next = falseChild;
                 ifBlock->invertCondition = true;
+                cout << "creating falseif" << endl;
+                cout << "condition " << cond->id << endl;
+                cout << "trueblock " << trueChild->id << endl;
+                cout << "next " << falseChild->id << endl;
 
                 trueChild->incoming.clear();
                 trueChild->incoming.push_back(ifBlock.get());
@@ -495,50 +499,50 @@ bool huntFors(Block *block) {
 
 void runTransforms(Block *root) {
     //walk(root);
-    set<const Block *>seen;
-    // seen->
-    root->dump(seen, "");
+    // set<const Block *>seen;
+    // root->dump(seen, "");
 
     // int numChanges = 1;
     bool madeChanges =  true;
     while(madeChanges > 0) {
         madeChanges = false;
         if(mergeSequences(root)) {
+            // cout << "merge changes made" << endl;
             madeChanges = true;
-            seen.clear();
-            root->dump(seen, "");
+            // seen.clear();
+            // root->dump(seen, "");
         }
 
         if(huntTrueIfs(root)) {
             madeChanges = true;
-            seen.clear();
-            root->dump(seen, "");
+            // seen.clear();
+            // root->dump(seen, "");
         }
 
         if(huntFalseIfs(root)) {
             madeChanges = true;
-            seen.clear();
-            root->dump(seen, "");
+            // seen.clear();
+            // root->dump(seen, "");
         }
 
         if(huntTrueIfElses(root)) {
             madeChanges = true;
-            seen.clear();
-            root->dump(seen, "");
+            // seen.clear();
+            // root->dump(seen, "");
         }
 
         // seen.clear();
         // root->dump(seen, "");
         if(huntFors(root)) {
             madeChanges = true;
-            seen.clear();
-            root->dump(seen, "");
+            // seen.clear();
+            // root->dump(seen, "");
         }
 
         if(huntDoWhiles(root)) {
             madeChanges = true;
-            seen.clear();
-            root->dump(seen, "");
+            // seen.clear();
+            // root->dump(seen, "");
         }
 
         // if(huntWhiles(root.get())) {
@@ -550,8 +554,9 @@ void runTransforms(Block *root) {
         // seen.clear();
         // root->dump(seen, "");
     }
-    seen.clear();
-    root->dump(seen, "");
+    // cout << "after branching transforms:" << endl;
+    // seen.clear();
+    // root->dump(seen, "");
 }
 
 } // namespace cocl

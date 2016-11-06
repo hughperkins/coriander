@@ -28,7 +28,7 @@ namespace flowcontrol {
 BasicBlockBlock::BasicBlockBlock() {
     gotoFree = true;
 }
-int BasicBlockBlock::getNumChildren() {
+int BasicBlockBlock::getNumChildren() const {
     return 0;
 }
 Block *BasicBlockBlock::getChild(int idx) {
@@ -76,7 +76,7 @@ string BasicBlockBlock::blockType() const {
 }
 void BasicBlockBlock::dump(set<const Block *> &seen, string indent) const {
     seen.insert(this);
-    cout << indent << "BasicBlockBlock " << this->id << endl;
+    cout << indent << "BasicBlockBlock " << this->id << gotoFreeString() << endl;
     if(next == 0) {
         return;
     }
@@ -100,7 +100,7 @@ void BasicBlockBlock::replaceChildOrSuccessor(Block *oldChild, Block *newChild) 
     }
     throw runtime_error("couldnt find old child");
 }
-int BasicBlockBlock::numSuccessors() {
+int BasicBlockBlock::numSuccessors() const {
     int count = 0;
     if(next != 0) {
         count++;

@@ -24,7 +24,7 @@ using namespace std;
 namespace cocl {
 namespace flowcontrol {
 
-int ConditionalBranch::getNumChildren() {
+int ConditionalBranch::getNumChildren() const {
     int count = 0;
     if(trueNext != 0) {
         count++;
@@ -83,7 +83,7 @@ string ConditionalBranch::blockType() const {
 }
 void ConditionalBranch::dump(set<const Block *> &seen, string indent) const {
     seen.insert(this);
-    cout << indent << "ConditionalBranch " << this->id << endl;
+    cout << indent << "ConditionalBranch " << this->id << gotoFreeString() << endl;
     cout << indent << "  True:" << endl;
     if(seen.find(trueNext) == seen.end()) {
         trueNext->dump(seen, indent + "    ");
@@ -121,7 +121,7 @@ void ConditionalBranch::replaceChildOrSuccessor(Block *oldChild, Block *newChild
     }
     throw runtime_error("couldnt find old child");
 }
-int ConditionalBranch::numSuccessors() {
+int ConditionalBranch::numSuccessors() const {
     int count = 0;
     if(trueNext != 0) {
         count++;

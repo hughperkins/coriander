@@ -24,7 +24,7 @@ using namespace llvm;
 namespace cocl {
 namespace flowcontrol {
 
-int For::getNumChildren() {
+int For::getNumChildren() const {
     return 2;
 }
 Block *For::getChild(int idx) {
@@ -60,7 +60,7 @@ void For::walk(std::function<void(Block *block)> fn) {
         next->walk(fn);
     }
 }
-int For::numSuccessors() {
+int For::numSuccessors() const {
     if(next != 0) {
         return 1;
     }
@@ -96,7 +96,7 @@ void For::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
 }
 void For::dump(set<const Block *> &seen, string indent) const {
     seen.insert(this);
-    cout << indent << "For " << this->id << endl;
+    cout << indent << "For " << this->id << gotoFreeString() << endl;
     cout << indent << "  Pre:" << endl;
     preBlock->dump(seen, indent + "    ");
     cout << indent << "  Body:" << endl;
