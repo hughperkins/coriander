@@ -150,7 +150,7 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 
 See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
-<img src="doc/img/dockerfile_beignet_cudasample.png?raw=true" width="600" />
+<img src="https://github.com/hughperkins/cuda-on-cl/raw/master/doc/img/dockerfile_beignet_cudasample.png?raw=true" width="600" />
 
 ## Roadmap
 
