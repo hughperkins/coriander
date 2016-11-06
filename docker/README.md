@@ -4,3 +4,40 @@ This is unlikely to work on your system, since your gpu driver probalby wont be 
 
 Ymmv though, and personally I'm using this to make sure that things at least build ok.  (I often miss things when
 hacking around the CMakeLists.txt file etc...)
+
+## Testing
+
+### Pre-requisites
+
+- have installed docker
+
+### NVIDIA platforms
+
+#### Pre-requisites
+
+- have installed nvidia-docker, nvidia driver etc, so that the following works ok:
+```
+nvidia-docker run -t nvidia/cuda:8.0-cudnn5-devel nvidia-smi
+```
+
+#### Procedure
+
+Build:
+```
+git clone --recursive https://github.com/hughperkins/cuda-on-cl
+cd cuda-on-cl/docker
+docker build ./ -t coclnvidia --file Dockerfile-nvidia
+```
+Run:
+```
+nvidia-docker run -it coclnvidia
+```
+Test a `cocl` compilation:
+```
+cd /tmp
+mkdir foo
+cd foo
+cp /cuda-on-cl/test/cuda_sample.cu .
+cocl cuda_sample.cu
+./cuda_sample
+```
