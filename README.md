@@ -146,6 +146,12 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 ```
 - end-to-end tests are at [test/cocl](test/cocl)
 
+## Docker
+
+See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
+
+<img src="doc/img/dockerfile_beignet_cudasample.png?raw=true" width="600" />
+
 ## Roadmap
 
 - I'm working on adding branching transforms, to get rid of `goto` and `label` statements, and replace with `if`, `for`, `while`
@@ -166,6 +172,8 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 
 ## News
 
+- Nov 6:
+  - created dockerfiles for Beignet and NVIDIA [docker](docker)
 - Nov 5:
   - switched from `Makefile` to `CMakeLists.txt` => build/install instructions have changed, see above
   - added a `cmake` file, so you can easily add `cocl` to your cmakelists file, eg see https://bitbucket.org/hughperkins/eigen/src/d84b9f44f924e36a8527e66a46a189395f046d21/unsupported/test/cuda-on-cl/CMakeLists.txt?at=eigen-cl&fileviewer=file-view-default for an example
