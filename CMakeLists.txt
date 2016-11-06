@@ -15,9 +15,6 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC ${LLVM_COMPILE_FLAGS}")
 add_definitions(-DUSE_CLEW)  # turns off direct linking with libOpenCL.so, all goes via clew dynamic loader (no need to link with libOpenCL at build time)
 # for llvm:
 add_definitions(-D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS)
-if(COCL_SPAM)
-    add_definitions(-DCOCL_SPAM)
-endif()
 
 set (LLVM_LIBS /usr/lib/llvm-3.8/lib/libLLVM.so)
 
@@ -64,6 +61,9 @@ add_library(cocl SHARED ${COCL_SRCS})
 target_include_directories(cocl PRIVATE src/CLBlast/include)
 target_include_directories(cocl PRIVATE include)
 target_include_directories(cocl PRIVATE src)
+if(COCL_SPAM)
+    target_compile_definitions(cocl PRIVATE -DCOCL_SPAM)
+endif()
 target_link_libraries(cocl easycl)
 
 # # target_include_directories(cocl PRIVATE src/CLBlast/include)
