@@ -150,12 +150,14 @@ std::string BranchesAsSwitch::writeAsCl() {
             if(branch->isConditional()) {
                 gencode += layout("if(" + dumpOperand(branch->getOperand(0)) + ") {");
                 indentLevel++;
-                gencode += writePhis(indentLevel, block, branch->getSuccessor(0));
+                gencode += dumpPhi(branch, branch->getSuccessor(0));
+                // gencode += writePhis(indentLevel, block, branch->getSuccessor(0));
                 gencode += layout("label = " + toString(idByBlock[branch->getSuccessor(0)]) + ";");
                 indentLevel--;
                 gencode += layout("} else {");
                 indentLevel++;
-                gencode += writePhis(indentLevel, block, branch->getSuccessor(1));
+                gencode += dumpPhi(branch, branch->getSuccessor(1));
+                // gencode += writePhis(indentLevel, block, branch->getSuccessor(1));
                 gencode += layout("label = " + toString(idByBlock[branch->getSuccessor(1)]) + ";");
                 indentLevel--;
                 gencode += layout("}");
