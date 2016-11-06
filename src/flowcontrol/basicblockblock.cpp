@@ -25,6 +25,9 @@ using namespace std;
 namespace cocl {
 namespace flowcontrol {
 
+BasicBlockBlock::BasicBlockBlock() {
+    gotoFree = true;
+}
 int BasicBlockBlock::getNumChildren() {
     return 0;
 }

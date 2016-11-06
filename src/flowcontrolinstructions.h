@@ -154,6 +154,7 @@ public:
     std::vector<llvm::PHINode *>originalIncomingPhis;
     std::map<llvm::PHINode *, llvm::Value *> migratedIntoOutgoingPhis;
     Block *next; // initially will probalby point to a Branch block
+    BasicBlockBlock();
     virtual int getNumChildren() override;
     virtual Block *getChild(int idx) override;
     virtual void walk(std::function<void(Block *block)> fn) override;
@@ -186,6 +187,7 @@ public:
 class ReturnBlock : public Block {
 public:
     llvm::Instruction *retInst = 0;
+    ReturnBlock();
     virtual int getNumChildren() override;
     virtual Block *getChild(int idx) override;
     virtual void walk(std::function<void(Block *block)> fn) override;

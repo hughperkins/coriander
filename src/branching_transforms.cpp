@@ -60,42 +60,103 @@ void migrateIncoming(Block *oldChild, Block *newChild) {
 //     successor->replaceIncoming(oldParent, newParent);
 // }
 
+void extendSequenceBegin(Block *first, Sequence *sequence) {
+    throw runtime_error("not implemented");
+}
+
+void extendSequenceEnd(Sequence *sequence, Block *second) {
+    cout << "extend sequence end" << endl;
+    cout << "sequence " << sequence->id << endl;
+    cout << "next " << second->id << endl;
+    sequence->children.push_back(second);
+    second->incoming.clear();
+    if(second->numSuccessors() == 1) {
+        Block *secondSuccessor = second->getSuccessor(0);
+        secondSuccessor->replaceIncoming(second, sequence);
+        sequence->next = secondSuccessor;
+        second->replaceSuccessor(secondSuccessor, 0);
+    }
+}
+
+void mergeSequences(Sequence *first, Sequence *second) {
+    // put everything from second into first, then destroy second
+    cout << "merging sequences " << first->id << " " << second->id << endl;
+    for(auto it = second->children.begin(); it != second->children.end(); it++) {
+        Block *child = *it;
+        first->children.push_back(child);
+        child->replaceIncoming(second, first);
+    }
+    first->next = 0;
+    if(second->next != 0) {
+        Block *secondSuccessor = second->next;
+        first->next = second->next;
+        secondSuccessor->replaceIncoming(second, first);
+    }
+    eraseBlock(second);
+}
+
 bool mergeSequences(Block *root) {
     // basically we look for any block with one single incoming, and that incoming is a basicblockblock
+
+    // revised version: we look for a block, with gotoFree true, and it successor is gotoFree
     bool didAMerge = true;
     int numChanges = 0;
     while(didAMerge) {
         didAMerge = false;
         for(auto it = blocks.begin(); it != blocks.end(); it++) {
-            Block *block = it->get();
-            if(block->incoming.size() != 1) {
+            Block *first = it->get();
+            if(first->numSuccessors() != 1) {
                 continue;
             }
-            // cout << "block " << block->id << " has only one incoming" << endl;
-            Block *parent = block->incoming[0];
-            if(parent->numSuccessors() != 1) {
+            if(!first->gotoFree) {
                 continue;
             }
-            if(block->numSuccessors() != 1) {
+            Block *second = first->getSuccessor(0);
+            if(!second->gotoFree) {
                 continue;
             }
-            if(parent->getSuccessor(0) != block) {
+            if(second->incoming.size() != 1) {
                 continue;
             }
-            // so merge...
-            cout << "merging ... " << block->id << ", " << parent->id << endl;
+            if(second->numSuccessors() > 1) {
+                continue;
+            }
+
+            // check if one is a sequence.  If so, extend it
+            if(Sequence *sequence = dynamic_cast<Sequence *>(first)) {
+                if(Sequence *secondSequence = dynamic_cast<Sequence *>(second)) {
+                    mergeSequences(sequence, secondSequence);
+                    return true;
+                }
+                extendSequenceEnd(sequence, second);
+                return true;
+            }
+            if(Sequence *sequence = dynamic_cast<Sequence *>(second)) {
+                extendSequenceBegin(first, sequence);
+                return true;
+            }
+
+            cout << "merging ... " << first->id << ", " << second->id << endl;
+
             unique_ptr<Sequence> sequence(new Sequence());
-            sequence->children.push_back(parent);
-            sequence->children.push_back(block);
-            migrateIncoming(parent, sequence.get());
-            parent->incoming.push_back(sequence.get());
-            parent->replaceSuccessor(block, 0);
-            block->incoming.clear();
-            block->incoming.push_back(sequence.get());
-            Block *blockSuccessor = block->getSuccessor(0);
-            blockSuccessor->replaceIncoming(block, sequence.get());
-            sequence->next = blockSuccessor;
-            block->replaceSuccessor(blockSuccessor, 0);
+            sequence->children.push_back(first);
+            sequence->children.push_back(second);
+
+            migrateIncoming(first, sequence.get());
+            first->incoming.push_back(sequence.get());
+            first->replaceSuccessor(second, 0);
+
+            second->incoming.clear();
+            second->incoming.push_back(sequence.get());
+
+            if(second->numSuccessors() == 1) {
+                Block *secondSuccessor = second->getSuccessor(0);
+                secondSuccessor->replaceIncoming(second, sequence.get());
+                sequence->next = secondSuccessor;
+                second->replaceSuccessor(secondSuccessor, 0);
+            }
+
+            sequence->gotoFree = true;
             blocks.push_back(std::move(sequence));
             didAMerge = true;
             numChanges++;
@@ -135,6 +196,10 @@ bool huntTrueIfs(Block *block) {
                 ifBlock->trueBlock = trueChild;
                 ifBlock->falseBlock = 0;
                 ifBlock->next = falseChild;
+                cout << "creating trueif" << endl;
+                cout << "condition " << cond->id << endl;
+                cout << "trueblock " << trueChild->id << endl;
+                cout << "falseblock " << falseChild->id << endl;
 
                 trueChild->incoming.clear();
                 trueChild->incoming.push_back(ifBlock.get());
@@ -244,6 +309,10 @@ bool huntTrueIfElses(Block *block) {
                 ifBlock->trueBlock = trueChild;
                 ifBlock->falseBlock = falseChild;
                 ifBlock->next = successor;
+                cout << "creating ifelse" << endl;
+                cout << "condition " << cond->id << endl;
+                cout << "trueblock " << trueChild->id << endl;
+                cout << "falseblock " << falseChild->id << endl;
 
                 trueChild->incoming.clear();
                 trueChild->incoming.push_back(ifBlock.get());
@@ -356,6 +425,12 @@ bool huntFors(Block *block) {
                 // if(pre->incoming.size() != 1) {
                 //     continue;
                 // }
+                if(!pre->gotoFree) {
+                    continue;
+                }
+                if(!body->gotoFree) {
+                    continue;
+                }
                 if(pre->numSuccessors() != 1) {
                     continue;
                 }
@@ -400,6 +475,7 @@ bool huntFors(Block *block) {
                 body->incoming.push_back(forBlock.get());
 
                 forBlock->next->replaceIncoming(cond, forBlock.get());
+                forBlock->gotoFree = true;
 
                 eraseBlock(cond);
                 blocks.push_back(std::move(forBlock));
@@ -425,40 +501,40 @@ void runTransforms(Block *root) {
         madeChanges = false;
         if(mergeSequences(root)) {
             madeChanges = true;
-            // seen.clear();
-            // root->dump(seen, "");
+            seen.clear();
+            root->dump(seen, "");
         }
 
         if(huntTrueIfs(root)) {
             madeChanges = true;
-            // seen.clear();
-            // root->dump(seen, "");
+            seen.clear();
+            root->dump(seen, "");
         }
 
         if(huntFalseIfs(root)) {
             madeChanges = true;
-            // seen.clear();
-            // root->dump(seen, "");
+            seen.clear();
+            root->dump(seen, "");
         }
 
         if(huntTrueIfElses(root)) {
             madeChanges = true;
-            // seen.clear();
-            // root->dump(seen, "");
+            seen.clear();
+            root->dump(seen, "");
         }
 
         // seen.clear();
         // root->dump(seen, "");
         if(huntFors(root)) {
             madeChanges = true;
-            // seen.clear();
-            // root->dump(seen, "");
+            seen.clear();
+            root->dump(seen, "");
         }
 
         if(huntDoWhiles(root)) {
             madeChanges = true;
-            // seen.clear();
-            // root->dump(seen, "");
+            seen.clear();
+            root->dump(seen, "");
         }
 
         // if(huntWhiles(root.get())) {

@@ -24,6 +24,9 @@ using namespace llvm;
 namespace cocl {
 namespace flowcontrol {
 
+ReturnBlock::ReturnBlock() {
+    gotoFree = true;
+}
 int ReturnBlock::getNumChildren() {
     return 0;
 }
