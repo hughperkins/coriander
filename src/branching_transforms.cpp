@@ -467,6 +467,7 @@ bool huntExitConditionals(Block *block) {
     //    true: exit node
     // resulting if is *not* goto-free, but at least removes a conditional branch fro mthe system
     // in this functiion we handle the first case: false causes exit
+    return false;
     int numChanges = 0;
     bool foundFor = true;
     while(foundFor) {
