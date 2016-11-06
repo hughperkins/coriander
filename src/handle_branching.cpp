@@ -200,9 +200,9 @@ std::unique_ptr<RootBlock> load_branching_tree(Function *F) {
     }
     return root;
 }
-void run_branching_transforms(RootBlock *root) {
-    runTransforms(root);
-}
+// void run_branching_transforms(RootBlock *root) {
+//     runTransforms(root);
+// }
 void addLabels() {
     // find any conditionalbranch, and set `needsLabel` to true for its destinations
     for(auto it=blocks.begin(); it != blocks.end(); it++) {

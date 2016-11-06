@@ -26,6 +26,7 @@ namespace flowcontrol {
 
 ReturnBlock::ReturnBlock() {
     gotoFree = true;
+    isExit = true;
 }
 int ReturnBlock::getNumChildren() const {
     return 0;
@@ -46,7 +47,7 @@ string ReturnBlock::blockType() const {
     return "ReturnBlock";
 }
 void ReturnBlock::dump(set<const Block *> &seen, string indent) const {
-    cout << indent << "ReturnBlock " << this->id << gotoFreeString() << endl;
+    cout << indent << "*** ReturnBlock " << this->id << gotoFreeString() << isExitString() << endl;
 }
 void ReturnBlock::replaceSuccessor(Block *oldChild, Block *newChild) {
     throw runtime_error("couldnt find old child");

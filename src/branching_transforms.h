@@ -30,6 +30,6 @@ bool huntTrueIfElses(flowcontrol::Block *block);
 bool huntDoWhiles(flowcontrol::Block *block);
 void huntWhiles(flowcontrol::Block *block);
 bool huntFors(flowcontrol::Block *block);
-void runTransforms(flowcontrol::Block *block);
+void runTransforms(flowcontrol::Block *block, bool dumpTransforms);
 
 } // namespace cocl

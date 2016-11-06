@@ -40,6 +40,8 @@ public:
     std::vector<Block *>incoming;
     bool dumped = false;
     bool gotoFree = false;
+    bool isExit = false;  // does entering this block definitively lead to exit, no matter how any of the subblock
+                          // conditions evaluate?
 
     Block();
     virtual void walk(std::function<void(Block *block)> fn) = 0;
@@ -58,6 +60,12 @@ public:
     std::string gotoFreeString() const {
         if(gotoFree) {
             return " [gotoFree]";
+        }
+        return "";
+    }
+    std::string isExitString() const {
+        if(isExit) {
+            return " [EXIT]";
         }
         return "";
     }

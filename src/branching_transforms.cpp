@@ -149,6 +149,11 @@ bool mergeSequences(Block *root) {
             second->incoming.clear();
             second->incoming.push_back(sequence.get());
 
+            if(second->isExit) {
+                first->isExit = true;
+                sequence->isExit = true;
+            }
+
             if(second->numSuccessors() == 1) {
                 Block *secondSuccessor = second->getSuccessor(0);
                 secondSuccessor->replaceIncoming(second, sequence.get());
@@ -411,6 +416,110 @@ void huntWhiles(Block *block) {
     // true: BlockA
     // false: BlockB
 }
+bool huntForWithBreak(Block *block) {
+    // for with break can look like:
+    // blockA
+    // cond
+    // true:
+    //    blockB
+    //    cond
+    //      true:
+    //        (blockE)
+    //        blockC
+    //      false:
+    //        (blockF)
+    //        blockA
+    //    (blockD ...)
+    // false: blockC
+
+    // there are at least two conditionals:
+    // - the one for the loop
+    // - the one around the `break`
+    // there are at least three jumps:
+    // - for the loop (into/leave)
+    // - for the break if: continue the loop body, or break out of it
+    // - ... we can probalby have a 'continue' instruction too...
+    // as far as 'gotofree' requirements:
+    // - blockE and blockC should probably be gotofree (?)
+    // - blockF and blockA should probably be goto free (?)
+    return false;
+    int numChanges = 0;
+    bool foundFor = true;
+    while(foundFor) {
+        foundFor = false;
+        for(auto it = blocks.begin(); it != blocks.end(); it++) {
+            Block *block = it->get();
+            if(ConditionalBranch *cond = dynamic_cast<ConditionalBranch *>(block)) {
+
+            }
+        }
+    }
+    return numChanges > 0;
+}
+bool huntExitConditionals(Block *block) {
+    // exit conditional looks like:
+    // cond:
+    //   true: (somehting)
+    //   false: exit node
+    // or:
+    // cond:
+    //    false: (something)
+    //    true: exit node
+    // resulting if is *not* goto-free, but at least removes a conditional branch fro mthe system
+    // in this functiion we handle the first case: false causes exit
+    int numChanges = 0;
+    bool foundFor = true;
+    while(foundFor) {
+        foundFor = false;
+        for(auto it = blocks.begin(); it != blocks.end(); it++) {
+            Block *block = it->get();
+            if(ConditionalBranch *cond = dynamic_cast<ConditionalBranch *>(block)) {
+                // Block *falseChild = cond->falseNext;
+                bool found = false;
+                Block *exitNode = 0;
+                Block *enterNode = 0;
+                if(cond->falseNext->isExit) {
+                    found = true;
+                    exitNode = cond->falseNext;
+                    enterNode = cond->trueNext;
+                } else if(cond->trueNext->isExit) {
+                    found = true;
+                    enterNode = cond->falseNext;
+                    exitNode = cond->trueNext;
+                }
+                if(!found) {
+                    continue;
+                }
+
+                unique_ptr<If> ifBlock(new If());
+                migrateIncoming(cond, ifBlock.get());
+                ifBlock->condition = cond->condition;
+                ifBlock->trueBlock = enterNode;
+                ifBlock->falseBlock = exitNode;
+                // no next/successor
+
+                cout << "found an exitconditional" << endl;
+                cout << "condition: " << cond->id << endl;
+                cout << "enter node " << enterNode->id << endl;
+                cout << "exit node: " << exitNode->id << endl;
+
+
+                enterNode->incoming.clear();
+                enterNode->incoming.push_back(ifBlock.get());
+
+                exitNode->incoming.clear();
+                exitNode->incoming.push_back(ifBlock.get());
+
+                eraseBlock(cond);
+                blocks.push_back(std::move(ifBlock));
+                foundFor = true;
+                numChanges++;
+                return true;
+            }
+        }
+    }
+    return numChanges > 0;
+}
 bool huntFors(Block *block) {
     //BlockA
     //ConditionalBlock
@@ -497,10 +606,12 @@ bool huntFors(Block *block) {
 
 
 
-void runTransforms(Block *root) {
+void runTransforms(Block *root, bool dumpTransforms) {
     //walk(root);
-    // set<const Block *>seen;
-    // root->dump(seen, "");
+    if(dumpTransforms) {
+        set<const Block *>seen;
+        root->dump(seen, "");
+    }
 
     // int numChanges = 1;
     bool madeChanges =  true;
@@ -509,40 +620,61 @@ void runTransforms(Block *root) {
         if(mergeSequences(root)) {
             // cout << "merge changes made" << endl;
             madeChanges = true;
-            // seen.clear();
-            // root->dump(seen, "");
+            if(dumpTransforms) {
+                set<const Block *>seen;
+                root->dump(seen, "");
+            }
+        }
+
+        if(huntExitConditionals(root)) {
+            // cout << "merge changes made" << endl;
+            madeChanges = true;
+            if(dumpTransforms) {
+                set<const Block *>seen;
+                root->dump(seen, "");
+            }
         }
 
         if(huntTrueIfs(root)) {
             madeChanges = true;
-            // seen.clear();
-            // root->dump(seen, "");
+            if(dumpTransforms) {
+                set<const Block *>seen;
+                root->dump(seen, "");
+            }
         }
 
         if(huntFalseIfs(root)) {
             madeChanges = true;
-            // seen.clear();
-            // root->dump(seen, "");
+            if(dumpTransforms) {
+                set<const Block *>seen;
+                root->dump(seen, "");
+            }
         }
 
         if(huntTrueIfElses(root)) {
             madeChanges = true;
-            // seen.clear();
-            // root->dump(seen, "");
+            if(dumpTransforms) {
+                set<const Block *>seen;
+                root->dump(seen, "");
+            }
         }
 
         // seen.clear();
         // root->dump(seen, "");
         if(huntFors(root)) {
             madeChanges = true;
-            // seen.clear();
-            // root->dump(seen, "");
+            if(dumpTransforms) {
+                set<const Block *>seen;
+                root->dump(seen, "");
+            }
         }
 
         if(huntDoWhiles(root)) {
             madeChanges = true;
-            // seen.clear();
-            // root->dump(seen, "");
+            if(dumpTransforms) {
+                set<const Block *>seen;
+                root->dump(seen, "");
+            }
         }
 
         // if(huntWhiles(root.get())) {
@@ -553,6 +685,10 @@ void runTransforms(Block *root) {
 
         // seen.clear();
         // root->dump(seen, "");
+    }
+    if(dumpTransforms) {
+        set<const Block *>seen;
+        root->dump(seen, "");
     }
     // cout << "after branching transforms:" << endl;
     // seen.clear();

@@ -275,6 +275,40 @@ __global__ void mykernel(float *data, int a, int b) {
     # assert abs(float_data[0] - sum(float_data_orig[0:32])) < 1e-4
 
 
+def test_break(context, q, float_data, float_data_gpu):
+    sourcecode = """
+__global__ void testFor(float *data, int N) {
+    if(threadIdx.x == 0) {
+        float sum = 0.0f;
+        for(int i = 0; i < N; i++) {
+            sum += data[i];
+            if(sum > 5) {
+                break;
+            }
+        }
+        data[0] = sum;
+    }
+}
+"""
+    prog = compile_code(cl, context, sourcecode)
+    float_data_orig = np.copy(float_data)
+
+    N = 4
+    prog.__getattr__(test_common.mangle('testFor', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(N), cl.LocalMemory(4))
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_code = f.read()
+    print('cl_code', cl_code)
+
+    sum = 0
+    for i in range(N):
+        sum += float_data_orig[i]
+        if sum > 5:
+            break
+    assert abs(float_data[0] - sum) <= 1e-4
+
+
 def test_conditional_branch(context, q, float_data, float_data_gpu):
     """
     Just use normal if...else, but turn off branching transformations, and check

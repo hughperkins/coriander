@@ -60,7 +60,7 @@ string Sequence::blockType() const {
 }
 void Sequence::dump(set<const Block *> &seen, string indent) const {
     seen.insert(this);
-    cout << indent << "Sequence " << this->id << gotoFreeString() << " succ=" << numSuccessors() << " inc=" << incoming.size() << endl;
+    cout << indent << "Sequence " << this->id << gotoFreeString() << " succ=" << numSuccessors() << " inc=" << incoming.size() << isExitString() << endl;
     for(auto it = children.begin(); it != children.end(); it++) {
         Block *child = *it;
         if(seen.find(child) == seen.end()) {

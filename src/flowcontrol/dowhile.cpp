@@ -88,7 +88,7 @@ void DoWhile::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
 }
 void DoWhile::dump(set<const Block *> &seen, string indent) const {
     seen.insert(this);
-    cout << indent << "DoWhile " << this->id << gotoFreeString() << endl;
+    cout << indent << "DoWhile " << this->id << gotoFreeString() << isExitString() << endl;
     cout << indent << "  Body:" << endl;
     body->dump(seen, indent + "    ");
     if(next != 0) {

@@ -21,6 +21,7 @@
 #include "struct_clone.h"
 #include "cocl/local_config.h"
 #include "handle_branching.h"
+#include "branching_transforms.h"
 
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
@@ -74,6 +75,7 @@ static bool add_ir_to_cl = false;
 extern bool single_precision;
 bool single_precision = true;
 static int instructions_processed = 0;
+bool dumpTransforms = false;
 
 
 static string cl_add_definitions = R"(
@@ -1480,7 +1482,7 @@ std::string dumpFunction(Function *F) {
     std::unique_ptr<cocl::flowcontrol::RootBlock> root = cocl::load_branching_tree(F);
     if(runBranchingTransforms) {
         cout << "running branching transforms..." << endl;
-        cocl::run_branching_transforms(root.get());
+        cocl::runTransforms(root.get(), dumpTransforms);
     }
     string bodyCl = cocl::branching_write_cl(root.get());
 
@@ -1651,6 +1653,7 @@ int main(int argc, char *argv[]) {
     parser.add_bool_argument("--debug", &debug);
     parser.add_bool_argument("--add_ir_to_cl", &add_ir_to_cl);
     parser.add_bool_argument("--no_branching_transforms", &noRunBranchingTransforms);
+    parser.add_bool_argument("--dump_transforms", &dumpTransforms)->help("mostly for dev/debug.  prints the results of branching transforms");
     parser.add_string_argument("--specific_function", &specificFunction)->help("Mostly for dev/debug, just process one specific function");
     if(!parser.parse_args(argc, argv)) {
         return -1;

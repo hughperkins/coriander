@@ -96,7 +96,7 @@ void For::replaceChildOrSuccessor(Block *oldChild, Block *newChild) {
 }
 void For::dump(set<const Block *> &seen, string indent) const {
     seen.insert(this);
-    cout << indent << "For " << this->id << gotoFreeString() << endl;
+    cout << indent << "For " << this->id << gotoFreeString() << isExitString() << endl;
     cout << indent << "  Pre:" << endl;
     preBlock->dump(seen, indent + "    ");
     cout << indent << "  Body:" << endl;
