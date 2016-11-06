@@ -45,6 +45,18 @@ void BranchesAsSwitch::parse() {
         idByBlock[block] = blockId;
         blockId++;
     }
+    // for(auto it=F->begin(); it != F->end(); it++) {
+    //     BasicBlock *block = &*it;
+    //     for(auto it = block->begin; it != block->end(); it++) {
+    //         Instruction *instr = &*it;
+    //         if(PHINode *phi = dyn_cast<PHINode>(instr)) {
+    //             for(auto it2 = phi->)
+    //         } else {
+    //             break;
+    //         }
+    //     }
+    // }
+    // phisToAddByBlock
 }
 const int indentLevelLength = 4;
 map<int, std::string>indentStringByLevel;
@@ -87,6 +99,20 @@ std::string BranchesAsSwitch::writeNonFlowInstructions(int indentLevel, BasicBlo
     return gencode;
 }
 
+std::string BranchesAsSwitch::writePhis(int indentLevel, BasicBlock *curr, BasicBlock *next) {
+    string gencode = "";
+    for(auto it = next->begin(); it != next->end(); it++) {
+        Instruction *instr = &*it;
+        if(PHINode *phi = dyn_cast<PHINode>(instr)) {
+            Value *value = phi->getIncomingValueForBlock(curr);
+            gencode += layout(dumpOperand(phi) + " = " + dumpValue(value) + ";");
+        } else {
+            break;
+        }
+    }
+    return gencode;
+}
+
 std::string BranchesAsSwitch::writeAsCl() {
     string gencode = "";
 
@@ -119,10 +145,12 @@ std::string BranchesAsSwitch::writeAsCl() {
                 gencode += layout("if(" + dumpOperand(branch->getOperand(0)) + ") {");
                 indentLevel++;
                 gencode += layout("label = " + toString(idByBlock[branch->getSuccessor(0)]) + ";");
+                gencode += writePhis(indentLevel, block, branch->getSuccessor(0));
                 indentLevel--;
                 gencode += layout("} else {");
                 indentLevel++;
                 gencode += layout("label = " + toString(idByBlock[branch->getSuccessor(1)]) + ";");
+                gencode += writePhis(indentLevel, block, branch->getSuccessor(1));
                 indentLevel--;
                 gencode += layout("}");
                 gencode += layout("break;");
@@ -130,6 +158,7 @@ std::string BranchesAsSwitch::writeAsCl() {
                 BasicBlock *next = branch->getSuccessor(0);
                 // int blockId = idByBlock[next];
                 gencode += layout("label = " + toString(idByBlock[next]) + ";");
+                gencode += writePhis(indentLevel, block, branch->getSuccessor(0));
                 gencode += layout("break;");
             }
         } else {

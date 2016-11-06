@@ -36,9 +36,11 @@ public:
     void parse();
     std::string writeAsCl();
     llvm::Function *F;
+    // std::map<BasicBlock *, vector<PHINode *> > phisToAddByBlock;
     std::map<int, llvm::BasicBlock *>blockById;
     std::map<llvm::BasicBlock *, int>idByBlock;
     std::string writeNonFlowInstructions(int indentLevel, llvm::BasicBlock *block);
+    std::string writePhis(int indentLevel, llvm::BasicBlock *curr, llvm::BasicBlock *next);
 };
 
 } // namespace coclq
