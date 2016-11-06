@@ -22,7 +22,7 @@ sudo docker run --device /dev/dri:/dev/dri -it coclbeignet
 
 (Based on https://github.com/chihchun/opencl-docker, following heads-up from bhack)
 
-<img src="https://github.com/hughperkins/cuda-on-cl/tree/master/doc/img/dockerfile_beignet_cudasample.png?raw=true" width="600" />
+<img src="https://github.com/hughperkins/cuda-on-cl/raw/master/doc/img/dockerfile_beignet_cudasample.png?raw=true" width="600" />
 
 ### NVIDIA platforms
 
