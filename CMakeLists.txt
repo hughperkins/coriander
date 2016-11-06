@@ -30,7 +30,6 @@ add_executable(ir-to-opencl
 target_include_directories(ir-to-opencl PRIVATE src)
 target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
 target_include_directories(ir-to-opencl PRIVATE /usr/lib/llvm-3.8/include)
-# target_link_libraries(ir-to-opencl llvm)
 set_target_properties(ir-to-opencl PROPERTIES
     LINK_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LLVM_LDFLAGS}"
 )
@@ -52,12 +51,13 @@ add_library(clew SHARED src/EasyCL/thirdparty/clew/src/clew.c)
 target_link_libraries(clew dl)
 
 add_library(easycl SHARED ${EASYCL_SRCS})
-include_directories(easycl PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
-include_directories(easycl PRIVATE src/EasyCL/thirdparty/clew/include)
-include_directories(easycl PRIVATE src/EasyCL)
+# target_include_directories(easycl PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
+target_include_directories(easycl PRIVATE src/EasyCL/thirdparty/clew/include)
+target_include_directories(easycl PRIVATE src/EasyCL)
 target_link_libraries(easycl clew)
 
 add_library(cocl SHARED ${COCL_SRCS})
+target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
 target_include_directories(cocl PRIVATE src/CLBlast/include)
 target_include_directories(cocl PRIVATE include)
 target_include_directories(cocl PRIVATE src)

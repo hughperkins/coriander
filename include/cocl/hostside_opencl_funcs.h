@@ -18,7 +18,7 @@
 // #include <map>
 // #include <set>
 
-#include "EasyCL.h"
+#include "EasyCL/EasyCL.h"
 
 // #include "CL/cl.h"
 

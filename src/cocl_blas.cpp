@@ -16,7 +16,7 @@
 
 #include "cocl/cocl_context.h"
 #include "cocl/hostside_opencl_funcs.h"
-#include "EasyCL.h"
+#include "EasyCL/EasyCL.h"
 
 #include <iostream>
 #include <clblast_c.h>

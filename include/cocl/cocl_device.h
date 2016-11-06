@@ -2,7 +2,7 @@
 
 #include <cstddef>
 
-#include "EasyCL.h"
+#include "EasyCL/EasyCL.h"
 
 // #include "CL/cl.h"
 #include "cocl_defs.h"
