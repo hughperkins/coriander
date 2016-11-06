@@ -39,6 +39,7 @@ void BranchesAsSwitch::parse() {
     // if(F->getBasicBlockList().size() == 0) {
     //     return;
     // }
+    cout << "parsing " << F->getName().str() << endl;
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *block = &*it;
         blockById[blockId] = block;
@@ -80,9 +81,9 @@ std::string BranchesAsSwitch::writeNonFlowInstructions(int indentLevel, BasicBlo
     string indentString = indentStr(indentLevel);
     for(auto it=block->begin(); it != block->end(); it++) {
         Instruction *inst = &*it;
-        if(isa<PHINode>(inst)) {
-            continue;
-        }
+        // if(isa<PHINode>(inst)) {
+        //     continue;
+        // }
         if(isa<ReturnInst>(inst)) {
             continue;
         }
@@ -100,17 +101,22 @@ std::string BranchesAsSwitch::writeNonFlowInstructions(int indentLevel, BasicBlo
 }
 
 std::string BranchesAsSwitch::writePhis(int indentLevel, BasicBlock *curr, BasicBlock *next) {
-    string gencode = "";
-    for(auto it = next->begin(); it != next->end(); it++) {
-        Instruction *instr = &*it;
-        if(PHINode *phi = dyn_cast<PHINode>(instr)) {
-            Value *value = phi->getIncomingValueForBlock(curr);
-            gencode += layout(dumpOperand(phi) + " = " + dumpValue(value) + ";");
-        } else {
-            break;
-        }
-    }
-    return gencode;
+    // return dumpPhi()
+    // string gencode = "";
+    // for(auto it = next->begin(); it != next->end(); it++) {
+    //     Instruction *instr = &*it;
+    //     if(PHINode *phi = dyn_cast<PHINode>(instr)) {
+    //         Value *value = phi->getIncomingValueForBlock(curr);
+    //         gencode = dumpPhi(phi, curr);
+    //         // copyAddressSpace(phi, value);
+    //         // gencode += layout(dumpOperand(phi) + " = " + dumpValue(value) + ";");
+    //         cout << "gencode from phi: " << gencode << endl;
+    //     } else {
+    //         break;
+    //     }
+    // }
+    // return gencode;
+    return "";
 }
 
 std::string BranchesAsSwitch::writeAsCl() {
@@ -144,21 +150,22 @@ std::string BranchesAsSwitch::writeAsCl() {
             if(branch->isConditional()) {
                 gencode += layout("if(" + dumpOperand(branch->getOperand(0)) + ") {");
                 indentLevel++;
-                gencode += layout("label = " + toString(idByBlock[branch->getSuccessor(0)]) + ";");
                 gencode += writePhis(indentLevel, block, branch->getSuccessor(0));
+                gencode += layout("label = " + toString(idByBlock[branch->getSuccessor(0)]) + ";");
                 indentLevel--;
                 gencode += layout("} else {");
                 indentLevel++;
-                gencode += layout("label = " + toString(idByBlock[branch->getSuccessor(1)]) + ";");
                 gencode += writePhis(indentLevel, block, branch->getSuccessor(1));
+                gencode += layout("label = " + toString(idByBlock[branch->getSuccessor(1)]) + ";");
                 indentLevel--;
                 gencode += layout("}");
                 gencode += layout("break;");
             } else {
                 BasicBlock *next = branch->getSuccessor(0);
                 // int blockId = idByBlock[next];
+                // gencode += writePhis(indentLevel, block, branch->getSuccessor(0));
+                gencode += dumpPhi(branch, next);
                 gencode += layout("label = " + toString(idByBlock[next]) + ";");
-                gencode += writePhis(indentLevel, block, branch->getSuccessor(0));
                 gencode += layout("break;");
             }
         } else {

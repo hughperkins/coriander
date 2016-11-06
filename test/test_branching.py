@@ -280,7 +280,7 @@ def test_break(context, q, float_data, float_data_gpu):
 __global__ void testFor(float *data, int N) {
     if(threadIdx.x == 0) {
         float sum = 0.0f;
-        for(int i = 0; i < N; i++) {
+        for(int i = 1; i < N; i++) {
             sum += data[i];
             if(sum > 5) {
                 break;
@@ -302,10 +302,12 @@ __global__ void testFor(float *data, int N) {
     print('cl_code', cl_code)
 
     sum = 0
-    for i in range(N):
+    for i in range(1, N):
         sum += float_data_orig[i]
+        print(i, float_data_orig[i], sum)
         if sum > 5:
             break
+    print('sum', sum, 'float_data[0]', float_data[0])
     assert abs(float_data[0] - sum) <= 1e-4
 
 

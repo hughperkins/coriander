@@ -445,7 +445,9 @@ std::string dumpAlloca(Instruction *alloca) {
             if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
                 int innercount = arrayType->getNumElements();
                 Type *elementType = arrayType->getElementType();
-                return dumpType(elementType) + " " + dumpOperand(alloca) + "[" + toString(innercount) + "];\n";
+                string allocaDeclaration = "    " + dumpType(elementType) + " " + dumpOperand(alloca) + "[" + toString(innercount) + "];\n";
+                currentFunctionSharedDeclarations += allocaDeclaration;
+                return "";
             } else {
                 // if the elementType is a pointer, assume its global?
                 if(isa<PointerType>(ptrElementType)) {
@@ -474,7 +476,10 @@ std::string dumpAlloca(Instruction *alloca) {
                     // gencode += "global ";
                     // updateAddressSpace(alloca, 1);
                 }
-                return gencode + typestring + " " + dumpOperand(alloca) + "[1]";
+                string allocaDeclaration = gencode + typestring + " " + dumpOperand(alloca) + "[1]";
+                // just declare this at the head of th efunction
+                currentFunctionSharedDeclarations += "    " + allocaDeclaration + ";\n";
+                return "";
             }
         } else {
             throw runtime_error("not implemented: alloca for count != 1");
@@ -1129,6 +1134,8 @@ std::string dumpSelect(SelectInst *instr) {
     return gencode;
 }
 
+// adds declaratoin of the phi, to the start of hte functoin (via currentFunctionPhiDeclarationsByName)
+// the address space should be correct on phi by the time this function is called
 void addPHIDeclaration(PHINode *phi) {
     storeValueName(phi);
     string name = nameByValue[phi];
