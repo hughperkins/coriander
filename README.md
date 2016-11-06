@@ -89,7 +89,7 @@ Other operating systems, and clang/llvm versions, might work too, but untested. 
 ### Procedure
 
 ```
-sudo apt-get install git cmake llvm-3.8-dev clang-3.8-dev libc6-dev-i386 make gcc g++
+sudo apt-get install git cmake cmake-curses-gui llvm-3.8-dev clang-3.8 libc6-dev-i386 make gcc g++
 git clone --recursive https://github.com/hughperkins/cuda-on-cl
 cd cuda-on-cl
 mkdir build
