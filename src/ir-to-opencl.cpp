@@ -21,6 +21,7 @@
 #include "struct_clone.h"
 #include "handle_branching.h"
 #include "branching_transforms.h"
+#include "branches_as_switch/branches_as_switch.h"
 
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
@@ -1477,13 +1478,22 @@ std::string dumpFunction(Function *F) {
     functionNeededForwardDeclarations.clear();
     string gencode = "";
     string declaration = dumpFunctionDeclaration(F);
+
+    // ===============
+    // flowcontrol
     // COCL_PRINT(cout << declaration << endl);
-    std::unique_ptr<cocl::flowcontrol::RootBlock> root = cocl::load_branching_tree(F);
-    if(runBranchingTransforms) {
-        cout << "running branching transforms..." << endl;
-        cocl::runTransforms(root.get(), dumpTransforms);
-    }
-    string bodyCl = cocl::branching_write_cl(root.get());
+    // std::unique_ptr<cocl::flowcontrol::RootBlock> root = cocl::load_branching_tree(F);
+    // if(runBranchingTransforms) {
+    //     cout << "running branching transforms..." << endl;
+    //     cocl::runTransforms(root.get(), dumpTransforms);
+    // }
+    // string bodyCl = cocl::branching_write_cl(root.get());
+    // ===============
+    // branches_as_switch
+    cocl::BranchesAsSwitch branchesAsSwitch(F);
+    branchesAsSwitch.parse();
+    string bodyCl = branchesAsSwitch.writeAsCl();
+    // ===============
 
     // functionBlockIndex.clear();
     // int i = 0;

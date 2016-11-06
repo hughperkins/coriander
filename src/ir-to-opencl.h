@@ -38,3 +38,4 @@ std::string getName(llvm::Function *value);
 void addPHIDeclaration(llvm::PHINode *phi);
 void storeValueName(llvm::Value *value);
 std::string dumpValue(llvm::Value *value);
+std::string dumpReturn(llvm::ReturnInst *retInst);
