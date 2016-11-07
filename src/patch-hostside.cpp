@@ -59,6 +59,7 @@ static std::string sourcecode_stringname;
 static std::string devicellcode_stringname;
 static string devicellfilename;
 static string deviceclfilename;
+// static string clfilenamesimple;
 
 bool single_precision = true;
 
@@ -346,7 +347,7 @@ void patchCudaLaunch(Function *F, CallInst *inst, vector<Instruction *> &to_repl
     // outs() << "patching launch in " << string(F->getName()) << "\n";
 
     string kernelName = launchCallInfo->kernelName;
-    Instruction *kernelNameValue = addStringInstr(M, "s." + ::deviceclfilename + "." + kernelName, kernelName);
+    Instruction *kernelNameValue = addStringInstr(M, "s_" + ::sourcecode_stringname + "_" + kernelName, kernelName);
     kernelNameValue->insertBefore(inst);
 
     // this isnt actually needed for running, but hopefully useful for debugging
@@ -422,6 +423,14 @@ void patchFunction(Function *F) {
     }
 }
 
+string getBasename(string path) {
+    // grab anything after final / ,or whole string
+    int slash_pos = path.rfind('/');
+    if(slash_pos == string::npos) {
+        return path;
+    }
+    return path.substr(slash_pos + 1);
+}
 
 void patchModule(string deviceclfilename, Module *M) {
     ifstream f_incl(::deviceclfilename);
@@ -434,8 +443,9 @@ void patchModule(string deviceclfilename, Module *M) {
         (std::istreambuf_iterator<char>(f_inll)),
         (std::istreambuf_iterator<char>()));
 
-    sourcecode_stringname = "__opencl_sourcecode" + ::deviceclfilename;
-    devicellcode_stringname = "__devicell_sourcecode" + ::devicellfilename;
+    ::sourcecode_stringname = replace(replace(getBasename(::deviceclfilename), '.', '_'), '-', '_');
+    ::devicellcode_stringname = replace(replace(getBasename(::devicellfilename), '.', '_'), '-', '_');
+
     addGlobalVariable(M, sourcecode_stringname, cl_sourcecode);
     addGlobalVariable(M, devicellcode_stringname, devicell_sourcecode);
 

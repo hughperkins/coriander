@@ -5,6 +5,16 @@ import subprocess
 clang_path = 'clang++-3.8'
 
 
+def get_cl_generation_options():
+    options = []
+    if os.environ.get('COCL_BRANCHES_AS_SWITCH', '0') != '0':
+        options.append('--branches_as_switch')
+
+    if os.environ.get('COCL_RUN_TRANSFORMS', '0') != '0':
+        options.append('--run_transforms')
+
+    return options
+
 def mangle(name, param_types):
     mangled = '_Z%s%s' % (len(name), name)
     for param in param_types:

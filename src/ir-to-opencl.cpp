@@ -66,16 +66,20 @@ static map<string, string> currentFunctionPhiDeclarationsByName;
 static string globalDeclarations = "";
 static string structpointershimcode = "";
 static set<Value *> functionNeededForwardDeclarations;
-// static map<BasicBlock *, int> functionBlockIndex;
+static map<BasicBlock *, int> functionBlockIndex;
 // static set<Value *>valuesAreExpressions;
 
-static bool debug = false;
-static bool runBranchingTransforms = true;
-static bool add_ir_to_cl = false;
 extern bool single_precision;
+
 bool single_precision = true;
-static int instructions_processed = 0;
+
+bool runBranchingTransforms = false;
 bool dumpTransforms = false;
+bool branchesAsSwitch = false;
+
+static int instructions_processed = 0;
+static bool debug = false;
+static bool add_ir_to_cl = false;
 
 
 static string cl_add_definitions = R"(
@@ -1051,80 +1055,80 @@ std::string dumpPhi(BranchInst *branchInstr, BasicBlock *nextBlock) {
     return gencode;
 }
 
-// std::string dumpBranch(BranchInst *instr) {
-//     string gencode = "";
-//     if(instr->isConditional()) {
-//         string conditionstring = dumpOperand(instr->getCondition());
-//         if(!isSingleExpression(conditionstring) || conditionstring[0] != '(') {
-//             conditionstring = "(" + conditionstring + ")";
-//         }
-//         // gencode += "if " + conditionstring + " {\n";
-//         string trueSection = "";
-//         bool needTrueSection = false;
-//         string phicode = dumpPhi(instr, instr->getSuccessor(0));
-//         if(phicode != "") {
-//             trueSection += "        " + phicode;
-//             needTrueSection = true;
-//         }
-//         if(instr->getNextNode() == 0 && functionBlockIndex[instr->getSuccessor(0)] != functionBlockIndex[instr->getParent()] + 1) {
-//             trueSection += "        goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
-//             needTrueSection = true;
-//         }
-//         string falseSection = "";
-//         bool needFalseSection = false;
-//         if(instr->getNumSuccessors() == 1) {
-//         } else if(instr->getNumSuccessors() == 2) {
-//             // gencode += "    } else {\n";
-//             string phicode = dumpPhi(instr, instr->getSuccessor(1));
-//             if(phicode != "") {
-//                 falseSection += "        " + phicode;
-//                 needFalseSection = true;
-//             }
-//             if(instr->getNextNode() == 0 && functionBlockIndex[instr->getSuccessor(1)] != functionBlockIndex[instr->getParent()] + 1) {
-//                 falseSection += "        goto " + dumpOperand(instr->getSuccessor(1)) + ";\n";
-//                 needFalseSection = true;
-//             }
-//         } else {
-//             throw runtime_error("not implemented for this numsuccessors br");
-//         }
+std::string dumpBranch(BranchInst *instr) {
+    string gencode = "";
+    if(instr->isConditional()) {
+        string conditionstring = dumpOperand(instr->getCondition());
+        if(!isSingleExpression(conditionstring) || conditionstring[0] != '(') {
+            conditionstring = "(" + conditionstring + ")";
+        }
+        // gencode += "if " + conditionstring + " {\n";
+        string trueSection = "";
+        bool needTrueSection = false;
+        string phicode = dumpPhi(instr, instr->getSuccessor(0));
+        if(phicode != "") {
+            trueSection += "        " + phicode;
+            needTrueSection = true;
+        }
+        if(instr->getNextNode() == 0 && functionBlockIndex[instr->getSuccessor(0)] != functionBlockIndex[instr->getParent()] + 1) {
+            trueSection += "        goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
+            needTrueSection = true;
+        }
+        string falseSection = "";
+        bool needFalseSection = false;
+        if(instr->getNumSuccessors() == 1) {
+        } else if(instr->getNumSuccessors() == 2) {
+            // gencode += "    } else {\n";
+            string phicode = dumpPhi(instr, instr->getSuccessor(1));
+            if(phicode != "") {
+                falseSection += "        " + phicode;
+                needFalseSection = true;
+            }
+            if(instr->getNextNode() == 0 && functionBlockIndex[instr->getSuccessor(1)] != functionBlockIndex[instr->getParent()] + 1) {
+                falseSection += "        goto " + dumpOperand(instr->getSuccessor(1)) + ";\n";
+                needFalseSection = true;
+            }
+        } else {
+            throw runtime_error("not implemented for this numsuccessors br");
+        }
 
-//         if(needTrueSection) {
-//             gencode += "if " + conditionstring + " {\n";
-//             gencode += trueSection;
-//             if(needFalseSection) {
-//                 gencode += "    } else {\n";
-//                 gencode += falseSection;
-//             }
-//             gencode += "    }\n";
-//         } else if(needFalseSection) {
-//             gencode += "if(!" + conditionstring + ") {\n";
-//             gencode += falseSection;
-//             gencode += "    }\n";
-//         }
+        if(needTrueSection) {
+            gencode += "if " + conditionstring + " {\n";
+            gencode += trueSection;
+            if(needFalseSection) {
+                gencode += "    } else {\n";
+                gencode += falseSection;
+            }
+            gencode += "    }\n";
+        } else if(needFalseSection) {
+            gencode += "if(!" + conditionstring + ") {\n";
+            gencode += falseSection;
+            gencode += "    }\n";
+        }
 
-//         // gencode += "    }\n";
-//     } else {
-//         if(instr->getNumSuccessors() == 1) {
-//             BasicBlock *nextBlock = instr->getSuccessor(0);
-//             string phicode = dumpPhi(instr, nextBlock);
-//             if(phicode != "") {
-//                 gencode += "    " + phicode;
-//             }
-//             bool needGoto = true;
-//             if(instr->getNextNode() == 0) {
-//                 if(functionBlockIndex[nextBlock] == functionBlockIndex[instr->getParent()] + 1) {
-//                     needGoto = false;
-//                 }
-//             }
-//             if(needGoto) {
-//                 gencode += "    goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
-//             }
-//         } else {
-//             throw runtime_error("not implemented sucessors != 1 for unconditional br");
-//         }
-//     }
-//     return gencode;
-// }
+        // gencode += "    }\n";
+    } else {
+        if(instr->getNumSuccessors() == 1) {
+            BasicBlock *nextBlock = instr->getSuccessor(0);
+            string phicode = dumpPhi(instr, nextBlock);
+            if(phicode != "") {
+                gencode += "    " + phicode;
+            }
+            bool needGoto = true;
+            if(instr->getNextNode() == 0) {
+                if(functionBlockIndex[nextBlock] == functionBlockIndex[instr->getParent()] + 1) {
+                    needGoto = false;
+                }
+            }
+            if(needGoto) {
+                gencode += "    goto " + dumpOperand(instr->getSuccessor(0)) + ";\n";
+            }
+        } else {
+            throw runtime_error("not implemented sucessors != 1 for unconditional br");
+        }
+    }
+    return gencode;
+}
 
 std::string dumpSelect(SelectInst *instr) {
     string gencode = "";
@@ -1292,10 +1296,10 @@ std::string dumpInstruction(string indent, Instruction *instruction) {
             instructionCode = dumpAlloca(cast<AllocaInst>(instruction));
             return instructionCode + ";\n";
             // break;
-        // case Instruction::Br:
-        //     instructionCode = dumpBranch(cast<BranchInst>(instruction));
-        //     return instructionCode;
-        //     // break;
+        case Instruction::Br:
+            instructionCode = dumpBranch(cast<BranchInst>(instruction));
+            return instructionCode;
+            // break;
         case Instruction::Select:
             // COCL_PRINT(cout << "its a select" << endl);
             instructionCode = dumpSelect(cast<SelectInst>(instruction));
@@ -1487,35 +1491,35 @@ std::string dumpFunction(Function *F) {
     string gencode = "";
     string declaration = dumpFunctionDeclaration(F);
 
-    // ===============
-    // flowcontrol
-    // COCL_PRINT(cout << declaration << endl);
-    // std::unique_ptr<cocl::flowcontrol::RootBlock> root = cocl::load_branching_tree(F);
-    // if(runBranchingTransforms) {
-    //     cout << "running branching transforms..." << endl;
-    //     cocl::runTransforms(root.get(), dumpTransforms);
-    // }
-    // string bodyCl = cocl::branching_write_cl(root.get());
-    // ===============
-    // branches_as_switch
-    cocl::BranchesAsSwitch branchesAsSwitch(F);
-    branchesAsSwitch.parse();
-    string bodyCl = branchesAsSwitch.writeAsCl();
-    // ===============
+    string bodyCl = "";
+    if(branchesAsSwitch) {
+        cocl::BranchesAsSwitch branchesAsSwitch(F);
+        branchesAsSwitch.parse();
+        bodyCl = branchesAsSwitch.writeAsCl();
+    } else {
+        if(runBranchingTransforms) {
+            std::unique_ptr<cocl::flowcontrol::RootBlock> root = cocl::load_branching_tree(F);
+            if(runBranchingTransforms) {
+                cout << "running branching transforms..." << endl;
+                cocl::runTransforms(root.get(), dumpTransforms);
+            }
+            bodyCl = cocl::branching_write_cl(root.get());
+        } else {
+            functionBlockIndex.clear();
+            int i = 0;
+            for(auto it=F->begin(); it != F->end(); it++) {
+                BasicBlock *basicBlock = &*it;
+                functionBlockIndex[basicBlock] = i;
+                i++;
+            }
 
-    // functionBlockIndex.clear();
-    // int i = 0;
-    // for(auto it=F->begin(); it != F->end(); it++) {
-    //     BasicBlock *basicBlock = &*it;
-    //     functionBlockIndex[basicBlock] = i;
-    //     i++;
-    // }
+            for(auto it=F->begin(); it != F->end(); it++) {
+                BasicBlock *basicBlock = &*it;
+                bodyCl += dumpBasicBlock(basicBlock);
+            }
+        }
+    }
 
-    // string body = "";
-    // for(auto it=F->begin(); it != F->end(); it++) {
-    //     BasicBlock *basicBlock = &*it;
-    //     body += dumpBasicBlock(basicBlock);
-    // }
     gencode =
         declaration + " {\n" +
         currentFunctionSharedDeclarations;
@@ -1661,21 +1665,34 @@ int main(int argc, char *argv[]) {
     SMDiagnostic smDiagnostic;
     string target;
     string outputfilepath;
-    bool noRunBranchingTransforms = false;
     string specificFunction = "";
+    string rcFile = "";
 
     argparsecpp::ArgumentParser parser;
     parser.add_string_argument("--inputfile", &target)->required();
     parser.add_string_argument("--outputfile", &outputfilepath)->required();
     parser.add_bool_argument("--debug", &debug);
+    // parser.add_string_argument("--rcfile", &rcFile)
+    //     ->help("Path to rcfile, containing default options, set to blank to disable")
+    //     ->defaultValue("~/.coclrc");
+    // parser.add_bool_argument("--no-load_rcfile", &add_ir_to_cl)->help("Dont load the ~/.coclrc file");
     parser.add_bool_argument("--add_ir_to_cl", &add_ir_to_cl);
-    parser.add_bool_argument("--no_branching_transforms", &noRunBranchingTransforms);
+    parser.add_bool_argument("--run_branching_transforms", &runBranchingTransforms)->help("might make the kernels more acceptable to your gpu driver; buggy though...");
+    parser.add_bool_argument("--branches_as_switch", &branchesAsSwitch)->help("might make the kernels more acceptable to your gpu driver; slow though...");
     parser.add_bool_argument("--dump_transforms", &dumpTransforms)->help("mostly for dev/debug.  prints the results of branching transforms");
     parser.add_string_argument("--specific_function", &specificFunction)->help("Mostly for dev/debug, just process one specific function");
     if(!parser.parse_args(argc, argv)) {
         return -1;
     }
-    runBranchingTransforms = !noRunBranchingTransforms;
+
+    // if(rcFile != "") {
+    //     loadRcFile(rcFile);
+    // }
+
+    // if(branchesAsSwitch && runBranchingTransforms) {
+    //     cout << "Branching transforms not yet supported for --branches_as_switch" << endl;
+    //     return -1;
+    // }
 
     std::unique_ptr<llvm::Module> M = parseIRFile(target, smDiagnostic, context);
     if(!M) {

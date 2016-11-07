@@ -1,7 +1,19 @@
 cmake_minimum_required(VERSION 2.8)
 
 option(BUILD_TESTS "Build tests" OFF)
+set(TESTS_COCL_OPTIONS "" CACHE STRING "cocl options, semicolon-separated.  See cocl -h")
+# option(TESTS_RUN_TRANSFORM_BRANCHES "")
+option(TESTS_DEVICELL_INLINE "cocl option for tests" ON)
+option(TESTS_DEVICELL_MEM2REG "cocl option for tests" ON)
+option(TESTS_DEVICELL_INSTCOMBINE "cocl option for tests" ON)
+set(TESTS_DEVICELL_OPT "O1" CACHE STRING "cocl option for tests")
+option(TESTS_CL_RUN_TRANSFORMS "cocl option for tests" OFF)
+option(TESTS_CL_BRANCHES_AS_SWITCH "cocl option for tests" OFF)
 option(COCL_SPAM "Lots of scrolly debug text.  Mostly for maintainer usage" OFF)
+
+# if(CL_BRANCHES_AS_SWITCH)
+#     unset(CL_RUN_TRANSFORMS CACHE)
+# endif()
 
 set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/platforminfo_helper.cpp src/EasyCL/EasyCL.cpp
     src/EasyCL/deviceinfo_helper.cpp src/EasyCL/util/easycl_stringhelper.cpp src/EasyCL/DevicesInfo.cpp src/EasyCL/DeviceInfo.cpp)
@@ -67,12 +79,6 @@ if(COCL_SPAM)
 endif()
 target_link_libraries(cocl easycl)
 
-# # target_include_directories(cocl PRIVATE src/CLBlast/include)
-
-# # SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
-# # FindPackage(cocl)
-include(cmake/cocl.cmake)
-
 # ==================================================================================================
 
 # next ~20 lines or so are copied from CLBlast CMakeLists.txt (seems easier than figuring out the whole cmake import/export
@@ -121,6 +127,8 @@ target_link_libraries(cocl clblast)
 
 # ==================================================================================================
 # tests
+
+include(cmake/cocl.cmake)
 
 if(BUILD_TESTS)
     set(TESTS testblas cuda_sample context byvaluestructwithpointer multigpu multithreading

@@ -57,11 +57,19 @@ function display_help {
              Try to convert heap allocations to registers
              Generally required, otherwise you'll get errors about address space mismatch
 
+          -devicell-opt instcombine
+             Pass to combine instructions where possible
+             This generally has no downsides.  You want this :-)
+
           -devicell-opt O3
           -devicell-opt O2
           -devicell-opt O1
           -devicell-opt O0
              Set various standard optimization levels
+             O0 works, as long as you set inline, mem2reg and instcombine
+             O1 and O2 are probably good options in general
+             O3 produces really long, gnarly llvm code, that is harder for the opencl generation
+             pass to deal with
 
       OpenCL generation options:
 
@@ -101,6 +109,7 @@ EOF
 # echo args "$@"
 PASSTHRU=
 export IROOPENCLARGS=
+export DEVICELLOPT=
 while [[ x$1 != x ]]; do {
     # echo 1 $1
     arr1=(${1//=/ })
@@ -172,6 +181,14 @@ while [[ x$1 != x ]]; do {
                 ;;
             -isystem)
                 # PASSTHRU="$PASSTHRU $1 $2"
+                shift
+                ;;
+             -devicell-opt)
+                if [[ x$2 == x ]]; then {
+                    echo Please provide a value for -devicell-opt
+                    exit 1
+                } fi
+                DEVICELLOPT="${DEVICELLOPT} -$2"
                 shift
                 ;;
             --run_branching_transforms)

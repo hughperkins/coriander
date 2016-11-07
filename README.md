@@ -57,6 +57,18 @@ hostFloats[2] 444
 | -I   | provide an include directory, eg `-I /usr/local/eigen` |
 | -o   | output filepath, eg `-o foo.o` |
 | -c   | compile to .o file; dont link |
+| -devicell-opt [option] | pass [option] through to device ll optimization phase.  Affects success and quality of OpenCL generation.
+You want: `-devicell-opt inline -devicell-opt mem2reg -devicell-opt instcombine`.  `-devicell-opt O1` or `-devicell-opt O2` might be helpful |
+| -branches_as_switch | Write branch instructions as a `switch`, in the OpenCL.  Fairly correct.  Some GPU drivers might like it. Slow |
+| -run_branching_transforms | Try to write branches as `for`/`if`/while`.  Makes code more readable.  Some GPU drivers might like it.  Buggy |
+| -fPIC | passed to clang object-code compiler |
+
+The options provided to `-devicell-opt` are passed through to `opt-3.8`, http://llvm.org/docs/Passes.html
+
+It fits in as follows:
+- `clang-3.8 -x cuda --device-only` is run, against hte `.cu` file, to convert it to LLVM IR
+- `opt-3.8` is run to optimize slightly this IR.  This is the command whose optimizations are guided by the `-devicell-opt` options
+- then, `ir-to-opencl` converts the output of `opt-3.8` into OpenCL
 
 ## How it works
 
@@ -123,15 +135,20 @@ py.test -svx
 
 ### End-to-end tests
 
-Simply run:
+Run:
 ```
 cd build
+ccmake ..
+```
+turn on `BUILD_TESTS`, and run the build.
+
+Now you can do, from `build` directory:
+```
 make run-tests
 ```
 
 You can run a test by name, eg:
 ```
-cd build
 make run-offsetkernelargs
 ```
 Result:
@@ -145,6 +162,12 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 126.456
 ```
 - end-to-end tests are at [test/cocl](test/cocl)
+
+#### Tests options
+
+From `ccmake ..`, there are various options you can choose, that affect hte OpenCL code produced.  These options will affect how well the OpenCL generation works, and how acceptable it is to your GPU driver.  If you're reading the OpenCL code ,they will affect readability too.
+
+You can see the section `Options` above for more details.
 
 ## Docker
 
