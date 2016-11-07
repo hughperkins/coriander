@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <memory>
+#include <iostream>
 
 
 namespace argparsecpp {
@@ -40,6 +41,7 @@ public:
     bool _required = false;
     std::string _help = "";
     virtual void applyDefault() {};
+    virtual void writeDefault(std::ostream &os) = 0;
 };
 
 class OptionBool : public Option {
@@ -51,6 +53,7 @@ public:
     virtual void parse(std::string valueString) override;
     OptionBool *defaultTrue();
     virtual void applyDefault() override;
+    virtual void writeDefault(std::ostream &os) override;
 };
 
 class OptionString : public Option {
@@ -62,6 +65,7 @@ public:
     void parse(std::string valueString) override;
     OptionString *defaultValue(std::string _default);
     virtual void applyDefault() override;
+    virtual void writeDefault(std::ostream &os) override;
 };
 
 class OptionFloat : public Option {
@@ -73,6 +77,7 @@ public:
     void parse(std::string valueString) override;
     OptionFloat *defaultValue(float _default);
     virtual void applyDefault() override;
+    virtual void writeDefault(std::ostream &os) override;
 };
 
 class OptionInt : public Option {
@@ -84,6 +89,7 @@ public:
     void parse(std::string valueString) override;
     OptionInt *defaultValue(int _default);
     virtual void applyDefault() override;
+    virtual void writeDefault(std::ostream &os) override;
 };
 
 class ArgumentParser {

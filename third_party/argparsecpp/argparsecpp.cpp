@@ -37,6 +37,9 @@ void OptionBool::parse(std::string valueString) {
 void OptionBool::applyDefault() {
     *target = _defaultTrue;
 }
+void OptionBool::writeDefault(std::ostream &os) {
+    os << _defaultTrue;
+}
 
 OptionString::OptionString(std::string *target) : target(target) {}
 bool OptionString::needsValue() { return true; }
@@ -49,6 +52,9 @@ OptionString *OptionString::defaultValue(std::string _default) {
 }
 void OptionString::applyDefault() {
     *target = _default;
+}
+void OptionString::writeDefault(std::ostream &os) {
+    os << _default;
 }
 
 OptionFloat::OptionFloat(float *target) : target(target) {}
@@ -63,6 +69,9 @@ OptionFloat *OptionFloat::defaultValue(float _default) {
 void OptionFloat::applyDefault() {
     *target = _default;
 }
+void OptionFloat::writeDefault(std::ostream &os) {
+    os << _default;
+}
 
 OptionInt::OptionInt(int *target) : target(target) {}
 bool OptionInt::needsValue() { return true; }
@@ -75,6 +84,9 @@ OptionInt *OptionInt::defaultValue(int _default) {
 }
 void OptionInt::applyDefault() {
     *target = _default;
+}
+void OptionInt::writeDefault(std::ostream &os) {
+    os << _default;
 }
 
 OptionInt *ArgumentParser::add_int_argument(std::string option, int *var) {
@@ -107,11 +119,18 @@ void ArgumentParser::print_usage() {
     for(auto it=options.begin(); it != options.end(); it++) {
         Option *option = it->second.get();
         std::string arg = it->first;
-        std::cout << "  " << arg;
+        std::cout << " " << arg;
+        if(option->_help != "") {
+            std::cout << "     " + option->_help;
+        }
         if(option->_required) {
             std::cout << " (required)";
+        } else {
+            std::cout << " [default: ";
+            option->writeDefault(std::cout);
+            std::cout << "]";
         }
-        std::cout << "   " + option->_help << std::endl;
+        std::cout << std::endl;
     }
     std::cout << std::endl;
 }
