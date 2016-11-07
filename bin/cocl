@@ -16,16 +16,87 @@ if [[ -f ${COCL_HOME}/bin/ir-to-opencl ]]; then {
     export COCL_LIB=${COCL_HOME}/build
 } fi
 
-# echo COCL_HOME $COCL_HOME
-# echo COCL_BIN $COCL_BIN
-# echo PWD $PWD
-
 # Using this weird bash, compared to other possibilities because:
 # - getopts cant handle long options
 # - would rather not make cocl dependent on python (although I know that tensorflow already is)
 # - getopt non-gnu cant handle long options either
 # - getopt gnu is not the default on Mac
 # I *hope* that bash is fairly portable, across Linux, Mac, cygwin/msys64?
+
+function display_help {
+    cat <<EOF
+
+    Usage: cocl [options] <targetfile>
+      -c compile to .o only, dont link
+      -o final output filepath
+
+      Device IR optimization options
+         These are applied to the device IR generation step
+         This is before the OpenCL generation step
+         These options strongly affect the success or not of the OpenCL generation step
+         They will also affect the 'look' of the final OpenCL, which will influence whether
+         different GPU drivers can read it, and probably affects final execution speed
+         Optimization at this point is not important for speed, but does affect how
+         easy the resulting IR is to parse, and convert to OpenCL
+         Too much optimization makes the code long, and branching hard to disentangle
+         Too little optimization causes lots of memory allocaiton/free, which invariably
+         makes it hard to handle address spaces
+
+         These options will mostly be passed through to opt-3.8
+
+          -devicell-opt [OPTION]
+             Passed through to opt-3.8
+
+           Examples:
+
+         --devicell-opt inline
+             Try to inline OpenCL functions
+             Generally required, otherwise you'll get errors about address space mismatch
+
+         --devicell-opt mem2reg
+             Try to convert heap allocations to registers
+             Generally required, otherwise you'll get errors about address space mismatch
+
+          -devicell-opt O3
+          -devicell-opt O2
+          -devicell-opt O1
+          -devicell-opt O0
+             Set various standard optimization levels
+
+      OpenCL generation options:
+
+        --branches_as_switch
+             Use a 'switch' statement to simulate branching
+             Some GPU drivers might prefer this output
+             Fairly correct.  Probably slow
+
+        --run_branching_transforms
+             Try to rewrite 'goto's as fors/whiles/ifs
+             Some GPU drivers might prefer the output
+             Currently buggy.  Cant be used with branches_as_switch
+
+      Options passed through to clang compiler:
+        -fPIC
+        -I<INCLUDEDIR>
+        -g
+
+      Options ignored currently:
+        -O
+        -G
+        -D<SYMBOL>[=<VALUE>]
+        -U
+        -M
+        -x <something>
+        -iquote <something>
+        -isystem <something>
+        -compiler-options <something>
+        -fno-canonical-system-headers
+        -std<something>
+        -compiler-bindir
+        -gencode
+
+EOF
+}
 
 # echo args "$@"
 PASSTHRU=
@@ -103,8 +174,23 @@ while [[ x$1 != x ]]; do {
                 # PASSTHRU="$PASSTHRU $1 $2"
                 shift
                 ;;
-            --no_branching_transforms)
-                IROOPENCLARGS="${IROOPENCLARGS} --no_branching_transforms"
+            --run_branching_transforms)
+                IROOPENCLARGS="${IROOPENCLARGS} $1"
+                ;;
+            --branches_as_switch)
+                IROOPENCLARGS="${IROOPENCLARGS} $1"
+                ;;
+            -?)
+                display_help
+                exit 0
+                ;;
+            -h)
+                display_help
+                exit 0
+                ;;
+            --help)
+                display_help
+                exit 0
                 ;;
             -gencode)
                 # echo ignoring -gencode
@@ -151,15 +237,8 @@ while [[ x$1 != x ]]; do {
     shift
 } done
 
-# echo OUTPATH [$OUTPATH]
-# echo INFILES ["$INFILES"]
-# echo PASSTHRU $PASSTHRU
 INPATH=${INFILES}
 
-# echo INCLUDES ${INCLUDES}
-# echo INPATH ${INPATH}
-# echo OUTPATH ${OUTPATH}
-# echo COMPILE ${COMPILE}
 export INCLUDES
 
 if [[ x$INPATH == x ]]; then {
@@ -197,11 +276,6 @@ split_path ${INPATH}
 INPUTBASEPATH=${BASEPATH}
 INPUTPOSTFIX=${POSTFIX}
 
-# # INPUTBASENAME=$(basename -s .cc ${INPATH})
-# INPUTBASENAME=$(basename -s .cu ${INPATH})
-# INPUTDIRNAME=$(dirname ${INPATH})
-# INPUTBASEPATH=${INPUTDIRNAME}/${INPUTBASENAME}
-
 if [[ -v OUTPATH ]]; then {
     OUTFILE=${OUTPATH}
 } else {
@@ -216,13 +290,6 @@ split_path ${OUTFILE}
 OUTPUTBASEPATH=${BASEPATH}
 OUTPUTPOSTFIX=${POSTFIX}
 
-
-# OUTPUTBASENAME=$(basename -s .o ${OUTFILE})
-# OUTPUTDIRNAME=$(dirname ${OUTFILE})
-# OUTPUTBASEPATH=${OUTPUTDIRNAME}/${OUTPUTBASENAME}
-
-# exit 1
-
 if [[ x${NOCOCLREBUILD} == x ]]; then {
     (cd ${COCL_HOME}
          # make
@@ -234,24 +301,12 @@ if [[ ! -v COMPILE ]]; then {
     OUTPUTPOSTFIX=.o
 } fi
 
-# PASSTHRU="${PASSTHRU}" OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${COCL_HOME}/src/cocl.Makefile
-# echo ${SCRIPT_DIR}/../share/cocl/cocl.Makefile
-# echo PASSTHRU ${PASSTHRU}
-OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} FINALPOSTFIX=${FINALPOSTFIX} PASSTHRU=${PASSTHRU} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${SCRIPT_DIR}/../share/cocl/cocl.Makefile
 
+OUTPUTARTIFACT=
 if [[ ! -v COMPILE ]]; then {
-    # echo linking...
-    # echo COCL_LIB ${COCL_LIB}
-    OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} PASSTHRU=${PASSTHRU} INPUTPOSTFIX=${INPUTPOSTFIX} INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} make -f ${SCRIPT_DIR}/../share/cocl/cocl.Makefile ${OUTPUTBASEPATH}${FINALPOSTFIX}
-    # g++  -Wl,-rpath,/usr/local/lib -Wl,-rpath,$$ORIGIN -Wl,-rpath,$$ORIGIN/clblast -o ${OUTPUTBASEPATH}${FINALPOSTFIX} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} -L${COCL_HOME}/build -L${COCL_HOME}/build/clblast -lcocl -lclblast -lOpenCL -leasycl -lclew -lpthread
+    OUTPUTARTIFACT=${OUTPUTBASEPATH}${FINALPOSTFIX}
 } fi
 
-#     set +x
-#     echo ""
-#     echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}"
-#     echo ""
-# } else {
-#     set +x
-#     echo ""
-#     echo "    ${INPUTBASEPATH}${INPUTPOSTFIX} compiled into ${OUTPUTBASEPATH}${FINALPOSTFIX}"
-#     echo ""
+OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} PASSTHRU=${PASSTHRU} INPUTPOSTFIX=${INPUTPOSTFIX} \
+    INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} \
+    make -B -f ${SCRIPT_DIR}/../share/cocl/cocl.Makefile ${OUTPUTARTIFACT}
