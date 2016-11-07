@@ -595,8 +595,9 @@ std::string dumpInsertValue(InsertValueInst *instr) {
     Type *currentType = instr->getType();
     bool declaredVar = false;
     if(incomingOperand == "") {
-        gencode += dumpType(instr->getType()) + " " + dumpOperand(instr) + ";\n";
-        gencode += "    ";
+        string declaration = dumpType(instr->getType()) + " " + dumpOperand(instr) + ";\n";
+        currentFunctionSharedDeclarations += declaration;
+        // gencode += "    ";
         incomingOperand = dumpOperand(instr);
         declaredVar = true;
     }
