@@ -275,6 +275,27 @@ __global__ void mykernel(float *data, int a, int b) {
     # assert abs(float_data[0] - sum(float_data_orig[0:32])) < 1e-4
 
 
+def test_simpleloop(context, q, float_data, float_data_gpu):
+    sourcecode = """
+__global__ void longKernel(float *data, int N, float value) {
+    for(int i = 0; i < N; i++) {
+        data[i] += value;
+    }
+}
+"""
+    prog = compile_code(cl, context, sourcecode)
+    float_data_orig = np.copy(float_data)
+
+    N = 2
+    prog.__getattr__(test_common.mangle('longKernel', ['float *', 'int', 'float']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(N), np.float32(123), cl.LocalMemory(4))
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_code = f.read()
+    print('cl_code', cl_code)
+    print(float_data[0])
+
+
 def test_break(context, q, float_data, float_data_gpu):
     sourcecode = """
 __global__ void testFor(float *data, int N) {

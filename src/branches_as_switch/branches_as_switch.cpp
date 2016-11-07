@@ -132,10 +132,10 @@ std::string BranchesAsSwitch::writeAsCl() {
     indentLevel++;
     for(auto it=blockById.begin(); it != blockById.end(); it++) {
         int blockId = it->first;
-        cout << "block " << blockId << endl;
+        // cout << "block " << blockId << endl;
         BasicBlock *block = it->second;
         int numInstructions = block->getInstList().size();
-        cout << "numInstructions " << numInstructions << endl;
+        // cout << "numInstructions " << numInstructions << endl;
         if(numInstructions == 0) {
             continue;
         }

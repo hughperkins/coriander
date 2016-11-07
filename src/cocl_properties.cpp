@@ -114,7 +114,8 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
     prop->regsPerBlock = 64;
     prop->warpSize = 32;
     // prop->memPitch = 4; // whats this?
-    prop->maxThreadsPerBlock = getDeviceInfoInt(deviceid, CL_DEVICE_MAX_WORK_GROUP_SIZE);
+    // prop->maxThreadsPerBlock = getDeviceInfoInt(deviceid, CL_DEVICE_MAX_WORK_GROUP_SIZE);
+    prop->maxThreadsPerBlock = 256;
     prop->maxThreadsDim[0] = 1024;
     prop->maxThreadsDim[1] = 1024;
     prop->maxThreadsDim[2] = 1024;
