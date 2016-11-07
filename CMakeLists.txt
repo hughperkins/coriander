@@ -117,6 +117,8 @@ add_library(clblast SHARED ${CLBLAST_SOURCES})
 target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
 target_include_directories(clblast PRIVATE src/CLBlast/include)
 
+target_link_libraries(cocl clblast)
+
 # ==================================================================================================
 # tests
 
