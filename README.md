@@ -183,15 +183,6 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 <img src="https://github.com/hughperkins/cuda-on-cl/raw/master/doc/img/dockerfile_beignet_cudasample.png?raw=true" width="600" />
 
-## Roadmap
-
-- I'm working on adding branching transforms, to get rid of `goto` and `label` statements, and replace with `if`, `for`, `while`
-  - this seems plausibly necessary for usage on Intel HD5500
-  - in any case it makes the output way more humanly readable
-- It's mostly working.  There are some pathological cases I'm not sure can be handled
-  - so I need to re-enable opencl generation from these remaining `goto`/`label` nodes
-- then I'm going to test against the tensorflow sqrt unary operator kernel, on HD5500, and try to figure out why that is not working, and/or how to get it to work ok
-
 ## Related projects
 
 - Eigen-CL: Minimally-tweaked fork of Eigen, which can be compiled/run using cuda-on-cl, on an OpenCL device, https://bitbucket.org/hughperkins/eigen/commits/branch/eigen-cl
