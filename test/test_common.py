@@ -5,6 +5,36 @@ import subprocess
 clang_path = 'clang++-3.8'
 
 
+# partial read/write seem not implemented in the version of pyopencl I have
+# logged an issue at https://github.com/pyopencl/pyopencl/issues/153
+def enqueue_write_buffer_ext(cl, queue, mem, hostbuf, device_offset=0, size=None,
+                             wait_for=None, is_blocking=True):
+    ptr_event = cl.cffi_cl._ffi.new('clobj_t*')
+    c_buf, actual_size, c_ref = cl.cffi_cl._c_buffer_from_obj(hostbuf, retain=True)
+    if size is None:
+        size = actual_size
+    c_wait_for, num_wait_for = cl.cffi_cl._clobj_list(wait_for)
+    nanny_event = cl.cffi_cl.NannyEvent._handle(hostbuf, c_ref)
+    cl.cffi_cl._handle_error(cl.cffi_cl._lib.enqueue_write_buffer(
+            ptr_event, queue.ptr, mem.ptr, c_buf, size, device_offset, c_wait_for, num_wait_for, bool(True),
+            nanny_event))
+    return cl.cffi_cl.NannyEvent._create(ptr_event[0])
+
+
+def enqueue_read_buffer_ext(cl, queue, mem, hostbuf, device_offset=0, size=None,
+                            wait_for=None, is_blocking=True):
+    ptr_event = cl.cffi_cl._ffi.new('clobj_t*')
+    c_buf, actual_size, c_ref = cl.cffi_cl._c_buffer_from_obj(hostbuf, retain=True)
+    if size is None:
+        size = actual_size
+    c_wait_for, num_wait_for = cl.cffi_cl._clobj_list(wait_for)
+    nanny_event = cl.cffi_cl.NannyEvent._handle(hostbuf, c_ref)
+    cl.cffi_cl._handle_error(cl.cffi_cl._lib.enqueue_read_buffer(
+            ptr_event, queue.ptr, mem.ptr, c_buf, size, device_offset, c_wait_for, num_wait_for, bool(True),
+            nanny_event))
+    return cl.cffi_cl.NannyEvent._create(ptr_event[0])
+
+
 def cocl_options():
     options = []
     # if os.environ.get('COCL_BRANCHES_AS_SWITCH', '0') != '0':
@@ -30,6 +60,8 @@ def mangle(name, param_types):
             mangled += 'Pi'
         elif param.replace(' ', '') == 'int':
             mangled += 'i'
+        elif param.replace(' ', '') == 'long':
+            mangled += 'l'
         elif param.replace(' ', '') == 'float':
             mangled += 'f'
         elif param.endswith('*'):

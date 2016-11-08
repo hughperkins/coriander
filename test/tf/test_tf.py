@@ -8,36 +8,6 @@ import subprocess
 from test import test_common
 
 
-# partial read/write seem not implemented in the version of pyopencl I have
-# logged an issue at https://github.com/pyopencl/pyopencl/issues/153
-def enqueue_write_buffer_ext(queue, mem, hostbuf, device_offset=0, size=None,
-                             wait_for=None, is_blocking=True):
-    ptr_event = cl.cffi_cl._ffi.new('clobj_t*')
-    c_buf, actual_size, c_ref = cl.cffi_cl._c_buffer_from_obj(hostbuf, retain=True)
-    if size is None:
-        size = actual_size
-    c_wait_for, num_wait_for = cl.cffi_cl._clobj_list(wait_for)
-    nanny_event = cl.cffi_cl.NannyEvent._handle(hostbuf, c_ref)
-    cl.cffi_cl._handle_error(cl.cffi_cl._lib.enqueue_write_buffer(
-            ptr_event, queue.ptr, mem.ptr, c_buf, size, device_offset, c_wait_for, num_wait_for, bool(True),
-            nanny_event))
-    return cl.cffi_cl.NannyEvent._create(ptr_event[0])
-
-
-def enqueue_read_buffer_ext(queue, mem, hostbuf, device_offset=0, size=None,
-                            wait_for=None, is_blocking=True):
-    ptr_event = cl.cffi_cl._ffi.new('clobj_t*')
-    c_buf, actual_size, c_ref = cl.cffi_cl._c_buffer_from_obj(hostbuf, retain=True)
-    if size is None:
-        size = actual_size
-    c_wait_for, num_wait_for = cl.cffi_cl._clobj_list(wait_for)
-    nanny_event = cl.cffi_cl.NannyEvent._handle(hostbuf, c_ref)
-    cl.cffi_cl._handle_error(cl.cffi_cl._lib.enqueue_read_buffer(
-            ptr_event, queue.ptr, mem.ptr, c_buf, size, device_offset, c_wait_for, num_wait_for, bool(True),
-            nanny_event))
-    return cl.cffi_cl.NannyEvent._create(ptr_event[0])
-
-
 def test_cwise_sqrt(context, q, float_data, float_data_gpu):
     options = test_common.cocl_options()
     i = 0
@@ -208,7 +178,7 @@ def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
 
     # copy our host memory across
     # cl.enqueue_copy(q, huge_buf_gpu_spare, src_host, device_offset=256, size=N * 4)
-    enqueue_write_buffer_ext(queue, huge_buf_gpu, src_host, device_offset=src_offset, size=N * 4)
+    test_common.enqueue_write_buffer_ext(cl, queue, huge_buf_gpu, src_host, device_offset=src_offset, size=N * 4)
 
     global_size = 256
     workgroup_size = 256
@@ -225,7 +195,7 @@ def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
     # check for errors
     queue.finish()
 
-    enqueue_read_buffer_ext(queue, huge_buf_gpu, dst_host, device_offset=dst_offset, size=N * 4)
+    test_common.enqueue_read_buffer_ext(cl, queue, huge_buf_gpu, dst_host, device_offset=dst_offset, size=N * 4)
     # cl.enqueue_copy(queue, dst_host, huge_buf_gpu, device_offset=128, size=N * 4)
     queue.finish()
     print('dst_host[:N]', dst_host[:N])
