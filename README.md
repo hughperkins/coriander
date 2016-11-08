@@ -201,7 +201,7 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 ## News
 
-- Nov 7:
+- Nov 8:
   - exposed generation options as `cocl` options, eg `--run_branching_transforms`, `--branches_as_switch`, and the `--devicell-opt [opt]` options
 - Nov 6:
   - created dockerfiles for Beignet and NVIDIA [docker](docker)
