@@ -3,6 +3,7 @@
 import subprocess
 import pyopencl as cl
 import pytest
+from test import test_common
 
 
 @pytest.mark.parametrize("cl_filepath", [
@@ -22,7 +23,7 @@ def test_compile(context, cl_filepath):
     print(subprocess.check_output([
         'bin/cocl', '-c', '-o', cl_filepath.replace('-device.cl', '.o'),
         cl_filepath.replace('/generated', '').replace('-device.cl', '.cu')
-    ]).decode('utf-8'))
+    ] + test_common.cocl_options()).decode('utf-8'))
 
     with open(cl_filepath, 'r') as f:
         sourcecode = f.read()

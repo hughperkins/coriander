@@ -67,6 +67,7 @@ static string globalDeclarations = "";
 static string structpointershimcode = "";
 static set<Value *> functionNeededForwardDeclarations;
 static map<BasicBlock *, int> functionBlockIndex;
+static set<Value *> currentFunctionAlreadyDeclaredShared;
 // static set<Value *>valuesAreExpressions;
 
 extern bool single_precision;
@@ -510,21 +511,30 @@ string dumpStore(StoreInst *instr) {
 
 void addSharedDeclaration(Value *value) {
     value ->dump();
-    if(nameByValue.find(value) != nameByValue.end()) {
+    // if(nameByValue.find(value) != nameByValue.end()) {
+    if(currentFunctionAlreadyDeclaredShared.find(value) != currentFunctionAlreadyDeclaredShared.end()) {
+        // cout << "already in nameByValue, so returning" << endl;
         return;
     }
     if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
+        // cout << "got glob" << endl;
         string name = getName(glob);
         string declaration = "";
         Type *type = glob->getType();
         if(ArrayType *arraytype = dyn_cast<ArrayType>(type->getPointerElementType())) {
+            // cout << "its an array" << endl;
             int length = arraytype->getNumElements();
             Type *elementType = arraytype->getElementType();
             string typestr = dumpType(elementType);
             declaration += "    local " + typestr + " " + name + "[" + toString(length) + "];\n";
             nameByValue[value] = name;
             currentFunctionSharedDeclarations += declaration;
+            currentFunctionAlreadyDeclaredShared.insert(value);
+        } else {
+            // cout << "not an array" << endl;
         }
+    } else {
+        // cout << "not globalvaraibel" << endl;
     }
 }
 
@@ -539,6 +549,7 @@ string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
         throw runtime_error("dumpgetelementptrrhs op0typeptr is 0");
     }
     int addressspace = op0typeptr->getAddressSpace();
+    // cout << "dumpgetlementptrrhs operand " << rhs << " addressspace=" << addressspace << endl;
     if(addressspace == 3) { // local/shared memory
         // pointer into shared memory.
         addSharedDeclaration(instr->getOperand(0));
@@ -1488,6 +1499,7 @@ std::string dumpFunction(Function *F) {
     currentFunctionSharedDeclarations = "";
     currentFunctionPhiDeclarationsByName.clear();
     functionNeededForwardDeclarations.clear();
+    currentFunctionAlreadyDeclaredShared.clear();
     string gencode = "";
     string declaration = dumpFunctionDeclaration(F);
 
