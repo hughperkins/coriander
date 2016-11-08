@@ -64,9 +64,9 @@ hostFloats[2] 444
 
 The options provided to `-devicell-opt` are passed through to `opt-3.8`, http://llvm.org/docs/Passes.html
 
-It fits in as follows:
-- `clang-3.8 -x cuda --device-only` converts the incoming '.cu' file to LLVM IR
-- `opt-3.8` optimizes the IR.  `-devicell-opt` options control this
+`opt-3.8` fits in as follows:
+- `clang-3.8 -x cuda --device-only` converts the incoming `.cu` file to LLVM IR
+- `opt-3.8` optimizes the IR.  `-devicell-opt` control this
 - `ir-to-opencl` writes the IR as OpenCL
 
 Recommended generation options:
