@@ -134,10 +134,12 @@ pip install -r test/requirements.txt
 #### Procedure
 
 ```
-py.test -svx
+COCL_OPTIONS='--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine' py.test -svx
 ```
 
 - python tests are at [test](test)
+
+You can modify the options in `COCL_OPTIONS`.  There are passed to the `cocl` command, see section #Options above.
 
 ### End-to-end tests
 

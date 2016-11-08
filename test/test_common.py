@@ -1,6 +1,5 @@
 import os
 import subprocess
-import pytest
 
 
 clang_path = 'clang++-3.8'

@@ -19,23 +19,24 @@ import pytest
 import os
 import subprocess
 from test import test_common
+from test.test_common import compile_code
 
 
-def compile_code(context, kernelSource):
-    for file in os.listdir('/tmp'):
-        if file.startswith('testprog'):
-            os.unlink('/tmp/%s' % file)
-    with open('/tmp/testprog.cu', 'w') as f:
-        f.write(kernelSource)
-    print(subprocess.check_output([
-        'bin/cocl',
-        '-c',
-        '/tmp/testprog.cu'
-    ]).decode('utf-8'))
-    with open('/tmp/testprog-device.cl', 'r') as f:
-        cl_sourcecode = f.read()
-    prog = cl.Program(context, cl_sourcecode).build()
-    return prog
+# def compile_code(context, kernelSource):
+#     for file in os.listdir('/tmp'):
+#         if file.startswith('testprog'):
+#             os.unlink('/tmp/%s' % file)
+#     with open('/tmp/testprog.cu', 'w') as f:
+#         f.write(kernelSource)
+#     print(subprocess.check_output([
+#         'bin/cocl',
+#         '-c',
+#         '/tmp/testprog.cu'
+#     ]).decode('utf-8'))
+#     with open('/tmp/testprog-device.cl', 'r') as f:
+#         cl_sourcecode = f.read()
+#     prog = cl.Program(context, cl_sourcecode).build()
+#     return prog
 
 
 @pytest.fixture(scope='module')
@@ -53,7 +54,7 @@ def testcudakernel1_cl():
         'bin/cocl',
         '-c', '-o', 'test/generated/testcudakernel1.o',
         'test/testcudakernel1.cu'
-    ]).decode('utf-8'))
+    ] + test_common.cocl_options()).decode('utf-8'))
     cl_path = 'test/generated/testcudakernel1-device.cl'
     return cl_path
 
@@ -113,7 +114,7 @@ __global__ void use_template1(float *data, int *intdata) {
     }
 }
 """
-    prog = compile_code(context, code)
+    prog = compile_code(cl, context, code)
     float_data_orig = np.copy(float_data)
     int_data_orig = np.copy(int_data)
 
@@ -136,7 +137,7 @@ __global__ void testTernary(float *data) {
     data[0] = data[1] > 0 ? data[2] : data[3];
 }
 """
-    prog = compile_code(context, kernelSource)
+    prog = compile_code(cl, context, kernelSource)
     float_data_orig = np.copy(float_data)
 
     def set_float_value(gpu_buffer, idx, value):
@@ -179,7 +180,7 @@ __global__ void testStructs(MyStruct *structs, float *float_data, int *int_data)
     float_data[1] = structs[1].myfloat;
 }
 """
-    prog = compile_code(context, code)
+    prog = compile_code(cl, context, code)
 
     # my_struct = np.dtype([("myfloat", np.float32), ("myint", np.int32)])  # I dont know why, but seems these are back to front...
     my_struct = np.dtype([("myint", np.int32), ("myfloat", np.float32)])  # seems these are wrong way around on HD5500.  Works ok on 940M

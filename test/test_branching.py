@@ -14,10 +14,6 @@ limitations under the License.
 """
 import numpy as np
 import pyopencl as cl
-import pyopencl.tools
-import pytest
-import os
-import subprocess
 from test import test_common
 from test.test_common import compile_code
 
@@ -332,33 +328,33 @@ __global__ void testFor(float *data, int N) {
     assert abs(float_data[0] - sum) <= 1e-4
 
 
-def test_conditional_branch(context, q, float_data, float_data_gpu):
-    """
-    Just use normal if...else, but turn off branching transformations, and check
-    opencl works ok
-    """
-    sourcecode = """
-__global__ void testIfElse(float *data, int N) {
-    int tid = threadIdx.x;
-    if(tid < N) {
-        data[tid] *= 2;
-    } else {
-        data[tid] += 5;
-    }
-}
-"""
-    prog = compile_code(cl, context, sourcecode, branching_transformations=False)
-    float_data_orig = np.copy(float_data)
+# def test_conditional_branch(context, q, float_data, float_data_gpu):
+#     """
+#     Just use normal if...else, but turn off branching transformations, and check
+#     opencl works ok
+#     """
+#     sourcecode = """
+# __global__ void testIfElse(float *data, int N) {
+#     int tid = threadIdx.x;
+#     if(tid < N) {
+#         data[tid] *= 2;
+#     } else {
+#         data[tid] += 5;
+#     }
+# }
+# """
+#     prog = compile_code(cl, context, sourcecode, branching_transformations=False)
+#     float_data_orig = np.copy(float_data)
 
-    N = 2
-    prog.__getattr__(test_common.mangle('testIfElse', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(N), cl.LocalMemory(4))
-    cl.enqueue_copy(q, float_data, float_data_gpu)
-    q.finish()
-    with open('/tmp/testprog-device.cl', 'r') as f:
-        cl_code = f.read()
-    print('cl_code', cl_code)
-    for i in range(10):
-        if i < N:
-            assert float_data[i] == float_data_orig[i] * 2
-        else:
-            assert abs(float_data[i] - float_data_orig[i] - 5) <= 1e-4
+#     N = 2
+#     prog.__getattr__(test_common.mangle('testIfElse', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, np.int64(0), np.int32(N), cl.LocalMemory(4))
+#     cl.enqueue_copy(q, float_data, float_data_gpu)
+#     q.finish()
+#     with open('/tmp/testprog-device.cl', 'r') as f:
+#         cl_code = f.read()
+#     print('cl_code', cl_code)
+#     for i in range(10):
+#         if i < N:
+#             assert float_data[i] == float_data_orig[i] * 2
+#         else:
+#             assert abs(float_data[i] - float_data_orig[i] - 5) <= 1e-4
