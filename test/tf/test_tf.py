@@ -2,6 +2,7 @@
 Try to run a tf kernel
 Check does/doesnt work
 """
+import os
 import numpy as np
 import pyopencl as cl
 import subprocess
@@ -117,24 +118,25 @@ def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
         i += 1
     print('opt_options', opt_options)
     print('iropencl_options', iropencl_options)
-    res = subprocess.run([
-        'opt-3.8'
-    ] + opt_options + [
-        '-S',
-        'test/tf/samples/cwise_op_gpu_sqrt-device-noopt.ll',
-        '-o', '/tmp/test-opt.ll'
-    ], stdout=subprocess.PIPE)
-    print(' '.join(res.args))
-    assert res.returncode == 0
+    if 'NOREBUILD' not in os.environ:
+        res = subprocess.run([
+            'opt-3.8'
+        ] + opt_options + [
+            '-S',
+            'test/tf/samples/cwise_op_gpu_sqrt-device-noopt.ll',
+            '-o', '/tmp/test-opt.ll'
+        ], stdout=subprocess.PIPE)
+        print(' '.join(res.args))
+        assert res.returncode == 0
 
-    res = subprocess.run([
-        'build/ir-to-opencl'
-    ] + iropencl_options + [
-        '--inputfile', '/tmp/test-opt.ll',
-        '--outputfile', '/tmp/test-device.cl'
-    ], stdout=subprocess.PIPE)
-    print(' '.join(res.args))
-    assert res.returncode == 0
+        res = subprocess.run([
+            'build/ir-to-opencl'
+        ] + iropencl_options + [
+            '--inputfile', '/tmp/test-opt.ll',
+            '--outputfile', '/tmp/test-device.cl'
+        ], stdout=subprocess.PIPE)
+        print(' '.join(res.args))
+        assert res.returncode == 0
 
     with open('/tmp/test-device.cl', 'r') as f:
         cl_sourcecode = f.read()
@@ -169,10 +171,10 @@ def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
     eval_nopointers_gpu = cl.Buffer(context, cl.mem_flags.READ_WRITE, size=4096)
 
     eval_ptr0_gpu = huge_buf_gpu
-    eval_ptr0_offset = src_offset
+    eval_ptr0_offset = dst_offset
 
     eval_ptr1_gpu = huge_buf_gpu
-    eval_ptr1_offset = dst_offset
+    eval_ptr1_offset = src_offset
 
     size = N
 
