@@ -9,6 +9,7 @@ from test import test_common
 @pytest.mark.parametrize("cl_filepath", [
     "test/generated/struct_initializer-device.cl",
     "test/generated/phiaddressspace-device.cl",
+    "test/generated/test_local-device.cl"
     # pytest.mark.xfail("test/generated/pointerpointer-device.cl"),
     # pytest.mark.xfail("test/eigen/generated/test_cuda_elementwise_small-device.cl"),
     # "test/eigen/generated/test_cuda_nullary-device.cl",
