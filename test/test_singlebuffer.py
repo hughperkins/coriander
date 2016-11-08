@@ -23,8 +23,8 @@ def test_singlebuffer_sqrt_opencl(context, queue):
     """
     code = """
 kernel void myKernel(global float *data0, long offset0, global float *data1, long offset1, int N) {
-    data0 += offset0;
-    data1 += offset1;
+    data0 += (offset0 >> 2);
+    data1 += (offset1 >> 2);
     if(get_global_id(0) < N) {
         data0[get_global_id(0)] = sqrt(data1[get_global_id(0)]);
     }
@@ -42,10 +42,11 @@ kernel void myKernel(global float *data0, long offset0, global float *data1, lon
 
     huge_buf_gpu = cl.Buffer(context, cl.mem_flags.READ_WRITE, size=4096)
 
-    test_common.enqueue_write_buffer_ext(cl, queue, huge_buf_gpu, src_host, device_offset=src_offset, size=N * 4)
-
     global_size = 256
     workgroup_size = 256
+
+    test_common.enqueue_write_buffer_ext(cl, queue, huge_buf_gpu, src_host, device_offset=src_offset, size=N * 4)
+    queue.finish()
 
     prog.myKernel(
         queue, (global_size,), (workgroup_size,),
@@ -54,9 +55,10 @@ kernel void myKernel(global float *data0, long offset0, global float *data1, lon
         np.int32(N)
     )
     queue.finish()
-    test_common.enqueue_read_buffer_ext(cl, queue, huge_buf_gpu, dst_host, device_offset=dst_offset, size=N * 4)
 
+    test_common.enqueue_read_buffer_ext(cl, queue, huge_buf_gpu, dst_host, device_offset=dst_offset, size=N * 4)
     queue.finish()
+
     print('src_host', src_host)
     print('dst_host', dst_host)
     print('np.sqrt(src_host)', np.sqrt(src_host))
