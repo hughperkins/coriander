@@ -1397,7 +1397,9 @@ string createOffsetDeclaration(string argName) {
 }
 
 string createOffsetShim(Type *argType, string argName) {
-    string shim = "    " + argName + " = (" + dumpType(argType) + ")((global char *)" + argName + " + " + argName + "_offset);\n";
+//    string shim = "    " + argName + " = (" + dumpType(argType) + ")((global char *)" + argName + " + " + argName + "_offset);\n";
+    // obviously the `>> 2` bit is a quick hack, and we should check the type.  But will work for now-ish
+    string shim = "    " + argName + " += (" + argName + "_offset >> 2);\n";
     shim += "    if(" + argName + "_offset == -1) {\n";
     shim += "        " + argName + " = 0;\n";
     shim += "    }\n";

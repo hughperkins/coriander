@@ -72,11 +72,13 @@ def test_singlebuffer_sqrt_opencl_2(context, queue):
     """
     code = """
 kernel void _Z8myKernelPfS_i(global float* data0, long data0_offset, global float* data1, long data1_offset, int N) {
-    data1 = (global float*)((global char *)data1 + data1_offset);
-    data0 = (global float*)((global char *)data0 + data0_offset);
+    //data1 = (global float*)((global char *)data1 + data1_offset);
+    //data0 = (global float*)((global char *)data0 + data0_offset);
+    data1 = data1 + (data1_offset >> 2);
+    data0 = data0 + (data0_offset >> 2);
 
     if(get_local_id(0) < N) {
-        (&data0[get_local_id(0)])[0] = (float)sqrt((&data1[get_local_id(0)])[0]);
+        data0[get_local_id(0)] = (float)sqrt(data1[get_local_id(0)]);
     }
 }
 """
