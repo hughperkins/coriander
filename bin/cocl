@@ -183,7 +183,7 @@ while [[ x$1 != x ]]; do {
                 # PASSTHRU="$PASSTHRU $1 $2"
                 shift
                 ;;
-             -devicell-opt)
+             --devicell-opt)
                 if [[ x$2 == x ]]; then {
                     echo Please provide a value for -devicell-opt
                     exit 1
@@ -324,6 +324,7 @@ if [[ ! -v COMPILE ]]; then {
     OUTPUTARTIFACT=${OUTPUTBASEPATH}${FINALPOSTFIX}
 } fi
 
+echo DEVICELLOPT ${DEVICELLOPT}
 OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} PASSTHRU=${PASSTHRU} INPUTPOSTFIX=${INPUTPOSTFIX} \
     INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} \
     make -B -f ${SCRIPT_DIR}/../share/cocl/cocl.Makefile ${OUTPUTARTIFACT}

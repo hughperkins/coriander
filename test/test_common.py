@@ -1,19 +1,24 @@
 import os
 import subprocess
+import pytest
 
 
 clang_path = 'clang++-3.8'
 
 
-def get_cl_generation_options():
+def cocl_options():
     options = []
-    if os.environ.get('COCL_BRANCHES_AS_SWITCH', '0') != '0':
-        options.append('--branches_as_switch')
+    # if os.environ.get('COCL_BRANCHES_AS_SWITCH', '0') != '0':
+    #     options.append('--branches_as_switch')
 
-    if os.environ.get('COCL_RUN_TRANSFORMS', '0') != '0':
-        options.append('--run_transforms')
+    # if os.environ.get('COCL_RUN_TRANSFORMS', '0') != '0':
+    #     options.append('--run_transforms')
 
+    options = os.environ.get('COCL_OPTIONS', '').split()
+
+    print('options', options)
     return options
+
 
 def mangle(name, param_types):
     mangled = '_Z%s%s' % (len(name), name)
@@ -37,20 +42,20 @@ def mangle(name, param_types):
     return mangled
 
 
-def compile_code(cl, context, kernelSource, branching_transformations=True):
+def compile_code(cl, context, kernelSource):
     for file in os.listdir('/tmp'):
         if file.startswith('testprog'):
             os.unlink('/tmp/%s' % file)
     with open('/tmp/testprog.cu', 'w') as f:
         f.write(kernelSource)
-    args = []
-    if not branching_transformations:
-        args.append('--no_branching_transforms')
+    # args = get_cl_generation_options()
+    # if not branching_transformations:
+    #     args.append('--no_branching_transforms')
     res = subprocess.run([
         'bin/cocl',
         '-c',
         '/tmp/testprog.cu'
-    ] + args, stdout=subprocess.PIPE)
+    ] + cocl_options(), stdout=subprocess.PIPE)
     print(' '.join(res.args))
     print(res.stdout.decode('utf-8'))
     assert res.returncode == 0
@@ -69,11 +74,14 @@ def compile_code_v2(cl, context, kernelSource):
             os.unlink('/tmp/%s' % file)
     with open('/tmp/testprog.cu', 'w') as f:
         f.write(kernelSource)
-    print(subprocess.check_output([
+    res = subprocess.run([
         'bin/cocl',
         '-c',
         '/tmp/testprog.cu'
-    ]).decode('utf-8'))
+    ] + cocl_options(), stdout=subprocess.PIPE)
+    print(' '.join(res.args))
+    print(res.stdout.decode('utf-8'))
+    assert res.returncode == 0
     with open('/tmp/testprog-device.cl', 'r') as f:
         cl_sourcecode = f.read()
     prog = cl.Program(context, cl_sourcecode).build()
