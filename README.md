@@ -57,8 +57,7 @@ hostFloats[2] 444
 | -I   | provide an include directory, eg `-I /usr/local/eigen` |
 | -o   | output filepath, eg `-o foo.o` |
 | -c   | compile to .o file; dont link |
-| -devicell-opt [option] | pass [option] through to device ll optimization phase.  Affects success and quality of OpenCL generation.
-You want: `-devicell-opt inline -devicell-opt mem2reg -devicell-opt instcombine`.  `-devicell-opt O1` or `-devicell-opt O2` might be helpful |
+| -devicell-opt [option] | pass [option] through to device ll optimization phase.  Affects success and quality of OpenCL generation. |
 | -branches_as_switch | Write branch instructions as a `switch`, in the OpenCL.  Fairly correct.  Some GPU drivers might like it. Slow |
 | -run_branching_transforms | Try to write branches as `for`/`if`/while`.  Makes code more readable.  Some GPU drivers might like it.  Buggy |
 | -fPIC | passed to clang object-code compiler |
@@ -69,6 +68,11 @@ It fits in as follows:
 - `clang-3.8 -x cuda --device-only` is run, against hte `.cu` file, to convert it to LLVM IR
 - `opt-3.8` is run to optimize slightly this IR.  This is the command whose optimizations are guided by the `-devicell-opt` options
 - then, `ir-to-opencl` converts the output of `opt-3.8` into OpenCL
+
+Recommended options:
+- You probably want to try the following options initially:
+  - `-devicell-opt inline -devicell-opt mem2reg -devicell-opt instcombine`
+- `-devicell-opt O1` or `-devicell-opt O2` might be helpful
 
 ## How it works
 
