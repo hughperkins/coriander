@@ -232,12 +232,15 @@ Instruction *addSetKernelArgInst_pointer(Instruction *lastInst, Value *value) {
     bitcast->insertAfter(lastInst);
     lastInst = bitcast;
 
+    int32_t elementSize = (elementType->getPrimitiveSizeInBits() >> 3);
     Function *setKernelArgFloatStar = cast<Function>(M->getOrInsertFunction(
-        "_Z20setKernelArgCharStarPc",
+        "_Z20setKernelArgCharStarPci",
         Type::getVoidTy(context),
         PointerType::get(IntegerType::get(context, 8), 0),
+        IntegerType::get(context, 32),
         NULL));
-    CallInst *call = CallInst::Create(setKernelArgFloatStar, bitcast);
+    Value *args[] = {bitcast, createInt32Constant(&context, elementSize)};
+    CallInst *call = CallInst::Create(setKernelArgFloatStar, ArrayRef<Value *>(args));
     call->insertAfter(lastInst);
     lastInst = call;
     return lastInst;

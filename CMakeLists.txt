@@ -6,7 +6,7 @@ set(TESTS_COCL_OPTIONS "" CACHE STRING "cocl options, semicolon-separated.  See 
 option(TESTS_DEVICELL_INLINE "cocl option for tests" ON)
 option(TESTS_DEVICELL_MEM2REG "cocl option for tests" ON)
 option(TESTS_DEVICELL_INSTCOMBINE "cocl option for tests" ON)
-set(TESTS_DEVICELL_OPT "O1" CACHE STRING "cocl option for tests")
+set(TESTS_DEVICELL_OPT "O2" CACHE STRING "cocl option for tests")
 option(TESTS_CL_RUN_TRANSFORMS "cocl option for tests" OFF)
 option(TESTS_CL_BRANCHES_AS_SWITCH "cocl option for tests" OFF)
 option(COCL_SPAM "Lots of scrolly debug text.  Mostly for maintainer usage" OFF)
@@ -156,6 +156,7 @@ if(BUILD_TESTS)
         offsetkernelargs properties test_bitcast test_callbacks testcumemcpy testevents2
         testevents testfloat4 test_kernelcachedok testmath testmemcpydevicetodevice test_memhostalloc
         testneg testnullpointer testpartialcopy testshfl teststream test_types
+        singlebuffer
     )
 
     foreach(TEST ${TESTS})

@@ -1363,7 +1363,9 @@ std::string dumpInstruction(string indent, Instruction *instruction) {
             functionNeededForwardDeclarations.insert(instruction);
             gencode += dumpOperand(instruction) + " = ";
         }
-        gencode += indent + instructionCode + ";\n";
+        if(instructionCode != "") {
+            gencode += indent + instructionCode + ";\n";
+        }
     }
     return gencode;
 }
@@ -1397,12 +1399,7 @@ string createOffsetDeclaration(string argName) {
 }
 
 string createOffsetShim(Type *argType, string argName) {
-//    string shim = "    " + argName + " = (" + dumpType(argType) + ")((global char *)" + argName + " + " + argName + "_offset);\n";
-    // obviously the `>> 2` bit is a quick hack, and we should check the type.  But will work for now-ish
-    string shim = "    " + argName + " += (" + argName + "_offset >> 2);\n";
-    shim += "    if(" + argName + "_offset == -1) {\n";
-    shim += "        " + argName + " = 0;\n";
-    shim += "    }\n";
+    string shim = "    " + argName + " += " + argName + "_offset;\n";
     return shim;
 }
 
@@ -1450,6 +1447,9 @@ std::string dumpFunctionDeclaration(Function *F) {
         }
         if(!is_struct_needs_cloning) {
             argdeclaration = dumpType(arg->getType()) + " " + argName;
+            // if(ispointer) {
+                // argdeclaration += "_";
+            // }
         }
         if(i > 0) {
             declaration += ", ";

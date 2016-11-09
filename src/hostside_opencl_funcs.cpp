@@ -116,10 +116,10 @@ int cudaConfigureCall(
         coclStream = v->currentContext->default_stream.get();
         // coclStream = defaultCoclStream;
         // throw runtime_error("not implemented: default stream");
-        // COCL_PRINT(cout << "using default_queue " << queue << endl);
+        COCL_PRINT(cout << "cudaConfigureCall using default_queue" << endl);
     }
     CLQueue *clqueue = coclStream->clqueue;
-    // COCL_PRINT(cout << "cudaConfigureCall queue=" << queue << endl);
+    COCL_PRINT(cout << "cudaConfigureCall queue=" << (void *)clqueue << endl);
     if(sharedMem != 0) {
         COCL_PRINT(cout << "cudaConfigureCall: Not implemented: non-zero shared memory" << endl);
         throw runtime_error("cudaConfigureCall: Not implemented: non-zero shared memory");
@@ -181,6 +181,7 @@ namespace cocl {
         // compile the kernel.  we are still locking the mutex, but I cnat think of a better
         // way right now...
         cout << "building kernel " << name << endl;
+        // cout << "source [" << sourcecode << "]" << endl;
 
         string filename = "/tmp/out.cl";
         if(getenv("COCL_LOAD_KERNEL") != 0) {
@@ -279,7 +280,7 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     // we should also:
     // deallocate the cl_mem after calling the kernel
     // (we assume hte struct is passed by-value, so we dont have to actually copy it back afterwards)
-    COCL_PRINT(cout << "setKernelArgStruct structsize=" << structAllocateSize << endl);
+    // COCL_PRINT(cout << "setKernelArgStruct structsize=" << structAllocateSize << endl);
     // int idx = 
     if(structAllocateSize < 4) {
         structAllocateSize = 4;
@@ -297,29 +298,26 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     pthread_mutex_unlock(&launchMutex);
 }
 
-void setKernelArgCharStar(char *memory_as_charstar) {
+void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
     // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
-    COCL_PRINT(cout << "setKernelArgCharStar " << (void *)memory_as_charstar << endl);
+    // COCL_PRINT(cout << "setKernelArgCharStar " << (void *)memory_as_charstar << endl);
     Memory *memory = findMemory(memory_as_charstar);
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getContext()->getCl();
     cl_context *ctx = cl->context;
     cl_int err;
     if(memory == 0) {
-        // lets just mak ea new buffer...
-        cl_mem gpu_struct = clCreateBuffer(*ctx, CL_MEM_READ_WRITE, 4,
-                                               NULL, &err);
-        EasyCL::checkError(err);
-        launchConfiguration.kernelArgsToBeReleased.push_back(gpu_struct);
-        launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
-        launchConfiguration.kernel->in((int64_t)-1); // `-1` means `null pointer`
+        launchConfiguration.kernel->in_nullptr();
+        launchConfiguration.kernel->in((int64_t)0);
     } else {
         size_t offset = memory->getOffset(memory_as_charstar);
         cl_mem clmem = memory->clmem;
         launchConfiguration.kernel->inout(&clmem);
-        launchConfiguration.kernel->in((int64_t)offset); // kernel expects a `long` which is 64-bit signed int
+        size_t offsetElements = offset / elementSize;
+        // COCL_PRINT(cout << "offset elements " << offsetElements << endl);
+        launchConfiguration.kernel->in((int64_t)offsetElements); // kernel expects a `long` which is 64-bit signed int
     }
     // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);
@@ -359,7 +357,7 @@ void kernelGo() {
     // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
-    COCL_PRINT(cout << "kernelGo " << endl);
+    COCL_PRINT(cout << "kernelGo queue=" << (void *)launchConfiguration.queue << endl);
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getContext()->getCl();
     cl_context *ctx = cl->context;
@@ -398,6 +396,7 @@ void kernelGo() {
     cl_int err;
     err = clFinish(launchConfiguration.queue->queue);
     EasyCL::checkError(err);
+
     // cout << "trying cl->finihs()" << endl;
     //cl->finish();
     // cout << "cl->finihs() done" << endl;
