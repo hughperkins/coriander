@@ -74,8 +74,10 @@ def test_singlebuffer_sqrt_opencl_2(context, queue):
 kernel void _Z8myKernelPfS_i(global float* data0, long data0_offset, global float* data1, long data1_offset, int N) {
     //data1 = (global float*)((global char *)data1 + data1_offset);
     //data0 = (global float*)((global char *)data0 + data0_offset);
-    data1 = data1 + (data1_offset >> 2);
-    data0 = data0 + (data0_offset >> 2);
+    //data1 = data1 + (data1_offset >> 2);
+    //data0 = data0 + (data0_offset >> 2);
+    data1 = data1 + data1_offset;
+    data0 = data0 + data0_offset;
 
     if(get_local_id(0) < N) {
         data0[get_local_id(0)] = (float)sqrt(data1[get_local_id(0)]);
@@ -85,14 +87,16 @@ kernel void _Z8myKernelPfS_i(global float* data0, long data0_offset, global floa
     prog = cl.Program(context, code).build()
 
     N = 10
+    bufsize = 64 * 1024 * 1024
 
+    np.random.seed(444)
     src_host = np.random.uniform(0, 1, size=(N,)).astype(np.float32) + 1.0
     dst_host = np.zeros(N, dtype=np.float32)
 
     src_offset = 128
     dst_offset = 256
 
-    huge_buf_gpu = cl.Buffer(context, cl.mem_flags.READ_WRITE, size=4096)
+    huge_buf_gpu = cl.Buffer(context, cl.mem_flags.READ_WRITE, size=bufsize)
 
     global_size = 256
     workgroup_size = 256
@@ -102,8 +106,8 @@ kernel void _Z8myKernelPfS_i(global float* data0, long data0_offset, global floa
 
     prog._Z8myKernelPfS_i(
         queue, (global_size,), (workgroup_size,),
-        huge_buf_gpu, np.int64(dst_offset),
-        huge_buf_gpu, np.int64(src_offset),
+        huge_buf_gpu, np.int64(dst_offset // 4),
+        huge_buf_gpu, np.int64(src_offset // 4),
         np.int32(N)
     )
     queue.finish()
