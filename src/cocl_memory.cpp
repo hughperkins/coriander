@@ -324,8 +324,14 @@ size_t cuMemcpyHtoDAsync(CUdeviceptr dst, const void *src, size_t bytes, char *_
     //     queue->queue, 0, 0, 0
     // );
     // EasyCL::checkError(err);
-    err = clEnqueueWriteBuffer(queue->queue, dstMemory->clmem, CL_FALSE, offset,
+    err = clFinish(queue->queue);
+    EasyCL::checkError(err);
+
+    err = clEnqueueWriteBuffer(queue->queue, dstMemory->clmem, CL_TRUE, offset,
                                       bytes, src, 0, NULL, NULL);
+    EasyCL::checkError(err);
+
+    err = clFinish(queue->queue);
     EasyCL::checkError(err);
     return 0;
 }
@@ -347,9 +353,13 @@ size_t  cuMemcpyDtoHAsync(void *dst, CUdeviceptr src, size_t bytes, char *_queue
         queue->queue, 0, 0, 0
     );
     EasyCL::checkError(err);
-    err = clEnqueueReadBuffer(queue->queue, srcMemory->clmem, CL_FALSE, offset,
+    err = clFinish(queue->queue);
+    EasyCL::checkError(err);
+    err = clEnqueueReadBuffer(queue->queue, srcMemory->clmem, CL_TRUE, offset,
                                      bytes, dst, 0, NULL, NULL);
     // cout << "queued buffer read device => host" << endl;
+    EasyCL::checkError(err);
+    err = clFinish(queue->queue);
     EasyCL::checkError(err);
     return 0;
 }

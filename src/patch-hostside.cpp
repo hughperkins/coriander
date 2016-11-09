@@ -443,8 +443,8 @@ void patchModule(string deviceclfilename, Module *M) {
         (std::istreambuf_iterator<char>(f_inll)),
         (std::istreambuf_iterator<char>()));
 
-    ::sourcecode_stringname = replace(replace(getBasename(::deviceclfilename), '.', '_'), '-', '_');
-    ::devicellcode_stringname = replace(replace(getBasename(::devicellfilename), '.', '_'), '-', '_');
+    ::sourcecode_stringname = "__opencl_sourcecode" + ::deviceclfilename;
+    ::devicellcode_stringname = "__devicell_sourcecode" + ::devicellfilename;
 
     addGlobalVariable(M, sourcecode_stringname, cl_sourcecode);
     addGlobalVariable(M, devicellcode_stringname, devicell_sourcecode);
