@@ -70,9 +70,7 @@ The options provided to `-devicell-opt` are passed through to `opt-3.8`, http://
 - `ir-to-opencl` writes the IR as OpenCL
 
 Recommended generation options:
-- `-devicell-opt inline -devicell-opt mem2reg -devicell-opt instcombine` will give you approximately usable OpenCL
-- `-devicell-opt O1` or `-devicell-opt O2` might be helpful
-- For some devices, `--run_branching_transforms` or `--branches_as_switch` might help
+- `-devicell-opt inline -devicell-opt mem2reg -devicell-opt instcombine --devicell-opt O2`
 
 You can open the `-device.cl` file to look at the OpenCL generated, and compare the effects of different options.
 
