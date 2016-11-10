@@ -315,7 +315,7 @@ size_t cuMemcpyHtoDAsync(CUdeviceptr dst, const void *src, size_t bytes, char *_
     // CLQueue *queue = (CLQueue*)_queue;
     // host => device
     COCL_PRINT(cout << "cuMemcpyHtoDAsync dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
-    cout << "src[0] " << ((float *)src)[0] << endl;
+    // cout << "src[0] " << ((float *)src)[0] << endl;
     Memory *dstMemory = findMemory((char *)dst);
     size_t offset = dstMemory->getOffset((char *)dst);
     // COCL_PRINT(cout << "memory " << (void *)dstMemory << " offset=" << offset << endl);
