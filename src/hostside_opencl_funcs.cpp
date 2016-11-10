@@ -310,14 +310,22 @@ void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
     cl_int err;
     if(memory == 0) {
         launchConfiguration.kernel->in_nullptr();
-        launchConfiguration.kernel->in((int64_t)0);
+        #ifdef OFFSET_32BIT
+        launchConfiguration.kernel->in_uint32(0);
+        #else
+        launchConfiguration.kernel->in_int64(0);
+        #endif
     } else {
         size_t offset = memory->getOffset(memory_as_charstar);
         cl_mem clmem = memory->clmem;
         launchConfiguration.kernel->inout(&clmem);
         size_t offsetElements = offset / elementSize;
         // COCL_PRINT(cout << "offset elements " << offsetElements << endl);
-        launchConfiguration.kernel->in((int64_t)offsetElements); // kernel expects a `long` which is 64-bit signed int
+        #ifdef OFFSET_32BIT
+        launchConfiguration.kernel->in_uint32((uint32_t)offsetElements); // kernel expects a `long` which is 64-bit signed int
+        #else
+        launchConfiguration.kernel->in_int64((int64_t)offsetElements); // kernel expects a `long` which is 64-bit signed int
+        #endif
     }
     // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);

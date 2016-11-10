@@ -9,6 +9,7 @@ option(TESTS_DEVICELL_INSTCOMBINE "cocl option for tests" ON)
 set(TESTS_DEVICELL_OPT "O2" CACHE STRING "cocl option for tests")
 option(TESTS_CL_RUN_TRANSFORMS "cocl option for tests" OFF)
 option(TESTS_CL_BRANCHES_AS_SWITCH "cocl option for tests" OFF)
+option(OFFSET_32BIT "type to use for offsets. off lets you use more memory.  on is necessary on beignet" ON)
 option(COCL_SPAM "Lots of scrolly debug text.  Mostly for maintainer usage" OFF)
 
 if(TESTS_CL_BRANCHES_AS_SWITCH)
@@ -69,6 +70,9 @@ set_target_properties(ir-to-opencl PROPERTIES
 )
 target_link_libraries(ir-to-opencl "${LLVM_LIBS}")
 target_link_libraries(ir-to-opencl pthread)
+if(OFFSET_32BIT)
+    target_compile_definitions(ir-to-opencl PRIVATE -DOFFSET_32BIT)
+endif()
 
 add_executable(patch-hostside
     src/patch-hostside.cpp src/struct_clone.cpp src/mutations.cpp src/readIR.cpp src/ir-to-opencl-common.cpp
@@ -96,7 +100,13 @@ target_include_directories(cocl PRIVATE src/CLBlast/include)
 target_include_directories(cocl PRIVATE include)
 target_include_directories(cocl PRIVATE src)
 if(COCL_SPAM)
-    target_compile_definitions(cocl PRIVATE -DCOCL_SPAM)
+    set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DCOCL_SPAM)
+endif()
+if(OFFSET_32BIT)
+    set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DOFFSET_32BIT)
+endif()
+if(COCL_DEFINITIONS)
+    target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
 endif()
 target_link_libraries(cocl easycl)
 

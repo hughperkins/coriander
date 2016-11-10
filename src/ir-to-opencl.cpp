@@ -1395,7 +1395,11 @@ std::string dumpBasicBlock(BasicBlock *basicBlock) {
 }
 
 string createOffsetDeclaration(string argName) {
-     return ", long " + argName + "_offset";
+    #ifdef OFFSET_32BIT
+       return ", uint " + argName + "_offset";
+    #else
+       return ", long " + argName + "_offset";
+    #endif
 }
 
 string createOffsetShim(Type *argType, string argName) {
