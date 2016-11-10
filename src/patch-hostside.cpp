@@ -232,7 +232,11 @@ Instruction *addSetKernelArgInst_pointer(Instruction *lastInst, Value *value) {
     bitcast->insertAfter(lastInst);
     lastInst = bitcast;
 
-    int32_t elementSize = (elementType->getPrimitiveSizeInBits() >> 3);
+    const DataLayout *dataLayout = &M->getDataLayout();
+    int allocSize = dataLayout->getTypeAllocSize(elementType);
+    // cout << "allocsize " << allocSize << endl;
+    int32_t elementSize = allocSize;
+
     Function *setKernelArgFloatStar = cast<Function>(M->getOrInsertFunction(
         "_Z20setKernelArgCharStarPci",
         Type::getVoidTy(context),
