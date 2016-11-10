@@ -138,7 +138,7 @@ pip install -r test/requirements.txt
 #### Procedure
 
 ```
-COCL_OPTIONS='--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine' py.test -svx
+COCL_OPTIONS='--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine --devicell-opt O2' py.test -svx
 ```
 
 - python tests are at [test](test)
