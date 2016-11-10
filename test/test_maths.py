@@ -17,6 +17,7 @@ import pyopencl as cl
 import os
 import subprocess
 from test import test_common
+from test.test_common import offset_type
 
 
 basename = os.path.basename(__name__).split('.')[-1]
@@ -46,7 +47,7 @@ __global__ void myKernel(float *data) {
     prog = test_common.compile_code(cl, context, code)
     prog.__getattr__(test_common.mangle('myKernel', ['float *']))(
         q, (32,), (32,),
-        float_data_gpu, np.int64(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -83,7 +84,7 @@ __global__ void myKernel(double *data) {
     prog = test_common.compile_code(cl, context, code)
     prog.__getattr__(test_common.mangle('myKernel', ['double *']))(
         q, (32,), (32,),
-        float_data_gpu, np.int64(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -144,7 +145,7 @@ __global__ void myKernel(float *data) {
     cl.enqueue_copy(q, float_data_gpu, float_data)
     prog.__getattr__(test_common.mangle('myKernel', ['float *']))(
         q, (32,), (32,),
-        float_data_gpu, np.int64(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -172,7 +173,7 @@ __global__ void myKernel(float *data) {
     cl.enqueue_copy(q, float_data_gpu, float_data)
     prog.__getattr__(test_common.mangle('myKernel', ['float *']))(
         q, (32,), (32,),
-        float_data_gpu, np.int64(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -194,8 +195,8 @@ __global__ void myKernel(float *float_data, int *int_data) {
     cl.enqueue_copy(q, float_data_gpu, float_data)
     prog.__getattr__(test_common.mangle('myKernel', ['float *', 'int *']))(
         q, (32,), (32,),
-        float_data_gpu, np.int64(0),
-        int_data_gpu, np.int64(0),
+        float_data_gpu, offset_type(0),
+        int_data_gpu, offset_type(0),
         cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
@@ -220,8 +221,8 @@ __global__ void myKernel(float *float_data, int *int_data) {
     cl.enqueue_copy(q, int_data_gpu, int_data)
     prog.__getattr__(test_common.mangle('myKernel', ['float *', 'int *']))(
         q, (32,), (32,),
-        float_data_gpu, np.int64(0),
-        int_data_gpu, np.int64(0),
+        float_data_gpu, offset_type(0),
+        int_data_gpu, offset_type(0),
         cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)

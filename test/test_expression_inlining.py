@@ -20,6 +20,7 @@ import math
 import os
 import subprocess
 from test import test_common
+from test.test_common import offset_type
 
 
 basename = os.path.basename(__name__).split('.')[-1]
@@ -55,7 +56,7 @@ __global__ void myKernel(float *data) {
     prog = cl.Program(context, sourcecode).build()
     prog.__getattr__(test_common.mangle('myKernel', ['float *']))(
         q, (32,), (32,),
-        float_data_gpu, np.int64(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), cl.LocalMemory(4))
     q.finish()
     float_data2 = np.zeros((1024,), dtype=np.float32)
     cl.enqueue_copy(q, float_data2, float_data_gpu)

@@ -1,5 +1,6 @@
 import os
 import subprocess
+import numpy as np
 
 
 clang_path = 'clang++-3.8'
@@ -16,8 +17,8 @@ def enqueue_write_buffer_ext(cl, queue, mem, hostbuf, device_offset=0, size=None
     c_wait_for, num_wait_for = cl.cffi_cl._clobj_list(wait_for)
     nanny_event = cl.cffi_cl.NannyEvent._handle(hostbuf, c_ref)
     cl.cffi_cl._handle_error(cl.cffi_cl._lib.enqueue_write_buffer(
-            ptr_event, queue.ptr, mem.ptr, c_buf, size, device_offset, c_wait_for, num_wait_for, bool(True),
-            nanny_event))
+        ptr_event, queue.ptr, mem.ptr, c_buf, size, device_offset, c_wait_for, num_wait_for, bool(True),
+        nanny_event))
     return cl.cffi_cl.NannyEvent._create(ptr_event[0])
 
 
@@ -30,8 +31,8 @@ def enqueue_read_buffer_ext(cl, queue, mem, hostbuf, device_offset=0, size=None,
     c_wait_for, num_wait_for = cl.cffi_cl._clobj_list(wait_for)
     nanny_event = cl.cffi_cl.NannyEvent._handle(hostbuf, c_ref)
     cl.cffi_cl._handle_error(cl.cffi_cl._lib.enqueue_read_buffer(
-            ptr_event, queue.ptr, mem.ptr, c_buf, size, device_offset, c_wait_for, num_wait_for, bool(True),
-            nanny_event))
+        ptr_event, queue.ptr, mem.ptr, c_buf, size, device_offset, c_wait_for, num_wait_for, bool(True),
+        nanny_event))
     return cl.cffi_cl.NannyEvent._create(ptr_event[0])
 
 
@@ -47,6 +48,12 @@ def cocl_options():
 
     print('options', options)
     return options
+
+
+def offset_type(offset):
+    if 'OFFSET_32BIT' in os.environ:
+        return np.uint32(offset)
+    return np.int64(offset)
 
 
 def mangle(name, param_types):

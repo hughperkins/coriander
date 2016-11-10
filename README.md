@@ -138,12 +138,14 @@ pip install -r test/requirements.txt
 #### Procedure
 
 ```
-COCL_OPTIONS='--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine --devicell-opt O2' py.test -svx
+OFFSET_32BITS=1 COCL_OPTIONS='--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine --devicell-opt O2' py.test -svx
 ```
 
 - python tests are at [test](test)
 
 You can modify the options in `COCL_OPTIONS`.  There are passed to the `cocl` command, see section #Options above.
+
+If you set `OFFSET_32BITS` to off in your cmake options, you should remove the `OFFSET_32BIT=1` optio nwhen running py.test
 
 ### End-to-end tests
 

@@ -15,6 +15,7 @@ limitations under the License.
 import numpy as np
 import pyopencl as cl
 from test import test_common
+from test.test_common import offset_type
 
 
 def test_singlebuffer_sqrt_opencl_1(context, queue):
@@ -50,8 +51,8 @@ kernel void myKernel(global float *data0, long offset0, global float *data1, lon
 
     prog.myKernel(
         queue, (global_size,), (workgroup_size,),
-        huge_buf_gpu, np.int64(dst_offset),
-        huge_buf_gpu, np.int64(src_offset),
+        huge_buf_gpu, offset_type(dst_offset),
+        huge_buf_gpu, offset_type(src_offset),
         np.int32(N)
     )
     queue.finish()
@@ -106,8 +107,8 @@ kernel void _Z8myKernelPfS_i(global float* data0, long data0_offset, global floa
 
     prog._Z8myKernelPfS_i(
         queue, (global_size,), (workgroup_size,),
-        huge_buf_gpu, np.int64(dst_offset // 4),
-        huge_buf_gpu, np.int64(src_offset // 4),
+        huge_buf_gpu, offset_type(dst_offset // 4),
+        huge_buf_gpu, offset_type(src_offset // 4),
         np.int32(N)
     )
     queue.finish()
@@ -154,8 +155,8 @@ __global__ void myKernel(float *data0, float *data1, int N) {
     mangledName = '_Z8myKernelPfS_i'
     prog.__getattr__(mangledName)(
         queue, (global_size,), (workgroup_size,),
-        huge_buf_gpu, np.int64(dst_offset),
-        huge_buf_gpu, np.int64(src_offset),
+        huge_buf_gpu, offset_type(dst_offset),
+        huge_buf_gpu, offset_type(src_offset),
         np.int32(N),
         cl.LocalMemory(4)
     )
@@ -202,8 +203,8 @@ __global__ void myKernel(float *data0, float *data1, int N) {
 #     mangledName = '_Z8myKernelPfS_i'
 #     prog.__getattr__(mangledName)(
 #         queue, (global_size,), (workgroup_size,),
-#         huge_buf_gpu, np.int64(dst_offset),
-#         huge_buf_gpu, np.int64(src_offset),
+#         huge_buf_gpu, offset_type(dst_offset),
+#         huge_buf_gpu, offset_type(src_offset),
 #         np.int32(N),
 #         cl.LocalMemory(4)
 #     )
