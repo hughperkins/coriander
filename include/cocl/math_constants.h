@@ -2,7 +2,8 @@
 
 #include <limits>
 
-#define CUDART_MAX_NORMAL_F std::numeric_limits<float>::max()
+// #define CUDART_MAX_NORMAL_F std::numeric_limits<float>::max()
+#define CUDART_MAX_NORMAL_F FLT_MAX
 #define CUDART_INF_F std::numeric_limits<float>::infinity()
 #define CUDART_NAN_F std::numeric_limits<float>::quiet_NaN()
 
