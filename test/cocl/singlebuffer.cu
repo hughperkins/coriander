@@ -58,59 +58,59 @@ void floats() {
     cuStreamDestroy(stream);
 }
 
-// __global__ void getValueChar(char *outdata, char *indata) {
-//     outdata[0] = indata[0] + 3;
-// }
+__global__ void getValueChar(char *outdata, char *indata) {
+    outdata[0] = indata[0] + 3;
+}
 
-// void chars() {
-    // int memSizeBytes = 65536;
-    // int N = 128;
+void chars() {
+    int memSizeBytes = 65536;
+    int N = 128;
 
-    // CUstream stream;
-    // cuStreamCreate(&stream, 0);
+    CUstream stream;
+    cuStreamCreate(&stream, 0);
 
-    // char *hostMemGiant;
-    // cuMemHostAlloc((void **)&hostMemGiant, memSizeBytes, CU_MEMHOSTALLOC_PORTABLE);
+    char *hostMemGiant;
+    cuMemHostAlloc((void **)&hostMemGiant, memSizeBytes, CU_MEMHOSTALLOC_PORTABLE);
 
-    // CUdeviceptr deviceMemGiant;
-    // cuMemAlloc(&deviceMemGiant, memSizeBytes);
+    CUdeviceptr deviceMemGiant;
+    cuMemAlloc(&deviceMemGiant, memSizeBytes);
 
-    // int chars1_offset_bytes = 128 * 4;
-    // int chars2_offset_bytes = 256 * 4;
+    int chars1_offset_bytes = 128 * 4;
+    int chars2_offset_bytes = 256 * 4;
 
-    // char *hostChars1 = (char *)(hostMemGiant + chars1_offset_bytes);
-    // char *hostChars2 = (char *)(hostMemGiant + chars2_offset_bytes);
+    char *hostChars1 = (char *)(hostMemGiant + chars1_offset_bytes);
+    char *hostChars2 = (char *)(hostMemGiant + chars2_offset_bytes);
 
-    // hostChars1[0] = 67;
+    hostChars1[0] = 67;
 
-    // CUdeviceptr deviceChars1 = deviceMemGiant + chars1_offset_bytes;
-    // CUdeviceptr deviceChars2 = deviceMemGiant + chars2_offset_bytes;
+    CUdeviceptr deviceChars1 = deviceMemGiant + chars1_offset_bytes;
+    CUdeviceptr deviceChars2 = deviceMemGiant + chars2_offset_bytes;
 
-    // cuMemcpyHtoDAsync(
-    //     (CUdeviceptr)(((float *)deviceChars1)),
-    //     hostChars1,
-    //     N * sizeof(char),
-    //     stream
-    // );
+    cuMemcpyHtoDAsync(
+        (CUdeviceptr)(((float *)deviceChars1)),
+        hostChars1,
+        N * sizeof(char),
+        stream
+    );
 
-    // getValueChar<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>((char *)deviceChars2, (char *)deviceChars1);
+    getValueChar<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>((char *)deviceChars2, (char *)deviceChars1);
 
-    // // now copy back entire buffer
-    // cuMemcpyDtoHAsync(hostChars2, deviceChars2, N * sizeof(char), stream);
-    // cuStreamSynchronize(stream);
+    // now copy back entire buffer
+    cuMemcpyDtoHAsync(hostChars2, deviceChars2, N * sizeof(char), stream);
+    cuStreamSynchronize(stream);
 
-    // // and check the values...
-    // cout << hostChars2[0] << endl;
+    // and check the values...
+    cout << hostChars2[0] << endl;
 
-    // assert(hostChars2[0] == 70);
+    assert(hostChars2[0] == 70);
 
-    // cuMemFreeHost(hostMemGiant);
-    // cuMemFree(deviceMemGiant);
-    // cuStreamDestroy(stream);
-// }
+    cuMemFreeHost(hostMemGiant);
+    cuMemFree(deviceMemGiant);
+    cuStreamDestroy(stream);
+}
 
 int main(int argc, char *argv[]) {
     floats();
-    // chars();
+    chars();
     return 0;
 }
