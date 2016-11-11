@@ -66,7 +66,7 @@ namespace cocl {
 
         vector<cl_mem> kernelArgsToBeReleased;
         std::string kernelName = "";;
-        std::string kernelSource = "";
+        // std::string kernelSource = "";
     };
     LaunchConfiguration launchConfiguration;
 
@@ -174,10 +174,10 @@ namespace cocl {
     }
 
     string  convertLlToCl(string devicellsourcecode, string kernelName) {
-        cout << "llsourcecode [" << devicellsourcecode << "]" << endl;  
+        // cout << "llsourcecode [" << devicellsourcecode << "]" << endl;  
         string clcode = convertLlStringToCl(devicellsourcecode, kernelName);
         // string clcode = convertLlStringToCl(devicellsourcecode, "");
-        cout << "clcode " << clcode << endl;
+        // cout << "clcode " << clcode << endl;
         return clcode;
     }
 
@@ -185,6 +185,7 @@ namespace cocl {
         // KernelByNameMutex mutex;
         ThreadVars *v = getThreadVars();
         EasyCL *cl = v->getContext()->getCl();
+        ofstream f;
         v->getContext()->numKernelCalls++;
         if(v->getContext()->kernelByName.find(kernelName) != v->getContext()->kernelByName.end()) {
             return v->getContext()->kernelByName[kernelName];
@@ -195,7 +196,18 @@ namespace cocl {
         // cout << "source [" << sourcecode << "]" << endl;
 
         // convert to opencl first... based on the kernel name required
-        string clSourcecode = convertLlToCl(devicellsourcecode, kernelName);
+        string clSourcecode = "";
+        try {
+           clSourcecode = convertLlToCl(devicellsourcecode, kernelName);
+        } catch(runtime_error &e) {
+            cout << "failed to generate opencl sourcecode" << endl;
+            cout << "kernel name " << kernelName << endl;
+            cout << "writing ll to /tmp/failed-kernel.ll" << endl;
+            f.open("/tmp/failed-kernel.ll", ios_base::out);
+            f << devicellsourcecode << endl;
+            f.close();
+            throw e;
+        }
 
         string filename = "/tmp/out.cl";
         if(getenv("COCL_LOAD_KERNEL") != 0) {
@@ -220,7 +232,25 @@ namespace cocl {
             f.close();
         }
 
-        CLKernel *kernel = cl->buildKernelFromString(clSourcecode, kernelName, "", "__internal__");
+        CLKernel *kernel = 0;
+        try {
+            kernel = cl->buildKernelFromString(clSourcecode, kernelName, "", "__internal__");
+        } catch(runtime_error &e) {
+            cout << "failed to compile opencl sourcecode" << endl;
+            cout << "kernel name " << kernelName << endl;
+            cout << "writing ll to /tmp/failed-kernel.ll" << endl;
+
+            f.open("/tmp/failed-kernel.ll", ios_base::out);
+            f << devicellsourcecode << endl;
+            f.close();
+
+            cout << "writing cl to /tmp/failed-kernel.cl" << endl;
+            f.open("/tmp/failed-kernel.cl", ios_base::out);
+            f << clSourcecode << endl;
+            f.close();
+
+            throw e;
+        }
         cout << " ... built" << endl;
         v->getContext()->kernelByName[kernelName ] = kernel;
         cl->storeKernel(kernelName, kernel, true);  // this will cause the kernel to be deleted with cl.  Not clean yet, but a start
@@ -244,37 +274,37 @@ void configureKernel(const char *kernelName, const char *devicellsourcecode) {
     }
     // hostside_opencl_funcs_assure_initialized();
     launchConfiguration.kernelName = kernelName;
-    launchConfiguration.kernelSource = devicellsourcecode;
-    try {
+    // launchConfiguration.kernelSource = devicellsourcecode;
+    // try {
         launchConfiguration.kernel = getKernelForName(kernelName, devicellsourcecode);
-    } catch(runtime_error &e) {
-        cout << "kernel failed to build" << endl;
-        cout << "kernel name: [" << launchConfiguration.kernelName << "]" << endl;
-        cout << "saving kernel soucecode to /tmp/failed-kernel.cl" << endl;
-        cout << "saving kernel ll sourcecode to /tmp/failed-kernel.ll" << endl;
-        cout << "saving meta info to /tmp/failed-kernel-meta.txt" << endl;
-        ofstream f;
-        f.open("/tmp/failed-kernel.cl", ios_base::out);
-        // f << launchConfiguration.kernelName << endl;
-        f << launchConfiguration.kernelSource << endl;
-        // f << e.what() << endl;
-        f.close();
-        f.open("/tmp/failed-kernel.ll", ios_base::out);
-        // f << launchConfiguration.kernelName << endl;
-        f << devicellsourcecode << endl;
-        // f << e.what() << endl;
-        f.close();
-        f.open("/tmp/failed-kernel-meta.txt", ios_base::out);
-        // f << launchConfiguration.kernelName << endl;
-        f << "kernel name: " << launchConfiguration.kernelName << endl;
-        f << e.what() << endl;
-        f.close();
-    // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
-    // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
-        pthread_mutex_unlock(&launchMutex);
-        pthread_mutex_unlock(&launchMutex);
-        throw e;
-    }
+    // } catch(runtime_error &e) {
+    //     cout << "kernel failed to build" << endl;
+    //     cout << "kernel name: [" << launchConfiguration.kernelName << "]" << endl;
+    //     cout << "saving kernel soucecode to /tmp/failed-kernel.cl" << endl;
+    //     cout << "saving kernel ll sourcecode to /tmp/failed-kernel.ll" << endl;
+    //     cout << "saving meta info to /tmp/failed-kernel-meta.txt" << endl;
+    //     ofstream f;
+    //     f.open("/tmp/failed-kernel.cl", ios_base::out);
+    //     // f << launchConfiguration.kernelName << endl;
+    //     f << launchConfiguration.kernelSource << endl;
+    //     // f << e.what() << endl;
+    //     f.close();
+    //     f.open("/tmp/failed-kernel.ll", ios_base::out);
+    //     // f << launchConfiguration.kernelName << endl;
+    //     f << devicellsourcecode << endl;
+    //     // f << e.what() << endl;
+    //     f.close();
+    //     f.open("/tmp/failed-kernel-meta.txt", ios_base::out);
+    //     // f << launchConfiguration.kernelName << endl;
+    //     f << "kernel name: " << launchConfiguration.kernelName << endl;
+    //     f << e.what() << endl;
+    //     f.close();
+    // // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
+    // // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
+    //     pthread_mutex_unlock(&launchMutex);
+    //     pthread_mutex_unlock(&launchMutex);
+    //     throw e;
+    // }
     // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);
 }
@@ -294,7 +324,7 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     // we should also:
     // deallocate the cl_mem after calling the kernel
     // (we assume hte struct is passed by-value, so we dont have to actually copy it back afterwards)
-    // COCL_PRINT(cout << "setKernelArgStruct structsize=" << structAllocateSize << endl);
+    COCL_PRINT(cout << "setKernelArgStruct structsize=" << structAllocateSize << endl);
     // int idx = 
     if(structAllocateSize < 4) {
         structAllocateSize = 4;
@@ -316,7 +346,7 @@ void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
     // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
-    // COCL_PRINT(cout << "setKernelArgCharStar " << (void *)memory_as_charstar << endl);
+    COCL_PRINT(cout << "setKernelArgCharStar " << (void *)memory_as_charstar << endl);
     Memory *memory = findMemory(memory_as_charstar);
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getContext()->getCl();
@@ -404,12 +434,12 @@ void kernelGo() {
     } catch(runtime_error &e) {
         cout << "kernel failed to run" << endl;
         cout << "kernel name: [" << launchConfiguration.kernelName << "]" << endl;
-        cout << "saving kernel soucecode to /tmp/failed-kernel.cl" << endl;
-        ofstream f;
-        f.open("/tmp/failed-kernel.cl", ios_base::out);
-        f << launchConfiguration.kernelName << endl;
-        f << launchConfiguration.kernelSource << endl;
-        f.close();
+        // cout << "saving kernel soucecode to /tmp/failed-kernel.cl" << endl;
+        // ofstream f;
+        // f.open("/tmp/failed-kernel.cl", ios_base::out);
+        // f << launchConfiguration.kernelName << endl;
+        // f << launchConfiguration.kernelSource << endl;
+        // f.close();
         pthread_mutex_unlock(&launchMutex);
         pthread_mutex_unlock(&launchMutex);
         throw e;

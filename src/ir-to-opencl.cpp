@@ -71,6 +71,9 @@ static map<BasicBlock *, int> functionBlockIndex;
 static set<Value *> currentFunctionAlreadyDeclaredShared;
 // static set<Value *>valuesAreExpressions;
 
+static set<Function *> dumpedFunctions;
+static set<Function *>functionsToDump;
+
 extern bool single_precision;
 
 bool single_precision = true;
@@ -880,7 +883,17 @@ std::string dumpCall(CallInst *instr) {
         i++;
     }
     if(!internalfunc) {
-        gencode += ", scratch";
+        if(i > 0) {
+            gencode += ", ";
+        }
+        gencode += "scratch";
+        Module *M = instr->getModule();
+        Function *F = M->getFunction(StringRef(functionName));
+        if(F != 0) {
+            if(dumpedFunctions.find(F) == dumpedFunctions.end()) {
+                functionsToDump.insert(F);
+            }
+        }
     }
     gencode += ")";
     return gencode;
@@ -1572,33 +1585,44 @@ std::string dumpFunction(Function *F) {
     return gencode;
 }
 
+string dumpFunctions(set<Function *> &functionsToDump) {
+    string gencode = "";
+    while(!functionsToDump.empty()) {
+        Function *F = *functionsToDump.begin();
+        dumpedFunctions.insert(F);
+        functionsToDump.erase(F);
+        gencode += dumpFunction(F);
+    }
+    return gencode;
+}
+
 std::string dumpModule(Module *M, string specificFunction = "") {
     string gencode;
 
     // get struct declarations
     // global_begin/end returns all the bits that start with '@', at the top of the .ll
     // cout << "begin declare global variables" << endl;
-    for(auto it=M->global_begin(); it != M->global_end(); it++) {
-        GlobalVariable *glob = &*it;
-        string name = getName(glob);
-        if(name == "llvm.used") {
-            continue;
-        }
-        if(name.find(".str") == 0) {
-            // ignore global strings for now (probably add in locally; though I dont think opencl really uses strings..)
-            continue;
-        }
-        if(name == "llvm.global_ctors") {
-            // we should handle these sooner or later, but skip for now
-            cerr << "warning: skipping @llvm.global_ctors" << endl;
-            continue;
-        }
-        if(ignoredGlobalVariables.find(name) != ignoredGlobalVariables.end()) {
-            continue;
-        }
-        glob->dump();
-        declareGlobal(glob);
-    }
+    // for(auto it=M->global_begin(); it != M->global_end(); it++) {
+    //     GlobalVariable *glob = &*it;
+    //     string name = getName(glob);
+    //     if(name == "llvm.used") {
+    //         continue;
+    //     }
+    //     if(name.find(".str") == 0) {
+    //         // ignore global strings for now (probably add in locally; though I dont think opencl really uses strings..)
+    //         continue;
+    //     }
+    //     if(name == "llvm.global_ctors") {
+    //         // we should handle these sooner or later, but skip for now
+    //         cerr << "warning: skipping @llvm.global_ctors" << endl;
+    //         continue;
+    //     }
+    //     if(ignoredGlobalVariables.find(name) != ignoredGlobalVariables.end()) {
+    //         continue;
+    //     }
+    //     glob->dump();
+    //     declareGlobal(glob);
+    // }
 
     // figure out which functions are kernels
     for(auto it=M->named_metadata_begin(); it != M->named_metadata_end(); it++) {
@@ -1636,57 +1660,75 @@ std::string dumpModule(Module *M, string specificFunction = "") {
 
     // dump function declarations
     // cout << "beginning function declarations" << endl;
-    for(auto it = M->begin(); it != M->end(); it++) {
-        Function *F = &*it;
-        string name = getName(F);
-        if(iskernel_by_name[name]) {
-            continue;  // no point in declaring kernels I think
-        }
-        if(specificFunction != "" && name != specificFunction) {
-            continue;
-        }
-        // hack for tensorflow: remove anything with 4Half in it, which one we dont use and two copies pointers inside
-        // pointers to structs, as kernel parameters...
-        if(name.find("_4half") != string::npos) {
-            continue;
-        }
-        if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
-                knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
-            string declaration = dumpFunctionDeclaration(F) + ";";
-            // cout << declaration << endl;
-            gencode += declaration + "\n";
-        }
-    }
-    gencode += "\n";
+    // for(auto it = M->begin(); it != M->end(); it++) {
+    //     Function *F = &*it;
+    //     string name = getName(F);
+    //     if(iskernel_by_name[name]) {
+    //         continue;  // no point in declaring kernels I think
+    //     }
+    //     if(specificFunction != "" && name != specificFunction) {
+    //         continue;
+    //     }
+    //     // hack for tensorflow: remove anything with 4Half in it, which one we dont use and two copies pointers inside
+    //     // pointers to structs, as kernel parameters...
+    //     if(name.find("_4half") != string::npos) {
+    //         continue;
+    //     }
+    //     if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
+    //             knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
+    //         string declaration = dumpFunctionDeclaration(F) + ";";
+    //         // cout << declaration << endl;
+    //         gencode += declaration + "\n";
+    //     }
+    // }
+    // gencode += "\n";
     // cout << "done writing function declarations" << endl;
     // cout << endl;
 
-    int i = 0;
-    for(auto it = M->begin(); it != M->end(); it++) {
-        nameByValue.clear();
-        nextNameIdx = 0;
-        Function *F = &*it;
-        string name = getName(F);
-        // COCL_PRINT(cout << "dumping functoin " << name << endl);
-        // hack for tensorflow: remove anything with 4Half in it, which one we dont use and two copies pointers inside
-        // pointers to structs, as kernel parameters...
-        if(name.find("_4half") != string::npos) {
-            continue;
+    if(specificFunction != "") {
+        Function *F = M->getFunction(StringRef(specificFunction));
+        functionsToDump.insert(F);
+       gencode += dumpFunctions(functionsToDump);
+       string declarations = "";
+       for(auto it=dumpedFunctions.begin(); it != dumpedFunctions.end(); it++) {
+            Function *F = *it;
+            string name = F->getName();
+            if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
+                    knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
+                string declaration = dumpFunctionDeclaration(F) + ";";
+                // cout << declaration << endl;
+                declarations += declaration + "\n";
+            }
+       }
+       gencode = "// Declarations:\n\n" + declarations + "\n\n// Definitions:\n\n" + gencode;
+    } else {
+        int i = 0;
+        for(auto it = M->begin(); it != M->end(); it++) {
+            nameByValue.clear();
+            nextNameIdx = 0;
+            Function *F = &*it;
+            string name = getName(F);
+            // COCL_PRINT(cout << "dumping functoin " << name << endl);
+            // hack for tensorflow: remove anything with 4Half in it, which one we dont use and two copies pointers inside
+            // pointers to structs, as kernel parameters...
+            if(name.find("_4half") != string::npos) {
+                continue;
+            }
+            if(ignoredFunctionNames.find(name) != ignoredFunctionNames.end()) {
+                continue;
+            }
+            if(knownFunctionsMap.find(name) != knownFunctionsMap.end()) {
+                continue;
+            }
+            if(specificFunction != "" and name != specificFunction) {
+                continue;
+            }
+            if(i > 0) {
+                gencode += "\n";
+            }
+            gencode += dumpFunction(F);
+            i++;
         }
-        if(ignoredFunctionNames.find(name) != ignoredFunctionNames.end()) {
-            continue;
-        }
-        if(knownFunctionsMap.find(name) != knownFunctionsMap.end()) {
-            continue;
-        }
-        if(specificFunction != "" and name != specificFunction) {
-            continue;
-        }
-        if(i > 0) {
-            gencode += "\n";
-        }
-        gencode += dumpFunction(F);
-        i++;
     }
     gencode = getDeclarationsToWrite() + "\n" + globalDeclarations + "\n" + gencode;
     return gencode;
