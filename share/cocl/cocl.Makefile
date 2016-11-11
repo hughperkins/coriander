@@ -21,16 +21,15 @@ $(OUTPUTBASEPATH)-device-noopt.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/
 $(OUTPUTBASEPATH)-device.ll: $(OUTPUTBASEPATH)-device-noopt.ll
 	opt-3.8 $(DEVICELLOPT) -S -o $@ $<
 
-$(OUTPUTBASEPATH)-device.cl: $(OUTPUTBASEPATH)-device.ll ${COCL_BIN}/ir-to-opencl
-	$(COCL_BIN)/ir-to-opencl $(IROOPENCLARGS) $(DEBUG) --inputfile $< --outputfile $@
+# $(OUTPUTBASEPATH)-device.cl: $(OUTPUTBASEPATH)-device.ll ${COCL_BIN}/ir-to-opencl
+# 	$(COCL_BIN)/ir-to-opencl $(IROOPENCLARGS) $(DEBUG) --inputfile $< --outputfile $@
 
 $(OUTPUTBASEPATH)-hostraw.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/cocl/fake_funcs.h
 	$(CLANG) $(PASSTHRU) $(INCLUDES) -x cuda -DUSE_CLEW -std=c++11 -I$(COCL_HOME)/include -I$(COCL_HOME)/include/EasyCL -I$(COCL_HOME)/include/cocl -I$(COCL_HOME)/src/EasyCL/thirdparty/clew/include -I$(COCL_HOME)/src/EasyCL -include $(COCL_HOME)/include/cocl/cocl.h -include $(COCL_HOME)/include/cocl/fake_funcs.h -include $(COCL_HOME)/include/cocl/cocl_hostside.h $< --cuda-host-only -emit-llvm  -O3 -S -o $@
 
-$(OUTPUTBASEPATH)-hostpatched.ll: $(OUTPUTBASEPATH)-hostraw.ll $(OUTPUTBASEPATH)-device.ll $(OUTPUTBASEPATH)-device.cl ${COCL_BIN}/patch-hostside
+$(OUTPUTBASEPATH)-hostpatched.ll: $(OUTPUTBASEPATH)-hostraw.ll $(OUTPUTBASEPATH)-device.ll ${COCL_BIN}/patch-hostside
 	$(COCL_BIN)/patch-hostside \
 		--hostrawfile $(OUTPUTBASEPATH)-hostraw.ll \
-		--deviceclfile $(OUTPUTBASEPATH)-device.cl \
 		--devicellfile $(OUTPUTBASEPATH)-device.ll \
 		--hostpatchedfile $@
 
@@ -38,7 +37,7 @@ $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX): $(OUTPUTBASEPATH)-hostpatched.ll
 	$(CLANG) $(PASSTHRU) -DUSE_CLEW -c $< -O3 $(OPT_G) -o $@
 
 $(OUTPUTBASEPATH)$(FINALPOSTFIX): $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX) ${COCL_LIB}/libclew.so ${COCL_LIB}/libcocl.so ${COCL_LIB}/libclblast.so
-	g++ -Wl,-rpath,$(COCL_LIB) -Wl,-rpath,$$ORIGIN -o $@ $< -L${COCL_LIB} -lcocl -lclblast -leasycl -lclew -lpthread
+	g++ -Wl,-rpath,$(COCL_LIB) -Wl,-rpath,$$ORIGIN -o $@ $< -L${COCL_LIB} -lcocl -lclblast -leasycl -lclew -lpthread ${LINK_FLAGS}
 
 # .INTERMEDIATE: $(OUTPUTBASEPATH)-hostpatched.ll
 

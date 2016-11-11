@@ -42,7 +42,7 @@ extern "C" {
 
 extern "C" {
     void configureKernel(
-        const char *kernelName, const char *llsourcecode, const char *clSourcecodeString);
+        const char *kernelName, const char *llsourcecode);
 
     size_t cuInit(unsigned int flags);
 }

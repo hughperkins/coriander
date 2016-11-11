@@ -55,10 +55,10 @@ using namespace llvm;
 using namespace std;
 
 static llvm::LLVMContext context;
-static std::string sourcecode_stringname;
+// static std::string sourcecode_stringname;
 static std::string devicellcode_stringname;
 static string devicellfilename;
-static string deviceclfilename;
+// static string deviceclfilename;
 // static string clfilenamesimple;
 
 bool single_precision = true;
@@ -354,25 +354,25 @@ void patchCudaLaunch(Function *F, CallInst *inst, vector<Instruction *> &to_repl
     // outs() << "patching launch in " << string(F->getName()) << "\n";
 
     string kernelName = launchCallInfo->kernelName;
-    Instruction *kernelNameValue = addStringInstr(M, "s_" + ::sourcecode_stringname + "_" + kernelName, kernelName);
+    Instruction *kernelNameValue = addStringInstr(M, "s_" + ::devicellcode_stringname + "_" + kernelName, kernelName);
     kernelNameValue->insertBefore(inst);
 
     // this isnt actually needed for running, but hopefully useful for debugging
     Instruction *llSourcecodeValue = addStringInstrExistingGlobal(M, devicellcode_stringname);
     llSourcecodeValue->insertBefore(inst);
 
-    Instruction *clSourcecodeValue = addStringInstrExistingGlobal(M, sourcecode_stringname);
-    clSourcecodeValue->insertBefore(inst);
+    // Instruction *clSourcecodeValue = addStringInstrExistingGlobal(M, sourcecode_stringname);
+    // clSourcecodeValue->insertBefore(inst);
 
     Function *configureKernel = cast<Function>(F->getParent()->getOrInsertFunction(
         "configureKernel",
         Type::getVoidTy(context),
         PointerType::get(IntegerType::get(context, 8), 0),
         PointerType::get(IntegerType::get(context, 8), 0),
-        PointerType::get(IntegerType::get(context, 8), 0),
+        // PointerType::get(IntegerType::get(context, 8), 0),
         NULL));
-    Value *args[] = {kernelNameValue, llSourcecodeValue, clSourcecodeValue};
-    CallInst *callConfigureKernel = CallInst::Create(configureKernel, ArrayRef<Value *>(&args[0], &args[3]));
+    Value *args[] = {kernelNameValue, llSourcecodeValue};
+    CallInst *callConfigureKernel = CallInst::Create(configureKernel, ArrayRef<Value *>(&args[0], &args[2]));
     callConfigureKernel->insertBefore(inst);
     Instruction *lastInst = callConfigureKernel;
 
@@ -439,21 +439,21 @@ string getBasename(string path) {
     return path.substr(slash_pos + 1);
 }
 
-void patchModule(string deviceclfilename, Module *M) {
-    ifstream f_incl(::deviceclfilename);
-    string cl_sourcecode(
-        (std::istreambuf_iterator<char>(f_incl)),
-        (std::istreambuf_iterator<char>()));
+void patchModule(Module *M) {
+    // ifstream f_incl(::deviceclfilename);
+    // string cl_sourcecode(
+    //     (std::istreambuf_iterator<char>(f_incl)),
+    //     (std::istreambuf_iterator<char>()));
 
     ifstream f_inll(::devicellfilename);
     string devicell_sourcecode(
         (std::istreambuf_iterator<char>(f_inll)),
         (std::istreambuf_iterator<char>()));
 
-    ::sourcecode_stringname = "__opencl_sourcecode" + ::deviceclfilename;
+    // ::sourcecode_stringname = "__opencl_sourcecode" + ::deviceclfilename;
     ::devicellcode_stringname = "__devicell_sourcecode" + ::devicellfilename;
 
-    addGlobalVariable(M, sourcecode_stringname, cl_sourcecode);
+    // addGlobalVariable(M, sourcecode_stringname, cl_sourcecode);
     addGlobalVariable(M, devicellcode_stringname, devicell_sourcecode);
 
     vector<Function *> functionsToRemove;
@@ -474,7 +474,7 @@ int main(int argc, char *argv[]) {
     string patchedhostfilename;
 
     parser.add_string_argument("--hostrawfile", &rawhostfilename)->required()->help("input file");
-    parser.add_string_argument("--deviceclfile", &::deviceclfilename)->required()->help("input file");
+    // parser.add_string_argument("--deviceclfile", &::deviceclfilename)->required()->help("input file");
     parser.add_string_argument("--devicellfile", &::devicellfilename)->required()->help("input file");
     parser.add_string_argument("--hostpatchedfile", &patchedhostfilename)->required()->help("output file");
     if(!parser.parse_args(argc, argv)) {
@@ -488,11 +488,11 @@ int main(int argc, char *argv[]) {
     }
 
     try {
-        patchModule(deviceclfilename, module.get());
+        patchModule(module.get());
     } catch(const runtime_error &e) {
         outs() << "exception whilst doing:\n";
         outs() << "reading rawhost ll file " << rawhostfilename << "\n";
-        outs() << "reading device cl file " << deviceclfilename << "\n";
+        // outs() << "reading device cl file " << deviceclfilename << "\n";
         outs() << "outputing to hostpatched file " << patchedhostfilename << "\n";
         throw e;
     }

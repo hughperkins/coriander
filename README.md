@@ -2,6 +2,9 @@
 
 Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 
+This fork moves opencl generation to runtime.  Means we have better information available, specifically we know
+which kernel we want to run.  This is going to help with address space determination.
+
 ## Concept
 
 - *Compile* using `cocl`

@@ -8,7 +8,7 @@ macro(add_cocl_executable OUTPUT SRCFILE)
         OUTPUT ${OUTPUT}
         COMMENT "${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl ${SRCFILE} -o ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT} ${_TESTS_COCL_OPTIONS}"
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl ${SRCFILE} -o ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT} ${_TESTS_COCL_OPTIONS}
-        DEPENDS cocl clblast clew easycl ir-to-opencl patch-hostside ${SRCFILE}
+        DEPENDS cocl clblast clew easycl patch-hostside ${SRCFILE}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
     add_custom_target(build_${OUTPUT}

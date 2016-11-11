@@ -9,6 +9,7 @@ macro(add_cocl_executable OUTPUT SRCFILE)
         OUTPUT ${OUTPUT}
         COMMENT "@CMAKE_INSTALL_PREFIX@/bin/cocl ${INCLUDE_ARGS} ${SRCFILE} -o ${OUTPUT} ${_TESTS_COCL_OPTIONS}"
         COMMAND @CMAKE_INSTALL_PREFIX@/bin/cocl ${INCLUDE_ARGS} ${SRCFILE} -o ${OUTPUT} ${_TESTS_COCL_OPTIONS}
+        #DEPENDS @CMAKE_INSTALL_PREFIX@/bin/cocl clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
     )
     add_custom_target(build_${OUTPUT} ALL
         DEPENDS ${OUTPUT}

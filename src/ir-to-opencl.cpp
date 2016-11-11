@@ -30,6 +30,7 @@
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/IR/Module.h"
+#include "llvm/Support/MemoryBuffer.h"
 #include "llvm/IR/Verifier.h"
 #include "llvm/IR/Type.h"
 #include "llvm/IR/ValueSymbolTable.h"
@@ -135,6 +136,9 @@ std::string stripOuterParams(string instructionCode) {
         return instructionCode;
     }
     string innerString = instructionCode.substr(1, instructionCode.size() - 2);
+    if(innerString[0] == '&') {
+        return instructionCode;
+    }
     // COCL_PRINT(cout << "innerString [" << innerString << "]" << endl);
     if(isValidExpression(innerString)) {
         // COCL_PRINT(cout << "stripping braces" << endl);
@@ -431,6 +435,8 @@ std::string dumpReturn(ReturnInst *retInst) {
     std::string gencode = "";
     Value *retValue = retInst->getReturnValue();
     if(retValue != 0) {
+        Function *F = retInst->getFunction();
+        copyAddressSpace(retValue, F);
         gencode += "return " + dumpOperand(retValue);
     } else {
         // we still need to have "return" if no value, since some loops terminate with a `return` in the middle
@@ -1538,6 +1544,13 @@ std::string dumpFunction(Function *F) {
         }
     }
 
+    Type *returnType = F->getReturnType();
+    if(PointerType *ptr = dyn_cast<PointerType>(returnType)) {
+        if(ptr->getAddressSpace() == 1) {
+            declaration = "global " + declaration;  // a bit hacky, but maybe it works ok for now?
+        }
+    }
+
     gencode =
         declaration + " {\n" +
         currentFunctionSharedDeclarations;
@@ -1679,44 +1692,7 @@ std::string dumpModule(Module *M, string specificFunction = "") {
     return gencode;
 }
 
-int main(int argc, char *argv[]) {
-    SMDiagnostic smDiagnostic;
-    string target;
-    string outputfilepath;
-    string specificFunction = "";
-    string rcFile = "";
-
-    argparsecpp::ArgumentParser parser;
-    parser.add_string_argument("--inputfile", &target)->required();
-    parser.add_string_argument("--outputfile", &outputfilepath)->required();
-    parser.add_bool_argument("--debug", &debug);
-    // parser.add_string_argument("--rcfile", &rcFile)
-    //     ->help("Path to rcfile, containing default options, set to blank to disable")
-    //     ->defaultValue("~/.coclrc");
-    // parser.add_bool_argument("--no-load_rcfile", &add_ir_to_cl)->help("Dont load the ~/.coclrc file");
-    parser.add_bool_argument("--add_ir_to_cl", &add_ir_to_cl);
-    parser.add_bool_argument("--run_branching_transforms", &runBranchingTransforms)->help("might make the kernels more acceptable to your gpu driver; buggy though...");
-    parser.add_bool_argument("--branches_as_switch", &branchesAsSwitch)->help("might make the kernels more acceptable to your gpu driver; slow though...");
-    parser.add_bool_argument("--dump_transforms", &dumpTransforms)->help("mostly for dev/debug.  prints the results of branching transforms");
-    parser.add_string_argument("--specific_function", &specificFunction)->help("Mostly for dev/debug, just process one specific function");
-    if(!parser.parse_args(argc, argv)) {
-        return -1;
-    }
-
-    // if(rcFile != "") {
-    //     loadRcFile(rcFile);
-    // }
-
-    // if(branchesAsSwitch && runBranchingTransforms) {
-    //     cout << "Branching transforms not yet supported for --branches_as_switch" << endl;
-    //     return -1;
-    // }
-
-    std::unique_ptr<llvm::Module> M = parseIRFile(target, smDiagnostic, context);
-    if(!M) {
-        smDiagnostic.print(argv[0], errs());
-        return 1;
-    }
+void populateKnownValues() {
     ignoredFunctionNames.insert("llvm.ptx.read.tid.x");
     ignoredFunctionNames.insert("llvm.ptx.read.tid.y");
     ignoredFunctionNames.insert("llvm.ptx.read.tid.z");
@@ -1793,21 +1769,84 @@ int main(int argc, char *argv[]) {
     ignoredGlobalVariables.insert("threadIdx");
     ignoredGlobalVariables.insert("gridDim");
     ignoredGlobalVariables.insert("blockDim");
+}
 
+string convertModuleToCl(Module *M, string specificFunction) {
+    populateKnownValues();
+    string gencode = "";
+    gencode += cl_add_definitions;
+    // COCL_PRINT(cout << "cl_add_definitions " << cl_add_definitions << endl);
     try {
-        string gencode = "";
-        gencode += cl_add_definitions;
-        // COCL_PRINT(cout << "cl_add_definitions " << cl_add_definitions << endl);
-        gencode += dumpModule(M.get(), specificFunction);
-        ofstream of;
-        of.open(outputfilepath, ios_base::out);
-        of << gencode;
-        of.close();
+        gencode += dumpModule(M, specificFunction);
     } catch(const runtime_error &e) {
         cout << "instructions processed before crash " << instructions_processed << endl;
         throw e;
     } catch(...) {
         cout << "some unknown exception" << endl;
     }
+    return gencode;
+}
+
+string convertLlStringToCl(string llString, string specificFunction) {
+    StringRef llStringRef(llString);
+    cout << "got llstringref" << endl;
+    unique_ptr<MemoryBuffer> llMemoryBuffer = MemoryBuffer::getMemBuffer(llStringRef);
+    cout << "got memory buffer " << endl;
+    SMDiagnostic smDiagnostic;
+    unique_ptr<Module> M = parseIR(llMemoryBuffer->getMemBufferRef(), smDiagnostic,
+                                context);
+    cout << "parsed module" << endl;
+    if(!M) {
+        smDiagnostic.print("irtopencl", errs());
+        // return "";
+        throw runtime_error("failed to parse IR");
+    }
+    string gencode = convertModuleToCl(M.get(), specificFunction);
+    cout << "gencode " << gencode << endl;;
+    return gencode;
+}
+
+void convertLlFileToClFile(string llFilename, string ClFilename, string specificFunction) {
+    SMDiagnostic smDiagnostic;
+    std::unique_ptr<llvm::Module> M = parseIRFile(llFilename, smDiagnostic, context);
+    if(!M) {
+        smDiagnostic.print("irtoopencl", errs());
+        // return 1;
+        throw runtime_error("failed to parse IR");
+    }
+    string gencode = convertModuleToCl(M.get(), specificFunction);
+    ofstream of;
+    of.open(ClFilename, ios_base::out);
+    of << gencode;
+    of.close();
+}
+
+#ifdef IROPENCL_MAIN
+int main(int argc, char *argv[]) {
+    string target;
+    string outputfilepath;
+    string specificFunction = "";
+    string rcFile = "";
+
+    argparsecpp::ArgumentParser parser;
+    parser.add_string_argument("--inputfile", &target)->required();
+    parser.add_string_argument("--outputfile", &outputfilepath)->required();
+    parser.add_bool_argument("--debug", &debug);
+    // parser.add_string_argument("--rcfile", &rcFile)
+    //     ->help("Path to rcfile, containing default options, set to blank to disable")
+    //     ->defaultValue("~/.coclrc");
+    // parser.add_bool_argument("--no-load_rcfile", &add_ir_to_cl)->help("Dont load the ~/.coclrc file");
+    parser.add_bool_argument("--add_ir_to_cl", &add_ir_to_cl);
+    parser.add_bool_argument("--run_branching_transforms", &runBranchingTransforms)->help("might make the kernels more acceptable to your gpu driver; buggy though...");
+    parser.add_bool_argument("--branches_as_switch", &branchesAsSwitch)->help("might make the kernels more acceptable to your gpu driver; slow though...");
+    parser.add_bool_argument("--dump_transforms", &dumpTransforms)->help("mostly for dev/debug.  prints the results of branching transforms");
+    parser.add_string_argument("--specific_function", &specificFunction)->help("Mostly for dev/debug, just process one specific function");
+    if(!parser.parse_args(argc, argv)) {
+        return -1;
+    }
+
+    convertLlFileToClFile(target, outputfilepath, specificFunction);
+
     return 0;
 }
+#endif // IROPENCL_MAIN

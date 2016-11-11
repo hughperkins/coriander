@@ -33,6 +33,9 @@
 #include "cocl/cocl.h"
 #include "cocl/cocl_memory.h"
 
+#include "ir-to-opencl.h"
+#include "ir-to-opencl-common.h"
+
 using namespace std;
 using namespace easycl;
 using namespace cocl;
@@ -170,18 +173,29 @@ namespace cocl {
         return getThreadVars()->getContext()->numKernelCalls;
     }
 
-    CLKernel *getKernelForName(string name, string sourcecode) {
+    string  convertLlToCl(string devicellsourcecode, string kernelName) {
+        cout << "llsourcecode [" << devicellsourcecode << "]" << endl;  
+        string clcode = convertLlStringToCl(devicellsourcecode, kernelName);
+        // string clcode = convertLlStringToCl(devicellsourcecode, "");
+        cout << "clcode " << clcode << endl;
+        return clcode;
+    }
+
+    CLKernel *getKernelForName(string kernelName, string devicellsourcecode) {
         // KernelByNameMutex mutex;
         ThreadVars *v = getThreadVars();
         EasyCL *cl = v->getContext()->getCl();
         v->getContext()->numKernelCalls++;
-        if(v->getContext()->kernelByName.find(name) != v->getContext()->kernelByName.end()) {
-            return v->getContext()->kernelByName[name];
+        if(v->getContext()->kernelByName.find(kernelName) != v->getContext()->kernelByName.end()) {
+            return v->getContext()->kernelByName[kernelName];
         }
         // compile the kernel.  we are still locking the mutex, but I cnat think of a better
         // way right now...
-        cout << "building kernel " << name << endl;
+        cout << "building kernel " << kernelName << endl;
         // cout << "source [" << sourcecode << "]" << endl;
+
+        // convert to opencl first... based on the kernel name required
+        string clSourcecode = convertLlToCl(devicellsourcecode, kernelName);
 
         string filename = "/tmp/out.cl";
         if(getenv("COCL_LOAD_KERNEL") != 0) {
@@ -190,10 +204,10 @@ namespace cocl {
             f.open(filename, ios_base::in);
             // f << launchConfiguration.kernelName << endl;
             // f >> sourcecode;
-            sourcecode = "";
+            clSourcecode = "";
             string line = "";
             while(getline(f, line)) {
-                sourcecode += line + "\n";
+                clSourcecode += line + "\n";
             }
             // cout << sourcecode << endl;
             f.close();
@@ -202,19 +216,19 @@ namespace cocl {
             ofstream f;
             f.open(filename, ios_base::out);
             // f << launchConfiguration.kernelName << endl;
-            f << sourcecode << endl;
+            f << clSourcecode << endl;
             f.close();
         }
 
-        CLKernel *kernel = cl->buildKernelFromString(sourcecode, name, "", "__internal__");
+        CLKernel *kernel = cl->buildKernelFromString(clSourcecode, kernelName, "", "__internal__");
         cout << " ... built" << endl;
-        v->getContext()->kernelByName[name ] = kernel;
-        cl->storeKernel(name, kernel, true);  // this will cause the kernel to be deleted with cl.  Not clean yet, but a start
+        v->getContext()->kernelByName[kernelName ] = kernel;
+        cl->storeKernel(kernelName, kernel, true);  // this will cause the kernel to be deleted with cl.  Not clean yet, but a start
         return kernel;
     }
 }
 
-void configureKernel(const char *kernelName, const char *devicellsourcecode, const char *clSourcecodeString) {
+void configureKernel(const char *kernelName, const char *devicellsourcecode) {
     // we just ignore the devicellsourcecode mostly, but might be useful for debugging
     // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
@@ -230,9 +244,9 @@ void configureKernel(const char *kernelName, const char *devicellsourcecode, con
     }
     // hostside_opencl_funcs_assure_initialized();
     launchConfiguration.kernelName = kernelName;
-    launchConfiguration.kernelSource = clSourcecodeString;
+    launchConfiguration.kernelSource = devicellsourcecode;
     try {
-        launchConfiguration.kernel = getKernelForName(kernelName, clSourcecodeString);
+        launchConfiguration.kernel = getKernelForName(kernelName, devicellsourcecode);
     } catch(runtime_error &e) {
         cout << "kernel failed to build" << endl;
         cout << "kernel name: [" << launchConfiguration.kernelName << "]" << endl;

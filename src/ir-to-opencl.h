@@ -40,3 +40,4 @@ void storeValueName(llvm::Value *value);
 std::string dumpValue(llvm::Value *value);
 std::string dumpReturn(llvm::ReturnInst *retInst);
 std::string dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock);
+std::string convertLlStringToCl(std::string llString, std::string specificFunction);
