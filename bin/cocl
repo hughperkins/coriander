@@ -83,6 +83,10 @@ function display_help {
              Some GPU drivers might prefer the output
              Currently buggy.  Cant be used with branches_as_switch
 
+        --add_ir_to_cl
+             Add the original IR code into the generated OpenCL code, as comments
+             Mainly useful to cuda-on-cl maintainers
+
       Options passed through to clang compiler:
         -fPIC
         -I<INCLUDEDIR>
@@ -195,6 +199,9 @@ while [[ x$1 != x ]]; do {
                 IROOPENCLARGS="${IROOPENCLARGS} $1"
                 ;;
             --branches_as_switch)
+                IROOPENCLARGS="${IROOPENCLARGS} $1"
+                ;;
+            --add_ir_to_cl)
                 IROOPENCLARGS="${IROOPENCLARGS} $1"
                 ;;
             -?)
