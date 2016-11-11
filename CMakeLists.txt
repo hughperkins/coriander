@@ -42,7 +42,7 @@ set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/plat
 
 set(COCL_SRCS src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cpp src/cocl_device.cpp src/cocl_error.cpp
     src/cocl_memory.cpp src/cocl_properties.cpp src/cocl_streams.cpp src/cocl_clsources.cpp src/cocl_context.cpp
-    src/ir-to-opencl.cpp
+    src/ir-to-opencl.cpp src/function_names_map.cpp
     src/ir-to-opencl-common.cpp src/mutations.cpp src/readIR.cpp src/struct_clone.cpp
     src/branches_as_switch/branches_as_switch.cpp
     src/handle_branching.cpp src/branching_transforms.cpp src/flowcontrolinstructions.cpp third_party/argparsecpp/argparsecpp.cpp
@@ -189,6 +189,22 @@ if(BUILD_TESTS)
     endforeach()
     add_custom_target(run-tests
         DEPENDS ${TEST_TARGETS})
+
+    if(UNIX)
+        add_library(cocl_gtest SHARED third_party/gtest/gtest-all.cc)
+        target_link_libraries(cocl_gtest pthread)
+    else()
+        add_library(cocl_gtest third_party/gtest/gtest-all.cc)
+    endif()
+
+    add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
+        # test/gtest/test_block_dumper.cpp src/basicblockdumper.cpp
+        test/gtest/test_type_dumper.cpp src/type_dumper.cpp
+    )
+    target_include_directories(cocl_unittests PRIVATE src)
+    target_include_directories(cocl_unittests PRIVATE third_party/gtest)
+    target_include_directories(cocl_unittests PRIVATE /usr/lib/llvm-3.8/include)
+    target_link_libraries(cocl_unittests "${LLVM_LIBS}" cocl_gtest easycl)
 endif(BUILD_TESTS)
 
 FILE(GLOB_RECURSE COCL_HEADERS

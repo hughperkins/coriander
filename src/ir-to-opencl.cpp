@@ -22,6 +22,7 @@
 #include "handle_branching.h"
 #include "branching_transforms.h"
 #include "branches_as_switch/branches_as_switch.h"
+#include "function_names_map.h"
 
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
@@ -51,13 +52,11 @@
 
 using namespace llvm;
 using namespace std;
+using namespace cocl;
 
 static llvm::LLVMContext context;
 static std::map<std::string, Value *> NamedValues;
 static std::map<string, bool> iskernel_by_name;
-static std::set<string> ignoredFunctionNames;
-static std::set<string> ignoredGlobalVariables;
-static std::map<string, string> knownFunctionsMap; // from cuda to opencl, eg tid.x => get_global_id
 
 map<Value *, string> nameByValue; // name here might be an entire subepxression
 map<Value *, string> origNameByValue; //origName here is just like v18, or v19, no expressions; its for debugging
@@ -868,8 +867,8 @@ std::string dumpCall(CallInst *instr) {
         return gencode + " 0"; //ignore, (but pretend to return 0)
     } else if(functionName == "llvm.memcpy.p0i8.p0i8.i64") {
         return dumpMemcpyCharCharLong(instr);  // just ignore for now
-    } else if(knownFunctionsMap.find(functionName) != knownFunctionsMap.end()) {
-        functionName = knownFunctionsMap[functionName];
+    } else if(function_names_map_isMappedFunction(functionName)) {
+        functionName = function_names_map_getFunctionMappedName(functionName);
         internalfunc = true;
     }
     gencode += functionName + "(";
@@ -1693,8 +1692,8 @@ std::string dumpModule(Module *M, string specificFunction = "") {
        for(auto it=dumpedFunctions.begin(); it != dumpedFunctions.end(); it++) {
             Function *F = *it;
             string name = F->getName();
-            if(ignoredFunctionNames.find(name) == ignoredFunctionNames.end() &&
-                    knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
+            if(!function_names_map_isIgnoredFunction(name) &&
+                !function_names_map_isMappedFunction(name)) {
                 string declaration = dumpFunctionDeclaration(F) + ";";
                 // cout << declaration << endl;
                 declarations += declaration + "\n";
@@ -1714,10 +1713,10 @@ std::string dumpModule(Module *M, string specificFunction = "") {
             if(name.find("_4half") != string::npos) {
                 continue;
             }
-            if(ignoredFunctionNames.find(name) != ignoredFunctionNames.end()) {
+            if(function_names_map_isIgnoredFunction(name)) {
                 continue;
             }
-            if(knownFunctionsMap.find(name) != knownFunctionsMap.end()) {
+            if(function_names_map_isMappedFunction(name)) {
                 continue;
             }
             if(specificFunction != "" and name != specificFunction) {
@@ -1734,87 +1733,8 @@ std::string dumpModule(Module *M, string specificFunction = "") {
     return gencode;
 }
 
-void populateKnownValues() {
-    ignoredFunctionNames.insert("llvm.ptx.read.tid.x");
-    ignoredFunctionNames.insert("llvm.ptx.read.tid.y");
-    ignoredFunctionNames.insert("llvm.ptx.read.tid.z");
-    ignoredFunctionNames.insert("llvm.cuda.syncthreads");
-    ignoredFunctionNames.insert("_Z11syncthreadsv");
-    ignoredFunctionNames.insert("_ZL21__nvvm_reflect_anchorv");
-    ignoredFunctionNames.insert("__nvvm_reflect");
-    ignoredFunctionNames.insert("llvm.ptx.read.ctaid.x");
-    ignoredFunctionNames.insert("llvm.ptx.read.ctaid.y");
-    ignoredFunctionNames.insert("llvm.ptx.read.ctaid.z");
-    ignoredFunctionNames.insert("llvm.ptx.read.nctaid.x");
-    ignoredFunctionNames.insert("llvm.ptx.read.nctaid.y");
-    ignoredFunctionNames.insert("llvm.ptx.read.nctaid.z");
-    ignoredFunctionNames.insert("llvm.ptx.read.ntid.x");
-    ignoredFunctionNames.insert("llvm.ptx.read.ntid.y");
-    ignoredFunctionNames.insert("llvm.ptx.read.ntid.z");
-    ignoredFunctionNames.insert("llvm.memcpy.p0i8.p0i8.i64");
-    ignoredFunctionNames.insert("llvm.memcpy.p0i8.p0i8.i32");
-    ignoredFunctionNames.insert("llvm.lifetime.start");
-    ignoredFunctionNames.insert("llvm.lifetime.end");
-    ignoredFunctionNames.insert("pow");
-    ignoredFunctionNames.insert("_Z11make_float4ffff");
-    ignoredFunctionNames.insert("_GLOBAL__sub_I_struct_initializer.cu");
-    ignoredFunctionNames.insert("_Z13__threadfencev");
-    ignoredFunctionNames.insert("_Z11__shfl_downIfET_S0_ii"); // 3 args, int
-    ignoredFunctionNames.insert("_Z11__shfl_downIfET_S0_i");  // 2 args, int
-
-    knownFunctionsMap["_ZSt4sqrtf"] = "sqrt";
-    knownFunctionsMap["llvm.nvvm.sqrt.rn.d"] = "sqrt";
-    knownFunctionsMap["llvm.nvvm.fabs.f"] = "fabs";
-    knownFunctionsMap["llvm.nvvm.fabs.ftz.f"] = "fabs";
-    knownFunctionsMap["_Z16our_pretend_tanhf"] = "tanh";
-    knownFunctionsMap["_Z15our_pretend_logf"] = "log";
-    knownFunctionsMap["_Z15our_pretend_expf"] = "exp";
-
-    knownFunctionsMap["_ZSt16our_pretend_tanhf"] = "tanh";
-    knownFunctionsMap["_ZSt15our_pretend_logf"] = "log";
-    knownFunctionsMap["_ZSt15our_pretend_expf"] = "exp";
-
-    knownFunctionsMap["_ZSt4tanhf"] = "tanh";
-    knownFunctionsMap["_ZSt3logf"] = "log";
-    knownFunctionsMap["_ZSt3expf"] = "exp";
-    knownFunctionsMap["_ZSt3powff"] = "pow";
-    knownFunctionsMap["_Z3minff"] = "fmin";
-    knownFunctionsMap["_Z3maxff"] = "fmax";
-    knownFunctionsMap["fminf"] = "fmin";
-    knownFunctionsMap["fmaxf"] = "fmax";
-    knownFunctionsMap["tanhf"] = "tanh";
-    knownFunctionsMap["expf"] = "exp";
-    knownFunctionsMap["fabsf"] = "fabs";
-    knownFunctionsMap["acosf"] = "acos";
-    knownFunctionsMap["asinf"] = "asin";
-    knownFunctionsMap["atanf"] = "atan";
-    knownFunctionsMap["cosf"] = "cos";
-    knownFunctionsMap["sinf"] = "sin";
-    knownFunctionsMap["tanf"] = "tan";
-    knownFunctionsMap["ceilf"] = "ceil";
-    knownFunctionsMap["floorf"] = "floor";
-    knownFunctionsMap["logf"] = "log";
-    knownFunctionsMap["sqrtf"] = "sqrt";
-    knownFunctionsMap["sqrt"] = "sqrt";
-    knownFunctionsMap["pow"] = "pow"; // just so we dont try to pass `scratch` to it :-P
-    // knownFunctoinsMap["_Z11syncthreadsv"] = "";
-
-    knownFunctionsMap["_Z9atomicCASIjET_PS0_S0_S0_"] = "atomic_cmpxchg";   // int
-    knownFunctionsMap["_Z10atomicExchIjET_PS0_S0_"] = "atomic_xchg";  // ints
-    knownFunctionsMap["_Z10atomicExchIfET_PS0_S0_"] = "atomic_xchg";   // floats
-    knownFunctionsMap["_Z9atomicIncIjET_PS0_S0_"] = "__atomic_inc";   // int
-    // knownFunctionsMap["_Z11__shfl_downIfET_S0_ii"] = "__shfl_down_3";   // float, and see cl_add_definitions, at top
-    // knownFunctionsMap["_Z11__shfl_downIfET_S0_i"] = "__shfl_down_2";   // float, and see cl_add_definitions, at top
-    knownFunctionsMap["_Z9atomicAddIfET_PS0_S0_"] = "__atomic_add"; // float
-
-    ignoredGlobalVariables.insert("blockIdx");
-    ignoredGlobalVariables.insert("threadIdx");
-    ignoredGlobalVariables.insert("gridDim");
-    ignoredGlobalVariables.insert("blockDim");
-}
-
 string convertModuleToCl(Module *M, string specificFunction) {
-    populateKnownValues();
+    function_names_map_populateKnownValues();
     string gencode = "";
     gencode += cl_add_definitions;
     // COCL_PRINT(cout << "cl_add_definitions " << cl_add_definitions << endl);
