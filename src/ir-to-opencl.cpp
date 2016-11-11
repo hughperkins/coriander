@@ -1844,7 +1844,7 @@ string convertLlStringToCl(string llString, string specificFunction) {
         throw runtime_error("failed to parse IR");
     }
     string gencode = convertModuleToCl(M.get(), specificFunction);
-    cout << "gencode " << gencode << endl;;
+    // cout << "gencode " << gencode << endl;;
     return gencode;
 }
 
