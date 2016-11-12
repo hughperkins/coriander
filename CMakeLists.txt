@@ -49,6 +49,8 @@ set(COCL_SRCS src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cp
     src/flowcontrol/returnblock.cpp src/flowcontrol/sequence.cpp src/flowcontrol/basicblockblock.cpp
     src/flowcontrol/conditionalbranch.cpp src/flowcontrol/dowhile.cpp src/flowcontrol/if.cpp
     src/flowcontrol/for.cpp src/flowcontrol/rootblock.cpp src/flowcontrol/block.cpp)
+set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp)
+ # src/struct_clone.cpp
 
 set(CMAKE_CC_FLAGS "-fPIC")
 set(LLVM_COMPILE_FLAGS "-fvisibility-inlines-hidden -ffunction-sections -fdata-sections")
@@ -199,12 +201,12 @@ if(BUILD_TESTS)
 
     add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
         # test/gtest/test_block_dumper.cpp src/basicblockdumper.cpp
-        test/gtest/test_type_dumper.cpp src/type_dumper.cpp
+        test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
     )
     target_include_directories(cocl_unittests PRIVATE src)
     target_include_directories(cocl_unittests PRIVATE third_party/gtest)
     target_include_directories(cocl_unittests PRIVATE /usr/lib/llvm-3.8/include)
-    target_link_libraries(cocl_unittests "${LLVM_LIBS}" cocl_gtest easycl)
+    target_link_libraries(cocl_unittests "${LLVM_LIBS}" cocl_gtest easycl cocl)
 endif(BUILD_TESTS)
 
 FILE(GLOB_RECURSE COCL_HEADERS

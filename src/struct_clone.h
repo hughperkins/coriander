@@ -28,7 +28,7 @@ public:
     virtual ~StructCloner() {
 
     }
-    StructType *cloneNoPointers(StructType *inStructType);
+    llvm::StructType *cloneNoPointers(llvm::StructType *inStructType);
 
     cocl::TypeDumper *typeDumper;
 };

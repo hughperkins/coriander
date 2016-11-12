@@ -41,3 +41,5 @@ define void @mystruct() {
     %2 = load %struct_mystruct, %struct_mystruct* %1
     ret void
 }
+
+%"struct.mystruct" = type { i32, float, float*, float* }

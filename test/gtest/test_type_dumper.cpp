@@ -190,3 +190,22 @@ TEST(test_type_dumper, mystruct) {
     ASSERT_NE(structDefinitions.find("int f0;"), string::npos);
     ASSERT_NE(structDefinitions.find("float f1;"), string::npos);
 }
+
+
+TEST(test_type_dumper, mystruct2) {
+    Module *M = getM();
+    StructType *myStructType = M->getTypeByName(StringRef("struct mystruct"));
+    TypeDumper typeDumper;
+    string structCl = typeDumper.dumpType(myStructType);
+
+    cout << "structCl: " << structCl << endl;
+    ASSERT_EQ(structCl, "struct mystruct");
+
+    string structDefinitions = typeDumper.dumpStructDefinitions();
+    cout << "structDefinitions: " << structDefinitions << endl;
+    ASSERT_NE(structDefinitions.find("struct mystruct"), string::npos);
+    ASSERT_NE(structDefinitions.find("int f0;"), string::npos);
+    ASSERT_NE(structDefinitions.find("float f1;"), string::npos);
+    ASSERT_NE(structDefinitions.find("float* f2;"), string::npos);
+    ASSERT_NE(structDefinitions.find("float* f3;"), string::npos);
+}

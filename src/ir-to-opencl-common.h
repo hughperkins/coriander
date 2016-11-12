@@ -21,22 +21,12 @@
 #include "llvm/IR/Type.h"
 #include "llvm/IR/DerivedTypes.h"
 
-llvm::GlobalVariable *addGlobalVariable(llvm::Module *M, std::string name, std::string value);
-llvm::Instruction *addStringInstr(llvm::Module *M, std::string name, std::string value);
-llvm::Instruction *addStringInstrExistingGlobal(llvm::Module *M, std::string name);
-
-llvm::Constant *createInt32Constant(llvm::LLVMContext *context, int value);
-
 template<typename T>
 std::string toString(T value) {
     std::ostringstream oss;
     oss << value;
     return oss.str();
 }
-std::string replace(std::string target, char old_char, char new_char);
-
-int readInt32Constant(llvm::Value *value);
-float readFloatConstant(llvm::Value *value);
 
 class PointerInfo {
 public:
@@ -59,11 +49,3 @@ public:
 void walkStructType(llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices, std::string path, llvm::StructType *type);
 void walkType(llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices, std::string path, llvm::Type *type);
 std::string getIndent(int level);
-
-std::string getName(llvm::StructType *type);
-std::string getName(llvm::Function *type);
-
-std::string dumpTypeNoPointers(llvm::Type *type);
-
-void updateAddressSpace(llvm::Value *value, int newSpace);
-void copyAddressSpace(llvm::Value *src, llvm::Value *dest);
