@@ -16,3 +16,13 @@ define void @someKernel(float * %d1, float * %d2) {
 }
 
 ;  %29 = getelementptr %struct.mystruct , %struct.mystruct *%24, i32 0, i32 0
+
+define void @kernelBranches(float *%d1) {
+label1:
+    %0 = fadd float 3.0, 4.0
+    br label %label2
+
+label2:
+    %1 = fadd float 5.0, 7.0
+    br label %label1
+}

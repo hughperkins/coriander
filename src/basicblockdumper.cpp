@@ -297,21 +297,6 @@ std::string BasicBlockDumper::dumpTrunc(llvm::CastInst *instr) {
     return gencode;
 }
 
-std::string BasicBlockDumper::dumpReturn(ReturnInst *retInst) {
-    std::string gencode = "";
-    Value *retValue = retInst->getReturnValue();
-    if(retValue != 0) {
-        Function *F = retInst->getFunction();
-        copyAddressSpace(retValue, F);
-        gencode += "return " + dumpOperand(retValue);
-    } else {
-        // we still need to have "return" if no value, since some loops terminate with a `return` in the middle
-        // of the codeblock.  Or rather, they dont terminate, if we dont write out a `return` :-P
-        gencode += "return";
-    }
-    return gencode;
-}
-
 std::string BasicBlockDumper::dumpAlloca(llvm::Instruction *alloca) {
     string gencode = "";
     if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
@@ -935,10 +920,10 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         //     instructionCode = dumpBranch(cast<BranchInst>(instruction));
         //     return instructionCode;
         //     // break;
-        case Instruction::Ret:
-            instructionCode = dumpReturn(cast<ReturnInst>(instruction));
-            return instructionCode + ";\n";
-            // break;
+        // case Instruction::Ret:
+        //     instructionCode = dumpReturn(cast<ReturnInst>(instruction));
+        //     return instructionCode + ";\n";
+        //     // break;
         // case Instruction::PHI:
         //     addPHIDeclaration(cast<PHINode>(instruction));
         //     return "";

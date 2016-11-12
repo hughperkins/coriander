@@ -21,6 +21,7 @@
 #include "struct_clone.h"
 
 #include "llvm/IR/Function.h"
+#include "llvm/IR/Instructions.h"
 #include "llvm/IR/Value.h"
 #include "llvm/IR/Type.h"
 
@@ -50,10 +51,17 @@ public:
     std::string createOffsetShim(llvm::Type *argType, std::string argName);
     std::string dumpFunctionDeclaration(llvm::Function *F);
 
+    void addPHIDeclaration(llvm::PHINode *phi);
+    std::string dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock);
+    std::string dumpBranch(llvm::BranchInst *instr, std::map<llvm::Value *, std::string> &exprByValue);
+    std::string dumpReturn(llvm::ReturnInst *retInst, std::map<llvm::Value *, std::string> &exprByValue);
+
     std::set<llvm::Function *> neededFunctions;
     std::set<llvm::StructType *> structsToDefine;
     std::string shimCode = "";
     std::string functionDeclarations = "";
+    std::map<llvm::Value *, std::string> exprByValue;
+    std::map<std::string, std::string> phiDeclarationsByName;
 
 protected:
     llvm::Function *F;
@@ -61,7 +69,6 @@ protected:
     bool _addIRToCl = false;
     std::map<llvm::BasicBlock *, int> functionBlockIndex;
 
-    std::map<llvm::Value *, std::string> exprByValue;
     std::set<llvm::Value *> variablesToDeclare;
     std::set<llvm::Value *> sharedVariablesToDeclare;
     std::set<std::string> allocaDeclarations;

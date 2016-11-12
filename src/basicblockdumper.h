@@ -64,7 +64,7 @@ public:
     std::string dumpTrunc(llvm::CastInst *instr);
 
     std::string dumpOperand(llvm::Value *value);
-    std::string dumpReturn(llvm::ReturnInst *retInst);
+    // std::string dumpReturn(llvm::ReturnInst *retInst);
     std::string dumpInstruction(std::string indent, llvm::Instruction *instruction);
     std::vector<std::string> dumpInsertValue(llvm::InsertValueInst *instr);
     std::string dumpExtractValue(llvm::ExtractValueInst *instr);
@@ -88,12 +88,11 @@ public:
     std::set<llvm::Value *> variablesToDeclare;
     std::set<llvm::Value *> sharedVariablesToDeclare;
     std::set<std::string> allocaDeclarations;
+    std::map<llvm::Value *, std::string> exprByValue;
 
 protected:
     llvm::BasicBlock *block;
     bool _addIRToCl = false;
-
-    std::map<llvm::Value *, std::string> exprByValue;
 
     GlobalNames *globalNames;
     LocalNames *localNames;

@@ -77,4 +77,18 @@ TEST(test_kernel_dumper, basic) {
     cout << "kernel cl:\n" << cl << endl;
 }
 
+TEST(test_kernel_dumper, kernelBranches) {
+    Module *M = getM();
+
+    // GlobalNames globalNames;
+    // LocalNames localNames;
+    // TypeDumper typeDumper(&globalNames);
+    // FunctionNamesMap functionNamesMap;
+    // FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
+
+    KernelDumper kernelDumper(M, "kernelBranches");
+    string cl = kernelDumper.toCl();
+    cout << "kernel cl:\n" << cl << endl;
+}
+
 } // test_block_dumper
