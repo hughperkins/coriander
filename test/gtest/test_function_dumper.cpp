@@ -66,7 +66,7 @@ Function *getFunction(string name) {
 TEST(test_function_dumper, basic) {
     Function *F = getFunction("someKernel");
     F->dump();
-    BasicBlock *block = &*F->begin();
+    // BasicBlock *block = &*F->begin();
     GlobalNames globalNames;
     LocalNames localNames;
     TypeDumper typeDumper(&globalNames);
@@ -74,6 +74,13 @@ TEST(test_function_dumper, basic) {
     FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
     string cl = functionDumper.toCl();
     cout << "cl:\n" << cl << endl;
+
+    for(auto it=functionDumper.neededFunctionCalls.begin(); it != functionDumper.neededFunctionCalls.end(); it++) {
+        Function *childF = *it;
+        cout << "needed function call: " << childF->getName().str() << endl;
+    }
+    ASSERT_EQ(1, functionDumper.neededFunctionCalls.size());
+    ASSERT_EQ("someFunc", (*functionDumper.neededFunctionCalls.begin())->getName().str());
 }
 
 } // test_block_dumper

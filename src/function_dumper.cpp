@@ -151,6 +151,9 @@ std::string FunctionDumper::toCl() {
         bodyCl += basicBlockDumper.toCl();
         functionDeclarations += basicBlockDumper.getAllocaDeclarations("    ");
         functionDeclarations += basicBlockDumper.writeDeclarations("    ");
+        for(auto it2=basicBlockDumper.neededFunctionCalls.begin(); it2 != basicBlockDumper.neededFunctionCalls.end(); it2++) {
+            neededFunctionCalls.insert(*it2);
+        }
         // bodyCl += dumpBasicBlock(basicBlock);
     }
 
