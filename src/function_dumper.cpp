@@ -276,6 +276,14 @@ std::string FunctionDumper::toCl() {
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
         string label = localNames.getOrCreateName(basicBlock);
+
+        for(auto it2=basicBlock->begin(); it2 != basicBlock->end(); it2++) {
+            Instruction *instr = &*it2;
+            if(PHINode *phi = dyn_cast<PHINode>(instr)) {
+                addPHIDeclaration(phi);
+            }
+        }
+
         bodyCl += label + ":;\n";
         BasicBlockDumper basicBlockDumper(
             basicBlock, globalNames, &localNames, typeDumper, functionNamesMap);

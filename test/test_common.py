@@ -147,3 +147,38 @@ def compile_code_v2(cl, context, kernelSource, kernelName):
         cl_sourcecode = f.read()
     prog = cl.Program(context, cl_sourcecode).build()
     return {'prog': prog, 'cl_sourcecode': cl_sourcecode}
+
+
+def compile_code_v3(cl, context, kernelSource, kernelName):
+    """
+    returns dict
+    """
+    for file in os.listdir('/tmp'):
+        if file.startswith('testprog'):
+            os.unlink('/tmp/%s' % file)
+    with open('/tmp/testprog.cu', 'w') as f:
+        f.write(kernelSource)
+    res = subprocess.run([
+        'bin/cocl',
+        '-c',
+        '/tmp/testprog.cu'
+    ] + cocl_options(), stdout=subprocess.PIPE)
+    print(' '.join(res.args))
+    print(res.stdout.decode('utf-8'))
+    assert res.returncode == 0
+
+    res = subprocess.run([
+        'build/ir-to-opencl',
+        '--inputfile', '/tmp/testprog-device.ll',
+        '--outputfile', '/tmp/testprog-device.cl',
+        '--kernelname', kernelName
+    ], stdout=subprocess.PIPE)
+    print(' '.join(res.args))
+    print(res.stdout.decode('utf-8'))
+    assert res.returncode == 0
+
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_sourcecode = f.read()
+    prog = cl.Program(context, cl_sourcecode).build()
+    kernel = prog.__getattr__(kernelName)
+    return {'kernel': kernel, 'cl_sourcecode': cl_sourcecode}
