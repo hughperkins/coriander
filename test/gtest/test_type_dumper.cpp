@@ -44,7 +44,7 @@ Module *getM() {
             smDiagnostic.print("irtopencl", errs());
             // return "";
             throw runtime_error("failed to parse IR");
-        }
+            }
     }
     return M.get();
 }
@@ -65,7 +65,8 @@ TEST(test_type_dumper, type_return) {
     F->dump();
     BasicBlock *block = &*F->begin();
     Instruction *retInst = &*block->begin();
-    TypeDumper typeDumper;
+    GlobalNames globalNames;
+    TypeDumper typeDumper(&globalNames);
     string retType = typeDumper.dumpType(retInst->getType());
     cout << "retType: [" << retType << "]" << endl;
 
@@ -80,7 +81,8 @@ TEST(test_type_dumper, add) {
     Instruction *retInst = &*it;
     retInst->dump();
     cout << endl;
-    TypeDumper typeDumper;
+    GlobalNames globalNames;
+    TypeDumper typeDumper(&globalNames);
     string retType = typeDumper.dumpType(retInst->getType());
     cout << "retType: [" << retType << "]" << endl;
 
@@ -96,7 +98,8 @@ TEST(test_type_dumper, float32) {
     Instruction *retInst = &*it;
     retInst->dump();
     cout << endl;
-    TypeDumper typeDumper;
+    GlobalNames globalNames;
+    TypeDumper typeDumper(&globalNames);
     string retType = typeDumper.dumpType(retInst->getType());
     cout << "retType: [" << retType << "]" << endl;
 
@@ -112,7 +115,8 @@ TEST(test_type_dumper, float64) {
     Instruction *retInst = &*it;
     retInst->dump();
     cout << endl;
-    TypeDumper typeDumper;
+    GlobalNames globalNames;
+    TypeDumper typeDumper(&globalNames);
     string retType = typeDumper.dumpType(retInst->getType());
     cout << "retType: [" << retType << "]" << endl;
 
@@ -127,7 +131,8 @@ TEST(test_type_dumper, pointer_float32) {
     Instruction *retInst = &*it;
     retInst->dump();
     cout << endl;
-    TypeDumper typeDumper;
+    GlobalNames globalNames;
+    TypeDumper typeDumper(&globalNames);
     string retType = typeDumper.dumpType(retInst->getType());
     cout << "retType: [" << retType << "]" << endl;
 
@@ -143,7 +148,8 @@ TEST(test_type_dumper, pointer_globalpfloat) {
     Instruction *retInst = &*it;
     retInst->dump();
     cout << endl;
-    TypeDumper typeDumper;
+    GlobalNames globalNames;
+    TypeDumper typeDumper(&globalNames);
     string retType = typeDumper.dumpType(retInst->getType());
     cout << "retType: [" << retType << "]" << endl;
 
@@ -159,7 +165,8 @@ TEST(test_type_dumper, array_int) {
     Instruction *retInst = &*it;
     retInst->dump();
     cout << endl;
-    TypeDumper typeDumper;
+    GlobalNames globalNames;
+    TypeDumper typeDumper(&globalNames);
     string retType = typeDumper.dumpType(retInst->getType());
     cout << "retType: [" << retType << "]" << endl;
 
@@ -175,14 +182,15 @@ TEST(test_type_dumper, mystruct) {
     Instruction *retInst = &*it;
     retInst->dump();
     cout << endl;
-    TypeDumper typeDumper;
+    GlobalNames globalNames;
+    TypeDumper typeDumper(&globalNames);
     string retType = typeDumper.dumpType(retInst->getType());
     cout << "retType: [" << retType << "]" << endl;
 
     ASSERT_EQ(retType, "struct mystruct");
-    ASSERT_EQ(typeDumper.structsToDefine.size(), 1);
-    ASSERT_EQ(typeDumper.structsToDefine.begin()->second, "struct mystruct");
-    ASSERT_TRUE(isa<StructType>(typeDumper.structsToDefine.begin()->first));
+    // ASSERT_EQ(typeDumper.structsToDefine.size(), 1);
+    // ASSERT_EQ(typeDumper.structsToDefine.begin()->second, "struct mystruct");
+    // ASSERT_TRUE(isa<StructType>(typeDumper.structsToDefine.begin()->first));
 
     string structDefinitions = typeDumper.dumpStructDefinitions();
     cout << "structDefinitions: " << structDefinitions << endl;
@@ -196,13 +204,35 @@ TEST(test_type_dumper, mystruct2) {
     Module *M = getM();
     StructType *myStructType = M->getTypeByName(StringRef("struct.mystruct"));
     ASSERT_TRUE(myStructType != nullptr);
-    TypeDumper typeDumper;
+    GlobalNames globalNames;
+    TypeDumper typeDumper(&globalNames);
     string structCl = typeDumper.dumpType(myStructType);
 
     cout << "structCl: " << structCl << endl;
     ASSERT_EQ(structCl, "struct mystruct");
 
     string structDefinitions = typeDumper.dumpStructDefinitions();
+    cout << "structDefinitions: " << structDefinitions << endl;
+    ASSERT_NE(structDefinitions.find("struct mystruct"), string::npos);
+    ASSERT_NE(structDefinitions.find("int f0;"), string::npos);
+    ASSERT_NE(structDefinitions.find("float f1;"), string::npos);
+    ASSERT_NE(structDefinitions.find("float* f2;"), string::npos);
+    ASSERT_NE(structDefinitions.find("float* f3;"), string::npos);
+
+    structDefinitions = typeDumper.dumpStructDefinitions();
+    cout << "structDefinitions: " << structDefinitions << endl;
+    ASSERT_NE(structDefinitions.find("struct mystruct"), string::npos);
+    ASSERT_NE(structDefinitions.find("int f0;"), string::npos);
+    ASSERT_NE(structDefinitions.find("float f1;"), string::npos);
+    ASSERT_NE(structDefinitions.find("float* f2;"), string::npos);
+    ASSERT_NE(structDefinitions.find("float* f3;"), string::npos);
+
+    structCl = typeDumper.dumpType(myStructType);
+
+    cout << "structCl: " << structCl << endl;
+    ASSERT_EQ(structCl, "struct mystruct");
+
+    structDefinitions = typeDumper.dumpStructDefinitions();
     cout << "structDefinitions: " << structDefinitions << endl;
     ASSERT_NE(structDefinitions.find("struct mystruct"), string::npos);
     ASSERT_NE(structDefinitions.find("int f0;"), string::npos);

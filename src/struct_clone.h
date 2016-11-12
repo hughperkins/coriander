@@ -1,6 +1,7 @@
 #pragma once
 
 #include "type_dumper.h"
+#include "GlobalNames.h"
 
 #include <string>
 
@@ -22,7 +23,8 @@ namespace cocl {
 
 class StructCloner {
 public:
-    StructCloner(cocl::TypeDumper *typeDumper) : typeDumper(typeDumper) {
+    StructCloner(cocl::TypeDumper *typeDumper, cocl::GlobalNames *globalNames) :
+        typeDumper(typeDumper), globalNames(globalNames) {
 
     }
     virtual ~StructCloner() {
@@ -31,6 +33,7 @@ public:
     llvm::StructType *cloneNoPointers(llvm::StructType *inStructType);
 
     cocl::TypeDumper *typeDumper;
+    cocl::GlobalNames *globalNames;
 };
 
 } // namespace cocl

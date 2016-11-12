@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include "GlobalNames.h"
+
 #include "llvm/IR/Type.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Function.h"
@@ -25,6 +27,8 @@ namespace cocl {
 
 class TypeDumper {
 public:
+    TypeDumper(GlobalNames *globalNames) : globalNames(globalNames) {
+    }
     std::string dumpType(llvm::Type *type);
     std::string dumpFunctionType(llvm::FunctionType *fn);
     std::string dumpPointerType(llvm::PointerType *ptr);
@@ -36,9 +40,11 @@ public:
     std::string dumpStructDefinitions();
     std::string dumpStructDefinition(llvm::StructType *type, std::string name);
 
+protected:
     // std::map<llvm::GlobalVariable *, std::string> globalVariablesToDefine;
     std::map<llvm::StructType *, std::string> structsToDefine;
     std::map<llvm::FunctionType *, std::string> functionsToDefine;
+    GlobalNames *globalNames = 0;
 };
 
 } // namespace cocl

@@ -64,5 +64,9 @@ TEST(test_struct_cloner, test_clone) {
     StructType *myStructType = M->getTypeByName(StringRef("struct mystruct"));
     TypeDumper typeDumper;
     string structCl = typeDumper->dumpType(myStructType);
+
+    string structDefinitions = typeDumper->dumpStructDefinitions();
+    cout << "structDefinitions " << structDefinitions << endl;
+
     StructCloner structCloner;
 }

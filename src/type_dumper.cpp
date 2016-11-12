@@ -101,6 +101,7 @@ std::string TypeDumper::dumpStructType(StructType *type) {
         // outs() << "name " << name << "\n";
         name = easycl::replace(name, ".", "_");
                 name = easycl::replace(name, ":", "_");
+        name = globalNames->getOrCreateName(type, name);
         if(name == "struct_float4") {
             return "float4";
         } else {
