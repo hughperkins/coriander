@@ -55,7 +55,9 @@ public:
     std::string dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock);
     std::string dumpBranch(llvm::BranchInst *instr, std::map<llvm::Value *, std::string> &exprByValue);
     std::string dumpReturn(llvm::Type **pReturnType, llvm::ReturnInst *retInst, std::map<llvm::Value *, std::string> &exprByValue);
+    std::string getDeclaration();
 
+    std::string functionDeclaration;
     std::set<llvm::Function *> neededFunctions;
     std::set<llvm::StructType *> structsToDefine;
     std::string shimCode = "";

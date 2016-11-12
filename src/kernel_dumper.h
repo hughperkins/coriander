@@ -20,6 +20,7 @@
 #include "llvm/IR/Module.h"
 
 #include <string>
+#include <set>
 
 namespace cocl {
 
@@ -34,6 +35,7 @@ public:
 
     llvm::Module *M;
     std::string kernelName;
+    std::set<std::string> functionDeclarations;
 
 protected:
 };

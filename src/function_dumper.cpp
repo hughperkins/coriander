@@ -308,6 +308,7 @@ std::string FunctionDumper::toCl() {
     if(isKernel) {
         declaration = "kernel " + declaration;
     }
+    this->functionDeclaration = declaration;
 
     // string declaration = dumpFunctionDeclaration(F);
 
@@ -332,6 +333,10 @@ std::string FunctionDumper::toCl() {
 
     // COCL_PRINT(cout << endl);
     return gencode;
+}
+
+std::string FunctionDumper::getDeclaration() {
+    return functionDeclaration;
 }
 
 } // namespace cocl

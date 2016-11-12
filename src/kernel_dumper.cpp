@@ -49,6 +49,7 @@ std::string KernelDumper::toCl() {
 
     FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
     string kernelFunctionCl = functionDumper.toCl();
+    functionDeclarations.insert(functionDumper.getDeclaration());
     cout << "kernelFunctionCl:\n" << kernelFunctionCl << endl;
     moduleClStream << kernelFunctionCl;
     for(auto it=functionDumper.neededFunctions.begin(); it != functionDumper.neededFunctions.end(); it++) {
@@ -64,11 +65,18 @@ std::string KernelDumper::toCl() {
             dumpedFunctions.insert(childF);
             FunctionDumper childFunctionDumper(childF, false, &globalNames, &typeDumper, &functionNamesMap);
             string childFunctionCl = childFunctionDumper.toCl();
+            functionDeclarations.insert(childFunctionDumper.getDeclaration());
             cout << "childFunctionCl:\n" << childFunctionCl << endl;
             moduleClStream << childFunctionCl;
         }
     }
-    return moduleClStream.str();
+    ostringstream functionDeclarationsStream;
+    for(auto it=functionDeclarations.begin(); it != functionDeclarations.end(); it++) {
+        functionDeclarationsStream << *it << ";\n";
+    }
+    return
+        functionDeclarationsStream.str() + "\n" +
+        moduleClStream.str();
 }
 
 } // namespace cocl
