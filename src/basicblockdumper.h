@@ -44,10 +44,12 @@ public:
     std::string toCl();
     // void storeValueName(llvm::Value *value);
     std::string dumpConstant(llvm::Constant *constant);
+    std::string dumpAlloca(llvm::Instruction *alloca);
     std::string dumpBinaryOperator(llvm::BinaryOperator *instr, std::string opstring);
     std::string dumpOperand(llvm::Value *value);
     std::string dumpReturn(llvm::ReturnInst *retInst);
     std::string dumpInstruction(std::string indent, llvm::Instruction *instruction);
+    std::string getAllocaDeclarations(std::string indent);
     BasicBlockDumper *addIRToCl() {
         _addIRToCl = true;
         return this;
@@ -65,6 +67,7 @@ protected:
     std::set<llvm::Function *> neededFunctionCalls;
     std::map<llvm::Value *, std::string> exprByValue;
     std::map<llvm::Value *, std::string> variablesToDeclare;
+    std::set<std::string> allocaDeclarations;
 
     GlobalNames *globalNames;
     LocalNames *localNames;

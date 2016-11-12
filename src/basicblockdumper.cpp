@@ -16,6 +16,8 @@
 
 #include "readIR.h"
 
+#include "EasyCL/util/easycl_stringhelper.h"
+
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/BasicBlock.h"
@@ -155,6 +157,64 @@ std::string BasicBlockDumper::dumpReturn(ReturnInst *retInst) {
     return gencode;
 }
 
+std::string BasicBlockDumper::dumpAlloca(llvm::Instruction *alloca) {
+    string gencode = "";
+    if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
+        Type *ptrElementType = allocatypeptr->getPointerElementType();
+        std::string typestring = typeDumper->dumpType(ptrElementType);
+        int count = readInt32Constant(alloca->getOperand(0));
+        if(count == 1) {
+            if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
+                int innercount = arrayType->getNumElements();
+                Type *elementType = arrayType->getElementType();
+                string allocaDeclaration = typeDumper->dumpType(elementType) + " " + 
+                    dumpOperand(alloca) + "[" + easycl::toString(innercount) + "]";
+                allocaDeclarations.insert(allocaDeclaration);
+                // currentFunctionSharedDeclarations += allocaDeclaration;
+                return "";
+            } else {
+                // if the elementType is a pointer, assume its global?
+                if(isa<PointerType>(ptrElementType)) {
+                    // cout << "dumpAlloca, for pointer" << endl;
+                    // find the store
+                    int numUses = alloca->getNumUses();
+                    // cout << "numUses " << numUses << endl;
+                    for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
+                        User *user = *it;
+                        // Value *useValue = use->
+                        // cout << "user " << endl;
+                        if(StoreInst *store = dyn_cast<StoreInst>(user)) {
+                            // cout << " got a store" << endl;
+                            // user->dump();
+                            // cout << endl;
+                            // int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
+                            // cout << "addessspace " << storeop0space << endl;
+                            // if(storeop0space == 1) {
+                                // gencode += "global ";
+                                // updateAddressSpace(alloca, 1);
+                            // }
+                            // copyAddressSpace(user, alloca);
+                            // typestring = dumpType(ptrElementType);
+                        }
+                    }
+                    // gencode += "global ";
+                    // updateAddressSpace(alloca, 1);
+                }
+                string allocaDeclaration = gencode + typestring + " " + dumpOperand(alloca) + "[1]";
+                // just declare this at the head of th efunction
+                // allocaDeclaration += "    " + allocaDeclaration + ";\n";
+                allocaDeclarations.insert(allocaDeclaration);
+                return "";
+            }
+        } else {
+            throw runtime_error("not implemented: alloca for count != 1");
+        }
+    } else {
+        alloca->dump();
+        throw runtime_error("dumpalloca not implemented for non pointer type");
+    }
+}
+
 string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction) {
     auto opcode = instruction->getOpcode();
     string resultName = localNames->getOrCreateName(instruction);
@@ -244,15 +304,6 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         case Instruction::AShr:
             instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
             break;
-        // case Instruction::Store:
-        //     instructionCode = dumpStore(cast<StoreInst>(instruction));
-        //     break;
-        // case Instruction::Call:
-        //     instructionCode = dumpCall(cast<CallInst>(instruction));
-        //     break;
-        // case Instruction::Load:
-        //     instructionCode = dumpLoad(cast<LoadInst>(instruction));
-        //     break;
         // case Instruction::ICmp:
         //     instructionCode = dumpIcmp(cast<ICmpInst>(instruction));
         //     break;
@@ -298,6 +349,10 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         // case Instruction::FPToSI:
         //     instructionCode = dumpFPToSI(cast<FPToSIInst>(instruction));
         //     break;
+        // case Instruction::Select:
+        //     // COCL_PRINT(cout << "its a select" << endl);
+        //     instructionCode = dumpSelect(cast<SelectInst>(instruction));
+        //     break;
         // case Instruction::GetElementPtr:
         //     instructionCode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
         //     break;
@@ -308,18 +363,22 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         // case Instruction::ExtractValue:
         //     instructionCode = dumpExtractValue(cast<ExtractValueInst>(instruction));
         //     break;
-        // case Instruction::Alloca:
-        //     instructionCode = dumpAlloca(cast<AllocaInst>(instruction));
-        //     return instructionCode + ";\n";
-        //     // break;
+        // case Instruction::Store:
+        //     instructionCode = dumpStore(cast<StoreInst>(instruction));
+        //     break;
+        // case Instruction::Call:
+        //     instructionCode = dumpCall(cast<CallInst>(instruction));
+        //     break;
+        // case Instruction::Load:
+        //     instructionCode = dumpLoad(cast<LoadInst>(instruction));
+        //     break;
+        case Instruction::Alloca:
+            instructionCode = dumpAlloca(cast<AllocaInst>(instruction));
+            return instructionCode + ";\n";
         // case Instruction::Br:
         //     instructionCode = dumpBranch(cast<BranchInst>(instruction));
         //     return instructionCode;
         //     // break;
-        // case Instruction::Select:
-        //     // COCL_PRINT(cout << "its a select" << endl);
-        //     instructionCode = dumpSelect(cast<SelectInst>(instruction));
-        //     break;
         case Instruction::Ret:
             instructionCode = dumpReturn(cast<ReturnInst>(instruction));
             return instructionCode + ";\n";
@@ -374,6 +433,15 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
             }
             gencode += instructionCode + ";\n";
         }
+    }
+    return gencode;
+}
+
+std::string BasicBlockDumper::getAllocaDeclarations(string indent) {
+    string gencode = "";
+    for(auto it=allocaDeclarations.begin(); it != allocaDeclarations.end(); it++) {
+        string declaration = *it;
+        gencode += indent + declaration + ";\n";
     }
     return gencode;
 }

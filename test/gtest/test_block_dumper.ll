@@ -4,5 +4,6 @@ define i32 @main() {
   %3 = fadd float 8.0, 3.0
   %4 = fadd float %3, 9.0
   %5 = fdiv float %4, %3
+  %6 = alloca i32 *, i32 1
   ret i32 0
 }

@@ -73,6 +73,8 @@ TEST(test_block_dumper, basic) {
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper);
     string cl = blockDumper.toCl();
     cout << cl << endl;
+
+    cout << "alloca declrations: [" << blockDumper.getAllocaDeclarations("    ") << "]" << endl;
 }
 
 } // test_block_dumper

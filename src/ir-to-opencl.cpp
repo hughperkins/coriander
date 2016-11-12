@@ -323,124 +323,124 @@ string dumpChainedInstruction(int level, Instruction * instr) {
 // }
 
 
-string dumpOperand(Value *value) {
-    if(nameByValue.find(value) != nameByValue.end()) {
-        return nameByValue[value];
-    }
-    if(Constant *constant = dyn_cast<Constant>(value)) {
-        return dumpConstant(constant);
-    }
-    if(isa<BasicBlock>(value)) {
-        storeValueName(value);
-        return nameByValue[value];
-    }
-    if(PHINode *phi = dyn_cast<PHINode>(value)) {
-        addPHIDeclaration(phi);
-        string name = nameByValue[value];
-        return name;
-    }
-    // lets just declare it???
-    storeValueName(value);
-    functionNeededForwardDeclarations.insert(value);
-    return nameByValue[value];
-}
+// string dumpOperand(Value *value) {
+//     if(nameByValue.find(value) != nameByValue.end()) {
+//         return nameByValue[value];
+//     }
+//     if(Constant *constant = dyn_cast<Constant>(value)) {
+//         return dumpConstant(constant);
+//     }
+//     if(isa<BasicBlock>(value)) {
+//         storeValueName(value);
+//         return nameByValue[value];
+//     }
+//     if(PHINode *phi = dyn_cast<PHINode>(value)) {
+//         addPHIDeclaration(phi);
+//         string name = nameByValue[value];
+//         return name;
+//     }
+//     // lets just declare it???
+//     storeValueName(value);
+//     functionNeededForwardDeclarations.insert(value);
+//     return nameByValue[value];
+// }
 
-void storeValueName(Value *value) {
-    if(nameByValue.find(value) != nameByValue.end()) {
-        return;
-    }
-    if(value->hasName()) {
-        string name = getName(value);
-        if(name[0] == '.') {
-            name = "v" + name;
-        }
-        name = replace(name, '.', '_');
-        name = replace(name, '-', '_');
-        name = replace(name, '$', '_');
-        if(name == "kernel") {
-            name = "_kernel";
-        }
-        nameByValue[value] = name;
-    } else {
-        int idx = nextNameIdx;
-        nextNameIdx++;
-        ostringstream oss;
-        oss << "v" << idx;
-        string name = oss.str();
-        nameByValue[value] = name;
-        origNameByValue[value] = name;
-    }
-}
+// void storeValueName(Value *value) {
+//     if(nameByValue.find(value) != nameByValue.end()) {
+//         return;
+//     }
+//     if(value->hasName()) {
+//         string name = getName(value);
+//         if(name[0] == '.') {
+//             name = "v" + name;
+//         }
+//         name = replace(name, '.', '_');
+//         name = replace(name, '-', '_');
+//         name = replace(name, '$', '_');
+//         if(name == "kernel") {
+//             name = "_kernel";
+//         }
+//         nameByValue[value] = name;
+//     } else {
+//         int idx = nextNameIdx;
+//         nextNameIdx++;
+//         ostringstream oss;
+//         oss << "v" << idx;
+//         string name = oss.str();
+//         nameByValue[value] = name;
+//         origNameByValue[value] = name;
+//     }
+// }
 
-std::string dumpReturn(ReturnInst *retInst) {
-    std::string gencode = "";
-    Value *retValue = retInst->getReturnValue();
-    if(retValue != 0) {
-        Function *F = retInst->getFunction();
-        copyAddressSpace(retValue, F);
-        gencode += "return " + dumpOperand(retValue);
-    } else {
-        // we still need to have "return" if no value, since some loops terminate with a `return` in the middle
-        // of the codeblock.  Or rather, they dont terminate, if we dont write out a `return` :-P
-        gencode += "return";
-    }
-    return gencode;
-}
+// std::string dumpReturn(ReturnInst *retInst) {
+//     std::string gencode = "";
+//     Value *retValue = retInst->getReturnValue();
+//     if(retValue != 0) {
+//         Function *F = retInst->getFunction();
+//         copyAddressSpace(retValue, F);
+//         gencode += "return " + dumpOperand(retValue);
+//     } else {
+//         // we still need to have "return" if no value, since some loops terminate with a `return` in the middle
+//         // of the codeblock.  Or rather, they dont terminate, if we dont write out a `return` :-P
+//         gencode += "return";
+//     }
+//     return gencode;
+// }
 
-std::string dumpAlloca(Instruction *alloca) {
-    string gencode = "";
-    if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
-        Type *ptrElementType = allocatypeptr->getPointerElementType();
-        std::string typestring = dumpType(ptrElementType);
-        int count = readInt32Constant(alloca->getOperand(0));
-        if(count == 1) {
-            if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
-                int innercount = arrayType->getNumElements();
-                Type *elementType = arrayType->getElementType();
-                string allocaDeclaration = "    " + dumpType(elementType) + " " + dumpOperand(alloca) + "[" + toString(innercount) + "];\n";
-                currentFunctionSharedDeclarations += allocaDeclaration;
-                return "";
-            } else {
-                // if the elementType is a pointer, assume its global?
-                if(isa<PointerType>(ptrElementType)) {
-                    // cout << "dumpAlloca, for pointer" << endl;
-                    // find the store
-                    int numUses = alloca->getNumUses();
-                    // cout << "numUses " << numUses << endl;
-                    for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
-                        User *user = *it;
-                        // Value *useValue = use->
-                        // cout << "user " << endl;
-                        if(StoreInst *store = dyn_cast<StoreInst>(user)) {
-                            // cout << " got a store" << endl;
-                            // user->dump();
-                            // cout << endl;
-                            int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
-                            // cout << "addessspace " << storeop0space << endl;
-                            if(storeop0space == 1) {
-                                gencode += "global ";
-                                updateAddressSpace(alloca, 1);
-                            }
-                            // copyAddressSpace(user, alloca);
-                            // typestring = dumpType(ptrElementType);
-                        }
-                    }
-                    // gencode += "global ";
-                    // updateAddressSpace(alloca, 1);
-                }
-                string allocaDeclaration = gencode + typestring + " " + dumpOperand(alloca) + "[1]";
-                // just declare this at the head of th efunction
-                currentFunctionSharedDeclarations += "    " + allocaDeclaration + ";\n";
-                return "";
-            }
-        } else {
-            throw runtime_error("not implemented: alloca for count != 1");
-        }
-    } else {
-        alloca->dump();
-        throw runtime_error("dumpalloca not implemented for non pointer type");
-    }
-}
+// std::string dumpAlloca(Instruction *alloca) {
+//     string gencode = "";
+//     if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
+//         Type *ptrElementType = allocatypeptr->getPointerElementType();
+//         std::string typestring = dumpType(ptrElementType);
+//         int count = readInt32Constant(alloca->getOperand(0));
+//         if(count == 1) {
+//             if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
+//                 int innercount = arrayType->getNumElements();
+//                 Type *elementType = arrayType->getElementType();
+//                 string allocaDeclaration = "    " + dumpType(elementType) + " " + dumpOperand(alloca) + "[" + toString(innercount) + "];\n";
+//                 currentFunctionSharedDeclarations += allocaDeclaration;
+//                 return "";
+//             } else {
+//                 // if the elementType is a pointer, assume its global?
+//                 if(isa<PointerType>(ptrElementType)) {
+//                     // cout << "dumpAlloca, for pointer" << endl;
+//                     // find the store
+//                     int numUses = alloca->getNumUses();
+//                     // cout << "numUses " << numUses << endl;
+//                     for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
+//                         User *user = *it;
+//                         // Value *useValue = use->
+//                         // cout << "user " << endl;
+//                         if(StoreInst *store = dyn_cast<StoreInst>(user)) {
+//                             // cout << " got a store" << endl;
+//                             // user->dump();
+//                             // cout << endl;
+//                             int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
+//                             // cout << "addessspace " << storeop0space << endl;
+//                             if(storeop0space == 1) {
+//                                 gencode += "global ";
+//                                 updateAddressSpace(alloca, 1);
+//                             }
+//                             // copyAddressSpace(user, alloca);
+//                             // typestring = dumpType(ptrElementType);
+//                         }
+//                     }
+//                     // gencode += "global ";
+//                     // updateAddressSpace(alloca, 1);
+//                 }
+//                 string allocaDeclaration = gencode + typestring + " " + dumpOperand(alloca) + "[1]";
+//                 // just declare this at the head of th efunction
+//                 currentFunctionSharedDeclarations += "    " + allocaDeclaration + ";\n";
+//                 return "";
+//             }
+//         } else {
+//             throw runtime_error("not implemented: alloca for count != 1");
+//         }
+//     } else {
+//         alloca->dump();
+//         throw runtime_error("dumpalloca not implemented for non pointer type");
+//     }
+// }
 
 string dumpLoad(LoadInst *instr) {
     string rhs = dumpOperand(instr->getOperand(0)) + "[0]";
