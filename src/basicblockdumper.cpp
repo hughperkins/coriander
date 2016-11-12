@@ -114,6 +114,7 @@ string BasicBlockDumper::dumpOperand(Value *value) {
 
 std::string BasicBlockDumper::dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
     string gencode = "";
+    copyAddressSpace(instr->getOperand(0), instr);
     Value *op1 = instr->getOperand(0);
     gencode += dumpOperand(op1) + " ";
     gencode += opstring + " ";
@@ -214,7 +215,7 @@ std::string BasicBlockDumper::dumpBitCast(BitCastInst *instr) {
         if(PointerType *destType = dyn_cast<PointerType>(instr->getDestTy())) {
             Type *castType = PointerType::get(destType->getElementType(), srcType->getAddressSpace());
             gencode += "((" + typeDumper->dumpType(castType) + ")" + op0str + ")";
-            // copyAddressSpace(instr->getOperand(0), instr);
+            copyAddressSpace(instr->getOperand(0), instr);
         }
     } else {
         // just pass through?
@@ -227,7 +228,7 @@ std::string BasicBlockDumper::dumpBitCast(BitCastInst *instr) {
 std::string BasicBlockDumper::dumpAddrSpaceCast(llvm::AddrSpaceCastInst *instr) {
     string gencode = "";
     string op0str = dumpOperand(instr->getOperand(0));
-    // copyAddressSpace(instr->getOperand(0), instr);
+    copyAddressSpace(instr->getOperand(0), instr);
     gencode += "((" + typeDumper->dumpType(instr->getType()) + ")" + op0str + ")";
     return gencode;
 }
@@ -309,10 +310,12 @@ std::string BasicBlockDumper::dumpAlloca(llvm::Instruction *alloca) {
                 Type *elementType = arrayType->getElementType();
                 string allocaDeclaration = typeDumper->dumpType(elementType) + " " + 
                     dumpOperand(alloca) + "[" + easycl::toString(innercount) + "]";
-                allocaDeclarations.insert(allocaDeclaration);
+                allocaDeclarationByValue[alloca] = allocaDeclaration;
+                cout << "alloca declaration as arraytype: " << allocaDeclaration << endl;
                 // currentFunctionSharedDeclarations += allocaDeclaration;
                 return "";
             } else {
+                Value *refInstruction = alloca;
                 // if the elementType is a pointer, assume its global?
                 if(isa<PointerType>(ptrElementType)) {
                     // cout << "dumpAlloca, for pointer" << endl;
@@ -329,6 +332,7 @@ std::string BasicBlockDumper::dumpAlloca(llvm::Instruction *alloca) {
                             // cout << endl;
                             int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
                             // cout << "addessspace " << storeop0space << endl;
+                            refInstruction = store->getOperand(0);
                             if(storeop0space == 1) {
                                 gencode += "global ";
                                 updateAddressSpace(alloca, 1);
@@ -343,7 +347,9 @@ std::string BasicBlockDumper::dumpAlloca(llvm::Instruction *alloca) {
                 string allocaDeclaration = gencode + typestring + " " + dumpOperand(alloca) + "[1]";
                 // just declare this at the head of th efunction
                 // allocaDeclaration += "    " + allocaDeclaration + ";\n";
-                allocaDeclarations.insert(allocaDeclaration);
+                allocaDeclarationByValue[refInstruction] = allocaDeclaration;
+                cout << "alloca declaration not arraytype: " << allocaDeclaration << endl;
+                // allocaDeclarations.insert(allocaDeclaration);
                 return "";
             }
         } else {
@@ -363,6 +369,7 @@ std::string BasicBlockDumper::dumpLoad(llvm::LoadInst *instr) {
 
 std::string BasicBlockDumper::dumpStore(llvm::StoreInst *instr) {
     string gencode = "";
+    copyAddressSpace(instr->getOperand(0), instr->getOperand(1));
     string rhs = dumpOperand(instr->getOperand(0));
     rhs = stripOuterParams(rhs);
     gencode += dumpOperand(instr->getOperand(1)) + "[0] = " + rhs;
@@ -542,7 +549,7 @@ std::string BasicBlockDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr) 
 
 std::string BasicBlockDumper::dumpSelect(SelectInst *instr) {
     string gencode = "";
-    // copyAddressSpace(instr->getOperand(1), instr);
+    copyAddressSpace(instr->getOperand(1), instr);
     gencode += dumpOperand(instr->getCondition()) + " ? ";
     gencode += dumpOperand(instr->getOperand(1)) + " : ";
     gencode += dumpOperand(instr->getOperand(2));
@@ -981,8 +988,16 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
 
 std::string BasicBlockDumper::getAllocaDeclarations(string indent) {
     string gencode = "";
-    for(auto it=allocaDeclarations.begin(); it != allocaDeclarations.end(); it++) {
-        string declaration = *it;
+    for(auto it=allocaDeclarationByValue.begin(); it != allocaDeclarationByValue.end(); it++) {
+        string declaration = it->second;
+        Value *value = it->first;
+        if(cast<PointerType>(value->getType())->getAddressSpace() == 1) {
+            if(declaration.find("global") != 0) {
+                declaration = "global " + declaration;
+            }
+        }
+        cout << "alloca declaration: " << declaration << endl;
+        value->dump();
         gencode += indent + declaration + ";\n";
     }
     return gencode;
@@ -1006,11 +1021,11 @@ std::string BasicBlockDumper::toCl() {
         if(isa<PHINode>(inst) || isa<BranchInst>(inst) || isa<ReturnInst>(inst)) {
             continue;
         }
-        inst->dump();
         // cout << endl;
         string instructionCode = dumpInstruction("    ", inst);
         cout << "instructionCode [" << instructionCode << "]" << endl;
         gencode += instructionCode;
+        inst->dump();
     }
     return gencode;
 }

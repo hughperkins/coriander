@@ -87,7 +87,7 @@ public:
     std::set<llvm::Function *> neededFunctions;
     std::set<llvm::Value *> variablesToDeclare;
     std::set<llvm::Value *> sharedVariablesToDeclare;
-    std::set<std::string> allocaDeclarations;
+    std::map<llvm::Value *, std::string> allocaDeclarationByValue;
     std::map<llvm::Value *, std::string> exprByValue;
 
 protected:

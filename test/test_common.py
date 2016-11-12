@@ -80,7 +80,7 @@ def mangle(name, param_types):
     return mangled
 
 
-def compile_code(cl, context, kernelSource):
+def compile_code(cl, context, kernelSource, kernelName):
     for file in os.listdir('/tmp'):
         if file.startswith('testprog'):
             os.unlink('/tmp/%s' % file)
@@ -89,6 +89,7 @@ def compile_code(cl, context, kernelSource):
     # args = get_cl_generation_options()
     # if not branching_transformations:
     #     args.append('--no_branching_transforms')
+
     res = subprocess.run([
         'bin/cocl',
         '-c',
@@ -97,13 +98,24 @@ def compile_code(cl, context, kernelSource):
     print(' '.join(res.args))
     print(res.stdout.decode('utf-8'))
     assert res.returncode == 0
+
+    res = subprocess.run([
+        'build/ir-to-opencl',
+        '--inputfile', '/tmp/testprog-device.ll',
+        '--outputfile', '/tmp/testprog-device.cl',
+        '--kernelname', kernelName
+    ], stdout=subprocess.PIPE)
+    print(' '.join(res.args))
+    print(res.stdout.decode('utf-8'))
+    assert res.returncode == 0
+
     with open('/tmp/testprog-device.cl', 'r') as f:
         cl_sourcecode = f.read()
     prog = cl.Program(context, cl_sourcecode).build()
     return prog
 
 
-def compile_code_v2(cl, context, kernelSource):
+def compile_code_v2(cl, context, kernelSource, kernelName):
     """
     returns dict
     """
@@ -120,6 +132,17 @@ def compile_code_v2(cl, context, kernelSource):
     print(' '.join(res.args))
     print(res.stdout.decode('utf-8'))
     assert res.returncode == 0
+
+    res = subprocess.run([
+        'build/ir-to-opencl',
+        '--inputfile', '/tmp/testprog-device.ll',
+        '--outputfile', '/tmp/testprog-device.cl',
+        '--kernelname', kernelName
+    ], stdout=subprocess.PIPE)
+    print(' '.join(res.args))
+    print(res.stdout.decode('utf-8'))
+    assert res.returncode == 0
+
     with open('/tmp/testprog-device.cl', 'r') as f:
         cl_sourcecode = f.read()
     prog = cl.Program(context, cl_sourcecode).build()

@@ -35,8 +35,9 @@ __global__ void mykernel(float *data) {
     foo[0] = data[1] + data[2] + data[3];
 }
 """
+    kernelName = test_common.mangle('mykernel', ['float *'])
     try:
-        dict = test_common.compile_code_v2(cl, context, code)
+        dict = test_common.compile_code_v2(cl, context, code, kernelName)
         prog = dict['prog']
         cl_sourcecode = dict['cl_sourcecode']
         print('cl_sourcecode', cl_sourcecode)
@@ -44,7 +45,7 @@ __global__ void mykernel(float *data) {
         with open('/tmp/testprog-device.cl', 'r') as f:
             print(f.read())
         raise e
-    prog.__getattr__(test_common.mangle('mykernel', ['float *']))(
+    prog.__getattr__(kernelName)(
         q, (32,), (32,),
         float_data_gpu, offset_type(0), cl.LocalMemory(4))
     # q.finish()

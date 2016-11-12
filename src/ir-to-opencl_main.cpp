@@ -34,14 +34,14 @@ using namespace llvm;
 int main(int argc, char *argv[]) {
     string llFilename;
     string ClFilename;
-    string specificFunction = "";
+    string kernelname = "";
     // bool add_ir_to_cl
     // string rcFile = "";
 
     argparsecpp::ArgumentParser parser;
     parser.add_string_argument("--inputfile", &llFilename)->required();
     parser.add_string_argument("--outputfile", &ClFilename)->required();
-    parser.add_string_argument("--specific_function", &specificFunction)->required();
+    parser.add_string_argument("--kernelname", &kernelname)->required();
     // parser.add_bool_argument("--debug", &debug);
     // parser.add_string_argument("--rcfile", &rcFile)
     //     ->help("Path to rcfile, containing default options, set to blank to disable")
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
         throw runtime_error("failed to parse IR");
     }
 
-    KernelDumper kernelDumper(M.get(), specificFunction);
+    KernelDumper kernelDumper(M.get(), kernelname);
     string cl = kernelDumper.toCl();
 
     ofstream of;

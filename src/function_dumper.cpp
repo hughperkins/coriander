@@ -306,7 +306,7 @@ std::string FunctionDumper::toCl() {
         declaration = string("void") + " " + declaration;
     }
     if(isKernel) {
-        declaration += "kernel " + declaration;
+        declaration = "kernel " + declaration;
     }
 
     // string declaration = dumpFunctionDeclaration(F);
