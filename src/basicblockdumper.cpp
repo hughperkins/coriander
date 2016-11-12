@@ -302,7 +302,7 @@ std::string BasicBlockDumper::dumpReturn(ReturnInst *retInst) {
     Value *retValue = retInst->getReturnValue();
     if(retValue != 0) {
         Function *F = retInst->getFunction();
-        // copyAddressSpace(retValue, F);
+        copyAddressSpace(retValue, F);
         gencode += "return " + dumpOperand(retValue);
     } else {
         // we still need to have "return" if no value, since some loops terminate with a `return` in the middle
@@ -502,7 +502,7 @@ std::string BasicBlockDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr) 
     Type *currentType = instr->getOperand(0)->getType();
     PointerType *op0typeptr = dyn_cast<PointerType>(instr->getOperand(0)->getType());
     if(op0typeptr == 0) {
-        throw runtime_error("dumpgetelementptrrhs op0typeptr is 0");
+        throw runtime_error("dumpgetelementptr op0typeptr is 0");
     }
     int addressspace = op0typeptr->getAddressSpace();
     // cout << "dumpgetlementptrrhs operand " << rhs << " addressspace=" << addressspace << endl;
@@ -550,7 +550,7 @@ std::string BasicBlockDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr) 
         // }
         currentType = newType;
     }
-    // updateAddressSpace(instr, addressspace);
+    updateAddressSpace(instr, addressspace);
     rhs = "(&" + rhs + ")";
     return rhs;
 }
