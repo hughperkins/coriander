@@ -746,6 +746,9 @@ std::string BasicBlockDumper::dumpCall(llvm::CallInst *instr) {
                     copyAddressSpace(callArg, calleeArg);
                     i++;
                 }
+                string newName = globalNames->getOrCreateName(newFunc, F->getName().str());
+                cout << "newName " << newName << endl;
+                newFunc->setName(newName);
                 neededFunctions.insert(newFunc);
             } else {
                 neededFunctions.insert(F);

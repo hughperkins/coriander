@@ -10,6 +10,8 @@ define void @someKernel(float * %d1, float * %d2) {
     %1 = alloca float *, i32 1
     %2 = load float *, float **%1
     %3 = call float * @someFunc(float *%d1, float *%2)
+    %4 = call float * @someFunc(float *%2, float *%d1)
+    %5 = call float * @someFunc(float *%d1, float *%d1)
     ret void
 }
 
