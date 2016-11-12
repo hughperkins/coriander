@@ -342,14 +342,14 @@ std::string BasicBlockDumper::dumpAlloca(llvm::Instruction *alloca) {
                             // cout << " got a store" << endl;
                             // user->dump();
                             // cout << endl;
-                            // int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
+                            int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
                             // cout << "addessspace " << storeop0space << endl;
-                            // if(storeop0space == 1) {
-                                // gencode += "global ";
-                                // updateAddressSpace(alloca, 1);
-                            // }
-                            // copyAddressSpace(user, alloca);
-                            // typestring = typeDumper->dumpType(ptrElementType);
+                            if(storeop0space == 1) {
+                                gencode += "global ";
+                                updateAddressSpace(alloca, 1);
+                            }
+                            copyAddressSpace(user, alloca);
+                            typestring = typeDumper->dumpType(ptrElementType);
                         }
                     }
                     // gencode += "global ";
@@ -372,7 +372,7 @@ std::string BasicBlockDumper::dumpAlloca(llvm::Instruction *alloca) {
 
 std::string BasicBlockDumper::dumpLoad(llvm::LoadInst *instr) {
     string rhs = dumpOperand(instr->getOperand(0)) + "[0]";
-    // copyAddressSpace(instr->getOperand(0), instr);
+    copyAddressSpace(instr->getOperand(0), instr);
     return rhs;
 }
 

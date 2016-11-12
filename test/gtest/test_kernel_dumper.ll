@@ -2,7 +2,7 @@ define float *@someFunc(float * %d1, float *%v1) {
     %1 = fadd float 3.0, 4.0
     %2 = load float, float *%d1
     %3 = getelementptr float , float *%d1, i32 3
-
+    store float %2, float *%3
     ret float *%3
 }
 
