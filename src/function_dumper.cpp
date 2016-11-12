@@ -64,12 +64,13 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
     return gencode;
 }
 
-std::string FunctionDumper::dumpReturn(ReturnInst *retInst, std::map<llvm::Value *, std::string> &exprByValue) {
+std::string FunctionDumper::dumpReturn(Type **pReturnType, ReturnInst *retInst, std::map<llvm::Value *, std::string> &exprByValue) {
     std::string gencode = "";
     Value *retValue = retInst->getReturnValue();
     if(retValue != 0) {
         Function *F = retInst->getFunction();
         copyAddressSpace(retValue, F);
+        *pReturnType = retValue->getType();
         gencode += "return " + exprByValue[retValue];
         // gencode += "return " + dumpOperand(retValue);
     } else {
@@ -165,15 +166,13 @@ void FunctionDumper::addPHIDeclaration(llvm::PHINode *phi) {
     phiDeclarationsByName[name] = declaration;
 }
 
-std::string FunctionDumper::dumpFunctionDeclaration(llvm::Function *F) {
+std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function *F) {
     string declaration = "";
-    Type *retType = F->getReturnType();
-    std::string retTypeString = typeDumper->dumpType(retType);
+    // Type *retType = F->getReturnType();
+    // std::string retTypeString = typeDumper->dumpType(retType);
     string fname = F->getName().str();
-    if(isKernel) {
-        declaration += "kernel ";
-    }
-    declaration += typeDumper->dumpType(retType) + " " + fname + "(";
+    // declaration += typeDumper->dumpType(retType) + " " + fname + "(";
+    declaration += fname + "(";
     int i = 0;
     // structpointershimcode = "";
     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
@@ -261,8 +260,6 @@ std::string FunctionDumper::dumpFunctionDeclaration(llvm::Function *F) {
 }
 
 std::string FunctionDumper::toCl() {
-    string declaration = dumpFunctionDeclaration(F);
-
     string bodyCl = "";
     int i = 0;
     for(auto it=F->begin(); it != F->end(); it++) {
@@ -271,6 +268,10 @@ std::string FunctionDumper::toCl() {
         i++;
     }
 
+    // first time initializes the types of hte args and so on
+    string declaration = dumpFunctionDeclarationWithoutReturn(F);
+
+    Type *returnType = 0;
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
         string label = localNames.getOrCreateName(basicBlock);
@@ -286,7 +287,8 @@ std::string FunctionDumper::toCl() {
         Instruction *terminator = basicBlock->getTerminator();
         string terminatorCl = "";
         if(ReturnInst *retInst = dyn_cast<ReturnInst>(terminator)) {
-            terminatorCl = dumpReturn(retInst, basicBlockDumper.exprByValue);
+            terminatorCl = "    " + dumpReturn(&returnType, retInst, basicBlockDumper.exprByValue) + ";\n";
+            // returnType = retInst->getOperand(0)->getType();
         } else if(BranchInst *branch = dyn_cast<BranchInst>(terminator)) {
             terminatorCl = dumpBranch(branch, basicBlockDumper.exprByValue);
         } else {
@@ -296,6 +298,17 @@ std::string FunctionDumper::toCl() {
         }
         bodyCl += terminatorCl;
     }
+
+    if(returnType != 0) {
+        declaration = typeDumper->dumpType(returnType) + " " + declaration;
+    } else {
+        declaration = string("void") + " " + declaration;
+    }
+    if(isKernel) {
+        declaration += "kernel " + declaration;
+    }
+
+    // string declaration = dumpFunctionDeclaration(F);
 
     // Type *returnType = F->getReturnType();
     // if(PointerType *ptr = dyn_cast<PointerType>(returnType)) {

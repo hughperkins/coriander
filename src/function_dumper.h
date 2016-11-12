@@ -49,12 +49,12 @@ public:
     std::string toCl();
     std::string createOffsetDeclaration(std::string argName);
     std::string createOffsetShim(llvm::Type *argType, std::string argName);
-    std::string dumpFunctionDeclaration(llvm::Function *F);
+    std::string dumpFunctionDeclarationWithoutReturn(llvm::Function *F);
 
     void addPHIDeclaration(llvm::PHINode *phi);
     std::string dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock);
     std::string dumpBranch(llvm::BranchInst *instr, std::map<llvm::Value *, std::string> &exprByValue);
-    std::string dumpReturn(llvm::ReturnInst *retInst, std::map<llvm::Value *, std::string> &exprByValue);
+    std::string dumpReturn(llvm::Type **pReturnType, llvm::ReturnInst *retInst, std::map<llvm::Value *, std::string> &exprByValue);
 
     std::set<llvm::Function *> neededFunctions;
     std::set<llvm::StructType *> structsToDefine;
