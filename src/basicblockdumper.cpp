@@ -613,6 +613,9 @@ std::string BasicBlockDumper::toCl() {
     string gencode = "";
     for(auto it = block->begin(); it != block->end(); it++) {
         Instruction *inst = &*it;
+        if(isa<PHINode>(inst) || isa<BranchInst>(inst) || isa<ReturnInst>(inst)) {
+            continue;
+        }
         inst->dump();
         // cout << endl;
         string instructionCode = dumpInstruction("    ", inst);
