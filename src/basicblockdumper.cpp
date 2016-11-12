@@ -201,6 +201,96 @@ std::string BasicBlockDumper::dumpFcmp(llvm::FCmpInst *instr) {
     return gencode;
 }
 
+std::string BasicBlockDumper::dumpBitCast(BitCastInst *instr) {
+    string gencode = "";
+    string op0str = dumpOperand(instr->getOperand(0));
+    if(PointerType *srcType = dyn_cast<PointerType>(instr->getSrcTy())) {
+        if(PointerType *destType = dyn_cast<PointerType>(instr->getDestTy())) {
+            Type *castType = PointerType::get(destType->getElementType(), srcType->getAddressSpace());
+            gencode += "((" + typeDumper->dumpType(castType) + ")" + op0str + ")";
+            // copyAddressSpace(instr->getOperand(0), instr);
+        }
+    } else {
+        // just pass through?
+        // cout << "bitcast, not a pointer" << endl;
+        gencode += "*(" + typeDumper->dumpType(instr->getDestTy()) + " *)&(" + op0str + ")";
+    }
+    return gencode;
+}
+
+std::string BasicBlockDumper::dumpAddrSpaceCast(llvm::AddrSpaceCastInst *instr) {
+    string gencode = "";
+    string op0str = dumpOperand(instr->getOperand(0));
+    // copyAddressSpace(instr->getOperand(0), instr);
+    gencode += "((" + typeDumper->dumpType(instr->getType()) + ")" + op0str + ")";
+    return gencode;
+}
+
+std::string BasicBlockDumper::dumpFPExt(llvm::CastInst *instr) {
+    string gencode = "";
+    gencode += dumpOperand(instr->getOperand(0));
+    return gencode;
+}
+
+std::string BasicBlockDumper::dumpZExt(llvm::CastInst *instr) {
+    string gencode = "";
+    gencode += dumpOperand(instr->getOperand(0));
+    return gencode;
+}
+
+std::string BasicBlockDumper::dumpSExt(llvm::CastInst *instr) {
+    string gencode = "";
+    gencode += dumpOperand(instr->getOperand(0));
+    return gencode;
+}
+
+std::string BasicBlockDumper::dumpFPToUI(llvm::FPToUIInst *instr) {
+    string gencode = "";
+    string typestr = typeDumper->dumpType(instr->getType());
+    // gencode += "(" + typestr + ")" + dumpOperand(instr->getOperand(0));
+    gencode += "(*(" + typestr + " *)" + "&" + dumpOperand(instr->getOperand(0)) + ")";
+    return gencode;
+}
+
+std::string BasicBlockDumper::dumpFPToSI(llvm::FPToSIInst *instr) {
+    string gencode = "";
+    string typestr = typeDumper->dumpType(instr->getType());
+    gencode += "(*(" + typestr + " *)" + "&" + dumpOperand(instr->getOperand(0)) + ")";
+    return gencode;
+}
+
+std::string BasicBlockDumper::dumpUIToFP(llvm::UIToFPInst *instr) {
+    string gencode = "";
+    string typestr = typeDumper->dumpType(instr->getType());
+    // gencode += "(" + typestr + ")" + dumpOperand(instr->getOperand(0));
+    gencode += "(*(" + typestr + " *)" + "&" + dumpOperand(instr->getOperand(0)) + ")";
+    return gencode;
+}
+
+std::string BasicBlockDumper::dumpSIToFP(llvm::SIToFPInst *instr) {
+    string gencode = "";
+    string typestr = typeDumper->dumpType(instr->getType());
+    // gencode += "(" + typestr + ")" + dumpOperand(instr->getOperand(0));
+    gencode += "(*(" + typestr + " *)" + "&" + dumpOperand(instr->getOperand(0)) + ")";
+    return gencode;
+}
+
+std::string BasicBlockDumper::dumpFPTrunc(llvm::CastInst *instr) {
+    // since this is float point trunc, lets just assume we're going from double to float
+    // fix any exceptiosn to this rule later
+    string gencode = "";
+    string typestr = typeDumper->dumpType(instr->getType());
+    gencode += "(" + typestr + ")" + dumpOperand(instr->getOperand(0));
+    return gencode;
+}
+
+std::string BasicBlockDumper::dumpTrunc(llvm::CastInst *instr) {
+    string gencode = "";
+    string typestr = typeDumper->dumpType(instr->getType());
+    gencode += "(" + typestr + ")" + dumpOperand(instr->getOperand(0));
+    return gencode;
+}
+
 std::string BasicBlockDumper::dumpReturn(ReturnInst *retInst) {
     std::string gencode = "";
     Value *retValue = retInst->getReturnValue();
@@ -253,7 +343,7 @@ std::string BasicBlockDumper::dumpAlloca(llvm::Instruction *alloca) {
                                 // updateAddressSpace(alloca, 1);
                             // }
                             // copyAddressSpace(user, alloca);
-                            // typestring = dumpType(ptrElementType);
+                            // typestring = typeDumper->dumpType(ptrElementType);
                         }
                     }
                     // gencode += "global ";
@@ -383,44 +473,44 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         case Instruction::FCmp:
             instructionCode = dumpFcmp(cast<FCmpInst>(instruction));
             break;
-        // case Instruction::SExt:
-        //     instructionCode = dumpSExt(cast<CastInst>(instruction));
-        //     break;
-        // case Instruction::ZExt:
-        //     instructionCode = dumpZExt(cast<CastInst>(instruction));
-        //     break;
-        // case Instruction::FPExt:
-        //     instructionCode = dumpFPExt(cast<CastInst>(instruction));
-        //     break;
-        // case Instruction::FPTrunc:
-        //     instructionCode = dumpFPTrunc(cast<CastInst>(instruction));
-        //     break;
-        // case Instruction::Trunc:
-        //     instructionCode = dumpTrunc(cast<CastInst>(instruction));
-        //     break;
+        case Instruction::SExt:
+            instructionCode = dumpSExt(cast<CastInst>(instruction));
+            break;
+        case Instruction::ZExt:
+            instructionCode = dumpZExt(cast<CastInst>(instruction));
+            break;
+        case Instruction::FPExt:
+            instructionCode = dumpFPExt(cast<CastInst>(instruction));
+            break;
+        case Instruction::FPTrunc:
+            instructionCode = dumpFPTrunc(cast<CastInst>(instruction));
+            break;
+        case Instruction::Trunc:
+            instructionCode = dumpTrunc(cast<CastInst>(instruction));
+            break;
+        case Instruction::UIToFP:
+            instructionCode = dumpUIToFP(cast<UIToFPInst>(instruction));
+            break;
+        case Instruction::SIToFP:
+            instructionCode = dumpSIToFP(cast<SIToFPInst>(instruction));
+            break;
+        case Instruction::FPToUI:
+            instructionCode = dumpFPToUI(cast<FPToUIInst>(instruction));
+            break;
+        case Instruction::FPToSI:
+            instructionCode = dumpFPToSI(cast<FPToSIInst>(instruction));
+            break;
+        case Instruction::BitCast:
+            instructionCode = dumpBitCast(cast<BitCastInst>(instruction));
+            break;
+        case Instruction::AddrSpaceCast:
+            instructionCode = dumpAddrSpaceCast(cast<AddrSpaceCastInst>(instruction));
+            break;
         // case Instruction::PtrToInt:
         //     instructionCode = dumpPtrToInt(cast<PtrToIntInst>(instruction));
         //     break;
-        // case Instruction::BitCast:
-        //     instructionCode = dumpBitCast(cast<BitCastInst>(instruction));
-        //     break;
-        // case Instruction::AddrSpaceCast:
-        //     instructionCode = dumpAddrSpaceCast(cast<AddrSpaceCastInst>(instruction));
-        //     break;
         // case Instruction::IntToPtr:
         //     instructionCode = dumpInttoPtr(cast<IntToPtrInst>(instruction));
-        //     break;
-        // case Instruction::UIToFP:
-        //     instructionCode = dumpUIToFP(cast<UIToFPInst>(instruction));
-        //     break;
-        // case Instruction::SIToFP:
-        //     instructionCode = dumpSIToFP(cast<SIToFPInst>(instruction));
-        //     break;
-        // case Instruction::FPToUI:
-        //     instructionCode = dumpFPToUI(cast<FPToUIInst>(instruction));
-        //     break;
-        // case Instruction::FPToSI:
-        //     instructionCode = dumpFPToSI(cast<FPToSIInst>(instruction));
         //     break;
         // case Instruction::Select:
         //     // COCL_PRINT(cout << "its a select" << endl);

@@ -44,16 +44,30 @@ public:
     std::string toCl();
     // void storeValueName(llvm::Value *value);
     std::string dumpConstant(llvm::Constant *constant);
-    std::string dumpAlloca(llvm::Instruction *alloca);
+
     std::string dumpBinaryOperator(llvm::BinaryOperator *instr, std::string opstring);
     std::string dumpIcmp(llvm::ICmpInst *instr);
     std::string dumpFcmp(llvm::FCmpInst *instr);
+
+    std::string dumpBitCast(llvm::BitCastInst *instr);
+    std::string dumpAddrSpaceCast(llvm::AddrSpaceCastInst *instr);
+    std::string dumpFPExt(llvm::CastInst *instr);
+    std::string dumpZExt(llvm::CastInst *instr);
+    std::string dumpSExt(llvm::CastInst *instr);
+    std::string dumpFPToUI(llvm::FPToUIInst *instr);
+    std::string dumpFPToSI(llvm::FPToSIInst *instr);
+    std::string dumpUIToFP(llvm::UIToFPInst *instr);
+    std::string dumpSIToFP(llvm::SIToFPInst *instr);
+    std::string dumpFPTrunc(llvm::CastInst *instr);
+    std::string dumpTrunc(llvm::CastInst *instr);
+
     std::string dumpOperand(llvm::Value *value);
     std::string dumpReturn(llvm::ReturnInst *retInst);
     std::string dumpInstruction(std::string indent, llvm::Instruction *instruction);
     std::string getAllocaDeclarations(std::string indent);
     std::string dumpLoad(llvm::LoadInst *instr);
     std::string dumpStore(llvm::StoreInst *instr);
+    std::string dumpAlloca(llvm::Instruction *alloca);
     BasicBlockDumper *addIRToCl() {
         _addIRToCl = true;
         return this;

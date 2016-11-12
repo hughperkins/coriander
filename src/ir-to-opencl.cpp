@@ -574,39 +574,6 @@ std::string dumpExtractValue(ExtractValueInst *instr) {
 //     return gencode;
 // }
 
-std::string dumpBitCastRhs(BitCastInst *instr) {
-    string gencode = "";
-    string op0str = dumpOperand(instr->getOperand(0));
-    if(PointerType *srcType = dyn_cast<PointerType>(instr->getSrcTy())) {
-        if(PointerType *destType = dyn_cast<PointerType>(instr->getDestTy())) {
-            Type *castType = PointerType::get(destType->getElementType(), srcType->getAddressSpace());
-            gencode += "((" + dumpType(castType) + ")" + op0str + ")";
-            copyAddressSpace(instr->getOperand(0), instr);
-        }
-    } else {
-        // just pass through?
-        gencode += "((" + dumpType(instr->getDestTy()) + ")" + op0str + ")";
-    }
-    return gencode;
-}
-
-std::string dumpBitCast(BitCastInst *instr) {
-    return dumpBitCastRhs(instr);
-}
-
-std::string dumpAddrSpaceCastRhs(AddrSpaceCastInst *instr) {
-    string gencode = "";
-    string op0str = dumpOperand(instr->getOperand(0));
-    copyAddressSpace(instr->getOperand(0), instr);
-    gencode += "(" + op0str + ")";
-    return gencode;
-}
-
-std::string dumpAddrSpaceCast(AddrSpaceCastInst *instr) {
-    copyAddressSpace(instr->getOperand(0), instr);
-    return dumpAddrSpaceCastRhs(instr);
-}
-
 std::string dumpMemcpyCharCharLong(CallInst *instr) {
     std::string gencode = "";
     int totalLength = cast<ConstantInt>(instr->getOperand(2))->getSExtValue();
@@ -753,69 +720,8 @@ std::string dumpCall(CallInst *instr) {
     return gencode;
 }
 
-std::string dumpFPExt(CastInst *instr) {
-    string gencode = "";
-    gencode += dumpValue(instr->getOperand(0));
-    return gencode;
-}
-
-std::string dumpZExt(CastInst *instr) {
-    string gencode = "";
-    gencode += dumpValue(instr->getOperand(0));
-    return gencode;
-}
-
-std::string dumpSExt(CastInst *instr) {
-    string gencode = "";
-    gencode += dumpValue(instr->getOperand(0));
-    return gencode;
-}
-
-std::string dumpFPToUI(FPToUIInst *instr) {
-    string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
-    return gencode;
-}
-
-std::string dumpFPToSI(FPToSIInst *instr) {
-    string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
-    return gencode;
-}
-
-std::string dumpUIToFP(UIToFPInst *instr) {
-    string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
-    return gencode;
-}
-
-std::string dumpSIToFP(SIToFPInst *instr) {
-    string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
-    return gencode;
-}
 
 std::string dumpInttoPtr(IntToPtrInst *instr) {
-    string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
-    return gencode;
-}
-
-std::string dumpFPTrunc(CastInst *instr) {
-    // since this is float point trunc, lets just assume we're going from double to float
-    // fix any exceptiosn to this rule later
-    string gencode = "";
-    string typestr = dumpType(instr->getType());
-    gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
-    return gencode;
-}
-
-std::string dumpTrunc(CastInst *instr) {
     string gencode = "";
     string typestr = dumpType(instr->getType());
     gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));

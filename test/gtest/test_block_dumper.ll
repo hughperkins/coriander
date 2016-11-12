@@ -10,5 +10,18 @@ define i32 @main() {
   store float %5, float *%8
   %9 = fcmp olt float %3, 4.0
   %10 = icmp slt i32 %2, 4
+  %11 = trunc i32 %7 to i8
+  %12 = fadd double 8.0, 3.0
+  %13 = fptrunc double %12 to float
+  %14 = fpext float %13 to double
+  %15 = zext i32 %7 to i64
+  %16 = sext i32 %7 to i64
+  %17 = fptoui float %4 to i32
+  %18 = fptosi float %4 to i32
+  %19 = uitofp i32 %2 to float
+  %20 = sitofp i32 %2 to float
+  %21 = bitcast float *%8 to i32*
+  %22 = addrspacecast float* %8 to float addrspace(1) *
+  %23 = bitcast float %3 to i32
   ret i32 0
 }
