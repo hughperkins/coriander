@@ -14,8 +14,11 @@
 
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/IR/Module.h"
+#include "llvm/IR/Instructions.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/Verifier.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_ostream.h"
 
@@ -101,6 +104,59 @@ TEST(test_struct_cloner, test_clone) {
     ASSERT_NE(clCopyCode.find("dest.f1 = src.f1;"), string::npos);
     ASSERT_NE(clCopyCode.find("dest.f3 = src.f2;"), string::npos);
 
+    unique_ptr<Module> hostsideM(new Module(StringRef("hostsideM"), context));
+    Function *testFunc = cast<Function>(hostsideM->getOrInsertFunction(
+        StringRef("testfunc"),
+        Type::getVoidTy(context),
+        NULL));
+    testFunc->setCallingConv(CallingConv::C);
+    BasicBlock *testBlock = BasicBlock::Create(context, "entry", testFunc);
+    // testBlock->insertInto(testFunc);
+
+    IRBuilder<> builder(testBlock);
+
+    Value *allocaPtrfull = builder.CreateAlloca(myStructType);
+    Value *allocaNoptr = builder.CreateAlloca(structNoPtrs);
+
+    Instruction *lastInst = structCloner.createHostsideIrCopyPtrfullToNoptr(
+        cast<Instruction>(allocaNoptr), myStructType, allocaPtrfull, allocaNoptr);
+
+    builder.CreateRetVoid();
+
+    verifyFunction(*testFunc);
+    verifyModule(*hostsideM);
+
+    std::string testIR;
+    raw_string_ostream testIRStream(testIR);
+    testIRStream << *hostsideM;
+    testIRStream.flush();
+
+    cout << "testIR [" << testIR << "]" << endl;
+string expectedIR = R"(; ModuleID = 'hostsideM'
+
+%"struct mystruct" = type { i32, float, float*, i32, float* }
+%"struct mystruct_nopointers" = type { i32, float, i32 }
+
+define void @testfunc() {
+entry:
+  %0 = alloca %"struct mystruct"
+  %1 = alloca %"struct mystruct_nopointers"
+  %2 = getelementptr inbounds %"struct mystruct", %"struct mystruct"* %0, i32 0, i32 0
+  %3 = getelementptr inbounds %"struct mystruct_nopointers", %"struct mystruct_nopointers"* %1, i32 0, i32 0
+  %loadint = load i32, i32* %2
+  store volatile i32 %loadint, i32* %3
+  %4 = getelementptr inbounds %"struct mystruct", %"struct mystruct"* %0, i32 0, i32 1
+  %5 = getelementptr inbounds %"struct mystruct_nopointers", %"struct mystruct_nopointers"* %1, i32 0, i32 1
+  %loadint1 = load float, float* %4
+  store volatile float %loadint1, float* %5
+  %6 = getelementptr inbounds %"struct mystruct", %"struct mystruct"* %0, i32 0, i32 3
+  %7 = getelementptr inbounds %"struct mystruct_nopointers", %"struct mystruct_nopointers"* %1, i32 0, i32 2
+  %loadint2 = load i32, i32* %6
+  store volatile i32 %loadint2, i32* %7
+  ret void
+}
+)";
+    ASSERT_EQ(expectedIR, testIR);
 }
 
 } // test_struct_cloner

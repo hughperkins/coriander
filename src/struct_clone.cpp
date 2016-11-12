@@ -122,8 +122,9 @@ std::string StructCloner::writeClCopyNoPtrToPtrfull(llvm::StructType *ptrfullTyp
     return gencode;
 }
 
-/*
-Instruction *copyStructValuesNoPointers(Instruction *lastInst, Value *src, Value *dst) {
+llvm::Instruction *StructCloner::createHostsideIrCopyPtrfullToNoptr(
+        llvm::Instruction *lastInst, StructType *ptrfullType, Value *src, Value *dst) {
+    // assumes incoming values are pointers to struct
     LLVMContext &context = src->getContext();
     int srcidx = 0;
     int dstidx = 0;
@@ -152,7 +153,7 @@ Instruction *copyStructValuesNoPointers(Instruction *lastInst, Value *src, Value
             lastInst = childDstInst;
 
             if(StructType *childStructType = dyn_cast<StructType>(childType)) {
-                lastInst = copyStructValuesNoPointers(lastInst, childSrcInst, childDstInst);
+                lastInst = createHostsideIrCopyPtrfullToNoptr(lastInst, childStructType, childSrcInst, childDstInst);
             // } else if(IntegerType *intType = dyn_cast<IntegerType>(childType)) {
             } else if(childType->getPrimitiveSizeInBits() > 0 ) {
                 // do we have to do `load` followed by `store`?
@@ -193,18 +194,23 @@ Instruction *copyStructValuesNoPointers(Instruction *lastInst, Value *src, Value
                 }
                 // throw runtime_error("unhandled type " + dumpType(childType));
             } else {
-                outs() << "unhandled type " + dumpType(childType) << "\n";
-                throw runtime_error("unhandled type " + dumpType(childType));
+                outs() << "unhandled type:\n";
+                childType->dump();
+                outs() << "\n";
+                throw runtime_error("structcloner unhandled type");
             }
             srcidx++;
             dstidx++;
         }
     } else {
-        outs() << "skipping type " << dumpType(src->getType()) << "\n";
+        outs() << "skipping type:\n";
+        structType->dump();
+        outs() << "\n";
     }
     return lastInst;
 }
 
+/*
 void declareStructNoPointers(string name, StructType *type) {
     LLVMContext &context = type->getContext();
     // writes out the declaration to declarations_to_write

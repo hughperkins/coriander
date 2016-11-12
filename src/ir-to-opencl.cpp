@@ -16,7 +16,6 @@
 
 #include "ir-to-opencl.h"
 
-#include "argparsecpp.h"
 #include "ir-to-opencl-common.h"
 #include "struct_clone.h"
 #include "handle_branching.h"
@@ -1782,33 +1781,3 @@ void convertLlFileToClFile(string llFilename, string ClFilename, string specific
     of << gencode;
     of.close();
 }
-
-#ifdef IROPENCL_MAIN
-int main(int argc, char *argv[]) {
-    string target;
-    string outputfilepath;
-    string specificFunction = "";
-    string rcFile = "";
-
-    argparsecpp::ArgumentParser parser;
-    parser.add_string_argument("--inputfile", &target)->required();
-    parser.add_string_argument("--outputfile", &outputfilepath)->required();
-    parser.add_bool_argument("--debug", &debug);
-    // parser.add_string_argument("--rcfile", &rcFile)
-    //     ->help("Path to rcfile, containing default options, set to blank to disable")
-    //     ->defaultValue("~/.coclrc");
-    // parser.add_bool_argument("--no-load_rcfile", &add_ir_to_cl)->help("Dont load the ~/.coclrc file");
-    parser.add_bool_argument("--add_ir_to_cl", &add_ir_to_cl);
-    parser.add_bool_argument("--run_branching_transforms", &runBranchingTransforms)->help("might make the kernels more acceptable to your gpu driver; buggy though...");
-    parser.add_bool_argument("--branches_as_switch", &branchesAsSwitch)->help("might make the kernels more acceptable to your gpu driver; slow though...");
-    parser.add_bool_argument("--dump_transforms", &dumpTransforms)->help("mostly for dev/debug.  prints the results of branching transforms");
-    parser.add_string_argument("--specific_function", &specificFunction)->help("Mostly for dev/debug, just process one specific function");
-    if(!parser.parse_args(argc, argv)) {
-        return -1;
-    }
-
-    convertLlFileToClFile(target, outputfilepath, specificFunction);
-
-    return 0;
-}
-#endif // IROPENCL_MAIN
