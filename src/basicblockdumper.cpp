@@ -32,32 +32,6 @@ using namespace llvm;
 
 namespace cocl {
 
-// void BasicBlockDumper::storeValueName(Value *value) {
-//     if(exprByValue.find(value) != exprByValue.end()) {
-//         return;
-//     }
-//     if(value->hasName()) {
-//         string name = getName(value);
-//         if(name[0] == '.') {
-//             name = "v" + name;
-//         }
-//         name = replace(name, '.', '_');
-//         name = replace(name, '-', '_');
-//         name = replace(name, '$', '_');
-//         if(name == "kernel") {
-//             name = "_kernel";
-//         }
-//         exprByValue[value] = name;
-//     } else {
-//         int idx = nextNameIdx;
-//         nextNameIdx++;
-//         ostringstream oss;
-//         oss << "v" << idx;
-//         string name = oss.str();
-//         exprByValue[value] = name;
-//     }
-// }
-
 // maybe this should be somewhere more generic?
 string BasicBlockDumper::dumpConstant(Constant *constant) {
     unsigned int valueTy = constant->getValueID();
@@ -109,16 +83,6 @@ string BasicBlockDumper::dumpConstant(Constant *constant) {
     return oss.str();
 }
 
-std::string BasicBlockDumper::dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
-    string gencode = "";
-    Value *op1 = instr->getOperand(0);
-    gencode += dumpOperand(op1) + " ";
-    gencode += opstring + " ";
-    Value *op2 = instr->getOperand(1);
-    gencode += dumpOperand(op2);
-    return gencode;
-}
-
 string BasicBlockDumper::dumpOperand(Value *value) {
     if(exprByValue.find(value) != exprByValue.end()) {
         return exprByValue[value];
@@ -140,6 +104,101 @@ string BasicBlockDumper::dumpOperand(Value *value) {
     // functionNeededForwardDeclarations.insert(value);
     // return nameByValue[value];
     throw runtime_error("Not implemented");
+}
+
+std::string BasicBlockDumper::dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
+    string gencode = "";
+    Value *op1 = instr->getOperand(0);
+    gencode += dumpOperand(op1) + " ";
+    gencode += opstring + " ";
+    Value *op2 = instr->getOperand(1);
+    gencode += dumpOperand(op2);
+    return gencode;
+}
+
+std::string BasicBlockDumper::dumpIcmp(llvm::ICmpInst *instr) {
+    string gencode = "";
+    CmpInst::Predicate predicate = instr->getSignedPredicate();  // note: we should detect signedness...
+    string predicate_string = "";
+    switch(predicate) {
+        case CmpInst::ICMP_SLT:
+            predicate_string = "<";
+            break;
+        case CmpInst::ICMP_SGT:
+            predicate_string = ">";
+            break;
+        case CmpInst::ICMP_SGE:
+            predicate_string = ">=";
+            break;
+        case CmpInst::ICMP_SLE:
+            predicate_string = "<=";
+            break;
+        case CmpInst::ICMP_EQ:
+            predicate_string = "==";
+            break;
+        case CmpInst::ICMP_NE:
+            predicate_string = "!=";
+            break;
+        default:
+            cout << "predicate " << predicate << endl;
+            throw runtime_error("predicate not supported");
+    }
+    string op0 = dumpOperand(instr->getOperand(0));
+    string op1 = dumpOperand(instr->getOperand(1));
+    // handle case like `a & 3 == 0`
+    if(op0.find('&') == string::npos) {
+        op0 = stripOuterParams(op0);
+    }
+    if(op1.find('&') == string::npos) {
+        op1 = stripOuterParams(op1);
+    }
+    gencode += op0;
+    gencode += " " + predicate_string + " ";
+    gencode += op1;
+    return gencode;
+}
+
+std::string BasicBlockDumper::dumpFcmp(llvm::FCmpInst *instr) {
+    string gencode = "";
+    CmpInst::Predicate predicate = instr->getPredicate();
+    string predicate_string = "";
+    switch(predicate) {
+        case CmpInst::FCMP_ULT:
+        case CmpInst::FCMP_OLT:
+            predicate_string = "<";
+            break;
+        case CmpInst::FCMP_UGT:
+        case CmpInst::FCMP_OGT:
+            predicate_string = ">";
+            break;
+        case CmpInst::FCMP_UGE:
+        case CmpInst::FCMP_OGE:
+            predicate_string = ">=";
+            break;
+        case CmpInst::FCMP_ULE:
+        case CmpInst::FCMP_OLE:
+            predicate_string = "<=";
+            break;
+        case CmpInst::FCMP_UEQ:
+        case CmpInst::FCMP_OEQ:
+            predicate_string = "==";
+            break;
+        case CmpInst::FCMP_UNE:
+        case CmpInst::FCMP_ONE:
+            predicate_string = "!=";
+            break;
+        default:
+            cout << "predicate " << predicate << endl;
+            throw runtime_error("predicate not supported");
+    }
+    string op0 = dumpOperand(instr->getOperand(0));
+    string op1 = dumpOperand(instr->getOperand(1));
+    op0 = stripOuterParams(op0);
+    op1 = stripOuterParams(op1);
+    gencode += op0;
+    gencode += " " + predicate_string + " ";
+    gencode += op1;
+    return gencode;
 }
 
 std::string BasicBlockDumper::dumpReturn(ReturnInst *retInst) {
@@ -318,12 +377,12 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         case Instruction::AShr:
             instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
             break;
-        // case Instruction::ICmp:
-        //     instructionCode = dumpIcmp(cast<ICmpInst>(instruction));
-        //     break;
-        // case Instruction::FCmp:
-        //     instructionCode = dumpFcmp(cast<FCmpInst>(instruction));
-        //     break;
+        case Instruction::ICmp:
+            instructionCode = dumpIcmp(cast<ICmpInst>(instruction));
+            break;
+        case Instruction::FCmp:
+            instructionCode = dumpFcmp(cast<FCmpInst>(instruction));
+            break;
         // case Instruction::SExt:
         //     instructionCode = dumpSExt(cast<CastInst>(instruction));
         //     break;

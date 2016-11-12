@@ -8,5 +8,7 @@ define i32 @main() {
   %7 = load i32, i32 *%6
   %8 = alloca float, i32 1
   store float %5, float *%8
+  %9 = fcmp olt float %3, 4.0
+  %10 = icmp slt i32 %2, 4
   ret i32 0
 }

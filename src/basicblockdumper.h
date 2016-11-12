@@ -46,6 +46,8 @@ public:
     std::string dumpConstant(llvm::Constant *constant);
     std::string dumpAlloca(llvm::Instruction *alloca);
     std::string dumpBinaryOperator(llvm::BinaryOperator *instr, std::string opstring);
+    std::string dumpIcmp(llvm::ICmpInst *instr);
+    std::string dumpFcmp(llvm::FCmpInst *instr);
     std::string dumpOperand(llvm::Value *value);
     std::string dumpReturn(llvm::ReturnInst *retInst);
     std::string dumpInstruction(std::string indent, llvm::Instruction *instruction);

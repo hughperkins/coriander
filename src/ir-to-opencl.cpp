@@ -372,118 +372,34 @@ string dumpChainedInstruction(int level, Instruction * instr) {
 //     }
 // }
 
-// std::string dumpReturn(ReturnInst *retInst) {
-//     std::string gencode = "";
-//     Value *retValue = retInst->getReturnValue();
-//     if(retValue != 0) {
-//         Function *F = retInst->getFunction();
-//         copyAddressSpace(retValue, F);
-//         gencode += "return " + dumpOperand(retValue);
-//     } else {
-//         // we still need to have "return" if no value, since some loops terminate with a `return` in the middle
-//         // of the codeblock.  Or rather, they dont terminate, if we dont write out a `return` :-P
-//         gencode += "return";
+// void addSharedDeclaration(Value *value) {
+//     value ->dump();
+//     // if(nameByValue.find(value) != nameByValue.end()) {
+//     if(currentFunctionAlreadyDeclaredShared.find(value) != currentFunctionAlreadyDeclaredShared.end()) {
+//         // cout << "already in nameByValue, so returning" << endl;
+//         return;
 //     }
-//     return gencode;
-// }
-
-// std::string dumpAlloca(Instruction *alloca) {
-//     string gencode = "";
-//     if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
-//         Type *ptrElementType = allocatypeptr->getPointerElementType();
-//         std::string typestring = dumpType(ptrElementType);
-//         int count = readInt32Constant(alloca->getOperand(0));
-//         if(count == 1) {
-//             if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
-//                 int innercount = arrayType->getNumElements();
-//                 Type *elementType = arrayType->getElementType();
-//                 string allocaDeclaration = "    " + dumpType(elementType) + " " + dumpOperand(alloca) + "[" + toString(innercount) + "];\n";
-//                 currentFunctionSharedDeclarations += allocaDeclaration;
-//                 return "";
-//             } else {
-//                 // if the elementType is a pointer, assume its global?
-//                 if(isa<PointerType>(ptrElementType)) {
-//                     // cout << "dumpAlloca, for pointer" << endl;
-//                     // find the store
-//                     int numUses = alloca->getNumUses();
-//                     // cout << "numUses " << numUses << endl;
-//                     for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
-//                         User *user = *it;
-//                         // Value *useValue = use->
-//                         // cout << "user " << endl;
-//                         if(StoreInst *store = dyn_cast<StoreInst>(user)) {
-//                             // cout << " got a store" << endl;
-//                             // user->dump();
-//                             // cout << endl;
-//                             int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
-//                             // cout << "addessspace " << storeop0space << endl;
-//                             if(storeop0space == 1) {
-//                                 gencode += "global ";
-//                                 updateAddressSpace(alloca, 1);
-//                             }
-//                             // copyAddressSpace(user, alloca);
-//                             // typestring = dumpType(ptrElementType);
-//                         }
-//                     }
-//                     // gencode += "global ";
-//                     // updateAddressSpace(alloca, 1);
-//                 }
-//                 string allocaDeclaration = gencode + typestring + " " + dumpOperand(alloca) + "[1]";
-//                 // just declare this at the head of th efunction
-//                 currentFunctionSharedDeclarations += "    " + allocaDeclaration + ";\n";
-//                 return "";
-//             }
+//     if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
+//         // cout << "got glob" << endl;
+//         string name = getName(glob);
+//         string declaration = "";
+//         Type *type = glob->getType();
+//         if(ArrayType *arraytype = dyn_cast<ArrayType>(type->getPointerElementType())) {
+//             // cout << "its an array" << endl;
+//             int length = arraytype->getNumElements();
+//             Type *elementType = arraytype->getElementType();
+//             string typestr = dumpType(elementType);
+//             declaration += "    local " + typestr + " " + name + "[" + toString(length) + "];\n";
+//             nameByValue[value] = name;
+//             currentFunctionSharedDeclarations += declaration;
+//             currentFunctionAlreadyDeclaredShared.insert(value);
 //         } else {
-//             throw runtime_error("not implemented: alloca for count != 1");
+//             // cout << "not an array" << endl;
 //         }
 //     } else {
-//         alloca->dump();
-//         throw runtime_error("dumpalloca not implemented for non pointer type");
+//         // cout << "not globalvaraibel" << endl;
 //     }
 // }
-
-// string dumpLoad(LoadInst *instr) {
-//     string rhs = dumpOperand(instr->getOperand(0)) + "[0]";
-//     copyAddressSpace(instr->getOperand(0), instr);
-//     return rhs;
-// }
-
-// string dumpStore(StoreInst *instr) {
-//     string gencode = "";
-//     string rhs = dumpOperand(instr->getOperand(0));
-//     rhs = stripOuterParams(rhs);
-//     gencode += dumpOperand(instr->getOperand(1)) + "[0] = " + rhs;
-//     return gencode;
-// }
-
-void addSharedDeclaration(Value *value) {
-    value ->dump();
-    // if(nameByValue.find(value) != nameByValue.end()) {
-    if(currentFunctionAlreadyDeclaredShared.find(value) != currentFunctionAlreadyDeclaredShared.end()) {
-        // cout << "already in nameByValue, so returning" << endl;
-        return;
-    }
-    if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
-        // cout << "got glob" << endl;
-        string name = getName(glob);
-        string declaration = "";
-        Type *type = glob->getType();
-        if(ArrayType *arraytype = dyn_cast<ArrayType>(type->getPointerElementType())) {
-            // cout << "its an array" << endl;
-            int length = arraytype->getNumElements();
-            Type *elementType = arraytype->getElementType();
-            string typestr = dumpType(elementType);
-            declaration += "    local " + typestr + " " + name + "[" + toString(length) + "];\n";
-            nameByValue[value] = name;
-            currentFunctionSharedDeclarations += declaration;
-            currentFunctionAlreadyDeclaredShared.insert(value);
-        } else {
-            // cout << "not an array" << endl;
-        }
-    } else {
-        // cout << "not globalvaraibel" << endl;
-    }
-}
 
 string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
     string gencode = "";
@@ -910,91 +826,6 @@ std::string dumpPtrToInt(PtrToIntInst *instr) {
     string gencode = "";
     string typestr = dumpType(instr->getType());
     gencode += "(" + typestr + ")" + dumpValue(instr->getOperand(0));
-    return gencode;
-}
-
-std::string dumpIcmp(ICmpInst *instr) {
-    string gencode = "";
-    CmpInst::Predicate predicate = instr->getSignedPredicate();  // note: we should detect signedness...
-    string predicate_string = "";
-    switch(predicate) {
-        case CmpInst::ICMP_SLT:
-            predicate_string = "<";
-            break;
-        case CmpInst::ICMP_SGT:
-            predicate_string = ">";
-            break;
-        case CmpInst::ICMP_SGE:
-            predicate_string = ">=";
-            break;
-        case CmpInst::ICMP_SLE:
-            predicate_string = "<=";
-            break;
-        case CmpInst::ICMP_EQ:
-            predicate_string = "==";
-            break;
-        case CmpInst::ICMP_NE:
-            predicate_string = "!=";
-            break;
-        default:
-            cout << "predicate " << predicate << endl;
-            throw runtime_error("predicate not supported");
-    }
-    string op0 = dumpOperand(instr->getOperand(0));
-    string op1 = dumpOperand(instr->getOperand(1));
-    // handle case like `a & 3 == 0`
-    if(op0.find('&') == string::npos) {
-        op0 = stripOuterParams(op0);
-    }
-    if(op1.find('&') == string::npos) {
-        op1 = stripOuterParams(op1);
-    }
-    gencode += op0;
-    gencode += " " + predicate_string + " ";
-    gencode += op1;
-    return gencode;
-}
-
-std::string dumpFcmp(FCmpInst *instr) {
-    string gencode = "";
-    CmpInst::Predicate predicate = instr->getPredicate();
-    string predicate_string = "";
-    switch(predicate) {
-        case CmpInst::FCMP_ULT:
-        case CmpInst::FCMP_OLT:
-            predicate_string = "<";
-            break;
-        case CmpInst::FCMP_UGT:
-        case CmpInst::FCMP_OGT:
-            predicate_string = ">";
-            break;
-        case CmpInst::FCMP_UGE:
-        case CmpInst::FCMP_OGE:
-            predicate_string = ">=";
-            break;
-        case CmpInst::FCMP_ULE:
-        case CmpInst::FCMP_OLE:
-            predicate_string = "<=";
-            break;
-        case CmpInst::FCMP_UEQ:
-        case CmpInst::FCMP_OEQ:
-            predicate_string = "==";
-            break;
-        case CmpInst::FCMP_UNE:
-        case CmpInst::FCMP_ONE:
-            predicate_string = "!=";
-            break;
-        default:
-            cout << "predicate " << predicate << endl;
-            throw runtime_error("predicate not supported");
-    }
-    string op0 = dumpOperand(instr->getOperand(0));
-    string op1 = dumpOperand(instr->getOperand(1));
-    op0 = stripOuterParams(op0);
-    op1 = stripOuterParams(op1);
-    gencode += op0;
-    gencode += " " + predicate_string + " ";
-    gencode += op1;
     return gencode;
 }
 
