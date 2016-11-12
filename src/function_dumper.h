@@ -14,23 +14,53 @@
 
 #pragma once
 
+#include "GlobalNames.h"
+#include "LocalNames.h"
+#include "function_names_map.h"
+#include "type_dumper.h"
+#include "struct_clone.h"
+
+#include "llvm/IR/Function.h"
+#include "llvm/IR/Value.h"
+#include "llvm/IR/Type.h"
+
+#include <string>
+#include <set>
+#include <map>
+
 namespace cocl {
 
 class FunctionDumper {
 public:
-    FunctionDumper(llvm::Function *F) :
-        F(F) {
-
+    FunctionDumper(llvm::Function *F, bool isKernel, GlobalNames *globalNames, TypeDumper *typeDumper,
+        FunctionNamesMap *functionNamesMap) :
+            F(F),
+            isKernel(isKernel),
+            globalNames(globalNames),
+            typeDumper(typeDumper),
+            structCloner(typeDumper, globalNames),
+            functionNamesMap(functionNamesMap) {
     }
     virtual ~FunctionDumper() {
 
     }
 
-protected:
-    llvm::Function *F;
-    bool _addIRToCl = false;
+    std::string toCl();
+    std::string createOffsetDeclaration(std::string argName);
+    std::string createOffsetShim(llvm::Type *argType, std::string argName);
+    std::string dumpFunctionDeclaration(llvm::Function *F);
 
     std::set<llvm::Function *> neededFunctionCalls;
+    std::set<llvm::StructType *> structsToDefine;
+    std::string shimCode = "";
+    std::string functionDeclarations = "";
+
+protected:
+    llvm::Function *F;
+    bool isKernel = false;
+    bool _addIRToCl = false;
+    std::map<llvm::BasicBlock *, int> functionBlockIndex;
+
     std::map<llvm::Value *, std::string> exprByValue;
     std::set<llvm::Value *> variablesToDeclare;
     std::set<llvm::Value *> sharedVariablesToDeclare;
@@ -42,8 +72,10 @@ protected:
     }
 
     GlobalNames *globalNames;
-    LocalNames *localNames;
+    LocalNames localNames;
     TypeDumper *typeDumper;
+    StructCloner structCloner;
+    const FunctionNamesMap *functionNamesMap;
 };
 
 } // namespace cocl

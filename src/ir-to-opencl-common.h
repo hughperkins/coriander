@@ -21,31 +21,15 @@
 #include "llvm/IR/Type.h"
 #include "llvm/IR/DerivedTypes.h"
 
-template<typename T>
-std::string toString(T value) {
-    std::ostringstream oss;
-    oss << value;
-    return oss.str();
-}
+// template<typename T>
+// std::string toString(T value) {
+//     std::ostringstream oss;
+//     oss << value;
+//     return oss.str();
+// }
 
-class PointerInfo {
-public:
-    PointerInfo(int offset, llvm::Type *type, std::vector<int> indices, std::string path) :
-        offset(offset), type(type), indices(indices), path(path) {
-    }
-    int offset;
-    llvm::Type *type;
-    std::vector<int> indices;
-    std::string path;
-};
-
-class StructInfo {
-public:
-    std::vector<std::unique_ptr<PointerInfo> > pointerInfos;
-};
-
-// offset: since we're walking a tree, over a base type, what is our offset into
-// the base type?
-void walkStructType(llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices, std::string path, llvm::StructType *type);
-void walkType(llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices, std::string path, llvm::Type *type);
-std::string getIndent(int level);
+// // offset: since we're walking a tree, over a base type, what is our offset into
+// // the base type?
+// void walkStructType(llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices, std::string path, llvm::StructType *type);
+// void walkType(llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices, std::string path, llvm::Type *type);
+// std::string getIndent(int level);

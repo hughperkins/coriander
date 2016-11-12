@@ -7,8 +7,6 @@ option(TESTS_DEVICELL_INLINE "cocl option for tests" ON)
 option(TESTS_DEVICELL_MEM2REG "cocl option for tests" ON)
 option(TESTS_DEVICELL_INSTCOMBINE "cocl option for tests" ON)
 set(TESTS_DEVICELL_OPT "O2" CACHE STRING "cocl option for tests")
-option(TESTS_CL_RUN_TRANSFORMS "cocl option for tests" OFF)
-option(TESTS_CL_BRANCHES_AS_SWITCH "cocl option for tests" OFF)
 option(OFFSET_32BIT "type to use for offsets. off lets you use more memory.  on is necessary on beignet" ON)
 option(COCL_SPAM "Lots of scrolly debug text.  Mostly for maintainer usage" OFF)
 
@@ -30,13 +28,6 @@ if(TESTS_DEVICELL_OPT)
 set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};-devicell-opt;-O${TESTS_DEVICELL_OPT})
 endif()
 
-if(TESTS_CL_RUN_TRANSFORMS)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--run_branching_transforms)
-endif()
-if(TESTS_CL_BRANCHES_AS_SWITCH)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--branches_as_switch)
-endif()
-
 set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/platforminfo_helper.cpp src/EasyCL/EasyCL.cpp
     src/EasyCL/deviceinfo_helper.cpp src/EasyCL/util/easycl_stringhelper.cpp src/EasyCL/DevicesInfo.cpp src/EasyCL/DeviceInfo.cpp)
 
@@ -51,7 +42,7 @@ set(COCL_SRCS src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cp
     src/flowcontrol/for.cpp src/flowcontrol/rootblock.cpp src/flowcontrol/block.cpp)
 set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp
     src/struct_clone.cpp src/basicblockdumper.cpp src/ExpressionsHelper.cpp src/readIR.cpp
-    src/function_names_map.cpp
+    src/function_names_map.cpp src/function_dumper.cpp
 )
 
 set(CMAKE_CC_FLAGS "-fPIC")
@@ -205,7 +196,7 @@ if(BUILD_TESTS)
     add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
         test/gtest/test_block_dumper.cpp
         test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
-        test/gtest/test_struct_cloner.cpp
+        test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
     )
     target_include_directories(cocl_unittests PRIVATE src)
     target_include_directories(cocl_unittests PRIVATE third_party/gtest)

@@ -73,16 +73,6 @@ function display_help {
 
       OpenCL generation options:
 
-        --branches_as_switch
-             Use a 'switch' statement to simulate branching
-             Some GPU drivers might prefer this output
-             Fairly correct.  Probably slow
-
-        --run_branching_transforms
-             Try to rewrite 'goto's as fors/whiles/ifs
-             Some GPU drivers might prefer the output
-             Currently buggy.  Cant be used with branches_as_switch
-
         --add_ir_to_cl
              Add the original IR code into the generated OpenCL code, as comments
              Mainly useful to cuda-on-cl maintainers
@@ -194,12 +184,6 @@ while [[ x$1 != x ]]; do {
                 } fi
                 DEVICELLOPT="${DEVICELLOPT} -$2"
                 shift
-                ;;
-            --run_branching_transforms)
-                IROOPENCLARGS="${IROOPENCLARGS} $1"
-                ;;
-            --branches_as_switch)
-                IROOPENCLARGS="${IROOPENCLARGS} $1"
                 ;;
             --add_ir_to_cl)
                 IROOPENCLARGS="${IROOPENCLARGS} $1"

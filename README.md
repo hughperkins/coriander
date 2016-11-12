@@ -61,8 +61,6 @@ hostFloats[2] 444
 | -o   | output filepath, eg `-o foo.o` |
 | -c   | compile to .o file; dont link |
 | -devicell-opt [option] | pass [option] through to device ll optimization phase.  Affects success and quality of OpenCL generation. |
-| -branches_as_switch | Write branch instructions as a `switch`, in the OpenCL.  Fairly correct.  Some GPU drivers might like it. Slow |
-| -run_branching_transforms | Try to write branches as `for`/`if`/`while`.  Makes code more readable.  Some GPU drivers might like it.  Buggy |
 | -fPIC | passed to clang object-code compiler |
 
 The options provided to `-devicell-opt` are passed through to `opt-3.8`, http://llvm.org/docs/Passes.html

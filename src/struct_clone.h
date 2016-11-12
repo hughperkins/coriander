@@ -35,6 +35,22 @@ namespace cocl {
 // std::string dumpTypeNoPointers(llvm::Type *type);
 // std::string dumpStructTypeNoPointers(llvm::StructType *type);
 
+class PointerInfo {
+public:
+    PointerInfo(int offset, llvm::Type *type, std::vector<int> indices, std::string path) :
+        offset(offset), type(type), indices(indices), path(path) {
+    }
+    int offset;
+    llvm::Type *type;
+    std::vector<int> indices;
+    std::string path;
+};
+
+class StructInfo {
+public:
+    std::vector<std::unique_ptr<PointerInfo> > pointerInfos;
+};
+
 class StructCloner {
 public:
     StructCloner(cocl::TypeDumper *typeDumper, cocl::GlobalNames *globalNames) :
@@ -48,6 +64,12 @@ public:
     std::string writeClCopyNoPtrToPtrfull(llvm::StructType *ptrfullType, std::string srcName, std::string destName);
     llvm::Instruction *createHostsideIrCopyPtrfullToNoptr(llvm::Instruction *lastInst, llvm::StructType *ptrfullType,
         llvm::Value *src, llvm::Value *dest);
+    static void walkType(
+        llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices,
+        std::string path, llvm::Type *type);
+    static void walkStructType(
+        llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices,
+        std::string path, llvm::StructType *type);
 
 protected:
     cocl::TypeDumper *typeDumper;

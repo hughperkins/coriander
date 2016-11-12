@@ -35,7 +35,7 @@ public:
     // - ignores returns
     // - ignores phis
     BasicBlockDumper(llvm::BasicBlock *block, GlobalNames *globalNames, LocalNames *localNames,
-            TypeDumper *typeDumper, FunctionNamesMap *functionNamesMap) :
+            TypeDumper *typeDumper, const FunctionNamesMap *functionNamesMap) :
         block(block),
         globalNames(globalNames),
         localNames(localNames),
