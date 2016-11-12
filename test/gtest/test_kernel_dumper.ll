@@ -1,10 +1,13 @@
-define float addrspace(1) *@someFunc(float addrspace(1) * %d1, float addrspace(1) * %v1) {
-    ret float addrspace(1) *%v1
+define float *@someFunc(float * %d1, float *%v1) {
+    %1 = fadd float 3.0, 4.0
+    %2 = load float, float *%d1
+
+    ret float *%v1
 }
 
-define void @someKernel(float addrspace(1) * %d1, float addrspace(1) * %d2) {
-    %1 = alloca float addrspace(1)*, i32 1
-    %2 = load float addrspace(1) *, float addrspace(1) **%1
-    %3 = call float addrspace(1) * @someFunc(float addrspace(1) *%d1, float addrspace(1) *%2)
+define void @someKernel(float * %d1, float * %d2) {
+    %1 = alloca float *, i32 1
+    %2 = load float *, float **%1
+    %3 = call float * @someFunc(float *%d1, float *%2)
     ret void
 }

@@ -15,6 +15,7 @@
 #include "basicblockdumper.h"
 
 #include "readIR.h"
+#include "mutations.h"
 
 #include "EasyCL/util/easycl_stringhelper.h"
 
@@ -23,6 +24,7 @@
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Module.h"
+#include "llvm/Transforms/Utils/Cloning.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -699,10 +701,61 @@ std::string BasicBlockDumper::dumpCall(llvm::CallInst *instr) {
         Module *M = instr->getModule();
         Function *F = M->getFunction(StringRef(functionName));
         if(F != 0) {
-            neededFunctions.insert(F);
+            // check arguments...
+            bool addressSpacesMatch = true;
+            // auto callit = instr->arg_begin();
+            int i = 0;
+            for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+                // Argument *callArg = callit->;
+                Value *callArg = instr->getArgOperand(i);
+                Argument *calleeArg = &*it;
+                // cout << "callArg";
+                // callArg->dump();
+                if(PointerType *callPtr = dyn_cast<PointerType>(callArg->getType())) {
+                    PointerType *calleePtr = cast<PointerType>(calleeArg->getType());
+                    if(callPtr->getAddressSpace() != calleePtr->getAddressSpace()) {
+                        addressSpacesMatch = false;
+                        cout << "arg " << callArg->getName().str() << " needs address space mutation" << endl;
+                        break;
+                    }
+                }
+                // callit++;
+                i++;
+            }
+            if(!addressSpacesMatch) {
+                int numArgs = instr->getNumArgOperands();
+                cout << "numArgs " << numArgs << endl;
+                // Value *newArgs = new Value *[numArgs];
+                int i;
+                // for(i = 0; i < numArgs; i++) {
+                //     Type *argType = instr->getArgOperand(i)->getType();
+
+                 // DenseMap<const Value*, Value*> valueMap;
+                ValueToValueMapTy valueMap;
+                 struct ClonedCodeInfo codeInfo;
+                Function *newFunc = CloneFunction(F,
+                               valueMap,
+                               &codeInfo);
+                // }
+                // delete [] newArgs;
+                i = 0;
+                for(auto it=newFunc->arg_begin(); it != newFunc->arg_end(); it++) {
+                    // Argument *callArg = callit->;
+                    Value *callArg = instr->getArgOperand(i);
+                    Argument *calleeArg = &*it;
+                    copyAddressSpace(callArg, calleeArg);
+                    i++;
+                }
+                neededFunctions.insert(newFunc);
+            } else {
+                neededFunctions.insert(F);
+            }
             // if(dumpedFunctions.find(F) == dumpedFunctions.end()) {
             //     functionsToDump.insert(F);
             // }
+        } else {
+            cout << "couldnt find function " + functionName << endl;
+            throw runtime_error("couldnt find function " + functionName);
         }
     }
     gencode += ")";

@@ -157,12 +157,12 @@ std::string FunctionDumper::toCl() {
         // bodyCl += dumpBasicBlock(basicBlock);
     }
 
-    Type *returnType = F->getReturnType();
-    if(PointerType *ptr = dyn_cast<PointerType>(returnType)) {
-        if(ptr->getAddressSpace() == 1) {
-            declaration = "global " + declaration;  // a bit hacky, but maybe it works ok for now?
-        }
-    }
+    // Type *returnType = F->getReturnType();
+    // if(PointerType *ptr = dyn_cast<PointerType>(returnType)) {
+    //     if(ptr->getAddressSpace() == 1) {
+    //         declaration = "global " + declaration;  // a bit hacky, but maybe it works ok for now?
+    //     }
+    // }
 
     string gencode = declaration + " {\n";
     gencode += functionDeclarations + "\n";

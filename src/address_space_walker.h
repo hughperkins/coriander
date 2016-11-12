@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "llvm/IR/Module.h"
+#include "llvm/IR/Function.h"
 
 #include <string>
 
@@ -22,7 +22,7 @@ namespace cocl {
 
 class AddressSpaceWalker {
 public:
-    AddressSpaceWalker(Module *M) : M(M) {
+    AddressSpaceWalker(Function *F) : F(F) {
 
     }
     virtual ~AddressSpaceWalker() {
@@ -30,8 +30,8 @@ public:
     }
     void walk();
 
-    llvm::Module *M;
-    std::set<llvm::Function *> requiredFunctionCalls;
+    llvm::Function *F;
+    // std::set<llvm::Function *> requiredFunctionCalls;
 };
 
 } // namespace cocl

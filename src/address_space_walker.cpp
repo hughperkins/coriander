@@ -29,7 +29,7 @@ void AddressSpaceWalker::walkBlock(BasicBlock *block) {
 }
 
 void AddressSpaceWalker::walk() {
-    for(auto it = M->begin(); it != M->end(); it++) {
+    for(auto it = F->begin(); it != F->end(); it++) {
         BasicBlock *block = &*it;
         walkBlock(block);
     }
