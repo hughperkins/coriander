@@ -24,5 +24,6 @@ label1:
 
 label2:
     %1 = fadd float 5.0, 7.0
-    br label %label1
+    %2 = fcmp ogt float %1, 6.0
+    br i1 %2, label %label1, label %label2
 }

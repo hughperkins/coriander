@@ -118,7 +118,7 @@ std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr, std::map<Value *
         }
 
         if(needTrueSection) {
-            gencode += "if " + conditionstring + " {\n";
+            gencode += "    if " + conditionstring + " {\n";
             gencode += trueSection;
             if(needFalseSection) {
                 gencode += "    } else {\n";
@@ -126,7 +126,7 @@ std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr, std::map<Value *
             }
             gencode += "    }\n";
         } else if(needFalseSection) {
-            gencode += "if(!" + conditionstring + ") {\n";
+            gencode += "    if(!" + conditionstring + ") {\n";
             gencode += falseSection;
             gencode += "    }\n";
         }
