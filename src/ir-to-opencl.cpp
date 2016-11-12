@@ -442,11 +442,11 @@ string dumpChainedInstruction(int level, Instruction * instr) {
 //     }
 // }
 
-string dumpLoad(LoadInst *instr) {
-    string rhs = dumpOperand(instr->getOperand(0)) + "[0]";
-    copyAddressSpace(instr->getOperand(0), instr);
-    return rhs;
-}
+// string dumpLoad(LoadInst *instr) {
+//     string rhs = dumpOperand(instr->getOperand(0)) + "[0]";
+//     copyAddressSpace(instr->getOperand(0), instr);
+//     return rhs;
+// }
 
 string dumpStore(StoreInst *instr) {
     string gencode = "";

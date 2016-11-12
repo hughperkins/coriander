@@ -74,7 +74,8 @@ TEST(test_block_dumper, basic) {
     string cl = blockDumper.toCl();
     cout << cl << endl;
 
-    cout << "alloca declrations: [" << blockDumper.getAllocaDeclarations("    ") << "]" << endl;
+    cout << "alloca declrations:" << endl;
+    cout << blockDumper.getAllocaDeclarations("    ") << endl;
 }
 
 } // test_block_dumper

@@ -215,6 +215,12 @@ std::string BasicBlockDumper::dumpAlloca(llvm::Instruction *alloca) {
     }
 }
 
+std::string BasicBlockDumper::dumpLoad(llvm::LoadInst *instr) {
+    string rhs = dumpOperand(instr->getOperand(0)) + "[0]";
+    // copyAddressSpace(instr->getOperand(0), instr);
+    return rhs;
+}
+
 string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction) {
     auto opcode = instruction->getOpcode();
     string resultName = localNames->getOrCreateName(instruction);
@@ -369,12 +375,12 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         // case Instruction::Call:
         //     instructionCode = dumpCall(cast<CallInst>(instruction));
         //     break;
-        // case Instruction::Load:
-        //     instructionCode = dumpLoad(cast<LoadInst>(instruction));
-        //     break;
+        case Instruction::Load:
+            instructionCode = dumpLoad(cast<LoadInst>(instruction));
+            break;
         case Instruction::Alloca:
             instructionCode = dumpAlloca(cast<AllocaInst>(instruction));
-            return instructionCode + ";\n";
+            return "";
         // case Instruction::Br:
         //     instructionCode = dumpBranch(cast<BranchInst>(instruction));
         //     return instructionCode;
