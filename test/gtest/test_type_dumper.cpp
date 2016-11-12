@@ -32,7 +32,7 @@ using namespace cocl;
 using namespace llvm;
 
 namespace test_type_dumper {
-    
+
 LLVMContext context;
 unique_ptr<Module>M;
 

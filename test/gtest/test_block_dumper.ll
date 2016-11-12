@@ -1,3 +1,5 @@
+%"struct.mystruct" = type { i32, float, float*, float* }
+
 define i32 @main() {
   %1 = add i32 5, 3
   %2 = add i32 %1, 7
@@ -23,5 +25,11 @@ define i32 @main() {
   %21 = bitcast float *%8 to i32*
   %22 = addrspacecast float* %8 to float addrspace(1) *
   %23 = bitcast float %3 to i32
+  %24 = alloca %struct.mystruct, i32 1
+  %25 = load %struct.mystruct, %struct.mystruct* %24
+  %26 = extractvalue %struct.mystruct %25, 0
+  %27 = insertvalue %struct.mystruct %25, i32 4, 0
+  %28 = insertvalue %struct.mystruct %27, float 1.5, 1
+
   ret i32 0
 }

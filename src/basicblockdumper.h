@@ -65,9 +65,12 @@ public:
     std::string dumpReturn(llvm::ReturnInst *retInst);
     std::string dumpInstruction(std::string indent, llvm::Instruction *instruction);
     std::string getAllocaDeclarations(std::string indent);
+    std::string dumpInsertValue(llvm::InsertValueInst *instr);
+    std::string dumpExtractValue(llvm::ExtractValueInst *instr);
     std::string dumpLoad(llvm::LoadInst *instr);
     std::string dumpStore(llvm::StoreInst *instr);
     std::string dumpAlloca(llvm::Instruction *alloca);
+
     BasicBlockDumper *addIRToCl() {
         _addIRToCl = true;
         return this;
@@ -84,7 +87,7 @@ protected:
 
     std::set<llvm::Function *> neededFunctionCalls;
     std::map<llvm::Value *, std::string> exprByValue;
-    std::map<llvm::Value *, std::string> variablesToDeclare;
+    std::set<llvm::Value *> variablesToDeclare;
     std::set<std::string> allocaDeclarations;
 
     GlobalNames *globalNames;

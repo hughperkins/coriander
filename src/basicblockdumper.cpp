@@ -378,6 +378,108 @@ std::string BasicBlockDumper::dumpStore(llvm::StoreInst *instr) {
     return gencode;
 }
 
+std::string BasicBlockDumper::dumpInsertValue(llvm::InsertValueInst *instr) {
+    string gencode = "";
+    string lhs = "";
+    cout << "lhs undef value? " << isa<UndefValue>(instr->getOperand(0)) << endl;
+    string incomingOperand = dumpOperand(instr->getOperand(0));
+    // if rhs is empty, that means its 'undef', so we better declare it, I guess...
+    Type *currentType = instr->getType();
+    bool declaredVar = false;
+    if(incomingOperand == "") {
+        variablesToDeclare.insert(instr);
+        // string declaration = typeDumper->dumpType(instr->getType()) + " " + dumpOperand(instr) + ";\n";
+        // currentFunctionSharedDeclarations += declaration;
+        // gencode += "    ";
+        incomingOperand = dumpOperand(instr);
+        declaredVar = true;
+    }
+    lhs += incomingOperand;
+    ArrayRef<unsigned> indices = instr->getIndices();
+    int numIndices = instr->getNumIndices();
+    for(int d=0; d < numIndices; d++) {
+        int idx = indices[d];
+        Type *newType = 0;
+        if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
+            if(d == 0) {
+                if(isa<ArrayType>(currentType->getPointerElementType())) {
+                    lhs = "(&" + lhs + ")";
+                }
+            }
+            lhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
+            newType = currentType->getPointerElementType();
+        } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
+            string structName = getName(structtype);
+            if(structName == "struct.float4") {
+                Type *elementType = structtype->getElementType(idx);
+                Type *castType = PointerType::get(elementType, 0);
+                newType = elementType;
+                lhs = "((" + typeDumper->dumpType(castType) + ")&" + lhs + ")";
+                lhs += string("[") + easycl::toString(idx) + "]";
+            } else {
+                // generic struct
+                Type *elementType = structtype->getElementType(idx);
+                lhs += string(".f") + easycl::toString(idx);
+                newType = elementType;
+            }
+        } else {
+            currentType->dump();
+            throw runtime_error("type not implemented in insertvalue");
+        }
+        currentType = newType;
+    }
+    gencode += lhs + " = " + dumpOperand(instr->getOperand(1));
+    // if(!declaredVar) {
+    //     gencode += "    " + dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand + ";\n";
+    // }
+    //     gencode += "    " + dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand + ";\n";
+    return gencode;
+}
+
+std::string BasicBlockDumper::dumpExtractValue(llvm::ExtractValueInst *instr) {
+    string gencode = "";
+    string lhs = "";
+    string incomingOperand = dumpOperand(instr->getAggregateOperand());
+    // if rhs is empty, that means its 'undef', so we better declare it, I guess...
+    Type *currentType = instr->getAggregateOperand()->getType();
+    lhs += incomingOperand;
+    ArrayRef<unsigned> indices = instr->getIndices();
+    int numIndices = instr->getNumIndices();
+    for(int d=0; d < numIndices; d++) {
+        int idx = indices[d];
+        Type *newType = 0;
+        if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
+            if(d == 0) {
+                if(isa<ArrayType>(currentType->getPointerElementType())) {
+                    lhs = "(&" + lhs + ")";
+                }
+            }
+            lhs += string("[") + dumpOperand(instr->getOperand(d + 1)) + "]";
+            newType = currentType->getPointerElementType();
+        } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
+            string structName = getName(structtype);
+            if(structName == "struct.float4") {
+                Type *elementType = structtype->getElementType(idx);
+                Type *castType = PointerType::get(elementType, 0);
+                newType = elementType;
+                lhs = "((" + typeDumper->dumpType(castType) + ")&" + lhs + ")";
+                lhs += string("[") + easycl::toString(idx) + "]";
+            } else {
+                // generic struct
+                Type *elementType = structtype->getElementType(idx);
+                lhs += string(".f") + easycl::toString(idx);
+                newType = elementType;
+            }
+        } else {
+            currentType->dump();
+            throw runtime_error("type not implemented in extractvalue");
+        }
+        currentType = newType;
+    }
+    gencode += lhs;
+    return gencode;
+}
+
 string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction) {
     auto opcode = instruction->getOpcode();
     string resultName = localNames->getOrCreateName(instruction);
@@ -519,13 +621,13 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         // case Instruction::GetElementPtr:
         //     instructionCode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
         //     break;
-        // case Instruction::InsertValue:
-        //     instructionCode = dumpInsertValue(cast<InsertValueInst>(instruction));
-        //     return instructionCode;
-        //     // break;
-        // case Instruction::ExtractValue:
-        //     instructionCode = dumpExtractValue(cast<ExtractValueInst>(instruction));
-        //     break;
+        case Instruction::InsertValue:
+            instructionCode = dumpInsertValue(cast<InsertValueInst>(instruction));
+            return indent + instructionCode + ";\n";
+            // break;
+        case Instruction::ExtractValue:
+            instructionCode = dumpExtractValue(cast<ExtractValueInst>(instruction));
+            break;
         case Instruction::Store:
             instructionCode = dumpStore(cast<StoreInst>(instruction));
             break;
@@ -591,7 +693,8 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
             if(typestr != "void") {
                 instructionCode = stripOuterParams(instructionCode);
                 // functionNeededForwardDeclarations.insert(instruction);
-                variablesToDeclare[instruction] = resultName;
+                // variablesToDeclare[instruction] = resultName;
+                variablesToDeclare.insert(instruction);
                 gencode += dumpOperand(instruction) + " = ";
             }
             gencode += instructionCode + ";\n";
