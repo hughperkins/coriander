@@ -31,18 +31,19 @@ endif()
 set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/platforminfo_helper.cpp src/EasyCL/EasyCL.cpp
     src/EasyCL/deviceinfo_helper.cpp src/EasyCL/util/easycl_stringhelper.cpp src/EasyCL/DevicesInfo.cpp src/EasyCL/DeviceInfo.cpp)
 
-set(COCL_SRCS src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cpp src/cocl_device.cpp src/cocl_error.cpp
-    src/cocl_memory.cpp src/cocl_properties.cpp src/cocl_streams.cpp src/cocl_clsources.cpp src/cocl_context.cpp
-    src/ir-to-opencl.cpp src/function_names_map.cpp
-    src/ir-to-opencl-common.cpp src/mutations.cpp src/readIR.cpp src/struct_clone.cpp
-    src/branches_as_switch/branches_as_switch.cpp src/type_dumper.cpp
-    src/handle_branching.cpp src/branching_transforms.cpp src/flowcontrolinstructions.cpp third_party/argparsecpp/argparsecpp.cpp
-    src/flowcontrol/returnblock.cpp src/flowcontrol/sequence.cpp src/flowcontrol/basicblockblock.cpp
-    src/flowcontrol/conditionalbranch.cpp src/flowcontrol/dowhile.cpp src/flowcontrol/if.cpp
-    src/flowcontrol/for.cpp src/flowcontrol/rootblock.cpp src/flowcontrol/block.cpp)
+# set(COCL_SRCS src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cpp src/cocl_device.cpp src/cocl_error.cpp
+#     src/cocl_memory.cpp src/cocl_properties.cpp src/cocl_streams.cpp src/cocl_clsources.cpp src/cocl_context.cpp
+#     src/ir-to-opencl.cpp src/function_names_map.cpp
+#     src/ir-to-opencl-common.cpp src/mutations.cpp src/readIR.cpp src/struct_clone.cpp
+#     src/branches_as_switch/branches_as_switch.cpp src/type_dumper.cpp
+#     src/handle_branching.cpp src/branching_transforms.cpp src/flowcontrolinstructions.cpp third_party/argparsecpp/argparsecpp.cpp
+#     src/flowcontrol/returnblock.cpp src/flowcontrol/sequence.cpp src/flowcontrol/basicblockblock.cpp
+#     src/flowcontrol/conditionalbranch.cpp src/flowcontrol/dowhile.cpp src/flowcontrol/if.cpp
+#     src/flowcontrol/for.cpp src/flowcontrol/rootblock.cpp src/flowcontrol/block.cpp)
 set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp
     src/struct_clone.cpp src/basicblockdumper.cpp src/ExpressionsHelper.cpp src/readIR.cpp
     src/function_names_map.cpp src/function_dumper.cpp src/kernel_dumper.cpp src/mutations.cpp
+    src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp
 )
 
 set(CMAKE_CC_FLAGS "-fPIC")
@@ -78,11 +79,13 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 # endif()
 
 add_executable(patch-hostside
-    src/patch-hostside.cpp src/struct_clone.cpp src/mutations.cpp src/readIR.cpp src/ir-to-opencl-common.cpp
-    third_party/argparsecpp/argparsecpp.cpp
+    src/patch-hostside.cpp src/struct_clone.cpp src/mutations.cpp src/readIR.cpp
+    third_party/argparsecpp/argparsecpp.cpp src/type_dumper.cpp src/GlobalNames.cpp
+    src/EasyCL/util/easycl_stringhelper.cpp
 )
 target_include_directories(patch-hostside PRIVATE /usr/lib/llvm-3.8/include)
 target_include_directories(patch-hostside PRIVATE third_party/argparsecpp)
+target_include_directories(patch-hostside PRIVATE src/EasyCL)
 set_target_properties(patch-hostside PROPERTIES
     LINK_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LLVM_LDFLAGS}"
 )

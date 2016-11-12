@@ -22,6 +22,7 @@
 #include "branching_transforms.h"
 #include "branches_as_switch/branches_as_switch.h"
 #include "function_names_map.h"
+#include "kernel_dumper.h"
 
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
@@ -53,28 +54,29 @@ using namespace llvm;
 using namespace std;
 using namespace cocl;
 
-static llvm::LLVMContext context;
-static std::map<std::string, Value *> NamedValues;
-static std::map<string, bool> iskernel_by_name;
+// static llvm::LLVMContext context;
+// static std::map<std::string, Value *> NamedValues;
+// static std::map<string, bool> iskernel_by_name;
 
-// map<Value *, string> nameByValue; // name here might be an entire subepxression
-// map<Value *, string> origNameByValue; //origName here is just like v18, or v19, no expressions; its for debugging
-// static int nextNameIdx;
-// static string currentFunctionSharedDeclarations = "";
-static map<string, string> currentFunctionPhiDeclarationsByName;
-// static string globalDeclarations = "";
-// static string structpointershimcode = "";
-// static set<Value *> functionNeededForwardDeclarations;
-static map<BasicBlock *, int> functionBlockIndex;
-static set<Value *> currentFunctionAlreadyDeclaredShared;
-// static set<Value *>valuesAreExpressions;
+// // map<Value *, string> nameByValue; // name here might be an entire subepxression
+// // map<Value *, string> origNameByValue; //origName here is just like v18, or v19, no expressions; its for debugging
+// // static int nextNameIdx;
+// // static string currentFunctionSharedDeclarations = "";
+// static map<string, string> currentFunctionPhiDeclarationsByName;
+// // static string globalDeclarations = "";
+// // static string structpointershimcode = "";
+// // static set<Value *> functionNeededForwardDeclarations;
+// static map<BasicBlock *, int> functionBlockIndex;
+// static set<Value *> currentFunctionAlreadyDeclaredShared;
+// // static set<Value *>valuesAreExpressions;
 
-static set<Function *> dumpedFunctions;
-static set<Function *>functionsToDump;
+// static set<Function *> dumpedFunctions;
+// static set<Function *>functionsToDump;
 
-static int instructions_processed = 0;
-static bool debug = false;
-static bool add_ir_to_cl = false;
+// static int instructions_processed = 0;
+// static bool debug = false;
+
+bool add_ir_to_cl = false;
 
 
 static string cl_add_definitions = R"(
@@ -231,24 +233,24 @@ string dumpChainedNextOp(int level, Value *op0) {
     return op0string;
 }
 
-string dumpChainedInstruction(int level, Instruction * instr) {
-    if(GetElementPtrInst *gep = dyn_cast<GetElementPtrInst>(instr)) {
-        string thisinstrstring = dumpGetElementPtrRhs(gep);
-        nameByValue[instr] = thisinstrstring;
-        return thisinstrstring;
-    } else if(BitCastInst *bitcast = dyn_cast<BitCastInst>(instr)) {
-        string thisinstrstring = dumpBitCastRhs(bitcast);
-        nameByValue[bitcast] = thisinstrstring;
-        return thisinstrstring;
-    } else if(AddrSpaceCastInst *addrspacecast = dyn_cast<AddrSpaceCastInst>(instr)) {
-        string thisinstrstring = dumpAddrSpaceCastRhs(addrspacecast);
-        nameByValue[addrspacecast] = thisinstrstring;
-        return thisinstrstring;
-    } else {
-        instr->dump();
-        throw runtime_error("dumpchained unknown instruction type ");
-    }
-}
+// string dumpChainedInstruction(int level, Instruction * instr) {
+//     if(GetElementPtrInst *gep = dyn_cast<GetElementPtrInst>(instr)) {
+//         string thisinstrstring = dumpGetElementPtrRhs(gep);
+//         nameByValue[instr] = thisinstrstring;
+//         return thisinstrstring;
+//     } else if(BitCastInst *bitcast = dyn_cast<BitCastInst>(instr)) {
+//         string thisinstrstring = dumpBitCastRhs(bitcast);
+//         nameByValue[bitcast] = thisinstrstring;
+//         return thisinstrstring;
+//     } else if(AddrSpaceCastInst *addrspacecast = dyn_cast<AddrSpaceCastInst>(instr)) {
+//         string thisinstrstring = dumpAddrSpaceCastRhs(addrspacecast);
+//         nameByValue[addrspacecast] = thisinstrstring;
+//         return thisinstrstring;
+//     } else {
+//         instr->dump();
+//         throw runtime_error("dumpchained unknown instruction type ");
+//     }
+// }
 
 // string dumpConstant(Constant *constant) {
 //     unsigned int valueTy = constant->getValueID();
@@ -467,19 +469,22 @@ std::string dumpModule(Module *M, string specificFunction = "") {
 }
 
 string convertModuleToCl(Module *M, string specificFunction) {
-    function_names_map_populateKnownValues();
-    string gencode = "";
-    gencode += cl_add_definitions;
-    // COCL_PRINT(cout << "cl_add_definitions " << cl_add_definitions << endl);
-    try {
-        gencode += dumpModule(M, specificFunction);
-    } catch(const runtime_error &e) {
-        cout << "instructions processed before crash " << instructions_processed << endl;
-        throw e;
-    } catch(...) {
-        cout << "some unknown exception" << endl;
-    }
-    return gencode;
+    KernelDumper kernelDumper(M, specificFunction);
+    string cl = kernelDumper.toCl();
+
+    // function_names_map_populateKnownValues();
+    // string gencode = "";
+    // gencode += cl_add_definitions;
+    // // COCL_PRINT(cout << "cl_add_definitions " << cl_add_definitions << endl);
+    // try {
+    //     gencode += dumpModule(M, specificFunction);
+    // } catch(const runtime_error &e) {
+    //     cout << "instructions processed before crash " << instructions_processed << endl;
+    //     throw e;
+    // } catch(...) {
+    //     cout << "some unknown exception" << endl;
+    // }
+    return cl;
 }
 
 string convertLlStringToCl(string llString, string specificFunction) {

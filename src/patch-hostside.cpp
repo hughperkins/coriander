@@ -15,6 +15,14 @@
 
 // This is going to patch the cuda launch instrutions, in the hostside ir. hopefully
 
+#include "mutations.h"
+#include "struct_clone.h"
+// #include "ir-to-opencl-common.h"
+#include "argparsecpp.h"
+#include "type_dumper.h"
+#include "GlobalNames.h"
+#include "EasyCL/util/easycl_stringhelper.h"
+
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
 
@@ -46,22 +54,25 @@
 #include <sstream>
 #include <fstream>
 
-#include "mutations.h"
-#include "struct_clone.h"
-#include "ir-to-opencl-common.h"
-#include "argparsecpp.h"
-
 using namespace llvm;
 using namespace std;
+using namespace cocl;
+
+namespace cocl {
 
 static llvm::LLVMContext context;
 // static std::string sourcecode_stringname;
 static std::string devicellcode_stringname;
 static string devicellfilename;
+
+static GlobalNames globalNames;
+static TypeDumper typeDumper(&globalNames);
+static StructCloner structCloner(&typeDumper, &globalNames);
+
 // static string deviceclfilename;
 // static string clfilenamesimple;
 
-bool single_precision = true;
+// bool single_precision = true;
 
 class LaunchCallInfo {
 public:
@@ -108,7 +119,7 @@ ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
         if(i > 0) {
             my_raw_os_ostream << ", ";
         }
-        my_raw_os_ostream << dumpType(value->getType());
+        my_raw_os_ostream << typeDumper.dumpType(value->getType());
         i ++;
     }
     return os;
@@ -169,7 +180,7 @@ void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
 }
 
 ostream &operator<<(ostream &os, const PointerInfo &pointerInfo) {
-    os << "PointerInfo(offset=" << pointerInfo.offset << ", type=" << dumpType(pointerInfo.type);
+    os << "PointerInfo(offset=" << pointerInfo.offset << ", type=" << typeDumper.dumpType(pointerInfo.type);
     os << " indices=";
     int i = 0;
     for(auto it=pointerInfo.indices.begin(); it != pointerInfo.indices.end(); it++) {
@@ -195,7 +206,7 @@ Instruction *addSetKernelArgInst_int(Instruction *lastInst, Value *value, Intege
     } else if(bitLength == 8) {
         mangledName = "_Z16setKernelArgInt8c";
     } else {
-        throw runtime_error("bitlength " + toString(bitLength) + " not implemented");
+        throw runtime_error("bitlength " + easycl::toString(bitLength) + " not implemented");
     }
     Function *setKernelArgInt = cast<Function>(M->getOrInsertFunction(
         mangledName,
@@ -255,7 +266,7 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
 
     // outs() << "got a byvalue struct" << "\n";
     unique_ptr<StructInfo> structInfo(new StructInfo());
-    walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", cast<StructType>(value->getType()));
+    StructCloner::walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", cast<StructType>(value->getType()));
 
     bool structHasPointers = structInfo->pointerInfos.size() > 0;
     // outs() << "struct has pointers? " << structHasPointers << "\n";
@@ -267,7 +278,8 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
         return addSetKernelArgInst_pointer(lastInst, valueAsPointerInstr);
     }
 
-    Type *newType = cloneStructTypeNoPointers(cast<StructType>(value->getType()));
+    StructType *structType = cast<StructType>(value->getType());
+    Type *newType = structCloner.cloneNoPointers(structType);
 
     const DataLayout *dataLayout = &M->getDataLayout();
     int allocSize = dataLayout->getTypeAllocSize(newType);
@@ -285,7 +297,7 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
     alloca->insertAfter(lastInst);
     lastInst = alloca;
 
-    lastInst = copyStructValuesNoPointers(lastInst, valueAsPointerInstr, alloca);
+    lastInst = structCloner.createHostsideIrCopyPtrfullToNoptr(lastInst, structType, valueAsPointerInstr, alloca);
 
     BitCastInst *bitcast = new BitCastInst(alloca, PointerType::get(IntegerType::get(context, 8), 0));
     bitcast->insertAfter(lastInst);
@@ -339,7 +351,7 @@ Instruction *addSetKernelArgInst(Instruction *lastInst, Value *value, Value *val
     } else {
         value->dump();
         outs() << "\n";
-        throw runtime_error("kernel arg type type not implemented " + dumpType(value->getType()));
+        throw runtime_error("kernel arg type type not implemented " + typeDumper.dumpType(value->getType()));
     }
     return lastInst;
 }
@@ -464,6 +476,8 @@ void patchModule(Module *M) {
             verifyFunction(*F);
     }
 }
+
+} // namespace cocl
 
 int main(int argc, char *argv[]) {
     SMDiagnostic smDiagnostic;
