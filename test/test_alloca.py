@@ -45,6 +45,7 @@ __global__ void mykernel(float *data) {
         with open('/tmp/testprog-device.cl', 'r') as f:
             print(f.read())
         raise e
+    print('type(offset_type(0))', type(offset_type(0)))
     prog.__getattr__(kernelName)(
         q, (32,), (32,),
         float_data_gpu, offset_type(0), cl.LocalMemory(4))
