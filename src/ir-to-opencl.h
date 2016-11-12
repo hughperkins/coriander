@@ -21,22 +21,15 @@
 
 #include <string>
 
-
 std::string dumpInstruction(std::string indent, llvm::Instruction *instruction);
 std::string dumpOperand(llvm::Value *value);
-// std::string dumpConstant(llvm::Constant *constant);
-std::string dumpGetElementPtr(llvm::GetElementPtrInst *instr);
-std::string dumpGetElementPtrRhs(llvm::GetElementPtrInst *instr);
 std::string dumpChainedInstruction(int level, llvm::Instruction * instr);
-std::string dumpBitCastRhs(llvm::BitCastInst *instr);
-std::string dumpAddrSpaceCastRhs(llvm::AddrSpaceCastInst *instr);
 void updateAddressSpace(llvm::Value *value, int newSpace);
 void copyAddressSpace(llvm::Value *src, llvm::Value *dest);
 std::string getName(llvm::Value *value);
 std::string getName(llvm::StructType *value);
 std::string getName(llvm::Function *value);
 void addPHIDeclaration(llvm::PHINode *phi);
-void storeValueName(llvm::Value *value);
 std::string dumpValue(llvm::Value *value);
 std::string dumpReturn(llvm::ReturnInst *retInst);
 std::string dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock);

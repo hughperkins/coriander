@@ -14,26 +14,36 @@
 
 #pragma once
 
-#include <string>
-#include <set>
-#include <map>
-
 namespace cocl {
 
-class FunctionNamesMap {
+class FunctionDumper {
 public:
-    FunctionNamesMap() {
-        populateKnownValues();
+    FunctionDumper(llvm::Function *F) :
+        F(F) {
+
     }
-    bool isMappedFunction(std::string name) const;
-    bool isIgnoredFunction(std::string name) const;
-    bool isIgnoredGlobalVariable(std::string name) const;
-    std::string getFunctionMappedName(std::string name) const;
+    virtual ~FunctionDumper() {
+
+    }
+
 protected:
-    void populateKnownValues();
-    std::set<std::string> ignoredFunctionNames;
-    std::set<std::string> ignoredGlobalVariables;
-    std::map<std::string, std::string> knownFunctionsMap; // from cuda to opencl, eg tid.x => get_global_id
+    llvm::Function *F;
+    bool _addIRToCl = false;
+
+    std::set<llvm::Function *> neededFunctionCalls;
+    std::map<llvm::Value *, std::string> exprByValue;
+    std::set<llvm::Value *> variablesToDeclare;
+    std::set<llvm::Value *> sharedVariablesToDeclare;
+    std::set<std::string> allocaDeclarations;
+
+    FunctionDumper *addIRToCl() {
+        _addIRToCl = true;
+        return this;
+    }
+
+    GlobalNames *globalNames;
+    LocalNames *localNames;
+    TypeDumper *typeDumper;
 };
 
 } // namespace cocl

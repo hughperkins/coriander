@@ -1,3 +1,17 @@
+// Copyright Hugh Perkins 2016
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "function_names_map.h"
 
 #include <set>
@@ -7,11 +21,7 @@ using namespace std;
 
 namespace cocl {
 
-static std::set<string> ignoredFunctionNames;
-static std::set<string> ignoredGlobalVariables;
-static std::map<string, string> knownFunctionsMap; // from cuda to opencl, eg tid.x => get_global_id
-
-void function_names_map_populateKnownValues() {
+void FunctionNamesMap::populateKnownValues() {
     ignoredFunctionNames.insert("llvm.ptx.read.tid.x");
     ignoredFunctionNames.insert("llvm.ptx.read.tid.y");
     ignoredFunctionNames.insert("llvm.ptx.read.tid.z");
@@ -90,23 +100,24 @@ void function_names_map_populateKnownValues() {
     ignoredGlobalVariables.insert("blockDim");
 }
 
-bool function_names_map_isIgnoredFunction(std::string name) {
+bool FunctionNamesMap::isIgnoredFunction(std::string name) const {
     return ignoredFunctionNames.find(name) != ignoredFunctionNames.end();
 }
 
-bool function_names_map_isMappedFunction(std::string name) {
+bool FunctionNamesMap::isMappedFunction(std::string name) const {
     return knownFunctionsMap.find(name) != knownFunctionsMap.end();
 }
 
-bool function_names_map_isIgnoredGlobalVariable(std::string name) {
+bool FunctionNamesMap::isIgnoredGlobalVariable(std::string name) const {
     return ignoredGlobalVariables.find(name) != ignoredGlobalVariables.end();
 }
 
-std::string function_names_map_getFunctionMappedName(std::string name) {
+std::string FunctionNamesMap::getFunctionMappedName(std::string name) const {
     if(knownFunctionsMap.find(name) == knownFunctionsMap.end()) {
         return 0;
     }
-    return knownFunctionsMap[name];
+    const string res = knownFunctionsMap.at(name);
+    return res;
 }
 
 } // namespace cocl

@@ -22,6 +22,7 @@
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Constants.h"
+#include "llvm/IR/Module.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -89,6 +90,9 @@ string BasicBlockDumper::dumpOperand(Value *value) {
     }
     if(Constant *constant = dyn_cast<Constant>(value)) {
         return dumpConstant(constant);
+    }
+    if(localNames->hasValue(value)) {
+        return localNames->getName(value);
     }
     // if(isa<BasicBlock>(value)) {
     //     storeValueName(value);
@@ -558,6 +562,153 @@ std::string BasicBlockDumper::dumpSelect(SelectInst *instr) {
     return gencode;
 }
 
+std::string BasicBlockDumper::dumpMemcpyCharCharLong(llvm::CallInst *instr) {
+    std::string gencode = "";
+    int totalLength = cast<ConstantInt>(instr->getOperand(2))->getSExtValue();
+    int align = cast<ConstantInt>(instr->getOperand(3))->getSExtValue();
+    string dstAddressSpaceStr = typeDumper->dumpAddressSpace(instr->getOperand(0)->getType());
+    string srcAddressSpaceStr = typeDumper->dumpAddressSpace(instr->getOperand(1)->getType());
+    string elementTypeString = "";
+    if(align == 4) {
+        elementTypeString = "int";
+    } else if(align == 8) {
+        elementTypeString = "int2";
+    } else if(align == 16) {
+        elementTypeString = "int4";
+    } else {
+        throw runtime_error("not implemented dumpmemcpy for align " + easycl::toString(align));
+    }
+    int numElements = totalLength / align;
+    if(numElements >1) {
+        gencode += "#pragma unroll\n";
+        gencode += "    for(int __i=0; __i < " + easycl::toString(numElements) + "; __i++) {\n";
+        gencode += "        ((" + dstAddressSpaceStr + " " + elementTypeString + " *)" + dumpOperand(instr->getOperand(0)) + ")[__i] = ";
+        gencode += "((" + srcAddressSpaceStr + " " + elementTypeString + " *)" + dumpOperand(instr->getOperand(1)) + ")[__i];\n";
+        gencode += "    }\n";
+    } else {
+        gencode += "((" + dstAddressSpaceStr + " " + elementTypeString + " *)" + dumpOperand(instr->getOperand(0)) + ")[0] = ";
+        gencode += "((" + srcAddressSpaceStr + " " + elementTypeString + " *)" + dumpOperand(instr->getOperand(1)) + ")[0];\n";
+    }
+    return gencode;
+}
+
+std::string BasicBlockDumper::dumpCall(llvm::CallInst *instr) {
+    string gencode = "";
+    string functionName = getName(instr->getCalledValue());
+    bool internalfunc = false;
+    if(functionName == "llvm.ptx.read.tid.x") {
+        return gencode + "get_local_id(0)";
+    } else if(functionName == "llvm.ptx.read.tid.y") {
+        return gencode + "get_local_id(1)";
+    } else if(functionName == "llvm.ptx.read.tid.z") {
+        return gencode + "get_local_id(2)";
+    } else if(functionName == "llvm.ptx.read.ctaid.x") {
+        return gencode + "get_group_id(0)";
+    } else if(functionName == "llvm.ptx.read.ctaid.y") {
+        return gencode + "get_group_id(1)";
+    } else if(functionName == "llvm.ptx.read.ctaid.z") {
+        return gencode + "get_group_id(2)";
+    } else if(functionName == "llvm.ptx.read.nctaid.x") {
+        return gencode + "get_num_groups(0)";
+    } else if(functionName == "llvm.ptx.read.nctaid.y") {
+        return gencode + "get_num_groups(1)";
+    } else if(functionName == "llvm.ptx.read.nctaid.z") {
+        return gencode + "get_num_groups(2)";
+    } else if(functionName == "llvm.ptx.read.ntid.x") {
+        return gencode + "get_local_size(0)";
+    } else if(functionName == "llvm.ptx.read.ntid.y") {
+        return gencode + "get_local_size(1)";
+    } else if(functionName == "llvm.ptx.read.ntid.z") {
+        return gencode + "get_local_size(2)";
+    } else if(functionName == "llvm.cuda.syncthreads" || functionName == "_Z11syncthreadsv") {
+        return gencode + "barrier(CLK_GLOBAL_MEM_FENCE)";
+    } else if(functionName == "_Z11__shfl_downIfET_S0_ii") {
+        gencode += "__shfl_down_3(scratch, ";
+        int i = 0;
+        for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
+            Value *op = &*it->get();
+            if(i > 0) {
+                gencode += ", ";
+            }
+            gencode += stripOuterParams(dumpOperand(op));
+            i++;
+        }
+        gencode += ")";
+        return gencode;
+    } else if(functionName == "_Z11__shfl_downIfET_S0_i") {
+        gencode += "__shfl_down_2(scratch, ";
+        int i = 0;
+        for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
+            Value *op = &*it->get();
+            if(i > 0) {
+                gencode += ", ";
+            }
+            gencode += stripOuterParams(dumpOperand(op));
+            i++;
+        }
+        gencode += ")";
+        return gencode;
+    } else if(functionName == "_Z13__threadfencev") {
+        // Not sure if this is correct?
+        // seems to be correct-ish???
+        // what I understand:
+        // (from https://stackoverflow.com/questions/5232689/cuda-threadfence/5233737#5233737 )
+        // threadfence orders writes to memory, so if you do:
+        // - write data
+        // - threadfence
+        // - write flag
+        // => then if another thread sees the flag, the data that was written is guaranteed to be visible
+        // to it too
+        // I *think* that barrier(CLK_GLOBAL_MEM_FENCE) achieves the same thing, though it might be
+        // a bit too "strong" (ie slow)?
+        return gencode + "barrier(CLK_GLOBAL_MEM_FENCE)";
+    } else if(functionName == "llvm.lifetime.start") {
+        return "";  // just ignore for now
+    } else if(functionName == "llvm.lifetime.end") {
+        return "";  // just ignore for now
+    } else if(functionName == "_Z11make_float4ffff") {
+        // change this into something like: (float4)(a, b, c, d)
+        functionName = "(float4)";
+        internalfunc = true;
+    } else if(functionName == "_GLOBAL__sub_I_struct_initializer.cu") {
+        cerr << "WARNING: skipping _GLOBAL__sub_I_struct_initializer.cu" << endl;
+        return "";
+    } else if(functionName == "__nvvm_reflect") {
+        return gencode + " 0"; //ignore, (but pretend to return 0)
+    } else if(functionName == "llvm.memcpy.p0i8.p0i8.i64") {
+        return dumpMemcpyCharCharLong(instr);  // just ignore for now
+    } else if(functionNamesMap->isMappedFunction(functionName)) {
+        functionName = functionNamesMap->getFunctionMappedName(functionName);
+        internalfunc = true;
+    }
+    gencode += functionName + "(";
+    int i = 0;
+    for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
+        Value *op = &*it->get();
+        if(i > 0) {
+            gencode += ", ";
+        }
+        gencode += stripOuterParams(dumpOperand(op));
+        i++;
+    }
+    if(!internalfunc) {
+        if(i > 0) {
+            gencode += ", ";
+        }
+        gencode += "scratch";
+        Module *M = instr->getModule();
+        Function *F = M->getFunction(StringRef(functionName));
+        if(F != 0) {
+            neededFunctionCalls.insert(F);
+            // if(dumpedFunctions.find(F) == dumpedFunctions.end()) {
+            //     functionsToDump.insert(F);
+            // }
+        }
+    }
+    gencode += ")";
+    return gencode;
+}
+
 string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction) {
     auto opcode = instruction->getOpcode();
     string resultName = localNames->getOrCreateName(instruction);
@@ -715,9 +866,9 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         case Instruction::Store:
             instructionCode = dumpStore(cast<StoreInst>(instruction));
             break;
-        // case Instruction::Call:
-        //     instructionCode = dumpCall(cast<CallInst>(instruction));
-        //     break;
+        case Instruction::Call:
+            instructionCode = dumpCall(cast<CallInst>(instruction));
+            break;
         case Instruction::Load:
             instructionCode = dumpLoad(cast<LoadInst>(instruction));
             break;

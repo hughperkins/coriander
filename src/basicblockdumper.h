@@ -18,6 +18,7 @@
 #include "LocalNames.h"
 #include "type_dumper.h"
 #include "ExpressionsHelper.h"
+#include "function_names_map.h"
 
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Instructions.h"
@@ -34,11 +35,12 @@ public:
     // - ignores returns
     // - ignores phis
     BasicBlockDumper(llvm::BasicBlock *block, GlobalNames *globalNames, LocalNames *localNames,
-            TypeDumper *typeDumper) :
+            TypeDumper *typeDumper, FunctionNamesMap *functionNamesMap) :
         block(block),
         globalNames(globalNames),
         localNames(localNames),
-        typeDumper(typeDumper) {
+        typeDumper(typeDumper),
+        functionNamesMap(functionNamesMap) {
 
     }
     std::string toCl();
@@ -71,6 +73,8 @@ public:
     std::string dumpAlloca(llvm::Instruction *alloca);
     std::string dumpGetElementPtr(llvm::GetElementPtrInst *instr);
     std::string dumpSelect(llvm::SelectInst *instr);
+    std::string dumpMemcpyCharCharLong(llvm::CallInst *instr);
+    std::string dumpCall(llvm::CallInst *instr);
 
     std::string getAllocaDeclarations(std::string indent);
     std::string writeDeclarations(std::string indent);
@@ -80,19 +84,22 @@ public:
         return this;
     }
 
-protected:
-    llvm::BasicBlock *block;
-    bool _addIRToCl = false;
-
     std::set<llvm::Function *> neededFunctionCalls;
-    std::map<llvm::Value *, std::string> exprByValue;
     std::set<llvm::Value *> variablesToDeclare;
     std::set<llvm::Value *> sharedVariablesToDeclare;
     std::set<std::string> allocaDeclarations;
 
+protected:
+    llvm::BasicBlock *block;
+    bool _addIRToCl = false;
+
+    std::map<llvm::Value *, std::string> exprByValue;
+
     GlobalNames *globalNames;
     LocalNames *localNames;
     TypeDumper *typeDumper;
+
+    const FunctionNamesMap *functionNamesMap;
 };
 
 } // namespace cocl

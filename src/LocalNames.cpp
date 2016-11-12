@@ -56,6 +56,10 @@ std::string LocalNames::getOrCreateName(Value *value, std::string proposedName) 
     }
 }
 
+bool LocalNames::hasValue(llvm::Value *value) {
+    return nameByValue.find(value) != nameByValue.end();
+}
+
 std::string LocalNames::createName(Value *value, std::string name) {
     if(valueByName.find(name) != valueByName.end()) {
         valueByName[name]->dump();
@@ -65,6 +69,14 @@ std::string LocalNames::createName(Value *value, std::string name) {
     valueByName[name] = value;
     nameByValue[value] = name;
     return name;
+}
+
+std::string LocalNames::dumpNames() {
+    string res;
+    for(auto it=nameByValue.begin(); it != nameByValue.end(); it++) {
+        res += it->second + "\n";
+    }
+    return res;
 }
 
 } // namespace cocl

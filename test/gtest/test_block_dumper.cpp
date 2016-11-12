@@ -70,7 +70,8 @@ TEST(test_block_dumper, basic) {
     GlobalNames globalNames;
     LocalNames localNames;
     TypeDumper typeDumper(&globalNames);
-    BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper);
+    FunctionNamesMap functionNamesMap;
+    BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
     string cl = blockDumper.toCl();
     cout << cl << endl;
     string expectedBlockCl = R"(    v2 = (5 + 3) + 7;
@@ -139,6 +140,33 @@ TEST(test_block_dumper, basic) {
     int v33;
 )";
     ASSERT_EQ(expectedDeclarations, blockDumper.writeDeclarations("    "));
+}
+
+TEST(test_block_dumper, basic2) {
+    Function *F = getFunction("someKernel");
+    F->dump();
+    BasicBlock *block = &*F->begin();
+    GlobalNames globalNames;
+    LocalNames localNames;
+    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+        Argument *arg = &*it;
+        string name = arg->getName().str();
+        Value *value = arg;
+        localNames.getOrCreateName(value, name);
+    }
+    cout << localNames.dumpNames();
+    TypeDumper typeDumper(&globalNames);
+    FunctionNamesMap functionNamesMap;
+    BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
+    string cl = blockDumper.toCl();
+    cout << "cl:\n" << cl << endl;
+    cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
+
+    for(auto it=blockDumper.neededFunctionCalls.begin(); it != blockDumper.neededFunctionCalls.end(); it++) {
+        cout << "called function " << (*it)->getName().str() << endl;
+    }
+    ASSERT_EQ(1, blockDumper.neededFunctionCalls.size());
+    ASSERT_EQ(getFunction("someFunc"), *blockDumper.neededFunctionCalls.begin());
 }
 
 } // test_block_dumper
