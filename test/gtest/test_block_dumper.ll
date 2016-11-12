@@ -30,6 +30,8 @@ define i32 @main() {
   %26 = extractvalue %struct.mystruct %25, 0
   %27 = insertvalue %struct.mystruct %25, i32 4, 0
   %28 = insertvalue %struct.mystruct %27, float 1.5, 1
+  %29 = getelementptr %struct.mystruct , %struct.mystruct *%24, i32 0, i32 0
+  %30 = getelementptr %struct.mystruct , %struct.mystruct *%24, i32 0, i32 1
 
   ret i32 0
 }

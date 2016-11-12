@@ -401,69 +401,9 @@ string dumpChainedInstruction(int level, Instruction * instr) {
 //     }
 // }
 
-string dumpGetElementPtrRhs(GetElementPtrInst *instr) {
-    string gencode = "";
-    int numOperands = instr->getNumOperands();
-    string rhs = "";
-    rhs += "" + dumpOperand(instr->getOperand(0));
-    Type *currentType = instr->getOperand(0)->getType();
-    PointerType *op0typeptr = dyn_cast<PointerType>(instr->getOperand(0)->getType());
-    if(op0typeptr == 0) {
-        throw runtime_error("dumpgetelementptrrhs op0typeptr is 0");
-    }
-    int addressspace = op0typeptr->getAddressSpace();
-    // cout << "dumpgetlementptrrhs operand " << rhs << " addressspace=" << addressspace << endl;
-    if(addressspace == 3) { // local/shared memory
-        // pointer into shared memory.
-        addSharedDeclaration(instr->getOperand(0));
-    }
-    for(int d=0; d < numOperands - 1; d++) {
-        Type *newType = 0;
-        if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
-            if(d == 0) {
-                if(isa<ArrayType>(currentType->getPointerElementType())) {
-                    rhs = "(&" + rhs + ")";
-                }
-            }
-            string idxstring = dumpOperand(instr->getOperand(d + 1));
-            idxstring = stripOuterParams(idxstring);
-            rhs += string("[") + idxstring + "]";
-            newType = currentType->getPointerElementType();
-        } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
-            string structName = getName(structtype);
-            if(structName == "struct.float4") {
-                int idx = readInt32Constant(instr->getOperand(d + 1));
-                Type *elementType = structtype->getElementType(idx);
-                Type *castType = PointerType::get(elementType, addressspace);
-                newType = elementType;
-                rhs = "((" + dumpType(castType) + ")&" + rhs + ")";
-                rhs += string("[") + toString(idx) + "]";
-            } else {
-                // generic struct
-                int idx = readInt32Constant(instr->getOperand(d + 1));
-                Type *elementType = structtype->getElementType(idx);
-                rhs += string(".f") + toString(idx);
-                newType = elementType;
-            }
-        } else {
-            currentType->dump();
-            throw runtime_error("type not implemented in gpe");
-        }
-        // if new type is a pointer, and old type was a struct, then we assume its a global pointer, and therefore
-        // update the addressspace to be global, ie 1.  This is a bit hacky I know
-        if(isa<PointerType>(newType) && isa<StructType>(currentType)) {
-            addressspace = 1;
-        }
-        currentType = newType;
-    }
-    updateAddressSpace(instr, addressspace);
-    rhs = "(&" + rhs + ")";
-    return rhs;
-}
-
-string dumpGetElementPtr(GetElementPtrInst *instr) {
-    return dumpGetElementPtrRhs(instr);
-}
+// string dumpGetElementPtr(GetElementPtrInst *instr) {
+//     return dumpGetElementPtrRhs(instr);
+// }
 
 // std::string dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
 //     string gencode = "";

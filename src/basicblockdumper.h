@@ -69,6 +69,7 @@ public:
     std::string dumpLoad(llvm::LoadInst *instr);
     std::string dumpStore(llvm::StoreInst *instr);
     std::string dumpAlloca(llvm::Instruction *alloca);
+    std::string dumpGetElementPtr(llvm::GetElementPtrInst *instr);
 
     std::string getAllocaDeclarations(std::string indent);
     std::string writeDeclarations(std::string indent);
@@ -90,6 +91,7 @@ protected:
     std::set<llvm::Function *> neededFunctionCalls;
     std::map<llvm::Value *, std::string> exprByValue;
     std::set<llvm::Value *> variablesToDeclare;
+    std::set<llvm::Value *> sharedVariablesToDeclare;
     std::set<std::string> allocaDeclarations;
 
     GlobalNames *globalNames;
