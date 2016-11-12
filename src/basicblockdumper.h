@@ -84,11 +84,6 @@ protected:
     llvm::BasicBlock *block;
     bool _addIRToCl = false;
 
-    // const std::map<llvm::Value *, std::string> &existingNameByValue;
-    // std::map<llvm::Value *, std::string> neededPrivateNameByValue;
-    // std::map<llvm::Value *, std::string> neededGlobalNameByValue;
-    // std::map<llvm::Value *, std::string> neededLocalNameByValue;
-
     std::set<llvm::Function *> neededFunctionCalls;
     std::map<llvm::Value *, std::string> exprByValue;
     std::set<llvm::Value *> variablesToDeclare;
