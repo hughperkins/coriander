@@ -23,6 +23,7 @@
 #include "llvm/IR/Module.h"
 
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 using namespace llvm;
@@ -62,6 +63,41 @@ std::string getName(Value *value) {
 
 int readInt32Constant(Value *value) {
     return cast<ConstantInt>(value)->getSExtValue();
+}
+
+string dumpFloatConstant(ConstantFP *constantFP) {
+    double doubleValue;
+    float floatValue;
+    bool isDouble = false;
+    ostringstream oss;
+    const APFloat *apf = &constantFP->getValueAPF();
+    switch(constantFP->getType()->getTypeID()) {
+        case Type::FloatTyID:
+            floatValue = apf->convertToFloat();
+            oss << floatValue;
+            break;
+        case Type::DoubleTyID:
+            isDouble = true;
+            doubleValue = apf->convertToDouble();
+            oss << doubleValue;
+            break;
+        default:
+            throw runtime_error("unrecognized type");
+    }
+//         oss << floatvalue;
+    string valuestr = oss.str();
+    if(valuestr == "inf") {
+        return "INFINITY";
+    } else if(valuestr == "-inf") {
+        return "-INFINITY";
+    }
+    if(valuestr.find('.') == string::npos) {
+        valuestr += ".0";
+    }
+    if(!isDouble) {
+        valuestr += "f";
+    }
+    return valuestr;
 }
 
 float readFloatConstant(Value *value) {

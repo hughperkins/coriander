@@ -57,14 +57,14 @@ static llvm::LLVMContext context;
 static std::map<std::string, Value *> NamedValues;
 static std::map<string, bool> iskernel_by_name;
 
-map<Value *, string> nameByValue; // name here might be an entire subepxression
-map<Value *, string> origNameByValue; //origName here is just like v18, or v19, no expressions; its for debugging
-static int nextNameIdx;
-static string currentFunctionSharedDeclarations = "";
+// map<Value *, string> nameByValue; // name here might be an entire subepxression
+// map<Value *, string> origNameByValue; //origName here is just like v18, or v19, no expressions; its for debugging
+// static int nextNameIdx;
+// static string currentFunctionSharedDeclarations = "";
 static map<string, string> currentFunctionPhiDeclarationsByName;
-static string globalDeclarations = "";
-static string structpointershimcode = "";
-static set<Value *> functionNeededForwardDeclarations;
+// static string globalDeclarations = "";
+// static string structpointershimcode = "";
+// static set<Value *> functionNeededForwardDeclarations;
 static map<BasicBlock *, int> functionBlockIndex;
 static set<Value *> currentFunctionAlreadyDeclaredShared;
 // static set<Value *>valuesAreExpressions;
@@ -72,9 +72,9 @@ static set<Value *> currentFunctionAlreadyDeclaredShared;
 static set<Function *> dumpedFunctions;
 static set<Function *>functionsToDump;
 
-extern bool single_precision;
+// extern bool single_precision;
 
-bool single_precision = true;
+// bool single_precision = true;
 
 bool runBranchingTransforms = false;
 bool dumpTransforms = false;
@@ -128,66 +128,6 @@ inline float __atomic_add(global volatile float *ptr, float val) { // we need to
 }
 
 )";
-
-bool isValidExpression(string instructionCode);
-bool isSingleExpression(string instructionCode);
-
-std::string stripOuterParams(string instructionCode) {
-    if(instructionCode[0] != '(' || instructionCode[instructionCode.size() - 1] != ')') {
-        return instructionCode;
-    }
-    string innerString = instructionCode.substr(1, instructionCode.size() - 2);
-    if(innerString[0] == '&') {
-        return instructionCode;
-    }
-    // COCL_PRINT(cout << "innerString [" << innerString << "]" << endl);
-    if(isValidExpression(innerString)) {
-        // COCL_PRINT(cout << "stripping braces" << endl);
-        instructionCode = innerString;
-    }
-    return instructionCode;
-}
-
-bool isSingleExpression(string instructionCode) {
-    int depth = 0;
-    int len = instructionCode.size();
-    for(int pos = 0; pos < len; pos++) {
-        char thischar = instructionCode[pos];
-        if(thischar == '(') {
-            depth++;
-        } else if(thischar == ')') {
-            depth--;
-            if(depth == 0 && pos != len - 1) {
-                return false;
-            }
-        } else if(depth == 0 &&
-                thischar != '[' && thischar != ']' &&
-                thischar != '_' &&
-                (thischar < 'a' || thischar > 'z') &&
-                (thischar < 'A' || thischar > 'Z') &&
-                (thischar < '0' || thischar > '9')) {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool isValidExpression(string instructionCode) {
-    int depth = 0;
-    int len = instructionCode.size();
-    for(int pos = 0; pos < len; pos++) {
-        char thischar = instructionCode[pos];
-        if(thischar == '(') {
-            depth++;
-        } else if(thischar == ')') {
-            depth--;
-            if(depth < 0) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
 
 std::string dumpValue(Value *value) {
     std::string gencode = "";
@@ -318,69 +258,69 @@ string dumpChainedInstruction(int level, Instruction * instr) {
     }
 }
 
-    string dumpConstant(Constant *constant) {
-    unsigned int valueTy = constant->getValueID();
-    ostringstream oss;
-    if(ConstantInt *constantInt = dyn_cast<ConstantInt>(constant)) {
-        oss << constantInt->getSExtValue();
-        string constantintval = oss.str();
-        return constantintval;
-    } else if(isa<ConstantStruct>(constant)) {
-        throw runtime_error("constantStruct not implemented in dumpconstnat");
-    } else if(ConstantExpr *expr = dyn_cast<ConstantExpr>(constant)) {
-        Instruction *instr = expr->getAsInstruction();
-        copyAddressSpace(constant, instr);
-        string dcires = dumpChainedInstruction(0, instr);
-        copyAddressSpace(instr, constant);
-        nameByValue[constant] = dcires;
-        return dcires;
-    } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
-        float floatvalue = readFloatConstant(constantFP);
-        // float floatvalue = constantFP->getValueAPF().convertToFloat();
-        ostringstream oss;
-        oss << floatvalue;
-        string floatvaluestr = oss.str();
-        if(floatvaluestr == "inf") {
-            return "INFINITY";
-        } else if(floatvaluestr == "-inf") {
-            return "-INFINITY";
-        }
-        if(single_precision) {
-            if(floatvaluestr.find('.') == string::npos) {
-                floatvaluestr += ".0";
-            }
-            floatvaluestr += "f";
-        }
-        return floatvaluestr;
-    } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
-         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
-             int addressspace = pointerType->getAddressSpace();
-             string name = getName(global);
-             if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
-                 return name;
-             }
-         }
-         if(nameByValue.find(constant) != nameByValue.end()) {
-            return nameByValue[constant];
-         }
-         string name = getName(global);
-         string ourinstrstr = "(&" + name + ")";
-         updateAddressSpace(constant, 4);
-         nameByValue[constant] = ourinstrstr;
+// string dumpConstant(Constant *constant) {
+//     unsigned int valueTy = constant->getValueID();
+//     ostringstream oss;
+//     if(ConstantInt *constantInt = dyn_cast<ConstantInt>(constant)) {
+//         oss << constantInt->getSExtValue();
+//         string constantintval = oss.str();
+//         return constantintval;
+//     } else if(isa<ConstantStruct>(constant)) {
+//         throw runtime_error("constantStruct not implemented in dumpconstnat");
+//     } else if(ConstantExpr *expr = dyn_cast<ConstantExpr>(constant)) {
+//         Instruction *instr = expr->getAsInstruction();
+//         copyAddressSpace(constant, instr);
+//         string dcires = dumpChainedInstruction(0, instr);
+//         copyAddressSpace(instr, constant);
+//         nameByValue[constant] = dcires;
+//         return dcires;
+//     } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
+//         float floatvalue = readFloatConstant(constantFP);
+//         // float floatvalue = constantFP->getValueAPF().convertToFloat();
+//         ostringstream oss;
+//         oss << floatvalue;
+//         string floatvaluestr = oss.str();
+//         if(floatvaluestr == "inf") {
+//             return "INFINITY";
+//         } else if(floatvaluestr == "-inf") {
+//             return "-INFINITY";
+//         }
+//         if(single_precision) {
+//             if(floatvaluestr.find('.') == string::npos) {
+//                 floatvaluestr += ".0";
+//             }
+//             floatvaluestr += "f";
+//         }
+//         return floatvaluestr;
+//     } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
+//          if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
+//              int addressspace = pointerType->getAddressSpace();
+//              string name = getName(global);
+//              if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
+//                  return name;
+//              }
+//          }
+//          if(nameByValue.find(constant) != nameByValue.end()) {
+//             return nameByValue[constant];
+//          }
+//          string name = getName(global);
+//          string ourinstrstr = "(&" + name + ")";
+//          updateAddressSpace(constant, 4);
+//          nameByValue[constant] = ourinstrstr;
 
-         return ourinstrstr;
-    } else if(isa<UndefValue>(constant)) {
-        return "";
-    } else if(isa<ConstantPointerNull>(constant)) {
-        return "0";
-    } else {
-        cout << "valueTy " << valueTy << endl;
-        oss << "unknown";
-        constant->dump();
-        throw runtime_error("unknown constnat type");
-    }
-    return oss.str();
-}
+//          return ourinstrstr;
+//     } else if(isa<UndefValue>(constant)) {
+//         return "";
+//     } else if(isa<ConstantPointerNull>(constant)) {
+//         return "0";
+//     } else {
+//         cout << "valueTy " << valueTy << endl;
+//         oss << "unknown";
+//         constant->dump();
+//         throw runtime_error("unknown constnat type");
+//     }
+//     return oss.str();
+// }
 
 
 string dumpOperand(Value *value) {
@@ -708,15 +648,15 @@ std::string dumpExtractValue(ExtractValueInst *instr) {
     return gencode;
 }
 
-std::string dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
-    string gencode = "";
-    Value *op1 = instr->getOperand(0);
-    gencode += dumpValue(op1) + " ";
-    gencode += opstring + " ";
-    Value *op2 = instr->getOperand(1);
-    gencode += dumpOperand(op2);
-    return gencode;
-}
+// std::string dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
+//     string gencode = "";
+//     Value *op1 = instr->getOperand(0);
+//     gencode += dumpValue(op1) + " ";
+//     gencode += opstring + " ";
+//     Value *op2 = instr->getOperand(1);
+//     gencode += dumpOperand(op2);
+//     return gencode;
+// }
 
 std::string dumpBitCastRhs(BitCastInst *instr) {
     string gencode = "";

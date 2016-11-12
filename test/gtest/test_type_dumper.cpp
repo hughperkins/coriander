@@ -31,6 +31,8 @@ using namespace std;
 using namespace cocl;
 using namespace llvm;
 
+namespace test_type_dumper {
+    
 LLVMContext context;
 unique_ptr<Module>M;
 
@@ -240,3 +242,5 @@ TEST(test_type_dumper, mystruct2) {
     ASSERT_NE(structDefinitions.find("float* f2;"), string::npos);
     ASSERT_NE(structDefinitions.find("float* f3;"), string::npos);
 }
+
+} // namespace test_type_dumper

@@ -1,8 +1,25 @@
+// Copyright Hugh Perkins 2016
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "basicblockdumper.h"
+
+#include "readIR.h"
 
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constants.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -13,39 +30,100 @@ using namespace llvm;
 
 namespace cocl {
 
-void BasicBlockDumper::storeValueName(Value *value) {
-    if(exprByValue.find(value) != exprByValue.end()) {
-        return;
-    }
-    if(value->hasName()) {
-        string name = getName(value);
-        if(name[0] == '.') {
-            name = "v" + name;
-        }
-        name = replace(name, '.', '_');
-        name = replace(name, '-', '_');
-        name = replace(name, '$', '_');
-        if(name == "kernel") {
-            name = "_kernel";
-        }
-        exprByValue[value] = name;
+// void BasicBlockDumper::storeValueName(Value *value) {
+//     if(exprByValue.find(value) != exprByValue.end()) {
+//         return;
+//     }
+//     if(value->hasName()) {
+//         string name = getName(value);
+//         if(name[0] == '.') {
+//             name = "v" + name;
+//         }
+//         name = replace(name, '.', '_');
+//         name = replace(name, '-', '_');
+//         name = replace(name, '$', '_');
+//         if(name == "kernel") {
+//             name = "_kernel";
+//         }
+//         exprByValue[value] = name;
+//     } else {
+//         int idx = nextNameIdx;
+//         nextNameIdx++;
+//         ostringstream oss;
+//         oss << "v" << idx;
+//         string name = oss.str();
+//         exprByValue[value] = name;
+//     }
+// }
+
+// maybe this should be somewhere more generic?
+string BasicBlockDumper::dumpConstant(Constant *constant) {
+    unsigned int valueTy = constant->getValueID();
+    ostringstream oss;
+    if(ConstantInt *constantInt = dyn_cast<ConstantInt>(constant)) {
+        oss << constantInt->getSExtValue();
+        string constantintval = oss.str();
+        return constantintval;
+    } else if(isa<ConstantStruct>(constant)) {
+        throw runtime_error("constantStruct not implemented in basicblockdumper.dumpconstnat");
+    } else if(ConstantExpr *expr = dyn_cast<ConstantExpr>(constant)) {
+        throw runtime_error("constantExpr not implemented in basicblockdumper.dumpconstnat");
+        // Instruction *instr = expr->getAsInstruction();
+        // copyAddressSpace(constant, instr);
+        // string dcires = dumpChainedInstruction(0, instr);
+        // // copyAddressSpace(instr, constant);
+        // nameByValue[constant] = dcires;
+        // return dcires;
+    } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
+        return dumpFloatConstant(constantFP);
+    } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
+        throw runtime_error("GlobalValue not implemented in basicblockdumper.dumpconstnat");
+         // if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
+         //     int addressspace = pointerType->getAddressSpace();
+         //     string name = getName(global);
+         //     if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
+         //         return name;
+         //     }
+         // }
+         // if(nameByValue.find(constant) != nameByValue.end()) {
+         //    return nameByValue[constant];
+         // }
+         // string name = getName(global);
+         // string ourinstrstr = "(&" + name + ")";
+         // updateAddressSpace(constant, 4);
+         // nameByValue[constant] = ourinstrstr;
+
+         // return ourinstrstr;
+    } else if(isa<UndefValue>(constant)) {
+        return "";
+    } else if(isa<ConstantPointerNull>(constant)) {
+        return "0";
     } else {
-        int idx = nextNameIdx;
-        nextNameIdx++;
-        ostringstream oss;
-        oss << "v" << idx;
-        string name = oss.str();
-        exprByValue[value] = name;
+        cout << "valueTy " << valueTy << endl;
+        oss << "unknown";
+        constant->dump();
+        throw runtime_error("unknown constnat type");
     }
+    return oss.str();
+}
+
+std::string BasicBlockDumper::dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
+    string gencode = "";
+    Value *op1 = instr->getOperand(0);
+    gencode += dumpOperand(op1) + " ";
+    gencode += opstring + " ";
+    Value *op2 = instr->getOperand(1);
+    gencode += dumpOperand(op2);
+    return gencode;
 }
 
 string BasicBlockDumper::dumpOperand(Value *value) {
     if(exprByValue.find(value) != exprByValue.end()) {
         return exprByValue[value];
     }
-    // if(Constant *constant = dyn_cast<Constant>(value)) {
-    //     return dumpConstant(constant);
-    // }
+    if(Constant *constant = dyn_cast<Constant>(value)) {
+        return dumpConstant(constant);
+    }
     // if(isa<BasicBlock>(value)) {
     //     storeValueName(value);
     //     return nameByValue[value];
@@ -79,9 +157,13 @@ std::string BasicBlockDumper::dumpReturn(ReturnInst *retInst) {
 
 string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction) {
     auto opcode = instruction->getOpcode();
-    storeValueName(instruction);
-    string resultName = exprByValue[instruction];
-    string resultType = dumpType(instruction->getType());
+    string resultName = localNames->getOrCreateName(instruction);
+    // string 
+    // storeValueName(instruction);
+    // string resultName = localNames->getOrCreateName(instruction);
+    // string resultName = exprByValue[instruction];
+    exprByValue[instruction] = resultName;
+    string resultType = typeDumper->dumpType(instruction->getType());
 
     string gencode = "";
     string instructionCode = "";
@@ -95,68 +177,73 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         // COCL_PRINT(cout << endl);
     // }
     // lets dump the original isntruction, commented out
-    string originalinstruction ="";
-    originalinstruction += resultType + " " + resultName + " =";
-    originalinstruction += " " + string(instruction->getOpcodeName());
+    string originalInstruction ="";
+    originalInstruction += resultType + " " + resultName + " =";
+    originalInstruction += " " + string(instruction->getOpcodeName());
     for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
         Value *op = &*it->get();
-        originalinstruction += " ";
-        if(origNameByValue.find(op) != exprByValue.end()) {
-            originalinstruction += exprByValue[op];
-        } else {
-            originalinstruction += "<unk>";
+        originalInstruction += " ";
+        string originalName = localNames->getNameOrEmpty(op);
+        if(originalName == "") {
+            originalName = "<unk";
         }
+        originalInstruction += originalName;
+        // if(origNameByValue.find(op) != exprByValue.end()) {
+        //     originalInstruction += exprByValue[op];
+        // } else {
+        //     originalInstruction += "<unk>";
+        // }
     }
-    // gencode += "/* " + originalinstruction + " */\n    ";
+    // gencode += "/* " + originalInstruction + " */\n    ";
     switch(opcode) {
-        // case Instruction::FAdd:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
-        //     break;
-        // case Instruction::FSub:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "-");
-        //     break;
-        // case Instruction::FMul:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "*");
-        //     break;
-        // case Instruction::FDiv:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
-        //     break;
-        // case Instruction::Sub:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "-");
-        //     break;
-        // case Instruction::Add:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
-        //     break;
-        // case Instruction::Mul:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "*");
-        //     break;
-        // case Instruction::SDiv:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
-        //     break;
-        // case Instruction::UDiv:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
-        //     break;
-        // case Instruction::SRem:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "%");
-        //     break;
-        // case Instruction::And:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "&");
-        //     break;
-        // case Instruction::Or:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "|");
-        //     break;
-        // case Instruction::Xor:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "^");
-        //     break;
-        // case Instruction::LShr:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
-        //     break;
-        // case Instruction::Shl:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "<<");
-        //     break;
-        // case Instruction::AShr:
-        //     instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
-        //     break;
+        case Instruction::FAdd:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
+            break;
+        case Instruction::FSub:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "-");
+            break;
+        case Instruction::FMul:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "*");
+            break;
+        case Instruction::FDiv:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
+            break;
+        case Instruction::Sub:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "-");
+            break;
+        case Instruction::Add:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
+            break;
+        case Instruction::Mul:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "*");
+            break;
+        case Instruction::SDiv:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
+            break;
+        case Instruction::UDiv:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "/");
+            break;
+        case Instruction::SRem:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "%");
+            break;
+        case Instruction::And:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "&");
+            break;
+        case Instruction::Or:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "|");
+            break;
+        case Instruction::Xor:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "^");
+            break;
+        case Instruction::LShr:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
+            break;
+        case Instruction::Shl:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "<<");
+            break;
+        case Instruction::AShr:
+            instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), ">>");
+            break;
         // case Instruction::Store:
         //     instructionCode = dumpStore(cast<StoreInst>(instruction));
         //     break;
@@ -245,7 +332,7 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
             cout << "opcode string " << instruction->getOpcodeName() << endl;
             throw runtime_error("unknown opcode");
     }
-    string typestr = dumpType(instruction->getType());
+    string typestr = typeDumper->dumpType(instruction->getType());
     Use *use = 0;
     User *use_user = 0;
     bool weArePointer = isa<PointerType>(instruction->getType());
@@ -265,35 +352,43 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         if(!isSingleExpression(instructionCode)) {
             instructionCode= "(" + instructionCode + ")";
         }
-        nameByValue[instruction] = instructionCode;
-        if(add_ir_to_cl) {
-            return "/* " + originalinstruction + " */\n" + indent;
+        exprByValue[instruction] = instructionCode;
+        // nameByValue[instruction] = instructionCode;
+        if(_addIRToCl) {
+            return "/* " + originalInstruction + " */\n" + indent;
         } else {
             return "";
         }
         // return "";
     } else {
-        if(add_ir_to_cl) {
-            gencode += "/* " + originalinstruction + " */\n" + indent;
-        }
-        if(typestr != "void") {
-            instructionCode = stripOuterParams(instructionCode);
-            functionNeededForwardDeclarations.insert(instruction);
-            gencode += dumpOperand(instruction) + " = ";
+        if(_addIRToCl) {
+            gencode += "/* " + originalInstruction + " */\n" + indent;
         }
         if(instructionCode != "") {
-            gencode += indent + instructionCode + ";\n";
+            gencode += indent;
+            if(typestr != "void") {
+                instructionCode = stripOuterParams(instructionCode);
+                // functionNeededForwardDeclarations.insert(instruction);
+                variablesToDeclare[instruction] = resultName;
+                gencode += dumpOperand(instruction) + " = ";
+            }
+            gencode += instructionCode + ";\n";
         }
     }
     return gencode;
 }
 
 std::string BasicBlockDumper::toCl() {
-    gencode = "";
+    string gencode = "";
     for(auto it = block->begin(); it != block->end(); it++) {
         Instruction *inst = &*it;
-        gencode += dumpInstruction("    ", inst);
+        inst->dump();
+        // cout << endl;
+        string instructionCode = dumpInstruction("    ", inst);
+        cout << "instructionCode [" << instructionCode << "]" << endl;
+        gencode += instructionCode;
     }
+    return gencode;
 }
 
 } // namespace cocl

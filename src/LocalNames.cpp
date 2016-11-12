@@ -20,6 +20,14 @@ std::string LocalNames::getName(Value *value) {
     return it->second;
 }
 
+std::string LocalNames::getNameOrEmpty(Value *value) {
+    auto it = nameByValue.find(value);
+    if(it == nameByValue.end()) {
+        return "";
+    }
+    return it->second;
+}
+
 std::string LocalNames::getOrCreateName(Value *value, std::string proposedName) {
     auto it = nameByValue.find(value);
     if(it != nameByValue.end()) {

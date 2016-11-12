@@ -10,6 +10,7 @@ namespace cocl {
 class LocalNames {
 public:
     std::string getName(llvm::Value *value);
+    std::string getNameOrEmpty(llvm::Value *value);
     std::string getOrCreateName(llvm::Value *value, std::string proposedName="");
     std::map<llvm::Value *, std::string> nameByValue;
 protected:

@@ -50,7 +50,7 @@ set(COCL_SRCS src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cp
     src/flowcontrol/conditionalbranch.cpp src/flowcontrol/dowhile.cpp src/flowcontrol/if.cpp
     src/flowcontrol/for.cpp src/flowcontrol/rootblock.cpp src/flowcontrol/block.cpp)
 set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp
-    src/struct_clone.cpp
+    src/struct_clone.cpp src/basicblockdumper.cpp src/ExpressionsHelper.cpp src/readIR.cpp
 )
 
 set(CMAKE_CC_FLAGS "-fPIC")
@@ -71,6 +71,7 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 #     src/flowcontrol/returnblock.cpp src/flowcontrol/sequence.cpp src/flowcontrol/basicblockblock.cpp
 #     src/flowcontrol/conditionalbranch.cpp src/flowcontrol/dowhile.cpp src/flowcontrol/if.cpp
 #     src/flowcontrol/for.cpp src/flowcontrol/rootblock.cpp src/flowcontrol/block.cpp
+#     src/ir-to-opencl_main.cpp
 # )
 # target_include_directories(ir-to-opencl PRIVATE src)
 # target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
@@ -201,7 +202,7 @@ if(BUILD_TESTS)
     endif()
 
     add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
-        # test/gtest/test_block_dumper.cpp src/basicblockdumper.cpp
+        test/gtest/test_block_dumper.cpp
         test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
         test/gtest/test_struct_cloner.cpp
     )

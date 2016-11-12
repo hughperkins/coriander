@@ -24,7 +24,7 @@
 
 std::string dumpInstruction(std::string indent, llvm::Instruction *instruction);
 std::string dumpOperand(llvm::Value *value);
-std::string dumpConstant(llvm::Constant *constant);
+// std::string dumpConstant(llvm::Constant *constant);
 std::string dumpGetElementPtr(llvm::GetElementPtrInst *instr);
 std::string dumpGetElementPtrRhs(llvm::GetElementPtrInst *instr);
 std::string dumpChainedInstruction(int level, llvm::Instruction * instr);
