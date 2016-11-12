@@ -70,6 +70,7 @@ public:
     std::string dumpStore(llvm::StoreInst *instr);
     std::string dumpAlloca(llvm::Instruction *alloca);
     std::string dumpGetElementPtr(llvm::GetElementPtrInst *instr);
+    std::string dumpSelect(llvm::SelectInst *instr);
 
     std::string getAllocaDeclarations(std::string indent);
     std::string writeDeclarations(std::string indent);

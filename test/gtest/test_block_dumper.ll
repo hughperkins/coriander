@@ -32,6 +32,8 @@ define i32 @main() {
   %28 = insertvalue %struct.mystruct %27, float 1.5, 1
   %29 = getelementptr %struct.mystruct , %struct.mystruct *%24, i32 0, i32 0
   %30 = getelementptr %struct.mystruct , %struct.mystruct *%24, i32 0, i32 1
+  %31 = icmp slt i32 %2, 4
+  %32 = select i1 %31, i32 21, i32 44
 
   ret i32 0
 }

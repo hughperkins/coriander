@@ -322,99 +322,6 @@ string dumpChainedInstruction(int level, Instruction * instr) {
 //     return oss.str();
 // }
 
-
-// string dumpOperand(Value *value) {
-//     if(nameByValue.find(value) != nameByValue.end()) {
-//         return nameByValue[value];
-//     }
-//     if(Constant *constant = dyn_cast<Constant>(value)) {
-//         return dumpConstant(constant);
-//     }
-//     if(isa<BasicBlock>(value)) {
-//         storeValueName(value);
-//         return nameByValue[value];
-//     }
-//     if(PHINode *phi = dyn_cast<PHINode>(value)) {
-//         addPHIDeclaration(phi);
-//         string name = nameByValue[value];
-//         return name;
-//     }
-//     // lets just declare it???
-//     storeValueName(value);
-//     functionNeededForwardDeclarations.insert(value);
-//     return nameByValue[value];
-// }
-
-// void storeValueName(Value *value) {
-//     if(nameByValue.find(value) != nameByValue.end()) {
-//         return;
-//     }
-//     if(value->hasName()) {
-//         string name = getName(value);
-//         if(name[0] == '.') {
-//             name = "v" + name;
-//         }
-//         name = replace(name, '.', '_');
-//         name = replace(name, '-', '_');
-//         name = replace(name, '$', '_');
-//         if(name == "kernel") {
-//             name = "_kernel";
-//         }
-//         nameByValue[value] = name;
-//     } else {
-//         int idx = nextNameIdx;
-//         nextNameIdx++;
-//         ostringstream oss;
-//         oss << "v" << idx;
-//         string name = oss.str();
-//         nameByValue[value] = name;
-//         origNameByValue[value] = name;
-//     }
-// }
-
-// void addSharedDeclaration(Value *value) {
-//     value ->dump();
-//     // if(nameByValue.find(value) != nameByValue.end()) {
-//     if(currentFunctionAlreadyDeclaredShared.find(value) != currentFunctionAlreadyDeclaredShared.end()) {
-//         // cout << "already in nameByValue, so returning" << endl;
-//         return;
-//     }
-//     if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
-//         // cout << "got glob" << endl;
-//         string name = getName(glob);
-//         string declaration = "";
-//         Type *type = glob->getType();
-//         if(ArrayType *arraytype = dyn_cast<ArrayType>(type->getPointerElementType())) {
-//             // cout << "its an array" << endl;
-//             int length = arraytype->getNumElements();
-//             Type *elementType = arraytype->getElementType();
-//             string typestr = dumpType(elementType);
-//             declaration += "    local " + typestr + " " + name + "[" + toString(length) + "];\n";
-//             nameByValue[value] = name;
-//             currentFunctionSharedDeclarations += declaration;
-//             currentFunctionAlreadyDeclaredShared.insert(value);
-//         } else {
-//             // cout << "not an array" << endl;
-//         }
-//     } else {
-//         // cout << "not globalvaraibel" << endl;
-//     }
-// }
-
-// string dumpGetElementPtr(GetElementPtrInst *instr) {
-//     return dumpGetElementPtrRhs(instr);
-// }
-
-// std::string dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
-//     string gencode = "";
-//     Value *op1 = instr->getOperand(0);
-//     gencode += dumpValue(op1) + " ";
-//     gencode += opstring + " ";
-//     Value *op2 = instr->getOperand(1);
-//     gencode += dumpOperand(op2);
-//     return gencode;
-// }
-
 std::string dumpMemcpyCharCharLong(CallInst *instr) {
     std::string gencode = "";
     int totalLength = cast<ConstantInt>(instr->getOperand(2))->getSExtValue();
@@ -673,15 +580,6 @@ std::string dumpBranch(BranchInst *instr) {
             throw runtime_error("not implemented sucessors != 1 for unconditional br");
         }
     }
-    return gencode;
-}
-
-std::string dumpSelect(SelectInst *instr) {
-    string gencode = "";
-    copyAddressSpace(instr->getOperand(1), instr);
-    gencode += dumpOperand(instr->getCondition()) + " ? ";
-    gencode += dumpOperand(instr->getOperand(1)) + " : ";
-    gencode += dumpOperand(instr->getOperand(2));
     return gencode;
 }
 

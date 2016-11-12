@@ -549,6 +549,15 @@ std::string BasicBlockDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr) 
     return rhs;
 }
 
+std::string BasicBlockDumper::dumpSelect(SelectInst *instr) {
+    string gencode = "";
+    // copyAddressSpace(instr->getOperand(1), instr);
+    gencode += dumpOperand(instr->getCondition()) + " ? ";
+    gencode += dumpOperand(instr->getOperand(1)) + " : ";
+    gencode += dumpOperand(instr->getOperand(2));
+    return gencode;
+}
+
 string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction) {
     auto opcode = instruction->getOpcode();
     string resultName = localNames->getOrCreateName(instruction);
@@ -684,10 +693,10 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         // case Instruction::IntToPtr:
         //     instructionCode = dumpInttoPtr(cast<IntToPtrInst>(instruction));
         //     break;
-        // case Instruction::Select:
-        //     // COCL_PRINT(cout << "its a select" << endl);
-        //     instructionCode = dumpSelect(cast<SelectInst>(instruction));
-        //     break;
+        case Instruction::Select:
+            // COCL_PRINT(cout << "its a select" << endl);
+            instructionCode = dumpSelect(cast<SelectInst>(instruction));
+            break;
         case Instruction::GetElementPtr:
             instructionCode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
             break;
