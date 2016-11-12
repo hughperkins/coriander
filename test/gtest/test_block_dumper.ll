@@ -7,5 +7,6 @@ define i32 @main() {
   %6 = alloca i32, i32 1
   %7 = load i32, i32 *%6
   %8 = alloca float, i32 1
+  store float %5, float *%8
   ret i32 0
 }

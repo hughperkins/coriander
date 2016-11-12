@@ -448,13 +448,13 @@ string dumpChainedInstruction(int level, Instruction * instr) {
 //     return rhs;
 // }
 
-string dumpStore(StoreInst *instr) {
-    string gencode = "";
-    string rhs = dumpOperand(instr->getOperand(0));
-    rhs = stripOuterParams(rhs);
-    gencode += dumpOperand(instr->getOperand(1)) + "[0] = " + rhs;
-    return gencode;
-}
+// string dumpStore(StoreInst *instr) {
+//     string gencode = "";
+//     string rhs = dumpOperand(instr->getOperand(0));
+//     rhs = stripOuterParams(rhs);
+//     gencode += dumpOperand(instr->getOperand(1)) + "[0] = " + rhs;
+//     return gencode;
+// }
 
 void addSharedDeclaration(Value *value) {
     value ->dump();

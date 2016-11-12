@@ -51,6 +51,7 @@ public:
     std::string dumpInstruction(std::string indent, llvm::Instruction *instruction);
     std::string getAllocaDeclarations(std::string indent);
     std::string dumpLoad(llvm::LoadInst *instr);
+    std::string dumpStore(llvm::StoreInst *instr);
     BasicBlockDumper *addIRToCl() {
         _addIRToCl = true;
         return this;

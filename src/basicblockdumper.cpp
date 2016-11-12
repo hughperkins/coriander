@@ -221,6 +221,14 @@ std::string BasicBlockDumper::dumpLoad(llvm::LoadInst *instr) {
     return rhs;
 }
 
+std::string BasicBlockDumper::dumpStore(llvm::StoreInst *instr) {
+    string gencode = "";
+    string rhs = dumpOperand(instr->getOperand(0));
+    rhs = stripOuterParams(rhs);
+    gencode += dumpOperand(instr->getOperand(1)) + "[0] = " + rhs;
+    return gencode;
+}
+
 string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction) {
     auto opcode = instruction->getOpcode();
     string resultName = localNames->getOrCreateName(instruction);
@@ -369,9 +377,9 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         // case Instruction::ExtractValue:
         //     instructionCode = dumpExtractValue(cast<ExtractValueInst>(instruction));
         //     break;
-        // case Instruction::Store:
-        //     instructionCode = dumpStore(cast<StoreInst>(instruction));
-        //     break;
+        case Instruction::Store:
+            instructionCode = dumpStore(cast<StoreInst>(instruction));
+            break;
         // case Instruction::Call:
         //     instructionCode = dumpCall(cast<CallInst>(instruction));
         //     break;
