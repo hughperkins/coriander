@@ -265,6 +265,7 @@ std::string FunctionDumper::toCl() {
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
         functionBlockIndex[basicBlock] = i;
+        localNames.getOrCreateName(basicBlock);
         i++;
     }
 

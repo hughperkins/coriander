@@ -29,7 +29,7 @@ using namespace llvm;
 
 // extern bool add_ir_to_cl;
 
-void convertLlFileToClFile(string llFilename, string ClFilename, string specificFunction);
+// void convertLlFileToClFile(string llFilename, string ClFilename, string specificFunction);
 
 int main(int argc, char *argv[]) {
     string llFilename;

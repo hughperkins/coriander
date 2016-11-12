@@ -44,6 +44,9 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp
     src/struct_clone.cpp src/basicblockdumper.cpp src/ExpressionsHelper.cpp src/readIR.cpp
     src/function_names_map.cpp src/function_dumper.cpp src/kernel_dumper.cpp src/mutations.cpp
     src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp
+    src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cpp src/cocl_device.cpp src/cocl_error.cpp
+    src/cocl_memory.cpp src/cocl_properties.cpp src/cocl_streams.cpp src/cocl_clsources.cpp src/cocl_context.cpp
+    src/ir-to-opencl.cpp
 )
 
 set(CMAKE_CC_FLAGS "-fPIC")
@@ -56,6 +59,11 @@ add_definitions(-D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D
 set (LLVM_LIBS /usr/lib/llvm-3.8/lib/libLLVM.so)
 
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
+
+add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp)
+target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
+target_include_directories(ir-to-opencl PRIVATE /usr/lib/llvm-3.8/include)
+target_link_libraries(ir-to-opencl cocl)
 
 # add_executable(ir-to-opencl
 #     src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/mutations.cpp src/readIR.cpp src/struct_clone.cpp

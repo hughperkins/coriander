@@ -21,16 +21,20 @@
 
 #include <string>
 
-std::string dumpInstruction(std::string indent, llvm::Instruction *instruction);
-std::string dumpOperand(llvm::Value *value);
-std::string dumpChainedInstruction(int level, llvm::Instruction * instr);
-void updateAddressSpace(llvm::Value *value, int newSpace);
-void copyAddressSpace(llvm::Value *src, llvm::Value *dest);
-std::string getName(llvm::Value *value);
-std::string getName(llvm::StructType *value);
-std::string getName(llvm::Function *value);
-void addPHIDeclaration(llvm::PHINode *phi);
-std::string dumpValue(llvm::Value *value);
-std::string dumpReturn(llvm::ReturnInst *retInst);
-std::string dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock);
+// std::string dumpInstruction(std::string indent, llvm::Instruction *instruction);
+// std::string dumpOperand(llvm::Value *value);
+// std::string dumpChainedInstruction(int level, llvm::Instruction * instr);
+// void updateAddressSpace(llvm::Value *value, int newSpace);
+// void copyAddressSpace(llvm::Value *src, llvm::Value *dest);
+// std::string getName(llvm::Value *value);
+// std::string getName(llvm::StructType *value);
+// std::string getName(llvm::Function *value);
+// void addPHIDeclaration(llvm::PHINode *phi);
+// std::string dumpValue(llvm::Value *value);
+// std::string dumpReturn(llvm::ReturnInst *retInst);
+// std::string dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock);
+// std::string convertLlStringToCl(std::string llString, std::string specificFunction);
+
+std::string convertModuleToCl(llvm::Module *M, std::string specificFunction);
 std::string convertLlStringToCl(std::string llString, std::string specificFunction);
+void convertLlFileToClFile(std::string llFilename, std::string ClFilename, std::string specificFunction);
