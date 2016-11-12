@@ -12,6 +12,11 @@ define void @float32() {
   ret void
 }
 
+define void @float64() {
+  %1 = fadd double 1.25, 3.0
+  ret void
+}
+
 define void @pointer_float32() {
     %1 = alloca float, i32 1
     ret void

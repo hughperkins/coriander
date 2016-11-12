@@ -8,6 +8,7 @@
 // #include "llvm/IR/FunctionType.h"
 
 #include <iostream>
+#include <set>
 
 using namespace std;
 using namespace llvm;
@@ -92,30 +93,15 @@ std::string TypeDumper::dumpStructType(StructType *type) {
             if(name.find("struct_") == 0) {
                 name[6] = ' ';
                 structsToDefine[type] = name;
-                // if(declaredStructs.find(name) == declaredStructs.end()) {
-                //     declaredStructs.insert(name);
-                //     declareStruct(name, type);
-                // }
                 return name;
             } else if(name.find("class_") != string::npos) {
-                // name[5] = '_';
                 name = "struct " + name;
                 structsToDefine[type] = name;
-                // if(declaredStructs.find(name) == declaredStructs.end()) {
-                //     declaredStructs.insert(name);
-                //     declareStruct(name, type);
-                // }
                 return name;
             } else {
                 name = "struct " + name;
                 structsToDefine[type] = name;
-                // if(declaredStructs.find(name) == declaredStructs.end()) {
-                //     declaredStructs.insert(name);
-                //     declareStruct(name, type);
-                // }
                 return name;
-                // outs() << "struct name: " << name << "\n";
-                // throw runtime_error("dumpStructType() not implemented: struct name " + name);
             }
         }
     } else {
@@ -180,5 +166,64 @@ std::string TypeDumper::dumpType(Type *type) {
     }
 }
 
+std::string TypeDumper::dumpStructDefinition(StructType *type, string name) {
+    std::string declaration = "";
+    declaration += name + " {\n";
+    int i = 0;
+    for(auto it=type->element_begin(); it != type->element_end(); it++) {
+        Type *elementType = *it;
+        bool isPtrPtrFunction = false;
+        if(PointerType *ptr = dyn_cast<PointerType>(elementType)) {
+            Type *ptrElementType = ptr->getPointerElementType();
+            if(PointerType *ptrptr = dyn_cast<PointerType>(ptrElementType)) {
+                Type *ptrptrElementType = ptrptr->getPointerElementType();
+                isPtrPtrFunction = isa<FunctionType>(ptrptrElementType);
+            }
+        }
+        if(isPtrPtrFunction) {
+            // we can ignore functions, whilst dumping structs
+            continue;
+        }
+        std::string memberName = "f" + easycl::toString(i);
+        if(ArrayType *arraytype = dyn_cast<ArrayType>(elementType)) {
+            Type *arrayelementtype = arraytype->getPointerElementType();
+            // outs() << "arrayelementtype " << dumpType(arrayelementtype) << "\n";
+            int numElements = arraytype->getNumElements();
+            // outs() << "numelements " << numElements << "\n";
+            declaration += "    " + dumpType(arrayelementtype) + " ";
+            declaration += memberName + "[" + easycl::toString(numElements) + "];\n";
+            // throw runtime_error("not implemented declarestruct for arraytype elements");
+        } else {
+            declaration += "    ";
+            // if its a pointer, lets assume its global, for now
+            if(PointerType *ptr = dyn_cast<PointerType>(elementType)) {
+                // updateAddressSpace(ptr, 1);
+                declaration += "global ";
+
+            }
+            declaration += dumpType(elementType) + " " + memberName + ";\n";
+        }
+        i++;
+    }
+    declaration += "};\n";
+
+    return declaration;
+}
+
+std::string TypeDumper::dumpStructDefinitions() {
+    string gencode = "";
+    set<StructType *>dumped;
+    while(dumped.size() < structsToDefine.size()) {
+        for(auto it=structsToDefine.begin(); it != structsToDefine.end(); it++) {
+            StructType *structType = it->first;
+            if(dumped.find(structType) != dumped.end()) {
+                continue;
+            }
+            dumped.insert(structType);
+            gencode += dumpStructDefinition(structType, it->second);
+        }
+    }
+    return gencode;
+}
 
 } // namespace cocl;

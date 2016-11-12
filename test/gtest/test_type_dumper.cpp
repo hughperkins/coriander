@@ -90,6 +90,21 @@ TEST(test_type_dumper, float32) {
 }
 
 
+TEST(test_type_dumper, float64) {
+    // Function *F = getM()->getFunction("float32");
+    Function *F = getFunction("float64");
+    BasicBlock *block = &*F->begin();
+    auto it = block->begin(); // it++; it++;
+    Instruction *retInst = &*it;
+    retInst->dump();
+    cout << endl;
+    TypeDumper typeDumper;
+    string retType = typeDumper.dumpType(retInst->getType());
+    cout << "retType: [" << retType << "]" << endl;
+
+    ASSERT_EQ(retType, "double");
+}
+
 TEST(test_type_dumper, pointer_float32) {
     // Function *F = getM()->getFunction("float32");
     Function *F = getFunction("pointer_float32");
@@ -154,4 +169,10 @@ TEST(test_type_dumper, mystruct) {
     ASSERT_EQ(typeDumper.structsToDefine.size(), 1);
     ASSERT_EQ(typeDumper.structsToDefine.begin()->second, "struct mystruct");
     ASSERT_TRUE(isa<StructType>(typeDumper.structsToDefine.begin()->first));
+
+    string structDefinitions = typeDumper.dumpStructDefinitions();
+    cout << "structDefinitions: " << structDefinitions << endl;
+    ASSERT_NE(structDefinitions.find("struct mystruct"), string::npos);
+    ASSERT_NE(structDefinitions.find("int f0;"), string::npos);
+    ASSERT_NE(structDefinitions.find("float f1;"), string::npos);
 }
