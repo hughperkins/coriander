@@ -19,7 +19,7 @@ public:
     std::string dumpAddressSpace(llvm::Type *type);
     std::string dumpArrayType(llvm::ArrayType *type);
 
-    std::map<llvm::GlobalVariable *, std::string> globalVariablesToDefine;
+    // std::map<llvm::GlobalVariable *, std::string> globalVariablesToDefine;
     std::map<llvm::StructType *, std::string> structsToDefine;
     std::map<llvm::FunctionType *, std::string> functionsToDefine;
 };

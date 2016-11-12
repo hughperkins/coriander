@@ -6,6 +6,8 @@
 #include "llvm/Support/raw_ostream.h"
 
 #include <iostream>
+#include <memory>
+#include <cassert>
 
 #include "gtest/gtest.h"
 
@@ -15,27 +17,38 @@ using namespace std;
 using namespace cocl;
 using namespace llvm;
 
-TEST(test_type_dumper, basic) {
-    string ll_code = R"(
-define i32 @main() {
-  ret i32 0
+LLVMContext context;
+unique_ptr<Module>M;
+
+string ll_path = "../test/gtest/test_type_dumper.ll";  // this is a bit hacky, but fine-ish for now
+
+Module *getM() {
+    if(M == nullptr) {
+        SMDiagnostic smDiagnostic;
+        M = parseIRFile(StringRef(ll_path), smDiagnostic, context);
+        if(!M) {
+            smDiagnostic.print("irtopencl", errs());
+            // return "";
+            throw runtime_error("failed to parse IR");
+        }
+    }
+    return M.get();
 }
-)";
-    cout << ll_code << endl;
-    LLVMContext context;
-    unique_ptr<MemoryBuffer> llMemoryBuffer = MemoryBuffer::getMemBuffer(ll_code);
-    SMDiagnostic smDiagnostic;
-    unique_ptr<Module> M = parseIR(llMemoryBuffer->getMemBufferRef(), smDiagnostic,
-                                context);
-    if(!M) {
-        smDiagnostic.print("irtopencl", errs());
-        // return "";
-        throw runtime_error("failed to parse IR");
+
+Function *getFunction(string name) {
+    // Module *M = getM();
+    getM();
+    Function *F = M->getFunction(StringRef(name));
+    if(F == 0) {
+        throw runtime_error("Function " + name + " not found");
     }
-    for(auto it = M->begin(); it != M->end(); it++) {
-        cout << "block " << endl;
-    }
-    Function *F = &*M->begin();
+    return F;
+}
+
+TEST(test_type_dumper, type_return) {
+    // Function *F = getM()->getFunction("type_return");
+    Function *F = getFunction("type_return");
+    F->dump();
     BasicBlock *block = &*F->begin();
     Instruction *retInst = &*block->begin();
     TypeDumper typeDumper;
@@ -43,8 +56,102 @@ define i32 @main() {
     cout << "retType: [" << retType << "]" << endl;
 
     ASSERT_EQ(retType, "void");
+}
 
-    // BasicBlockDumper blockDumper(block);
-    // string cl = blockDumper.toCl();
-    // cout << cl << endl;
+TEST(test_type_dumper, add) {
+    // Function *F = getM()->getFunction("add");
+    Function *F = getFunction("add");
+    BasicBlock *block = &*F->begin();
+    auto it = block->begin(); // it++; it++;
+    Instruction *retInst = &*it;
+    retInst->dump();
+    cout << endl;
+    TypeDumper typeDumper;
+    string retType = typeDumper.dumpType(retInst->getType());
+    cout << "retType: [" << retType << "]" << endl;
+
+    ASSERT_EQ(retType, "int");
+}
+
+
+TEST(test_type_dumper, float32) {
+    // Function *F = getM()->getFunction("float32");
+    Function *F = getFunction("float32");
+    BasicBlock *block = &*F->begin();
+    auto it = block->begin(); // it++; it++;
+    Instruction *retInst = &*it;
+    retInst->dump();
+    cout << endl;
+    TypeDumper typeDumper;
+    string retType = typeDumper.dumpType(retInst->getType());
+    cout << "retType: [" << retType << "]" << endl;
+
+    ASSERT_EQ(retType, "float");
+}
+
+
+TEST(test_type_dumper, pointer_float32) {
+    // Function *F = getM()->getFunction("float32");
+    Function *F = getFunction("pointer_float32");
+    BasicBlock *block = &*F->begin();
+    auto it = block->begin(); // it++; it++;
+    Instruction *retInst = &*it;
+    retInst->dump();
+    cout << endl;
+    TypeDumper typeDumper;
+    string retType = typeDumper.dumpType(retInst->getType());
+    cout << "retType: [" << retType << "]" << endl;
+
+    ASSERT_EQ(retType, "float*");
+}
+
+
+TEST(test_type_dumper, pointer_globalpfloat) {
+    // Function *F = getM()->getFunction("float32");
+    Function *F = getFunction("pointer_globalpfloat");
+    BasicBlock *block = &*F->begin();
+    auto it = block->begin(); it++; // it++; it++;
+    Instruction *retInst = &*it;
+    retInst->dump();
+    cout << endl;
+    TypeDumper typeDumper;
+    string retType = typeDumper.dumpType(retInst->getType());
+    cout << "retType: [" << retType << "]" << endl;
+
+    ASSERT_EQ(retType, "global float*");
+}
+
+
+TEST(test_type_dumper, array_int) {
+    // Function *F = getM()->getFunction("float32");
+    Function *F = getFunction("array_int");
+    BasicBlock *block = &*F->begin();
+    auto it = block->begin(); it++; // it++; it++;
+    Instruction *retInst = &*it;
+    retInst->dump();
+    cout << endl;
+    TypeDumper typeDumper;
+    string retType = typeDumper.dumpType(retInst->getType());
+    cout << "retType: [" << retType << "]" << endl;
+
+    ASSERT_EQ(retType, "int[4]");
+}
+
+
+TEST(test_type_dumper, mystruct) {
+    // Function *F = getM()->getFunction("float32");
+    Function *F = getFunction("mystruct");
+    BasicBlock *block = &*F->begin();
+    auto it = block->begin(); it++; // it++; it++;
+    Instruction *retInst = &*it;
+    retInst->dump();
+    cout << endl;
+    TypeDumper typeDumper;
+    string retType = typeDumper.dumpType(retInst->getType());
+    cout << "retType: [" << retType << "]" << endl;
+
+    ASSERT_EQ(retType, "struct mystruct");
+    ASSERT_EQ(typeDumper.structsToDefine.size(), 1);
+    ASSERT_EQ(typeDumper.structsToDefine.begin()->second, "struct mystruct");
+    ASSERT_TRUE(isa<StructType>(typeDumper.structsToDefine.begin()->first));
 }
