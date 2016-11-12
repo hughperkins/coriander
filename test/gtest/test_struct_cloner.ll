@@ -1,1 +1,1 @@
-%"struct mystruct" = { i32, float, float*, float* }
+%"struct mystruct" = type { i32, float, float*, i32, float* }

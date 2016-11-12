@@ -26,10 +26,14 @@
 #include "gtest/gtest.h"
 
 #include "type_dumper.h"
+#include "GlobalNames.h"
+#include "struct_clone.h"
 
 using namespace std;
 using namespace cocl;
 using namespace llvm;
+
+namespace test_struct_cloner {
 
 LLVMContext context;
 unique_ptr<Module>M;
@@ -50,8 +54,8 @@ Module *getM() {
 }
 
 Function *getFunction(string name) {
-    // Module *M = getM();
-    getM();
+    Module *M = getM();
+    // getM();
     Function *F = M->getFunction(StringRef(name));
     if(F == 0) {
         throw runtime_error("Function " + name + " not found");
@@ -62,11 +66,41 @@ Function *getFunction(string name) {
 TEST(test_struct_cloner, test_clone) {
     Module *M = getM();
     StructType *myStructType = M->getTypeByName(StringRef("struct mystruct"));
-    TypeDumper typeDumper;
-    string structCl = typeDumper->dumpType(myStructType);
+    GlobalNames globalNames;
+    TypeDumper typeDumper(&globalNames);
+    string structCl = typeDumper.dumpType(myStructType);
 
-    string structDefinitions = typeDumper->dumpStructDefinitions();
+    string structDefinitions = typeDumper.dumpStructDefinitions();
     cout << "structDefinitions " << structDefinitions << endl;
+    ASSERT_NE(structDefinitions.find("int f0;"), string::npos);
+    ASSERT_NE(structDefinitions.find("float f1;"), string::npos);
+    ASSERT_NE(structDefinitions.find("float* f2;"), string::npos);
+    ASSERT_NE(structDefinitions.find("int f3;"), string::npos);
+    ASSERT_NE(structDefinitions.find("float* f4;"), string::npos);
 
-    StructCloner structCloner;
+    string structDefinition = typeDumper.dumpStructDefinition(myStructType, "foo");
+    cout << "structDefinition " << structDefinition << endl;
+    ASSERT_NE(structDefinition.find("int f0;"), string::npos);
+    ASSERT_NE(structDefinition.find("float f1;"), string::npos);
+    ASSERT_NE(structDefinition.find("float* f2;"), string::npos);
+    ASSERT_NE(structDefinition.find("int f3;"), string::npos);
+    ASSERT_NE(structDefinition.find("float* f4;"), string::npos);
+
+    StructCloner structCloner(&typeDumper, &globalNames);
+    StructType *structNoPtrs = structCloner.cloneNoPointers(myStructType);
+    string structNoPtrCl = typeDumper.dumpStructDefinition(structNoPtrs, "foo");
+    cout << "structNoPtrCl " << structNoPtrCl << endl;
+    ASSERT_NE(structNoPtrCl.find("int f0;"), string::npos);
+    ASSERT_NE(structNoPtrCl.find("float f1;"), string::npos);
+    ASSERT_NE(structNoPtrCl.find("int f2;"), string::npos);
+
+    string clCopyCode = structCloner.writeClCopyNoPtrToPtrfull(
+        myStructType, "src", "dest");
+    cout << "clCopyCode " << clCopyCode << endl;
+    ASSERT_NE(clCopyCode.find("dest.f0 = src.f0;"), string::npos);
+    ASSERT_NE(clCopyCode.find("dest.f1 = src.f1;"), string::npos);
+    ASSERT_NE(clCopyCode.find("dest.f3 = src.f2;"), string::npos);
+
 }
+
+} // test_struct_cloner

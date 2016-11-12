@@ -66,7 +66,7 @@ StructType *StructCloner::cloneNoPointers(StructType *inType) {
         }
     }
     // outs() << "newchildren.size() " << newChildren.size() << "\n";
-    Type *newType = 0;
+    StructType *newType = 0;
     if(newChildren.size() > 0) {
         newType = StructType::create(ArrayRef<Type *>(&newChildren[0], &newChildren[newChildren.size()]), newName);
     } else {
@@ -74,6 +74,52 @@ StructType *StructCloner::cloneNoPointers(StructType *inType) {
     }
     pointerlessTypeByOriginalType[inType] = newType;
     return newType;
+}
+
+std::string StructCloner::writeClCopyNoPtrToPtrfull(llvm::StructType *ptrfullType,  std::string srcName, std::string destName) {
+    string gencode = "";
+    int srcidx = 0;
+    int dstidx = 0;
+    // outs() << "writeStructCopyCodeNoPointers " << dumpType(structType) << "\n";
+    for(auto it=ptrfullType->element_begin(); it != ptrfullType->element_end(); it++) {
+        Type *childType = *it;
+        if(isa<PointerType>(childType)) {
+            // ignore
+            // srcidx++;
+            dstidx++;
+            continue;
+        }
+        string childSrcName = srcName + ".f" + toString(srcidx);
+        string childDstName = destName + ".f" + toString(dstidx);
+        if(StructType *childStructType = dyn_cast<StructType>(childType)) {
+            gencode += writeClCopyNoPtrToPtrfull(childStructType, childSrcName, childDstName);
+            srcidx++;
+            dstidx++;
+        } else if(childType->getPrimitiveSizeInBits() > 0 ) {
+            gencode += childDstName + " = " + childSrcName + ";\n";
+            // outs() << "copying " << dumpType(childType) << "\n";
+            srcidx++;
+            dstidx++;
+        } else if(ArrayType *arrayType = dyn_cast<ArrayType>(childType)) {
+            int numElements = arrayType->getNumElements();
+            // outs() << "numlemenets " << numElements << "\n";
+            for(int i=0; i < numElements; i++) {
+                gencode += childDstName + "[" + toString(i) + "] = " + childSrcName + "[" + toString(i) +  "];\n";
+            }
+            srcidx++;
+            dstidx++;
+            // throw runtime_error("unhandled type " + dumpType(childType));
+        } else {
+            outs() << "unhandled type\n";
+            childType->dump();
+            outs() << "\n";
+            // outs() << "unhandled type " + dumpType(childType) << "\n";
+            throw runtime_error("unhandled type");
+            srcidx++;
+            dstidx++;
+        }
+    }
+    return gencode;
 }
 
 /*
@@ -282,49 +328,6 @@ std::string dumpTypeNoPointers(Type *type) {
         //     throw runtime_error("unrecognized type");
     }
     return "";
-}
-
-string writeStructCopyCodeNoPointers(StructType *structType, string srcName, string destName) {
-    string gencode = "";
-    int srcidx = 0;
-    int dstidx = 0;
-    // outs() << "writeStructCopyCodeNoPointers " << dumpType(structType) << "\n";
-    for(auto it=structType->element_begin(); it != structType->element_end(); it++) {
-        Type *childType = *it;
-        if(isa<PointerType>(childType)) {
-            // ignore
-            srcidx++;
-            dstidx++;
-            continue;
-        }
-        string childSrcName = srcName + ".f" + toString(srcidx);
-        string childDstName = destName + ".f" + toString(dstidx);
-        if(StructType *childStructType = dyn_cast<StructType>(childType)) {
-            gencode += writeStructCopyCodeNoPointers(childStructType, childSrcName, childDstName);
-            srcidx++;
-            dstidx++;
-        } else if(childType->getPrimitiveSizeInBits() > 0 ) {
-            gencode += childDstName + " = " + childSrcName + ";\n";
-            // outs() << "copying " << dumpType(childType) << "\n";
-            srcidx++;
-            dstidx++;
-        } else if(ArrayType *arrayType = dyn_cast<ArrayType>(childType)) {
-            int numElements = arrayType->getNumElements();
-            // outs() << "numlemenets " << numElements << "\n";
-            for(int i=0; i < numElements; i++) {
-                gencode += childDstName + "[" + toString(i) + "] = " + childSrcName + "[" + toString(i) +  "];\n";
-            }
-            srcidx++;
-            dstidx++;
-            // throw runtime_error("unhandled type " + dumpType(childType));
-        } else {
-            outs() << "unhandled type " + dumpType(childType) << "\n";
-            throw runtime_error("unhandled type " + dumpType(childType));
-            srcidx++;
-            dstidx++;
-        }
-    }
-    return gencode;
 }
 */
 

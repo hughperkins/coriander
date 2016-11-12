@@ -31,9 +31,12 @@ public:
 
     }
     llvm::StructType *cloneNoPointers(llvm::StructType *inStructType);
+    std::string writeClCopyNoPtrToPtrfull(llvm::StructType *ptrfullType, std::string srcName, std::string destName);
 
+protected:
     cocl::TypeDumper *typeDumper;
     cocl::GlobalNames *globalNames;
+    std::map<llvm::StructType *, llvm::StructType *> pointerlessTypeByOriginalType;
 };
 
 } // namespace cocl
