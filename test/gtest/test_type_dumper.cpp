@@ -194,7 +194,8 @@ TEST(test_type_dumper, mystruct) {
 
 TEST(test_type_dumper, mystruct2) {
     Module *M = getM();
-    StructType *myStructType = M->getTypeByName(StringRef("struct mystruct"));
+    StructType *myStructType = M->getTypeByName(StringRef("struct.mystruct"));
+    ASSERT_TRUE(myStructType != nullptr);
     TypeDumper typeDumper;
     string structCl = typeDumper.dumpType(myStructType);
 
