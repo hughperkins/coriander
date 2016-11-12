@@ -74,11 +74,12 @@ __global__ void testIf(float *data, int N) {
     }
 }
 """
-    prog = compile_code(cl, context, sourcecode)
+    kernelName = test_common.mangle('testIf', ['float *', 'int'])
+    prog = compile_code(cl, context, sourcecode, kernelName)
     float_data_orig = np.copy(float_data)
 
     N = 2
-    prog.__getattr__(test_common.mangle('testIf', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -102,11 +103,12 @@ __global__ void testIfElse(float *data, int N) {
     }
 }
 """
-    prog = compile_code(cl, context, sourcecode)
+    kernelName = test_common.mangle('testIfElse', ['float *', 'int'])
+    prog = compile_code(cl, context, sourcecode, kernelName)
     float_data_orig = np.copy(float_data)
 
     N = 2
-    prog.__getattr__(test_common.mangle('testIfElse', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -132,11 +134,12 @@ __global__ void testIfElse(float *data, int N) {
     data[0] = sum;
 }
 """
-    prog = compile_code(cl, context, sourcecode)
+    kernelName = test_common.mangle('testIfElse', ['float *', 'int'])
+    prog = compile_code(cl, context, sourcecode, kernelName)
     float_data_orig = np.copy(float_data)
 
     N = 2
-    prog.__getattr__(test_common.mangle('testIfElse', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -155,11 +158,12 @@ __global__ void testInline(float *data, int N) {
     somefunc(data);
 }
 """
-    prog = compile_code(cl, context, sourcecode)
+    kernelName = test_common.mangle('testInline', ['float *', 'int'])
+    prog = compile_code(cl, context, sourcecode, kernelName)
     float_data_orig = np.copy(float_data)
 
     N = 4
-    prog.__getattr__(test_common.mangle('testInline', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -179,11 +183,12 @@ __global__ void testFor(float *data, int N) {
     }
 }
 """
-    prog = compile_code(cl, context, sourcecode)
+    kernelName = test_common.mangle('testFor', ['float *', 'int'])
+    prog = compile_code(cl, context, sourcecode, kernelName)
     float_data_orig = np.copy(float_data)
 
     N = 4
-    prog.__getattr__(test_common.mangle('testFor', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -214,11 +219,12 @@ __global__ void testTwoFors(float *data, int N) {
     }
 }
 """
-    prog = compile_code(cl, context, sourcecode)
+    kernelName = test_common.mangle('testTwoFors', ['float *', 'int'])
+    prog = compile_code(cl, context, sourcecode, kernelName)
     float_data_orig = np.copy(float_data)
 
     N = 4
-    prog.__getattr__(test_common.mangle('testTwoFors', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -248,12 +254,13 @@ __global__ void mykernel(float *data, int a, int b) {
     myfunc(data, a, b);
 }
 """
-    prog = compile_code(cl, context, source)
+    kernelName = test_common.mangle('mykernel', ['float *', 'int', 'int'])
+    prog = compile_code(cl, context, source, kernelName)
     float_data_orig = np.copy(float_data)
 
     a = 2
     b = 3
-    prog.__getattr__(test_common.mangle('mykernel', ['float *', 'int', 'int']))(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(a), np.int32(b), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(a), np.int32(b), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -280,11 +287,12 @@ __global__ void longKernel(float *data, int N, float value) {
     }
 }
 """
-    prog = compile_code(cl, context, sourcecode)
+    kernelName = test_common.mangle('longKernel', ['float *', 'int', 'float'])
+    prog = compile_code(cl, context, sourcecode, kernelName)
     float_data_orig = np.copy(float_data)
 
     N = 2
-    prog.__getattr__(test_common.mangle('longKernel', ['float *', 'int', 'float']))(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), np.float32(123), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), np.float32(123), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -308,11 +316,12 @@ __global__ void testFor(float *data, int N) {
     }
 }
 """
-    prog = compile_code(cl, context, sourcecode)
+    kernelName = test_common.mangle('testFor', ['float *', 'int'])
+    prog = compile_code(cl, context, sourcecode, kernelName)
     float_data_orig = np.copy(float_data)
 
     N = 4
-    prog.__getattr__(test_common.mangle('testFor', ['float *', 'int']))(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
