@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "function_dumper.h"
+#include "kernel_dumper.h"
 
 #include "type_dumper.h"
 #include "GlobalNames.h"
@@ -33,12 +33,12 @@ using namespace std;
 using namespace cocl;
 using namespace llvm;
 
-namespace test_function_dumper {
+namespace test_kernel_dumper {
 
 LLVMContext context;
 unique_ptr<Module>M;
 
-string ll_path = "../test/gtest/test_function_dumper.ll";  // this is a bit hacky, but fine-ish for now
+string ll_path = "../test/gtest/test_kernel_dumper.ll";  // this is a bit hacky, but fine-ish for now
 
 Module *getM() {
     if(M == nullptr) {
@@ -63,24 +63,18 @@ Function *getFunction(string name) {
     return F;
 }
 
-TEST(test_function_dumper, basic) {
-    Function *F = getFunction("someKernel");
-    F->dump();
-    // BasicBlock *block = &*F->begin();
-    GlobalNames globalNames;
-    LocalNames localNames;
-    TypeDumper typeDumper(&globalNames);
-    FunctionNamesMap functionNamesMap;
-    FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
-    string cl = functionDumper.toCl();
-    cout << "cl:\n" << cl << endl;
+TEST(test_kernel_dumper, basic) {
+    Module *M = getM();
 
-    for(auto it=functionDumper.neededFunctions.begin(); it != functionDumper.neededFunctions.end(); it++) {
-        Function *childF = *it;
-        cout << "needed function call: " << childF->getName().str() << endl;
-    }
-    ASSERT_EQ(1, functionDumper.neededFunctions.size());
-    ASSERT_EQ("someFunc", (*functionDumper.neededFunctions.begin())->getName().str());
+    // GlobalNames globalNames;
+    // LocalNames localNames;
+    // TypeDumper typeDumper(&globalNames);
+    // FunctionNamesMap functionNamesMap;
+    // FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
+
+    KernelDumper kernelDumper(M, "someKernel");
+    string cl = kernelDumper.toCl();
+    cout << "kernel cl:\n" << cl << endl;
 }
 
 } // test_block_dumper

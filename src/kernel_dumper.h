@@ -25,7 +25,8 @@ namespace cocl {
 
 class KernelDumper {
 public:
-    KernelDumper(llvm::Module *M, std::string kernelName) : M(M0, kernelName(kernelName)) {
+    KernelDumper(llvm::Module *M, std::string kernelName) :
+        M(M), kernelName(kernelName) {
 
     }
     virtual ~KernelDumper() {}

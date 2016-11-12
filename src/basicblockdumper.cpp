@@ -699,7 +699,7 @@ std::string BasicBlockDumper::dumpCall(llvm::CallInst *instr) {
         Module *M = instr->getModule();
         Function *F = M->getFunction(StringRef(functionName));
         if(F != 0) {
-            neededFunctionCalls.insert(F);
+            neededFunctions.insert(F);
             // if(dumpedFunctions.find(F) == dumpedFunctions.end()) {
             //     functionsToDump.insert(F);
             // }

@@ -50,7 +50,7 @@ public:
     std::string createOffsetShim(llvm::Type *argType, std::string argName);
     std::string dumpFunctionDeclaration(llvm::Function *F);
 
-    std::set<llvm::Function *> neededFunctionCalls;
+    std::set<llvm::Function *> neededFunctions;
     std::set<llvm::StructType *> structsToDefine;
     std::string shimCode = "";
     std::string functionDeclarations = "";

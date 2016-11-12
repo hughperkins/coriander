@@ -42,7 +42,7 @@ set(COCL_SRCS src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cp
     src/flowcontrol/for.cpp src/flowcontrol/rootblock.cpp src/flowcontrol/block.cpp)
 set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp
     src/struct_clone.cpp src/basicblockdumper.cpp src/ExpressionsHelper.cpp src/readIR.cpp
-    src/function_names_map.cpp src/function_dumper.cpp
+    src/function_names_map.cpp src/function_dumper.cpp src/kernel_dumper.cpp
 )
 
 set(CMAKE_CC_FLAGS "-fPIC")
@@ -197,6 +197,7 @@ if(BUILD_TESTS)
         test/gtest/test_block_dumper.cpp
         test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
         test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
+        test/gtest/test_kernel_dumper.cpp
     )
     target_include_directories(cocl_unittests PRIVATE src)
     target_include_directories(cocl_unittests PRIVATE third_party/gtest)

@@ -162,11 +162,11 @@ TEST(test_block_dumper, basic2) {
     cout << "cl:\n" << cl << endl;
     cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
 
-    for(auto it=blockDumper.neededFunctionCalls.begin(); it != blockDumper.neededFunctionCalls.end(); it++) {
+    for(auto it=blockDumper.neededFunctions.begin(); it != blockDumper.neededFunctions.end(); it++) {
         cout << "called function " << (*it)->getName().str() << endl;
     }
-    ASSERT_EQ(1, blockDumper.neededFunctionCalls.size());
-    ASSERT_EQ(getFunction("someFunc"), *blockDumper.neededFunctionCalls.begin());
+    ASSERT_EQ(1, blockDumper.neededFunctions.size());
+    ASSERT_EQ(getFunction("someFunc"), *blockDumper.neededFunctions.begin());
 }
 
 } // test_block_dumper

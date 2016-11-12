@@ -84,7 +84,7 @@ public:
         return this;
     }
 
-    std::set<llvm::Function *> neededFunctionCalls;
+    std::set<llvm::Function *> neededFunctions;
     std::set<llvm::Value *> variablesToDeclare;
     std::set<llvm::Value *> sharedVariablesToDeclare;
     std::set<std::string> allocaDeclarations;
