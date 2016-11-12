@@ -64,12 +64,14 @@ public:
     std::string dumpOperand(llvm::Value *value);
     std::string dumpReturn(llvm::ReturnInst *retInst);
     std::string dumpInstruction(std::string indent, llvm::Instruction *instruction);
-    std::string getAllocaDeclarations(std::string indent);
-    std::string dumpInsertValue(llvm::InsertValueInst *instr);
+    std::vector<std::string> dumpInsertValue(llvm::InsertValueInst *instr);
     std::string dumpExtractValue(llvm::ExtractValueInst *instr);
     std::string dumpLoad(llvm::LoadInst *instr);
     std::string dumpStore(llvm::StoreInst *instr);
     std::string dumpAlloca(llvm::Instruction *alloca);
+
+    std::string getAllocaDeclarations(std::string indent);
+    std::string writeDeclarations(std::string indent);
 
     BasicBlockDumper *addIRToCl() {
         _addIRToCl = true;

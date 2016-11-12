@@ -378,8 +378,8 @@ std::string BasicBlockDumper::dumpStore(llvm::StoreInst *instr) {
     return gencode;
 }
 
-std::string BasicBlockDumper::dumpInsertValue(llvm::InsertValueInst *instr) {
-    string gencode = "";
+std::vector<std::string> BasicBlockDumper::dumpInsertValue(llvm::InsertValueInst *instr) {
+    // string gencode = "";
     string lhs = "";
     cout << "lhs undef value? " << isa<UndefValue>(instr->getOperand(0)) << endl;
     string incomingOperand = dumpOperand(instr->getOperand(0));
@@ -428,12 +428,20 @@ std::string BasicBlockDumper::dumpInsertValue(llvm::InsertValueInst *instr) {
         }
         currentType = newType;
     }
-    gencode += lhs + " = " + dumpOperand(instr->getOperand(1));
+    std::vector<std::string> res;
+    // gencode += lhs + " = " + dumpOperand(instr->getOperand(1));
+    res.push_back(lhs + " = " + dumpOperand(instr->getOperand(1)));
+    if(!declaredVar) {
+        variablesToDeclare.insert(instr);
+        // res.push_back(typeDumper->dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand);
+        res.push_back(dumpOperand(instr) + " = " + incomingOperand);
+    }
+    return res;
     // if(!declaredVar) {
     //     gencode += "    " + dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand + ";\n";
     // }
     //     gencode += "    " + dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand + ";\n";
-    return gencode;
+    // return gencode;
 }
 
 std::string BasicBlockDumper::dumpExtractValue(llvm::ExtractValueInst *instr) {
@@ -519,6 +527,7 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         //     originalInstruction += "<unk>";
         // }
     }
+    vector<string> reslines;
     // gencode += "/* " + originalInstruction + " */\n    ";
     switch(opcode) {
         case Instruction::FAdd:
@@ -622,8 +631,13 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         //     instructionCode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
         //     break;
         case Instruction::InsertValue:
-            instructionCode = dumpInsertValue(cast<InsertValueInst>(instruction));
-            return indent + instructionCode + ";\n";
+            reslines = dumpInsertValue(cast<InsertValueInst>(instruction));
+            // string gencode = "";
+            for(auto it=reslines.begin(); it != reslines.end(); it++) {
+                instructionCode += indent + *it + ";\n";
+            }
+            return instructionCode;
+            // return indent + instructionCode + ";\n";
             // break;
         case Instruction::ExtractValue:
             instructionCode = dumpExtractValue(cast<ExtractValueInst>(instruction));
@@ -707,6 +721,17 @@ std::string BasicBlockDumper::getAllocaDeclarations(string indent) {
     string gencode = "";
     for(auto it=allocaDeclarations.begin(); it != allocaDeclarations.end(); it++) {
         string declaration = *it;
+        gencode += indent + declaration + ";\n";
+    }
+    return gencode;
+}
+
+std::string BasicBlockDumper::writeDeclarations(std::string indent) {
+    string gencode = "";
+    for(auto it=variablesToDeclare.begin(); it != variablesToDeclare.end(); it++) {
+        Value *value = *it;
+        // value->dump();
+        string declaration = typeDumper->dumpType(value->getType()) + " " + localNames->getName(value);
         gencode += indent + declaration + ";\n";
     }
     return gencode;

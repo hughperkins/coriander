@@ -76,6 +76,9 @@ TEST(test_block_dumper, basic) {
 
     cout << "alloca declrations:" << endl;
     cout << blockDumper.getAllocaDeclarations("    ") << endl;
+
+    cout << "variable declarations:" << endl;
+    cout << blockDumper.writeDeclarations("    ") << endl;
 }
 
 } // test_block_dumper
