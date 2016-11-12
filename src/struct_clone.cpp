@@ -30,14 +30,23 @@
 
 using namespace llvm;
 using namespace std;
+using namespace cocl;
 
-static std::map<Type *, Type *> pointerlessTypeByOriginalType;
+namespace cocl {
 
-extern std::set<string> declaredStructs;
-extern std::string declarations_to_write;
-extern bool single_precision;
+// static std::map<Type *, Type *> pointerlessTypeByOriginalType;
 
-Type *cloneStructTypeNoPointers(StructType *inType) {
+// extern std::set<string> declaredStructs;
+// extern std::string declarations_to_write;
+// extern bool single_precision;
+
+// StructType *StructCloner::cloneNoPointers(StructType *inStructType) {
+
+// }
+
+// Type *cloneStructTypeNoPointers(StructType *inType) {
+
+StructType *StructCloner::cloneNoPointers(StructType *inType) {
     LLVMContext &context = inType->getContext();
     if(pointerlessTypeByOriginalType.find(inType) != pointerlessTypeByOriginalType.end()) {
         return pointerlessTypeByOriginalType[inType];
@@ -48,7 +57,7 @@ Type *cloneStructTypeNoPointers(StructType *inType) {
     for(auto it=inType->element_begin(); it != inType->element_end(); it++) {
         Type *childType = *it;
         if(StructType *childStructType = dyn_cast<StructType>(childType)) {
-            childType = cloneStructTypeNoPointers(childStructType);
+            childType = cloneNoPointers(childStructType);
             newChildren.push_back(childType);
         } else if(isa<PointerType>(childType)) {
             // ignore
@@ -67,6 +76,7 @@ Type *cloneStructTypeNoPointers(StructType *inType) {
     return newType;
 }
 
+/*
 Instruction *copyStructValuesNoPointers(Instruction *lastInst, Value *src, Value *dst) {
     LLVMContext &context = src->getContext();
     int srcidx = 0;
@@ -316,3 +326,6 @@ string writeStructCopyCodeNoPointers(StructType *structType, string srcName, str
     }
     return gencode;
 }
+*/
+
+} // namespace cocl

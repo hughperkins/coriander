@@ -44,7 +44,7 @@ set(COCL_SRCS src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cp
     src/cocl_memory.cpp src/cocl_properties.cpp src/cocl_streams.cpp src/cocl_clsources.cpp src/cocl_context.cpp
     src/ir-to-opencl.cpp src/function_names_map.cpp
     src/ir-to-opencl-common.cpp src/mutations.cpp src/readIR.cpp src/struct_clone.cpp
-    src/branches_as_switch/branches_as_switch.cpp
+    src/branches_as_switch/branches_as_switch.cpp src/type_dumper.cpp
     src/handle_branching.cpp src/branching_transforms.cpp src/flowcontrolinstructions.cpp third_party/argparsecpp/argparsecpp.cpp
     src/flowcontrol/returnblock.cpp src/flowcontrol/sequence.cpp src/flowcontrol/basicblockblock.cpp
     src/flowcontrol/conditionalbranch.cpp src/flowcontrol/dowhile.cpp src/flowcontrol/if.cpp

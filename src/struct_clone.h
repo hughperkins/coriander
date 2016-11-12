@@ -1,5 +1,7 @@
 #pragma once
 
+#include "type_dumper.h"
+
 #include <string>
 
 #include "llvm/IR/Type.h"
@@ -7,12 +9,28 @@
 #include "llvm/IR/Value.h"
 #include "llvm/IR/DerivedTypes.h"
 
+namespace cocl {
 
-llvm::Type *cloneStructTypeNoPointers(llvm::StructType *inType);
-void declareStructNoPointers(std::string name, llvm::StructType *type);
+// llvm::Type *cloneStructTypeNoPointers(llvm::StructType *inType);
+// void declareStructNoPointers(std::string name, llvm::StructType *type);
 
-std::string writeStructCopyCodeNoPointers(llvm::StructType *structType, std::string srcName, std::string destName);
-llvm::Instruction *copyStructValuesNoPointers(llvm::Instruction *lastInst, llvm::Value *src, llvm::Value *dst);
+// std::string writeStructCopyCodeNoPointers(llvm::StructType *structType, std::string srcName, std::string destName);
+// llvm::Instruction *copyStructValuesNoPointers(llvm::Instruction *lastInst, llvm::Value *src, llvm::Value *dst);
 
-std::string dumpTypeNoPointers(llvm::Type *type);
-std::string dumpStructTypeNoPointers(llvm::StructType *type);
+// std::string dumpTypeNoPointers(llvm::Type *type);
+// std::string dumpStructTypeNoPointers(llvm::StructType *type);
+
+class StructCloner {
+public:
+    StructCloner(cocl::TypeDumper *typeDumper) : typeDumper(typeDumper) {
+
+    }
+    virtual ~StructCloner() {
+
+    }
+    StructType *cloneNoPointers(StructType *inStructType);
+
+    cocl::TypeDumper *typeDumper;
+};
+
+} // namespace cocl
