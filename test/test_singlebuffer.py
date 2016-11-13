@@ -51,8 +51,8 @@ kernel void myKernel(global float *data0, long offset0, global float *data1, lon
 
     prog.myKernel(
         queue, (global_size,), (workgroup_size,),
-        huge_buf_gpu, offset_type(dst_offset),
-        huge_buf_gpu, offset_type(src_offset),
+        huge_buf_gpu, np.int64(dst_offset),
+        huge_buf_gpu, np.int64(src_offset),
         np.int32(N)
     )
     queue.finish()
@@ -107,8 +107,8 @@ kernel void _Z8myKernelPfS_i(global float* data0, long data0_offset, global floa
 
     prog._Z8myKernelPfS_i(
         queue, (global_size,), (workgroup_size,),
-        huge_buf_gpu, offset_type(dst_offset // 4),
-        huge_buf_gpu, offset_type(src_offset // 4),
+        huge_buf_gpu, np.int64(dst_offset // 4),
+        huge_buf_gpu, np.int64(src_offset // 4),
         np.int32(N)
     )
     queue.finish()
@@ -123,7 +123,7 @@ kernel void _Z8myKernelPfS_i(global float* data0, long data0_offset, global floa
     assert np.abs(np.sqrt(src_host) - dst_host).max() <= 1e-4
 
 
-def test_singlebuffer_sqrt(context, queue):
+def test_singlebuffer_sqrt_cocl(context, queue):
     """
     Test doing stuff with one single large buffer for destination and source, just offset a bit
     """
@@ -134,7 +134,8 @@ __global__ void myKernel(float *data0, float *data1, int N) {
     }
 }
 """
-    prog = test_common.compile_code(cl, context, code)
+    mangledName = '_Z8myKernelPfS_i'
+    kernel = test_common.compile_code_v3(cl, context, code, mangledName)['kernel']
 
     N = 10
 
@@ -152,8 +153,7 @@ __global__ void myKernel(float *data0, float *data1, int N) {
     workgroup_size = 256
     # scratch = workgroup_size * 4
 
-    mangledName = '_Z8myKernelPfS_i'
-    prog.__getattr__(mangledName)(
+    kernel(
         queue, (global_size,), (workgroup_size,),
         huge_buf_gpu, offset_type(dst_offset),
         huge_buf_gpu, offset_type(src_offset),

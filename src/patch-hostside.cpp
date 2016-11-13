@@ -279,6 +279,7 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
     }
 
     StructType *structType = cast<StructType>(value->getType());
+    string name = globalNames.getOrCreateName(structType);
     Type *newType = structCloner.cloneNoPointers(structType);
 
     const DataLayout *dataLayout = &M->getDataLayout();

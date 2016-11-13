@@ -241,7 +241,9 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
                         unique_ptr<StructInfo> structInfo(new StructInfo());
                         StructCloner::walkStructType(F->getParent(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
                         if(structInfo->pointerInfos.size() > 0) { // struct has pointers...
+                            // globalNames->getOrCreateName(structType, structType->getName().str());
                             StructType *noptrType = structCloner.cloneNoPointers(structType);
+                            noptrType->setName(structType->getName().str() + "_nopointers");
                             structsToDefine.insert(noptrType);
                             is_struct_needs_cloning = true;
                             argdeclaration = "global " + typeDumper->dumpType(noptrType) + "* " + argName + "_nopointers";

@@ -52,8 +52,9 @@ StructType *StructCloner::cloneNoPointers(StructType *inType) {
     if(pointerlessTypeByOriginalType.find(inType) != pointerlessTypeByOriginalType.end()) {
         return pointerlessTypeByOriginalType[inType];
     }
-    string name = globalNames->getName(inType);
-    string newName = name + "_nopointers";
+    // string name = globalNames->getName(inType);
+    // string newName = name + "_nopointers";
+    string newName = inType->getName().str() + "_nopointers";
     vector<Type *>newChildren;
     for(auto it=inType->element_begin(); it != inType->element_end(); it++) {
         Type *childType = *it;

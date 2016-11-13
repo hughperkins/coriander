@@ -470,6 +470,7 @@ inline float __atomic_add(global volatile float *ptr, float val) { // we need to
 
 string convertModuleToCl(Module *M, string specificFunction) {
     KernelDumper kernelDumper(M, specificFunction);
+    kernelDumper.addIRToCl();
     string cl = kernelDumper.toCl();
     return cl;
 }

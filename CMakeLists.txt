@@ -8,6 +8,7 @@ option(TESTS_DEVICELL_MEM2REG "cocl option for tests" ON)
 option(TESTS_DEVICELL_INSTCOMBINE "cocl option for tests" ON)
 set(TESTS_DEVICELL_OPT "O2" CACHE STRING "cocl option for tests")
 option(OFFSET_32BIT "type to use for offsets. off lets you use more memory.  on is necessary on beignet" ON)
+option(EXPLAIN_CL "Add IR code into OpenCL.  For maintainers mostly" OFF)
 option(COCL_SPAM "Lots of scrolly debug text.  Mostly for maintainer usage" OFF)
 
 if(TESTS_CL_BRANCHES_AS_SWITCH)
@@ -26,6 +27,9 @@ set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};-devicell-opt;instcombine)
 endif()
 if(TESTS_DEVICELL_OPT)
 set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};-devicell-opt;-O${TESTS_DEVICELL_OPT})
+endif()
+if(EXPLAIN_CL)
+set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--add_ir_to_cl)
 endif()
 
 set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/platforminfo_helper.cpp src/EasyCL/EasyCL.cpp
