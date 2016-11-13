@@ -166,6 +166,35 @@ void FunctionDumper::addPHIDeclaration(llvm::PHINode *phi) {
     phiDeclarationsByName[name] = declaration;
 }
 
+std::string FunctionDumper::dumpSharedDefinition(llvm::Value *value) {
+    value ->dump();
+    if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
+        string name = glob->getName().str();
+        string declaration = "";
+        Type *type = glob->getType();
+        if(ArrayType *arraytype = dyn_cast<ArrayType>(type->getPointerElementType())) {
+            int length = arraytype->getNumElements();
+            Type *elementType = arraytype->getElementType();
+            string typestr = typeDumper->dumpType(elementType);
+            declaration += "    local " + typestr + " " + name + "[" + easycl::toString(length) + "];\n";
+            exprByValue[value] = name;
+            // nameByValue[value] = name;
+            // currentFunctionSharedDeclarations += declaration;
+            return declaration;
+        } else {
+            cout << "dumpshared definition called with:" << endl;
+            value->dump();
+            cout << endl;
+            throw runtime_error("didnt expect ot be here, globalvaraible, not array.  dumpshareddefinition, for htis value");
+        }
+    } else {
+        cout << "dumpshared definition called with:" << endl;
+        value->dump();
+        cout << endl;
+        throw runtime_error("didnt expect ot be here.  dumpshareddefinition, for htis value");
+    }
+}
+
 std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function *F) {
     string declaration = "";
     // Type *retType = F->getReturnType();
@@ -259,6 +288,21 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
     return declaration;
 }
 
+std::string FunctionDumper::dumpTerminator(Type **pReturnType, Instruction *terminator, std::map<llvm::Value *, std::string> &exprByValue) {
+    string terminatorCl = "";
+    if(ReturnInst *retInst = dyn_cast<ReturnInst>(terminator)) {
+        terminatorCl = "    " + dumpReturn(pReturnType, retInst, exprByValue) + ";\n";
+        // returnType = retInst->getOperand(0)->getType();
+    } else if(BranchInst *branch = dyn_cast<BranchInst>(terminator)) {
+        terminatorCl = dumpBranch(branch, exprByValue);
+    } else {
+        cout << "unhandled terminator type:";
+        terminator->dump();
+        throw runtime_error("unhandled terminator type");
+    }
+    return terminatorCl;
+}
+
 std::string FunctionDumper::toCl() {
     string bodyCl = "";
     int i = 0;
@@ -285,27 +329,18 @@ std::string FunctionDumper::toCl() {
         }
 
         bodyCl += label + ":;\n";
+
         BasicBlockDumper basicBlockDumper(
             basicBlock, globalNames, &localNames, typeDumper, functionNamesMap);
         bodyCl += basicBlockDumper.toCl();
+
         functionDeclarations += basicBlockDumper.getAllocaDeclarations("    ");
         functionDeclarations += basicBlockDumper.writeDeclarations("    ");
-        for(auto it2=basicBlockDumper.neededFunctions.begin(); it2 != basicBlockDumper.neededFunctions.end(); it2++) {
-            neededFunctions.insert(*it2);
-        }
-        Instruction *terminator = basicBlock->getTerminator();
-        string terminatorCl = "";
-        if(ReturnInst *retInst = dyn_cast<ReturnInst>(terminator)) {
-            terminatorCl = "    " + dumpReturn(&returnType, retInst, basicBlockDumper.exprByValue) + ";\n";
-            // returnType = retInst->getOperand(0)->getType();
-        } else if(BranchInst *branch = dyn_cast<BranchInst>(terminator)) {
-            terminatorCl = dumpBranch(branch, basicBlockDumper.exprByValue);
-        } else {
-            cout << "unhandled terminator type:";
-            terminator->dump();
-            throw runtime_error("unhandled terminator type");
-        }
-        bodyCl += terminatorCl;
+
+        sharedVariablesToDeclare.insert(basicBlockDumper.sharedVariablesToDeclare.begin(), basicBlockDumper.sharedVariablesToDeclare.end());
+        neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
+
+        bodyCl += dumpTerminator(&returnType, basicBlock->getTerminator(), basicBlockDumper.exprByValue);
     }
 
     if(returnType != 0) {
@@ -328,14 +363,27 @@ std::string FunctionDumper::toCl() {
     // }
 
     string gencode = declaration + " {\n";
-    gencode += functionDeclarations + "\n";
-    for(auto it=phiDeclarationsByName.begin(); it != phiDeclarationsByName.end(); it++){
-        gencode += "    " + it->second + ";\n";
-    }
 
     if(shimCode != "") {
         gencode += shimCode + "\n";
     }
+
+    gencode += functionDeclarations + "\n";
+
+    for(auto it=phiDeclarationsByName.begin(); it != phiDeclarationsByName.end(); it++){
+        gencode += "    " + it->second + ";\n";
+    }
+
+    for(auto it=sharedVariablesToDeclare.begin(); it != sharedVariablesToDeclare.end(); it++) {
+        Value *variable = *it;
+        cout << "declaring:" << endl;
+        variable->dump();
+        cout << endl;
+        string definition = dumpSharedDefinition(variable);
+        cout << "defnition: " << definition << endl;
+        gencode += definition;
+    }
+
     gencode += bodyCl;
     gencode += "}\n";
 

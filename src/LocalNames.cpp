@@ -13,9 +13,10 @@ namespace cocl {
 std::string LocalNames::getName(Value *value) {
     auto it = nameByValue.find(value);
     if(it == nameByValue.end()) {
+        cout << "this value not found in local names:" << endl;
         value->dump();
         cout << endl;
-        throw runtime_error("value not found in name map");
+        throw runtime_error("value not found in local name map");
     }
     return it->second;
 }

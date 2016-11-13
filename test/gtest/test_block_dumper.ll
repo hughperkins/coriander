@@ -48,3 +48,10 @@ define void @someKernel(float addrspace(1) * %d1, float addrspace(1) * %d2) {
     %3 = call float addrspace(1) * @someFunc(float addrspace(1) *%d1, float addrspace(1) *%2)
     ret void
 }
+
+@mysharedmem = internal addrspace(3) global [8 x float] zeroinitializer, align 4
+
+define void @usesShared(float addrspace(1) *%d1) {
+    %1 = getelementptr inbounds [8 x float], [8 x float]* addrspacecast ([8 x float] addrspace(3) *@mysharedmem to [8 x float]*), i32 0
+    ret void
+}

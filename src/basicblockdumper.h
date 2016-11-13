@@ -22,6 +22,7 @@
 
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Instructions.h"
+#include "llvm/IR/Constants.h"
 
 #include <map>
 #include <set>
@@ -46,6 +47,10 @@ public:
     std::string toCl();
     // void storeValueName(llvm::Value *value);
     std::string dumpConstant(llvm::Constant *constant);
+    std::string dumpChainedInstruction(int level, llvm::Instruction * instr, bool ignoreCasts=false);
+    std::string dumpConstantExpr(llvm::ConstantExpr *expr);
+    std::string dumpOperand(llvm::Value *value);
+    std::string dumpInstruction(std::string indent, llvm::Instruction *instruction);
 
     std::string dumpBinaryOperator(llvm::BinaryOperator *instr, std::string opstring);
     std::string dumpIcmp(llvm::ICmpInst *instr);
@@ -63,9 +68,6 @@ public:
     std::string dumpFPTrunc(llvm::CastInst *instr);
     std::string dumpTrunc(llvm::CastInst *instr);
 
-    std::string dumpOperand(llvm::Value *value);
-    // std::string dumpReturn(llvm::ReturnInst *retInst);
-    std::string dumpInstruction(std::string indent, llvm::Instruction *instruction);
     std::vector<std::string> dumpInsertValue(llvm::InsertValueInst *instr);
     std::string dumpExtractValue(llvm::ExtractValueInst *instr);
     std::string dumpLoad(llvm::LoadInst *instr);

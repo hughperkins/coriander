@@ -41,7 +41,8 @@ def test_cwise_sqrt(context, q, float_data, float_data_gpu):
         'build/ir-to-opencl'
     ] + iropencl_options + [
         '--inputfile', '/tmp/test-opt.ll',
-        '--outputfile', '/tmp/test-device.cl'
+        '--outputfile', '/tmp/test-device.cl',
+        '--kernelname', '_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_'
     ], stdout=subprocess.PIPE)
     print(' '.join(res.args))
     assert res.returncode == 0
@@ -134,6 +135,7 @@ def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
         ] + iropencl_options + [
             '--inputfile', '/tmp/test-opt.ll',
             '--outputfile', '/tmp/test-device.cl'
+            '--kernelname', '_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_'
         ], stdout=subprocess.PIPE)
         print(' '.join(res.args))
         assert res.returncode == 0

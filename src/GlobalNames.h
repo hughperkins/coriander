@@ -34,6 +34,7 @@ class GlobalNames {
 public:
     std::string getName(llvm::Value *value);
     std::string getOrCreateName(llvm::Value *value, std::string proposedName="");
+    bool hasName(llvm::Value *value);
 
     std::string getName(llvm::Type *type);
     std::string getOrCreateName(llvm::Type *type, std::string proposedName="");

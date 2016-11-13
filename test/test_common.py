@@ -1,9 +1,22 @@
 import os
 import subprocess
 import numpy as np
+import pyopencl as cl
 
 
 clang_path = 'clang++-3.8'
+
+
+def run_process(cmdline_list):
+    fout = open('/tmp/pout.txt', 'w')
+    res = subprocess.run(cmdline_list, stdout=fout, stderr=subprocess.STDOUT)
+    fout.close()
+    with open('/tmp/pout.txt', 'r') as f:
+        output = f.read()
+    print(' '.join(res.args))
+    print(output)
+    assert res.returncode == 0
+    return output
 
 
 # partial read/write seem not implemented in the version of pyopencl I have
@@ -90,24 +103,18 @@ def compile_code(cl, context, kernelSource, kernelName):
     # if not branching_transformations:
     #     args.append('--no_branching_transforms')
 
-    res = subprocess.run([
+    run_process([
         'bin/cocl',
         '-c',
         '/tmp/testprog.cu'
-    ] + cocl_options(), stdout=subprocess.PIPE)
-    print(' '.join(res.args))
-    print(res.stdout.decode('utf-8'))
-    assert res.returncode == 0
+    ] + cocl_options())
 
-    res = subprocess.run([
+    run_process([
         'build/ir-to-opencl',
         '--inputfile', '/tmp/testprog-device.ll',
         '--outputfile', '/tmp/testprog-device.cl',
         '--kernelname', kernelName
-    ], stdout=subprocess.PIPE)
-    print(' '.join(res.args))
-    print(res.stdout.decode('utf-8'))
-    assert res.returncode == 0
+    ])
 
     with open('/tmp/testprog-device.cl', 'r') as f:
         cl_sourcecode = f.read()
@@ -124,24 +131,19 @@ def compile_code_v2(cl, context, kernelSource, kernelName):
             os.unlink('/tmp/%s' % file)
     with open('/tmp/testprog.cu', 'w') as f:
         f.write(kernelSource)
-    res = subprocess.run([
+
+    run_process([
         'bin/cocl',
         '-c',
         '/tmp/testprog.cu'
-    ] + cocl_options(), stdout=subprocess.PIPE)
-    print(' '.join(res.args))
-    print(res.stdout.decode('utf-8'))
-    assert res.returncode == 0
+    ] + cocl_options())
 
-    res = subprocess.run([
+    run_process([
         'build/ir-to-opencl',
         '--inputfile', '/tmp/testprog-device.ll',
         '--outputfile', '/tmp/testprog-device.cl',
         '--kernelname', kernelName
-    ], stdout=subprocess.PIPE)
-    print(' '.join(res.args))
-    print(res.stdout.decode('utf-8'))
-    assert res.returncode == 0
+    ])
 
     with open('/tmp/testprog-device.cl', 'r') as f:
         cl_sourcecode = f.read()
@@ -158,27 +160,53 @@ def compile_code_v3(cl, context, kernelSource, kernelName):
             os.unlink('/tmp/%s' % file)
     with open('/tmp/testprog.cu', 'w') as f:
         f.write(kernelSource)
-    res = subprocess.run([
+
+    run_process([
         'bin/cocl',
         '-c',
         '/tmp/testprog.cu'
-    ] + cocl_options(), stdout=subprocess.PIPE)
-    print(' '.join(res.args))
-    print(res.stdout.decode('utf-8'))
-    assert res.returncode == 0
+    ] + cocl_options())
 
-    res = subprocess.run([
+    run_process([
         'build/ir-to-opencl',
         '--inputfile', '/tmp/testprog-device.ll',
         '--outputfile', '/tmp/testprog-device.cl',
         '--kernelname', kernelName
-    ], stdout=subprocess.PIPE)
-    print(' '.join(res.args))
-    print(res.stdout.decode('utf-8'))
-    assert res.returncode == 0
+    ])
 
     with open('/tmp/testprog-device.cl', 'r') as f:
         cl_sourcecode = f.read()
     prog = cl.Program(context, cl_sourcecode).build()
     kernel = prog.__getattr__(kernelName)
     return {'kernel': kernel, 'cl_sourcecode': cl_sourcecode}
+
+
+def cu_to_cl(cu_sourcecode, kernelName):
+    for file in os.listdir('/tmp'):
+        if file.startswith('testprog'):
+            os.unlink('/tmp/%s' % file)
+    with open('/tmp/testprog.cu', 'w') as f:
+        f.write(cu_sourcecode)
+
+    run_process([
+        'bin/cocl',
+        '-c',
+        '/tmp/testprog.cu'
+    ] + cocl_options())
+
+    run_process([
+        'build/ir-to-opencl',
+        '--inputfile', '/tmp/testprog-device.ll',
+        '--outputfile', '/tmp/testprog-device.cl',
+        '--kernelname', kernelName
+    ])
+
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_sourcecode = f.read()
+    return cl_sourcecode
+
+
+def build_kernel(context, cl_sourcecode, kernelName):
+    prog = cl.Program(context, cl_sourcecode).build()
+    kernel = prog.__getattr__(kernelName)
+    return kernel

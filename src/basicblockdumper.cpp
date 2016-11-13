@@ -35,6 +35,65 @@ using namespace llvm;
 
 namespace cocl {
 
+// string BasicBlockDumper::dumpChainedInstruction(int level, Instruction * instr, bool ignoreCasts) {
+//     if(GetElementPtrInst *gep = dyn_cast<GetElementPtrInst>(instr)) {
+//         string thisinstrstring = dumpGetElementPtr(gep);
+//         exprByValue[instr] = thisinstrstring;
+//         return thisinstrstring;
+//     } else if(BitCastInst *bitcast = dyn_cast<BitCastInst>(instr)) {
+//         string thisinstrstring = "";
+//         if(ignoreCasts) {
+//             thisinstrstring = dumpChainedInstruction(level+1, cast<Instruction>(instr->getOperand(0)), true);
+//         } else {
+//             thisinstrstring = dumpBitCast(bitcast);
+//         }
+//         return thisinstrstring;
+//     } else if(AddrSpaceCastInst *addrspacecast = dyn_cast<AddrSpaceCastInst>(instr)) {
+//         string thisinstrstring = "";
+//         if(ignoreCasts) {
+//             thisinstrstring = dumpChainedInstruction(level+1, cast<Instruction>(instr->getOperand(0)), true);
+//             // thisinstrstring = dumpOperand(instr);
+//         } else {
+//             thisinstrstring = dumpAddrSpaceCast(addrspacecast);
+//         }
+//         exprByValue[addrspacecast] = thisinstrstring;
+//         return thisinstrstring;
+//     } else {
+//         instr->dump();
+//         throw runtime_error("dumpchained unknown instruction type ");
+//     }
+// }
+
+// string BasicBlockDumper::dumpChainedInstruction(int level, Instruction * instr, bool ignoreCasts) {
+//     if(!ignoreCasts) {
+//         throw runtime_error("not implemented: dci with ignoreCasts false");
+//     }
+
+// }
+
+string BasicBlockDumper::dumpConstantExpr(ConstantExpr *expr) {
+    // this means things like:
+    // shared memory 
+    cout << "dumping constnat expr:" << endl;
+    expr->dump();
+    cout << endl;
+    Instruction *instr = expr->getAsInstruction();
+    int numOperands = instr->getNumOperands();
+    cout << "numoperands " << numOperands << endl;
+    for(int i = 0; i < numOperands; i++) {
+        Value *op = instr->getOperand(i);
+        cout << "op " << i << ":" << endl;
+        op->dump();
+        cout << endl;
+        string opstring = dumpOperand(op);
+        cout << "opstring:" << opstring << endl;
+    }
+    string thisinstrstr = dumpInstruction("", instr);
+    cout << "thisinstrstr: [" << thisinstrstr << "]" << endl;
+    return thisinstrstr;
+    // throw runtime_error("not implemented");
+}
+
 // maybe this should be somewhere more generic?
 string BasicBlockDumper::dumpConstant(Constant *constant) {
     unsigned int valueTy = constant->getValueID();
@@ -44,35 +103,50 @@ string BasicBlockDumper::dumpConstant(Constant *constant) {
         string constantintval = oss.str();
         return constantintval;
     } else if(isa<ConstantStruct>(constant)) {
-        throw runtime_error("constantStruct not implemented in basicblockdumper.dumpconstnat");
+        throw runtime_error("constantStruct not implemented in basicblockdumper.dumpconstant");
     } else if(ConstantExpr *expr = dyn_cast<ConstantExpr>(constant)) {
-        throw runtime_error("constantExpr not implemented in basicblockdumper.dumpconstnat");
+        cout << "constantexpr" << endl;
+        return dumpConstantExpr(expr);
+        // throw runtime_error("constantExpr not implemented in basicblockdumper.dumpconstnat");
         // Instruction *instr = expr->getAsInstruction();
+        // cout << "dumping:" << endl;
+        // instr->dump();
         // copyAddressSpace(constant, instr);
-        // string dcires = dumpChainedInstruction(0, instr);
+        // string dcires = dumpInstruction(instr);
+        // cout << "calling dci" << endl;
+        // string dcires = dumpChainedInstruction(0, instr, true);
+        // cout << "dcires " << dcires << endl;
         // // copyAddressSpace(instr, constant);
         // nameByValue[constant] = dcires;
+        // cout << "exprByValue has constant? " << (exprByValue.find(constant) != exprByValue.end()) << endl;
+        // exprByValue[constant] = dcires;
         // return dcires;
     } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
         return dumpFloatConstant(constantFP);
     } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
-        throw runtime_error("GlobalValue not implemented in basicblockdumper.dumpconstnat");
-         // if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
-         //     int addressspace = pointerType->getAddressSpace();
-         //     string name = getName(global);
-         //     if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
-         //         return name;
-         //     }
-         // }
-         // if(nameByValue.find(constant) != nameByValue.end()) {
-         //    return nameByValue[constant];
-         // }
-         // string name = getName(global);
-         // string ourinstrstr = "(&" + name + ")";
-         // updateAddressSpace(constant, 4);
-         // nameByValue[constant] = ourinstrstr;
+        cout << "globalvalue" << endl;
+        // throw runtime_error("GlobalValue not implemented in basicblockdumper.dumpconstant");
+        if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
+            int addressspace = pointerType->getAddressSpace();
+            if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
+                sharedVariablesToDeclare.insert(global);
+                string name = localNames->getOrCreateName(global);
+                cout << "shared memory, creating in localnames name=" << name << endl;
+                return name;
+            }
+        }
+        if(globalNames->hasName(constant)) {
+            cout << "found constnat in globalanesm, returning" << endl;
+           return globalNames->getName(constant);
+        }
+        string name = global->getName().str();
+        cout << "using global's native name " << name << endl;
+        string ourinstrstr = "(&" + name + ")";
+        updateAddressSpace(constant, 4);  // 4 means constant
+        cout << "adding to exprByValue [" << ourinstrstr << "]" << endl;
+        exprByValue[constant] = ourinstrstr;
 
-         // return ourinstrstr;
+        return ourinstrstr;
     } else if(isa<UndefValue>(constant)) {
         return "";
     } else if(isa<ConstantPointerNull>(constant)) {
@@ -109,7 +183,10 @@ string BasicBlockDumper::dumpOperand(Value *value) {
     // storeValueName(value);
     // functionNeededForwardDeclarations.insert(value);
     // return nameByValue[value];
-    throw runtime_error("Not implemented");
+    cout << "dumpoperand, not implemented for value:" << endl;
+    value->dump();
+    cout << endl;
+    throw runtime_error("dumpoperand not implemented for this value");
 }
 
 std::string BasicBlockDumper::dumpBinaryOperator(BinaryOperator *instr, std::string opstring) {
@@ -229,7 +306,10 @@ std::string BasicBlockDumper::dumpAddrSpaceCast(llvm::AddrSpaceCastInst *instr) 
     string gencode = "";
     string op0str = dumpOperand(instr->getOperand(0));
     copyAddressSpace(instr->getOperand(0), instr);
-    gencode += "((" + typeDumper->dumpType(instr->getType()) + ")" + op0str + ")";
+    // hackily ignore casts if shared address space
+    // actually, just ignore all address space casts, since they're all illegal in opencl...
+    // gencode += "((" + typeDumper->dumpType(instr->getType()) + ")" + op0str + ")";
+    gencode += op0str;
     return gencode;
 }
 
@@ -261,6 +341,7 @@ std::string BasicBlockDumper::dumpFPToUI(llvm::FPToUIInst *instr) {
 
 std::string BasicBlockDumper::dumpFPToSI(llvm::FPToSIInst *instr) {
     string gencode = "";
+    // copyAddressSpace(instr->getOperand(0), instr);
     string typestr = typeDumper->dumpType(instr->getType());
     gencode += "(*(" + typestr + " *)" + "&" + dumpOperand(instr->getOperand(0)) + ")";
     return gencode;
@@ -1023,8 +1104,10 @@ std::string BasicBlockDumper::toCl() {
         }
         // cout << endl;
         string instructionCode = dumpInstruction("    ", inst);
-        cout << "instructionCode [" << instructionCode << "]" << endl;
-        gencode += instructionCode;
+        if(instructionCode != "") {
+            cout << "instructionCode [" << instructionCode << "]" << endl;
+            gencode += instructionCode;
+        }
         inst->dump();
     }
     return gencode;

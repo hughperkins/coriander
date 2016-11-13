@@ -55,6 +55,8 @@ public:
     std::string dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock);
     std::string dumpBranch(llvm::BranchInst *instr, std::map<llvm::Value *, std::string> &exprByValue);
     std::string dumpReturn(llvm::Type **pReturnType, llvm::ReturnInst *retInst, std::map<llvm::Value *, std::string> &exprByValue);
+    std::string dumpTerminator(llvm::Type **pReturnType, llvm::Instruction *terminator, std::map<llvm::Value *, std::string> &exprByValue);
+    std::string dumpSharedDefinition(llvm::Value *value);
     std::string getDeclaration();
 
     std::string functionDeclaration;

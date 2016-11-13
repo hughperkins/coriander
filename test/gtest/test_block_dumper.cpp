@@ -90,7 +90,7 @@ TEST(test_block_dumper, basic) {
     v20 = *(float *)&v2;
     v21 = *(float *)&v2;
     v22 = (int*)v8;
-    v23 = (global float*)v8;
+    v23 = v8;
     v24 = *(int *)&(v3);
     v26 = v25[0];
     v27 = v26.f0;
@@ -106,8 +106,8 @@ TEST(test_block_dumper, basic) {
 
     cout << "alloca declrations:" << endl;
     cout << blockDumper.getAllocaDeclarations("    ") << endl;
-    string expectedAllocaDeclarations = R"(    float v8[1];
-    int v6[1];
+    string expectedAllocaDeclarations = R"(    int v6[1];
+    float v8[1];
     struct mystruct v25[1];
 )";
     ASSERT_EQ(expectedAllocaDeclarations, blockDumper.getAllocaDeclarations("    "));
@@ -167,6 +167,38 @@ TEST(test_block_dumper, basic2) {
     }
     ASSERT_EQ(1, blockDumper.neededFunctions.size());
     ASSERT_EQ(getFunction("someFunc"), *blockDumper.neededFunctions.begin());
+}
+
+TEST(test_block_dumper, usesShared) {
+    Function *F = getFunction("usesShared");
+    F->dump();
+    BasicBlock *block = &*F->begin();
+    GlobalNames globalNames;
+    LocalNames localNames;
+    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+        Argument *arg = &*it;
+        string name = arg->getName().str();
+        Value *value = arg;
+        localNames.getOrCreateName(value, name);
+    }
+    cout << localNames.dumpNames();
+    TypeDumper typeDumper(&globalNames);
+    FunctionNamesMap functionNamesMap;
+    BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
+    string cl = blockDumper.toCl();
+    cout << "cl:\n" << cl << endl;
+    cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
+
+    cout << "num shared variables to declare: " << blockDumper.sharedVariablesToDeclare.size() << endl;
+    ASSERT_EQ(1, blockDumper.sharedVariablesToDeclare.size());
+    for(auto it=blockDumper.sharedVariablesToDeclare.begin(); it !=blockDumper.sharedVariablesToDeclare.end(); it++) {
+        Value *value = *it;
+        cout << "shared:" << endl;
+        value->dump();
+        cout << endl;
+    }
+    Value *shared = *blockDumper.sharedVariablesToDeclare.begin();
+    shared->dump();
 }
 
 } // test_block_dumper

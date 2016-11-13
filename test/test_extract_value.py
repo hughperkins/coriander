@@ -22,6 +22,9 @@ from test import test_common
 from test.test_common import offset_type
 
 
+kernelname = test_common.mangle('test_floats', ['float *'])
+
+
 @pytest.fixture(scope='module')
 def extract_value_cl():
     # lets check it's compileable ll first, using llvm
@@ -51,9 +54,10 @@ def extract_value_cl():
         os.makedirs('test/generated')
     print(subprocess.check_output([
         'build/ir-to-opencl',
-        '--debug',
+        # '--debug',
         '--inputfile', ll_filepath,
-        '--outputfile', cl_filepath
+        '--outputfile', cl_filepath,
+        '--kernelname', kernelname
     ]).decode('utf-8'))
     return cl_filepath
 
@@ -72,7 +76,7 @@ def test_program_compiles(extract_value):
 
 
 def test_copy_float(extract_value, q, float_data, float_data_gpu):
-    extract_value.__getattr__(test_common.mangle('test_floats', ['float *']))(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(4))
+    extract_value.__getattr__(kernelname)(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     assert float_data[0] == float_data[1]
