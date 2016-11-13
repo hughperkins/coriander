@@ -92,10 +92,10 @@ TEST(test_block_dumper, basic) {
     v8[0] = v4;
     v34[0] = v7;
     v34[0] = v7;
-    v6[0] = *(int *)&v4;
-    v6[0] = *(int *)&v4;
-    v8[0] = *(float *)&v2;
-    v8[0] = *(float *)&v2;
+    v6[0] = (int)v4;
+    v6[0] = (int)v4;
+    v8[0] = (float)v2;
+    v8[0] = (float)v2;
     structs[0] = v29;
     v6[0] = (v2 < 4) ? 21 : 44;
 )";

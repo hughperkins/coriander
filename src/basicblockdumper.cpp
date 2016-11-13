@@ -338,7 +338,7 @@ std::string BasicBlockDumper::dumpFPToUI(llvm::FPToUIInst *instr) {
     string typestr = typeDumper->dumpType(instr->getType());
     // gencode += "(" + typestr + ")" + dumpOperand(instr->getOperand(0));
     // gencode += "(*(" + typestr + " *)" + "&" + dumpOperand(instr->getOperand(0)) + ")";
-    gencode += "(" + typestr + " )" + dumpOperand(instr->getOperand(0)) + "";
+    gencode += "(" + typestr + ")" + dumpOperand(instr->getOperand(0)) + "";
     return gencode;
 }
 
@@ -347,7 +347,7 @@ std::string BasicBlockDumper::dumpFPToSI(llvm::FPToSIInst *instr) {
     // copyAddressSpace(instr->getOperand(0), instr);
     string typestr = typeDumper->dumpType(instr->getType());
     // gencode += "(*(" + typestr + " *)" + "&" + dumpOperand(instr->getOperand(0)) + ")";
-    gencode += "(" + typestr + " )" + dumpOperand(instr->getOperand(0)) + "";
+    gencode += "(" + typestr + ")" + dumpOperand(instr->getOperand(0)) + "";
     return gencode;
 }
 
@@ -356,7 +356,7 @@ std::string BasicBlockDumper::dumpUIToFP(llvm::UIToFPInst *instr) {
     string typestr = typeDumper->dumpType(instr->getType());
     // gencode += "(" + typestr + ")" + dumpOperand(instr->getOperand(0));
     // gencode += "(*(" + typestr + " *)" + "&" + dumpOperand(instr->getOperand(0)) + ")";
-    gencode += "(" + typestr + " )" + dumpOperand(instr->getOperand(0)) + "";
+    gencode += "(" + typestr + ")" + dumpOperand(instr->getOperand(0)) + "";
     return gencode;
 }
 
@@ -365,7 +365,7 @@ std::string BasicBlockDumper::dumpSIToFP(llvm::SIToFPInst *instr) {
     string typestr = typeDumper->dumpType(instr->getType());
     // gencode += "(" + typestr + ")" + dumpOperand(instr->getOperand(0));
 //    gencode += "(*(" + typestr + " *)" + "&" + dumpOperand(instr->getOperand(0)) + ")";
-    gencode += "(" + typestr + " )" + dumpOperand(instr->getOperand(0)) + "";
+    gencode += "(" + typestr + ")" + dumpOperand(instr->getOperand(0)) + "";
     return gencode;
 }
 
