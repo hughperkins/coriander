@@ -176,11 +176,10 @@ std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {
         case Type::ArrayTyID:
             return dumpArrayType(cast<ArrayType>(type), decayArraysToPointer);
         case Type::DoubleTyID:
-            // if(single_precision) {
-                // return "float";
-            // } else {
-                return "double";
-            // }
+            if(forceSingle) {
+                return "float";
+            }
+            return "double";
         case Type::FunctionTyID:
             return dumpFunctionType(cast<FunctionType>(type));
         case Type::PointerTyID:

@@ -15,4 +15,4 @@ std::string getName(llvm::Function *type);
 std::string getName(llvm::Value *value);
 int readInt32Constant(llvm::Value *value);
 float readFloatConstant(llvm::Value *value);
-std::string dumpFloatConstant(llvm::ConstantFP *constantFP);
+std::string dumpFloatConstant(bool forceSingle, llvm::ConstantFP *constantFP);

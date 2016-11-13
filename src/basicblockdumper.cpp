@@ -123,7 +123,7 @@ string BasicBlockDumper::dumpConstant(Constant *constant) {
         // exprByValue[constant] = dcires;
         // return dcires;
     } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
-        return dumpFloatConstant(constantFP);
+        return dumpFloatConstant(forceSingle, constantFP);
     } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
         cout << "globalvalue" << endl;
         // throw runtime_error("GlobalValue not implemented in basicblockdumper.dumpconstant");

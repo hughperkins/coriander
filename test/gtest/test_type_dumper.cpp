@@ -122,7 +122,7 @@ TEST(test_type_dumper, float64) {
     string retType = typeDumper.dumpType(retInst->getType());
     cout << "retType: [" << retType << "]" << endl;
 
-    ASSERT_EQ(retType, "double");
+    ASSERT_EQ(retType, "float");
 }
 
 TEST(test_type_dumper, pointer_float32) {

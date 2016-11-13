@@ -65,7 +65,7 @@ int readInt32Constant(Value *value) {
     return cast<ConstantInt>(value)->getSExtValue();
 }
 
-string dumpFloatConstant(ConstantFP *constantFP) {
+string dumpFloatConstant(bool forceSingle, ConstantFP *constantFP) {
     double doubleValue;
     float floatValue;
     bool isDouble = false;
@@ -94,7 +94,7 @@ string dumpFloatConstant(ConstantFP *constantFP) {
     if(valuestr.find('.') == string::npos) {
         valuestr += ".0";
     }
-    if(!isDouble) {
+    if(!isDouble || forceSingle) {
         valuestr += "f";
     }
     return valuestr;

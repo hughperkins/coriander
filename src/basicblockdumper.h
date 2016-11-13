@@ -104,6 +104,7 @@ public:
 protected:
     llvm::BasicBlock *block;
     bool _addIRToCl = false;
+    bool forceSingle = true;
 
     GlobalNames *globalNames;
     LocalNames *localNames;

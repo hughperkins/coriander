@@ -47,6 +47,7 @@ public:
 protected:
     // std::map<llvm::GlobalVariable *, std::string> globalVariablesToDefine;
     GlobalNames *globalNames = 0;
+    bool forceSingle = true;
 };
 
 } // namespace cocl
