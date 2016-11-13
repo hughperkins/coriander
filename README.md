@@ -124,9 +124,22 @@ sudo make install
 
 ## Test
 
-There are two sets of tests:
-- low-level tests, using `py.test`
+There are three sets of tests:
+- low-level tests, using gtest
+- mid-level tests, using `py.test`
 - end-to-end tests
+
+### gtest tests
+
+```
+cd build
+make -j 4
+./cocl_unittests
+```
+
+No dependencies on graphics card etc.  It simply takes some hand-crafted IR, and writes it to OpenCL.  It never actually tries to run the OpenCL, so it validates:
+- can cocl handle the IR without choking/crashing?
+- do the hand-crafted OpenCL expected results match up with the actual cocl outputs?
 
 ### Tests from python
 
