@@ -60,6 +60,8 @@ public:
     virtual ~StructCloner() {
 
     }
+    // void makePointersGlobal(llvm::StructType *inStructType);
+    llvm::StructType *createGlobalizedPointerStruct(std::map<llvm::StructType *, llvm::StructType *> &newByOld, llvm::StructType *inType);
     llvm::StructType *cloneNoPointers(llvm::StructType *inStructType);
     std::string writeClCopyNoPtrToPtrfull(llvm::StructType *ptrfullType, std::string srcName, std::string destName);
     llvm::Instruction *createHostsideIrCopyPtrfullToNoptr(llvm::Instruction *lastInst, llvm::StructType *ptrfullType,

@@ -601,9 +601,18 @@ std::string BasicBlockDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr) 
         // addSharedDeclaration(instr->getOperand(0));
         sharedVariablesToDeclare.insert(instr->getOperand(0));
     }
+    cout << "dumpgetelementptr addressspace=" << addressspace << endl;
+    cout << "currenttype:" << endl;
+    currentType->dump();
+    cout << endl;
     for(int d=0; d < numOperands - 1; d++) {
+        cout << "  dumpgetelementptr d=" << d << " addessspace=" << addressspace << endl;
+        cout << "currenttype:" << endl;
+        currentType->dump();
+        cout << endl;
         Type *newType = 0;
         if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
+            cout << "  dumpgetelementptr d=" << d << " pointer or array" << endl;
             if(d == 0) {
                 if(isa<ArrayType>(currentType->getPointerElementType())) {
                     rhs = "(&" + rhs + ")";
@@ -614,6 +623,7 @@ std::string BasicBlockDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr) 
             rhs += string("[") + idxstring + "]";
             newType = currentType->getPointerElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
+            cout << "  dumpgetelementptr d=" << d << " struct" << endl;
             string structName = getName(structtype);
             if(structName == "struct.float4") {
                 int idx = readInt32Constant(instr->getOperand(d + 1));
@@ -628,6 +638,12 @@ std::string BasicBlockDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr) 
                 Type *elementType = structtype->getElementType(idx);
                 rhs += string(".f") + easycl::toString(idx);
                 newType = elementType;
+                if(PointerType *ptr = dyn_cast<PointerType>(newType)) {
+                    addressspace = ptr->getAddressSpace();
+                    cout << "  dumpgetelementptr d=" << d << " struct updating addressspace to " << addressspace << endl;
+                } else {
+                    addressspace = 0;
+                }
             }
         } else {
             currentType->dump();

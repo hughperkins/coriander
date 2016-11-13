@@ -16,6 +16,7 @@
 
 #include "ir-to-opencl-common.h"
 #include "EasyCL/util/easycl_stringhelper.h"
+#include "mutations.h"
 
 #include "llvm/Support/raw_os_ostream.h"
 #include "llvm/IR/Constants.h"
@@ -46,6 +47,44 @@ namespace cocl {
 // }
 
 // Type *cloneStructTypeNoPointers(StructType *inType) {
+
+llvm::StructType *StructCloner::createGlobalizedPointerStruct(std::map<llvm::StructType *, llvm::StructType *> &newByOld, llvm::StructType *inType) {
+    LLVMContext &context = inType->getContext();
+    if(newByOld.find(inType) != newByOld.end()) {
+        return newByOld[inType];
+    }
+    string newName = inType->getName().str() + "_ptrglobal";
+    vector<Type *>newChildren;
+    for(auto it=inType->element_begin(); it != inType->element_end(); it++) {
+        Type *childType = *it;
+        if(StructType *childStructType = dyn_cast<StructType>(childType)) {
+            childType = createGlobalizedPointerStruct(newByOld, childStructType);
+            newChildren.push_back(childType);
+        } else if(PointerType *ptr = dyn_cast<PointerType>(childType)) {
+            Type *elementType = ptr->getElementType();
+            // assume fundamental for now
+            if(elementType->getPrimitiveSizeInBits() > 0) {
+                PointerType *newPtr = PointerType::get(elementType, 1);
+                newChildren.push_back(newPtr);
+            } else {
+                // just ignore...
+                // elementType->dump();
+                // throw runtime_error("not implemented");
+            }
+        } else {
+            newChildren.push_back(childType);
+        }
+    }
+    // outs() << "newchildren.size() " << newChildren.size() << "\n";
+    StructType *newType = 0;
+    if(newChildren.size() > 0) {
+        newType = StructType::create(ArrayRef<Type *>(&newChildren[0], &newChildren[newChildren.size()]), newName);
+    } else {
+        newType = StructType::get(context);
+    }
+    newByOld[inType] = newType;
+    return newType;
+}
 
 StructType *StructCloner::cloneNoPointers(StructType *inType) {
     LLVMContext &context = inType->getContext();
