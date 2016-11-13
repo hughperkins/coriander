@@ -83,4 +83,44 @@ TEST(test_function_dumper, basic) {
     ASSERT_EQ("someFunc", (*functionDumper.neededFunctions.begin())->getName().str());
 }
 
+TEST(test_function_dumper, usesShared1) {
+    Function *F = getFunction("usesShared");
+    F->dump();
+    // BasicBlock *block = &*F->begin();
+    GlobalNames globalNames;
+    LocalNames localNames;
+    TypeDumper typeDumper(&globalNames);
+    FunctionNamesMap functionNamesMap;
+    FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
+    string cl = functionDumper.toCl();
+    cout << "cl:\n" << cl << endl;
+
+    ASSERT_EQ(1, functionDumper.sharedVariablesToDeclare.size());
+    string sharedDefinitions = functionDumper.dumpSharedDefinitions("    ");
+    cout << "shareddefinitions: " << sharedDefinitions << endl;
+    string expected_shared = "    local float mysharedmem[8];\n";
+    ASSERT_EQ(expected_shared, sharedDefinitions);
+}
+
+TEST(test_function_dumper, usesShared2) {
+    Function *F = getFunction("usesShared2");
+    F->dump();
+    // BasicBlock *block = &*F->begin();
+    GlobalNames globalNames;
+    LocalNames localNames;
+    TypeDumper typeDumper(&globalNames);
+    FunctionNamesMap functionNamesMap;
+    FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
+    string cl = functionDumper.toCl();
+    cout << "cl:\n" << cl << endl;
+
+    ASSERT_EQ(2, functionDumper.sharedVariablesToDeclare.size());
+    string sharedDefinitions = functionDumper.dumpSharedDefinitions("    ");
+    cout << "shareddefinitions: " << sharedDefinitions << endl;
+    string expected_shared = R"(    local float mysharedmem[8];
+    local int anothershared[12];
+)";
+    ASSERT_EQ(expected_shared, sharedDefinitions);
+}
+
 } // test_block_dumper

@@ -176,7 +176,7 @@ std::string FunctionDumper::dumpSharedDefinition(llvm::Value *value) {
             int length = arraytype->getNumElements();
             Type *elementType = arraytype->getElementType();
             string typestr = typeDumper->dumpType(elementType);
-            declaration += "    local " + typestr + " " + name + "[" + easycl::toString(length) + "];\n";
+            declaration += "local " + typestr + " " + name + "[" + easycl::toString(length) + "]";
             exprByValue[value] = name;
             // nameByValue[value] = name;
             // currentFunctionSharedDeclarations += declaration;
@@ -193,6 +193,21 @@ std::string FunctionDumper::dumpSharedDefinition(llvm::Value *value) {
         cout << endl;
         throw runtime_error("didnt expect ot be here.  dumpshareddefinition, for htis value");
     }
+}
+
+std::string FunctionDumper::dumpSharedDefinitions(std::string indent) {
+    ostringstream oss;
+    for(auto it=sharedVariablesToDeclare.begin(); it != sharedVariablesToDeclare.end(); it++) {
+        Value *variable = *it;
+        // cout << "declaring:" << endl;
+        // variable->dump();
+        // cout << endl;
+        string definition = dumpSharedDefinition(variable);
+        // cout << "defnition: " << definition << endl;
+        // gencode += definition;
+        oss << indent << definition << ";\n";
+    }
+    return oss.str();
 }
 
 std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function *F) {
@@ -374,15 +389,7 @@ std::string FunctionDumper::toCl() {
         gencode += "    " + it->second + ";\n";
     }
 
-    for(auto it=sharedVariablesToDeclare.begin(); it != sharedVariablesToDeclare.end(); it++) {
-        Value *variable = *it;
-        cout << "declaring:" << endl;
-        variable->dump();
-        cout << endl;
-        string definition = dumpSharedDefinition(variable);
-        cout << "defnition: " << definition << endl;
-        gencode += definition;
-    }
+    gencode += dumpSharedDefinitions("    ");
 
     gencode += bodyCl;
     gencode += "}\n";

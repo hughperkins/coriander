@@ -57,25 +57,26 @@ public:
     std::string dumpReturn(llvm::Type **pReturnType, llvm::ReturnInst *retInst, std::map<llvm::Value *, std::string> &exprByValue);
     std::string dumpTerminator(llvm::Type **pReturnType, llvm::Instruction *terminator, std::map<llvm::Value *, std::string> &exprByValue);
     std::string dumpSharedDefinition(llvm::Value *value);
+    std::string dumpSharedDefinitions(std::string indent);
     std::string getDeclaration();
 
-    std::string functionDeclaration;
     std::set<llvm::Function *> neededFunctions;
     std::set<llvm::StructType *> structsToDefine;
-    std::string shimCode = "";
-    std::string functionDeclarations = "";
     std::map<llvm::Value *, std::string> exprByValue;
     std::map<std::string, std::string> phiDeclarationsByName;
+    std::set<llvm::Value *> sharedVariablesToDeclare;
+    std::set<llvm::Value *> variablesToDeclare;
+    std::set<std::string> allocaDeclarations;
+
+    std::string shimCode = "";
+    std::string functionDeclaration;
+    std::string functionDeclarations = "";
 
 protected:
     llvm::Function *F;
     bool isKernel = false;
     bool _addIRToCl = false;
     std::map<llvm::BasicBlock *, int> functionBlockIndex;
-
-    std::set<llvm::Value *> variablesToDeclare;
-    std::set<llvm::Value *> sharedVariablesToDeclare;
-    std::set<std::string> allocaDeclarations;
 
     FunctionDumper *addIRToCl() {
         _addIRToCl = true;
