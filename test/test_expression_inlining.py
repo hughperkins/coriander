@@ -46,6 +46,14 @@ __global__ void myKernel(float *data) {
         '/tmp/%s.cu' % basename
     ]).decode('utf-8'))
 
+    kernelName = test_common.mangle('myKernel', ['float *'])
+    print(subprocess.check_output([
+        'build/ir-to-opencl',
+        '--inputfile', '/tmp/%s-device.ll' % basename,
+        '--outputfile', '/tmp/%s-device.cl' % basename,
+        '--kernelname', kernelName
+    ]).decode('utf-8'))
+
     with open('/tmp/%s-device.cl' % basename, 'r') as f:
         sourcecode = f.read()
 
@@ -54,7 +62,7 @@ __global__ void myKernel(float *data) {
     cl.enqueue_copy(q, float_data_gpu, float_data)
     q.finish()
     prog = cl.Program(context, sourcecode).build()
-    prog.__getattr__(test_common.mangle('myKernel', ['float *']))(
+    prog.__getattr__(kernelName)(
         q, (32,), (32,),
         float_data_gpu, offset_type(0), cl.LocalMemory(4))
     q.finish()
