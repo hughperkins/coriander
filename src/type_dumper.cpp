@@ -107,7 +107,7 @@ std::string TypeDumper::dumpStructType(StructType *type) {
             name = globalNames->getOrCreateName(type, name);
             return "float4";
         } else {
-            if(name.find("struct_") == 0) {
+            if(name.find("struct_") == 0 || name.find("struct ") == 0) {
                 name[6] = ' ';
                 name = globalNames->getOrCreateName(type, name);
                 // structsToDefine[type] = name;
