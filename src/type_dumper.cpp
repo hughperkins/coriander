@@ -99,23 +99,31 @@ std::string TypeDumper::dumpStructType(StructType *type) {
     if(type->hasName()) {
         string name = type->getName();
         // outs() << "name " << name << "\n";
-        name = easycl::replace(name, ".", "_");
-                name = easycl::replace(name, ":", "_");
-        name = globalNames->getOrCreateName(type, name);
+        name = easycl::replaceGlobal(name, ".", "_");
+        name = easycl::replaceGlobal(name, ":", "_");
+        cout << "typedumper::dumpstructtype, name=" << name << endl;
         if(name == "struct_float4") {
+            name = "float4";
+            name = globalNames->getOrCreateName(type, name);
             return "float4";
         } else {
             if(name.find("struct_") == 0) {
                 name[6] = ' ';
-                structsToDefine[type] = name;
+                name = globalNames->getOrCreateName(type, name);
+                // structsToDefine[type] = name;
+                structsToDefine.insert(type);
                 return name;
             } else if(name.find("class_") != string::npos) {
                 name = "struct " + name;
-                structsToDefine[type] = name;
+                name = globalNames->getOrCreateName(type, name);
+                // structsToDefine[type] = name;
+                structsToDefine.insert(type);
                 return name;
             } else {
                 name = "struct " + name;
-                structsToDefine[type] = name;
+                name = globalNames->getOrCreateName(type, name);
+                structsToDefine.insert(type);
+                // structsToDefine[type] = name;
                 return name;
             }
         }
@@ -230,12 +238,12 @@ std::string TypeDumper::dumpStructDefinitions() {
     set<StructType *>dumped;
     while(dumped.size() < structsToDefine.size()) {
         for(auto it=structsToDefine.begin(); it != structsToDefine.end(); it++) {
-            StructType *structType = it->first;
+            StructType *structType = *it;
             if(dumped.find(structType) != dumped.end()) {
                 continue;
             }
             dumped.insert(structType);
-            gencode += dumpStructDefinition(structType, it->second);
+            gencode += dumpStructDefinition(structType, globalNames->getName(structType));
         }
     }
     return gencode;

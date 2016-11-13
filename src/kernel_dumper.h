@@ -36,6 +36,7 @@ public:
     llvm::Module *M;
     std::string kernelName;
     std::set<std::string> functionDeclarations;
+    std::set<llvm::StructType *>structsToDefine;
 
 protected:
 };

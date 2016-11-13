@@ -37,9 +37,10 @@ def dotdotdot_cl():
         os.makedirs('test/generated')
     print(subprocess.check_output([
         'build/ir-to-opencl',
-        '--debug',
+        # '--debug',
         '--inputfile', ll_filepath,
-        '--outputfile', cl_filepath
+        '--outputfile', cl_filepath,
+        '--kernelname', '_Z7test_siPf'
     ]).decode('utf-8'))
     return cl_filepath
 

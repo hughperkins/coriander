@@ -55,6 +55,9 @@ std::string KernelDumper::toCl() {
     for(auto it=functionDumper.neededFunctions.begin(); it != functionDumper.neededFunctions.end(); it++) {
         neededFunctions.insert(*it);
     }
+    for(auto it2=functionDumper.structsToDefine.begin(); it2 != functionDumper.structsToDefine.end(); it2++) {
+        structsToDefine.insert(*it2);
+    }
     while(dumpedFunctions.size() < neededFunctions.size()) {
         for(auto it = neededFunctions.begin(); it != neededFunctions.end(); it++) {
             Function *childF = *it;
@@ -68,9 +71,17 @@ std::string KernelDumper::toCl() {
             functionDeclarations.insert(childFunctionDumper.getDeclaration());
             cout << "childFunctionCl:\n" << childFunctionCl << endl;
             moduleClStream << childFunctionCl;
+            for(auto it2=childFunctionDumper.structsToDefine.begin(); it2 != childFunctionDumper.structsToDefine.end(); it2++) {
+                structsToDefine.insert(*it2);
+            }
         }
     }
+
     ostringstream functionDeclarationsStream;
+    for(auto it=structsToDefine.begin(); it != structsToDefine.end(); it++) {
+        typeDumper.structsToDefine.insert(*it);
+    }
+    functionDeclarationsStream << typeDumper.dumpStructDefinitions() << "\n";
     for(auto it=functionDeclarations.begin(); it != functionDeclarations.end(); it++) {
         functionDeclarationsStream << *it << ";\n";
     }
