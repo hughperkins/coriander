@@ -14,8 +14,6 @@ limitations under the License.
 """
 import numpy as np
 import pyopencl as cl
-import os
-import subprocess
 from test import test_common
 from test.test_common import offset_type
 

@@ -347,6 +347,9 @@ std::string FunctionDumper::toCl() {
 
         BasicBlockDumper basicBlockDumper(
             basicBlock, globalNames, &localNames, typeDumper, functionNamesMap);
+        if(_addIRToCl) {
+            basicBlockDumper.addIRToCl();
+        }
         bodyCl += basicBlockDumper.toCl();
 
         functionDeclarations += basicBlockDumper.getAllocaDeclarations("    ");

@@ -38,7 +38,13 @@ public:
     std::set<std::string> functionDeclarations;
     std::set<llvm::StructType *>structsToDefine;
 
+    KernelDumper *addIRToCl() {
+        _addIRToCl = true;
+        return this;
+    }
+
 protected:
+    bool _addIRToCl = false;
 };
 
 } // namespace cocl

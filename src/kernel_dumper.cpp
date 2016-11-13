@@ -48,6 +48,9 @@ std::string KernelDumper::toCl() {
     neededFunctions.insert(F);
 
     FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
+    if(_addIRToCl) {
+        functionDumper.addIRToCl();
+    }
     string kernelFunctionCl = functionDumper.toCl();
     functionDeclarations.insert(functionDumper.getDeclaration());
     cout << "kernelFunctionCl:\n" << kernelFunctionCl << endl;
@@ -67,6 +70,9 @@ std::string KernelDumper::toCl() {
             cout << "dumping function " << childF->getName().str() << endl;
             dumpedFunctions.insert(childF);
             FunctionDumper childFunctionDumper(childF, false, &globalNames, &typeDumper, &functionNamesMap);
+            if(_addIRToCl) {
+                childFunctionDumper.addIRToCl();
+            }
             string childFunctionCl = childFunctionDumper.toCl();
             functionDeclarations.insert(childFunctionDumper.getDeclaration());
             cout << "childFunctionCl:\n" << childFunctionCl << endl;

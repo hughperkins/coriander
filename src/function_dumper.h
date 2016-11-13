@@ -60,6 +60,11 @@ public:
     std::string dumpSharedDefinitions(std::string indent);
     std::string getDeclaration();
 
+    FunctionDumper *addIRToCl() {
+        _addIRToCl = true;
+        return this;
+    }
+
     std::set<llvm::Function *> neededFunctions;
     std::set<llvm::StructType *> structsToDefine;
     std::map<llvm::Value *, std::string> exprByValue;
@@ -77,11 +82,6 @@ protected:
     bool isKernel = false;
     bool _addIRToCl = false;
     std::map<llvm::BasicBlock *, int> functionBlockIndex;
-
-    FunctionDumper *addIRToCl() {
-        _addIRToCl = true;
-        return this;
-    }
 
     GlobalNames *globalNames;
     LocalNames localNames;

@@ -625,6 +625,7 @@ std::string BasicBlockDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr) 
     }
     updateAddressSpace(instr, addressspace);
     rhs = "(&" + rhs + ")";
+    cout << "getelmenetptr res: " << rhs << endl;
     return rhs;
 }
 
@@ -1041,6 +1042,7 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
             instructionCode= "(" + instructionCode + ")";
         }
         exprByValue[instruction] = instructionCode;
+        cout << "storing expression for " << localNames->getName(instruction) << ": [" << instructionCode << "]" << endl;
         // nameByValue[instruction] = instructionCode;
         if(_addIRToCl) {
             return "/* " + originalInstruction + " */\n" + indent;
