@@ -78,6 +78,7 @@ string BasicBlockDumper::dumpConstantExpr(ConstantExpr *expr) {
     expr->dump();
     cout << endl;
     Instruction *instr = expr->getAsInstruction();
+    dumpInstruction(instr);
     int numOperands = instr->getNumOperands();
     cout << "numoperands " << numOperands << endl;
     for(int i = 0; i < numOperands; i++) {
@@ -88,7 +89,6 @@ string BasicBlockDumper::dumpConstantExpr(ConstantExpr *expr) {
         string opstring = dumpOperand(op);
         cout << "opstring:" << opstring << endl;
     }
-    dumpInstruction(instr);
     string thisinstrstr = exprByValue[instr];
     cout << "thisinstrstr: [" << thisinstrstr << "]" << endl;
     return thisinstrstr;
@@ -131,7 +131,8 @@ string BasicBlockDumper::dumpConstant(Constant *constant) {
             int addressspace = pointerType->getAddressSpace();
             if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
                 sharedVariablesToDeclare.insert(global);
-                string name = localNames->getOrCreateName(global);
+                string name = global->getName().str();
+                localNames->getOrCreateName(global, name);
                 cout << "shared memory, creating in localnames name=" << name << endl;
                 return name;
             }
@@ -1043,15 +1044,23 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
     bool useIsAStore = false;
     bool useIsExtractValue = false;
     bool useIsAPhi = false;
-    if(instruction->hasOneUse()) {
+    // bool useIsALoad = false;
+    cout << "end of dumpinstruction for " << localNames->getName(instruction) << endl;
+    exprByValue[instruction] = instructionCode;
+    cout << "numuses " << instruction->getNumUses() << " useisaphi " << useIsAPhi << " useIsExtractValue=" << useIsExtractValue << endl;
+    if(instruction->getNumUses() == 1) {
+        cout << "one use" << endl;
         use = &*instruction->use_begin();
         use_user = use->getUser();
         useIsAStore = isa<StoreInst>(use_user);
         useIsPointer = isa<PointerType>(use_user->getType());
         useIsExtractValue = isa<ExtractValueInst>(use_user);
         useIsAPhi = isa<PHINode>(use_user);
+        // useIsALoad = isa<LoadInst>(use_user);
     }
-    if(!useIsAPhi && !useIsExtractValue && instruction->hasOneUse()) { // } && !useIsAStore) {
+    if(!useIsAPhi && !useIsExtractValue && instruction->getNumUses() <= 1 && !isa<LoadInst>(instruction)
+            && !isa<StoreInst>(instruction)) { // } && !useIsAStore) {
+        cout << "handling as single use" << endl;
         if(!isSingleExpression(instructionCode)) {
             instructionCode= "(" + instructionCode + ")";
         }
@@ -1067,6 +1076,7 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
             return;
         }
     } else {
+        cout << "not single use, assigning to variable" << endl;
         if(_addIRToCl) {
             clcode.push_back("/* " + originalInstruction + " */");
         }
@@ -1077,7 +1087,7 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
                 // functionNeededForwardDeclarations.insert(instruction);
                 // variablesToDeclare[instruction] = resultName;
                 variablesToDeclare.insert(instruction);
-                gencode += dumpOperand(instruction) + " = ";
+                gencode += localNames->getName(instruction) + " = ";
             }
             gencode += instructionCode;
             clcode.push_back(gencode);
@@ -1119,7 +1129,7 @@ std::string BasicBlockDumper::writeDeclarations(std::string indent) {
         if(_addIRToCl) {
             oss << indent << "/* local variable declaration */\n";
         }
-        string declaration = typeDumper->dumpType(value->getType()) + " " + localNames->getName(value);
+        string declaration = typeDumper->dumpType(value->getType(), true) + " " + localNames->getName(value);
         oss << indent << declaration << ";\n";
     }
     return oss.str();

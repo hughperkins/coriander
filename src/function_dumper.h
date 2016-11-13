@@ -56,7 +56,7 @@ public:
     std::string dumpBranch(llvm::BranchInst *instr, std::map<llvm::Value *, std::string> &exprByValue);
     std::string dumpReturn(llvm::Type **pReturnType, llvm::ReturnInst *retInst, std::map<llvm::Value *, std::string> &exprByValue);
     std::string dumpTerminator(llvm::Type **pReturnType, llvm::Instruction *terminator, std::map<llvm::Value *, std::string> &exprByValue);
-    std::string dumpSharedDefinition(llvm::Value *value);
+    std::vector<std::string> dumpSharedDefinition(llvm::Value *value);
     std::string dumpSharedDefinitions(std::string indent);
     std::string getDeclaration();
 

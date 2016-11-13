@@ -30,13 +30,13 @@ class TypeDumper {
 public:
     TypeDumper(GlobalNames *globalNames) : globalNames(globalNames) {
     }
-    std::string dumpType(llvm::Type *type);
+    std::string dumpType(llvm::Type *type, bool decayArraysToPointer = false);
     std::string dumpFunctionType(llvm::FunctionType *fn);
-    std::string dumpPointerType(llvm::PointerType *ptr);
+    std::string dumpPointerType(llvm::PointerType *ptr, bool decayArraysToPointer = false);
     std::string dumpIntegerType(llvm::IntegerType *type);
     std::string dumpStructType(llvm::StructType *type);
     std::string dumpAddressSpace(llvm::Type *type);
-    std::string dumpArrayType(llvm::ArrayType *type);
+    std::string dumpArrayType(llvm::ArrayType *type, bool decayArraysToPointer = false);
 
     std::string dumpStructDefinitions();
     std::string dumpStructDefinition(llvm::StructType *type, std::string name);

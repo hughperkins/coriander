@@ -24,8 +24,8 @@ def test_local(context, q, float_data, float_data_gpu):
         __shared__ float localmem[33];
         int tid = threadIdx.x;
         int warpId = tid % 32;
-        localmem[warpId] = data[0];
-        data[0] = localmem[warpId + 1];
+        localmem[warpId] = data[warpId];
+        data[warpId] = localmem[warpId + 1];
     }
 """
     kernelName = test_common.mangle('foo', ['float *'])
@@ -38,3 +38,4 @@ def test_local(context, q, float_data, float_data_gpu):
     q.finish()
     print('before', float_data_orig[:5])
     print('after', float_data[:5])
+    assert np.abs(float_data_orig[1:32] - float_data[0:31]).max() <= 1e-4

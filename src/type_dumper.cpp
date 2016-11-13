@@ -48,10 +48,10 @@ std::string TypeDumper::dumpAddressSpace(llvm::Type *type) {
     }
 }
 
-std::string TypeDumper::dumpPointerType(PointerType *ptr) {
+std::string TypeDumper::dumpPointerType(PointerType *ptr, bool decayArraysToPointer) {
     string gencode = "";
     Type *elementType = ptr->getPointerElementType();
-    string elementTypeString = dumpType(elementType);
+    string elementTypeString = dumpType(elementType, decayArraysToPointer);
     int addressspace = ptr->getAddressSpace();
     string addressspacestr = "";
     if(addressspace == 1) {
@@ -133,10 +133,14 @@ std::string TypeDumper::dumpStructType(StructType *type) {
     }
 }
 
-std::string TypeDumper::dumpArrayType(ArrayType *type) {
+std::string TypeDumper::dumpArrayType(ArrayType *type, bool decayArraysToPointer) {
     int length = type->getNumElements();
     Type *elementType = type->getElementType();
-    return dumpType(elementType) + "[" + easycl::toString(length) + "]";
+    if(decayArraysToPointer) {
+        return dumpType(elementType, decayArraysToPointer) + "*";
+    } else {
+        return dumpType(elementType, decayArraysToPointer) + "[" + easycl::toString(length) + "]";
+    }
 }
 
 std::string TypeDumper::dumpFunctionType(FunctionType *fn) {
@@ -156,7 +160,7 @@ std::string TypeDumper::dumpFunctionType(FunctionType *fn) {
     // return params_str;
 }
 
-std::string TypeDumper::dumpType(Type *type) {
+std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {
     Type::TypeID typeID = type->getTypeID();
     switch(typeID) {
         case Type::VoidTyID:
@@ -170,7 +174,7 @@ std::string TypeDumper::dumpType(Type *type) {
         case Type::VectorTyID:
             throw runtime_error("not implemented: vector type");
         case Type::ArrayTyID:
-            return dumpArrayType(cast<ArrayType>(type));
+            return dumpArrayType(cast<ArrayType>(type), decayArraysToPointer);
         case Type::DoubleTyID:
             // if(single_precision) {
                 // return "float";
@@ -180,7 +184,7 @@ std::string TypeDumper::dumpType(Type *type) {
         case Type::FunctionTyID:
             return dumpFunctionType(cast<FunctionType>(type));
         case Type::PointerTyID:
-            return dumpPointerType(cast<PointerType>(type));
+            return dumpPointerType(cast<PointerType>(type), decayArraysToPointer);
         case Type::IntegerTyID:
             return dumpIntegerType(cast<IntegerType>(type));
         default:

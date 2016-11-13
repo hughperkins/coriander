@@ -166,7 +166,8 @@ void FunctionDumper::addPHIDeclaration(llvm::PHINode *phi) {
     phiDeclarationsByName[name] = declaration;
 }
 
-std::string FunctionDumper::dumpSharedDefinition(llvm::Value *value) {
+std::vector<std::string> FunctionDumper::dumpSharedDefinition(llvm::Value *value) {
+    std::vector<std::string> declarations;
     value ->dump();
     if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
         string name = glob->getName().str();
@@ -176,11 +177,12 @@ std::string FunctionDumper::dumpSharedDefinition(llvm::Value *value) {
             int length = arraytype->getNumElements();
             Type *elementType = arraytype->getElementType();
             string typestr = typeDumper->dumpType(elementType);
-            declaration += "local " + typestr + " " + name + "[" + easycl::toString(length) + "]";
+            declarations.push_back("local " + typestr + " " + name + "[" + easycl::toString(length) + "]");
+            // declarations.push_back("local " + typestr + "** " + name + " = &" + name + "__");
             exprByValue[value] = name;
             // nameByValue[value] = name;
             // currentFunctionSharedDeclarations += declaration;
-            return declaration;
+            return declarations;
         } else {
             cout << "dumpshared definition called with:" << endl;
             value->dump();
@@ -202,10 +204,14 @@ std::string FunctionDumper::dumpSharedDefinitions(std::string indent) {
         // cout << "declaring:" << endl;
         // variable->dump();
         // cout << endl;
-        string definition = dumpSharedDefinition(variable);
+        std::vector<std::string> declarations = dumpSharedDefinition(variable);
+        for(auto it2=declarations.begin(); it2 != declarations.end(); it2++) {
+            oss << indent << *it2 << ";\n";
+        }
+        // string definition = dumpSharedDefinition(variable);
         // cout << "defnition: " << definition << endl;
         // gencode += definition;
-        oss << indent << definition << ";\n";
+        // oss << indent << definition << ";\n";
     }
     return oss.str();
 }
