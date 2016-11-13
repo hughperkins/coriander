@@ -1,6 +1,6 @@
 %"struct.mystruct" = type { i32, float, float*, float* }
 
-define i32 @main() {
+define i32 @main(%"struct.mystruct" *%structs) {
   %1 = add i32 5, 3
   %2 = add i32 %1, 7
   %3 = fadd float 8.0, 3.0
@@ -34,6 +34,25 @@ define i32 @main() {
   %30 = getelementptr %struct.mystruct , %struct.mystruct *%24, i32 0, i32 1
   %31 = icmp slt i32 %2, 4
   %32 = select i1 %31, i32 21, i32 44
+
+  %33 = alloca i64, i32 1
+
+  store float %3, float *%8
+  store float %4, float *%8
+
+  store i64 %15, i64 *%33
+  store i64 %16, i64 *%33
+  store i32 %17, i32 *%6
+  store i32 %18, i32 *%6
+  store float %19, float *%8
+  store float %20, float *%8
+;  store i32 %21, i32 *%6
+ ; store i32 %22, i32 *%6
+  ;store i32 %24, i32 *%6
+
+  store %struct.mystruct %28, %struct.mystruct *%structs
+
+  store i32 %32, i32 *%6
 
   ret i32 0
 }

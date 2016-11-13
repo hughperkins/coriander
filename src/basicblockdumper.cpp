@@ -1046,7 +1046,7 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
     bool useIsAPhi = false;
     // bool useIsALoad = false;
     cout << "end of dumpinstruction for " << localNames->getName(instruction) << endl;
-    exprByValue[instruction] = instructionCode;
+    // exprByValue[instruction] = instructionCode;
     cout << "numuses " << instruction->getNumUses() << " useisaphi " << useIsAPhi << " useIsExtractValue=" << useIsExtractValue << endl;
     if(instruction->getNumUses() == 1) {
         cout << "one use" << endl;

@@ -69,6 +69,10 @@ TEST(test_block_dumper, basic) {
     BasicBlock *block = &*F->begin();
     GlobalNames globalNames;
     LocalNames localNames;
+    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+        Argument *arg = &*it;
+        localNames.getOrCreateName(arg, arg->getName().str());
+    }
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
@@ -79,28 +83,21 @@ TEST(test_block_dumper, basic) {
     v4 = v3 + 9.0f;
     v7 = v6[0];
     v8[0] = v4 / v3;
-    v10 = v3 < 4.0f;
-    v11 = v2 < 4;
-    v12 = (char)v7;
-    v15 = (float)(8.0 + 3.0);
-    v16 = v7;
-    v17 = v7;
-    v18 = *(int *)&v4;
-    v19 = *(int *)&v4;
-    v20 = *(float *)&v2;
-    v21 = *(float *)&v2;
-    v22 = (int*)v8;
-    v23 = v8;
-    v24 = *(int *)&(v3);
     v26 = v25[0];
-    v27 = v26.f0;
     v26.f0 = 4;
     v28 = v26;
     v28.f1 = 1.5f;
     v29 = v28;
-    v30 = (&v25[0].f0);
-    v31 = (&v25[0].f1);
-    v33 = (v2 < 4) ? 21 : 44;
+    v8[0] = v3;
+    v8[0] = v4;
+    v34[0] = v7;
+    v34[0] = v7;
+    v6[0] = *(int *)&v4;
+    v6[0] = *(int *)&v4;
+    v8[0] = *(float *)&v2;
+    v8[0] = *(float *)&v2;
+    structs[0] = v29;
+    v6[0] = (v2 < 4) ? 21 : 44;
 )";
     ASSERT_EQ(expectedBlockCl, cl);
 
@@ -109,6 +106,7 @@ TEST(test_block_dumper, basic) {
     string expectedAllocaDeclarations = R"(    int v6[1];
     float v8[1];
     struct mystruct v25[1];
+    long v34[1];
 )";
     ASSERT_EQ(expectedAllocaDeclarations, blockDumper.getAllocaDeclarations("    "));
 
@@ -118,26 +116,9 @@ TEST(test_block_dumper, basic) {
     float v3;
     float v4;
     int v7;
-    int v18;
-    bool v10;
-    bool v11;
-    char v12;
-    double v15;
-    long v16;
-    long v17;
-    int v19;
-    float v20;
-    float v21;
-    int* v22;
-    global float* v23;
-    int v24;
     struct mystruct v26;
-    int v27;
     struct mystruct v28;
     struct mystruct v29;
-    int* v30;
-    float* v31;
-    int v33;
 )";
     ASSERT_EQ(expectedDeclarations, blockDumper.writeDeclarations("    "));
 }
