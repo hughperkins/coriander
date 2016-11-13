@@ -29,6 +29,14 @@
 
 namespace cocl {
 
+class AllocaInfo {
+public:
+    llvm::AllocaInst *alloca = 0;
+    llvm::Value *refValue = 0;
+    std::string definition = "";
+    std::string explain = "";
+};
+
 class BasicBlockDumper {
 public:
     // will block all non-controlflow instructions, meaning:
@@ -50,7 +58,7 @@ public:
     std::string dumpChainedInstruction(int level, llvm::Instruction * instr, bool ignoreCasts=false);
     std::string dumpConstantExpr(llvm::ConstantExpr *expr);
     std::string dumpOperand(llvm::Value *value);
-    std::string dumpInstruction(std::string indent, llvm::Instruction *instruction);
+    void dumpInstruction(llvm::Instruction *instruction);
 
     std::string dumpBinaryOperator(llvm::BinaryOperator *instr, std::string opstring);
     std::string dumpIcmp(llvm::ICmpInst *instr);
@@ -72,7 +80,7 @@ public:
     std::string dumpExtractValue(llvm::ExtractValueInst *instr);
     std::string dumpLoad(llvm::LoadInst *instr);
     std::string dumpStore(llvm::StoreInst *instr);
-    std::string dumpAlloca(llvm::Instruction *alloca);
+    void dumpAlloca(llvm::AllocaInst *alloca);
     std::string dumpGetElementPtr(llvm::GetElementPtrInst *instr);
     std::string dumpSelect(llvm::SelectInst *instr);
     std::string dumpMemcpyCharCharLong(llvm::CallInst *instr);
@@ -89,8 +97,9 @@ public:
     std::set<llvm::Function *> neededFunctions;
     std::set<llvm::Value *> variablesToDeclare;
     std::set<llvm::Value *> sharedVariablesToDeclare;
-    std::map<llvm::Value *, std::string> allocaDeclarationByValue;
+    std::vector<AllocaInfo> allocaDeclarations;
     std::map<llvm::Value *, std::string> exprByValue;
+    std::vector<std::string> clcode;
 
 protected:
     llvm::BasicBlock *block;

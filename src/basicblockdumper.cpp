@@ -88,7 +88,8 @@ string BasicBlockDumper::dumpConstantExpr(ConstantExpr *expr) {
         string opstring = dumpOperand(op);
         cout << "opstring:" << opstring << endl;
     }
-    string thisinstrstr = dumpInstruction("", instr);
+    dumpInstruction(instr);
+    string thisinstrstr = exprByValue[instr];
     cout << "thisinstrstr: [" << thisinstrstr << "]" << endl;
     return thisinstrstr;
     // throw runtime_error("not implemented");
@@ -379,8 +380,9 @@ std::string BasicBlockDumper::dumpTrunc(llvm::CastInst *instr) {
     return gencode;
 }
 
-std::string BasicBlockDumper::dumpAlloca(llvm::Instruction *alloca) {
+void BasicBlockDumper::dumpAlloca(llvm::AllocaInst *alloca) {
     string gencode = "";
+    AllocaInfo allocaInfo;
     if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
         Type *ptrElementType = allocatypeptr->getPointerElementType();
         std::string typestring = typeDumper->dumpType(ptrElementType);
@@ -391,10 +393,15 @@ std::string BasicBlockDumper::dumpAlloca(llvm::Instruction *alloca) {
                 Type *elementType = arrayType->getElementType();
                 string allocaDeclaration = typeDumper->dumpType(elementType) + " " + 
                     dumpOperand(alloca) + "[" + easycl::toString(innercount) + "]";
-                allocaDeclarationByValue[alloca] = allocaDeclaration;
+                allocaInfo.alloca = alloca;
+                allocaInfo.refValue = alloca;
+                allocaInfo.definition = allocaDeclaration;
+                allocaDeclarations.push_back(allocaInfo);
+                // allocaDeclarationByValue[alloca] = allocaDeclaration;
                 cout << "alloca declaration as arraytype: " << allocaDeclaration << endl;
                 // currentFunctionSharedDeclarations += allocaDeclaration;
-                return "";
+                // return "";
+                return;
             } else {
                 Value *refInstruction = alloca;
                 // if the elementType is a pointer, assume its global?
@@ -428,10 +435,15 @@ std::string BasicBlockDumper::dumpAlloca(llvm::Instruction *alloca) {
                 string allocaDeclaration = gencode + typestring + " " + dumpOperand(alloca) + "[1]";
                 // just declare this at the head of th efunction
                 // allocaDeclaration += "    " + allocaDeclaration + ";\n";
-                allocaDeclarationByValue[refInstruction] = allocaDeclaration;
+                allocaInfo.alloca = alloca;
+                allocaInfo.refValue = refInstruction;
+                allocaInfo.definition = allocaDeclaration;
+                allocaDeclarations.push_back(allocaInfo);
+                // allocaDeclarationByValue[refInstruction] = allocaDeclaration;
                 cout << "alloca declaration not arraytype: " << allocaDeclaration << endl;
                 // allocaDeclarations.insert(allocaDeclaration);
-                return "";
+                // return "";
+                return;
             }
         } else {
             throw runtime_error("not implemented: alloca for count != 1");
@@ -839,7 +851,7 @@ std::string BasicBlockDumper::dumpCall(llvm::CallInst *instr) {
     return gencode;
 }
 
-string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction) {
+void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
     auto opcode = instruction->getOpcode();
     string resultName = localNames->getOrCreateName(instruction);
     // string 
@@ -984,10 +996,12 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         case Instruction::InsertValue:
             reslines = dumpInsertValue(cast<InsertValueInst>(instruction));
             // string gencode = "";
-            for(auto it=reslines.begin(); it != reslines.end(); it++) {
-                instructionCode += indent + *it + ";\n";
-            }
-            return instructionCode;
+            clcode.insert(clcode.end(), reslines.begin(), reslines.end());
+            // for(auto it=reslines.begin(); it != reslines.end(); it++) {
+            //     instructionCode += indent + *it + ";\n";
+            // }
+            // return instructionCode;
+            return;
             // return indent + instructionCode + ";\n";
             // break;
         case Instruction::ExtractValue:
@@ -1003,8 +1017,8 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
             instructionCode = dumpLoad(cast<LoadInst>(instruction));
             break;
         case Instruction::Alloca:
-            instructionCode = dumpAlloca(cast<AllocaInst>(instruction));
-            return "";
+            dumpAlloca(cast<AllocaInst>(instruction));
+            return;
         // case Instruction::Br:
         //     instructionCode = dumpBranch(cast<BranchInst>(instruction));
         //     return instructionCode;
@@ -1045,17 +1059,19 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
         cout << "storing expression for " << localNames->getName(instruction) << ": [" << instructionCode << "]" << endl;
         // nameByValue[instruction] = instructionCode;
         if(_addIRToCl) {
-            return "/* " + originalInstruction + " */\n" + indent;
+            // return "/* " + originalInstruction + " */\n" + indent;
+            clcode.push_back("/* " + originalInstruction + " */");
+            return;
         } else {
-            return "";
+            // return "";
+            return;
         }
-        // return "";
     } else {
         if(_addIRToCl) {
-            gencode += "/* " + originalInstruction + " */\n" + indent;
+            clcode.push_back("/* " + originalInstruction + " */");
         }
         if(instructionCode != "") {
-            gencode += indent;
+            // gencode += indent;
             if(typestr != "void") {
                 instructionCode = stripOuterParams(instructionCode);
                 // functionNeededForwardDeclarations.insert(instruction);
@@ -1063,56 +1079,73 @@ string BasicBlockDumper::dumpInstruction(string indent, Instruction *instruction
                 variablesToDeclare.insert(instruction);
                 gencode += dumpOperand(instruction) + " = ";
             }
-            gencode += instructionCode + ";\n";
+            gencode += instructionCode;
+            clcode.push_back(gencode);
         }
     }
-    return gencode;
+    // return gencode;
 }
 
 std::string BasicBlockDumper::getAllocaDeclarations(string indent) {
-    string gencode = "";
-    for(auto it=allocaDeclarationByValue.begin(); it != allocaDeclarationByValue.end(); it++) {
-        string declaration = it->second;
-        Value *value = it->first;
-        if(cast<PointerType>(value->getType())->getAddressSpace() == 1) {
+    // string gencode = "";
+    ostringstream oss;
+    for(auto it=allocaDeclarations.begin(); it != allocaDeclarations.end(); it++) {
+        // string declaration = it->second;
+        AllocaInfo allocaInfo = *it;
+        string declaration = allocaInfo.definition;
+        Value *refValue = allocaInfo.refValue;
+        AllocaInst *alloca = allocaInfo.alloca;
+        if(cast<PointerType>(refValue->getType())->getAddressSpace() == 1) {
             if(declaration.find("global") != 0) {
                 declaration = "global " + declaration;
             }
         }
         cout << "alloca declaration: " << declaration << endl;
-        value->dump();
-        gencode += indent + declaration + ";\n";
+        alloca->dump();
+        if(_addIRToCl) {
+            oss << indent << "/* " << typeDumper->dumpType(alloca->getType()) << " " << localNames->getName(alloca) << " = alloca " << typeDumper->dumpType(alloca->getType()) << " */\n";
+        }
+        oss << indent << declaration << ";\n";
     }
-    return gencode;
+    return oss.str();
 }
 
 std::string BasicBlockDumper::writeDeclarations(std::string indent) {
-    string gencode = "";
+    // string gencode = "";
+    ostringstream oss;
     for(auto it=variablesToDeclare.begin(); it != variablesToDeclare.end(); it++) {
         Value *value = *it;
         // value->dump();
+        if(_addIRToCl) {
+            oss << indent << "/* local variable declaration */\n";
+        }
         string declaration = typeDumper->dumpType(value->getType()) + " " + localNames->getName(value);
-        gencode += indent + declaration + ";\n";
+        oss << indent << declaration << ";\n";
     }
-    return gencode;
+    return oss.str();
 }
 
 std::string BasicBlockDumper::toCl() {
-    string gencode = "";
     for(auto it = block->begin(); it != block->end(); it++) {
         Instruction *inst = &*it;
         if(isa<PHINode>(inst) || isa<BranchInst>(inst) || isa<ReturnInst>(inst)) {
             continue;
         }
         // cout << endl;
-        string instructionCode = dumpInstruction("    ", inst);
-        if(instructionCode != "") {
-            cout << "instructionCode [" << instructionCode << "]" << endl;
-            gencode += instructionCode;
-        }
+        // string instructionCode = dumpInstruction("    ", inst);
+        dumpInstruction(inst);
+        // if(instructionCode != "") {
+        //     cout << "instructionCode [" << instructionCode << "]" << endl;
+        //     gencode += instructionCode;
+        // }
         inst->dump();
     }
-    return gencode;
+    // string gencode = "";
+    ostringstream oss;
+    for(auto it=clcode.begin(); it != clcode.end(); it++) {
+        oss << "    " << *it << ";\n";
+    }
+    return oss.str();
 }
 
 } // namespace cocl
