@@ -1059,7 +1059,8 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
         // useIsALoad = isa<LoadInst>(use_user);
     }
     if(!useIsAPhi && !useIsExtractValue && instruction->getNumUses() <= 1 && !isa<LoadInst>(instruction)
-            && !isa<StoreInst>(instruction)) { // } && !useIsAStore) {
+            && !isa<StoreInst>(instruction)
+            && !isa<CallInst>(instruction)) { // } && !useIsAStore) {
         cout << "handling as single use" << endl;
         if(!isSingleExpression(instructionCode)) {
             instructionCode= "(" + instructionCode + ")";

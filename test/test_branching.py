@@ -48,23 +48,6 @@ __global__ void testIfElse(int *data, int N) {
 """
 
 
-# def compile_code(context, kernelSource):
-#     for file in os.listdir('/tmp'):
-#         if file.startswith('testprog'):
-#             os.unlink('/tmp/%s' % file)
-#     with open('/tmp/testprog.cu', 'w') as f:
-#         f.write(kernelSource)
-#     print(subprocess.check_output([
-#         'bin/cocl',
-#         '-c',
-#         '/tmp/testprog.cu'
-#     ]).decode('utf-8'))
-#     with open('/tmp/testprog-device.cl', 'r') as f:
-#         cl_sourcecode = f.read()
-#     prog = cl.Program(context, cl_sourcecode).build()
-#     return prog
-
-
 def test_test_if(context, q, float_data, float_data_gpu):
     sourcecode = """
 __global__ void testIf(float *data, int N) {
@@ -255,12 +238,12 @@ __global__ void mykernel(float *data, int a, int b) {
 }
 """
     kernelName = test_common.mangle('mykernel', ['float *', 'int', 'int'])
-    prog = compile_code(cl, context, source, kernelName)
+    kernel = test_common.compile_code_v3(cl, context, source, kernelName)['kernel']
     float_data_orig = np.copy(float_data)
 
     a = 2
     b = 3
-    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(a), np.int32(b), cl.LocalMemory(4))
+    kernel(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(a), np.int32(b), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
