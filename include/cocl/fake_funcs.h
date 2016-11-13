@@ -108,6 +108,9 @@ double min(double in1, double in2);
 float max(float in1, float in2);
 float min(float in1, float in2);
 
+float pow(float in1, float in2);
+float sqrt(float in1);
+
 // #define max cocl::max
 // #define min cocl::min
 

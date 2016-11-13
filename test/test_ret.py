@@ -42,7 +42,8 @@ def test_return(context):
         foo(a);
     }
 """
-    dict = test_common.compile_code_v2(cl, context, source)
-    prog = dict['prog']
+    kernelName = test_common.mangle('mykernel', ['float*'])
+    dict = test_common.compile_code_v3(cl, context, source, kernelName)
+    # prog = dict['prog']
     cl_sourcecode = dict['cl_sourcecode']
     print('cl_sourcecode', cl_sourcecode)
