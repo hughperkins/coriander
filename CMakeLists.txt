@@ -35,16 +35,14 @@ endif()
 set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/platforminfo_helper.cpp src/EasyCL/EasyCL.cpp
     src/EasyCL/deviceinfo_helper.cpp src/EasyCL/util/easycl_stringhelper.cpp src/EasyCL/DevicesInfo.cpp src/EasyCL/DeviceInfo.cpp)
 
-# set(COCL_SRCS src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cpp src/cocl_device.cpp src/cocl_error.cpp
-#     src/cocl_memory.cpp src/cocl_properties.cpp src/cocl_streams.cpp src/cocl_clsources.cpp src/cocl_context.cpp
-#     src/ir-to-opencl.cpp src/function_names_map.cpp
-#     src/ir-to-opencl-common.cpp src/mutations.cpp src/readIR.cpp src/struct_clone.cpp
-#     src/branches_as_switch/branches_as_switch.cpp src/type_dumper.cpp
-#     src/handle_branching.cpp src/branching_transforms.cpp src/flowcontrolinstructions.cpp third_party/argparsecpp/argparsecpp.cpp
+# set(COCL_BRANCHING_SRCS
+#     src/branches_as_switch/branches_as_switch.cpp
+#     src/handle_branching.cpp src/branching_transforms.cpp src/flowcontrolinstructions.cpp
 #     src/flowcontrol/returnblock.cpp src/flowcontrol/sequence.cpp src/flowcontrol/basicblockblock.cpp
-#     src/flowcontrol/conditionalbranch.cpp src/flowcontrol/dowhile.cpp src/flowcontrol/if.cpp
+#     src/flowcontrol/conditionalbranch.cpp src/flowcontrol/dowhile.cpp src/flowcontrol/if.scpp
 #     src/flowcontrol/for.cpp src/flowcontrol/rootblock.cpp src/flowcontrol/block.cpp)
-set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp
+
+set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/ConstantDumper.cpp
     src/struct_clone.cpp src/basicblockdumper.cpp src/ExpressionsHelper.cpp src/readIR.cpp
     src/function_names_map.cpp src/function_dumper.cpp src/kernel_dumper.cpp src/mutations.cpp
     src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp
@@ -68,19 +66,7 @@ add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/ar
 target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
 target_include_directories(ir-to-opencl PRIVATE /usr/lib/llvm-3.8/include)
 target_link_libraries(ir-to-opencl cocl)
-
-# add_executable(ir-to-opencl
-#     src/ir-to-opencl.cpp src/ir-to-opencl-common.cpp src/mutations.cpp src/readIR.cpp src/struct_clone.cpp
-#     src/branches_as_switch/branches_as_switch.cpp
-#     src/handle_branching.cpp src/branching_transforms.cpp src/flowcontrolinstructions.cpp third_party/argparsecpp/argparsecpp.cpp
-#     src/flowcontrol/returnblock.cpp src/flowcontrol/sequence.cpp src/flowcontrol/basicblockblock.cpp
-#     src/flowcontrol/conditionalbranch.cpp src/flowcontrol/dowhile.cpp src/flowcontrol/if.cpp
-#     src/flowcontrol/for.cpp src/flowcontrol/rootblock.cpp src/flowcontrol/block.cpp
-#     src/ir-to-opencl_main.cpp
-# )
 # target_include_directories(ir-to-opencl PRIVATE src)
-# target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
-# target_include_directories(ir-to-opencl PRIVATE /usr/lib/llvm-3.8/include)
 # set_target_properties(ir-to-opencl PROPERTIES
 #     LINK_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LLVM_LDFLAGS}"
 # )
@@ -212,7 +198,7 @@ if(BUILD_TESTS)
         test/gtest/test_block_dumper.cpp
         test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
         test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
-        test/gtest/test_kernel_dumper.cpp
+        test/gtest/test_kernel_dumper.cpp test/gtest/test_global_constants.cpp
     )
     target_include_directories(cocl_unittests PRIVATE src)
     target_include_directories(cocl_unittests PRIVATE third_party/gtest)

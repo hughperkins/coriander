@@ -17,6 +17,9 @@
 // this takes in the module, and the name of a kernel, and does whatever we need to do to get some
 // working opencl code out of it :-)
 
+#include "GlobalNames.h"
+#include "type_dumper.h"
+
 #include "llvm/IR/Module.h"
 
 #include <string>
@@ -27,11 +30,13 @@ namespace cocl {
 class KernelDumper {
 public:
     KernelDumper(llvm::Module *M, std::string kernelName) :
-        M(M), kernelName(kernelName) {
-
+            M(M), kernelName(kernelName) {
+        typeDumper.reset(new cocl::TypeDumper(&globalNames));
     }
     virtual ~KernelDumper() {}
     std::string toCl();
+    void declareGlobals(std::ostream &os);
+    void declareGlobal(std::ostream &os, llvm::GlobalValue *var);
 
     llvm::Module *M;
     std::string kernelName;
@@ -46,6 +51,8 @@ public:
 
 protected:
     bool _addIRToCl = false;
+    cocl::GlobalNames globalNames;
+    std::unique_ptr<cocl::TypeDumper> typeDumper;
 };
 
 } // namespace cocl

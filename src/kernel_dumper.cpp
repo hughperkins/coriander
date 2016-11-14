@@ -20,6 +20,9 @@
 #include "type_dumper.h"
 #include "function_dumper.h"
 #include "shims.h"
+#include "mutations.h"
+
+#include "llvm/IR/Constants.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -30,14 +33,99 @@ using namespace llvm;
 
 namespace cocl {
 
+void KernelDumper::declareGlobal(ostream &os, GlobalValue *global) {
+    // string gencode = "";
+    if(GlobalVariable *var = dyn_cast<GlobalVariable>(global)) {
+        string name = global->getName().str();
+        if(name == "$str") {
+            return;  // lazily skip $str for now...
+        }
+        // gencode += "constant " + dumpType(global->getType()->getPointerElementType()) + " " + name;
+        os << "constant " << typeDumper->dumpType(global->getType()->getPointerElementType()) << " " << name;
+        if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
+            int addressspace = pointerType->getAddressSpace();
+            if(addressspace == 3) { // shared/local => skip
+                return;
+            } else {
+                updateAddressSpace(var, 4);
+            }
+        }
+        if(var->hasInitializer()) {
+            Constant *initializer = var->getInitializer();
+            // gencode += " = {";
+            os << " = {";
+            if(ConstantStruct *constStruct = dyn_cast<ConstantStruct>(initializer)) {
+                int i = 0;
+                while(Value *aggel = constStruct->getAggregateElement(i)) {
+                    if(i == 0) {
+                    } else {
+                        // gencode += ", ";
+                        os << ", ";
+                    }
+                    if(Constant *constant = dyn_cast<Constant>(aggel) {
+                    os << dumpOperand(aggel);
+                    
+                    } else {
+                        cout << "value not implemented in declareglobal:" << endl;
+                        aggel->dump();
+                        cout << endl;
+                        throw runtime_error("not implemetned in declareglobal");
+                    }
+                    // gencode += dumpOperand(aggel);
+                    i++;
+                }
+                if(i > 0) {
+                }
+            }
+            // gencode += "}";
+            os << "}";
+        } else {
+            // gencode += " = {}";
+            os << " = {}";
+        }
+    } else {
+        global->dump();
+        throw runtime_error("unimplemented declareglobalvalue for this type");
+    }
+    // gencode += ";\n";
+    os << ";\n";
+    // globalDeclarations += gencode + "\n";
+}
+
+void KernelDumper::declareGlobals(ostream &os) {
+    // global_begin/end returns all the bits that start with '@', at the top of the .ll
+    // cout << "begin declare global variables" << endl;
+    // for(auto it=M->global_begin(); it != M->global_end(); it++) {
+    //     GlobalVariable *glob = &*it;
+    //     string name = getName(glob);
+    //     if(name == "llvm.used") {
+    //         continue;
+    //     }
+    //     if(name.find(".str") == 0) {
+    //         // ignore global strings for now (probably add in locally; though I dont think opencl really uses strings..)
+    //         continue;
+    //     }
+    //     if(name == "llvm.global_ctors") {
+    //         // we should handle these sooner or later, but skip for now
+    //         cerr << "warning: skipping @llvm.global_ctors" << endl;
+    //         continue;
+    //     }
+    //     if(ignoredGlobalVariables.find(name) != ignoredGlobalVariables.end()) {
+    //         continue;
+    //     }
+    //     glob->dump();
+    //     declareGlobal(os, glob);
+    // }
+}
+
 std::string KernelDumper::toCl() {
     Function *F = M->getFunction(kernelName);
     if(F == 0) {
         throw runtime_error("Couldnt find kernel " + kernelName);
     }
 
-    GlobalNames globalNames;
-    TypeDumper typeDumper(&globalNames);
+    // GlobalNames globalNames;
+    // TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     Shims shims;
 
