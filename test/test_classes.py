@@ -12,46 +12,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-import subprocess
-import pyopencl as cl
-import pytest
-import os
-from os import path
+from test import test_common
 
 
-@pytest.fixture(scope='module')
-def test_classes_cl():
-    cl_filepath = 'test/generated/test_classes-device.cl'
-
-    print('running make...')
-    # print(subprocess.check_output([
-    #     'make',
-    #     cl_filepath
-    # ]).decode('utf-8'))
-    if not path.isdir('test/generated'):
-        os.makedirs('test/generated')
-    print(subprocess.check_output([
-        'bin/cocl',
-        '-c', '-o', 'test/generated/test_classes.o',
-        'test/test_classes.cu'
-        # cl_filepath
-    ]).decode('utf-8'))
-    print('... make finished')
-    return cl_filepath
+def try_build(context, filepath, kernelname):
+    with open(filepath, 'r') as f:
+        cucode = f.read()
+    clcode = test_common.cu_to_cl(cucode, kernelname)
+    test_common.build_kernel(context, clcode, kernelname)
 
 
-def test_build_cl(test_classes_cl):
-    pass
-
-
-@pytest.fixture(scope='module')
-def test_classes(context, test_classes_cl):
-    with open(test_classes_cl, 'r') as f:
-        sourcecode = f.read()
-
-    prog = cl.Program(context, sourcecode).build()
-    return prog
-
-
-def test_program_compiles(test_classes):
-    pass
+def test_program_compiles(context):
+    # ok these names were obtained empirically :-P
+    # ie, I first ran `cocl`, then examined the resulting testprog-device.ll file to get the names
+    kernelNames = [
+        '_Z11doSomethingIfEvN11mynamespace3BarENS0_9TemplatedIT_EEPS3_Pi',
+        '_Z11doSomethingIiEvN11mynamespace3BarENS0_9TemplatedIT_EEPS3_Pi',
+        '_Z11doSomethingIcEvN11mynamespace3BarENS0_9TemplatedIT_EEPS3_Pi'
+    ]
+    for kernelname in kernelNames:
+        try_build(context, 'test/test_classes.cu', kernelname)

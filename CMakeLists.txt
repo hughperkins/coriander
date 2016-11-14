@@ -238,7 +238,7 @@ INSTALL(FILES ${CLEW_HEADERS} DESTINATION include)
 INSTALL(FILES ${EASYCL_HEADERS_ROOT} DESTINATION include/EasyCL)
 # INSTALL(FILES ${CMAKE_SOURCE_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
 INSTALL(FILES ${CMAKE_BINARY_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
-install(TARGETS easycl clew clblast cocl patch-hostside EXPORT cocl-targets
+install(TARGETS easycl clew clblast cocl patch-hostside ir-to-opencl EXPORT cocl-targets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
