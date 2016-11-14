@@ -74,23 +74,23 @@ namespace cocl {
 string BasicBlockDumper::dumpConstantExpr(ConstantExpr *expr) {
     // this means things like:
     // shared memory 
-    cout << "dumping constnat expr:" << endl;
-    expr->dump();
-    cout << endl;
+    // cout << "dumping constnat expr:" << endl;
+    // expr->dump();
+    // cout << endl;
     Instruction *instr = expr->getAsInstruction();
     dumpInstruction(instr);
     int numOperands = instr->getNumOperands();
-    cout << "numoperands " << numOperands << endl;
-    for(int i = 0; i < numOperands; i++) {
-        Value *op = instr->getOperand(i);
-        cout << "op " << i << ":" << endl;
-        op->dump();
-        cout << endl;
-        string opstring = dumpOperand(op);
-        cout << "opstring:" << opstring << endl;
-    }
+    // cout << "numoperands " << numOperands << endl;
+    // for(int i = 0; i < numOperands; i++) {
+    //     Value *op = instr->getOperand(i);
+    //     cout << "op " << i << ":" << endl;
+    //     op->dump();
+    //     cout << endl;
+        // string opstring = dumpOperand(op);
+        // cout << "opstring:" << opstring << endl;
+    // }
     string thisinstrstr = exprByValue[instr];
-    cout << "thisinstrstr: [" << thisinstrstr << "]" << endl;
+    // cout << "thisinstrstr: [" << thisinstrstr << "]" << endl;
     return thisinstrstr;
     // throw runtime_error("not implemented");
 }
@@ -106,7 +106,7 @@ string BasicBlockDumper::dumpConstant(Constant *constant) {
     } else if(isa<ConstantStruct>(constant)) {
         throw runtime_error("constantStruct not implemented in basicblockdumper.dumpconstant");
     } else if(ConstantExpr *expr = dyn_cast<ConstantExpr>(constant)) {
-        cout << "constantexpr" << endl;
+        // cout << "constantexpr" << endl;
         return dumpConstantExpr(expr);
         // throw runtime_error("constantExpr not implemented in basicblockdumper.dumpconstnat");
         // Instruction *instr = expr->getAsInstruction();
@@ -125,7 +125,7 @@ string BasicBlockDumper::dumpConstant(Constant *constant) {
     } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
         return dumpFloatConstant(forceSingle, constantFP);
     } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
-        cout << "globalvalue" << endl;
+        // cout << "globalvalue" << endl;
         // throw runtime_error("GlobalValue not implemented in basicblockdumper.dumpconstant");
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
             int addressspace = pointerType->getAddressSpace();
@@ -133,19 +133,19 @@ string BasicBlockDumper::dumpConstant(Constant *constant) {
                 sharedVariablesToDeclare.insert(global);
                 string name = global->getName().str();
                 localNames->getOrCreateName(global, name);
-                cout << "shared memory, creating in localnames name=" << name << endl;
+                // cout << "shared memory, creating in localnames name=" << name << endl;
                 return name;
             }
         }
         if(globalNames->hasName(constant)) {
-            cout << "found constnat in globalanesm, returning" << endl;
+            // cout << "found constnat in globalanesm, returning" << endl;
            return globalNames->getName(constant);
         }
         string name = global->getName().str();
-        cout << "using global's native name " << name << endl;
+        // cout << "using global's native name " << name << endl;
         string ourinstrstr = "(&" + name + ")";
         updateAddressSpace(constant, 4);  // 4 means constant
-        cout << "adding to exprByValue [" << ourinstrstr << "]" << endl;
+        // cout << "adding to exprByValue [" << ourinstrstr << "]" << endl;
         exprByValue[constant] = ourinstrstr;
 
         return ourinstrstr;
@@ -403,7 +403,7 @@ void BasicBlockDumper::dumpAlloca(llvm::AllocaInst *alloca) {
                 allocaInfo.definition = allocaDeclaration;
                 allocaDeclarations.push_back(allocaInfo);
                 // allocaDeclarationByValue[alloca] = allocaDeclaration;
-                cout << "alloca declaration as arraytype: " << allocaDeclaration << endl;
+                // cout << "alloca declaration as arraytype: " << allocaDeclaration << endl;
                 // currentFunctionSharedDeclarations += allocaDeclaration;
                 // return "";
                 return;
@@ -445,7 +445,7 @@ void BasicBlockDumper::dumpAlloca(llvm::AllocaInst *alloca) {
                 allocaInfo.definition = allocaDeclaration;
                 allocaDeclarations.push_back(allocaInfo);
                 // allocaDeclarationByValue[refInstruction] = allocaDeclaration;
-                cout << "alloca declaration not arraytype: " << allocaDeclaration << endl;
+                // cout << "alloca declaration not arraytype: " << allocaDeclaration << endl;
                 // allocaDeclarations.insert(allocaDeclaration);
                 // return "";
                 return;
@@ -477,7 +477,7 @@ std::string BasicBlockDumper::dumpStore(llvm::StoreInst *instr) {
 std::vector<std::string> BasicBlockDumper::dumpInsertValue(llvm::InsertValueInst *instr) {
     // string gencode = "";
     string lhs = "";
-    cout << "lhs undef value? " << isa<UndefValue>(instr->getOperand(0)) << endl;
+    // cout << "lhs undef value? " << isa<UndefValue>(instr->getOperand(0)) << endl;
     string incomingOperand = dumpOperand(instr->getOperand(0));
     // if rhs is empty, that means its 'undef', so we better declare it, I guess...
     Type *currentType = instr->getType();
@@ -601,18 +601,18 @@ std::string BasicBlockDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr) 
         // addSharedDeclaration(instr->getOperand(0));
         sharedVariablesToDeclare.insert(instr->getOperand(0));
     }
-    cout << "dumpgetelementptr addressspace=" << addressspace << endl;
-    cout << "currenttype:" << endl;
-    currentType->dump();
-    cout << endl;
+    // cout << "dumpgetelementptr addressspace=" << addressspace << endl;
+    // cout << "currenttype:" << endl;
+    // currentType->dump();
+    // cout << endl;
     for(int d=0; d < numOperands - 1; d++) {
-        cout << "  dumpgetelementptr d=" << d << " addessspace=" << addressspace << endl;
-        cout << "currenttype:" << endl;
-        currentType->dump();
-        cout << endl;
+        // cout << "  dumpgetelementptr d=" << d << " addessspace=" << addressspace << endl;
+        // cout << "currenttype:" << endl;
+        // currentType->dump();
+        // cout << endl;
         Type *newType = 0;
         if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
-            cout << "  dumpgetelementptr d=" << d << " pointer or array" << endl;
+            // cout << "  dumpgetelementptr d=" << d << " pointer or array" << endl;
             if(d == 0) {
                 if(isa<ArrayType>(currentType->getPointerElementType())) {
                     rhs = "(&" + rhs + ")";
@@ -623,7 +623,7 @@ std::string BasicBlockDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr) 
             rhs += string("[") + idxstring + "]";
             newType = currentType->getPointerElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
-            cout << "  dumpgetelementptr d=" << d << " struct" << endl;
+            // cout << "  dumpgetelementptr d=" << d << " struct" << endl;
             string structName = getName(structtype);
             if(structName == "struct.float4") {
                 int idx = readInt32Constant(instr->getOperand(d + 1));
@@ -642,7 +642,7 @@ std::string BasicBlockDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr) 
                     // addressspace = ptr->getAddressSpace();
                     // if its a pointer in a struct, hackily assume gloal for now
                     addressspace = 1;
-                    cout << "  dumpgetelementptr d=" << d << " struct updating addressspace to " << addressspace << endl;
+                    // cout << "  dumpgetelementptr d=" << d << " struct updating addressspace to " << addressspace << endl;
                 } else {
                     addressspace = 0;
                 }
@@ -660,7 +660,7 @@ std::string BasicBlockDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr) 
     }
     updateAddressSpace(instr, addressspace);
     rhs = "(&" + rhs + ")";
-    cout << "getelmenetptr res: " << rhs << endl;
+    // cout << "getelmenetptr res: " << rhs << endl;
     return rhs;
 }
 
@@ -745,6 +745,8 @@ std::string BasicBlockDumper::dumpCall(llvm::CallInst *instr) {
             i++;
         }
         gencode += ")";
+        cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
+        shimFunctionsNeeded.insert("__shfl_down_3");
         return gencode;
     } else if(functionName == "_Z11__shfl_downIfET_S0_i") {
         gencode += "__shfl_down_2(scratch, ";
@@ -758,6 +760,8 @@ std::string BasicBlockDumper::dumpCall(llvm::CallInst *instr) {
             i++;
         }
         gencode += ")";
+        cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
+        shimFunctionsNeeded.insert("__shfl_down_2");
         return gencode;
     } else if(functionName == "_Z13__threadfencev") {
         // Not sure if this is correct?
@@ -1067,11 +1071,11 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
     bool useIsExtractValue = false;
     bool useIsAPhi = false;
     // bool useIsALoad = false;
-    cout << "end of dumpinstruction for " << localNames->getName(instruction) << endl;
+    // cout << "end of dumpinstruction for " << localNames->getName(instruction) << endl;
     // exprByValue[instruction] = instructionCode;
-    cout << "numuses " << instruction->getNumUses() << " useisaphi " << useIsAPhi << " useIsExtractValue=" << useIsExtractValue << endl;
+    // cout << "numuses " << instruction->getNumUses() << " useisaphi " << useIsAPhi << " useIsExtractValue=" << useIsExtractValue << endl;
     if(instruction->getNumUses() == 1) {
-        cout << "one use" << endl;
+        // cout << "one use" << endl;
         use = &*instruction->use_begin();
         use_user = use->getUser();
         useIsAStore = isa<StoreInst>(use_user);
@@ -1083,12 +1087,12 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
     if(!useIsAPhi && !useIsExtractValue && instruction->getNumUses() <= 1 && !isa<LoadInst>(instruction)
             && !isa<StoreInst>(instruction)
             && !isa<CallInst>(instruction)) { // } && !useIsAStore) {
-        cout << "handling as single use" << endl;
+        // cout << "handling as single use" << endl;
         if(!isSingleExpression(instructionCode)) {
             instructionCode= "(" + instructionCode + ")";
         }
         exprByValue[instruction] = instructionCode;
-        cout << "storing expression for " << localNames->getName(instruction) << ": [" << instructionCode << "]" << endl;
+        // cout << "storing expression for " << localNames->getName(instruction) << ": [" << instructionCode << "]" << endl;
         // nameByValue[instruction] = instructionCode;
         if(_addIRToCl) {
             // return "/* " + originalInstruction + " */\n" + indent;
@@ -1099,7 +1103,7 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
             return;
         }
     } else {
-        cout << "not single use, assigning to variable" << endl;
+        // cout << "not single use, assigning to variable" << endl;
         if(_addIRToCl) {
             clcode.push_back("/* " + originalInstruction + " */");
         }
@@ -1133,8 +1137,8 @@ std::string BasicBlockDumper::getAllocaDeclarations(string indent) {
                 declaration = "global " + declaration;
             }
         }
-        cout << "alloca declaration: " << declaration << endl;
-        alloca->dump();
+        // cout << "alloca declaration: " << declaration << endl;
+        // alloca->dump();
         if(_addIRToCl) {
             oss << indent << "/* " << typeDumper->dumpType(alloca->getType()) << " " << localNames->getName(alloca) << " = alloca " << typeDumper->dumpType(alloca->getType()) << " */\n";
         }
@@ -1171,7 +1175,7 @@ std::string BasicBlockDumper::toCl() {
         //     cout << "instructionCode [" << instructionCode << "]" << endl;
         //     gencode += instructionCode;
         // }
-        inst->dump();
+        // inst->dump();
     }
     // string gencode = "";
     ostringstream oss;

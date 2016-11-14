@@ -37,6 +37,7 @@ public:
     std::string kernelName;
     std::set<std::string> functionDeclarations;
     std::set<llvm::StructType *>structsToDefine;
+    std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
 
     KernelDumper *addIRToCl() {
         _addIRToCl = true;

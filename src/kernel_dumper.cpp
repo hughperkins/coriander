@@ -19,6 +19,7 @@
 #include "function_names_map.h"
 #include "type_dumper.h"
 #include "function_dumper.h"
+#include "shims.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -38,29 +39,31 @@ std::string KernelDumper::toCl() {
     GlobalNames globalNames;
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
+    Shims shims;
 
     ostringstream moduleClStream;
 
     set<Function *> dumpedFunctions;
     set<Function *> neededFunctions;
+    set<Function *> isKernel;
 
-    dumpedFunctions.insert(F);
+    isKernel.insert(F);
+    // dumpedFunctions.insert(F);
     neededFunctions.insert(F);
 
-    FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
-    if(_addIRToCl) {
-        functionDumper.addIRToCl();
-    }
-    string kernelFunctionCl = functionDumper.toCl();
-    functionDeclarations.insert(functionDumper.getDeclaration());
-    cout << "kernelFunctionCl:\n" << kernelFunctionCl << endl;
-    moduleClStream << kernelFunctionCl;
-    for(auto it=functionDumper.neededFunctions.begin(); it != functionDumper.neededFunctions.end(); it++) {
-        neededFunctions.insert(*it);
-    }
-    for(auto it2=functionDumper.structsToDefine.begin(); it2 != functionDumper.structsToDefine.end(); it2++) {
-        structsToDefine.insert(*it2);
-    }
+    // FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
+    // if(_addIRToCl) {
+    //     functionDumper.addIRToCl();
+    // }
+    // string kernelFunctionCl = functionDumper.toCl();
+
+    // functionDeclarations.insert(functionDumper.getDeclaration());
+    // // cout << "kernelFunctionCl:\n" << kernelFunctionCl << endl;
+    // moduleClStream << kernelFunctionCl;
+    // shimFunctionsNeeded.insert(functionDumper.shimFunctionsNeeded.begin(), functionDumper.shimFunctionsNeeded.end());
+    // neededFunctions.insert(functionDumper.neededFunctions.begin(), functionDumper.neededFunctions.end());
+    // structsToDefine.insert(functionDumper.structsToDefine.begin(), functionDumper.structsToDefine.end());
+
     while(dumpedFunctions.size() < neededFunctions.size()) {
         for(auto it = neededFunctions.begin(); it != neededFunctions.end(); it++) {
             Function *childF = *it;
@@ -69,18 +72,29 @@ std::string KernelDumper::toCl() {
             }
             cout << "dumping function " << childF->getName().str() << endl;
             dumpedFunctions.insert(childF);
-            FunctionDumper childFunctionDumper(childF, false, &globalNames, &typeDumper, &functionNamesMap);
+            bool _isKernel = isKernel.find(childF) != isKernel.end();
+            FunctionDumper childFunctionDumper(childF, _isKernel, &globalNames, &typeDumper, &functionNamesMap);
             if(_addIRToCl) {
                 childFunctionDumper.addIRToCl();
             }
             string childFunctionCl = childFunctionDumper.toCl();
+
+            structsToDefine.insert(childFunctionDumper.structsToDefine.begin(), childFunctionDumper.structsToDefine.end());
             functionDeclarations.insert(childFunctionDumper.getDeclaration());
-            cout << "childFunctionCl:\n" << childFunctionCl << endl;
+            shimFunctionsNeeded.insert(childFunctionDumper.shimFunctionsNeeded.begin(), childFunctionDumper.shimFunctionsNeeded.end());
+            neededFunctions.insert(childFunctionDumper.neededFunctions.begin(), childFunctionDumper.neededFunctions.end());
+
+            // cout << "childFunctionCl:\n" << childFunctionCl << endl;
             moduleClStream << childFunctionCl;
-            for(auto it2=childFunctionDumper.structsToDefine.begin(); it2 != childFunctionDumper.structsToDefine.end(); it2++) {
-                structsToDefine.insert(*it2);
-            }
         }
+    }
+
+    // get all shim names
+    for(auto it=shimFunctionsNeeded.begin(); it != shimFunctionsNeeded.end(); it++) {
+        string shimName = *it;
+        cout << "kerneldumper, shim name needed=" << shimName << endl;
+        set<string> dependencies = shims.getDependenciesByName(shimName);
+        shimFunctionsNeeded.insert(dependencies.begin(), dependencies.end());
     }
 
     ostringstream functionDeclarationsStream;
@@ -88,6 +102,13 @@ std::string KernelDumper::toCl() {
         typeDumper.structsToDefine.insert(*it);
     }
     functionDeclarationsStream << typeDumper.dumpStructDefinitions() << "\n";
+
+    for(auto it=shimFunctionsNeeded.begin(); it != shimFunctionsNeeded.end(); it++) {
+        string shimName = *it;
+        string shimCl = shims.getClByName(shimName);
+        functionDeclarationsStream << shimCl << "\n";
+    }
+
     for(auto it=functionDeclarations.begin(); it != functionDeclarations.end(); it++) {
         functionDeclarationsStream << *it << ";\n";
     }

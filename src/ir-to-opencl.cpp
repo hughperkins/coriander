@@ -77,52 +77,6 @@ using namespace cocl;
 // static bool debug = false;
 
 bool add_ir_to_cl = false;
-
-
-static string cl_add_definitions = R"(
-inline float __shfl_down_3(local int *scratch, float v0, int v1, int v2) {
-    // local float mem[1024];
-    local float *mem = (local float *)scratch;
-    int tid = get_local_id(0);
-    int warpid = tid % 32;
-    int warpstart = tid - warpid;
-    mem[tid] = v0;
-    //barrier(CLK_LOCAL_MEM_FENCE);
-    int warpsrc = warpid + v1;
-    warpsrc = warpsrc >= 32 ? warpid : warpsrc;
-    return mem[warpstart + warpsrc];
-}
-
-inline float __shfl_down_2(local int *scratch, float v0, int v1) {
-    return __shfl_down_3(scratch, v0, v1, 32);
-}
-
-// based on https://community.amd.com/thread/167462
-inline int __atomic_inc(global volatile int *ptr, int val) {
-    while( true ){
-        int old = *ptr;
-        if( old >= val ) {
-            if(old == atomic_cmpxchg(ptr, old, 0)) {
-               break;
-            }
-        }
-        else {
-            if(old == atomic_cmpxchg(ptr, old, old+1)) {
-                break;
-            }
-        }
-    }
-    return 0;
-}
-
-//float __atomic_add(global volatile float *ptr, float val);
-
-inline float __atomic_add(global volatile float *ptr, float val) { // we need to actually implement this
-    return 555;
-}
-
-)";
-
 // std::string dumpValue(Value *value) {
 //     std::string gencode = "";
 //     if(nameByValue.find(value) != nameByValue.end()) {

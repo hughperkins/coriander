@@ -94,6 +94,7 @@ public:
         return this;
     }
 
+    std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
     std::set<llvm::Function *> neededFunctions;
     std::set<llvm::Value *> variablesToDeclare;
     std::set<llvm::Value *> sharedVariablesToDeclare;

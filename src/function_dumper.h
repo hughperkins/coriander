@@ -65,6 +65,7 @@ public:
         return this;
     }
 
+    std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
     std::set<llvm::Function *> neededFunctions;
     std::set<llvm::StructType *> structsToDefine;
     std::map<llvm::Value *, std::string> exprByValue;

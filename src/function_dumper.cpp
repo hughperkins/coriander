@@ -374,6 +374,7 @@ std::string FunctionDumper::toCl() {
 
         sharedVariablesToDeclare.insert(basicBlockDumper.sharedVariablesToDeclare.begin(), basicBlockDumper.sharedVariablesToDeclare.end());
         neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
+        shimFunctionsNeeded.insert(basicBlockDumper.shimFunctionsNeeded.begin(), basicBlockDumper.shimFunctionsNeeded.end());
 
         bodyCl += dumpTerminator(&returnType, basicBlock->getTerminator(), basicBlockDumper.exprByValue);
     }
