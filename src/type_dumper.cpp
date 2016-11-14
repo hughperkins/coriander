@@ -14,6 +14,7 @@
 
 #include "type_dumper.h"
 
+#include "mutations.h"
 #include "EasyCL/util/easycl_stringhelper.h"
 
 #include "llvm/IR/Instructions.h"
@@ -230,11 +231,11 @@ std::string TypeDumper::dumpStructDefinition(StructType *type, string name) {
         } else {
             declaration += "    ";
             // if its a pointer, lets assume its global, for now
-            // if(PointerType *ptr = dyn_cast<PointerType>(elementType)) {
+            if(PointerType *ptr = dyn_cast<PointerType>(elementType)) {
                 // updateAddressSpace(ptr, 1);
-                // declaration += "global ";
+                declaration += "global ";
 
-            // }
+            }
             declaration += dumpType(elementType) + " " + memberName + ";\n";
         }
         i++;

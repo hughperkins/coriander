@@ -639,7 +639,9 @@ std::string BasicBlockDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr) 
                 rhs += string(".f") + easycl::toString(idx);
                 newType = elementType;
                 if(PointerType *ptr = dyn_cast<PointerType>(newType)) {
-                    addressspace = ptr->getAddressSpace();
+                    // addressspace = ptr->getAddressSpace();
+                    // if its a pointer in a struct, hackily assume gloal for now
+                    addressspace = 1;
                     cout << "  dumpgetelementptr d=" << d << " struct updating addressspace to " << addressspace << endl;
                 } else {
                     addressspace = 0;
