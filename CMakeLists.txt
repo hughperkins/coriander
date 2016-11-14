@@ -86,6 +86,7 @@ set_target_properties(patch-hostside PROPERTIES
 target_link_libraries(patch-hostside "${LLVM_LIBS}")
 
 add_library(clew SHARED src/EasyCL/thirdparty/clew/src/clew.c)
+target_include_directories(clew PRIVATE src/EasyCL/thirdparty/clew/include)
 target_link_libraries(clew dl)
 
 add_library(easycl SHARED ${EASYCL_SRCS})
@@ -99,6 +100,7 @@ target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include/proxy
 target_include_directories(cocl PRIVATE src/CLBlast/include)
 target_include_directories(cocl PRIVATE include)
 target_include_directories(cocl PRIVATE src)
+target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include)
 if(COCL_SPAM)
     set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DCOCL_SPAM)
 endif()
@@ -153,6 +155,7 @@ include_directories(src/CLBlast/src)
 add_library(clblast SHARED ${CLBLAST_SOURCES})
 target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
 target_include_directories(clblast PRIVATE src/CLBlast/include)
+target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include)
 
 target_link_libraries(cocl clblast)
 
