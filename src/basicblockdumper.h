@@ -29,14 +29,6 @@
 
 namespace cocl {
 
-class AllocaInfo {
-public:
-    llvm::AllocaInst *alloca = 0;
-    llvm::Value *refValue = 0;
-    std::string definition = "";
-    std::string explain = "";
-};
-
 class BasicBlockDumper {
 public:
     // will block all non-controlflow instructions, meaning:
@@ -54,37 +46,8 @@ public:
     }
     std::string toCl();
     // void storeValueName(llvm::Value *value);
-    std::string dumpConstant(llvm::Constant *constant);
     std::string dumpChainedInstruction(int level, llvm::Instruction * instr, bool ignoreCasts=false);
-    std::string dumpConstantExpr(llvm::ConstantExpr *expr);
-    std::string dumpOperand(llvm::Value *value);
     void dumpInstruction(llvm::Instruction *instruction);
-
-    std::string dumpBinaryOperator(llvm::BinaryOperator *instr, std::string opstring);
-    std::string dumpIcmp(llvm::ICmpInst *instr);
-    std::string dumpFcmp(llvm::FCmpInst *instr);
-
-    std::string dumpBitCast(llvm::BitCastInst *instr);
-    std::string dumpAddrSpaceCast(llvm::AddrSpaceCastInst *instr);
-    std::string dumpFPExt(llvm::CastInst *instr);
-    std::string dumpZExt(llvm::CastInst *instr);
-    std::string dumpSExt(llvm::CastInst *instr);
-    std::string dumpFPToUI(llvm::FPToUIInst *instr);
-    std::string dumpFPToSI(llvm::FPToSIInst *instr);
-    std::string dumpUIToFP(llvm::UIToFPInst *instr);
-    std::string dumpSIToFP(llvm::SIToFPInst *instr);
-    std::string dumpFPTrunc(llvm::CastInst *instr);
-    std::string dumpTrunc(llvm::CastInst *instr);
-
-    std::vector<std::string> dumpInsertValue(llvm::InsertValueInst *instr);
-    std::string dumpExtractValue(llvm::ExtractValueInst *instr);
-    std::string dumpLoad(llvm::LoadInst *instr);
-    std::string dumpStore(llvm::StoreInst *instr);
-    void dumpAlloca(llvm::AllocaInst *alloca);
-    std::string dumpGetElementPtr(llvm::GetElementPtrInst *instr);
-    std::string dumpSelect(llvm::SelectInst *instr);
-    std::string dumpMemcpyCharCharLong(llvm::CallInst *instr);
-    std::string dumpCall(llvm::CallInst *instr);
 
     std::string getAllocaDeclarations(std::string indent);
     std::string writeDeclarations(std::string indent);
