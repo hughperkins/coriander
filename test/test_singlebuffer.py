@@ -16,6 +16,7 @@ import numpy as np
 import pyopencl as cl
 from test import test_common
 from test.test_common import offset_type
+import pytest
 
 
 def test_singlebuffer_sqrt_opencl_1(context, queue):
@@ -67,6 +68,7 @@ kernel void myKernel(global float *data0, long offset0, global float *data1, lon
     assert np.abs(np.sqrt(src_host) - dst_host).max() <= 1e-4
 
 
+@pytest.mark.xfail(reason='demonstration test case of long offsets failing on hd5500 (I think?)')
 def test_singlebuffer_sqrt_opencl_2(context, queue):
     """
     Test doing stuff with one single large buffer for destination and source, just offset a bit
@@ -155,8 +157,8 @@ __global__ void myKernel(float *data0, float *data1, int N) {
 
     kernel(
         queue, (global_size,), (workgroup_size,),
-        huge_buf_gpu, offset_type(dst_offset),
-        huge_buf_gpu, offset_type(src_offset),
+        huge_buf_gpu, offset_type(dst_offset // 4),
+        huge_buf_gpu, offset_type(src_offset // 4),
         np.int32(N),
         cl.LocalMemory(4)
     )
