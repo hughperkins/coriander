@@ -91,7 +91,10 @@ std::string KernelDumper::toCl() {
     for(auto it=functionDeclarations.begin(); it != functionDeclarations.end(); it++) {
         functionDeclarationsStream << *it << ";\n";
     }
+    // ostringstream structDeclarationsStream;
+    // typeDumper.dumpStructDeclarations(structDeclarationsStream);
     return
+        // structDeclarationsStream.str() + "\n" +
         functionDeclarationsStream.str() + "\n" +
         moduleClStream.str();
 }

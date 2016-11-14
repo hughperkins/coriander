@@ -32,6 +32,10 @@ bool GlobalNames::hasName(Value *value) {
     return nameByValue.find(value) != nameByValue.end();
 }
 
+bool GlobalNames::hasName(Type *type) {
+    return nameByType.find(type) != nameByType.end();
+}
+
 std::string GlobalNames::getOrCreateName(Value *value, std::string proposedName) {
     auto it = nameByValue.find(value);
     if(it != nameByValue.end()) {

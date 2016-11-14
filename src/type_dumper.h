@@ -23,6 +23,7 @@
 #include <string>
 #include <map>
 #include <set>
+#include <ostream>
 
 namespace cocl {
 
@@ -30,6 +31,7 @@ class TypeDumper {
 public:
     TypeDumper(GlobalNames *globalNames) : globalNames(globalNames) {
     }
+    std::string addStructToGlobalNames(llvm::StructType *type);
     std::string dumpType(llvm::Type *type, bool decayArraysToPointer = false);
     std::string dumpFunctionType(llvm::FunctionType *fn);
     std::string dumpPointerType(llvm::PointerType *ptr, bool decayArraysToPointer = false);
@@ -40,7 +42,9 @@ public:
 
     std::string dumpStructDefinitions();
     std::string dumpStructDefinition(llvm::StructType *type, std::string name);
+    // void dumpStructDeclarations(std::ostream &os);
 
+    // std::set<std::string> structDeclarations;
     std::set<llvm::StructType *> structsToDefine;
     std::map<llvm::FunctionType *, std::string> functionsToDefine;
 

@@ -38,6 +38,7 @@ public:
 
     std::string getName(llvm::Type *type);
     std::string getOrCreateName(llvm::Type *type, std::string proposedName="");
+    bool hasName(llvm::Type *type);
 
 protected:
     std::string createName(llvm::Type *type, std::string name);

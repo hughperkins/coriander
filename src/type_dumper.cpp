@@ -94,8 +94,11 @@ std::string TypeDumper::dumpIntegerType(IntegerType *type) {
     }
 }
 
-std::string TypeDumper::dumpStructType(StructType *type) {
+std::string TypeDumper::addStructToGlobalNames(StructType *type) {
     // outs() << "dumpstructtype" << "\n";
+    if(globalNames->hasName(type)) {
+        return globalNames->getName(type);
+    }
     if(type->hasName()) {
         string name = type->getName();
         // outs() << "name " << name << "\n";
@@ -131,6 +134,10 @@ std::string TypeDumper::dumpStructType(StructType *type) {
         type->dump();
         throw runtime_error("not implemented: anonymous struct types");
     }
+}
+
+std::string TypeDumper::dumpStructType(StructType *type) {
+    return addStructToGlobalNames(type);
 }
 
 std::string TypeDumper::dumpArrayType(ArrayType *type, bool decayArraysToPointer) {
@@ -194,6 +201,7 @@ std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {
 
 std::string TypeDumper::dumpStructDefinition(StructType *type, string name) {
     std::string declaration = "";
+    // structDeclarations.insert(name);
     declaration += name + " {\n";
     int i = 0;
     for(auto it=type->element_begin(); it != type->element_end(); it++) {
@@ -245,11 +253,37 @@ std::string TypeDumper::dumpStructDefinitions() {
             if(dumped.find(structType) != dumped.end()) {
                 continue;
             }
+            cout << "checking " << structType->getName().str() << endl;
+            // check if we already defined its members
+            bool dumpable = true;
+            for(auto it2=structType->element_begin(); it2 != structType->element_end(); it2++) {
+                // Type *structElementType = *it2;
+                if(StructType *elementStructType = dyn_cast<StructType>(*it2)) {
+                    if(dumped.find(elementStructType) == dumped.end()) {
+                        cout << "      ... depends on " << elementStructType->getName().str() << endl;
+                        structsToDefine.insert(elementStructType);
+                        dumpable = false;
+                        break;
+                    }
+                }
+            }
+            if(!dumpable) {
+                continue;
+            }
             dumped.insert(structType);
+            addStructToGlobalNames(structType);
+            cout << "dumping struct " << structType->getName().str() << endl;
             gencode += dumpStructDefinition(structType, globalNames->getName(structType));
         }
     }
+    cout << "all structs dumped" << endl;
     return gencode;
 }
+
+// void TypeDumper::dumpStructDeclarations(std::ostream &os) {
+//     for(auto it=structDeclarations.begin(); it != structDeclarations.end(); it++) {
+//         os << *it << ";\n";
+//     }
+// }
 
 } // namespace cocl;
