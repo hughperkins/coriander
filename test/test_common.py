@@ -182,6 +182,23 @@ def compile_code_v3(cl, context, kernelSource, kernelName):
     return {'kernel': kernel, 'cl_sourcecode': cl_sourcecode}
 
 
+def ll_to_cl(ll_sourcecode, kernelName):
+    with open('/tmp/testprog-device.ll', 'w') as f:
+        f.write(ll_sourcecode)
+
+    run_process([
+        'build/ir-to-opencl',
+        '--inputfile', '/tmp/testprog-device.ll',
+        '--outputfile', '/tmp/testprog-device.cl',
+        '--kernelname', kernelName,
+        '--add_ir_to_cl'
+    ])
+
+    with open('/tmp/testprog-device.cl', 'r') as f:
+        cl_sourcecode = f.read()
+    return cl_sourcecode
+
+
 def cu_to_cl(cu_sourcecode, kernelName):
     for file in os.listdir('/tmp'):
         if file.startswith('testprog'):

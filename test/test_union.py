@@ -12,51 +12,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-import subprocess
-import pyopencl as cl
-import pytest
-import os
-from os import path
 from test import test_common
 
 
-@pytest.fixture(scope='module')
-def union_cl():
-    # lets check it's compileable ll first, using llvm
-    ll_filepath = 'test/union-device.ll'
-    cl_filepath = 'test/generated/union-device.cl'
-
-    print(subprocess.check_output([
-        test_common.clang_path,
-        '-c', ll_filepath,
-        '-O3',
-        '-o', '/tmp/~foo'
-    ]).decode('utf-8'))
-
-    print(subprocess.check_output([
-        'make',
-        'build/ir-to-opencl',
-    ]).decode('utf-8'))
-
-    if not path.isdir('test/generated'):
-        os.makedirs('test/generated')
-    print(subprocess.check_output([
-        'build/ir-to-opencl',
-        '--debug',
-        '--inputfile', ll_filepath,
-        '--outputfile', cl_filepath
-    ]).decode('utf-8'))
-    return cl_filepath
+def try_build(context, ll_filepath, kernelname):
+    with open(ll_filepath, 'r') as f:
+        llcode = f.read()
+    clcode = test_common.ll_to_cl(llcode, kernelname)
+    test_common.build_kernel(context, clcode, kernelname)
 
 
-@pytest.fixture(scope='module')
-def union(context, union_cl):
-    with open(union_cl, 'r') as f:
-        sourcecode = f.read()
-
-    prog = cl.Program(context, sourcecode).build()
-    return prog
-
-
-def test_program_compiles(union):
-    pass
+def test_program_compiles(context):
+    # ok these names were obtained empirically :-P
+    # ie, I first ran `cocl`, then examined the resulting testprog-device.ll file to get the names
+    kernelNames = [
+        'test_union',
+        'test_union1',
+    ]
+    for kernelname in kernelNames:
+        try_build(context, 'test/union-device.ll', kernelname)
