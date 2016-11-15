@@ -10,6 +10,13 @@ before_install:
   - if [ -f ".git/shallow" ]; then travis_retry git fetch --unshallow; fi
   - BASEDIR=$(pwd)
   - echo BASEDIR ${BASEDIR}
+  - mkdir soft
+  - cd soft
+  - wget http://llvm.org/releases/3.8.0/clang+llvm-3.8.0-x86_64-apple-darwin.tar.xz
+  - tar -xf clang+llvm-3.8.0-x86_64-apple-darwin.tar.xz
+  - ls
+  - ls clang+llvm-3.8.0-x86_64-apple-darwin
+  - cd ${BASEDIR}
   - mkdir build
   - cd build
   - cmake ..
