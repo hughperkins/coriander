@@ -60,7 +60,11 @@ add_definitions(-DUSE_CLEW)  # turns off direct linking with libOpenCL.so, all g
 # for llvm:
 add_definitions(-D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS)
 
+if(APPLE)
+set (LLVM_LIBS ${CLANG_HOME}/lib/libLLVM.a)
+else()
 set (LLVM_LIBS ${CLANG_HOME}/lib/libLLVM.so)
+endif()
 
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 
