@@ -76,7 +76,10 @@ TEST(test_block_dumper, basic) {
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
-    string cl = blockDumper.toCl();
+    ostringstream oss;
+    blockDumper.runGeneration();
+    blockDumper.toCl(oss);
+    string cl = oss.str();
     cout << cl << endl;
     string expectedBlockCl = R"(    v2 = (5 + 3) + 7;
     v3 = 8.0f + 3.0f;
@@ -139,7 +142,10 @@ TEST(test_block_dumper, basic2) {
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
-    string cl = blockDumper.toCl();
+    ostringstream oss;
+    blockDumper.runGeneration();
+    blockDumper.toCl(oss);
+    string cl = oss.str();
     cout << "cl:\n" << cl << endl;
     cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
 
@@ -166,7 +172,10 @@ TEST(test_block_dumper, usesShared) {
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
-    string cl = blockDumper.toCl();
+    ostringstream oss;
+    blockDumper.runGeneration();
+    blockDumper.toCl(oss);
+    string cl = oss.str();
     cout << "cl:\n" << cl << endl;
     cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
 

@@ -217,27 +217,26 @@ std::string BasicBlockDumper::writeDeclarations(std::string indent) {
     return oss.str();
 }
 
-std::string BasicBlockDumper::toCl() {
-    for(auto it = block->begin(); it != block->end(); it++) {
-        Instruction *inst = &*it;
+bool BasicBlockDumper::runGeneration() {
+    // returns true if finished, otherwise false, if missing some dependnecies and so on,
+    // like child functions we need to walk over first ,to figure ou the address spcae of
+    // the return value
+    for(; instruction_it != block->end(); instruction_it++) {
+        Instruction *inst = &*instruction_it;
         if(isa<PHINode>(inst) || isa<BranchInst>(inst) || isa<ReturnInst>(inst)) {
             continue;
         }
-        // cout << endl;
-        // string instructionCode = dumpInstruction("    ", inst);
         dumpInstruction(inst);
-        // if(instructionCode != "") {
-        //     cout << "instructionCode [" << instructionCode << "]" << endl;
-        //     gencode += instructionCode;
-        // }
-        // inst->dump();
     }
-    // string gencode = "";
-    ostringstream oss;
+    return true;
+}
+
+void BasicBlockDumper::toCl(ostream &os) {
+    // ostringstream oss;
     for(auto it=clcode.begin(); it != clcode.end(); it++) {
-        oss << "    " << *it << ";\n";
+        os << "    " << *it << ";\n";
     }
-    return oss.str();
+    // return oss.str();
 }
 
 } // namespace cocl

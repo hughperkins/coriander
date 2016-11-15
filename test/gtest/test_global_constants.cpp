@@ -79,7 +79,10 @@ TEST(test_global_constant, test_union) {
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
-    string cl = blockDumper.toCl();
+    blockDumper.runGeneration();
+    ostringstream oss;
+    blockDumper.toCl(oss);
+    string cl = oss.str();
     cout << "cl:\n" << cl << endl;
     cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
 

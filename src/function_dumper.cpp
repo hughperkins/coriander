@@ -367,7 +367,13 @@ std::string FunctionDumper::toCl() {
         if(_addIRToCl) {
             basicBlockDumper.addIRToCl();
         }
-        bodyCl += basicBlockDumper.toCl();
+        ostringstream oss;
+        if(!basicBlockDumper.runGeneration()) {
+            cout << "blockdumper generation didnt run to completion" << endl;
+            throw runtime_error("blockdumper generation didnt run to completion");
+        }
+        basicBlockDumper.toCl(oss);
+        bodyCl += oss.str();
 
         functionDeclarations += basicBlockDumper.getAllocaDeclarations("    ");
         functionDeclarations += basicBlockDumper.writeDeclarations("    ");

@@ -48,8 +48,10 @@ public:
             new InstructionDumper(globalNames, localNames, typeDumper, functionNamesMap,
             &allocaDeclarations, &variablesToDeclare, &sharedVariablesToDeclare,
             &shimFunctionsNeeded, &neededFunctions, &globalExpressionByValue, &localExpressionByValue));
+        instruction_it = block->begin();
     }
-    std::string toCl();
+    bool runGeneration();
+    void toCl(std::ostream &os);
     // void storeValueName(llvm::Value *value);
     std::string dumpChainedInstruction(int level, llvm::Instruction * instr, bool ignoreCasts=false);
     void dumpInstruction(llvm::Instruction *instruction);
@@ -72,6 +74,8 @@ public:
     std::vector<std::string> clcode;
 
 protected:
+    llvm::BasicBlock::iterator instruction_it;
+
     llvm::BasicBlock *block;
     bool _addIRToCl = false;
     bool forceSingle = true;
