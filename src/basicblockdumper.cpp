@@ -72,17 +72,15 @@ namespace cocl {
 // }
 
 void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
-    auto opcode = instruction->getOpcode();
     string resultName = localNames->getOrCreateName(instruction);
     // string 
     // storeValueName(instruction);
     // string resultName = localNames->getOrCreateName(instruction);
     // string resultName = exprByValue[instruction];
-    exprByValue[instruction] = resultName;
+    localExpressionByValue[instruction] = resultName;
     string resultType = typeDumper->dumpType(instruction->getType());
 
     string gencode = "";
-    string instructionCode = "";
     // if(debug) {
         // COCL_PRINT(cout << resultType << " " << resultName << " =");
         // COCL_PRINT(cout << " " << string(instruction->getOpcodeName()));
@@ -111,10 +109,10 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
         // }
     }
     vector<string> reslines;
-    InstructionDumper instructionDumper;
-    string instructionRhs = instructionDumper.dumpInstructionRhs(instruction, &reslines);
+    // InstructionDumper instructionDumper;
+    string instructionCode = instructionDumper->dumpInstructionRhs(instruction, &reslines);
     clcode.insert(clcode.end(), reslines.begin(), reslines.end());
-    if(instructionRhs == "") {
+    if(instructionCode == "") {
         return;
     }
 
@@ -147,7 +145,7 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
         if(!isSingleExpression(instructionCode)) {
             instructionCode= "(" + instructionCode + ")";
         }
-        exprByValue[instruction] = instructionCode;
+        localExpressionByValue[instruction] = instructionCode;
         // cout << "storing expression for " << localNames->getName(instruction) << ": [" << instructionCode << "]" << endl;
         // nameByValue[instruction] = instructionCode;
         if(_addIRToCl) {

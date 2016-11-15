@@ -33,64 +33,63 @@ using namespace llvm;
 
 namespace cocl {
 
-void KernelDumper::declareGlobal(ostream &os, GlobalValue *global) {
-    // string gencode = "";
-    if(GlobalVariable *var = dyn_cast<GlobalVariable>(global)) {
-        string name = global->getName().str();
-        if(name == "$str") {
-            return;  // lazily skip $str for now...
-        }
-        // gencode += "constant " + dumpType(global->getType()->getPointerElementType()) + " " + name;
-        os << "constant " << typeDumper->dumpType(global->getType()->getPointerElementType()) << " " << name;
-        if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
-            int addressspace = pointerType->getAddressSpace();
-            if(addressspace == 3) { // shared/local => skip
-                return;
-            } else {
-                updateAddressSpace(var, 4);
-            }
-        }
-        if(var->hasInitializer()) {
-            Constant *initializer = var->getInitializer();
-            // gencode += " = {";
-            os << " = {";
-            if(ConstantStruct *constStruct = dyn_cast<ConstantStruct>(initializer)) {
-                int i = 0;
-                while(Value *aggel = constStruct->getAggregateElement(i)) {
-                    if(i == 0) {
-                    } else {
-                        // gencode += ", ";
-                        os << ", ";
-                    }
-                    if(Constant *constant = dyn_cast<Constant>(aggel) {
-                    os << dumpOperand(aggel);
-                    
-                    } else {
-                        cout << "value not implemented in declareglobal:" << endl;
-                        aggel->dump();
-                        cout << endl;
-                        throw runtime_error("not implemetned in declareglobal");
-                    }
-                    // gencode += dumpOperand(aggel);
-                    i++;
-                }
-                if(i > 0) {
-                }
-            }
-            // gencode += "}";
-            os << "}";
-        } else {
-            // gencode += " = {}";
-            os << " = {}";
-        }
-    } else {
-        global->dump();
-        throw runtime_error("unimplemented declareglobalvalue for this type");
-    }
-    // gencode += ";\n";
-    os << ";\n";
-    // globalDeclarations += gencode + "\n";
-}
+// void KernelDumper::declareGlobal(ostream &os, GlobalValue *global) {
+//     // string gencode = "";
+//     if(GlobalVariable *var = dyn_cast<GlobalVariable>(global)) {
+//         string name = global->getName().str();
+//         if(name == "$str") {
+//             return;  // lazily skip $str for now...
+//         }
+//         // gencode += "constant " + dumpType(global->getType()->getPointerElementType()) + " " + name;
+//         os << "constant " << typeDumper->dumpType(global->getType()->getPointerElementType()) << " " << name;
+//         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
+//             int addressspace = pointerType->getAddressSpace();
+//             if(addressspace == 3) { // shared/local => skip
+//                 return;
+//             } else {
+//                 updateAddressSpace(var, 4);
+//             }
+//         }
+//         if(var->hasInitializer()) {
+//             Constant *initializer = var->getInitializer();
+//             // gencode += " = {";
+//             os << " = {";
+//             if(ConstantStruct *constStruct = dyn_cast<ConstantStruct>(initializer)) {
+//                 int i = 0;
+//                 while(Value *aggel = constStruct->getAggregateElement(i)) {
+//                     if(i == 0) {
+//                     } else {
+//                         // gencode += ", ";
+//                         os << ", ";
+//                     }
+//                     if(Constant *constant = dyn_cast<Constant>(aggel)) {
+//                         os << dumpOperand(aggel);
+//                     } else {
+//                         cout << "value not implemented in declareglobal:" << endl;
+//                         aggel->dump();
+//                         cout << endl;
+//                         throw runtime_error("not implemetned in declareglobal");
+//                     }
+//                     // gencode += dumpOperand(aggel);
+//                     i++;
+//                 }
+//                 if(i > 0) {
+//                 }
+//             }
+//             // gencode += "}";
+//             os << "}";
+//         } else {
+//             // gencode += " = {}";
+//             os << " = {}";
+//         }
+//     } else {
+//         global->dump();
+//         throw runtime_error("unimplemented declareglobalvalue for this type");
+//     }
+//     // gencode += ";\n";
+//     os << ";\n";
+//     // globalDeclarations += gencode + "\n";
+// }
 
 void KernelDumper::declareGlobals(ostream &os) {
     // global_begin/end returns all the bits that start with '@', at the top of the .ll
@@ -161,7 +160,7 @@ std::string KernelDumper::toCl() {
             cout << "dumping function " << childF->getName().str() << endl;
             dumpedFunctions.insert(childF);
             bool _isKernel = isKernel.find(childF) != isKernel.end();
-            FunctionDumper childFunctionDumper(childF, _isKernel, &globalNames, &typeDumper, &functionNamesMap);
+            FunctionDumper childFunctionDumper(childF, _isKernel, &globalNames, typeDumper.get(), &functionNamesMap);
             if(_addIRToCl) {
                 childFunctionDumper.addIRToCl();
             }
@@ -187,9 +186,9 @@ std::string KernelDumper::toCl() {
 
     ostringstream functionDeclarationsStream;
     for(auto it=structsToDefine.begin(); it != structsToDefine.end(); it++) {
-        typeDumper.structsToDefine.insert(*it);
+        typeDumper->structsToDefine.insert(*it);
     }
-    functionDeclarationsStream << typeDumper.dumpStructDefinitions() << "\n";
+    functionDeclarationsStream << typeDumper->dumpStructDefinitions() << "\n";
 
     for(auto it=shimFunctionsNeeded.begin(); it != shimFunctionsNeeded.end(); it++) {
         string shimName = *it;

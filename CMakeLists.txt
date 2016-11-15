@@ -198,6 +198,16 @@ if(BUILD_TESTS)
         add_library(cocl_gtest third_party/gtest/gtest-all.cc)
     endif()
 
+    add_executable(test_instructiondumper test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
+      src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/ConstantDumper.cpp
+      src/mutations.cpp src/ExpressionsHelper.cpp src/readIR.cpp
+      src/function_names_map.cpp
+      src/InstructionDumper.cpp test/gtest/test_instructiondumper.cpp)
+    target_include_directories(test_instructiondumper PRIVATE src)
+    target_include_directories(test_instructiondumper PRIVATE third_party/gtest)
+    target_include_directories(test_instructiondumper PRIVATE /usr/lib/llvm-3.8/include)
+    target_link_libraries(test_instructiondumper "${LLVM_LIBS}" cocl_gtest easycl)
+
     add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
         test/gtest/test_block_dumper.cpp
         test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp

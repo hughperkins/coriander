@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "ConstantDumper.h"
-
-// I guess that constants dont need other values and so on, therefore can be dumped outside of a basicblock context?
-
-#include <iostream>
-
-using namespace std;
-using namespace llvm;
+#pragma once
 
 namespace cocl {
 
-} //namespace cocl
+class GlobalConstants {
+public:
+};
+
+} // namespace cocl

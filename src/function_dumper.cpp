@@ -64,14 +64,14 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
     return gencode;
 }
 
-std::string FunctionDumper::dumpReturn(Type **pReturnType, ReturnInst *retInst, std::map<llvm::Value *, std::string> &exprByValue) {
+std::string FunctionDumper::dumpReturn(Type **pReturnType, ReturnInst *retInst, std::map<llvm::Value *, std::string> &localExpressionByValue) {
     std::string gencode = "";
     Value *retValue = retInst->getReturnValue();
     if(retValue != 0) {
         Function *F = retInst->getFunction();
         copyAddressSpace(retValue, F);
         *pReturnType = retValue->getType();
-        gencode += "return " + exprByValue[retValue];
+        gencode += "return " + localExpressionByValue[retValue];
         // gencode += "return " + dumpOperand(retValue);
     } else {
         // we still need to have "return" if no value, since some loops terminate with a `return` in the middle
@@ -81,10 +81,10 @@ std::string FunctionDumper::dumpReturn(Type **pReturnType, ReturnInst *retInst, 
     return gencode;
 }
 
-std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr, std::map<Value *, std::string> &exprByValue) {
+std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr, std::map<Value *, std::string> &localExpressionByValue) {
     string gencode = "";
     if(instr->isConditional()) {
-        string conditionstring = exprByValue[instr->getCondition()];
+        string conditionstring = localExpressionByValue[instr->getCondition()];
         if(!isSingleExpression(conditionstring) || conditionstring[0] != '(') {
             conditionstring = "(" + conditionstring + ")";
         }
@@ -179,7 +179,7 @@ std::vector<std::string> FunctionDumper::dumpSharedDefinition(llvm::Value *value
             string typestr = typeDumper->dumpType(elementType);
             declarations.push_back("local " + typestr + " " + name + "[" + easycl::toString(length) + "]");
             // declarations.push_back("local " + typestr + "** " + name + " = &" + name + "__");
-            exprByValue[value] = name;
+            localExpressionByValue[value] = name;
             // nameByValue[value] = name;
             // currentFunctionSharedDeclarations += declaration;
             return declarations;
@@ -320,13 +320,13 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
     return declaration;
 }
 
-std::string FunctionDumper::dumpTerminator(Type **pReturnType, Instruction *terminator, std::map<llvm::Value *, std::string> &exprByValue) {
+std::string FunctionDumper::dumpTerminator(Type **pReturnType, Instruction *terminator, std::map<llvm::Value *, std::string> &localExpressionByValue) {
     string terminatorCl = "";
     if(ReturnInst *retInst = dyn_cast<ReturnInst>(terminator)) {
-        terminatorCl = "    " + dumpReturn(pReturnType, retInst, exprByValue) + ";\n";
+        terminatorCl = "    " + dumpReturn(pReturnType, retInst, localExpressionByValue) + ";\n";
         // returnType = retInst->getOperand(0)->getType();
     } else if(BranchInst *branch = dyn_cast<BranchInst>(terminator)) {
-        terminatorCl = dumpBranch(branch, exprByValue);
+        terminatorCl = dumpBranch(branch, localExpressionByValue);
     } else {
         cout << "unhandled terminator type:";
         terminator->dump();
@@ -376,7 +376,7 @@ std::string FunctionDumper::toCl() {
         neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
         shimFunctionsNeeded.insert(basicBlockDumper.shimFunctionsNeeded.begin(), basicBlockDumper.shimFunctionsNeeded.end());
 
-        bodyCl += dumpTerminator(&returnType, basicBlock->getTerminator(), basicBlockDumper.exprByValue);
+        bodyCl += dumpTerminator(&returnType, basicBlock->getTerminator(), basicBlockDumper.localExpressionByValue);
     }
 
     if(returnType != 0) {

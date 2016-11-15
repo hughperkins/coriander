@@ -68,7 +68,8 @@ public:
     std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
     std::set<llvm::Function *> neededFunctions;
     std::set<llvm::StructType *> structsToDefine;
-    std::map<llvm::Value *, std::string> exprByValue;
+    std::map<llvm::Value *, std::string> globalExpressionByValue;
+    std::map<llvm::Value *, std::string> localExpressionByValue;
     std::map<std::string, std::string> phiDeclarationsByName;
     std::set<llvm::Value *> sharedVariablesToDeclare;
     std::set<llvm::Value *> variablesToDeclare;

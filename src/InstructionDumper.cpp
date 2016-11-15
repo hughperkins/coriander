@@ -26,6 +26,87 @@ using namespace llvm;
 
 namespace cocl {
 
+void InstructionDumper::dumpConstant(std::ostream &oss, llvm::Constant *constant) {
+// maybe this should be somewhere more generic?
+// string BasicBlockDumper::dumpConstant(Constant *constant) {
+    unsigned int valueTy = constant->getValueID();
+    // ostringstream oss;
+    if(ConstantInt *constantInt = dyn_cast<ConstantInt>(constant)) {
+        oss << constantInt->getSExtValue();
+        // string constantintval = oss.str();
+        // return constantintval;
+        return;
+    } else if(isa<ConstantStruct>(constant)) {
+        throw runtime_error("constantStruct not implemented in basicblockdumper.dumpconstant");
+    } else if(ConstantExpr *expr = dyn_cast<ConstantExpr>(constant)) {
+        // cout << "constantexpr" << endl;
+        // return dumpConstantExpr(expr);
+        oss << dumpConstantExpr(expr);
+        return;
+        // throw runtime_error("constantExpr not implemented in basicblockdumper.dumpconstnat");
+        // Instruction *instr = expr->getAsInstruction();
+        // cout << "dumping:" << endl;
+        // instr->dump();
+        // copyAddressSpace(constant, instr);
+        // string dcires = dumpInstruction(instr);
+        // cout << "calling dci" << endl;
+        // string dcires = dumpChainedInstruction(0, instr, true);
+        // cout << "dcires " << dcires << endl;
+        // // copyAddressSpace(instr, constant);
+        // nameByValue[constant] = dcires;
+        // cout << "exprByValue has constant? " << (exprByValue.find(constant) != exprByValue.end()) << endl;
+        // exprByValue[constant] = dcires;
+        // return dcires;
+    } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
+        oss << dumpFloatConstant(forceSingle, constantFP);
+        return;
+    } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
+        // cout << "globalvalue" << endl;
+        // throw runtime_error("GlobalValue not implemented in basicblockdumper.dumpconstant");
+        if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
+            int addressspace = pointerType->getAddressSpace();
+            if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
+                sharedVariablesToDeclare->insert(global);
+                string name = global->getName().str();
+                localNames->getOrCreateName(global, name);
+                // cout << "shared memory, creating in localnames name=" << name << endl;
+                oss << name;
+                return;
+                // return name;
+            }
+        }
+        if(globalNames->hasName(constant)) {
+            // cout << "found constnat in globalanesm, returning" << endl;
+           // return globalNames->getName(constant);
+            oss << globalNames->getName(constant);
+            return;
+        }
+        string name = global->getName().str();
+        // cout << "using global's native name " << name << endl;
+        string ourinstrstr = "(&" + name + ")";
+        updateAddressSpace(constant, 4);  // 4 means constant
+        // cout << "adding to exprByValue [" << ourinstrstr << "]" << endl;
+        globalExpressionByValue->operator[](constant) = ourinstrstr;
+
+        oss << ourinstrstr;
+        return;
+        // return ourinstrstr;
+    } else if(isa<UndefValue>(constant)) {
+        // return "";
+        return;
+    } else if(isa<ConstantPointerNull>(constant)) {
+        // return "0";
+        oss << "0";
+        return;
+    } else {
+        cout << "valueTy " << valueTy << endl;
+        oss << "unknown";
+        constant->dump();
+        throw runtime_error("unknown constnat type");
+    }
+    // return oss.str();
+}
+
 string InstructionDumper::dumpConstantExpr(ConstantExpr *expr) {
     // this means things like:
     // shared memory 
@@ -33,7 +114,13 @@ string InstructionDumper::dumpConstantExpr(ConstantExpr *expr) {
     // expr->dump();
     // cout << endl;
     Instruction *instr = expr->getAsInstruction();
-    dumpInstruction(instr);
+    // InstructionDumper childInstructionDumper;
+    // string rhs = dumpInstruction(instr);
+    vector<string> excessLines;
+    string rhs = dumpInstructionRhs(instr, &excessLines);
+    if(excessLines.size() > 0) {
+        throw runtime_error("InstructionDumper::dumpConstantExpr cannot handle excess lines > 0");
+    }
     int numOperands = instr->getNumOperands();
     // cout << "numoperands " << numOperands << endl;
     // for(int i = 0; i < numOperands; i++) {
@@ -44,18 +131,20 @@ string InstructionDumper::dumpConstantExpr(ConstantExpr *expr) {
         // string opstring = dumpOperand(op);
         // cout << "opstring:" << opstring << endl;
     // }
-    string thisinstrstr = globalExpressionByValue[instr];
+    string thisinstrstr = globalExpressionByValue->operator[](instr);
     // cout << "thisinstrstr: [" << thisinstrstr << "]" << endl;
     return thisinstrstr;
     // throw runtime_error("not implemented");
 }
 
 string InstructionDumper::dumpOperand(Value *value) {
-    if(localExpressionByValue.find(value) != localExpressionByValue.end()) {
-        return localExpressionByValue[value];
+    if(localExpressionByValue->find(value) != localExpressionByValue->end()) {
+        return localExpressionByValue->operator[](value);
     }
     if(Constant *constant = dyn_cast<Constant>(value)) {
-        return dumpConstant(constant);
+        ostringstream oss;
+        dumpConstant(oss, constant);
+        return oss.str();
     }
     if(localNames->hasValue(value)) {
         return localNames->getName(value);
@@ -289,7 +378,7 @@ void InstructionDumper::dumpAlloca(llvm::AllocaInst *alloca) {
                 allocaInfo.alloca = alloca;
                 allocaInfo.refValue = alloca;
                 allocaInfo.definition = allocaDeclaration;
-                allocaDeclarations.push_back(allocaInfo);
+                allocaDeclarations->push_back(allocaInfo);
                 // allocaDeclarationByValue[alloca] = allocaDeclaration;
                 // cout << "alloca declaration as arraytype: " << allocaDeclaration << endl;
                 // currentFunctionSharedDeclarations += allocaDeclaration;
@@ -331,7 +420,7 @@ void InstructionDumper::dumpAlloca(llvm::AllocaInst *alloca) {
                 allocaInfo.alloca = alloca;
                 allocaInfo.refValue = refInstruction;
                 allocaInfo.definition = allocaDeclaration;
-                allocaDeclarations.push_back(allocaInfo);
+                allocaDeclarations->push_back(allocaInfo);
                 // allocaDeclarationByValue[refInstruction] = allocaDeclaration;
                 // cout << "alloca declaration not arraytype: " << allocaDeclaration << endl;
                 // allocaDeclarations.insert(allocaDeclaration);
@@ -371,7 +460,7 @@ std::vector<std::string> InstructionDumper::dumpInsertValue(llvm::InsertValueIns
     Type *currentType = instr->getType();
     bool declaredVar = false;
     if(incomingOperand == "") {
-        variablesToDeclare.insert(instr);
+        variablesToDeclare->insert(instr);
         // string declaration = typeDumper->dumpType(instr->getType()) + " " + dumpOperand(instr) + ";\n";
         // currentFunctionSharedDeclarations += declaration;
         // gencode += "    ";
@@ -416,7 +505,7 @@ std::vector<std::string> InstructionDumper::dumpInsertValue(llvm::InsertValueIns
     // gencode += lhs + " = " + dumpOperand(instr->getOperand(1));
     res.push_back(lhs + " = " + dumpOperand(instr->getOperand(1)));
     if(!declaredVar) {
-        variablesToDeclare.insert(instr);
+        variablesToDeclare->insert(instr);
         // res.push_back(typeDumper->dumpType(instr->getType()) + " " + dumpOperand(instr) + " = " + incomingOperand);
         res.push_back(dumpOperand(instr) + " = " + incomingOperand);
     }
@@ -487,7 +576,7 @@ std::string InstructionDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr)
     if(addressspace == 3) { // local/shared memory
         // pointer into shared memory.
         // addSharedDeclaration(instr->getOperand(0));
-        sharedVariablesToDeclare.insert(instr->getOperand(0));
+        sharedVariablesToDeclare->insert(instr->getOperand(0));
     }
     // cout << "dumpgetelementptr addressspace=" << addressspace << endl;
     // cout << "currenttype:" << endl;
@@ -634,7 +723,7 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr) {
         }
         gencode += ")";
         cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
-        shimFunctionsNeeded.insert("__shfl_down_3");
+        shimFunctionsNeeded->insert("__shfl_down_3");
         return gencode;
     } else if(functionName == "_Z11__shfl_downIfET_S0_i") {
         gencode += "__shfl_down_2(scratch, ";
@@ -649,7 +738,7 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr) {
         }
         gencode += ")";
         cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
-        shimFunctionsNeeded.insert("__shfl_down_2");
+        shimFunctionsNeeded->insert("__shfl_down_2");
         return gencode;
     } else if(functionName == "_Z13__threadfencev") {
         // Not sure if this is correct?
@@ -750,9 +839,9 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr) {
                 string newName = globalNames->getOrCreateName(newFunc, F->getName().str());
                 cout << "newName " << newName << endl;
                 newFunc->setName(newName);
-                neededFunctions.insert(newFunc);
+                neededFunctions->insert(newFunc);
             } else {
-                neededFunctions.insert(F);
+                neededFunctions->insert(F);
             }
             // if(dumpedFunctions.find(F) == dumpedFunctions.end()) {
             //     functionsToDump.insert(F);
@@ -769,6 +858,8 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr) {
 std::string InstructionDumper::dumpInstructionRhs(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded) {
     // vector<string> reslines;
     // gencode += "/* " + originalInstruction + " */\n    ";
+    auto opcode = instruction->getOpcode();
+    string instructionCode = "";
     switch(opcode) {
         case Instruction::FAdd:
             instructionCode = dumpBinaryOperator(cast<BinaryOperator>(instruction), "+");
@@ -879,7 +970,7 @@ std::string InstructionDumper::dumpInstructionRhs(llvm::Instruction *instruction
             //     instructionCode += indent + *it + ";\n";
             // }
             // return instructionCode;
-            return;
+            return "";
             // return indent + instructionCode + ";\n";
             // break;
         case Instruction::ExtractValue:

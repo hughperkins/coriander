@@ -20,9 +20,9 @@
 
 namespace cocl {
 
-class ConstantDumper {
-public:
-    static void dumpConstant(std::ostream &os, llvm::Constant *constant);
-};
+// class ConstantDumper {
+// public:
+//     static void dumpConstant(std::ostream &os, llvm::Constant *constant);
+// };
 
 } // namespace cocl;

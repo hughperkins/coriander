@@ -33,12 +33,12 @@ using namespace std;
 using namespace cocl;
 using namespace llvm;
 
-namespace test_block_dumper {
+namespace {
 
 LLVMContext context;
 unique_ptr<Module>M;
 
-string ll_path = "../test/gtest/test_global_constant.ll";  // this is a bit hacky, but fine-ish for now
+string ll_path = "../test/gtest/test_global_constants.ll";  // this is a bit hacky, but fine-ish for now
 
 Module *getM() {
     if(M == nullptr) {
@@ -95,5 +95,4 @@ TEST(test_global_constant, test_union) {
     shared->dump();
 }
 
-} // test_block_dumper
-
+} // namespace

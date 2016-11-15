@@ -39,17 +39,33 @@ public:
 
 class InstructionDumper {
 public:
-    InstructionDumper(LocalNames *localNames, TypeDumper *typeDumper, FunctionNamesMap *functionNamesMap) :
+    InstructionDumper(
+            GlobalNames *globalNames, LocalNames *localNames, TypeDumper *typeDumper, const FunctionNamesMap *functionNamesMap,
+            std::vector<AllocaInfo> *allocaDeclarations, std::set<llvm::Value *> *variablesToDeclare,
+            std::set<llvm::Value *> *sharedVariablesToDeclare, std::set<std::string> *shimFunctionsNeeded,
+            std::set<llvm::Function *> *neededFunctions,
+            std::map<llvm::Value *, std::string> *globalExpressionByValue, std::map<llvm::Value *, std::string> *localExpressionByValue
+            ) :
+        globalNames(globalNames),
         localNames(localNames),
         typeDumper(typeDumper),
-        functionNamesMap(functionNamesMap) {
+        functionNamesMap(functionNamesMap),
+        allocaDeclarations(allocaDeclarations),
+        variablesToDeclare(variablesToDeclare),
+        sharedVariablesToDeclare(sharedVariablesToDeclare),
+        shimFunctionsNeeded(shimFunctionsNeeded),
+        neededFunctions(neededFunctions),
+        globalExpressionByValue(globalExpressionByValue),
+        localExpressionByValue(localExpressionByValue) {
 
     }
+    // InstructionDumper *setAllocaDeclarations()
     virtual ~InstructionDumper() {}
     std::string dumpInstructionRhs(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded);
     std::string dumpOperand(llvm::Value *value);
+    void dumpConstant(std::ostream &oss, llvm::Constant *constant);
 
-    std::string dumpConstant(llvm::Constant *constant);
+    // void dumpConstant(std::ostream &os, llvm::Constant *constant);
     std::string dumpConstantExpr(llvm::ConstantExpr *expr);
     std::string dumpBinaryOperator(llvm::BinaryOperator *instr, std::string opstring);
     std::string dumpIcmp(llvm::ICmpInst *instr);
@@ -78,20 +94,26 @@ public:
     std::string dumpCall(llvm::CallInst *instr);
 
     std::vector<std::string> generatedCl;
-    std::vector<AllocaInfo> allocaDeclarations;
-    std::set<llvm::Value *> variablesToDeclare;
-    std::set<llvm::Value *> sharedVariablesToDeclare;
-    std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
-    std::set<llvm::Function *> neededFunctions;
 
-    std::map<llvm::Value *, std::string>globalExpressionByValue;
-    std::map<llvm::Value *, std::string>localExpressionByValue;
+    std::vector<AllocaInfo> *allocaDeclarations = 0;
+    std::set<llvm::Value *> *variablesToDeclare = 0;
+    std::set<llvm::Value *> *sharedVariablesToDeclare = 0;
+    std::set<std::string> *shimFunctionsNeeded = 0; // for __shfldown_3 etc, that we provide as opencl directly
+    std::set<llvm::Function *> *neededFunctions = 0;
 
-    cocl::LocalNames *localNames;
-    cocl::TypeDumper *typeDumper;
-    cocl::GlobalNames *globalNames;
+    // TOOD: do something with this.  Like remov eit...
+    // std::map<llvm::Value *, std::string> exprByValue;
+
+    std::map<llvm::Value *, std::string> *globalExpressionByValue = 0;
+    std::map<llvm::Value *, std::string> *localExpressionByValue = 0;
+
+    cocl::LocalNames *localNames = 0;
+    cocl::TypeDumper *typeDumper = 0;
+    cocl::GlobalNames *globalNames = 0;
 protected:
-    const cocl::FunctionNamesMap *functionNamesMap;
+    const cocl::FunctionNamesMap *functionNamesMap = 0;
+
+    bool forceSingle = true;
 };
 
 } // namespace cocl

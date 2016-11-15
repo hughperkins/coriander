@@ -19,6 +19,7 @@
 #include "type_dumper.h"
 #include "ExpressionsHelper.h"
 #include "function_names_map.h"
+#include "InstructionDumper.h"
 
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Instructions.h"
@@ -41,8 +42,12 @@ public:
         globalNames(globalNames),
         localNames(localNames),
         typeDumper(typeDumper),
-        functionNamesMap(functionNamesMap) {
-
+        functionNamesMap(functionNamesMap)
+             {
+        instructionDumper.reset(
+            new InstructionDumper(globalNames, localNames, typeDumper, functionNamesMap,
+            &allocaDeclarations, &variablesToDeclare, &sharedVariablesToDeclare,
+            &shimFunctionsNeeded, &neededFunctions, &globalExpressionByValue, &localExpressionByValue));
     }
     std::string toCl();
     // void storeValueName(llvm::Value *value);
@@ -62,7 +67,8 @@ public:
     std::set<llvm::Value *> variablesToDeclare;
     std::set<llvm::Value *> sharedVariablesToDeclare;
     std::vector<AllocaInfo> allocaDeclarations;
-    std::map<llvm::Value *, std::string> exprByValue;
+    std::map<llvm::Value *, std::string> globalExpressionByValue;
+    std::map<llvm::Value *, std::string> localExpressionByValue;
     std::vector<std::string> clcode;
 
 protected:
@@ -73,6 +79,7 @@ protected:
     GlobalNames *globalNames;
     LocalNames *localNames;
     TypeDumper *typeDumper;
+    std::unique_ptr<InstructionDumper> instructionDumper;
 
     const FunctionNamesMap *functionNamesMap;
 };
