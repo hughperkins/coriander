@@ -27,7 +27,7 @@ before_install:
   - cd ${BASEDIR}
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake .. -DCLANG_HOME=${CLANG_HOME}
   - make -j 8
   - make install
 

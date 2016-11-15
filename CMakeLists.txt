@@ -10,7 +10,7 @@ set(TESTS_DEVICELL_OPT "O2" CACHE STRING "cocl option for tests")
 option(OFFSET_32BIT "type to use for offsets. off lets you use more memory.  on is necessary on beignet" ON)
 option(EXPLAIN_CL "Add IR code into OpenCL.  For maintainers mostly" OFF)
 option(COCL_SPAM "Lots of scrolly debug text.  Mostly for maintainer usage" OFF)
-set(CLANG_HOME CACHE STRING "eg the downloaded clang-3.8.0 folder, containing lib, bin etc" /usr/lib/llvm-3.8)
+set(CLANG_HOME "/usr/lib/llvm-3.8" CACHE STRING "eg the downloaded clang-3.8.0 folder, containing lib, bin etc")
 
 if(TESTS_CL_BRANCHES_AS_SWITCH)
     unset(TESTS_CL_RUN_TRANSFORMS CACHE)
