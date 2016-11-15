@@ -60,13 +60,13 @@ add_definitions(-DUSE_CLEW)  # turns off direct linking with libOpenCL.so, all g
 # for llvm:
 add_definitions(-D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS)
 
-set (LLVM_LIBS /usr/lib/llvm-3.8/lib/libLLVM.so)
+set (LLVM_LIBS ${CLANG_HOME}/lib/libLLVM.so)
 
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 
 add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp)
 target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
-target_include_directories(ir-to-opencl PRIVATE /usr/lib/llvm-3.8/include)
+target_include_directories(ir-to-opencl PRIVATE ${CLANG_HOME}/include)
 target_link_libraries(ir-to-opencl cocl)
 # target_include_directories(ir-to-opencl PRIVATE src)
 # set_target_properties(ir-to-opencl PROPERTIES
@@ -83,7 +83,7 @@ add_executable(patch-hostside
     third_party/argparsecpp/argparsecpp.cpp src/type_dumper.cpp src/GlobalNames.cpp
     src/EasyCL/util/easycl_stringhelper.cpp
 )
-target_include_directories(patch-hostside PRIVATE /usr/lib/llvm-3.8/include)
+target_include_directories(patch-hostside PRIVATE ${CLANG_HOME}/include)
 target_include_directories(patch-hostside PRIVATE third_party/argparsecpp)
 target_include_directories(patch-hostside PRIVATE src/EasyCL)
 set_target_properties(patch-hostside PROPERTIES
@@ -107,7 +107,7 @@ target_include_directories(cocl PRIVATE src/CLBlast/include)
 target_include_directories(cocl PRIVATE include)
 target_include_directories(cocl PRIVATE src)
 target_include_directories(cocl PRIVATE third_party/argparsecpp)
-target_include_directories(cocl PRIVATE /usr/lib/llvm-3.8/include)
+target_include_directories(cocl PRIVATE ${CLANG_HOME}/include)
 target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include)
 if(COCL_SPAM)
     set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DCOCL_SPAM)
@@ -218,7 +218,7 @@ if(BUILD_TESTS)
     )
     target_include_directories(cocl_unittests PRIVATE src)
     target_include_directories(cocl_unittests PRIVATE third_party/gtest)
-    target_include_directories(cocl_unittests PRIVATE /usr/lib/llvm-3.8/include)
+    target_include_directories(cocl_unittests PRIVATE ${CLANG_HOME}/include)
     target_link_libraries(cocl_unittests "${LLVM_LIBS}" cocl_gtest easycl cocl)
 endif(BUILD_TESTS)
 
