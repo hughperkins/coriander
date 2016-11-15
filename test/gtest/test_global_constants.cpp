@@ -83,16 +83,16 @@ TEST(test_global_constant, test_union) {
     cout << "cl:\n" << cl << endl;
     cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
 
-    cout << "num shared variables to declare: " << blockDumper.sharedVariablesToDeclare.size() << endl;
-    ASSERT_EQ(1, blockDumper.sharedVariablesToDeclare.size());
-    for(auto it=blockDumper.sharedVariablesToDeclare.begin(); it !=blockDumper.sharedVariablesToDeclare.end(); it++) {
-        Value *value = *it;
-        cout << "shared:" << endl;
-        value->dump();
-        cout << endl;
-    }
-    Value *shared = *blockDumper.sharedVariablesToDeclare.begin();
-    shared->dump();
+    // cout << "num shared variables to declare: " << blockDumper.sharedVariablesToDeclare.size() << endl;
+    // ASSERT_EQ(1, blockDumper.sharedVariablesToDeclare.size());
+    // for(auto it=blockDumper.sharedVariablesToDeclare.begin(); it !=blockDumper.sharedVariablesToDeclare.end(); it++) {
+    //     Value *value = *it;
+    //     cout << "shared:" << endl;
+    //     value->dump();
+    //     cout << endl;
+    // }
+    // Value *shared = *blockDumper.sharedVariablesToDeclare.begin();
+    // shared->dump();
 }
 
 } // namespace
