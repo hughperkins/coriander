@@ -8,14 +8,22 @@ matrix:
 
 before_install:
   - if [ -f ".git/shallow" ]; then travis_retry git fetch --unshallow; fi
-
-script:
   - BASEDIR=$(pwd)
   - echo BASEDIR ${BASEDIR}
-  - make
-  - make run-cuda_sample
-  - make run-test_cuda_elementwise
-  - make run-test_cuda_nullary
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make -j 8
+  - make install
+
+script:
+  - cd ${BASEDIR}
+  - ./cocl_unittests
+  - mkdir /tmp/foo
+  - cd /tmp/foo
+  - cp ${BASEDIR}/test/cocl/cuda_sample.cu .
+  - cocl cuda_sample.cu
+  - ./cuda_sample
 
 notifications:
   email:
