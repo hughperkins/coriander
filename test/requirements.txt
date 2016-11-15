@@ -1,5 +1,6 @@
-pyopencl
-pytest
 numpy
+pytest
 pep8
 pytest-pep8
+mako
+pyopencl
