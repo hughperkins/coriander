@@ -172,6 +172,7 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
             }
             gencode += instructionCode;
             clcode.push_back(gencode);
+            (localExpressionByValue)[instruction] = localNames->getName(instruction);
         }
     }
     // return gencode;
