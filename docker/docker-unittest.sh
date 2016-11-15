@@ -20,3 +20,7 @@ cocl cuda_sample.cu
 
 cd /cuda-on-cl/build
 make run-tests
+
+cd /cuda-on-cl
+source /env3/bin/activate
+pytest -v

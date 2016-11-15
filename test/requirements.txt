@@ -1,2 +1,4 @@
 pyopencl
 pytest
+numpy
+
