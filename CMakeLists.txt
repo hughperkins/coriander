@@ -75,7 +75,11 @@ add_definitions(-D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D
 # # message("LLVM_LDFLAGS ${LLVM_LDFLAGS}")
 
 execute_process(
-    # COMMAND "${CLANG_HOME}/bin/llvm-config --ldflags --libs | tr -d '\n'"
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/llvm-syslibs.sh ${CLANG_HOME}
+    OUTPUT_VARIABLE LLVM_SYSLIBS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+execute_process(
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/get-llvm-cxxflags.sh ${CLANG_HOME}
     OUTPUT_VARIABLE LLVM_CXXFLAGS)
 # message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
@@ -107,7 +111,7 @@ endforeach()
 add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp)
 target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
 target_include_directories(ir-to-opencl PRIVATE ${CLANG_HOME}/include)
-target_link_libraries(ir-to-opencl cocl pthread tinfo)
+target_link_libraries(ir-to-opencl cocl ${LLVM_SYSLIBS})
 # target_include_directories(ir-to-opencl PRIVATE src)
 # set_target_properties(ir-to-opencl PROPERTIES
 #     LINK_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LLVM_LDFLAGS}"
@@ -129,7 +133,7 @@ target_include_directories(patch-hostside PRIVATE src/EasyCL)
 # set_target_properties(patch-hostside PROPERTIES
 #     LINK_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LLVM_LIBFILES}"
 # )
-target_link_libraries(patch-hostside "${LLVM_LIBS}" pthread dl tinfo)
+target_link_libraries(patch-hostside "${LLVM_LIBS}"  ${LLVM_SYSLIBS})
 
 add_library(clew SHARED src/EasyCL/thirdparty/clew/src/clew.c)
 target_include_directories(clew PRIVATE src/EasyCL/thirdparty/clew/include)
@@ -251,7 +255,7 @@ if(BUILD_TESTS)
     target_include_directories(test_instructiondumper PRIVATE src)
     target_include_directories(test_instructiondumper PRIVATE third_party/gtest)
     target_include_directories(test_instructiondumper PRIVATE /usr/lib/llvm-3.8/include)
-    target_link_libraries(test_instructiondumper "${LLVM_LIBS}" cocl_gtest easycl tinfo)
+    target_link_libraries(test_instructiondumper "${LLVM_LIBS}" cocl_gtest easycl ${LLVM_SYSLIBS})
 
     add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
         test/gtest/test_block_dumper.cpp
@@ -266,7 +270,7 @@ if(BUILD_TESTS)
     #     LINK_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LLVM_LDFLAGS}"
     #     CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LLVM_CXXFLAGS}"
     # )
-    target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} tinfo)
+    target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} ${LLVM_SYSLIBS})
 endif(BUILD_TESTS)
 
 FILE(GLOB_RECURSE COCL_HEADERS
