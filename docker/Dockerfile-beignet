@@ -15,7 +15,7 @@ RUN git clone --recursive https://github.com/hughperkins/cuda-on-cl -b ${GIT_BRA
 # lets add python3 virtualenv, so can run the python tests too
 # this is not strictly necessary for using/running cuda-on-cl
 # in fact, it's not necessary at all :-P
-RUN apt-get install -y --no-install-recommends python3 python3-dev python-virtualenv
+RUN apt-get install -y --no-install-recommends python3 python3-dev python-virtualenv python3-numpy python3-wheel python3-setuptools
 
 RUN virtualenv -p python3 /env3
 
