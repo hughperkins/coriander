@@ -3,7 +3,7 @@ FROM nvidia/cuda:8.0-cudnn5-devel
 ARG GIT_BRANCH=master
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    cmake cmake-curses-gui git llvm-3.8-dev clang-3.8 gcc g++ libc6-dev \
+    cmake cmake-curses-gui git llvm-3.8-dev clang-3.8 gcc g++ libc6-dev zlib1g-dev \
      curl ca-certificates build-essential \
     nvidia-opencl-icd-361 clinfo
 
