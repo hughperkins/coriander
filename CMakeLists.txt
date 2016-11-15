@@ -62,20 +62,52 @@ add_definitions(-DUSE_CLEW)  # turns off direct linking with libOpenCL.so, all g
 # for llvm:
 add_definitions(-D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS)
 
-if(APPLE)
-set (LLVM_LIBS ${CLANG_HOME}/lib/libLLVM.a)
-else()
-set (LLVM_LIBS ${CLANG_HOME}/lib/libLLVM.so)
-endif()
+# if(APPLE)
+# set (LLVM_LIBS ${CLANG_HOME}/lib/libLLVM.a)
+# else()
+# set (LLVM_LIBS ${CLANG_HOME}/lib/libLLVM.so)
+# endif()
 
-message("LLVM_LIBS ${LLVM_LIBS}")
+# execute_process(
+#     # COMMAND "${CLANG_HOME}/bin/llvm-config --ldflags --libs | tr -d '\n'"
+#     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/get-llvm-link-config.sh ${CLANG_HOME}
+#     OUTPUT_VARIABLE LLVM_LDFLAGS)
+# # message("LLVM_LDFLAGS ${LLVM_LDFLAGS}")
+
+execute_process(
+    # COMMAND "${CLANG_HOME}/bin/llvm-config --ldflags --libs | tr -d '\n'"
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/get-llvm-cxxflags.sh ${CLANG_HOME}
+    OUTPUT_VARIABLE LLVM_CXXFLAGS)
+# message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
+
+execute_process(
+    # COMMAND "${CLANG_HOME}/bin/llvm-config --ldflags --libs | tr -d '\n'"
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/get-llvm-libs.sh ${CLANG_HOME}
+    OUTPUT_VARIABLE LLVM_LIBFILES
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+STRING(REGEX MATCHALL "[^ ]+" LLVM_LIBFILES "${LLVM_LIBFILES}")
+
+# LLVM_LIBS
+# message("LLVM_LIBFILES ${LLVM_LIBFILES}")
+foreach(LIB ${LLVM_LIBFILES})
+   # message("LIB ${LIB}")
+   if(LLVM_LIBS)
+   set(LLVM_LIBS ${LLVM_LIBS} ${CLANG_HOME}/lib/${LIB})
+   else()
+   set(LLVM_LIBS "${CLANG_HOME}/lib/${LIB}")
+   endif()
+endforeach()
+# message("LLVM_LIBS [${LLVM_LIBS}]")
+# message("LLVM_LIBFILES ${LLVM_LIBFILES}")
 
 add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp)
 target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
 target_include_directories(ir-to-opencl PRIVATE ${CLANG_HOME}/include)
-target_link_libraries(ir-to-opencl cocl)
+target_link_libraries(ir-to-opencl cocl pthread tinfo)
 # target_include_directories(ir-to-opencl PRIVATE src)
 # set_target_properties(ir-to-opencl PROPERTIES
 #     LINK_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LLVM_LDFLAGS}"
@@ -94,10 +126,10 @@ add_executable(patch-hostside
 target_include_directories(patch-hostside PRIVATE ${CLANG_HOME}/include)
 target_include_directories(patch-hostside PRIVATE third_party/argparsecpp)
 target_include_directories(patch-hostside PRIVATE src/EasyCL)
-set_target_properties(patch-hostside PROPERTIES
-    LINK_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LLVM_LDFLAGS}"
-)
-target_link_libraries(patch-hostside "${LLVM_LIBS}")
+# set_target_properties(patch-hostside PROPERTIES
+#     LINK_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LLVM_LIBFILES}"
+# )
+target_link_libraries(patch-hostside "${LLVM_LIBS}" pthread dl tinfo)
 
 add_library(clew SHARED src/EasyCL/thirdparty/clew/src/clew.c)
 target_include_directories(clew PRIVATE src/EasyCL/thirdparty/clew/include)
@@ -126,8 +158,11 @@ endif()
 if(COCL_DEFINITIONS)
     target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
 endif()
-target_link_libraries(cocl easycl)
-target_link_libraries(cocl "${LLVM_LIBS}")
+target_link_libraries(cocl easycl ${LLVM_LIBS})
+# set_target_properties(patch-hostside PROPERTIES
+#     LINK_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LLVM_LIBFILES}"
+# )
+# target_link_libraries(cocl "${LLVM_LIBS}")
 
 # ==================================================================================================
 
@@ -227,7 +262,11 @@ if(BUILD_TESTS)
     target_include_directories(cocl_unittests PRIVATE src)
     target_include_directories(cocl_unittests PRIVATE third_party/gtest)
     target_include_directories(cocl_unittests PRIVATE ${CLANG_HOME}/include)
-    target_link_libraries(cocl_unittests "${LLVM_LIBS}" cocl_gtest easycl cocl)
+    # set_target_properties(cocl_unittests PROPERTIES
+    #     LINK_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LLVM_LDFLAGS}"
+    #     CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LLVM_CXXFLAGS}"
+    # )
+    target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBFILES})
 endif(BUILD_TESTS)
 
 FILE(GLOB_RECURSE COCL_HEADERS
