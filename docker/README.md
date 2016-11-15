@@ -2,6 +2,8 @@
 
 Dockerfiles for Beignet and NVIDIA systems.
 
+Note that the nvidia dockerfile uses Ubuntu 14.04 for now.
+
 ## Testing
 
 ### Pre-requisites
@@ -41,7 +43,7 @@ Build:
 ```
 git clone --recursive https://github.com/hughperkins/cuda-on-cl
 cd cuda-on-cl/docker
-docker build ./ -t coclnvidia --file Dockerfile-nvidia
+docker build ./ -t coclnvidia --file Dockerfile-1404-nvidia
 ```
 Run:
 ```
