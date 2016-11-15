@@ -43,6 +43,8 @@ set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/plat
 #     src/flowcontrol/conditionalbranch.cpp src/flowcontrol/dowhile.cpp src/flowcontrol/if.scpp
 #     src/flowcontrol/for.cpp src/flowcontrol/rootblock.cpp src/flowcontrol/block.cpp)
 
+message("CLANG_HOME: ${CLANG_HOME}")
+
 set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/InstructionDumper.cpp
     src/ConstantDumper.cpp
     src/struct_clone.cpp src/basicblockdumper.cpp src/ExpressionsHelper.cpp src/readIR.cpp
@@ -65,6 +67,8 @@ set (LLVM_LIBS ${CLANG_HOME}/lib/libLLVM.a)
 else()
 set (LLVM_LIBS ${CLANG_HOME}/lib/libLLVM.so)
 endif()
+
+message("LLVM_LIBS ${LLVM_LIBS}")
 
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 

@@ -27,6 +27,8 @@ before_install:
   - cd ${BASEDIR}
   - mkdir build
   - cd build
+  - echo CLANG_HOME ${CLANG_HOME}
+  - ls ${CLANG_HOME}/lib
   - cmake .. -DCLANG_HOME=${CLANG_HOME}
   - make -j 8
   - make install
