@@ -101,9 +101,6 @@ public:
     std::set<std::string> *shimFunctionsNeeded = 0; // for __shfldown_3 etc, that we provide as opencl directly
     std::set<llvm::Function *> *neededFunctions = 0;
 
-    // TOOD: do something with this.  Like remov eit...
-    // std::map<llvm::Value *, std::string> exprByValue;
-
     std::map<llvm::Value *, std::string> *globalExpressionByValue = 0;
     std::map<llvm::Value *, std::string> *localExpressionByValue = 0;
 

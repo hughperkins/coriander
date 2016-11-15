@@ -61,7 +61,7 @@ void InstructionDumper::dumpConstant(std::ostream &oss, llvm::Constant *constant
         oss << dumpFloatConstant(forceSingle, constantFP);
         return;
     } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
-        // cout << "globalvalue" << endl;
+        cout << "globalvalue" << endl;
         // throw runtime_error("GlobalValue not implemented in basicblockdumper.dumpconstant");
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
             int addressspace = pointerType->getAddressSpace();
@@ -69,23 +69,24 @@ void InstructionDumper::dumpConstant(std::ostream &oss, llvm::Constant *constant
                 sharedVariablesToDeclare->insert(global);
                 string name = global->getName().str();
                 localNames->getOrCreateName(global, name);
-                // cout << "shared memory, creating in localnames name=" << name << endl;
+                (*localExpressionByValue)[global] = name;
+                cout << "shared memory, creating in localnames name=" << name << endl;
                 oss << name;
                 return;
                 // return name;
             }
         }
         if(globalNames->hasName(constant)) {
-            // cout << "found constnat in globalanesm, returning" << endl;
+            cout << "found constnat in globalanesm, returning" << endl;
            // return globalNames->getName(constant);
             oss << globalNames->getName(constant);
             return;
         }
         string name = global->getName().str();
-        // cout << "using global's native name " << name << endl;
+        cout << "using global's native name " << name << endl;
         string ourinstrstr = "(&" + name + ")";
         updateAddressSpace(constant, 4);  // 4 means constant
-        // cout << "adding to exprByValue [" << ourinstrstr << "]" << endl;
+        cout << "adding to globalExpressionByValue [" << ourinstrstr << "]" << endl;
         globalExpressionByValue->operator[](constant) = ourinstrstr;
 
         oss << ourinstrstr;
@@ -110,14 +111,15 @@ void InstructionDumper::dumpConstant(std::ostream &oss, llvm::Constant *constant
 string InstructionDumper::dumpConstantExpr(ConstantExpr *expr) {
     // this means things like:
     // shared memory 
-    // cout << "dumping constnat expr:" << endl;
-    // expr->dump();
-    // cout << endl;
+    cout << "dumping constnat expr:" << endl;
+    expr->dump();
+    cout << endl;
     Instruction *instr = expr->getAsInstruction();
     // InstructionDumper childInstructionDumper;
     // string rhs = dumpInstruction(instr);
     vector<string> excessLines;
     string rhs = dumpInstructionRhs(instr, &excessLines);
+    cout << "rhs: [" << rhs << "]" << endl;
     if(excessLines.size() > 0) {
         throw runtime_error("InstructionDumper::dumpConstantExpr cannot handle excess lines > 0");
     }
@@ -131,8 +133,14 @@ string InstructionDumper::dumpConstantExpr(ConstantExpr *expr) {
         // string opstring = dumpOperand(op);
         // cout << "opstring:" << opstring << endl;
     // }
-    string thisinstrstr = globalExpressionByValue->operator[](instr);
-    // cout << "thisinstrstr: [" << thisinstrstr << "]" << endl;
+    string thisinstrstr = "";
+    if((*localExpressionByValue).find(instr) != localExpressionByValue->end()) {
+        thisinstrstr = (*localExpressionByValue)[instr];
+    } else {
+        thisinstrstr = (*globalExpressionByValue)[instr];
+    }
+    // string thisinstrstr = globalExpressionByValue->operator[](instr);
+    cout << "thisinstrstr: [" << thisinstrstr << "]" << endl;
     return thisinstrstr;
     // throw runtime_error("not implemented");
 }
@@ -1003,6 +1011,9 @@ std::string InstructionDumper::dumpInstructionRhs(llvm::Instruction *instruction
         default:
             cout << "opcode string " << instruction->getOpcodeName() << endl;
             throw runtime_error("unknown opcode");
+    }
+    if(instructionCode != "") {
+        (*localExpressionByValue)[instruction] = instructionCode;
     }
     return instructionCode;
     // generatedCl.push_back(instructionCode);
