@@ -65,3 +65,10 @@ cocl cuda_sample.cu
 You might find some options at: https://github.com/chihchun/opencl-docker
 
 Update: bhack informed me of a project to let one run docker containers on beignet https://github.com/chihchun/opencl-docker
+
+## Generic options
+
+In all cases, you can choose which branch to build, using `--build-arg GIT_BRANCH=mybranchnamehere`, like:
+```
+docker build ./ -t cocl --build-arg GIT_BRANCH=runtime-compile
+```
