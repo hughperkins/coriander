@@ -43,7 +43,7 @@ set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/plat
 #     src/flowcontrol/conditionalbranch.cpp src/flowcontrol/dowhile.cpp src/flowcontrol/if.scpp
 #     src/flowcontrol/for.cpp src/flowcontrol/rootblock.cpp src/flowcontrol/block.cpp)
 
-message("CLANG_HOME: ${CLANG_HOME}")
+# message("CLANG_HOME: ${CLANG_HOME}")
 
 set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/InstructionDumper.cpp
     src/ConstantDumper.cpp
@@ -251,7 +251,7 @@ if(BUILD_TESTS)
     target_include_directories(test_instructiondumper PRIVATE src)
     target_include_directories(test_instructiondumper PRIVATE third_party/gtest)
     target_include_directories(test_instructiondumper PRIVATE /usr/lib/llvm-3.8/include)
-    target_link_libraries(test_instructiondumper "${LLVM_LIBS}" cocl_gtest easycl)
+    target_link_libraries(test_instructiondumper "${LLVM_LIBS}" cocl_gtest easycl tinfo)
 
     add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
         test/gtest/test_block_dumper.cpp
@@ -266,7 +266,7 @@ if(BUILD_TESTS)
     #     LINK_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LLVM_LDFLAGS}"
     #     CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LLVM_CXXFLAGS}"
     # )
-    target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBFILES})
+    target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} tinfo)
 endif(BUILD_TESTS)
 
 FILE(GLOB_RECURSE COCL_HEADERS
