@@ -10,6 +10,9 @@
 #
 # note that it will build/run the current git branch you are sitting in
 
+set -e
+set -x
+
 GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 docker build -t coclnvidia --no-cache ./ --file Dockerfile-nvidia --build-arg GIT_BRANCH=${GIT_BRANCH}
 nvidia-docker run -t coclnvidia bash /cuda-on-cl/docker/docker-unittest.sh

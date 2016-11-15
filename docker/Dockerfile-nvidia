@@ -16,7 +16,7 @@ RUN apt-get install -y --no-install-recommends python3 python3-dev python-virtua
 
 RUN virtualenv -p python3 /env3
 
-RUN source /env3/bin/activate && \
+RUN . /env3/bin/activate && \
     pip install -r /cuda-on-cl/test/requirements.txt
 
 RUN cd cuda-on-cl && \
