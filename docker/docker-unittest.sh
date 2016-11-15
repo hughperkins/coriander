@@ -36,4 +36,4 @@ pip install numpy
 pip install -r /cuda-on-cl/test/requirements.txt
 
 cd /cuda-on-cl
-pytest -v
+OFFSET_32BIT=1 pytest -v
