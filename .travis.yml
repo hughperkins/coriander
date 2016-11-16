@@ -16,11 +16,11 @@ before_install:
   - tar -xf clang+llvm-3.9.0-x86_64-apple-darwin.tar.xz
   - ls
   - export CLANG_HOME=${PWD}/clang+llvm-3.9.0-x86_64-apple-darwin
-  - ls {CLANG_HOME}
-  - ls {CLANG_HOME}/bin
-  - ls {CLANG_HOME}/lib
-  - ls {CLANG_HOME}/include
-  - ls -R {CLANG_HOME}
+  - ls ${CLANG_HOME}
+  - ls ${CLANG_HOME}/bin
+  - ls ${CLANG_HOME}/lib
+  - ls ${CLANG_HOME}/include
+  - ls -R ${CLANG_HOME}
   - export PATH=${CLANG_HOME}/bin:$PATH
   - export LD_LIBRARY_PATH=${CLANG_HOME}/lib:$LD_LIBRARY_PATH
   - export DYLD_LIBRARY_PATH=${CLANG_HOME}/lib:$DYLD_LIBRARY_PATH
