@@ -28,6 +28,7 @@ namespace argparsecpp {
 
 class Option {
 public:
+    virtual ~Option() {}
     virtual  bool needsValue() = 0;
     virtual void parse(std::string valueAsString = "") = 0;
     Option *required() {
