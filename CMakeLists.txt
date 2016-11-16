@@ -240,6 +240,7 @@ if(BUILD_TESTS)
     target_include_directories(test_instructiondumper PRIVATE third_party/gtest)
     target_include_directories(test_instructiondumper PRIVATE ${CLANG_HOME}/include)
     target_link_libraries(test_instructiondumper "${LLVM_LIBS}" cocl_gtest easycl ${LLVM_SYSLIBS})
+    target_compile_options(test_instructiondumper PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 
     add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
         test/gtest/test_block_dumper.cpp test/gtest/test_instructiondumper.cpp
@@ -251,6 +252,7 @@ if(BUILD_TESTS)
     target_include_directories(cocl_unittests PRIVATE third_party/gtest)
     target_include_directories(cocl_unittests PRIVATE ${CLANG_HOME}/include)
     target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} ${LLVM_SYSLIBS})
+    target_compile_options(cocl_unittests PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 endif(BUILD_TESTS)
 
 FILE(GLOB_RECURSE COCL_HEADERS
