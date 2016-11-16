@@ -396,7 +396,7 @@ void InstructionDumper::dumpAlloca(llvm::AllocaInst *alloca) {
         std::string typestring = typeDumper->dumpType(ptrElementType);
         int count = readInt32Constant(alloca->getOperand(0));
         string name = localNames->getOrCreateName(alloca);
-        cout << "alloca var name [" << name << "]" << endl;
+        // cout << "alloca var name [" << name << "]" << endl;
         localExpressionByValue->operator[](alloca) = name;
         if(count == 1) {
             if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {

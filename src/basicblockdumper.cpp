@@ -165,7 +165,7 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
         if(instructionCode != "") {
             // gencode += indent;
             if(typestr != "void") {
-                cout << "declaring local variable" << endl;
+                // cout << "declaring local variable" << endl;
                 instructionCode = stripOuterParams(instructionCode);
                 // functionNeededForwardDeclarations.insert(instruction);
                 // variablesToDeclare[instruction] = resultName;

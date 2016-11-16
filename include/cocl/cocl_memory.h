@@ -13,7 +13,7 @@ namespace cocl {
      public:
         static Memory *newDeviceAlloc(size_t bytes);
         ~Memory();
-        size_t getOffset(char *passedInAsCharStar);
+        size_t getOffset(const char *passedInAsCharStar);
         cl_mem clmem; // this is assumed to always be valid
         size_t bytes; // should always be valid (ideally > 0...)
         size_t fakePos; // the range (fakePos) to (fakePos + bytes) should not overlap with any other memory
@@ -21,7 +21,7 @@ namespace cocl {
     };
 
     // typedef Memory *PMemory;
-    Memory *findMemory(char *passedInPointer);
+    Memory *findMemory(const char *passedInPointer);
 }
 
 typedef long long CUdeviceptr;

@@ -284,7 +284,7 @@ split_path ${INPATH}
 INPUTBASEPATH=${BASEPATH}
 INPUTPOSTFIX=${POSTFIX}
 
-if [[ -v OUTPATH ]]; then {
+if [[ $OUTPATH ]]; then {
     OUTFILE=${OUTPATH}
 } else {
     if [[ $COMPILE == 1 ]]; then {
@@ -304,14 +304,14 @@ if [[ x${NOCOCLREBUILD} == x ]]; then {
     )
 } fi
 
-if [[ ! -v COMPILE ]]; then {
+if [[ ! "$COMPILE" ]]; then {
     FINALPOSTFIX=${OUTPUTPOSTFIX}
     OUTPUTPOSTFIX=.o
 } fi
 
 
 OUTPUTARTIFACT=
-if [[ ! -v COMPILE ]]; then {
+if [[ ! "$COMPILE" ]]; then {
     OUTPUTARTIFACT=${OUTPUTBASEPATH}${FINALPOSTFIX}
 } fi
 

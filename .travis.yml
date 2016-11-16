@@ -30,7 +30,7 @@ before_install:
   - cd build
   - echo CLANG_HOME ${CLANG_HOME}
   - ls ${CLANG_HOME}/lib
-  - cmake .. -DCLANG_HOME=${CLANG_HOME}
+  - cmake .. -DCLANG_HOME=${CLANG_HOME} -DBUILD_TESTS=ON
   - make -j 8
   - make install
 
