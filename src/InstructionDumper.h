@@ -45,22 +45,9 @@ public:
             std::set<llvm::Value *> *sharedVariablesToDeclare, std::set<std::string> *shimFunctionsNeeded,
             std::set<llvm::Function *> *neededFunctions,
             std::map<llvm::Value *, std::string> *globalExpressionByValue, std::map<llvm::Value *, std::string> *localExpressionByValue
-            ) :
-        globalNames(globalNames),
-        localNames(localNames),
-        typeDumper(typeDumper),
-        functionNamesMap(functionNamesMap),
-        allocaDeclarations(allocaDeclarations),
-        variablesToDeclare(variablesToDeclare),
-        sharedVariablesToDeclare(sharedVariablesToDeclare),
-        shimFunctionsNeeded(shimFunctionsNeeded),
-        neededFunctions(neededFunctions),
-        globalExpressionByValue(globalExpressionByValue),
-        localExpressionByValue(localExpressionByValue) {
+            );
+    virtual ~InstructionDumper();
 
-    }
-    // InstructionDumper *setAllocaDeclarations()
-    virtual ~InstructionDumper() {}
     // std::string dumpInstructionRhs(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded);
     bool runRhsGeneration(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded);
     std::string dumpOperand(llvm::Value *value);

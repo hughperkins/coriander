@@ -26,6 +26,28 @@ using namespace llvm;
 
 namespace cocl {
 
+InstructionDumper::InstructionDumper(
+        GlobalNames *globalNames, LocalNames *localNames, TypeDumper *typeDumper, const FunctionNamesMap *functionNamesMap,
+        std::vector<AllocaInfo> *allocaDeclarations, std::set<llvm::Value *> *variablesToDeclare,
+        std::set<llvm::Value *> *sharedVariablesToDeclare, std::set<std::string> *shimFunctionsNeeded,
+        std::set<llvm::Function *> *neededFunctions,
+        std::map<llvm::Value *, std::string> *globalExpressionByValue, std::map<llvm::Value *, std::string> *localExpressionByValue
+        ) :
+    globalNames(globalNames),
+    localNames(localNames),
+    typeDumper(typeDumper),
+    functionNamesMap(functionNamesMap),
+    allocaDeclarations(allocaDeclarations),
+    variablesToDeclare(variablesToDeclare),
+    sharedVariablesToDeclare(sharedVariablesToDeclare),
+    shimFunctionsNeeded(shimFunctionsNeeded),
+    neededFunctions(neededFunctions),
+    globalExpressionByValue(globalExpressionByValue),
+    localExpressionByValue(localExpressionByValue) {
+}
+InstructionDumper::~InstructionDumper() {
+}
+
 void InstructionDumper::dumpConstant(std::ostream &oss, llvm::Constant *constant) {
 // maybe this should be somewhere more generic?
 // string BasicBlockDumper::dumpConstant(Constant *constant) {
