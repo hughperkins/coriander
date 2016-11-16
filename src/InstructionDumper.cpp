@@ -862,11 +862,13 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr) {
 
                  // DenseMap<const Value*, Value*> valueMap;
                 ValueToValueMapTy valueMap;
-                 struct ClonedCodeInfo codeInfo;
+                 // struct ClonedCodeInfo codeInfo;
                 Function *newFunc = CloneFunction(F,
                                valueMap,
-                               false,
-                               &codeInfo);
+                               false);
+                // ,
+                //                false,
+                //                &codeInfo);
                 // }
                 // delete [] newArgs;
                 i = 0;
