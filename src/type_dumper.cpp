@@ -231,7 +231,7 @@ std::string TypeDumper::dumpStructDefinition(StructType *type, string name) {
         } else {
             declaration += "    ";
             // if its a pointer, lets assume its global, for now
-            if(PointerType *ptr = dyn_cast<PointerType>(elementType)) {
+            if(isa<PointerType>(elementType)) {
                 // updateAddressSpace(ptr, 1);
                 declaration += "global ";
 

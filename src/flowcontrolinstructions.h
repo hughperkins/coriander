@@ -46,6 +46,7 @@ public:
                           // conditions evaluate?
 
     Block();
+    virtual ~Block() {}
     virtual void walk(std::function<void(Block *block)> fn) = 0;
     virtual std::string blockType() const;
     virtual void dump(std::set<const Block *> &seen, std::string indent = "") const = 0;

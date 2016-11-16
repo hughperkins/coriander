@@ -106,7 +106,7 @@ namespace cocl {
         ContextMutex contextMutex(context);
         // MemoryMutex memoryMutex;
         // char *passedInAsCharStar = (char *)passedInPointer;
-        long long pos = (long long )passedInAsCharStar;
+        size_t pos = (size_t)passedInAsCharStar;
         // COCL_PRINT(cout << "findMemory pos=" << pos << endl;)
         for(auto it=v->getContext()->memories.begin(), e=v->getContext()->memories.end(); it != e; it++) {
             Memory *memory = *it;
@@ -121,7 +121,7 @@ namespace cocl {
         // throw runtime_error("could not find memory");
     }
     size_t Memory::getOffset(char *passedInAsCharStar) {
-        return (long long)passedInAsCharStar - fakePos;
+        return (size_t)passedInAsCharStar - fakePos;
     }
 }
 

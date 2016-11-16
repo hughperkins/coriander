@@ -292,7 +292,6 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
             for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
                 PointerInfo *pointerInfo = pointerit->get();
                 pointerInfo->type = PointerType::get(pointerInfo->type->getPointerElementType(), 1);
-                int offset = pointerInfo->offset;
                 string pointerArgName = argName + "_ptr" + easycl::toString(j);
                 declaration += ", " + typeDumper->dumpType(pointerInfo->type) + " " + pointerArgName;
                 declaration += createOffsetDeclaration(pointerArgName);

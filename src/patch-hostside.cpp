@@ -315,8 +315,6 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
     // outs() << "pointers in struct:" << "\n";
     for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
         PointerInfo *pointerInfo = pointerit->get();
-        int offset = pointerInfo->offset;
-        Type *type = pointerInfo->type;
         vector<Value *> indices;
         indices.push_back(createInt32Constant(&context, 0));
         for(auto idxit = pointerInfo->indices.begin(); idxit != pointerInfo->indices.end(); idxit++) {
@@ -332,15 +330,12 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
         loadgep->insertAfter(lastInst);
         lastInst = loadgep;
 
-        Type *gepElementType = loadgep->getType()->getPointerElementType();
         lastInst = addSetKernelArgInst_pointer(lastInst, loadgep);
     }
     return lastInst;
 }
 
 Instruction *addSetKernelArgInst(Instruction *lastInst, Value *value, Value *valueAsPointerInstr) {
-    Module *M = lastInst->getModule();
-
     if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
         lastInst = addSetKernelArgInst_int(lastInst, value, intType);
     } else if(value->getType()->isFloatingPointTy()) {
@@ -445,7 +440,7 @@ void patchFunction(Function *F) {
 
 string getBasename(string path) {
     // grab anything after final / ,or whole string
-    int slash_pos = path.rfind('/');
+    size_t slash_pos = path.rfind('/');
     if(slash_pos == string::npos) {
         return path;
     }

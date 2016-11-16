@@ -169,8 +169,6 @@ llvm::Instruction *StructCloner::createHostsideIrCopyPtrfullToNoptr(
     LLVMContext &context = src->getContext();
     int srcidx = 0;
     int dstidx = 0;
-    Type *type = src->getType();
-    // outs() << "copyStructValuesNoPointers " << dumpType(type) << "\n";
     if(StructType *structType = dyn_cast<StructType>(src->getType()->getPointerElementType())) {
         for(auto it=structType->element_begin(); it != structType->element_end(); it++) {
             Type *childType = *it;
@@ -256,7 +254,6 @@ void StructCloner::walkType(Module *M, StructInfo *structInfo, int level, int of
         walkStructType(M, structInfo, level, offset, indices, path, structtype);
     } else if(PointerType *pointerType = dyn_cast<PointerType>(type)) {
         Type *elementType = pointerType->getPointerElementType();
-        int addressspace = pointerType->getAddressSpace();
         // outs() << getIndent(level) << "pointer type " << dumpType(elementType) << " addressspace " << addressspace << " offset=" << offset << "\n";
         // how to find out if this is gpu allocated or not?
         // let's just heuristically assume that all primitive*s are gpu allocated for now?
@@ -267,12 +264,9 @@ void StructCloner::walkType(Module *M, StructInfo *structInfo, int level, int of
             // outs() << "primitive type " << dumpType(pointerType) << "\n";
             structInfo->pointerInfos.push_back(unique_ptr<PointerInfo>(new PointerInfo(offset, pointerType, indices, path)));
         }
-    } else if(ArrayType *arrayType = dyn_cast<ArrayType>(type)) {
-        Type *elemType = arrayType->getElementType();
-        int count = arrayType->getNumElements();
+    } else if(isa<ArrayType>(type)) {
         // outs() << getIndent(level) << dumpType(elemType) << "[" << count << "] offset=" << offset << "\n";
-    } else if(IntegerType *intType = dyn_cast<IntegerType>(type)) {
-        int bitwidth = intType->getBitWidth();
+    } else if(isa<IntegerType>(type)) {
         // outs() << getIndent(level) << "int" << bitwidth << " offset=" << offset << "\n";
     } else if(type->getPrimitiveSizeInBits() != 0) {
         // int bitwidth = intType->getBitWidth();

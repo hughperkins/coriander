@@ -33,17 +33,21 @@ InstructionDumper::InstructionDumper(
         std::set<llvm::Function *> *neededFunctions,
         std::map<llvm::Value *, std::string> *globalExpressionByValue, std::map<llvm::Value *, std::string> *localExpressionByValue
         ) :
-    globalNames(globalNames),
-    localNames(localNames),
-    typeDumper(typeDumper),
-    functionNamesMap(functionNamesMap),
     allocaDeclarations(allocaDeclarations),
     variablesToDeclare(variablesToDeclare),
     sharedVariablesToDeclare(sharedVariablesToDeclare),
     shimFunctionsNeeded(shimFunctionsNeeded),
     neededFunctions(neededFunctions),
+
     globalExpressionByValue(globalExpressionByValue),
-    localExpressionByValue(localExpressionByValue) {
+    localExpressionByValue(localExpressionByValue),
+
+    localNames(localNames),
+    typeDumper(typeDumper),
+    globalNames(globalNames),
+
+    functionNamesMap(functionNamesMap)
+        {
 }
 InstructionDumper::~InstructionDumper() {
 }
@@ -147,16 +151,6 @@ string InstructionDumper::dumpConstantExpr(ConstantExpr *expr) {
     if(excessLines.size() > 0) {
         throw runtime_error("InstructionDumper::dumpConstantExpr cannot handle excess lines > 0");
     }
-    int numOperands = instr->getNumOperands();
-    // cout << "numoperands " << numOperands << endl;
-    // for(int i = 0; i < numOperands; i++) {
-    //     Value *op = instr->getOperand(i);
-    //     cout << "op " << i << ":" << endl;
-    //     op->dump();
-    //     cout << endl;
-        // string opstring = dumpOperand(op);
-        // cout << "opstring:" << opstring << endl;
-    // }
     string thisinstrstr = "";
     if((*localExpressionByValue).find(instr) != localExpressionByValue->end()) {
         thisinstrstr = (*localExpressionByValue)[instr];
@@ -401,11 +395,8 @@ void InstructionDumper::dumpAlloca(llvm::AllocaInst *alloca) {
         Type *ptrElementType = allocatypeptr->getPointerElementType();
         std::string typestring = typeDumper->dumpType(ptrElementType);
         int count = readInt32Constant(alloca->getOperand(0));
-        // string name = dumpOperand(alloca);
         string name = localNames->getOrCreateName(alloca);
         cout << "alloca var name [" << name << "]" << endl;
-        // localNames->getOrCreateName(alloca, name);
-        // lastExpression = name;
         localExpressionByValue->operator[](alloca) = name;
         if(count == 1) {
             if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
@@ -417,30 +408,16 @@ void InstructionDumper::dumpAlloca(llvm::AllocaInst *alloca) {
                 allocaInfo.refValue = alloca;
                 allocaInfo.definition = allocaDeclaration;
                 allocaDeclarations->push_back(allocaInfo);
-                // (*localExpressionByValue)[alloca] = dumpOperand(alloca);
-                // allocaDeclarationByValue[alloca] = allocaDeclaration;
-                // cout << "alloca declaration as arraytype: " << allocaDeclaration << endl;
-                // currentFunctionSharedDeclarations += allocaDeclaration;
-                // return "";
                 return;
             } else {
                 Value *refInstruction = alloca;
                 // if the elementType is a pointer, assume its global?
                 if(isa<PointerType>(ptrElementType)) {
-                    // cout << "dumpAlloca, for pointer" << endl;
                     // find the store
-                    int numUses = alloca->getNumUses();
-                    // cout << "numUses " << numUses << endl;
                     for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
                         User *user = *it;
-                        // Value *useValue = use->
-                        // cout << "user " << endl;
                         if(StoreInst *store = dyn_cast<StoreInst>(user)) {
-                            // cout << " got a store" << endl;
-                            // user->dump();
-                            // cout << endl;
                             int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
-                            // cout << "addessspace " << storeop0space << endl;
                             refInstruction = store->getOperand(0);
                             if(storeop0space == 1) {
                                 gencode += "global ";
@@ -450,21 +427,13 @@ void InstructionDumper::dumpAlloca(llvm::AllocaInst *alloca) {
                             typestring = typeDumper->dumpType(ptrElementType);
                         }
                     }
-                    // gencode += "global ";
-                    // updateAddressSpace(alloca, 1);
                 }
                 string allocaDeclaration = gencode + typestring + " " + dumpOperand(alloca) + "[1]";
                 // just declare this at the head of th efunction
-                // allocaDeclaration += "    " + allocaDeclaration + ";\n";
                 allocaInfo.alloca = alloca;
                 allocaInfo.refValue = refInstruction;
                 allocaInfo.definition = allocaDeclaration;
                 allocaDeclarations->push_back(allocaInfo);
-                // allocaDeclarationByValue[refInstruction] = allocaDeclaration;
-                // cout << "alloca declaration not arraytype: " << allocaDeclaration << endl;
-                // allocaDeclarations.insert(allocaDeclaration);
-                // return "";
-                // (*localExpressionByValue)[alloca] = dumpOperand(alloca);
                 return;
             }
         } else {
@@ -612,24 +581,13 @@ std::string InstructionDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr)
         throw runtime_error("dumpgetelementptr op0typeptr is 0");
     }
     int addressspace = op0typeptr->getAddressSpace();
-    // cout << "dumpgetlementptrrhs operand " << rhs << " addressspace=" << addressspace << endl;
     if(addressspace == 3) { // local/shared memory
         // pointer into shared memory.
-        // addSharedDeclaration(instr->getOperand(0));
         sharedVariablesToDeclare->insert(instr->getOperand(0));
     }
-    // cout << "dumpgetelementptr addressspace=" << addressspace << endl;
-    // cout << "currenttype:" << endl;
-    // currentType->dump();
-    // cout << endl;
     for(int d=0; d < numOperands - 1; d++) {
-        // cout << "  dumpgetelementptr d=" << d << " addessspace=" << addressspace << endl;
-        // cout << "currenttype:" << endl;
-        // currentType->dump();
-        // cout << endl;
         Type *newType = 0;
         if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
-            // cout << "  dumpgetelementptr d=" << d << " pointer or array" << endl;
             if(d == 0) {
                 if(isa<ArrayType>(currentType->getPointerElementType())) {
                     rhs = "(&" + rhs + ")";
@@ -640,7 +598,6 @@ std::string InstructionDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr)
             rhs += string("[") + idxstring + "]";
             newType = currentType->getPointerElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
-            // cout << "  dumpgetelementptr d=" << d << " struct" << endl;
             string structName = getName(structtype);
             if(structName == "struct.float4") {
                 int idx = readInt32Constant(instr->getOperand(d + 1));
@@ -655,11 +612,9 @@ std::string InstructionDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr)
                 Type *elementType = structtype->getElementType(idx);
                 rhs += string(".f") + easycl::toString(idx);
                 newType = elementType;
-                if(PointerType *ptr = dyn_cast<PointerType>(newType)) {
-                    // addressspace = ptr->getAddressSpace();
+                if(isa<PointerType>(newType)) {
                     // if its a pointer in a struct, hackily assume gloal for now
                     addressspace = 1;
-                    // cout << "  dumpgetelementptr d=" << d << " struct updating addressspace to " << addressspace << endl;
                 } else {
                     addressspace = 0;
                 }
@@ -670,14 +625,10 @@ std::string InstructionDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr)
         }
         // if new type is a pointer, and old type was a struct, then we assume its a global pointer, and therefore
         // update the addressspace to be global, ie 1.  This is a bit hacky I know
-        // if(isa<PointerType>(newType) && isa<StructType>(currentType)) {
-        //     addressspace = 1;
-        // }
         currentType = newType;
     }
     updateAddressSpace(instr, addressspace);
     rhs = "(&" + rhs + ")";
-    // cout << "getelmenetptr res: " << rhs << endl;
     return rhs;
 }
 

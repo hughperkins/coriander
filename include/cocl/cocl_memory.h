@@ -16,7 +16,7 @@ namespace cocl {
         size_t getOffset(char *passedInAsCharStar);
         cl_mem clmem; // this is assumed to always be valid
         size_t bytes; // should always be valid (ideally > 0...)
-        long long fakePos; // the range (fakePos) to (fakePos + bytes) should not overlap with any other memory
+        size_t fakePos; // the range (fakePos) to (fakePos + bytes) should not overlap with any other memory
         // otherwise, problems :-P
     };
 
