@@ -55,7 +55,11 @@ CUfunc_cache CU_FUNC_CACHE_PREFER_L1;
 CUfunc_cache CU_FUNC_CACHE_PREFER_EQUAL;
 
 namespace cocl {
+    #ifdef __APPLE__
+    pthread_mutex_t launchMutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
+    #else
     pthread_mutex_t launchMutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+    #endif
     class LaunchConfiguration {
     public:
         size_t grid[3];
