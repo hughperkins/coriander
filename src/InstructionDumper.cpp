@@ -843,6 +843,7 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr) {
                  struct ClonedCodeInfo codeInfo;
                 Function *newFunc = CloneFunction(F,
                                valueMap,
+                               false,
                                &codeInfo);
                 // }
                 // delete [] newArgs;
