@@ -162,7 +162,7 @@ endif()
 if(COCL_DEFINITIONS)
     target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
 endif()
-target_link_libraries(cocl easycl ${LLVM_LIBS})
+target_link_libraries(cocl easycl ${LLVM_LIBS} ${LLVM_SYSLIBS})
 # set_target_properties(patch-hostside PROPERTIES
 #     LINK_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LLVM_LIBFILES}"
 # )
