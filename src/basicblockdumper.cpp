@@ -120,9 +120,9 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
     string typestr = typeDumper->dumpType(instruction->getType());
     Use *use = 0;
     User *use_user = 0;
-    bool weArePointer = isa<PointerType>(instruction->getType());
-    bool useIsPointer = false;
-    bool useIsAStore = false;
+    // bool weArePointer = isa<PointerType>(instruction->getType());
+    // bool useIsPointer = false;
+    // bool useIsAStore = false;
     bool useIsExtractValue = false;
     bool useIsAPhi = false;
     // bool useIsALoad = false;
@@ -133,8 +133,8 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
         // cout << "one use" << endl;
         use = &*instruction->use_begin();
         use_user = use->getUser();
-        useIsAStore = isa<StoreInst>(use_user);
-        useIsPointer = isa<PointerType>(use_user->getType());
+        // useIsAStore = isa<StoreInst>(use_user);
+        // useIsPointer = isa<PointerType>(use_user->getType());
         useIsExtractValue = isa<ExtractValueInst>(use_user);
         useIsAPhi = isa<PHINode>(use_user);
         // useIsALoad = isa<LoadInst>(use_user);
