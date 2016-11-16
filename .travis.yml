@@ -17,11 +17,6 @@ before_install:
   - tar -xf clang+llvm-${CLANG_VERSION}-x86_64-apple-darwin.tar.xz
   - ls
   - export CLANG_HOME=${PWD}/clang+llvm-${CLANG_VERSION}-x86_64-apple-darwin
-  - ls ${CLANG_HOME}
-  - ls ${CLANG_HOME}/bin
-  - ls ${CLANG_HOME}/lib
-  - ls ${CLANG_HOME}/include
-  - ls -R ${CLANG_HOME}
   - export PATH=${CLANG_HOME}/bin:$PATH
   - export LD_LIBRARY_PATH=${CLANG_HOME}/lib:$LD_LIBRARY_PATH
   - export DYLD_LIBRARY_PATH=${CLANG_HOME}/lib:$DYLD_LIBRARY_PATH
@@ -29,7 +24,6 @@ before_install:
   - mkdir build
   - cd build
   - echo CLANG_HOME ${CLANG_HOME}
-  - ls ${CLANG_HOME}/lib
   - cmake .. -DCLANG_HOME=${CLANG_HOME} -DBUILD_TESTS=ON
   - make -j 8
   - make install
