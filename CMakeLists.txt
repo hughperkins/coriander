@@ -74,6 +74,13 @@ string(REGEX REPLACE ";-DNDEBUG" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-isysroot;[^;]" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 
+# split LLVM_CXXFLAGS into defines vs other options
+STRING(REGEX MATCHALL ";-D[^;]+" LLVM_DEFINES "${LLVM_CXXFLAGS}")
+STRING(REGEX REPLACE ";+" ";" LLVM_DEFINES "${LLVM_DEFINES}")
+STRING(REGEX REPLACE ";-D[^;]+" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
+message("LLVM_DEFINES ${LLVM_DEFINES}")
+message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
+
 execute_process(
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/llvm-syslibs.sh ${CLANG_HOME}
     OUTPUT_VARIABLE LLVM_SYSLIBS
@@ -138,7 +145,7 @@ if(OFFSET_32BIT)
     set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DOFFSET_32BIT)
 endif()
 if(COCL_DEFINITIONS)
-    target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
+    target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS} ${LLVM_DEFINES})
 endif()
 target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS})
 target_link_libraries(cocl easycl ${LLVM_LIBS} ${LLVM_SYSLIBS})
