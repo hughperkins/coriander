@@ -238,7 +238,7 @@ if(BUILD_TESTS)
       src/InstructionDumper.cpp test/gtest/test_instructiondumper.cpp)
     target_include_directories(test_instructiondumper PRIVATE src)
     target_include_directories(test_instructiondumper PRIVATE third_party/gtest)
-    target_include_directories(test_instructiondumper PRIVATE /usr/lib/llvm-3.8/include)
+    target_include_directories(test_instructiondumper PRIVATE ${CLANG_HOME}/include)
     target_link_libraries(test_instructiondumper "${LLVM_LIBS}" cocl_gtest easycl ${LLVM_SYSLIBS})
 
     add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
