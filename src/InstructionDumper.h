@@ -109,7 +109,7 @@ public:
     cocl::TypeDumper *typeDumper = 0;
     cocl::GlobalNames *globalNames = 0;
 
-    std::string lastExpression;
+    // std::string lastExpression;
 
 protected:
     const cocl::FunctionNamesMap *functionNamesMap = 0;

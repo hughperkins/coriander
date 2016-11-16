@@ -383,7 +383,7 @@ void InstructionDumper::dumpAlloca(llvm::AllocaInst *alloca) {
         string name = localNames->getOrCreateName(alloca);
         cout << "alloca var name [" << name << "]" << endl;
         // localNames->getOrCreateName(alloca, name);
-        lastExpression = name;
+        // lastExpression = name;
         localExpressionByValue->operator[](alloca) = name;
         if(count == 1) {
             if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
@@ -1028,7 +1028,7 @@ bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::ve
         (*localExpressionByValue)[instruction] = instructionCode;
     }
     // return instructionCode;
-    this->lastExpression = instructionCode;
+    // this->lastExpression = instructionCode;
     return true;
     // generatedCl.push_back(instructionCode);
 }

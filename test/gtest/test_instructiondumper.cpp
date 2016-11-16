@@ -143,7 +143,7 @@ TEST(test_instructiondumper, alloca) {
     AllocaInst *alloca = new AllocaInst(IntegerType::get(context, 32));
 
     instructionDumper.runRhsGeneration(alloca, &extraInstructions);
-    cout << "last expression " << instructionDumper.lastExpression << endl;
+    // cout << "last expression " << instructionDumper.lastExpression << endl;
     string expr = instructionDumper.localExpressionByValue->operator[](alloca);
     cout << "expr " << expr << endl;
 }
