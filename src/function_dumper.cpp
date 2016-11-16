@@ -335,22 +335,28 @@ std::string FunctionDumper::dumpTerminator(Type **pReturnType, Instruction *term
     return terminatorCl;
 }
 
-std::string FunctionDumper::toCl() {
-    string bodyCl = "";
-    int i = 0;
-    for(auto it=F->begin(); it != F->end(); it++) {
-        BasicBlock *basicBlock = &*it;
-        functionBlockIndex[basicBlock] = i;
-        localNames.getOrCreateName(basicBlock);
-        i++;
+void FunctionDumper::generateBlockIndex() {
+    if(functionBlockIndex.size() == 0) {
+        int i = 0;
+        for(auto it=F->begin(); it != F->end(); it++) {
+            BasicBlock *basicBlock = &*it;
+            functionBlockIndex[basicBlock] = i;
+            localNames.getOrCreateName(basicBlock);
+            i++;
+        }
     }
+}
+
+bool FunctionDumper::runGeneration() {
+    // returns true means finished, false means missing some dependnecy, like a sub fucntion walk
+
+    generateBlockIndex();
 
     // first time initializes the types of hte args and so on
-    string declaration = dumpFunctionDeclarationWithoutReturn(F);
+    declaration = dumpFunctionDeclarationWithoutReturn(F);
 
-    Type *returnType = 0;
-    for(auto it=F->begin(); it != F->end(); it++) {
-        BasicBlock *basicBlock = &*it;
+    for(; block_it != F->end(); block_it++) {
+        BasicBlock *basicBlock = &*block_it;
         string label = localNames.getOrCreateName(basicBlock);
 
         for(auto it2=basicBlock->begin(); it2 != basicBlock->end(); it2++) {
@@ -384,7 +390,10 @@ std::string FunctionDumper::toCl() {
 
         bodyCl += dumpTerminator(&returnType, basicBlock->getTerminator(), basicBlockDumper.localExpressionByValue);
     }
+    return true;
+}
 
+void FunctionDumper::toCl(ostream &os) {
     if(returnType != 0) {
         declaration = typeDumper->dumpType(returnType) + " " + declaration;
     } else {
@@ -422,7 +431,8 @@ std::string FunctionDumper::toCl() {
     gencode += "}\n";
 
     // COCL_PRINT(cout << endl);
-    return gencode;
+    os << gencode;
+    // return gencode;
 }
 
 std::string FunctionDumper::getDeclaration() {

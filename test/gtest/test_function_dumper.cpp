@@ -72,7 +72,10 @@ TEST(test_function_dumper, basic) {
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
-    string cl = functionDumper.toCl();
+    functionDumper.runGeneration();
+    ostringstream os;
+    functionDumper.toCl(os);
+    string cl = os.str();
     cout << "cl:\n" << cl << endl;
 
     for(auto it=functionDumper.neededFunctions.begin(); it != functionDumper.neededFunctions.end(); it++) {
@@ -92,7 +95,10 @@ TEST(test_function_dumper, usesShared1) {
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
-    string cl = functionDumper.toCl();
+    functionDumper.runGeneration();
+    ostringstream os;
+    functionDumper.toCl(os);
+    string cl = os.str();
     cout << "cl:\n" << cl << endl;
 
     ASSERT_EQ(1, functionDumper.sharedVariablesToDeclare.size());
@@ -111,7 +117,10 @@ TEST(test_function_dumper, usesShared2) {
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
-    string cl = functionDumper.toCl();
+    functionDumper.runGeneration();
+    ostringstream os;
+    functionDumper.toCl(os);
+    string cl = os.str();
     cout << "cl:\n" << cl << endl;
 
     ASSERT_EQ(2, functionDumper.sharedVariablesToDeclare.size());

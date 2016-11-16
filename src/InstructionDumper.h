@@ -61,7 +61,8 @@ public:
     }
     // InstructionDumper *setAllocaDeclarations()
     virtual ~InstructionDumper() {}
-    std::string dumpInstructionRhs(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded);
+    // std::string dumpInstructionRhs(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded);
+    bool runRhsGeneration(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded);
     std::string dumpOperand(llvm::Value *value);
     void dumpConstant(std::ostream &oss, llvm::Constant *constant);
 
@@ -107,6 +108,9 @@ public:
     cocl::LocalNames *localNames = 0;
     cocl::TypeDumper *typeDumper = 0;
     cocl::GlobalNames *globalNames = 0;
+
+    std::string lastExpression;
+
 protected:
     const cocl::FunctionNamesMap *functionNamesMap = 0;
 

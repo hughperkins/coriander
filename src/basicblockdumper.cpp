@@ -110,9 +110,10 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
     }
     vector<string> reslines;
     // InstructionDumper instructionDumper;
-    string instructionCode = instructionDumper->dumpInstructionRhs(instruction, &reslines);
+    instructionDumper->runRhsGeneration(instruction, &reslines);
+    string instructionCode = instructionDumper->localExpressionByValue->operator[](instruction);
     clcode.insert(clcode.end(), reslines.begin(), reslines.end());
-    if(instructionCode == "") {
+    if(instructionCode == "" || isa<AllocaInst>(instruction)) {
         return;
     }
 
@@ -164,6 +165,7 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
         if(instructionCode != "") {
             // gencode += indent;
             if(typestr != "void") {
+                cout << "declaring local variable" << endl;
                 instructionCode = stripOuterParams(instructionCode);
                 // functionNeededForwardDeclarations.insert(instruction);
                 // variablesToDeclare[instruction] = resultName;

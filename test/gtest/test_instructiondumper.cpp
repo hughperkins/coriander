@@ -62,12 +62,14 @@ TEST(test_instructiondumper, basic) {
         &neededFunctions,
         &globalExpressionByValue, &localExpressionByValue);
     vector<string> extraInstructions;
-    string expr = instructionDumper.dumpInstructionRhs(add, &extraInstructions);
+    instructionDumper.runRhsGeneration(add, &extraInstructions);
+    string expr = instructionDumper.localExpressionByValue->operator[](add);
 
     cout << "expr " << expr << endl;
 
     instructionDumper.localExpressionByValue->operator[](a) = "v1";
-    expr = instructionDumper.dumpInstructionRhs(add, &extraInstructions);
+    instructionDumper.runRhsGeneration(add, &extraInstructions);
+    expr = instructionDumper.localExpressionByValue->operator[](add);
     cout << "expr " << expr << endl;
 
     a = new AllocaInst(IntegerType::get(context, 32));
@@ -75,11 +77,14 @@ TEST(test_instructiondumper, basic) {
     instructionDumper.localExpressionByValue->operator[](a) = "v3";
     instructionDumper.localExpressionByValue->operator[](b) = "v4";
     add = BinaryOperator::Create(Instruction::Add, a, b);
-    expr = instructionDumper.dumpInstructionRhs(add, &extraInstructions);
+    instructionDumper.runRhsGeneration(add, &extraInstructions);
+    expr = instructionDumper.localExpressionByValue->operator[](add);
     cout << "expr " << expr << endl;
 
     instructionDumper.localExpressionByValue->operator[](add) = "v5";
-    expr = instructionDumper.dumpInstructionRhs(add, &extraInstructions);
+    // expr = instructionDumper.dumpInstructionRhs(add, &extraInstructions);
+    instructionDumper.runRhsGeneration(add, &extraInstructions);
+    expr = instructionDumper.localExpressionByValue->operator[](add);
     cout << "expr " << expr << endl;
 }
 
@@ -106,7 +111,40 @@ TEST(test_instructiondumper, globalexpr) {
         &neededFunctions,
         &globalExpressionByValue, &localExpressionByValue);
     vector<string> extraInstructions;
-    string expr = instructionDumper.dumpInstructionRhs(add, &extraInstructions);
+    instructionDumper.runRhsGeneration(add, &extraInstructions);
+    string expr = instructionDumper.localExpressionByValue->operator[](add);
+    cout << "expr " << expr << endl;
+}
+
+TEST(test_instructiondumper, alloca) {
+    // Value *a = ConstantInt::getSigned(IntegerType::get(context, 32), 123);
+    // Value *b = ConstantInt::getSigned(IntegerType::get(context, 32), 47);
+    // Instruction *add = BinaryOperator::Create(Instruction::FAdd, a, b);
+    GlobalNames globalNames;
+    LocalNames localNames;
+    TypeDumper typeDumper(&globalNames);
+    FunctionNamesMap functionNamesMap;
+
+    std::vector<AllocaInfo> allocaDeclarations;
+    std::set<llvm::Value *> variablesToDeclare;
+    std::set<llvm::Value *> sharedVariablesToDeclare;
+    std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
+    std::set<llvm::Function *> neededFunctions;
+
+    std::map<llvm::Value *, std::string> globalExpressionByValue;
+    std::map<llvm::Value *, std::string> localExpressionByValue;
+
+    InstructionDumper instructionDumper(&globalNames, &localNames, &typeDumper, &functionNamesMap,
+        &allocaDeclarations, &variablesToDeclare, &sharedVariablesToDeclare, &shimFunctionsNeeded,
+        &neededFunctions,
+        &globalExpressionByValue, &localExpressionByValue);
+    vector<string> extraInstructions;
+
+    AllocaInst *alloca = new AllocaInst(IntegerType::get(context, 32));
+
+    instructionDumper.runRhsGeneration(alloca, &extraInstructions);
+    cout << "last expression " << instructionDumper.lastExpression << endl;
+    string expr = instructionDumper.localExpressionByValue->operator[](alloca);
     cout << "expr " << expr << endl;
 }
 

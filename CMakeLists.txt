@@ -258,7 +258,7 @@ if(BUILD_TESTS)
     target_link_libraries(test_instructiondumper "${LLVM_LIBS}" cocl_gtest easycl ${LLVM_SYSLIBS})
 
     add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
-        test/gtest/test_block_dumper.cpp
+        test/gtest/test_block_dumper.cpp test/gtest/test_instructiondumper.cpp
         test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
         test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
         test/gtest/test_kernel_dumper.cpp test/gtest/test_global_constants.cpp

@@ -41,15 +41,18 @@ public:
             typeDumper(typeDumper),
             structCloner(typeDumper, globalNames),
             functionNamesMap(functionNamesMap) {
+        block_it = F->begin();
     }
     virtual ~FunctionDumper() {
 
     }
 
-    std::string toCl();
+    bool runGeneration();
+    void toCl(std::ostream &os);
     std::string createOffsetDeclaration(std::string argName);
     std::string createOffsetShim(llvm::Type *argType, std::string argName);
     std::string dumpFunctionDeclarationWithoutReturn(llvm::Function *F);
+    void generateBlockIndex();
 
     void addPHIDeclaration(llvm::PHINode *phi);
     std::string dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock);
@@ -80,6 +83,11 @@ public:
     std::string functionDeclarations = "";
 
 protected:
+    llvm::Function::iterator block_it;
+    std::string bodyCl = "";
+    llvm::Type *returnType = 0;
+    std::string declaration;
+
     llvm::Function *F;
     bool isKernel = false;
     bool _addIRToCl = false;

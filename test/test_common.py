@@ -113,7 +113,8 @@ def compile_code(cl, context, kernelSource, kernelName):
         'build/ir-to-opencl',
         '--inputfile', '/tmp/testprog-device.ll',
         '--outputfile', '/tmp/testprog-device.cl',
-        '--kernelname', kernelName
+        '--kernelname', kernelName,
+        '--add_ir_to_cl'
     ])
 
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -142,7 +143,8 @@ def compile_code_v2(cl, context, kernelSource, kernelName):
         'build/ir-to-opencl',
         '--inputfile', '/tmp/testprog-device.ll',
         '--outputfile', '/tmp/testprog-device.cl',
-        '--kernelname', kernelName
+        '--kernelname', kernelName,
+        '--add_ir_to_cl'
     ])
 
     with open('/tmp/testprog-device.cl', 'r') as f:

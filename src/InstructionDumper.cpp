@@ -118,7 +118,9 @@ string InstructionDumper::dumpConstantExpr(ConstantExpr *expr) {
     // InstructionDumper childInstructionDumper;
     // string rhs = dumpInstruction(instr);
     vector<string> excessLines;
-    string rhs = dumpInstructionRhs(instr, &excessLines);
+    runRhsGeneration(instr, &excessLines);
+    string rhs = (*localExpressionByValue)[instr];
+    // string rhs = dumpInstructionRhs(instr, &excessLines);
     cout << "rhs: [" << rhs << "]" << endl;
     if(excessLines.size() > 0) {
         throw runtime_error("InstructionDumper::dumpConstantExpr cannot handle excess lines > 0");
@@ -377,6 +379,12 @@ void InstructionDumper::dumpAlloca(llvm::AllocaInst *alloca) {
         Type *ptrElementType = allocatypeptr->getPointerElementType();
         std::string typestring = typeDumper->dumpType(ptrElementType);
         int count = readInt32Constant(alloca->getOperand(0));
+        // string name = dumpOperand(alloca);
+        string name = localNames->getOrCreateName(alloca);
+        cout << "alloca var name [" << name << "]" << endl;
+        // localNames->getOrCreateName(alloca, name);
+        lastExpression = name;
+        localExpressionByValue->operator[](alloca) = name;
         if(count == 1) {
             if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
                 int innercount = arrayType->getNumElements();
@@ -387,6 +395,7 @@ void InstructionDumper::dumpAlloca(llvm::AllocaInst *alloca) {
                 allocaInfo.refValue = alloca;
                 allocaInfo.definition = allocaDeclaration;
                 allocaDeclarations->push_back(allocaInfo);
+                // (*localExpressionByValue)[alloca] = dumpOperand(alloca);
                 // allocaDeclarationByValue[alloca] = allocaDeclaration;
                 // cout << "alloca declaration as arraytype: " << allocaDeclaration << endl;
                 // currentFunctionSharedDeclarations += allocaDeclaration;
@@ -433,6 +442,7 @@ void InstructionDumper::dumpAlloca(llvm::AllocaInst *alloca) {
                 // cout << "alloca declaration not arraytype: " << allocaDeclaration << endl;
                 // allocaDeclarations.insert(allocaDeclaration);
                 // return "";
+                // (*localExpressionByValue)[alloca] = dumpOperand(alloca);
                 return;
             }
         } else {
@@ -863,7 +873,7 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr) {
     return gencode;
 }
 
-std::string InstructionDumper::dumpInstructionRhs(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded) {
+bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded) {
     // vector<string> reslines;
     // gencode += "/* " + originalInstruction + " */\n    ";
     auto opcode = instruction->getOpcode();
@@ -971,7 +981,8 @@ std::string InstructionDumper::dumpInstructionRhs(llvm::Instruction *instruction
             break;
         case Instruction::InsertValue:
             *additionalLinesNeeded = dumpInsertValue(cast<InsertValueInst>(instruction));
-            return "";
+            // return "";
+            return true;
             // string gencode = "";
             // generatedCl.insert(generatedCl.end(), reslines.begin(), reslines.end());
             // for(auto it=reslines.begin(); it != reslines.end(); it++) {
@@ -995,7 +1006,8 @@ std::string InstructionDumper::dumpInstructionRhs(llvm::Instruction *instruction
             break;
         case Instruction::Alloca:
             dumpAlloca(cast<AllocaInst>(instruction));
-            return "";
+            // return "";
+            return true;
         // case Instruction::Br:
         //     instructionCode = dumpBranch(cast<BranchInst>(instruction));
         //     return instructionCode;
@@ -1015,7 +1027,9 @@ std::string InstructionDumper::dumpInstructionRhs(llvm::Instruction *instruction
     if(instructionCode != "") {
         (*localExpressionByValue)[instruction] = instructionCode;
     }
-    return instructionCode;
+    // return instructionCode;
+    this->lastExpression = instructionCode;
+    return true;
     // generatedCl.push_back(instructionCode);
 }
 

@@ -164,7 +164,10 @@ std::string KernelDumper::toCl() {
             if(_addIRToCl) {
                 childFunctionDumper.addIRToCl();
             }
-            string childFunctionCl = childFunctionDumper.toCl();
+            childFunctionDumper.runGeneration();
+            ostringstream os;
+            childFunctionDumper.toCl(os);
+            string childFunctionCl = os.str();
 
             structsToDefine.insert(childFunctionDumper.structsToDefine.begin(), childFunctionDumper.structsToDefine.end());
             functionDeclarations.insert(childFunctionDumper.getDeclaration());
