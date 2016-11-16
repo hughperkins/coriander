@@ -64,9 +64,6 @@ size_t cuEventCreate(Event **pevent, unsigned int flags) {
 
 size_t cuEventSynchronize(Event *event) {
     COCL_PRINT(cout << "cuEventSynchronize redirected event=" << event << endl);
-    ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getContext()->getCl();
-    // cl_context *ctx = cl->context;
     cl_int err = clWaitForEvents(1, &event->event);
     EasyCL::checkError(err);
     return 0;
@@ -89,9 +86,6 @@ size_t cuEventRecord(Event *event, char *_queue) {
 
 size_t cuEventQuery(Event *event) {
     COCL_PRINT(cout << "cuEventQuery redirected event=" << event << endl);
-    ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getContext()->getCl();
-    // cl_context *ctx = cl->context;
     cl_int res;
     cl_int err = clGetEventInfo (
         event->event,

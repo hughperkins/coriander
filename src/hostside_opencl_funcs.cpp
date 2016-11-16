@@ -69,7 +69,7 @@ namespace cocl {
         CoclStream *coclStream = 0; // NOT owned
 
         vector<cl_mem> kernelArgsToBeReleased;
-        std::string kernelName = "";;
+        std::string kernelName = "";
         // std::string kernelSource = "";
     };
     LaunchConfiguration launchConfiguration;
@@ -118,7 +118,6 @@ int cudaConfigureCall(
     // COCL_PRINT(cout << "... locked launch mutex " << (void *)getThreadVars() << endl);
     CoclStream *coclStream = (CoclStream *)queue_as_voidstar;
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getContext()->getCl();
     if(coclStream == 0) {
         coclStream = v->currentContext->default_stream.get();
         // coclStream = defaultCoclStream;
@@ -352,10 +351,6 @@ void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "setKernelArgCharStar " << (void *)memory_as_charstar << endl);
     Memory *memory = findMemory(memory_as_charstar);
-    ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getContext()->getCl();
-    cl_context *ctx = cl->context;
-    cl_int err;
     if(memory == 0) {
         launchConfiguration.kernel->in_nullptr();
         #ifdef OFFSET_32BIT
@@ -414,9 +409,6 @@ void kernelGo() {
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "kernelGo queue=" << (void *)launchConfiguration.queue << endl);
-    ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getContext()->getCl();
-    cl_context *ctx = cl->context;
     size_t global[3];
      COCL_PRINT(cout << "<<< global=dim3(");
     for(int i = 0; i < 3; i++) {
