@@ -119,6 +119,7 @@ add_executable(patch-hostside
 target_include_directories(patch-hostside PRIVATE ${CLANG_HOME}/include)
 target_include_directories(patch-hostside PRIVATE third_party/argparsecpp)
 target_include_directories(patch-hostside PRIVATE src/EasyCL)
+target_compile_options(patch-hostside PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 target_link_libraries(patch-hostside "${LLVM_LIBS}"  ${LLVM_SYSLIBS})
 
 add_library(clew SHARED src/EasyCL/thirdparty/clew/src/clew.c)
@@ -145,9 +146,9 @@ if(OFFSET_32BIT)
     set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DOFFSET_32BIT)
 endif()
 if(COCL_DEFINITIONS)
-    target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS} ${LLVM_DEFINES})
+    target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
 endif()
-target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS})
+target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 target_link_libraries(cocl easycl ${LLVM_LIBS} ${LLVM_SYSLIBS})
 
 # ==================================================================================================
