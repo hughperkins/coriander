@@ -18,10 +18,12 @@ export CLANG=clang++
 
 export ADDFLAGS=
 export NATIVE_COMPILER=g++
+export SO_SUFFIX=.so
 case `uname` in
     Darwin)
         ADDFLAGS="-stdlib=libc++"
         export NATIVE_COMPILER=clang++
+        export SO_SUFFIX=.dylib
         ;;
     *)
         ;;
