@@ -249,7 +249,7 @@ INPATH=${INFILES}
 
 export INCLUDES
 
-if [ x$INPATH = x ]; then {
+if [ "x$INPATH" = "x" ]; then {
     echo Usage: $0 [-c] [-g] [[-Iincludepath]...] [-o outfile] [infile.cu]
     exit 1
 } fi
