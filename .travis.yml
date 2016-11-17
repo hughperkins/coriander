@@ -17,6 +17,7 @@ before_install:
   - tar -xf clang+llvm-${CLANG_VERSION}-x86_64-apple-darwin.tar.xz
   - ls
   - export CLANG_HOME=${PWD}/clang+llvm-${CLANG_VERSION}-x86_64-apple-darwin
+  - ${CLANG_HOME}/bin/clang++ -### -c ${BASEDIR}/test//cocl/cuda_sample.cu
   - cd ${BASEDIR}
   - mkdir build
   - cd build

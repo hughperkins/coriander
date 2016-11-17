@@ -1,15 +1,13 @@
 #pragma once
 
-#ifdef __cplusplus
+#include <stdexcept>
 #include <cmath>
 #include <random>
-#endif // _cplusplus
 
 #if defined(__CUDACC__) || defined(__CUDA_ARCH__)
 #define __device__ __attribute__((device))
 #define __host__ __attribute__((host))
 #else
-#include <stdexcept>
 #define __host__
 #define __device__
 #endif

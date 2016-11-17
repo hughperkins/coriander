@@ -29,6 +29,7 @@ $(OUTPUTBASEPATH)-device-noopt.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/
 		-include $(COCL_HOME)/include/cocl/fake_funcs.h \
 		-include $(COCL_HOME)/include/cocl/cocl_deviceside.h \
 		-I$(COCL_HOME)/include \
+		$(ADDFLAGS) \
 		$(INCLUDES) \
 		--cuda-device-only -emit-llvm -O0 -S \
 		$< -o $@
@@ -53,6 +54,7 @@ $(OUTPUTBASEPATH)-hostraw.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/inclu
 		-I$(COCL_HOME)/src \
 		-I$(COCL_HOME)/src/EasyCL/thirdparty/clew/include \
 		-I$(COCL_HOME)/src/EasyCL \
+		$(ADDFLAGS) \
 		-include $(COCL_HOME)/include/cocl/cocl.h \
 		-include $(COCL_HOME)/include/cocl/fake_funcs.h \
 		-include $(COCL_HOME)/include/cocl/cocl_hostside.h \
