@@ -17,9 +17,11 @@ if [ x$CLANG_HOME = x ]; then {
 export CLANG=clang++
 
 export ADDFLAGS=
+export NATIVE_COMPILER=g++
 case `uname` in
     Darwin)
         ADDFLAGS="-stdlib=libc++"
+        export NATIVE_COMPILER=clang++
         ;;
     *)
         ;;
