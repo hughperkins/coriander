@@ -87,12 +87,6 @@ Behind the scenes, there are a few parts:
 
 [More detail](doc/how-it-works.md)
 
-## Device-specific notes
-
-I'm testing personally on:
-- NVIDIA K520M => this generally works pretty well
-- Intel HD5500, using Beignet Release_v1.2.1 (built from git source)
-
 ## What it provides
 
 - compiler for host-side code, including memory allocation, copy, streams, kernel launches
@@ -171,7 +165,7 @@ pip install -r test/requirements.txt
 #### Procedure
 
 ```
-OFFSET_32BIT=1 COCL_OPTIONS='--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine --devicell-opt O2' py.test -svx
+OFFSET_32BIT=1 COCL_OPTIONS='--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine --devicell-opt O2' py.test -v
 ```
 
 - python tests are at [test](test)
