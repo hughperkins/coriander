@@ -31,7 +31,7 @@ script:
   - mkdir /tmp/foo
   - cd /tmp/foo
   - cp ${BASEDIR}/test/cocl/cuda_sample.cu .
-  - SETX=1 cocl cuda_sample.cu
+  - CLANG_HOME=${CLANG_HOME} SETX=1 cocl cuda_sample.cu
   - ./cuda_sample
 
 notifications:

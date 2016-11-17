@@ -15,7 +15,7 @@ which kernel we want to run.  This is going to help with address space determina
 
 - write a CUDA sourcecode file, or find an existing one
 - here's a simple example: [cuda_sample.cu](https://github.com/hughperkins/cuda-on-cl/blob/76a849d9510276bc67167c9a7676d64ff04c3e4a/test/cuda_sample.cu)
-- Run `cocl` to compile it:
+- Use `cocl` to compile `cuda_sample.cu`:
 ```
 $ cocl cuda_sample.cu
    ...
@@ -25,7 +25,7 @@ $ cocl cuda_sample.cu
     ./cuda_sample.cu compiled into ./cuda_sample
 
 ```
-Run.  You'll need to add libclew.so, libclblast.co, libeasycl.so to the LD_LIBRARY_PATH:
+Run:
 ```
 $ ./cuda_sample
 Using Intel , OpenCL platform: Intel Gen OCL Driver
@@ -87,12 +87,6 @@ Behind the scenes, there are a few parts:
 
 [More detail](doc/how-it-works.md)
 
-## Device-specific notes
-
-I'm testing personally on:
-- NVIDIA K520M => this generally works pretty well
-- Intel HD5500, using Beignet Release_v1.2.1 (built from git source)
-
 ## What it provides
 
 - compiler for host-side code, including memory allocation, copy, streams, kernel launches
@@ -103,16 +97,33 @@ I'm testing personally on:
 
 ### Pre-requisites
 
-- Ubuntu 16.04
-- clang/llvm 3.8 (installed in 'Procedure' below)
+- Operating system:
+  - Tested/developed on Ubuntu 16.04
+  - Ubuntu 14.04 does seem to work ok too (not tested very much though...)
+  - Mac OS X very close to working, eg see https://travis-ci.org/hughperkins/cuda-on-cl/builds/176629553
+  - Other operating systems, and clang/llvm versions, might work too, but untested.  Your mileage may vary :-)
 - OpenCL-enabled GPU, and appropriate OpenCL drivers installed for the GPU
 
-Other operating systems, and clang/llvm versions, might work too, but untested.  Your mileage may vary :-)
+### Install clang/llvm-3.8
+
+Either:
+- download from http://llvm.org/releases/download.html , and set `CLANG_HOME` to point to the root of this unzipped folder, or
+- on ubuntu you can do `sudo apt-get install llvm-3.8 llvm-3.8-dev clang-3.8`
+  - but you still need to set `CLANG_HOME` :-)  In this case, to: `/usr/lib/llvm-3.8`
+
+### Other libraries
+
+On Ubuntu 16.04:
+```
+sudo apt-get install git cmake cmake-curses-gui libc6-dev-i386 make gcc g++
+```
+
+On other systems:
+- somehow install the same things as for Ubuntu 16.04 section
 
 ### Procedure
 
 ```
-sudo apt-get install git cmake cmake-curses-gui llvm-3.8-dev clang-3.8 libc6-dev-i386 make gcc g++
 git clone --recursive https://github.com/hughperkins/cuda-on-cl
 cd cuda-on-cl
 mkdir build
@@ -121,6 +132,8 @@ cmake ..
 make -j 4
 sudo make install
 ```
+
+Note that you'll need to continue to export `CLANG_HOME` environment variable when using `cocl`.
 
 ## Test
 
@@ -152,7 +165,9 @@ pip install -r test/requirements.txt
 #### Procedure
 
 ```
-OFFSET_32BIT=1 COCL_OPTIONS='--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine --devicell-opt O2' py.test -svx
+OFFSET_32BIT=1 \
+COCL_OPTIONS='--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine --devicell-opt O2' \
+py.test -v
 ```
 
 - python tests are at [test](test)
@@ -214,34 +229,19 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 ## News
 
+- Nov 17:
+  - merged `runtime-compile` branch into `master` branch.  This brings a few changes:
+    - opencl generation is now at runtime, rather than at compile time
+      - this lets us build only the one specific kernel we need
+      - means more information is available at generation time, facilitating the generation process
+    - build on Mac OS X is more or less working, eg https://travis-ci.org/hughperkins/cuda-on-cl/builds/176580716
+    - code radically refactorized underneath
+    - remove `--run_branch_transforms`, `--branches_as_switch`, for now
 - Nov 8:
-  - exposed generation options as `cocl` options, eg `--run_branching_transforms`, `--branches_as_switch`, and the `--devicell-opt [opt]` options
+  - ~~exposed generation options as `cocl` options, eg `--run_branching_transforms`, `--branches_as_switch`, and the `--devicell-opt [opt]` options~~
 - Nov 6:
   - created dockerfiles for Beignet and NVIDIA [docker](docker)
 - Nov 5:
   - switched from `Makefile` to `CMakeLists.txt` => build/install instructions have changed, see above
   - added a `cmake` file, so you can easily add `cocl` to your cmakelists file, eg see https://bitbucket.org/hughperkins/eigen/src/d84b9f44f924e36a8527e66a46a189395f046d21/unsupported/test/cuda-on-cl/CMakeLists.txt?at=eigen-cl&fileviewer=file-view-default for an example
-- Nov 4:
-  - merged in changes that remove `label`s and gotos, and replace them with `if`s, `while`s, `for`s.  This is a bit flaky/beta/duct-tape, but the unit tests do all pass...
-- Nov 1:
-  - turned on rpath, switched from static to shared compilation
-- Oct 29:
-  - negative infinity float constants handled correctly now (pre-requisite for `reduce_min` working in tensorflow)
-  - properties now return correct device name, total memory, and a few other device parameters
-  - added callbacks
-  - remember to cache the kernels between calls :-P  (this should make things run quite a lot faster now...)
-- Oct 28:
-  - denormalized generated OpenCL out of SSA form, to make it more human-readable
-  - added support to pass null pointers into kernels
-- Oct 26:
-  - fixed a bug where BLAS results were empty on HD5500, using beignet 1.2
-  - added `__shfl_down` shim
-  - moved Eigen tests into a new Eigen fork, https://bitbucket.org/hughperkins/eigen/commits/branch/eigen-cl
-- Oct 25:
-  - BLAS wrapper handles memory offsets correctly now
-- Oct 24:
-  - fixed `pow`, `min`, `max` (beta)
-- Oct 23:
-  - fixed `float4`s.  This is a critical bug-fix, without which Eigen componentwise works less well in Tensorflow :-P
-  - added BLAS, using Cedric Nugteren's [CLBlast](https://github.com/CNugteren/CLBlast))
 - [Older news](doc/news.md)

@@ -1,5 +1,28 @@
 # Older News
 
+- Nov 4:
+  - merged in changes that remove `label`s and gotos, and replace them with `if`s, `while`s, `for`s.  This is a bit flaky/beta/duct-tape, but the unit tests do all pass...
+- Nov 1:
+  - turned on rpath, switched from static to shared compilation
+- Oct 29:
+  - negative infinity float constants handled correctly now (pre-requisite for `reduce_min` working in tensorflow)
+  - properties now return correct device name, total memory, and a few other device parameters
+  - added callbacks
+  - remember to cache the kernels between calls :-P  (this should make things run quite a lot faster now...)
+- Oct 28:
+  - denormalized generated OpenCL out of SSA form, to make it more human-readable
+  - added support to pass null pointers into kernels
+- Oct 26:
+  - fixed a bug where BLAS results were empty on HD5500, using beignet 1.2
+  - added `__shfl_down` shim
+  - moved Eigen tests into a new Eigen fork, https://bitbucket.org/hughperkins/eigen/commits/branch/eigen-cl
+- Oct 25:
+  - BLAS wrapper handles memory offsets correctly now
+- Oct 24:
+  - fixed `pow`, `min`, `max` (beta)
+- Oct 23:
+  - fixed `float4`s.  This is a critical bug-fix, without which Eigen componentwise works less well in Tensorflow :-P
+  - added BLAS, using Cedric Nugteren's [CLBlast](https://github.com/CNugteren/CLBlast))
 - Oct 22:
   - arrays of structs can be passed to kernels again, as long as they contain no pointers
     - (structs containing pointers can be passed only by-value)
