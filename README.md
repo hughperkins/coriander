@@ -165,7 +165,9 @@ pip install -r test/requirements.txt
 #### Procedure
 
 ```
-OFFSET_32BIT=1 COCL_OPTIONS='--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine --devicell-opt O2' py.test -v
+OFFSET_32BIT=1 \
+COCL_OPTIONS='--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine --devicell-opt O2' \
+py.test -v
 ```
 
 - python tests are at [test](test)
