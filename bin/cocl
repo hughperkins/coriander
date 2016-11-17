@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-if [[ ! -z "$SETX" ]]; then {
+if [ ! -z "$SETX" ]; then {
    set -x
 } fi
 
@@ -9,10 +9,10 @@ set -e
 
 export CLANG=clang++-3.8
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPT_DIR=$( cd "$( dirname "$0" )" && pwd )
 export COCL_HOME=$(dirname ${SCRIPT_DIR})
 
-if [[ -f ${COCL_HOME}/bin/ir-to-opencl ]]; then {
+if [ -f ${COCL_HOME}/bin/ir-to-opencl ]; then {
     export COCL_BIN=${COCL_HOME}/bin
     export COCL_LIB=${COCL_HOME}/lib
 } else {
@@ -27,7 +27,7 @@ if [[ -f ${COCL_HOME}/bin/ir-to-opencl ]]; then {
 # - getopt gnu is not the default on Mac
 # I *hope* that bash is fairly portable, across Linux, Mac, cygwin/msys64?
 
-function display_help {
+display_help () {
     cat <<EOF
 
     Usage: cocl [options] <targetfile>
@@ -104,22 +104,18 @@ function display_help {
 EOF
 }
 
-# echo args "$@"
 PASSTHRU=
 export IROOPENCLARGS=
 export DEVICELLOPT=
-while [[ x$1 != x ]]; do {
-    # echo 1 $1
-    arr1=(${1//=/ })
-    THISARG=${arr1[0]}
+while [ x$1 != x ]; do {
+    THISARG=$(echo $1 | cut -d = -f 1)
     DONE=0
-    TWOLETTERS=${1:0:2}
-    # echo TWOLETTERS [$TWOLETTERS]
+    TWOLETTERS=$(echo $1 | cut -c 1-2)
     case "${TWOLETTERS}" in
         -I)
             # echo got include
             # need to check if theres a space or not
-            if [[ $1 == -I ]]; then {
+            if [ $1 = -I ]; then {
                 INCLUDES="$INCLUDES -I$2"
                 shift
             } else {
@@ -152,7 +148,7 @@ while [[ x$1 != x ]]; do {
          *)
             ;;
     esac
-    if [[ $DONE != 1 ]]; then {
+    if [ $DONE != 1 ]; then {
         # echo THISARG ${THISARG}
         case ${THISARG} in
             -M)
@@ -182,7 +178,7 @@ while [[ x$1 != x ]]; do {
                 shift
                 ;;
              --devicell-opt)
-                if [[ x$2 == x ]]; then {
+                if [ x$2 = x ]; then {
                     echo Please provide a value for -devicell-opt
                     exit 1
                 } fi
@@ -235,7 +231,7 @@ while [[ x$1 != x ]]; do {
                 ;;
             *)
                 # echo adding $1 as input file
-                if [[ x$INFILES != x ]]; then {
+                if [ x$INFILES != x ]; then {
                     INFILES="$INFILES $1"
                 } else {
                     INFILES="$1"
@@ -253,7 +249,7 @@ INPATH=${INFILES}
 
 export INCLUDES
 
-if [[ x$INPATH == x ]]; then {
+if [ x$INPATH = x ]; then {
     echo Usage: $0 [-c] [-g] [[-Iincludepath]...] [-o outfile] [infile.cu]
     exit 1
 } fi
@@ -268,19 +264,17 @@ if [[ x$INPATH == x ]]; then {
 # outputs will be:
 # BASEPATH=foo/bar/somefile
 # POSTFIX=.cu.cc
-function split_path {
+split_path () {
     DIRNAME=$(dirname $1)
-
     BASENAME=$(basename $1)
 
-    BASEARR=(${BASENAME//./ })
-    BASEPATH=${DIRNAME}/${BASEARR[0]}
+    BASEARR0=$(echo $BASENAME | cut -d . -f 1)
+    BASEPATH=${DIRNAME}/${BASEARR0}
 
-    LENARR=$((${#BASEARR[@]} - 1))
-    ARGREST=
-    for j in $(seq 1 ${LENARR}); do {
-        ARGREST="$ARGREST.${BASEARR[$j]}";
-    } done
+    ARGREST=$(echo $BASENAME | cut -s -d . -f 2-)
+    if [ x$ARGREST != x ]; then {
+        ARGREST=.${ARGREST}
+    } fi
     POSTFIX=$ARGREST
 }
 
@@ -288,10 +282,10 @@ split_path ${INPATH}
 INPUTBASEPATH=${BASEPATH}
 INPUTPOSTFIX=${POSTFIX}
 
-if [[ $OUTPATH ]]; then {
+if [ $OUTPATH ]; then {
     OUTFILE=${OUTPATH}
 } else {
-    if [[ $COMPILE == 1 ]]; then {
+    if [ x$COMPILE = x1 ]; then {
         OUTFILE=${INPUTBASEPATH}.o
     } else {
         OUTFILE=${INPUTBASEPATH}
@@ -302,20 +296,20 @@ split_path ${OUTFILE}
 OUTPUTBASEPATH=${BASEPATH}
 OUTPUTPOSTFIX=${POSTFIX}
 
-if [[ x${NOCOCLREBUILD} == x ]]; then {
+if [ x${NOCOCLREBUILD} = x ]; then {
     (cd ${COCL_HOME}
          # make
     )
 } fi
 
-if [[ ! "$COMPILE" ]]; then {
+if [ ! "$COMPILE" ]; then {
     FINALPOSTFIX=${OUTPUTPOSTFIX}
     OUTPUTPOSTFIX=.o
 } fi
 
 
 OUTPUTARTIFACT=
-if [[ ! "$COMPILE" ]]; then {
+if [ ! "$COMPILE" ]; then {
     OUTPUTARTIFACT=${OUTPUTBASEPATH}${FINALPOSTFIX}
 } fi
 
