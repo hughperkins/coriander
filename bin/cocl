@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [[ ! -z "$SETX" ]]; then {
+   set -x
+} fi
+
 # set -x
 set -e
 
