@@ -82,7 +82,7 @@ TEST(test_function_dumper, basic) {
         Function *childF = *it;
         cout << "needed function call: " << childF->getName().str() << endl;
     }
-    ASSERT_EQ(1, functionDumper.neededFunctions.size());
+    ASSERT_EQ(1u, functionDumper.neededFunctions.size());
     ASSERT_EQ("someFunc", (*functionDumper.neededFunctions.begin())->getName().str());
 }
 
@@ -101,7 +101,7 @@ TEST(test_function_dumper, usesShared1) {
     string cl = os.str();
     cout << "cl:\n" << cl << endl;
 
-    ASSERT_EQ(1, functionDumper.sharedVariablesToDeclare.size());
+    ASSERT_EQ(1u, functionDumper.sharedVariablesToDeclare.size());
     string sharedDefinitions = functionDumper.dumpSharedDefinitions("    ");
     cout << "shareddefinitions: " << sharedDefinitions << endl;
     string expected_shared = "    local float mysharedmem[8];\n";
@@ -123,7 +123,7 @@ TEST(test_function_dumper, usesShared2) {
     string cl = os.str();
     cout << "cl:\n" << cl << endl;
 
-    ASSERT_EQ(2, functionDumper.sharedVariablesToDeclare.size());
+    ASSERT_EQ(2u, functionDumper.sharedVariablesToDeclare.size());
     string sharedDefinitions = functionDumper.dumpSharedDefinitions("    ");
     cout << "shareddefinitions: " << sharedDefinitions << endl;
     string expected_shared = R"(    local float mysharedmem[8];

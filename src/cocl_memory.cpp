@@ -325,12 +325,9 @@ size_t cuMemcpyHtoDAsync(CUdeviceptr dst, const void *src, size_t bytes, char *_
 size_t  cuMemcpyDtoHAsync(void *dst, CUdeviceptr src, size_t bytes, char *_queue) {
     CoclStream *coclStream = (CoclStream *)_queue;
     CLQueue *queue = coclStream->clqueue;
-    ThreadVars *v = getThreadVars();
-    // CLQueue *queue = (CLQueue*)_queue;
     COCL_PRINT(cout << "cuMemcpyDtoHAsync queue=" << (void *)queue << " dst=" << dst << " src=" << src << " bytes=" << bytes << endl);
     Memory *srcMemory = findMemory((char *)src);
     size_t offset = srcMemory->getOffset((char *)src);
-    // COCL_PRINT(cout << "memory " << (void *)srcMemory << " offset=" << offset << endl);
     // adding this because otherwise seems I need to call synchronize, on intel hd beignet, before
     // copying data back (even though the copy should wait, by virtue of being on the same queue, I think)
     // this error shows up only in testblas, for now
