@@ -218,8 +218,15 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 ## News
 
+- Nov 17:
+  - merged `runtime-compile` branch into `master` branch.  This brings a few changes:
+    - opencl generation is now at runtime, rather than at compile time
+      - this lets us build only the one specific kernel we need
+      - means more information is available at generation time, facilitating the generation process
+    - build on Mac OS X is more or less working, eg https://travis-ci.org/hughperkins/cuda-on-cl/builds/176580716
+    - code radically refactorized underneath
 - Nov 8:
-  - exposed generation options as `cocl` options, eg `--run_branching_transforms`, `--branches_as_switch`, and the `--devicell-opt [opt]` options
+  - ~~exposed generation options as `cocl` options, eg `--run_branching_transforms`, `--branches_as_switch`, and the `--devicell-opt [opt]` options~~
 - Nov 6:
   - created dockerfiles for Beignet and NVIDIA [docker](docker)
 - Nov 5:
