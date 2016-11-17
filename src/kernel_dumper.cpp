@@ -151,20 +151,31 @@ std::string KernelDumper::toCl() {
     // neededFunctions.insert(functionDumper.neededFunctions.begin(), functionDumper.neededFunctions.end());
     // structsToDefine.insert(functionDumper.structsToDefine.begin(), functionDumper.structsToDefine.end());
 
+    int nothingHappenedCount = 0;
     while(dumpedFunctions.size() < neededFunctions.size()) {
+        bool changedSomething = false;
         for(auto it = neededFunctions.begin(); it != neededFunctions.end(); it++) {
             Function *childF = *it;
             if(dumpedFunctions.find(childF) != dumpedFunctions.end()) {
                 continue;
             }
             cout << "dumping function " << childF->getName().str() << endl;
-            dumpedFunctions.insert(childF);
             bool _isKernel = isKernel.find(childF) != isKernel.end();
             FunctionDumper childFunctionDumper(childF, _isKernel, &globalNames, typeDumper.get(), &functionNamesMap);
             if(_addIRToCl) {
                 childFunctionDumper.addIRToCl();
             }
-            childFunctionDumper.runGeneration();
+            if(!childFunctionDumper.runGeneration(dumpedFunctions)) {
+                cout << "couldnt run generation to completion yet for " << childF->getName().str() << endl;
+                neededFunctions.insert(childFunctionDumper.neededFunctions.begin(), childFunctionDumper.neededFunctions.end());
+                for(auto it2=neededFunctions.begin(); it2 != neededFunctions.end(); it2++) {
+                    cout << "needed function: " << (*it2)->getName().str() << endl;
+                }
+                continue;
+            }
+
+            dumpedFunctions.insert(childF);
+            changedSomething = true;
             ostringstream os;
             childFunctionDumper.toCl(os);
             string childFunctionCl = os.str();
@@ -176,6 +187,15 @@ std::string KernelDumper::toCl() {
 
             // cout << "childFunctionCl:\n" << childFunctionCl << endl;
             moduleClStream << childFunctionCl;
+        }
+        if(!changedSomething) {
+            nothingHappenedCount++;
+            if(nothingHappenedCount >= 2) {
+                cout << "no new function dependency found to update => failing" << endl;
+                throw runtime_error("no new function dependency found to update => failing");
+            }
+        } else {
+            nothingHappenedCount = 0;
         }
     }
 

@@ -21,6 +21,8 @@
 
 #include "llvm/IR/Function.h"
 
+#include <sstream>
+
 using namespace std;
 using namespace llvm;
 
@@ -346,7 +348,7 @@ void FunctionDumper::generateBlockIndex() {
     }
 }
 
-bool FunctionDumper::runGeneration() {
+bool FunctionDumper::runGeneration(const std::set<llvm::Function *> &dumpedFunctions) {
     // returns true means finished, false means missing some dependnecy, like a sub fucntion walk
 
     generateBlockIndex();
@@ -365,29 +367,33 @@ bool FunctionDumper::runGeneration() {
             }
         }
 
-        bodyCl += label + ":;\n";
-
         BasicBlockDumper basicBlockDumper(
             basicBlock, globalNames, &localNames, typeDumper, functionNamesMap);
         if(_addIRToCl) {
             basicBlockDumper.addIRToCl();
         }
-        ostringstream oss;
-        if(!basicBlockDumper.runGeneration()) {
+        if(!basicBlockDumper.runGeneration(dumpedFunctions)) {
             cout << "blockdumper generation didnt run to completion" << endl;
-            throw runtime_error("blockdumper generation didnt run to completion");
+            neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
+            for(auto it2=neededFunctions.begin(); it2 != neededFunctions.end(); it2++) {
+                cout << "function dumper, needed function: " << (*it2)->getName().str() << endl;
+            }
+            // throw runtime_error("blockdumper generation didnt run to completion");
+            return false;
         }
-        basicBlockDumper.toCl(oss);
-        bodyCl += oss.str();
+        // bodyCl += label + ":;\n";
+        // ostringstream oss;
+        ouros << label << ":;\n";
+        basicBlockDumper.toCl(ouros);
+        // bodyCl += oss.str();
 
         functionDeclarations += basicBlockDumper.getAllocaDeclarations("    ");
         functionDeclarations += basicBlockDumper.writeDeclarations("    ");
 
         sharedVariablesToDeclare.insert(basicBlockDumper.sharedVariablesToDeclare.begin(), basicBlockDumper.sharedVariablesToDeclare.end());
-        neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
         shimFunctionsNeeded.insert(basicBlockDumper.shimFunctionsNeeded.begin(), basicBlockDumper.shimFunctionsNeeded.end());
 
-        bodyCl += dumpTerminator(&returnType, basicBlock->getTerminator(), basicBlockDumper.localExpressionByValue);
+        ouros << dumpTerminator(&returnType, basicBlock->getTerminator(), basicBlockDumper.localExpressionByValue);
     }
     return true;
 }
@@ -412,25 +418,27 @@ void FunctionDumper::toCl(ostream &os) {
     //     }
     // }
 
-    string gencode = declaration + " {\n";
+    // ostringstream oss;
+    os << declaration << " {\n";
 
     if(shimCode != "") {
-        gencode += shimCode + "\n";
+        os << shimCode << "\n";
     }
 
-    gencode += functionDeclarations + "\n";
+    os << functionDeclarations + "\n";
 
     for(auto it=phiDeclarationsByName.begin(); it != phiDeclarationsByName.end(); it++){
-        gencode += "    " + it->second + ";\n";
+        os << "    " << it->second << ";\n";
     }
 
-    gencode += dumpSharedDefinitions("    ");
+    os << dumpSharedDefinitions("    ");
 
-    gencode += bodyCl;
-    gencode += "}\n";
+    os << ouros.str();
+    // gencode += bodyCl;
+    os << "}\n";
 
     // COCL_PRINT(cout << endl);
-    os << gencode;
+    // os << gencode;
     // return gencode;
 }
 

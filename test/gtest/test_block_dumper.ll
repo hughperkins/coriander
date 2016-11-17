@@ -76,3 +76,12 @@ define void @usesShared(float addrspace(1) *%d1) {
     ;store float addrspace(3) *%2, float 3.0
     ret void
 }
+
+define float *@returnsPointer(float *%in) {
+    ret float * %in
+}
+
+define void @usesPointerFunction(float *%in) {
+    call float *@returnsPointer(float *%in)
+    ret void
+}

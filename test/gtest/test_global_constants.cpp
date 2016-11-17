@@ -79,7 +79,8 @@ TEST(test_global_constant, test_union) {
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
-    blockDumper.runGeneration();
+    std::set< llvm::Function *> dumpedFunctions;
+    blockDumper.runGeneration(dumpedFunctions);
     ostringstream oss;
     blockDumper.toCl(oss);
     string cl = oss.str();

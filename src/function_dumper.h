@@ -28,6 +28,7 @@
 #include <string>
 #include <set>
 #include <map>
+#include <sstream>
 
 namespace cocl {
 
@@ -47,7 +48,7 @@ public:
 
     }
 
-    bool runGeneration();
+    bool runGeneration(const std::set<llvm::Function *> &dumpedFunctions);
     void toCl(std::ostream &os);
     std::string createOffsetDeclaration(std::string argName);
     std::string createOffsetShim(llvm::Type *argType, std::string argName);
@@ -84,7 +85,8 @@ public:
 
 protected:
     llvm::Function::iterator block_it;
-    std::string bodyCl = "";
+    // std::string bodyCl = "";
+    std::ostringstream ouros;
     llvm::Type *returnType = 0;
     std::string declaration;
 

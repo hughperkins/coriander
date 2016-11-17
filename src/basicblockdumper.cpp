@@ -71,7 +71,7 @@ namespace cocl {
 
 // }
 
-void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
+bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set< llvm::Function *> &dumpedFunctions ) {
     string resultName = localNames->getOrCreateName(instruction);
     // string 
     // storeValueName(instruction);
@@ -110,11 +110,14 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
     }
     vector<string> reslines;
     // InstructionDumper instructionDumper;
-    instructionDumper->runRhsGeneration(instruction, &reslines);
+    if(!instructionDumper->runRhsGeneration(instruction, &reslines, dumpedFunctions)) {
+        cout << "instructiondumper needs dependencies" << endl;
+        return false;
+    }
     string instructionCode = instructionDumper->localExpressionByValue->operator[](instruction);
     clcode.insert(clcode.end(), reslines.begin(), reslines.end());
     if(instructionCode == "" || isa<AllocaInst>(instruction)) {
-        return;
+        return true;
     }
 
     string typestr = typeDumper->dumpType(instruction->getType());
@@ -152,10 +155,10 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
         if(_addIRToCl) {
             // return "/* " + originalInstruction + " */\n" + indent;
             clcode.push_back("/* " + originalInstruction + " */");
-            return;
+            return true;
         } else {
             // return "";
-            return;
+            return true;
         }
     } else {
         // cout << "not single use, assigning to variable" << endl;
@@ -177,6 +180,7 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
             (localExpressionByValue)[instruction] = localNames->getName(instruction);
         }
     }
+    return true;
     // return gencode;
 }
 
@@ -219,7 +223,7 @@ std::string BasicBlockDumper::writeDeclarations(std::string indent) {
     return oss.str();
 }
 
-bool BasicBlockDumper::runGeneration() {
+bool BasicBlockDumper::runGeneration(const std::set< llvm::Function *> &dumpedFunctions ) {
     // returns true if finished, otherwise false, if missing some dependnecies and so on,
     // like child functions we need to walk over first ,to figure ou the address spcae of
     // the return value
@@ -228,7 +232,9 @@ bool BasicBlockDumper::runGeneration() {
         if(isa<PHINode>(inst) || isa<BranchInst>(inst) || isa<ReturnInst>(inst)) {
             continue;
         }
-        dumpInstruction(inst);
+        if(!dumpInstruction(inst, dumpedFunctions)) {
+            return false;
+        }
     }
     return true;
 }

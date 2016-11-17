@@ -50,11 +50,11 @@ public:
             &shimFunctionsNeeded, &neededFunctions, &globalExpressionByValue, &localExpressionByValue));
         instruction_it = block->begin();
     }
-    bool runGeneration();
+    bool runGeneration(const std::set< llvm::Function *> &dumpedFunctions );
     void toCl(std::ostream &os);
     // void storeValueName(llvm::Value *value);
     std::string dumpChainedInstruction(int level, llvm::Instruction * instr, bool ignoreCasts=false);
-    void dumpInstruction(llvm::Instruction *instruction);
+    bool dumpInstruction(llvm::Instruction *instruction, const std::set< llvm::Function *> &dumpedFunctions );
 
     std::string getAllocaDeclarations(std::string indent);
     std::string writeDeclarations(std::string indent);

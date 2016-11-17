@@ -91,4 +91,19 @@ TEST(test_kernel_dumper, kernelBranches) {
     cout << "kernel cl:\n" << cl << endl;
 }
 
+TEST(test_kernel_dumper, usesPointerFunction) {
+    Module *M = getM();
+
+    // GlobalNames globalNames;
+    // LocalNames localNames;
+    // TypeDumper typeDumper(&globalNames);
+    // FunctionNamesMap functionNamesMap;
+    // FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
+
+    KernelDumper kernelDumper(M, "usesPointerFunction");
+    string cl = kernelDumper.toCl();
+    cout << "kernel cl:\n" << cl << endl;
+    ASSERT_TRUE(cl.find("returnsPointer") != string::npos);
+}
+
 } // test_block_dumper

@@ -144,7 +144,8 @@ string InstructionDumper::dumpConstantExpr(ConstantExpr *expr) {
     // InstructionDumper childInstructionDumper;
     // string rhs = dumpInstruction(instr);
     vector<string> excessLines;
-    runRhsGeneration(instr, &excessLines);
+    std::set< llvm::Function *> dumpedFunctions;
+    runRhsGeneration(instr, &excessLines, dumpedFunctions);
     string rhs = (*localExpressionByValue)[instr];
     // string rhs = dumpInstructionRhs(instr, &excessLines);
     cout << "rhs: [" << rhs << "]" << endl;
@@ -671,7 +672,7 @@ std::string InstructionDumper::dumpMemcpyCharCharLong(llvm::CallInst *instr) {
     return gencode;
 }
 
-std::string InstructionDumper::dumpCall(llvm::CallInst *instr) {
+std::string InstructionDumper::dumpCall(llvm::CallInst *instr, const std::set< llvm::Function *> &dumpedFunctions) {
     string gencode = "";
     string functionName = instr->getCalledValue()->getName().str();
     bool internalfunc = false;
@@ -834,9 +835,20 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr) {
                 cout << "newName " << newName << endl;
                 newFunc->setName(newName);
                 neededFunctions->insert(newFunc);
+                if(isa<PointerType>(newFunc->getReturnType()) && dumpedFunctions.find(newFunc) == dumpedFunctions.end()) {
+                    needDependencies = true;
+                    // return false;
+                }
             } else {
                 neededFunctions->insert(F);
+                if(isa<PointerType>(F->getReturnType()) && dumpedFunctions.find(F) == dumpedFunctions.end()) {
+                    needDependencies = true;
+                    // return false;
+                }
+            // do we need to walk this function first?
+            // check the return code
             }
+
             // if(dumpedFunctions.find(F) == dumpedFunctions.end()) {
             //     functionsToDump.insert(F);
             // }
@@ -849,9 +861,10 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr) {
     return gencode;
 }
 
-bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded) {
+bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded, const std::set< llvm::Function *> &dumpedFunctions) {
     // vector<string> reslines;
     // gencode += "/* " + originalInstruction + " */\n    ";
+    needDependencies = false;
     auto opcode = instruction->getOpcode();
     string instructionCode = "";
     switch(opcode) {
@@ -975,7 +988,7 @@ bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::ve
             instructionCode = dumpStore(cast<StoreInst>(instruction));
             break;
         case Instruction::Call:
-            instructionCode = dumpCall(cast<CallInst>(instruction));
+            instructionCode = dumpCall(cast<CallInst>(instruction), dumpedFunctions);
             break;
         case Instruction::Load:
             instructionCode = dumpLoad(cast<LoadInst>(instruction));
@@ -1002,6 +1015,10 @@ bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::ve
     }
     if(instructionCode != "") {
         (*localExpressionByValue)[instruction] = instructionCode;
+    }
+    if(needDependencies) {
+        cout << "dumpinstruction: need dependencies" << endl;
+        return false;
     }
     // return instructionCode;
     // this->lastExpression = instructionCode;

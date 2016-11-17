@@ -77,7 +77,8 @@ TEST(test_block_dumper, basic) {
     FunctionNamesMap functionNamesMap;
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
     ostringstream oss;
-    blockDumper.runGeneration();
+    std::set< llvm::Function *> dumpedFunctions;
+    blockDumper.runGeneration(dumpedFunctions);
     blockDumper.toCl(oss);
     string cl = oss.str();
     cout << cl << endl;
@@ -143,7 +144,8 @@ TEST(test_block_dumper, basic2) {
     FunctionNamesMap functionNamesMap;
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
     ostringstream oss;
-    blockDumper.runGeneration();
+    std::set< llvm::Function *> dumpedFunctions;
+    blockDumper.runGeneration(dumpedFunctions);
     blockDumper.toCl(oss);
     string cl = oss.str();
     cout << "cl:\n" << cl << endl;
@@ -173,7 +175,8 @@ TEST(test_block_dumper, usesShared) {
     FunctionNamesMap functionNamesMap;
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
     ostringstream oss;
-    blockDumper.runGeneration();
+    std::set< llvm::Function *> dumpedFunctions;
+    blockDumper.runGeneration(dumpedFunctions);
     blockDumper.toCl(oss);
     string cl = oss.str();
     cout << "cl:\n" << cl << endl;
@@ -189,6 +192,55 @@ TEST(test_block_dumper, usesShared) {
     }
     Value *shared = *blockDumper.sharedVariablesToDeclare.begin();
     shared->dump();
+}
+
+TEST(test_block_dumper, usesPointerFunction) {
+    Function *F = getFunction("usesPointerFunction");
+    F->dump();
+    BasicBlock *block = &*F->begin();
+    GlobalNames globalNames;
+    LocalNames localNames;
+    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+        Argument *arg = &*it;
+        string name = arg->getName().str();
+        Value *value = arg;
+        localNames.getOrCreateName(value, name);
+    }
+    cout << localNames.dumpNames();
+    TypeDumper typeDumper(&globalNames);
+    FunctionNamesMap functionNamesMap;
+    BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
+    ostringstream oss;
+    std::set< llvm::Function *> dumpedFunctions;
+    bool generation_result = blockDumper.runGeneration(dumpedFunctions);
+    cout << "generation_result " << generation_result << endl;
+    ASSERT_FALSE(generation_result);
+    blockDumper.toCl(oss);
+    string cl = oss.str();
+    cout << "cl:\n" << cl << endl;
+    // cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
+
+    // Function *F2 = getFunction("returnsPointer");
+
+    // BasicBlockDumper blockDumper2(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
+    // ostringstream oss;
+    // bool generation_result = blockDumper2.runGeneration();
+    // cout << "generation_result " << generation_result << endl;
+    // ASSERT_FALSE(generation_result);
+    // blockDumper.toCl(oss);
+    // string cl = oss.str();
+    // cout << "cl:\n" << cl << endl;
+
+    // cout << "num shared variables to declare: " << blockDumper.sharedVariablesToDeclare.size() << endl;
+    // ASSERT_EQ(1, blockDumper.sharedVariablesToDeclare.size());
+    // for(auto it=blockDumper.sharedVariablesToDeclare.begin(); it !=blockDumper.sharedVariablesToDeclare.end(); it++) {
+    //     Value *value = *it;
+    //     cout << "shared:" << endl;
+    //     value->dump();
+    //     cout << endl;
+    // }
+    // Value *shared = *blockDumper.sharedVariablesToDeclare.begin();
+    // shared->dump();
 }
 
 } // test_block_dumper

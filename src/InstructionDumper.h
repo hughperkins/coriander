@@ -49,7 +49,7 @@ public:
     virtual ~InstructionDumper();
 
     // std::string dumpInstructionRhs(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded);
-    bool runRhsGeneration(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded);
+    bool runRhsGeneration(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded, const std::set< llvm::Function *> &dumpedFunctions );
     std::string dumpOperand(llvm::Value *value);
     void dumpConstant(std::ostream &oss, llvm::Constant *constant);
 
@@ -79,7 +79,7 @@ public:
     std::string dumpGetElementPtr(llvm::GetElementPtrInst *instr);
     std::string dumpSelect(llvm::SelectInst *instr);
     std::string dumpMemcpyCharCharLong(llvm::CallInst *instr);
-    std::string dumpCall(llvm::CallInst *instr);
+    std::string dumpCall(llvm::CallInst *instr, const std::set< llvm::Function *> &dumpedFunctions);
 
     std::vector<std::string> generatedCl;
 
@@ -95,6 +95,8 @@ public:
     cocl::LocalNames *localNames = 0;
     cocl::TypeDumper *typeDumper = 0;
     cocl::GlobalNames *globalNames = 0;
+
+    bool needDependencies = false;
 
     // std::string lastExpression;
 
