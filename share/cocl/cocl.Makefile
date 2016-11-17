@@ -13,7 +13,7 @@
 LLVM_LINK_FLAGS=`$(CLANG_HOME)/bin/llvm-config --ldflags --system-libs --libs all`
 # the llvm-config compile flags suppresses asserts
 # COMPILE_FLAGS=-I$(CLANG_HOME)/include -fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -g -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++11
-LLVM_COMPILE_FLAGS=`$(CLANG_HOME)/bin/llvm-config --cppflags --cxxflags | sed -e 's/ -fno-exceptions/ -fexceptions/g' -e 's/ -DNDEBUG//g' -e 's/ -std=c++0x/ -std=c++11/g'`
+LLVM_COMPILE_FLAGS=`$(CLANG_HOME)/bin/llvm-config --cppflags --cxxflags | sed -e 's/ -fno-exceptions/ -fexceptions/g' -e 's/ -DNDEBUG//g' -e 's/ -std=c++0x/ -std=c++11/g' -e 's/ -isysroot [^ ]+//'`
 
 all: $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX)
 
