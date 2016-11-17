@@ -7,7 +7,14 @@ if [ ! -z "$SETX" ]; then {
 # set -x
 set -e
 
-export CLANG=clang++-3.8
+if [ x$CLANG_HOME = x ]; then {
+    echo
+    echo Please set CLANG_HOME
+    echo
+    exit 1
+} fi
+
+export CLANG=clang++
 
 SCRIPT_DIR=$( cd "$( dirname "$0" )" && pwd )
 export COCL_HOME=$(dirname ${SCRIPT_DIR})
@@ -313,6 +320,6 @@ if [ ! "$COMPILE" ]; then {
     OUTPUTARTIFACT=${OUTPUTBASEPATH}${FINALPOSTFIX}
 } fi
 
-OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} PASSTHRU=${PASSTHRU} INPUTPOSTFIX=${INPUTPOSTFIX} \
+CLANG_HOME=${CLANG_HOME} CLANG=${CLANG} OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} PASSTHRU=${PASSTHRU} INPUTPOSTFIX=${INPUTPOSTFIX} \
     INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} \
     make -B -f ${SCRIPT_DIR}/../share/cocl/cocl.Makefile ${OUTPUTARTIFACT}

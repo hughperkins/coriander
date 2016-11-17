@@ -4,19 +4,19 @@
 # INPUTBASEPATH should point to the input filename, without suffix, eg test/test_cuda_sample
 # OUTPUTBASEPATH should point to the output filename, without suffix
 
-CLANG=clang++-3.8
+# CLANG=clang++-3.8
 LLVM_CONFIG=llvm-config-3.8
 LLVM_INCLUDE=/usr/include/llvm-3.8
 
 # COMPILE_FLAGS=`$(LLVM_CONFIG) --cxxflags` -std=c++11
 LINK_FLAGS=`$(LLVM_CONFIG) --ldflags --system-libs --libs all`
 # the llvm-config compile flags suppresses asserts
-COMPILE_FLAGS=-I/usr/lib/llvm-3.8/include -fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -g -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++11
+COMPILE_FLAGS=-I$(CLANG_HOME)/include -fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -g -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=c++11
 
 all: $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX)
 
 $(OUTPUTBASEPATH)-device-noopt.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/cocl/fake_funcs.h
-	$(CLANG) $(PASSTHRU) -DUSE_CLEW -x cuda -std=c++11 --cuda-gpu-arch=sm_30 -D__CUDA_ARCH__=300 \
+	$(CLANG_HOME)/bin/clang++ $(PASSTHRU) -DUSE_CLEW -x cuda -std=c++11 --cuda-gpu-arch=sm_30 -D__CUDA_ARCH__=300 \
 		-I$(COCL_HOME)/include/EasyCL \
 		-I$(COCL_HOME)/include/cocl \
 		-I$(COCL_HOME)/src \
@@ -32,13 +32,13 @@ $(OUTPUTBASEPATH)-device-noopt.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/
 		$< -o $@
 
 $(OUTPUTBASEPATH)-device.ll: $(OUTPUTBASEPATH)-device-noopt.ll
-	opt-3.8 $(DEVICELLOPT) -S -o $@ $<
+	$(CLANG_HOME)/bin/opt $(DEVICELLOPT) -S -o $@ $<
 
 # $(OUTPUTBASEPATH)-device.cl: $(OUTPUTBASEPATH)-device.ll ${COCL_BIN}/ir-to-opencl
 # 	$(COCL_BIN)/ir-to-opencl $(IROOPENCLARGS) $(DEBUG) --inputfile $< --outputfile $@
 
 $(OUTPUTBASEPATH)-hostraw.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/include/cocl/fake_funcs.h
-	$(CLANG) $(PASSTHRU) \
+	$(CLANG_HOME)/bin/clang++ $(PASSTHRU) \
 		$(INCLUDES) -x cuda -DUSE_CLEW -std=c++11 \
 		-I$(COCL_HOME)/include \
 		-I$(COCL_HOME)/include/EasyCL \
@@ -59,7 +59,7 @@ $(OUTPUTBASEPATH)-hostpatched.ll: $(OUTPUTBASEPATH)-hostraw.ll $(OUTPUTBASEPATH)
 		--hostpatchedfile $@
 
 $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX): $(OUTPUTBASEPATH)-hostpatched.ll
-	$(CLANG) $(PASSTHRU) -DUSE_CLEW -c $< -O3 $(OPT_G) -o $@
+	$(CLANG_HOME)/bin/clang++ $(PASSTHRU) -DUSE_CLEW -c $< -O3 $(OPT_G) -o $@
 
 $(OUTPUTBASEPATH)$(FINALPOSTFIX): $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX) ${COCL_LIB}/libclew.so ${COCL_LIB}/libcocl.so ${COCL_LIB}/libclblast.so
 	g++ -Wl,-rpath,$(COCL_LIB) -Wl,-rpath,$$ORIGIN -o $@ $< -L${COCL_LIB} -lcocl -lclblast -leasycl -lclew -lpthread ${LINK_FLAGS}

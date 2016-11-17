@@ -15,7 +15,11 @@ which kernel we want to run.  This is going to help with address space determina
 
 - write a CUDA sourcecode file, or find an existing one
 - here's a simple example: [cuda_sample.cu](https://github.com/hughperkins/cuda-on-cl/blob/76a849d9510276bc67167c9a7676d64ff04c3e4a/test/cuda_sample.cu)
-- Run `cocl` to compile it:
+- export `CLANG_HOME`, it should point to wherever clang-3.8 is, eg on ubuntu, `/usr/lib/llvm-3.8`:
+```
+export CLANG_HOME=/usr/lib/llvm-3.8
+```
+- Use `cocl` to compile `cuda_sample.cu`:
 ```
 $ cocl cuda_sample.cu
    ...
