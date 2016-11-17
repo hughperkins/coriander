@@ -16,6 +16,19 @@ if [ x$CLANG_HOME = x ]; then {
 
 export CLANG=clang++
 
+export ADDFLAGS=
+export NATIVE_COMPILER=g++
+export SO_SUFFIX=.so
+case `uname` in
+    Darwin)
+        ADDFLAGS="-stdlib=libc++"
+        export NATIVE_COMPILER=clang++
+        export SO_SUFFIX=.dylib
+        ;;
+    *)
+        ;;
+esac
+
 SCRIPT_DIR=$( cd "$( dirname "$0" )" && pwd )
 export COCL_HOME=$(dirname ${SCRIPT_DIR})
 
