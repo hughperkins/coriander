@@ -15,10 +15,6 @@ which kernel we want to run.  This is going to help with address space determina
 
 - write a CUDA sourcecode file, or find an existing one
 - here's a simple example: [cuda_sample.cu](https://github.com/hughperkins/cuda-on-cl/blob/76a849d9510276bc67167c9a7676d64ff04c3e4a/test/cuda_sample.cu)
-- export `CLANG_HOME`, it should point to wherever clang-3.8 is, eg on ubuntu, `/usr/lib/llvm-3.8`:
-```
-export CLANG_HOME=/usr/lib/llvm-3.8
-```
 - Use `cocl` to compile `cuda_sample.cu`:
 ```
 $ cocl cuda_sample.cu
@@ -29,7 +25,7 @@ $ cocl cuda_sample.cu
     ./cuda_sample.cu compiled into ./cuda_sample
 
 ```
-Run.  You'll need to add libclew.so, libclblast.co, libeasycl.so to the LD_LIBRARY_PATH:
+Run:
 ```
 $ ./cuda_sample
 Using Intel , OpenCL platform: Intel Gen OCL Driver
@@ -107,16 +103,33 @@ I'm testing personally on:
 
 ### Pre-requisites
 
-- Ubuntu 16.04
-- clang/llvm 3.8 (installed in 'Procedure' below)
+- Operating system:
+  - Tested/developed on Ubuntu 16.04
+  - Ubuntu 14.04 does seem to work ok too (not tested very much though...)
+  - Mac OS X very close to working, eg see https://travis-ci.org/hughperkins/cuda-on-cl/builds/176629553
+  - Other operating systems, and clang/llvm versions, might work too, but untested.  Your mileage may vary :-)
 - OpenCL-enabled GPU, and appropriate OpenCL drivers installed for the GPU
 
-Other operating systems, and clang/llvm versions, might work too, but untested.  Your mileage may vary :-)
+### Install clang/llvm-3.8
+
+Either:
+- download from http://llvm.org/releases/download.html , and set `CLANG_HOME` to point to the root of this unzipped folder, or
+- on ubuntu you can do `sudo apt-get install llvm-3.8 llvm-3.8-dev clang-3.8`
+  - but you still need to set `CLANG_HOME` :-)  In this case, to: `/usr/lib/llvm-3.8`
+
+### Other libraries
+
+On Ubuntu 16.04:
+```
+sudo apt-get install git cmake cmake-curses-gui libc6-dev-i386 make gcc g++
+```
+
+On other systems:
+- somehow install the same things as for Ubuntu 16.04 section
 
 ### Procedure
 
 ```
-sudo apt-get install git cmake cmake-curses-gui llvm-3.8-dev clang-3.8 libc6-dev-i386 make gcc g++
 git clone --recursive https://github.com/hughperkins/cuda-on-cl
 cd cuda-on-cl
 mkdir build
@@ -125,6 +138,8 @@ cmake ..
 make -j 4
 sudo make install
 ```
+
+Note that you'll need to continue to export `CLANG_HOME` environment variable when using `cocl`.
 
 ## Test
 
