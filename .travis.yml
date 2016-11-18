@@ -41,8 +41,9 @@ notifications:
     on_failure: always
 
 addons:
-  artifacts: true
-  s3_region: "us-east-1" # defaults to "us-east-1"
-  paths:
-  - $(ls build/*)
-  - $(ls /tmp/foo/*)
+  artifacts:
+    debug: true
+    s3_region: "us-east-1" # defaults to "us-east-1"
+    paths:
+    - $(ls build/*)
+    - $(ls /tmp/foo/*)
