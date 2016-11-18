@@ -52,7 +52,7 @@ public:
 
     }
     void runRhsGeneration(Instruction *inst) {
-        instructionDumper->runRhsGeneration(inst, &extraInstructions);
+        instructionDumper->runRhsGeneration(inst, &extraInstructions, dumpedFunctions, returnTypeByFunction);
     }
     string getExpr(Instruction *inst) {
         return instructionDumper->localExpressionByValue->operator[](inst);
@@ -62,6 +62,9 @@ public:
     LocalNames localNames;
     unique_ptr<TypeDumper> typeDumper;
     FunctionNamesMap functionNamesMap;
+
+    set<Function *> dumpedFunctions;
+    map<Function *, Type*> returnTypeByFunction;
 
     std::vector<AllocaInfo> allocaDeclarations;
     std::set<llvm::Value *> variablesToDeclare;

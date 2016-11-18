@@ -91,12 +91,12 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
     // lets dump the original isntruction, commented out
     vector<string> reslines;
     // InstructionDumper instructionDumper;
-    instructionDumper->runRhsGeneration(instruction, &reslines);
+    instructionDumper->runRhsGeneration(instruction, &reslines, dumpedFunctions, returnTypeByFunction);
     string instructionCode = instructionDumper->localExpressionByValue->operator[](instruction);
     cout << "basicblockdumper dumpInstruction instrucitoncode=" << instructionCode << " reslines.size() " << reslines.size() << endl;
     clcode.insert(clcode.end(), reslines.begin(), reslines.end());
     if(instructionCode == "" || isa<AllocaInst>(instruction)) {
-        return;
+        return true;
     }
     localExpressionByValue[instruction] = resultName;
     string resultType = typeDumper->dumpType(instruction->getType());
@@ -117,17 +117,6 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
         // } else {
         //     originalInstruction += "<unk>";
         // }
-    }
-    vector<string> reslines;
-    // InstructionDumper instructionDumper;
-    if(!instructionDumper->runRhsGeneration(instruction, &reslines, dumpedFunctions, returnTypeByFunction)) {
-        cout << "instructiondumper needs dependencies" << endl;
-        return false;
-    }
-    string instructionCode = instructionDumper->localExpressionByValue->operator[](instruction);
-    clcode.insert(clcode.end(), reslines.begin(), reslines.end());
-    if(instructionCode == "" || isa<AllocaInst>(instruction)) {
-        return true;
     }
 
     string typestr = typeDumper->dumpType(instruction->getType());
@@ -248,7 +237,7 @@ bool BasicBlockDumper::runGeneration(const std::set< llvm::Function *> &dumpedFu
             continue;
         }
         try {
-            if(!dumpInstruction(inst)) {
+            if(!dumpInstruction(inst, dumpedFunctions, returnTypeByFunction)) {
                 return false;
             }
         } catch(runtime_error &e) {

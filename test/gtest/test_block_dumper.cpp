@@ -278,9 +278,11 @@ TEST(test_block_dumper, containsLlvmDebug) {
     cout << localNames.dumpNames();
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
+    std::set< llvm::Function *> dumpedFunctions;
+    map<Function *, Type *>returnTypeByFunction;
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
     ostringstream oss;
-    blockDumper.runGeneration();
+    blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
     blockDumper.toCl(oss);
     string cl = oss.str();
     cout << "cl:\n" << cl << endl;
