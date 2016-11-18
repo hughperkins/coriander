@@ -330,11 +330,17 @@ if [ ! "$COMPILE" ]; then {
 
 
 
-LLVM_LINK_FLAGS=`${CLANG_HOME}/bin/llvm-config --ldflags --system-libs --libs all`
 LLVM_COMPILE_FLAGS=`${CLANG_HOME}/bin/llvm-config --cppflags --cxxflags | sed -e 's/ -fno-exceptions/ -fexceptions/g' -e 's/ -DNDEBUG//g' -e 's/ -std=c++0x/ -std=c++11/g' -e 's% -isysroot [^ ]*%%g'`
+LLVM_LINK_FLAGS=`${CLANG_HOME}/bin/llvm-config --ldflags --system-libs --libs all`
 
 echo LLVM_COMPILE_FLAGS ${LLVM_COMPILE_FLAGS}
-${CLANG_HOME}/bin/clang++ ${PASSTHRU} -DUSE_CLEW -x cuda -std=c++11 --cuda-gpu-arch=sm_30 -D__CUDA_ARCH__=300 \
+echo LLVM_LINK_FLAGS ${LLVM_LINK_FLAGS}
+
+${CLANG_HOME}/bin/clang++ ${PASSTHRU} -DUSE_CLEW \
+    -std=c++11 -x cuda \
+    --cuda-gpu-arch=sm_30 --cuda-device-only -emit-llvm -O0 -S \
+    ${ADDFLAGS} \
+    ${LLVM_COMPILE_FLAGS} \
     -I${COCL_HOME}/include/EasyCL \
     -I${COCL_HOME}/include/cocl \
     -I${COCL_HOME}/src \
@@ -344,10 +350,7 @@ ${CLANG_HOME}/bin/clang++ ${PASSTHRU} -DUSE_CLEW -x cuda -std=c++11 --cuda-gpu-a
     -include ${COCL_HOME}/include/cocl/fake_funcs.h \
     -include ${COCL_HOME}/include/cocl/cocl_deviceside.h \
     -I${COCL_HOME}/include \
-    ${ADDFLAGS} \
-    ${LLVM_COMPILE_FLAGS} \
     ${INCLUDES} \
-    --cuda-device-only -emit-llvm -O0 -S \
     ${INPUTBASEPATH}${INPUTPOSTFIX} -o ${OUTPUTBASEPATH}-device-noopt.ll
 
     # -nostdinc -nostdinc++ \
@@ -360,7 +363,8 @@ ${CLANG_HOME}/bin/opt ${DEVICELLOPT} -S -o ${OUTPUTBASEPATH}-device.ll ${OUTPUTB
 #   ${COCL_BIN}/ir-to-opencl $(IROOPENCLARGS) $(DEBUG) --inputfile $< --outputfile $@
 
 ${CLANG_HOME}/bin/clang++ ${PASSTHRU} \
-    ${INCLUDES} -x cuda -DUSE_CLEW -std=c++11 \
+    ${INCLUDES} -DUSE_CLEW \
+    -std=c++11 -x cuda --cuda-host-only -emit-llvm  -O3 -S \
     ${LLVM_COMPILE_FLAGS} \
     -I${COCL_HOME}/include \
     -I${COCL_HOME}/include/EasyCL \
@@ -373,7 +377,6 @@ ${CLANG_HOME}/bin/clang++ ${PASSTHRU} \
     -include ${COCL_HOME}/include/cocl/cocl.h \
     -include ${COCL_HOME}/include/cocl/fake_funcs.h \
     -include ${COCL_HOME}/include/cocl/cocl_hostside.h \
-    --cuda-host-only -emit-llvm  -O3 -S \
     ${INPUTBASEPATH}${INPUTPOSTFIX} -o ${OUTPUTBASEPATH}-hostraw.ll
 
 ${COCL_BIN}/patch-hostside \
