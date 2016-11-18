@@ -912,16 +912,17 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr, const std::set< l
             }
             // Type *returnType = F->getReturnType();
             // if(returnTypeByFunction.find(F) != returnTypeByFunction.end()) {
-            Type *returnType = returnTypeByFunction.at(F);
-            cout << "function return type:" << endl;
-            returnType->dump();
-            cout << endl;
-            if(PointerType *retptr = dyn_cast<PointerType>(returnType)) {
-                int functionReturnAddressSpace = retptr->getAddressSpace();
-                cout << " updating call instruction to addressspace " << functionReturnAddressSpace << endl;
-                updateAddressSpace(instr, functionReturnAddressSpace);
+            if(isa<PointerType>(F->getReturnType())) {
+                Type *returnType = returnTypeByFunction.at(F);
+                cout << "function return type:" << endl;
+                returnType->dump();
+                cout << endl;
+                if(PointerType *retptr = dyn_cast<PointerType>(returnType)) {
+                    int functionReturnAddressSpace = retptr->getAddressSpace();
+                    cout << " updating call instruction to addressspace " << functionReturnAddressSpace << endl;
+                    updateAddressSpace(instr, functionReturnAddressSpace);
+                }
             }
-
             // if(dumpedFunctions.find(F) == dumpedFunctions.end()) {
             //     functionsToDump.insert(F);
             // }
