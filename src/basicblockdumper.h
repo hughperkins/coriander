@@ -58,6 +58,7 @@ public:
 
     std::string getAllocaDeclarations(std::string indent);
     std::string writeDeclarations(std::string indent);
+    void writeDeclaration(std::ostream &os, llvm::Value *value);
 
     BasicBlockDumper *addIRToCl() {
         _addIRToCl = true;

@@ -158,6 +158,7 @@ TEST(test_instructiondumper, basic) {
     string expr = instructionDumper.localExpressionByValue->operator[](add);
 
     cout << "expr " << expr << endl;
+    ASSERT_EQ("123 + 47", expr);
 
     instructionDumper.localExpressionByValue->operator[](a) = "v1";
     instructionDumper.runRhsGeneration(add, &extraInstructions, dumpedFunctions, returnTypeByFunction);

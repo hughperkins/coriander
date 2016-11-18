@@ -28,14 +28,25 @@ before_install:
 
 script:
   - cd ${BASEDIR}/build
-  - # ./cocl_unittests
-  - mkdir /tmp/foo
-  - cd /tmp/foo
+  - ./cocl_unittests
+  - mkdir ${BASEDIR}/foo
+  - cd ${BASEDIR}/foo
   - cp ${BASEDIR}/test/cocl/cuda_sample.cu .
   - CLANG_HOME=${CLANG_HOME} SETX=1 cocl cuda_sample.cu
-  - ./cuda_sample
+  - COCL_DEVICES_ALL=1 ./cuda_sample
+  - pwd
+  - ls -lh
 
 notifications:
   email:
     on_success: change
     on_failure: always
+
+addons:
+  artifacts:
+    debug: true
+    s3_region: "us-east-1" # defaults to "us-east-1"
+    paths:
+    - /Users/travis/build/hughperkins/cuda-on-cl/foo/cuda_sample-hostraw.ll
+    - /Users/travis/build/hughperkins/cuda-on-cl/foo/cuda_sample-hostpatched.ll
+    - /Users/travis/build/hughperkins/cuda-on-cl/foo/cuda_sample.o

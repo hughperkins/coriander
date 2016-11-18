@@ -118,7 +118,7 @@ TEST(test_struct_cloner, test_clone) {
     Value *allocaPtrfull = builder.CreateAlloca(myStructType);
     Value *allocaNoptr = builder.CreateAlloca(structNoPtrs);
 
-    Instruction *lastInst = structCloner.createHostsideIrCopyPtrfullToNoptr(
+    structCloner.createHostsideIrCopyPtrfullToNoptr(
         cast<Instruction>(allocaNoptr), myStructType, allocaPtrfull, allocaNoptr);
 
     builder.CreateRetVoid();

@@ -33,5 +33,5 @@ namespace cocl {
     // void run_branching_transforms(flowcontrol::RootBlock *root);
     std::string branching_write_cl(flowcontrol::RootBlock *root);
 
-    extern std::vector<std::unique_ptr<flowcontrol::Block> > blocks;;
+    extern std::vector<std::unique_ptr<flowcontrol::Block> > blocks;
 }

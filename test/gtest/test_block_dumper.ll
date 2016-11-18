@@ -85,3 +85,12 @@ define void @usesPointerFunction(float *%in) {
     call float *@returnsPointer(float *%in)
     ret void
 }
+
+define void @llvm.dbg.value(float *%foo, i64 %i1) {
+    ret void
+}
+
+define void @containsLlvmDebug(float *%d1) {
+    tail call void @llvm.dbg.value(float* %d1, i64 0)
+    ret void
+}

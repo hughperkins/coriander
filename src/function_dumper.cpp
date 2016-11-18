@@ -41,6 +41,12 @@ string FunctionDumper::createOffsetShim(Type *argType, string argName) {
     return shim;
 }
 
+            // GlobalNames *globalNames, LocalNames *localNames, TypeDumper *typeDumper, const FunctionNamesMap *functionNamesMap,
+            // std::vector<AllocaInfo> *allocaDeclarations, std::set<llvm::Value *> *variablesToDeclare,
+            // std::set<llvm::Value *> *sharedVariablesToDeclare, std::set<std::string> *shimFunctionsNeeded,
+            // std::set<llvm::Function *> *neededFunctions,
+            // std::map<llvm::Value *, std::string> *globalExpressionByValue, std::map<llvm::Value *, std::string> *localExpressionByValue
+
 std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock) {
     std::string gencode = "";
     for(auto it = nextBlock->begin(); it != nextBlock->end(); it++) {
@@ -52,7 +58,17 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
             string name = localNames.getOrCreateName(phi);
             BasicBlock *ourBlock = branchInstr->getParent();
             Value *sourceValue = phi->getIncomingValueForBlock(ourBlock);
-            string sourceValueCode = localNames.getName(sourceValue);
+            vector<AllocaInfo> allocaInfos;
+            InstructionDumper instructionDumper(globalNames, &localNames, typeDumper, functionNamesMap,
+                &allocaInfos, &variablesToDeclare,
+                &sharedVariablesToDeclare, &shimFunctionsNeeded,
+                &neededFunctions,
+                &globalExpressionByValue, &localExpressionByValue);
+            vector<string> reslines;
+            // string sourceValueCode = instructionDumper.runRhsGeneration(sourceValue, &reslines);
+            string sourceValueCode = instructionDumper.dumpOperand(sourceValue);
+
+            // string sourceValueCode = localNames.getName(sourceValue);
             // COCL_PRINT(cout << "adding phi " << sourceValueCode << endl);
             if(sourceValueCode == "") { // this is a hack really..
                 continue;  // assume its an undef. which it might be

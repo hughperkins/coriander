@@ -48,6 +48,7 @@ void FunctionNamesMap::populateKnownValues() {
     ignoredFunctionNames.insert("_Z13__threadfencev");
     ignoredFunctionNames.insert("_Z11__shfl_downIfET_S0_ii"); // 3 args, int
     ignoredFunctionNames.insert("_Z11__shfl_downIfET_S0_i");  // 2 args, int
+    ignoredFunctionNames.insert("llvm.dbg.value");
 
     knownFunctionsMap["_ZSt4sqrtf"] = "sqrt";
     knownFunctionsMap["llvm.nvvm.sqrt.rn.d"] = "sqrt";

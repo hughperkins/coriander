@@ -77,8 +77,6 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
     // storeValueName(instruction);
     // string resultName = localNames->getOrCreateName(instruction);
     // string resultName = exprByValue[instruction];
-    localExpressionByValue[instruction] = resultName;
-    string resultType = typeDumper->dumpType(instruction->getType());
 
     string gencode = "";
     // if(debug) {
@@ -91,6 +89,18 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
         // COCL_PRINT(cout << endl);
     // }
     // lets dump the original isntruction, commented out
+    vector<string> reslines;
+    // InstructionDumper instructionDumper;
+    instructionDumper->runRhsGeneration(instruction, &reslines);
+    string instructionCode = instructionDumper->localExpressionByValue->operator[](instruction);
+    cout << "basicblockdumper dumpInstruction instrucitoncode=" << instructionCode << " reslines.size() " << reslines.size() << endl;
+    clcode.insert(clcode.end(), reslines.begin(), reslines.end());
+    if(instructionCode == "" || isa<AllocaInst>(instruction)) {
+        return;
+    }
+    localExpressionByValue[instruction] = resultName;
+    string resultType = typeDumper->dumpType(instruction->getType());
+
     string originalInstruction ="";
     originalInstruction += resultType + " " + resultName + " =";
     originalInstruction += " " + string(instruction->getOpcodeName());
@@ -99,7 +109,7 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
         originalInstruction += " ";
         string originalName = localNames->getNameOrEmpty(op);
         if(originalName == "") {
-            originalName = "<unk";
+            originalName = "<unk>";
         }
         originalInstruction += originalName;
         // if(origNameByValue.find(op) != exprByValue.end()) {
@@ -208,19 +218,24 @@ std::string BasicBlockDumper::getAllocaDeclarations(string indent) {
     return oss.str();
 }
 
+void BasicBlockDumper::writeDeclaration(std::ostream &os, llvm::Value *value) {
+    // value->dump();
+    os << typeDumper->dumpType(value->getType(), true) + " " + localNames->getName(value);
+}
+
 std::string BasicBlockDumper::writeDeclarations(std::string indent) {
     // string gencode = "";
-    ostringstream oss;
+    ostringstream os;
     for(auto it=variablesToDeclare.begin(); it != variablesToDeclare.end(); it++) {
         Value *value = *it;
-        // value->dump();
         if(_addIRToCl) {
-            oss << indent << "/* local variable declaration */\n";
+            os << indent << "/* local variable declaration */\n";
         }
-        string declaration = typeDumper->dumpType(value->getType(), true) + " " + localNames->getName(value);
-        oss << indent << declaration << ";\n";
+        os << indent;
+        writeDeclaration(os, value);
+        os << ";\n";
     }
-    return oss.str();
+    return os.str();
 }
 
 bool BasicBlockDumper::runGeneration(const std::set< llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
@@ -232,8 +247,15 @@ bool BasicBlockDumper::runGeneration(const std::set< llvm::Function *> &dumpedFu
         if(isa<PHINode>(inst) || isa<BranchInst>(inst) || isa<ReturnInst>(inst)) {
             continue;
         }
-        if(!dumpInstruction(inst, dumpedFunctions, returnTypeByFunction)) {
-            return false;
+        try {
+            if(!dumpInstruction(inst)) {
+                return false;
+            }
+        } catch(runtime_error &e) {
+            cout << "basicblockdumper.runGeneration got exception whilst processing:" << endl;
+            inst->dump();
+            cout << endl;
+            throw e;
         }
     }
     return true;

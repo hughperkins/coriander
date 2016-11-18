@@ -11,6 +11,10 @@ which kernel we want to run.  This is going to help with address space determina
 - *link* using `-lcocl -lOpenCL`
 - at runtime, loads *libOpenCL.so*
 
+Here is a screenshot of running on a Mac:
+
+<img src="doc/img/mac_run_cuda_sample.png?raw=true" />
+
 ## How to use, example
 
 - write a CUDA sourcecode file, or find an existing one
@@ -100,7 +104,7 @@ Behind the scenes, there are a few parts:
 - Operating system:
   - Tested/developed on Ubuntu 16.04
   - Ubuntu 14.04 does seem to work ok too (not tested very much though...)
-  - Mac OS X very close to working, eg see https://travis-ci.org/hughperkins/cuda-on-cl/builds/176629553
+  - Mac OS X ~~very close to working~~ working, https://travis-ci.org/hughperkins/cuda-on-cl/builds/176997220#L1356, (and screenshot earlier)
   - Other operating systems, and clang/llvm versions, might work too, but untested.  Your mileage may vary :-)
 - OpenCL-enabled GPU, and appropriate OpenCL drivers installed for the GPU
 
@@ -229,6 +233,8 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 ## News
 
+- Nov 18:
+  - Mac build working :-)  https://travis-ci.org/hughperkins/cuda-on-cl/builds/176997220#L1356
 - Nov 17:
   - merged `runtime-compile` branch into `master` branch.  This brings a few changes:
     - opencl generation is now at runtime, rather than at compile time

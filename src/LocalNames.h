@@ -12,6 +12,7 @@ public:
     std::string getName(llvm::Value *value);
     std::string getNameOrEmpty(llvm::Value *value);
     bool hasValue(llvm::Value *value);
+    bool hasName(std::string name);
     std::string getOrCreateName(llvm::Value *value, std::string proposedName="");
     std::map<llvm::Value *, std::string> nameByValue;
     std::string dumpNames();

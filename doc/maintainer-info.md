@@ -9,5 +9,3 @@ These are here because they're not terribly useful, except to dev/maintainers, a
 | Environment variable | Description |
 |----------------------|-------------|
 | COCL_DEVICES_ALL=1   | device index is across all devices, both OpenCL CPUs and OpenCL GPUS. Since cuda-on-cl likely won't run much/at-all on OpenCL CPUs, this option is pretty useless to end-users, however it might be useful eg for travis builds https://travis-ci.org/hughperkins/cuda-on-cl |
-
-(Note that not only is this option going to be almost certainly useless to you, its not actually impelmented yet :-P  though it will be soon...)
