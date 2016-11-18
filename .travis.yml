@@ -29,8 +29,8 @@ before_install:
 script:
   - cd ${BASEDIR}/build
   - ./cocl_unittests
-  - mkdir /tmp/foo
-  - cd /tmp/foo
+  - mkdir ${BASEDIR}/foo
+  - cd ${BASEDIR}/foo
   - cp ${BASEDIR}/test/cocl/cuda_sample.cu .
   - CLANG_HOME=${CLANG_HOME} SETX=1 cocl cuda_sample.cu
   - ./cuda_sample
@@ -46,4 +46,4 @@ addons:
     s3_region: "us-east-1" # defaults to "us-east-1"
     paths:
     - $(ls /Users/travis/build/hughperkins/cuda-on-cl/build/*)
-    - $(ls /tmp/foo/*)
+    - $(ls /Users/travis/build/hughperkins/cuda-on-cl/foo/*)
