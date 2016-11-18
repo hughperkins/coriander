@@ -28,6 +28,15 @@ std::string GlobalNames::getName(Value *value) {
     return it->second;
 }
 
+bool GlobalNames::hasName(std::string name) {
+    return valueByName.find(name) != valueByName.end() ||
+        typeByName.find(name) != typeByName.end();
+}
+
+llvm::Value *GlobalNames::getValueByName(std::string name) {
+    return valueByName[name];
+}
+
 bool GlobalNames::hasName(Value *value) {
     return nameByValue.find(value) != nameByValue.end();
 }

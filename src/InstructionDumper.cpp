@@ -145,7 +145,8 @@ string InstructionDumper::dumpConstantExpr(ConstantExpr *expr) {
     // string rhs = dumpInstruction(instr);
     vector<string> excessLines;
     std::set< llvm::Function *> dumpedFunctions;
-    runRhsGeneration(instr, &excessLines, dumpedFunctions);
+    std::map<llvm::Function *, llvm::Type*> returnTypeByFunction;
+    runRhsGeneration(instr, &excessLines, dumpedFunctions, returnTypeByFunction);
     string rhs = (*localExpressionByValue)[instr];
     // string rhs = dumpInstructionRhs(instr, &excessLines);
     cout << "rhs: [" << rhs << "]" << endl;
@@ -672,7 +673,7 @@ std::string InstructionDumper::dumpMemcpyCharCharLong(llvm::CallInst *instr) {
     return gencode;
 }
 
-std::string InstructionDumper::dumpCall(llvm::CallInst *instr, const std::set< llvm::Function *> &dumpedFunctions) {
+std::string InstructionDumper::dumpCall(llvm::CallInst *instr, const std::set< llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
     string gencode = "";
     string functionName = instr->getCalledValue()->getName().str();
     bool internalfunc = false;
@@ -787,6 +788,7 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr, const std::set< l
             bool addressSpacesMatch = true;
             // auto callit = instr->arg_begin();
             int i = 0;
+            ostringstream manglingpostfix;
             for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
                 // Argument *callArg = callit->;
                 Value *callArg = instr->getArgOperand(i);
@@ -795,6 +797,24 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr, const std::set< l
                 // callArg->dump();
                 if(PointerType *callPtr = dyn_cast<PointerType>(callArg->getType())) {
                     PointerType *calleePtr = cast<PointerType>(calleeArg->getType());
+                    char thisaddressspacechar = 'p'; // private
+                    switch(callPtr->getAddressSpace()) {
+                        case 0:
+                            break;
+                        case 1:
+                            thisaddressspacechar = 'g';  // global
+                            break;
+                        case 3:
+                            thisaddressspacechar = 's';  // shared
+                            break;
+                        case 4:
+                            thisaddressspacechar = 'c';  // constant
+                            break;
+                        default:
+                            cout << "address space: " << callPtr->getAddressSpace() << endl;
+                            throw runtime_error("unhandled address space");
+                    }
+                    manglingpostfix << thisaddressspacechar;
                     if(callPtr->getAddressSpace() != calleePtr->getAddressSpace()) {
                         addressSpacesMatch = false;
                         cout << "arg " << callArg->getName().str() << " needs address space mutation" << endl;
@@ -805,6 +825,11 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr, const std::set< l
                 i++;
             }
             if(!addressSpacesMatch) {
+                string newName = F->getName().str() + "_" + manglingpostfix.str();
+                cout << "new name [" << newName << "]" << endl;
+                bool alreadyExists = globalNames->hasName(newName);
+                cout << "alreadyeists? " << alreadyExists << endl;
+
                 int numArgs = instr->getNumArgOperands();
                 cout << "numArgs " << numArgs << endl;
                 // Value *newArgs = new Value *[numArgs];
@@ -812,41 +837,89 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr, const std::set< l
                 // for(i = 0; i < numArgs; i++) {
                 //     Type *argType = instr->getArgOperand(i)->getType();
 
-                 // DenseMap<const Value*, Value*> valueMap;
-                ValueToValueMapTy valueMap;
-                 // struct ClonedCodeInfo codeInfo;
-                Function *newFunc = CloneFunction(F,
-                               valueMap,
-                               false);
-                // ,
-                //                false,
-                //                &codeInfo);
-                // }
-                // delete [] newArgs;
-                i = 0;
-                for(auto it=newFunc->arg_begin(); it != newFunc->arg_end(); it++) {
-                    // Argument *callArg = callit->;
-                    Value *callArg = instr->getArgOperand(i);
-                    Argument *calleeArg = &*it;
-                    copyAddressSpace(callArg, calleeArg);
-                    i++;
+                Function *newFunc = 0;
+                if(!alreadyExists) {
+                     // DenseMap<const Value*, Value*> valueMap;
+                    ValueToValueMapTy valueMap;
+                     // struct ClonedCodeInfo codeInfo;
+                    newFunc = CloneFunction(F,
+                                   valueMap,
+                                   false);
+                    newFunc->setName(newName);
+                    // Function *newFunc2 = CloneFunction(F,
+                    //                valueMap,
+                    //                false);
+                    // cout << "newFunc == newFunc2? " << (newFunc == newFunc2) << endl;
+                    // ,
+                    //                false,
+                    //                &codeInfo);
+                    // }
+                    // delete [] newArgs;
+                    i = 0;
+                    ostringstream manglingpostfix;
+                    for(auto it=newFunc->arg_begin(); it != newFunc->arg_end(); it++) {
+                        // Argument *callArg = callit->;
+                        Value *callArg = instr->getArgOperand(i);
+                        Argument *calleeArg = &*it;
+                        copyAddressSpace(callArg, calleeArg);
+                        i++;
+                    }
+                    if(globalNames->getOrCreateName(newFunc, newName) != newName) {
+                        cout << "somehow created same name twice" << endl;
+                        throw runtime_error("somehow created same name twice");
+                    }
                 }
-                string newName = globalNames->getOrCreateName(newFunc, F->getName().str());
-                cout << "newName " << newName << endl;
-                newFunc->setName(newName);
+                newFunc = cast<Function>(globalNames->getValueByName(newName));
+                // at this point, we only really want to insert it into needed functions if 
+                // its not there already yet
+                // also we need to mangle the name anyway....
+                // maybe we use the name mangling to check if it's already there???
+                // if(alreadyExists) {
+
+                // } else {
+                    // string newName = globalNames->getOrCreateName(newFunc, F->getName().str());
+                    // cout << "func in neededFunctions? " << (neededFunctions->find(newFunc) != neededFunctions->end()) << endl;
+                    // cout << "newName " << newName << endl;
                 neededFunctions->insert(newFunc);
+                // needDependencies = true;
                 if(isa<PointerType>(newFunc->getReturnType()) && dumpedFunctions.find(newFunc) == dumpedFunctions.end()) {
                     needDependencies = true;
+                    return "";
                     // return false;
                 }
+                F = newFunc;
+                functionName = newName;
             } else {
                 neededFunctions->insert(F);
                 if(isa<PointerType>(F->getReturnType()) && dumpedFunctions.find(F) == dumpedFunctions.end()) {
                     needDependencies = true;
+                    return "";
                     // return false;
                 }
             // do we need to walk this function first?
             // check the return code
+            }
+
+            gencode = functionName + "(";
+            i = 0;
+            for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
+                Value *op = &*it->get();
+                if(i > 0) {
+                    gencode += ", ";
+                }
+                gencode += stripOuterParams(dumpOperand(op));
+                i++;
+            }
+            // Type *returnType = F->getReturnType();
+            // if(returnTypeByFunction.find(F) != returnTypeByFunction.end()) {
+            Type *returnType = returnTypeByFunction.at(F);
+            cout << "function return type:" << endl;
+            returnType->dump();
+            cout << endl;
+            if(PointerType *retptr = dyn_cast<PointerType>(returnType)) {
+                int functionReturnAddressSpace = retptr->getAddressSpace();
+                cout << " updating call instruction to addressspace " << functionReturnAddressSpace << endl;
+                updateAddressSpace(instr, functionReturnAddressSpace);
             }
 
             // if(dumpedFunctions.find(F) == dumpedFunctions.end()) {
@@ -861,7 +934,7 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr, const std::set< l
     return gencode;
 }
 
-bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded, const std::set< llvm::Function *> &dumpedFunctions) {
+bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded, const std::set< llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
     // vector<string> reslines;
     // gencode += "/* " + originalInstruction + " */\n    ";
     needDependencies = false;
@@ -988,7 +1061,7 @@ bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::ve
             instructionCode = dumpStore(cast<StoreInst>(instruction));
             break;
         case Instruction::Call:
-            instructionCode = dumpCall(cast<CallInst>(instruction), dumpedFunctions);
+            instructionCode = dumpCall(cast<CallInst>(instruction), dumpedFunctions, returnTypeByFunction);
             break;
         case Instruction::Load:
             instructionCode = dumpLoad(cast<LoadInst>(instruction));

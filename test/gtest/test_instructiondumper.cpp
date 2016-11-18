@@ -63,13 +63,14 @@ TEST(test_instructiondumper, basic) {
         &globalExpressionByValue, &localExpressionByValue);
     vector<string> extraInstructions;
     std::set< llvm::Function *> dumpedFunctions;
-    instructionDumper.runRhsGeneration(add, &extraInstructions, dumpedFunctions);
+    map<Function *, Type *>returnTypeByFunction;
+    instructionDumper.runRhsGeneration(add, &extraInstructions, dumpedFunctions, returnTypeByFunction);
     string expr = instructionDumper.localExpressionByValue->operator[](add);
 
     cout << "expr " << expr << endl;
 
     instructionDumper.localExpressionByValue->operator[](a) = "v1";
-    instructionDumper.runRhsGeneration(add, &extraInstructions, dumpedFunctions);
+    instructionDumper.runRhsGeneration(add, &extraInstructions, dumpedFunctions, returnTypeByFunction);
     expr = instructionDumper.localExpressionByValue->operator[](add);
     cout << "expr " << expr << endl;
 
@@ -78,13 +79,13 @@ TEST(test_instructiondumper, basic) {
     instructionDumper.localExpressionByValue->operator[](a) = "v3";
     instructionDumper.localExpressionByValue->operator[](b) = "v4";
     add = BinaryOperator::Create(Instruction::Add, a, b);
-    instructionDumper.runRhsGeneration(add, &extraInstructions, dumpedFunctions);
+    instructionDumper.runRhsGeneration(add, &extraInstructions, dumpedFunctions, returnTypeByFunction);
     expr = instructionDumper.localExpressionByValue->operator[](add);
     cout << "expr " << expr << endl;
 
     instructionDumper.localExpressionByValue->operator[](add) = "v5";
     // expr = instructionDumper.dumpInstructionRhs(add, &extraInstructions);
-    instructionDumper.runRhsGeneration(add, &extraInstructions, dumpedFunctions);
+    instructionDumper.runRhsGeneration(add, &extraInstructions, dumpedFunctions, returnTypeByFunction);
     expr = instructionDumper.localExpressionByValue->operator[](add);
     cout << "expr " << expr << endl;
 }
@@ -113,7 +114,8 @@ TEST(test_instructiondumper, globalexpr) {
         &globalExpressionByValue, &localExpressionByValue);
     vector<string> extraInstructions;
     std::set< llvm::Function *> dumpedFunctions;
-    instructionDumper.runRhsGeneration(add, &extraInstructions, dumpedFunctions);
+    map<Function *, Type *>returnTypeByFunction;
+    instructionDumper.runRhsGeneration(add, &extraInstructions, dumpedFunctions, returnTypeByFunction);
     string expr = instructionDumper.localExpressionByValue->operator[](add);
     cout << "expr " << expr << endl;
 }
@@ -145,7 +147,8 @@ TEST(test_instructiondumper, alloca) {
     AllocaInst *alloca = new AllocaInst(IntegerType::get(context, 32));
 
     std::set< llvm::Function *> dumpedFunctions;
-    instructionDumper.runRhsGeneration(alloca, &extraInstructions, dumpedFunctions);
+    map<Function *, Type *>returnTypeByFunction;
+    instructionDumper.runRhsGeneration(alloca, &extraInstructions, dumpedFunctions, returnTypeByFunction);
     // cout << "last expression " << instructionDumper.lastExpression << endl;
     string expr = instructionDumper.localExpressionByValue->operator[](alloca);
     cout << "expr " << expr << endl;

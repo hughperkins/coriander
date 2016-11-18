@@ -48,7 +48,7 @@ public:
 
     }
 
-    bool runGeneration(const std::set<llvm::Function *> &dumpedFunctions);
+    bool runGeneration(const std::set<llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
     void toCl(std::ostream &os);
     std::string createOffsetDeclaration(std::string argName);
     std::string createOffsetShim(llvm::Type *argType, std::string argName);
@@ -83,11 +83,12 @@ public:
     std::string functionDeclaration;
     std::string functionDeclarations = "";
 
+    llvm::Type *returnType = 0;
+
 protected:
     llvm::Function::iterator block_it;
     // std::string bodyCl = "";
     std::ostringstream ouros;
-    llvm::Type *returnType = 0;
     std::string declaration;
 
     llvm::Function *F;

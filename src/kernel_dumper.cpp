@@ -133,6 +133,7 @@ std::string KernelDumper::toCl() {
     set<Function *> dumpedFunctions;
     set<Function *> neededFunctions;
     set<Function *> isKernel;
+    map<Function *, Type *> returnTypeByFunction;
 
     isKernel.insert(F);
     // dumpedFunctions.insert(F);
@@ -165,7 +166,7 @@ std::string KernelDumper::toCl() {
             if(_addIRToCl) {
                 childFunctionDumper.addIRToCl();
             }
-            if(!childFunctionDumper.runGeneration(dumpedFunctions)) {
+            if(!childFunctionDumper.runGeneration(dumpedFunctions, returnTypeByFunction)) {
                 cout << "couldnt run generation to completion yet for " << childF->getName().str() << endl;
                 neededFunctions.insert(childFunctionDumper.neededFunctions.begin(), childFunctionDumper.neededFunctions.end());
                 for(auto it2=neededFunctions.begin(); it2 != neededFunctions.end(); it2++) {
@@ -175,6 +176,7 @@ std::string KernelDumper::toCl() {
             }
 
             dumpedFunctions.insert(childF);
+            returnTypeByFunction[childF] = childFunctionDumper.returnType;
             changedSomething = true;
             ostringstream os;
             childFunctionDumper.toCl(os);

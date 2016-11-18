@@ -78,7 +78,8 @@ TEST(test_block_dumper, basic) {
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
     ostringstream oss;
     std::set< llvm::Function *> dumpedFunctions;
-    blockDumper.runGeneration(dumpedFunctions);
+    map<Function *, Type *>returnTypeByFunction;
+    blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
     blockDumper.toCl(oss);
     string cl = oss.str();
     cout << cl << endl;
@@ -145,7 +146,8 @@ TEST(test_block_dumper, basic2) {
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
     ostringstream oss;
     std::set< llvm::Function *> dumpedFunctions;
-    blockDumper.runGeneration(dumpedFunctions);
+    map<Function *, Type *>returnTypeByFunction;
+    blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
     blockDumper.toCl(oss);
     string cl = oss.str();
     cout << "cl:\n" << cl << endl;
@@ -176,7 +178,8 @@ TEST(test_block_dumper, usesShared) {
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
     ostringstream oss;
     std::set< llvm::Function *> dumpedFunctions;
-    blockDumper.runGeneration(dumpedFunctions);
+    map<Function *, Type *>returnTypeByFunction;
+    blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
     blockDumper.toCl(oss);
     string cl = oss.str();
     cout << "cl:\n" << cl << endl;
@@ -212,7 +215,8 @@ TEST(test_block_dumper, usesPointerFunction) {
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
     ostringstream oss;
     std::set< llvm::Function *> dumpedFunctions;
-    bool generation_result = blockDumper.runGeneration(dumpedFunctions);
+    map<Function *, Type *>returnTypeByFunction;
+    bool generation_result = blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
     cout << "generation_result " << generation_result << endl;
     ASSERT_FALSE(generation_result);
     blockDumper.toCl(oss);

@@ -348,7 +348,7 @@ void FunctionDumper::generateBlockIndex() {
     }
 }
 
-bool FunctionDumper::runGeneration(const std::set<llvm::Function *> &dumpedFunctions) {
+bool FunctionDumper::runGeneration(const std::set<llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
     // returns true means finished, false means missing some dependnecy, like a sub fucntion walk
 
     generateBlockIndex();
@@ -372,7 +372,7 @@ bool FunctionDumper::runGeneration(const std::set<llvm::Function *> &dumpedFunct
         if(_addIRToCl) {
             basicBlockDumper.addIRToCl();
         }
-        if(!basicBlockDumper.runGeneration(dumpedFunctions)) {
+        if(!basicBlockDumper.runGeneration(dumpedFunctions, returnTypeByFunction)) {
             cout << "blockdumper generation didnt run to completion" << endl;
             neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
             for(auto it2=neededFunctions.begin(); it2 != neededFunctions.end(); it2++) {

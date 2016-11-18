@@ -71,7 +71,7 @@ namespace cocl {
 
 // }
 
-bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set< llvm::Function *> &dumpedFunctions ) {
+bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set< llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
     string resultName = localNames->getOrCreateName(instruction);
     // string 
     // storeValueName(instruction);
@@ -110,7 +110,7 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
     }
     vector<string> reslines;
     // InstructionDumper instructionDumper;
-    if(!instructionDumper->runRhsGeneration(instruction, &reslines, dumpedFunctions)) {
+    if(!instructionDumper->runRhsGeneration(instruction, &reslines, dumpedFunctions, returnTypeByFunction)) {
         cout << "instructiondumper needs dependencies" << endl;
         return false;
     }
@@ -223,7 +223,7 @@ std::string BasicBlockDumper::writeDeclarations(std::string indent) {
     return oss.str();
 }
 
-bool BasicBlockDumper::runGeneration(const std::set< llvm::Function *> &dumpedFunctions ) {
+bool BasicBlockDumper::runGeneration(const std::set< llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
     // returns true if finished, otherwise false, if missing some dependnecies and so on,
     // like child functions we need to walk over first ,to figure ou the address spcae of
     // the return value
@@ -232,7 +232,7 @@ bool BasicBlockDumper::runGeneration(const std::set< llvm::Function *> &dumpedFu
         if(isa<PHINode>(inst) || isa<BranchInst>(inst) || isa<ReturnInst>(inst)) {
             continue;
         }
-        if(!dumpInstruction(inst, dumpedFunctions)) {
+        if(!dumpInstruction(inst, dumpedFunctions, returnTypeByFunction)) {
             return false;
         }
     }

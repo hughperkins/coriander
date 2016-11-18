@@ -73,7 +73,8 @@ TEST(test_function_dumper, basic) {
     FunctionNamesMap functionNamesMap;
     FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
     std::set< llvm::Function *> dumpedFunctions;
-    functionDumper.runGeneration(dumpedFunctions);
+    map<Function *, Type *>returnTypeByFunction;
+    functionDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
     ostringstream os;
     functionDumper.toCl(os);
     string cl = os.str();
@@ -97,7 +98,8 @@ TEST(test_function_dumper, usesShared1) {
     FunctionNamesMap functionNamesMap;
     FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
     std::set< llvm::Function *> dumpedFunctions;
-    functionDumper.runGeneration(dumpedFunctions);
+    map<Function *, Type *>returnTypeByFunction;
+    functionDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
     ostringstream os;
     functionDumper.toCl(os);
     string cl = os.str();
@@ -120,7 +122,8 @@ TEST(test_function_dumper, usesShared2) {
     FunctionNamesMap functionNamesMap;
     FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
     std::set< llvm::Function *> dumpedFunctions;
-    functionDumper.runGeneration(dumpedFunctions);
+    map<Function *, Type *>returnTypeByFunction;
+    functionDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
     ostringstream os;
     functionDumper.toCl(os);
     string cl = os.str();
@@ -145,7 +148,8 @@ TEST(test_function_dumper, usesPointerFunction) {
     FunctionNamesMap functionNamesMap;
     FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
     std::set< llvm::Function *> dumpedFunctions;
-    bool genresult = functionDumper.runGeneration(dumpedFunctions);
+    map<Function *, Type *>returnTypeByFunction;
+    bool genresult = functionDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
     ASSERT_FALSE(genresult);
     ostringstream os;
     functionDumper.toCl(os);
@@ -155,7 +159,7 @@ TEST(test_function_dumper, usesPointerFunction) {
     Function *F2 = getFunction("returnsPointer");
     F2->dump();
     FunctionDumper functionDumper2(F2, true, &globalNames, &typeDumper, &functionNamesMap);
-    bool genresult2 = functionDumper2.runGeneration(dumpedFunctions);
+    bool genresult2 = functionDumper2.runGeneration(dumpedFunctions, returnTypeByFunction);
     ASSERT_TRUE(genresult2);
     ostringstream os2;
     functionDumper2.toCl(os2);

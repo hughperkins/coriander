@@ -36,6 +36,9 @@ public:
     std::string getName(llvm::Value *value);
     std::string getOrCreateName(llvm::Value *value, std::string proposedName="");
     bool hasName(llvm::Value *value);
+    llvm::Value *getValueByName(std::string name);
+
+    bool hasName(std::string name);
 
     std::string getName(llvm::Type *type);
     std::string getOrCreateName(llvm::Type *type, std::string proposedName="");

@@ -34,5 +34,7 @@ define float *@returnsPointer(float *%in) {
 
 define void @usesPointerFunction(float *%in) {
     call float *@returnsPointer(float *%in)
+    %2 = alloca float, i32 1
+    call float *@returnsPointer(float *%2)
     ret void
 }
