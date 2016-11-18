@@ -46,8 +46,14 @@ namespace cocl {
         COCL_PRINT(cout << "Context() " << this << endl);
         pthread_mutex_lock(&clcontextcreation_mutex);
         // int deviceId = getThreadVars()->currentDevice;
-        if(string(getenv("COCL_DEVICES_ALL")) == "1") {
-            cout << "COCL_DEVICES_ALL=1 activated.  WARNING!  this is a maintainer option, and will likely not do anything useful for you ,and probably cause lots of errors."  << endl;
+        bool coclDevicesAll = false;
+        if(getenv("COCL_DEVICES_ALL")) {
+            if(string(getenv("COCL_DEVICES_ALL")) == "1") {
+                cout << "COCL_DEVICES_ALL=1 activated.  WARNING!  this is a maintainer option, and will likely not do anything useful for you ,and probably cause lots of errors."  << endl;
+                coclDevicesAll = true;
+            }
+        }
+        if(coclDevicesAll) {
             cl.reset(EasyCL::createForIndexedDevice(device));
         } else {
             cl.reset(EasyCL::createForIndexedGpu(device));
