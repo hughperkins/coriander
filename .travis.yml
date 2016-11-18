@@ -45,3 +45,4 @@ addons:
   s3_region: "us-east-1" # defaults to "us-east-1"
   paths:
   - $(ls build/*)
+  - $(ls /tmp/foo/*)
