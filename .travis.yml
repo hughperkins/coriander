@@ -32,7 +32,7 @@ script:
   - mkdir ${BASEDIR}/foo
   - cd ${BASEDIR}/foo
   - cp ${BASEDIR}/test/cocl/cuda_sample.cu .
-  - CLANG_HOME=${CLANG_HOME} SETX=1 cocl cuda_sample.cu
+  - COCL_DEVICES_ALL=1 CLANG_HOME=${CLANG_HOME} SETX=1 cocl cuda_sample.cu
   - ./cuda_sample
   - pwd
   - ls -lh
