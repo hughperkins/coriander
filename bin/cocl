@@ -328,11 +328,66 @@ if [ ! "$COMPILE" ]; then {
 } fi
 
 
-OUTPUTARTIFACT=
-if [ ! "$COMPILE" ]; then {
-    OUTPUTARTIFACT=${OUTPUTBASEPATH}${FINALPOSTFIX}
-} fi
 
-CLANG_HOME=${CLANG_HOME} CLANG=${CLANG} OUTPUTBASEPATH=${OUTPUTBASEPATH} OUTPUTPOSTFIX=${OUTPUTPOSTFIX} PASSTHRU=${PASSTHRU} INPUTPOSTFIX=${INPUTPOSTFIX} \
-    INPUTBASEPATH=${INPUTBASEPATH} OPT_G=${OPT_G} \
-    make -B -f ${SCRIPT_DIR}/../share/cocl/cocl.Makefile ${OUTPUTARTIFACT}
+
+LLVM_LINK_FLAGS=`${CLANG_HOME}/bin/llvm-config --ldflags --system-libs --libs all`
+LLVM_COMPILE_FLAGS=`${CLANG_HOME}/bin/llvm-config --cppflags --cxxflags | sed -e 's/ -fno-exceptions/ -fexceptions/g' -e 's/ -DNDEBUG//g' -e 's/ -std=c++0x/ -std=c++11/g' -e 's% -isysroot [^ ]*%%g'`
+
+echo LLVM_COMPILE_FLAGS ${LLVM_COMPILE_FLAGS}
+${CLANG_HOME}/bin/clang++ ${PASSTHRU} -DUSE_CLEW -x cuda -std=c++11 --cuda-gpu-arch=sm_30 -D__CUDA_ARCH__=300 \
+    -I${COCL_HOME}/include/EasyCL \
+    -I${COCL_HOME}/include/cocl \
+    -I${COCL_HOME}/src \
+    -I${COCL_HOME}/src/EasyCL \
+    -I${COCL_HOME}/src/EasyCL/thirdparty/clew/include \
+    -include ${COCL_HOME}/include/cocl/cocl.h \
+    -include ${COCL_HOME}/include/cocl/fake_funcs.h \
+    -include ${COCL_HOME}/include/cocl/cocl_deviceside.h \
+    -I${COCL_HOME}/include \
+    ${ADDFLAGS} \
+    ${LLVM_COMPILE_FLAGS} \
+    ${INCLUDES} \
+    --cuda-device-only -emit-llvm -O0 -S \
+    ${INPUTBASEPATH}${INPUTPOSTFIX} -o ${OUTPUTBASEPATH}-device-noopt.ll
+
+    # -nostdinc -nostdinc++ \
+    # -I/usr/include/x86_64-linux-gnu \
+    # ${LLVM_COMPILE_FLAGS} \
+
+${CLANG_HOME}/bin/opt ${DEVICELLOPT} -S -o ${OUTPUTBASEPATH}-device.ll ${OUTPUTBASEPATH}-device-noopt.ll
+
+# ${OUTPUTBASEPATH}-device.cl: ${OUTPUTBASEPATH}-device.ll ${COCL_BIN}/ir-to-opencl
+#   ${COCL_BIN}/ir-to-opencl $(IROOPENCLARGS) $(DEBUG) --inputfile $< --outputfile $@
+
+${CLANG_HOME}/bin/clang++ ${PASSTHRU} \
+    ${INCLUDES} -x cuda -DUSE_CLEW -std=c++11 \
+    ${LLVM_COMPILE_FLAGS} \
+    -I${COCL_HOME}/include \
+    -I${COCL_HOME}/include/EasyCL \
+    -I${COCL_HOME}/include/cocl \
+    -I${COCL_HOME}/src \
+    -I${COCL_HOME}/src/EasyCL/thirdparty/clew/include \
+    -I${COCL_HOME}/src/EasyCL \
+    ${ADDFLAGS} \
+    ${LLVM_COMPILE_FLAGS} \
+    -include ${COCL_HOME}/include/cocl/cocl.h \
+    -include ${COCL_HOME}/include/cocl/fake_funcs.h \
+    -include ${COCL_HOME}/include/cocl/cocl_hostside.h \
+    --cuda-host-only -emit-llvm  -O3 -S \
+    ${INPUTBASEPATH}${INPUTPOSTFIX} -o ${OUTPUTBASEPATH}-hostraw.ll
+
+${COCL_BIN}/patch-hostside \
+    --hostrawfile ${OUTPUTBASEPATH}-hostraw.ll \
+    --devicellfile ${OUTPUTBASEPATH}-device.ll \
+    --hostpatchedfile ${OUTPUTBASEPATH}-hostpatched.ll
+
+${CLANG_HOME}/bin/clang++ ${PASSTHRU} ${LLVM_COMPILE_FLAGS} -DUSE_CLEW -c ${OUTPUTBASEPATH}-hostpatched.ll -O3 ${OPT_G} -o ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}
+
+if [ ! "$COMPILE" ]; then {
+    ${NATIVE_COMPILER} \
+        -Wl,-rpath,${COCL_LIB} \
+        -Wl,-rpath,$$ORIGIN \
+        -o ${OUTPUTBASEPATH}${FINALPOSTFIX} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} \
+        -L${COCL_LIB} -lcocl -lclblast -leasycl -lclew -lpthread \
+        ${LLVM_LINK_FLAGS}
+} fi

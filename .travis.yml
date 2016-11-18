@@ -50,5 +50,3 @@ addons:
     - /Users/travis/build/hughperkins/cuda-on-cl/foo/cuda_sample-hostraw.ll
     - /Users/travis/build/hughperkins/cuda-on-cl/foo/cuda_sample-hostpatched.ll
     - /Users/travis/build/hughperkins/cuda-on-cl/foo/cuda_sample.o
-    #- $(ls /Users/travis/build/hughperkins/cuda-on-cl/build/*)
-    #- $(ls /Users/travis/build/hughperkins/cuda-on-cl/foo/*)
