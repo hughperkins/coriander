@@ -11,7 +11,7 @@ which kernel we want to run.  This is going to help with address space determina
 - *link* using `-lcocl -lOpenCL`
 - at runtime, loads *libOpenCL.so*
 
-<img src="doc/img/mac_run_cuda_sample.png?raw=true" width="600" />
+<img src="doc/img/mac_run_cuda_sample.png?raw=true" />
 
 ## How to use, example
 
