@@ -30,6 +30,7 @@ $(OUTPUTBASEPATH)-device-noopt.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/
 		-include $(COCL_HOME)/include/cocl/cocl_deviceside.h \
 		-I$(COCL_HOME)/include \
 		$(ADDFLAGS) \
+		$(LLVM_COMPILE_FLAGS) \
 		$(INCLUDES) \
 		--cuda-device-only -emit-llvm -O0 -S \
 		$< -o $@
@@ -55,6 +56,7 @@ $(OUTPUTBASEPATH)-hostraw.ll: $(INPUTBASEPATH)$(INPUTPOSTFIX) $(COCL_HOME)/inclu
 		-I$(COCL_HOME)/src/EasyCL/thirdparty/clew/include \
 		-I$(COCL_HOME)/src/EasyCL \
 		$(ADDFLAGS) \
+		$(LLVM_COMPILE_FLAGS) \
 		-include $(COCL_HOME)/include/cocl/cocl.h \
 		-include $(COCL_HOME)/include/cocl/fake_funcs.h \
 		-include $(COCL_HOME)/include/cocl/cocl_hostside.h \
@@ -69,10 +71,15 @@ $(OUTPUTBASEPATH)-hostpatched.ll: $(OUTPUTBASEPATH)-hostraw.ll $(OUTPUTBASEPATH)
 		--hostpatchedfile $@
 
 $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX): $(OUTPUTBASEPATH)-hostpatched.ll
-	$(CLANG_HOME)/bin/clang++ $(PASSTHRU) -DUSE_CLEW -c $< -O3 $(OPT_G) -o $@
+	$(CLANG_HOME)/bin/clang++ $(PASSTHRU) $(LLVM_COMPILE_FLAGS) -DUSE_CLEW -c $< -O3 $(OPT_G) -o $@
 
 $(OUTPUTBASEPATH)$(FINALPOSTFIX): $(OUTPUTBASEPATH)$(OUTPUTPOSTFIX) $(COCL_LIB)/libclew$(SO_SUFFIX) $(COCL_LIB)/libcocl$(SO_SUFFIX) $(COCL_LIB)/libclblast$(SO_SUFFIX)
-	$(NATIVE_COMPILER) -Wl,-rpath,$(COCL_LIB) -Wl,-rpath,$$ORIGIN -o $@ $< -L${COCL_LIB} -lcocl -lclblast -leasycl -lclew -lpthread ${LLVM_LINK_FLAGS}
+	$(NATIVE_COMPILER) \
+		-Wl,-rpath,$(COCL_LIB) \
+		-Wl,-rpath,$$ORIGIN \
+		-o $@ $< \
+		-L${COCL_LIB} -lcocl -lclblast -leasycl -lclew -lpthread \
+		$(LLVM_LINK_FLAGS)
 
 # .INTERMEDIATE: $(OUTPUTBASEPATH)-hostpatched.ll
 
