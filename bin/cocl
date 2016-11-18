@@ -9,7 +9,9 @@ set -e
 
 if [ x$CLANG_HOME = x ]; then {
     echo
-    echo Please set CLANG_HOME
+    echo Please set CLANG_HOME, eg on Ubuntu you might do:
+    echo 
+    echo     export CLANG_HOME=/usr/lib/llvm-3.8
     echo
     exit 1
 } fi
@@ -333,8 +335,8 @@ if [ ! "$COMPILE" ]; then {
 LLVM_COMPILE_FLAGS=`${CLANG_HOME}/bin/llvm-config --cppflags --cxxflags | sed -e 's/ -fno-exceptions/ -fexceptions/g' -e 's/ -DNDEBUG//g' -e 's/ -std=c++0x/ -std=c++11/g' -e 's% -isysroot [^ ]*%%g'`
 LLVM_LINK_FLAGS=`${CLANG_HOME}/bin/llvm-config --ldflags --system-libs --libs all`
 
-echo LLVM_COMPILE_FLAGS ${LLVM_COMPILE_FLAGS}
-echo LLVM_LINK_FLAGS ${LLVM_LINK_FLAGS}
+# echo LLVM_COMPILE_FLAGS ${LLVM_COMPILE_FLAGS}
+# echo LLVM_LINK_FLAGS ${LLVM_LINK_FLAGS}
 
 ${CLANG_HOME}/bin/clang++ ${PASSTHRU} -DUSE_CLEW \
     -std=c++11 -x cuda \

@@ -114,16 +114,32 @@ TEST(test_block_dumper, basic) {
     ASSERT_EQ(expectedAllocaDeclarations, blockDumper.getAllocaDeclarations("    "));
 
     cout << "variable declarations:" << endl;
+    ASSERT_EQ(7u, blockDumper.variablesToDeclare.size());
     cout << blockDumper.writeDeclarations("    ") << endl;
-    string expectedDeclarations = R"(    int v2;
-    float v3;
-    float v4;
-    int v7;
-    struct mystruct v26;
-    struct mystruct v28;
-    struct mystruct v29;
-)";
-    ASSERT_EQ(expectedDeclarations, blockDumper.writeDeclarations("    "));
+    set<string> declaredVariableStrings;
+    for(auto it=blockDumper.variablesToDeclare.begin(); it != blockDumper.variablesToDeclare.end(); it++) {
+        ostringstream os;
+        Value *v = *it;
+        blockDumper.writeDeclaration(os, v);
+        declaredVariableStrings.insert(os.str());
+    }
+    ASSERT_TRUE(declaredVariableStrings.find("struct mystruct v26") != declaredVariableStrings.end());
+    ASSERT_TRUE(declaredVariableStrings.find("struct mystruct v28") != declaredVariableStrings.end());
+    ASSERT_TRUE(declaredVariableStrings.find("struct mystruct v29") != declaredVariableStrings.end());
+    ASSERT_TRUE(declaredVariableStrings.find("float v3") != declaredVariableStrings.end());
+    ASSERT_TRUE(declaredVariableStrings.find("float v4") != declaredVariableStrings.end());
+    ASSERT_TRUE(declaredVariableStrings.find("int v7") != declaredVariableStrings.end());
+
+    cout << blockDumper.writeDeclarations("    ") << endl;
+//     string expectedDeclarations = R"(    int v2;
+//     float v3;
+//     float v4;
+//     int v7;
+//     struct mystruct v26;
+//     struct mystruct v28;
+//     struct mystruct v29;
+// )";
+//     ASSERT_EQ(expectedDeclarations, blockDumper.writeDeclarations("    "));
 }
 
 TEST(test_block_dumper, basic2) {
@@ -189,6 +205,33 @@ TEST(test_block_dumper, usesShared) {
     }
     Value *shared = *blockDumper.sharedVariablesToDeclare.begin();
     shared->dump();
+}
+
+TEST(test_block_dumper, containsLlvmDebug) {
+    Function *F = getFunction("containsLlvmDebug");
+    F->dump();
+    BasicBlock *block = &*F->begin();
+    GlobalNames globalNames;
+    LocalNames localNames;
+    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+        Argument *arg = &*it;
+        string name = arg->getName().str();
+        Value *value = arg;
+        localNames.getOrCreateName(value, name);
+    }
+    cout << localNames.dumpNames();
+    TypeDumper typeDumper(&globalNames);
+    FunctionNamesMap functionNamesMap;
+    BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
+    ostringstream oss;
+    blockDumper.runGeneration();
+    blockDumper.toCl(oss);
+    string cl = oss.str();
+    cout << "cl:\n" << cl << endl;
+
+    cout << "variable declarations:" << endl;
+    ASSERT_EQ(0u, blockDumper.variablesToDeclare.size());
+    cout << blockDumper.writeDeclarations("    ") << endl;
 }
 
 } // test_block_dumper

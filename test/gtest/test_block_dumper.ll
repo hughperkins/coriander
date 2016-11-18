@@ -76,3 +76,12 @@ define void @usesShared(float addrspace(1) *%d1) {
     ;store float addrspace(3) *%2, float 3.0
     ret void
 }
+
+define void @llvm.dbg.value(float *%foo, i64 %i1) {
+    ret void
+}
+
+define void @containsLlvmDebug(float *%d1) {
+    tail call void @llvm.dbg.value(float* %d1, i64 0)
+    ret void
+}

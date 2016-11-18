@@ -701,6 +701,12 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr) {
         return gencode + "get_local_size(2)";
     } else if(functionName == "llvm.cuda.syncthreads" || functionName == "_Z11syncthreadsv") {
         return gencode + "barrier(CLK_GLOBAL_MEM_FENCE)";
+    } else if(functionName == "llvm.dbg.value") {
+        // ignore
+        return "";
+    } else if(functionName == "llvm.dbg.declare") {
+        // ignore
+        return "";
     } else if(functionName == "_Z11__shfl_downIfET_S0_ii") {
         gencode += "__shfl_down_3(scratch, ";
         int i = 0;
@@ -1001,6 +1007,7 @@ bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::ve
             throw runtime_error("unknown opcode");
     }
     if(instructionCode != "") {
+        cout << "instructioncode " << localNames->getName(instruction) << " [" << instructionCode << "]" << endl;
         (*localExpressionByValue)[instruction] = instructionCode;
     }
     // return instructionCode;

@@ -77,8 +77,6 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
     // storeValueName(instruction);
     // string resultName = localNames->getOrCreateName(instruction);
     // string resultName = exprByValue[instruction];
-    localExpressionByValue[instruction] = resultName;
-    string resultType = typeDumper->dumpType(instruction->getType());
 
     string gencode = "";
     // if(debug) {
@@ -91,6 +89,18 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
         // COCL_PRINT(cout << endl);
     // }
     // lets dump the original isntruction, commented out
+    vector<string> reslines;
+    // InstructionDumper instructionDumper;
+    instructionDumper->runRhsGeneration(instruction, &reslines);
+    string instructionCode = instructionDumper->localExpressionByValue->operator[](instruction);
+    cout << "basicblockdumper dumpInstruction instrucitoncode=" << instructionCode << " reslines.size() " << reslines.size() << endl;
+    clcode.insert(clcode.end(), reslines.begin(), reslines.end());
+    if(instructionCode == "" || isa<AllocaInst>(instruction)) {
+        return;
+    }
+    localExpressionByValue[instruction] = resultName;
+    string resultType = typeDumper->dumpType(instruction->getType());
+
     string originalInstruction ="";
     originalInstruction += resultType + " " + resultName + " =";
     originalInstruction += " " + string(instruction->getOpcodeName());
@@ -99,7 +109,7 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
         originalInstruction += " ";
         string originalName = localNames->getNameOrEmpty(op);
         if(originalName == "") {
-            originalName = "<unk";
+            originalName = "<unk>";
         }
         originalInstruction += originalName;
         // if(origNameByValue.find(op) != exprByValue.end()) {
@@ -107,14 +117,6 @@ void BasicBlockDumper::dumpInstruction(Instruction *instruction) {
         // } else {
         //     originalInstruction += "<unk>";
         // }
-    }
-    vector<string> reslines;
-    // InstructionDumper instructionDumper;
-    instructionDumper->runRhsGeneration(instruction, &reslines);
-    string instructionCode = instructionDumper->localExpressionByValue->operator[](instruction);
-    clcode.insert(clcode.end(), reslines.begin(), reslines.end());
-    if(instructionCode == "" || isa<AllocaInst>(instruction)) {
-        return;
     }
 
     string typestr = typeDumper->dumpType(instruction->getType());
@@ -204,19 +206,24 @@ std::string BasicBlockDumper::getAllocaDeclarations(string indent) {
     return oss.str();
 }
 
+void BasicBlockDumper::writeDeclaration(std::ostream &os, llvm::Value *value) {
+    // value->dump();
+    os << typeDumper->dumpType(value->getType(), true) + " " + localNames->getName(value);
+}
+
 std::string BasicBlockDumper::writeDeclarations(std::string indent) {
     // string gencode = "";
-    ostringstream oss;
+    ostringstream os;
     for(auto it=variablesToDeclare.begin(); it != variablesToDeclare.end(); it++) {
         Value *value = *it;
-        // value->dump();
         if(_addIRToCl) {
-            oss << indent << "/* local variable declaration */\n";
+            os << indent << "/* local variable declaration */\n";
         }
-        string declaration = typeDumper->dumpType(value->getType(), true) + " " + localNames->getName(value);
-        oss << indent << declaration << ";\n";
+        os << indent;
+        writeDeclaration(os, value);
+        os << ";\n";
     }
-    return oss.str();
+    return os.str();
 }
 
 bool BasicBlockDumper::runGeneration() {
@@ -228,7 +235,14 @@ bool BasicBlockDumper::runGeneration() {
         if(isa<PHINode>(inst) || isa<BranchInst>(inst) || isa<ReturnInst>(inst)) {
             continue;
         }
-        dumpInstruction(inst);
+        try {
+            dumpInstruction(inst);
+        } catch(runtime_error &e) {
+            cout << "basicblockdumper.runGeneration got exception whilst processing:" << endl;
+            inst->dump();
+            cout << endl;
+            throw e;
+        }
     }
     return true;
 }
