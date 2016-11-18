@@ -39,6 +39,56 @@ namespace {
 LLVMContext context;
 unique_ptr<Module>M;
 
+class InstructionDumperWrapper {
+public:
+    InstructionDumperWrapper() {
+        instructionDumper.reset(new InstructionDumper(&globalNames, &localNames, &typeDumper, &functionNamesMap,
+            &allocaDeclarations, &variablesToDeclare, &sharedVariablesToDeclare, &shimFunctionsNeeded,
+            &neededFunctions,
+            &globalExpressionByValue, &localExpressionByValue));
+    }
+    virtual ~InstructionDumperWrapper() {
+
+    }
+    void runRhsGeneration(Instruction *inst) {
+        instructionDumper.runRhsGeneration(inst, &extraInstructions);
+    }
+    string getExpr(Instruction *inst) {
+        return instructionDumper.localExpressionByValue->operator[](inst);
+    }
+
+    GlobalNames globalNames;
+    LocalNames localNames;
+    TypeDumper typeDumper(&globalNames);
+    FunctionNamesMap functionNamesMap;
+
+    vector<string> extraInstructions;
+
+    unique_ptr<InstructionDumper> instructionDumper
+};
+
+// Lets think about how instructiondumper should behave for various inputs:
+//
+// we give it an add, for two declared values, it should output eg 'v1 + v2'
+TEST(test_instructiondumper, add_two_declared_variables) {
+    // we should create allocas really, and load those.  I guess?
+    AllocaInst *a = new AllocaInst(IntegerType::get(context, 32));
+    AllocaInst *b = new AllocaInst(IntegerType::get(context, 32));
+
+    LoadInst *aLoad = new LoadInst(a);
+    LoadInst *bLoad = new LoadInst(b);
+
+    InstructionDumperWrapper wrapper;
+
+    // since they are declared, we expect to find them in localnames:
+    wrapper.localNames.getOrCreateName(aLoad, "v_a");
+    wrapper.localNames.getOrCreateName(bLoad, "v_b");
+
+    wrapper.runRhsGeneration(add);
+    string expr = instructionDumper.localExpressionByValue->operator[](add);
+    cout << "expr" << expr << endl;
+}
+
 TEST(test_instructiondumper, basic) {
     Value *a = ConstantInt::getSigned(IntegerType::get(context, 32), 123);
     Value *b = ConstantInt::getSigned(IntegerType::get(context, 32), 47);
@@ -66,6 +116,7 @@ TEST(test_instructiondumper, basic) {
     string expr = instructionDumper.localExpressionByValue->operator[](add);
 
     cout << "expr " << expr << endl;
+    ASSERT_EQ("123 + 47", expr);
 
     instructionDumper.localExpressionByValue->operator[](a) = "v1";
     instructionDumper.runRhsGeneration(add, &extraInstructions);

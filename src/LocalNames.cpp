@@ -29,6 +29,10 @@ std::string LocalNames::getNameOrEmpty(Value *value) {
     return it->second;
 }
 
+bool LocalNames::hasName(std::string name) {
+    return valueByName.find(name) != valueByName.end();
+}
+
 std::string LocalNames::getOrCreateName(Value *value, std::string proposedName) {
     auto it = nameByValue.find(value);
     if(it != nameByValue.end()) {

@@ -1007,7 +1007,8 @@ bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::ve
             throw runtime_error("unknown opcode");
     }
     if(instructionCode != "") {
-        cout << "instructioncode " << localNames->getName(instruction) << " [" << instructionCode << "]" << endl;
+        cout << "instructioncode localnames hasvalue? " << localNames->hasValue(instruction) << " [" << instructionCode << "]" << endl;
+        // cout << "instructioncode " << localNames->getName(instruction) << " [" << instructionCode << "]" << endl;
         (*localExpressionByValue)[instruction] = instructionCode;
     }
     // return instructionCode;
