@@ -34,6 +34,8 @@ script:
   - cp ${BASEDIR}/test/cocl/cuda_sample.cu .
   - CLANG_HOME=${CLANG_HOME} SETX=1 cocl cuda_sample.cu
   - ./cuda_sample
+  - pwd
+  - ls -lh
 
 notifications:
   email:
