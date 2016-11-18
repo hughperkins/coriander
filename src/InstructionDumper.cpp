@@ -818,7 +818,7 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr, const std::set< l
                     if(callPtr->getAddressSpace() != calleePtr->getAddressSpace()) {
                         addressSpacesMatch = false;
                         cout << "arg " << callArg->getName().str() << " needs address space mutation" << endl;
-                        break;
+                        // break;
                     }
                 }
                 // callit++;
@@ -839,6 +839,7 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr, const std::set< l
 
                 Function *newFunc = 0;
                 if(!alreadyExists) {
+                    cout << "cloning new funciton " << newName << endl;
                      // DenseMap<const Value*, Value*> valueMap;
                     ValueToValueMapTy valueMap;
                      // struct ClonedCodeInfo codeInfo;
@@ -856,7 +857,6 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr, const std::set< l
                     // }
                     // delete [] newArgs;
                     i = 0;
-                    ostringstream manglingpostfix;
                     for(auto it=newFunc->arg_begin(); it != newFunc->arg_end(); it++) {
                         // Argument *callArg = callit->;
                         Value *callArg = instr->getArgOperand(i);
@@ -880,6 +880,7 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr, const std::set< l
                     // string newName = globalNames->getOrCreateName(newFunc, F->getName().str());
                     // cout << "func in neededFunctions? " << (neededFunctions->find(newFunc) != neededFunctions->end()) << endl;
                     // cout << "newName " << newName << endl;
+                cout << "inserting new funciton into neededfunctions" << endl;
                 neededFunctions->insert(newFunc);
                 // needDependencies = true;
                 if(isa<PointerType>(newFunc->getReturnType()) && dumpedFunctions.find(newFunc) == dumpedFunctions.end()) {

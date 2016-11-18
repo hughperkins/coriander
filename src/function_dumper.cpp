@@ -392,6 +392,7 @@ bool FunctionDumper::runGeneration(const std::set<llvm::Function *> &dumpedFunct
 
         sharedVariablesToDeclare.insert(basicBlockDumper.sharedVariablesToDeclare.begin(), basicBlockDumper.sharedVariablesToDeclare.end());
         shimFunctionsNeeded.insert(basicBlockDumper.shimFunctionsNeeded.begin(), basicBlockDumper.shimFunctionsNeeded.end());
+        neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
 
         ouros << dumpTerminator(&returnType, basicBlock->getTerminator(), basicBlockDumper.localExpressionByValue);
     }

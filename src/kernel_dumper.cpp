@@ -186,6 +186,9 @@ std::string KernelDumper::toCl() {
             functionDeclarations.insert(childFunctionDumper.getDeclaration());
             shimFunctionsNeeded.insert(childFunctionDumper.shimFunctionsNeeded.begin(), childFunctionDumper.shimFunctionsNeeded.end());
             neededFunctions.insert(childFunctionDumper.neededFunctions.begin(), childFunctionDumper.neededFunctions.end());
+            for(auto it2=neededFunctions.begin(); it2 != neededFunctions.end(); it2++) {
+                cout << "needed function: " << (*it2)->getName().str() << endl;
+            }
 
             // cout << "childFunctionCl:\n" << childFunctionCl << endl;
             moduleClStream << childFunctionCl;
