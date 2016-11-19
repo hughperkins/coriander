@@ -98,7 +98,8 @@ TEST(test_block_dumper, basic) {
     v26.f0 = 4;
     v28 = v26;
     v28.f1 = 1.5f;
-    v29 = v28;
+    v29 = v26;
+    v33 = (v2 < 4) ? 21 : 44;
     v8[0] = v3;
     v8[0] = v4;
     v34[0] = v7;
