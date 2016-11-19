@@ -88,6 +88,7 @@ TEST(test_block_dumper, basic) {
     v4 = v3 + 9.0f;
     v5 = v4 / v3;
     v7 = v6[0];
+    v8[0] = v5;
     v16 = v7;
     v17 = v7;
     v18 = (int)v4;
@@ -96,20 +97,19 @@ TEST(test_block_dumper, basic) {
     v21 = (float)v2;
     v26 = v25[0];
     v26.f0 = 4;
-    v28 = v26;
-    v28.f1 = 1.5f;
+    v26.f1 = 1.5f;
     v29 = v26;
     v33 = (v2 < 4) ? 21 : 44;
     v8[0] = v3;
     v8[0] = v4;
-    v34[0] = v7;
-    v34[0] = v7;
-    v6[0] = (int)v4;
-    v6[0] = (int)v4;
-    v8[0] = (float)v2;
-    v8[0] = (float)v2;
+    v34[0] = v16;
+    v34[0] = v17;
+    v6[0] = v18;
+    v6[0] = v19;
+    v8[0] = v20;
+    v8[0] = v21;
     structs[0] = v29;
-    v6[0] = (v2 < 4) ? 21 : 44;
+    v6[0] = v33;
 )";
     ASSERT_EQ(expectedBlockCl, cl);
 
