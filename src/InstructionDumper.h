@@ -95,9 +95,15 @@ public:
     std::set<llvm::Function *> *neededFunctions = 0;
 
     std::map<llvm::Value *, std::string> *globalExpressionByValue = 0;
-    std::map<llvm::Value *, std::string> *localExpressionByValue = 0;
+    std::map<llvm::Value *, std::string> *localExpressionByValue = 0; // this is something one can put on the right-hand side, could be eg "v1", could be eg "v1 + v3"
 
-    cocl::LocalNames *localNames = 0;
+    cocl::LocalNames *localNames = 0;   // these are names that are concretely declared in the funciton, eg "int v1 = ...;".  an instruction which is not assigned to a
+                                        // local variable will:
+                                        // - have a correponsindg local expressoin value, eg "v1 + v2"
+                                        // - NOT be in localNames
+                                        // hence anything in localExpressions and localNames should be useable on the rhs
+                                        // ideally, any value that is in localNames will also be in localExpressions, with the exact same string/name/value, eg "v1"
+                                        // hence ,should be sufficient to read only from localexpressions, if one wants a useable rhs value for a Value
     cocl::TypeDumper *typeDumper = 0;
     cocl::GlobalNames *globalNames = 0;
 

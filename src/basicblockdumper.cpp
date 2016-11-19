@@ -72,11 +72,14 @@ namespace cocl {
 // }
 
 bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set< llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
-    string resultName = localNames->getOrCreateName(instruction);
     // string 
     // storeValueName(instruction);
     // string resultName = localNames->getOrCreateName(instruction);
     // string resultName = exprByValue[instruction];
+
+    cout << "basicblockdumper dumpinstruction() begin" << endl;
+    instruction->dump();
+    cout << endl;
 
     string gencode = "";
     // if(debug) {
@@ -103,7 +106,8 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
     if(instructionCode == "" || isa<AllocaInst>(instruction)) {
         return true;
     }
-    localExpressionByValue[instruction] = resultName;
+    // cout << "basicblockdumper dumpinstruction updating localexpressionbyvalue with [" << resultName << "]" << endl;
+    // localExpressionByValue[instruction] = resultName;
     string resultType = typeDumper->dumpType(instruction->getType());
 
     string originalInstruction ="";
@@ -157,6 +161,7 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
         if(!isSingleExpression(instructionCode)) {
             instructionCode= "(" + instructionCode + ")";
         }
+        cout << "basicblockdumper.dumpinstruction, updating localexpressionbyvalue to [" << instructionCode << "]" << endl;
         localExpressionByValue[instruction] = instructionCode;
         // cout << "storing expression for " << localNames->getName(instruction) << ": [" << instructionCode << "]" << endl;
         // nameByValue[instruction] = instructionCode;
@@ -181,10 +186,13 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
                 // functionNeededForwardDeclarations.insert(instruction);
                 // variablesToDeclare[instruction] = resultName;
                 variablesToDeclare.insert(instruction);
+                string resultName = localNames->getOrCreateName(instruction);
+                cout << "basicblockdumper.dumpinstruction, adding to variables to declare name in localnames is [" << localNames->getName(instruction) << endl;
                 gencode += localNames->getName(instruction) + " = ";
             }
             gencode += instructionCode;
             clcode.push_back(gencode);
+            cout << "basicblockdumper.dumpinstruction, updating localexpressionbyvalue to [" << instructionCode << "]" << endl;
             (localExpressionByValue)[instruction] = localNames->getName(instruction);
         }
     }

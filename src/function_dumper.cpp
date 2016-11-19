@@ -73,9 +73,11 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
             if(sourceValueCode == "") { // this is a hack really..
                 continue;  // assume its an undef. which it might be
             }
+            // variablesToDeclare.insert(phi);
             copyAddressSpace(sourceValue, phi);
             gencode += localNames.getName(phi) + " = ";
             gencode += sourceValueCode + ";\n";
+            // cout << "dumpphi gencode [" << gencode << "]" << endl;
         }
         // }
     }

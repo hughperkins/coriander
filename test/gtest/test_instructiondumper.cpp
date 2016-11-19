@@ -145,6 +145,44 @@ TEST(test_instructiondumper, add_two_declared_variables) {
     ASSERT_EQ(0u, wrapper.allocaDeclarations.size());
 }
 
+TEST(test_instructiondumper, add_icmp) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+
+    LLVMContext &context = myblock.context;
+    // we should create allocas really, and load those.  I guess?
+    AllocaInst *a = builder.CreateAlloca(IntegerType::get(context, 32));
+    AllocaInst *b = builder.CreateAlloca(IntegerType::get(context, 32));
+
+    LoadInst *aLoad = builder.CreateLoad(a);
+    LoadInst *bLoad = builder.CreateLoad(b);
+
+    InstructionDumperWrapper wrapper;
+
+    // since they are declared, we expect to find them in localnames:
+    wrapper.localNames.getOrCreateName(aLoad, "v_a");
+    wrapper.localNames.getOrCreateName(bLoad, "v_b");
+
+    // Instruction *add = BinaryOperator::Create(Instruction::FAdd, aLoad, bLoad);
+    Instruction *icmp = cast<Instruction>(builder.CreateICmpSLT(aLoad, bLoad));
+
+    wrapper.runRhsGeneration(icmp);
+    string expr = wrapper.getExpr(icmp);
+    cout << "expr " << expr << endl;
+    ASSERT_EQ("v_a < v_b", expr);
+
+    // if we check local names, we should NOT find the add, since we havent declared it
+    ASSERT_FALSE(wrapper.localNames.hasValue(icmp));
+
+    // but we should find an expression for it:
+    /// oh ... we already tested this :-)
+
+    // we should not find a requirement to declare the variable
+    ASSERT_EQ(0u, wrapper.variablesToDeclare.size());
+    // ... and no allocas
+    ASSERT_EQ(0u, wrapper.allocaDeclarations.size());
+}
+
 TEST(test_instructiondumper, store) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
