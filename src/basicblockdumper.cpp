@@ -199,9 +199,11 @@ std::string BasicBlockDumper::getAllocaDeclarations(string indent) {
         string declaration = allocaInfo.definition;
         Value *refValue = allocaInfo.refValue;
         AllocaInst *alloca = allocaInfo.alloca;
-        if(cast<PointerType>(refValue->getType())->getAddressSpace() == 1) {
-            if(declaration.find("global") != 0) {
-                declaration = "global " + declaration;
+        if(PointerType *ptrType = dyn_cast<PointerType>(refValue->getType())) {
+            if(ptrType->getAddressSpace() == 1) {
+                if(declaration.find("global") != 0) {
+                    declaration = "global " + declaration;
+                }
             }
         }
         // cout << "alloca declaration: " << declaration << endl;
