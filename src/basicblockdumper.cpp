@@ -99,7 +99,7 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
         return true;
     }
     string instructionCode = instructionDumper->localExpressionByValue->at(instruction);
-    cout << "basicblockdumper dumpInstruction instrucitoncode=" << instructionCode << " reslines.size() " << reslines.size() << endl;
+    // cout << "basicblockdumper dumpInstruction instrucitoncode=" << instructionCode << " reslines.size() " << reslines.size() << endl;
     if(instructionCode == "" || isa<AllocaInst>(instruction)) {
         return true;
     }

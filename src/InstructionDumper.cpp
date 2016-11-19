@@ -1062,8 +1062,8 @@ bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::ve
         return true;
     }
     if(instructionCode != "") {
-        cout << "instructiondumper.runRhsGeneration instructioncode=[" << instructionCode <<"] localnames hasvalue? " <<
-            localNames->hasValue(instruction) << " additionalines.size()=" << additionalLinesNeeded->size() << endl;
+        // cout << "instructiondumper.runRhsGeneration instructioncode=[" << instructionCode <<"] localnames hasvalue? " <<
+        //     localNames->hasValue(instruction) << " additionalines.size()=" << additionalLinesNeeded->size() << endl;
         (*localExpressionByValue)[instruction] = instructionCode;
     }
     if(needDependencies) {
