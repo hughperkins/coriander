@@ -77,7 +77,7 @@ public:
         instructionDumper->runRhsGeneration(inst, &extraInstructions, dumpedFunctions, returnTypeByFunction);
     }
     string getExpr(Instruction *inst) {
-        return instructionDumper->localExpressionByValue->operator[](inst);
+        return instructionDumper->localExpressionByValue->at(inst);
     }
 
     GlobalNames globalNames;
@@ -214,13 +214,13 @@ TEST(test_instructiondumper, callsomething) {
     cout << endl;
 
     InstructionDumperWrapper wrapper;
-    wrapper.localNames.getOrCreateName(charArray, "myCharArray");
-    wrapper.runRhsGeneration(call);
-    string expr = wrapper.getExpr(call);
-    cout << "expr " << expr << endl;
-    ASSERT_EQ("", expr);
-
     InstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    wrapper.localNames.getOrCreateName(charArray, "myCharArray");
+    ASSERT_EQ(0u, instructionDumper->localExpressionByValue->size());
+
+    wrapper.runRhsGeneration(call);
+
     ASSERT_TRUE(instructionDumper->needDependencies);
     ASSERT_EQ(1u, instructionDumper->neededFunctions->size());
     (*instructionDumper->neededFunctions->begin())->dump();
@@ -229,33 +229,29 @@ TEST(test_instructiondumper, callsomething) {
     ASSERT_EQ(0u, instructionDumper->generatedCl.size());
     ASSERT_EQ(0u, instructionDumper->variablesToDeclare->size());
     ASSERT_EQ(0u, instructionDumper->globalExpressionByValue->size());
+    ASSERT_EQ(0u, instructionDumper->localExpressionByValue->size());
+
+    wrapper.dumpedFunctions.insert(childF);
+    wrapper.returnTypeByFunction[childF] = PointerType::get(IntegerType::get(context, 8), 1);
+    wrapper.runRhsGeneration(call);
+
+    ASSERT_FALSE(instructionDumper->needDependencies);
+    ASSERT_EQ(1u, instructionDumper->neededFunctions->size());
+    // (*instructionDumper->neededFunctions->begin())->dump();
+    // cout << endl;
+    // ASSERT_EQ(childF, (*instructionDumper->neededFunctions->begin()));
+    ASSERT_EQ(0u, instructionDumper->generatedCl.size());
+    ASSERT_EQ(0u, instructionDumper->variablesToDeclare->size());
+    ASSERT_EQ(0u, instructionDumper->globalExpressionByValue->size());
     ASSERT_EQ(1u, instructionDumper->localExpressionByValue->size());
     auto it = instructionDumper->localExpressionByValue->begin();
-    cout << "local expr 0 value " << endl;
+    cout << "localexpr name=[" << it->second << "]" << endl;
+    cout << "local expr value=" << endl;
     it->first->dump();
     cout << endl;
+    cout << wrapper.getExpr(call) << endl;
+    ASSERT_EQ("mychildfunc(myCharArray)", it->second);
     ASSERT_EQ(call, it->first);
-    cout << "local expr 0 name [" << it->second << "]" << endl;
-    // ASSERT_EQ(call, it->first);
-    // cout << instructionDumper->localExpressionByValue->operator[](0) << endl;
-
-    // LLVMContext context;
-    // unique_ptr<Module>M(new Module("module", context));
-    // BasicBlock *block = 
-    // Value *charArray = new AllocaInst(IntegerType::get(context, 8));
-    // cout << "charArray:" << endl;
-    // charArray->dump();
-    // cout << endl;
-    // Value *args[] = {charArray};
-    // CallInst *call = CallInst::Create(childF, ArrayRef<Value *>(args));
-    // cout << "call:" << endl;
-    // call->dump();
-    // cout << endl;
-    // InstructionDumperWrapper wrapper;
-    // wrapper.localNames.getOrCreateName(charArray, "myCharArray");
-    // wrapper.runRhsGeneration(call);
-    // string expr = wrapper.getExpr(call);
-    // cout << "expr " << expr << endl;
 }
 
 TEST(test_instructiondumper, basic) {
