@@ -292,4 +292,99 @@ TEST(test_block_dumper, containsLlvmDebug) {
     cout << blockDumper.writeDeclarations("    ") << endl;
 }
 
+TEST(test_block_dumper, usestructs) {
+    Function *F = getFunction("usestructs");
+    F->dump();
+    BasicBlock *block = &*F->begin();
+    GlobalNames globalNames;
+    LocalNames localNames;
+    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+        Argument *arg = &*it;
+        localNames.getOrCreateName(arg, arg->getName().str());
+    }
+    TypeDumper typeDumper(&globalNames);
+    FunctionNamesMap functionNamesMap;
+    BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
+    blockDumper.maxInstructionsToGenerate = 1;
+    ostringstream oss;
+    std::set< llvm::Function *> dumpedFunctions;
+    map<Function *, Type *>returnTypeByFunction;
+    Instruction *inst = 0;
+
+    blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
+    oss.str("");
+    blockDumper.toCl(oss);
+    string cl = oss.str();
+    cout << "cl [" << cl << "]" << endl;
+    ASSERT_EQ("", cl);
+
+    cout << "alloca declrations:" << endl;
+    ASSERT_EQ(1u, blockDumper.allocaDeclarations.size());
+    cout << blockDumper.getAllocaDeclarations("    ") << endl;
+    string expectedAllocaDeclarations = R"(    struct mystruct v1[1];
+)";
+    ASSERT_EQ(expectedAllocaDeclarations, blockDumper.getAllocaDeclarations("    "));
+    ASSERT_EQ(0u, blockDumper.variablesToDeclare.size());
+
+    cout << "\n=======================" << endl;
+    // blockDumper.addIRToCl();
+    inst = &*blockDumper.instruction_it;
+    cout << "inst:" << endl;
+    inst->dump();
+    cout << endl;
+    blockDumper.maxInstructionsToGenerate = 1;
+    blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
+    cout << "clcode.size()" << blockDumper.clcode.size() << endl;
+    oss.str("");
+    blockDumper.toCl(oss);
+    cl = oss.str();
+    cout << "cl [" << cl << "]" << endl;
+    // blockDumper.addIRToCl(false);
+    ASSERT_EQ("    v2 = v1[0];\n", cl);
+    ASSERT_EQ(1u, blockDumper.variablesToDeclare.size());
+    cout << "variable delcarations: [" << blockDumper.writeDeclarations("    ") << "]" << endl;
+    ASSERT_EQ("    struct mystruct v2;\n", blockDumper.writeDeclarations("    "));
+    cout << "blockDumper.localExpressionByValue[inst]=[" << blockDumper.localExpressionByValue[inst] << "]" << endl;
+    ASSERT_EQ("v2", blockDumper.localExpressionByValue[inst]);
+
+    cout << "\n=======================" << endl;
+    blockDumper.maxInstructionsToGenerate = 1;
+    inst = &*blockDumper.instruction_it;
+    cout << "inst:" << endl;
+    inst->dump();
+    cout << endl;
+    blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
+    cout << "clcode.size() " << blockDumper.clcode.size() << endl;
+    cout << "clcode[0] [" << blockDumper.clcode[0] << "]" << endl;
+    ASSERT_EQ(1u, blockDumper.clcode.size());
+    oss.str("");
+    // oss.clear();
+    blockDumper.toCl(oss);
+    cl = oss.str();
+    cout << "cl [" << cl << "]" << endl;
+    cout << "localExpressionByVAlue.size " << blockDumper.localExpressionByValue.size() <<  endl;
+    ASSERT_EQ(3u, blockDumper.localExpressionByValue.size());
+    cout << "blockDumper.localExpressionByValue[inst]=[" << blockDumper.localExpressionByValue[inst] << "]" << endl;
+    ASSERT_EQ("(&v1[0].f0)", blockDumper.localExpressionByValue[inst]);
+
+    cout << "\n=======================" << endl;
+    blockDumper.maxInstructionsToGenerate = 1;
+    inst = &*blockDumper.instruction_it;
+    cout << "inst:" << endl;
+    inst->dump();
+    cout << endl;
+    blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
+    cout << "clcode.size() " << blockDumper.clcode.size() << endl;
+    cout << "clcode[0] [" << blockDumper.clcode[0] << "]" << endl;
+    // ASSERT_EQ(1u, blockDumper.clcode.size());
+    oss.str("");
+    // oss.clear();
+    blockDumper.toCl(oss);
+    cl = oss.str();
+    cout << "cl [" << cl << "]" << endl;
+    cout << "localExpressionByVAlue.size " << blockDumper.localExpressionByValue.size() <<  endl;
+    ASSERT_EQ(3u, blockDumper.localExpressionByValue.size());
+    // cout << "blockDumper.localExpressionByValue[inst]=[" << blockDumper.localExpressionByValue.at(inst) << "]" << endl;
+}
+
 } // test_block_dumper

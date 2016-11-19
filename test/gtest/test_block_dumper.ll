@@ -94,3 +94,19 @@ define void @containsLlvmDebug(float *%d1) {
     tail call void @llvm.dbg.value(float* %d1, i64 0)
     ret void
 }
+
+define i32 @usestructs(%"struct.mystruct" *%structs) {
+  %1 = alloca %struct.mystruct, i32 1
+  %2 = load %struct.mystruct, %struct.mystruct* %1
+  %3 = getelementptr %struct.mystruct , %struct.mystruct *%1, i32 0, i32 0
+  store %struct.mystruct %2, %struct.mystruct *%structs
+
+  ;%26 = extractvalue %struct.mystruct %25, 0
+  ;%27 = insertvalue %struct.mystruct %25, i32 4, 0
+  ;%28 = insertvalue %struct.mystruct %27, float 1.5, 1
+  ;%29 = getelementptr %struct.mystruct , %struct.mystruct *%24, i32 0, i32 0
+  ;%30 = getelementptr %struct.mystruct , %struct.mystruct *%24, i32 0, i32 1
+  ;store %struct.mystruct %28, %struct.mystruct *%structs
+
+  ret i32 0
+}

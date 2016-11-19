@@ -92,7 +92,10 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
     vector<string> reslines;
     // InstructionDumper instructionDumper;
     instructionDumper->runRhsGeneration(instruction, &reslines, dumpedFunctions, returnTypeByFunction);
-    string instructionCode = instructionDumper->localExpressionByValue->operator[](instruction);
+    if(instructionDumper->localExpressionByValue->find(instruction) == instructionDumper->localExpressionByValue->end()) {
+        return true;
+    }
+    string instructionCode = instructionDumper->localExpressionByValue->at(instruction);
     cout << "basicblockdumper dumpInstruction instrucitoncode=" << instructionCode << " reslines.size() " << reslines.size() << endl;
     clcode.insert(clcode.end(), reslines.begin(), reslines.end());
     if(instructionCode == "" || isa<AllocaInst>(instruction)) {
@@ -231,7 +234,7 @@ bool BasicBlockDumper::runGeneration(const std::set< llvm::Function *> &dumpedFu
     // returns true if finished, otherwise false, if missing some dependnecies and so on,
     // like child functions we need to walk over first ,to figure ou the address spcae of
     // the return value
-    for(; instruction_it != block->end(); instruction_it++) {
+    for(; (maxInstructionsToGenerate == -1 || maxInstructionsToGenerate > 0) && instruction_it != block->end(); instruction_it++) {
         Instruction *inst = &*instruction_it;
         if(isa<PHINode>(inst) || isa<BranchInst>(inst) || isa<ReturnInst>(inst)) {
             continue;
@@ -245,6 +248,9 @@ bool BasicBlockDumper::runGeneration(const std::set< llvm::Function *> &dumpedFu
             inst->dump();
             cout << endl;
             throw e;
+        }
+        if(maxInstructionsToGenerate > 0) {
+            maxInstructionsToGenerate--;
         }
     }
     return true;

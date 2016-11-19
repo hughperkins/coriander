@@ -60,8 +60,8 @@ public:
     std::string writeDeclarations(std::string indent);
     void writeDeclaration(std::ostream &os, llvm::Value *value);
 
-    BasicBlockDumper *addIRToCl() {
-        _addIRToCl = true;
+    BasicBlockDumper *addIRToCl(bool set=true) {
+        _addIRToCl = set;
         return this;
     }
 
@@ -74,9 +74,10 @@ public:
     std::map<llvm::Value *, std::string> localExpressionByValue;
     std::vector<std::string> clcode;
 
-protected:
+    int maxInstructionsToGenerate = -1; // -1 means no limit, 0 will cause runGeneration to do nothing; otherwise however many instructions to process
     llvm::BasicBlock::iterator instruction_it;
 
+protected:
     llvm::BasicBlock *block;
     bool _addIRToCl = false;
     bool forceSingle = true;

@@ -106,57 +106,13 @@ public:
 //
 // we give it an add, for two declared values, it should output eg 'v1 + v2'
 TEST(test_instructiondumper, add_two_declared_variables) {
-    LLVMContext context;
-    unique_ptr<Module>M(new Module("module", context));
-
-    // we should create allocas really, and load those.  I guess?
-    AllocaInst *a = new AllocaInst(IntegerType::get(context, 32));
-    AllocaInst *b = new AllocaInst(IntegerType::get(context, 32));
-
-    LoadInst *aLoad = new LoadInst(a);
-    LoadInst *bLoad = new LoadInst(b);
-
-    InstructionDumperWrapper wrapper;
-
-    // since they are declared, we expect to find them in localnames:
-    wrapper.localNames.getOrCreateName(aLoad, "v_a");
-    wrapper.localNames.getOrCreateName(bLoad, "v_b");
-
-    Instruction *add = BinaryOperator::Create(Instruction::FAdd, aLoad, bLoad);
-
-    wrapper.runRhsGeneration(add);
-    string expr = wrapper.getExpr(add);
-    cout << "expr " << expr << endl;
-    ASSERT_EQ("v_a + v_b", expr);
-
-    // if we check local names, we should NOT find the add, since we havent declared it
-    ASSERT_FALSE(wrapper.localNames.hasValue(add));
-
-    // but we should find an expression for it:
-    /// oh ... we already tested this :-)
-
-    // we should not find a requirement to declare the variable
-    ASSERT_EQ(0u, wrapper.variablesToDeclare.size());
-    // ... and no allocas
-    ASSERT_EQ(0u, wrapper.allocaDeclarations.size());
-}
-
-TEST(test_instructiondumper, add_two_declared_variables_using_builder) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    // LLVMContext context;
-    // unique_ptr<Module>M(new Module("module", context));
-
-    // we should create allocas really, and load those.  I guess?
-    // AllocaInst *a = new AllocaInst(IntegerType::get(context, 32));
-    // AllocaInst *b = new AllocaInst(IntegerType::get(context, 32));
 
     LLVMContext &context = myblock.context;
+    // we should create allocas really, and load those.  I guess?
     AllocaInst *a = builder.CreateAlloca(IntegerType::get(context, 32));
     AllocaInst *b = builder.CreateAlloca(IntegerType::get(context, 32));
-
-    // LoadInst *aLoad = new LoadInst(a);
-    // LoadInst *bLoad = new LoadInst(b);
 
     LoadInst *aLoad = builder.CreateLoad(a);
     LoadInst *bLoad = builder.CreateLoad(b);

@@ -612,6 +612,7 @@ std::string InstructionDumper::dumpGetElementPtr(llvm::GetElementPtrInst *instr)
     }
     updateAddressSpace(instr, addressspace);
     rhs = "(&" + rhs + ")";
+    cout << "gep rhs=" << rhs << endl;
     return rhs;
 }
 
@@ -1030,8 +1031,13 @@ bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::ve
             cout << "opcode string " << instruction->getOpcodeName() << endl;
             throw runtime_error("unknown opcode");
     }
+    if(isa<StoreInst>(instruction)) {
+        additionalLinesNeeded->push_back(instructionCode);
+        return true;
+    }
     if(instructionCode != "") {
-        cout << "instructioncode localnames hasvalue? " << localNames->hasValue(instruction) << " [" << instructionCode << "]" << endl;
+        cout << "instructiondumper.runRhsGeneration instructioncode=[" << instructionCode <<"] localnames hasvalue? " <<
+            localNames->hasValue(instruction) << " additionalines.size()=" << additionalLinesNeeded->size() << endl;
         (*localExpressionByValue)[instruction] = instructionCode;
     }
     if(needDependencies) {
