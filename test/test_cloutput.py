@@ -82,6 +82,35 @@ def cuSourcecode():
 #     pass
 
 
+def test_insertvalue(context, q, float_data, float_data_gpu):
+    sourcecode = """
+struct mystruct {
+    int f0;
+    float f1;
+};
+
+__device__ struct mystruct doSomething(struct mystruct foo, int somevalue);
+
+__device__ struct mystruct doSomething(struct mystruct foo, int somevalue) {
+    foo.f0 = somevalue;
+    foo.f1 = 4.5f;
+    return foo;
+}
+
+__global__ void somekernel(float *data) {
+    struct mystruct foo;
+    foo.f0 = 3;
+    foo.f1 = 4.5;
+    foo = doSomething(foo, data[2]);
+    data[0] = (int)foo.f0;
+    data[1] = foo.f1;
+}
+"""
+    mangledname = test_common.mangle('somekernel', ['float *'])
+    cl_code = test_common.cu_to_cl(sourcecode, mangledname)
+    kernel = test_common.build_kernel(context, cl_code, mangledname)
+
+
 def test_foo(context, q, float_data, float_data_gpu, cuSourcecode):
     kernelName = test_common.mangle('foo', ['float *'])
     testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName)

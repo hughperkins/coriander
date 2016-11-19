@@ -74,7 +74,7 @@ public:
     std::string dumpFPTrunc(llvm::CastInst *instr);
     std::string dumpTrunc(llvm::CastInst *instr);
 
-    std::vector<std::string> dumpInsertValue(llvm::InsertValueInst *instr);
+    std::string dumpInsertValue(llvm::InsertValueInst *instr, std::vector<std::string> *extralines);
     std::string dumpExtractValue(llvm::ExtractValueInst *instr);
     std::string dumpLoad(llvm::LoadInst *instr);
     std::string dumpStore(llvm::StoreInst *instr);

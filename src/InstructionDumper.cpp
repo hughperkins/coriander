@@ -469,7 +469,7 @@ std::string InstructionDumper::dumpStore(llvm::StoreInst *instr) {
     return gencode;
 }
 
-std::vector<std::string> InstructionDumper::dumpInsertValue(llvm::InsertValueInst *instr) {
+std::string InstructionDumper::dumpInsertValue(llvm::InsertValueInst *instr, std::vector<std::string> *extralines) {
     string lhs = "";
     // cout << "lhs undef value? " << isa<UndefValue>(instr->getOperand(0)) << endl;
     string incomingOperand = dumpOperand(instr->getOperand(0));
@@ -477,7 +477,9 @@ std::vector<std::string> InstructionDumper::dumpInsertValue(llvm::InsertValueIns
     Type *currentType = instr->getType();
     bool declaredVar = false;
     if(incomingOperand == "") {
+        cout << "incomingoperand is undef, so adding insertvalue instr to variables to declare" << endl;
         variablesToDeclare->insert(instr);
+        // localNames->getOrCreateName(instr);
         incomingOperand = dumpOperand(instr);
         declaredVar = true;
     }
@@ -515,13 +517,20 @@ std::vector<std::string> InstructionDumper::dumpInsertValue(llvm::InsertValueIns
         }
         currentType = newType;
     }
-    std::vector<std::string> res;
-    res.push_back(lhs + " = " + dumpOperand(instr->getOperand(1)));
-    if(!declaredVar) {
-        variablesToDeclare->insert(instr);
-        res.push_back(dumpOperand(instr) + " = " + incomingOperand);
-    }
-    return res;
+    // std::vector<std::string> res;
+    string updateline = lhs + " = " + dumpOperand(instr->getOperand(1));
+    extralines->push_back(updateline);
+    // res.push_back(lhs + " = " + dumpOperand(instr->getOperand(1)));
+    cout << "dumpinsertvalue lhs=" << lhs << endl;
+    // if(false && declaredVar) {
+    //     // variablesToDeclare->insert(instr);
+    //     string assignline = dumpOperand(instr) + " = " + incomingOperand;
+    //     cout << "declaredvar=" << declaredVar << " so adding line " << assignline << endl;
+    //     extralines->push_back(assignline);
+    // }
+    // (*localExpressionByValue)[instr] = dumpOperand(instr);
+    (*localExpressionByValue)[instr] = incomingOperand;
+    return "";
 }
 
 std::string InstructionDumper::dumpExtractValue(llvm::ExtractValueInst *instr) {
@@ -1012,7 +1021,7 @@ bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::ve
             instructionCode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
             break;
         case Instruction::InsertValue:
-            *additionalLinesNeeded = dumpInsertValue(cast<InsertValueInst>(instruction));
+            dumpInsertValue(cast<InsertValueInst>(instruction), additionalLinesNeeded);
             return true;
         case Instruction::ExtractValue:
             instructionCode = dumpExtractValue(cast<ExtractValueInst>(instruction));

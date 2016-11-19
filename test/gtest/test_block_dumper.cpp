@@ -391,6 +391,54 @@ TEST(test_block_dumper, usestructs) {
     cout << "localExpressionByVAlue.size " << blockDumper.localExpressionByValue.size() <<  endl;
     ASSERT_EQ(3u, blockDumper.localExpressionByValue.size());
     // cout << "blockDumper.localExpressionByValue[inst]=[" << blockDumper.localExpressionByValue.at(inst) << "]" << endl;
+
+    cout << "\n=======================" << endl;
+    cout << "insert value, from undef:" << endl;
+    blockDumper.maxInstructionsToGenerate = 1;
+    inst = &*blockDumper.instruction_it;
+    cout << "inst:" << endl;
+    inst->dump();
+    cout << endl;
+    blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
+    cout << "clcode.size() " << blockDumper.clcode.size() << endl;
+    cout << "clcode[0] [" << blockDumper.clcode[0] << "]" << endl;
+    // ASSERT_EQ(1u, blockDumper.clcode.size());
+    oss.str("");
+    // oss.clear();
+    blockDumper.toCl(oss);
+    cl = oss.str();
+    cout << "cl [" << cl << "]" << endl;
+    cout << "localExpressionByVAlue.size " << blockDumper.localExpressionByValue.size() <<  endl;
+    cout << "expr for inst: " << blockDumper.localExpressionByValue[inst] << endl;
+    ASSERT_EQ("v5", blockDumper.localExpressionByValue[inst]);
+    cout << "variable delcarations size(): " << blockDumper.variablesToDeclare.size() << endl;
+    ASSERT_TRUE(blockDumper.variablesToDeclare.find(inst) != blockDumper.variablesToDeclare.end());
+    // ASSERT_EQ(3u, blockDumper.localExpressionByValue.size());
+    // cout << "blockDumper.localExpressionByValue[inst]=[" << blockDumper.localExpressionByValue.at(inst) << "]" << endl;
+
+    cout << "\n=======================" << endl;
+    cout << "insert value, from already defined:" << endl;
+    blockDumper.maxInstructionsToGenerate = 1;
+    inst = &*blockDumper.instruction_it;
+    cout << "inst:" << endl;
+    inst->dump();
+    cout << endl;
+    blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
+    cout << "clcode.size() " << blockDumper.clcode.size() << endl;
+    cout << "clcode[0] [" << blockDumper.clcode[0] << "]" << endl;
+    // ASSERT_EQ(1u, blockDumper.clcode.size());
+    oss.str("");
+    // oss.clear();
+    blockDumper.toCl(oss);
+    cl = oss.str();
+    cout << "cl [" << cl << "]" << endl;
+    cout << "localExpressionByVAlue.size " << blockDumper.localExpressionByValue.size() <<  endl;
+    cout << "expr for inst: " << blockDumper.localExpressionByValue[inst] << endl;
+    // ASSERT_EQ("v5", blockDumper.localExpressionByValue[inst]);
+    cout << "variable delcarations size(): " << blockDumper.variablesToDeclare.size() << endl;
+    // ASSERT_TRUE(blockDumper.variablesToDeclare.find(inst) != blockDumper.variablesToDeclare.end());
+    // ASSERT_EQ(3u, blockDumper.localExpressionByValue.size());
+    // cout << "blockDumper.localExpressionByValue[inst]=[" << blockDumper.localExpressionByValue.at(inst) << "]" << endl;
 }
 
 } // test_block_dumper

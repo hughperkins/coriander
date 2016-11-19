@@ -362,4 +362,63 @@ TEST(test_instructiondumper, alloca_struct) {
     ASSERT_EQ(myStructType, *(wrapper.typeDumper->structsToDefine.begin()));
 }
 
+TEST(test_instructiondumper, insert_value) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+    LLVMContext &context = myblock.context;
+
+    InstructionDumperWrapper wrapper;
+    InstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    Type *structElements[] = {
+        IntegerType::get(context, 32),
+        IntegerType::get(context, 32)
+    };
+    StructType *myStructType = StructType::create(
+        context, structElements, "struct.mystruct"
+    );
+    myStructType->dump();
+    cout << endl;
+
+    AllocaInst *aAlloca = builder.CreateAlloca(myStructType);
+    LoadInst *aLoad = builder.CreateLoad(aAlloca);
+
+    AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(context, 32));
+    LoadInst *intLoad = builder.CreateLoad(intAlloca);
+
+    // AllocaInst *bAlloca = builder.CreateAlloca(myStructType);
+    // StoreInst *bstore = builder.CreateStore(aLoad, bAlloca);
+
+    Value *idx0 = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
+    Value *idx1 = ConstantInt::getSigned(IntegerType::get(context, 32), 1);
+    // Value *idx1 = ConstantInt::getSigned(IntegerType::get(context, 32), 1);
+    unsigned int idxs0[] = {0};
+    InsertValueInst *insert = cast<InsertValueInst>(builder.CreateInsertValue(aAlloca, intLoad, idxs0));
+
+    myblock.block->dump();
+
+    wrapper.localNames.getOrCreateName(aAlloca, "aAlloca");
+    wrapper.localNames.getOrCreateName(intLoad, "intLoad");
+    wrapper.runRhsGeneration(insert);
+    // string expr = wrapper.getExpr(insert);
+
+    // string expr = instructionDumper.localExpressionByValue->operator[](alloca);
+    // cout << "expr " << expr << endl;
+    // ASSERT_EQ("v1", expr);
+    cout << "allocaDeclarations.size() " << instructionDumper->allocaDeclarations->size() << endl;
+    // AllocaInfo allocaInfo = instructionDumper->allocaDeclarations->operator[](0);
+    // ASSERT_EQ(bAlloca, allocaInfo.alloca);
+    // allocaInfo.refValue->dump();
+    // ASSERT_EQ(aLoad, allocaInfo.refValue);
+    // cout << "allocaInfo->definition [" << allocaInfo.definition << "]" << endl;
+    // ASSERT_EQ("struct mystruct v1[1]", allocaInfo.definition);
+
+    cout << "additionalLines.size() " << wrapper.extraInstructions.size() << endl;
+    cout << "additionalLines[0] [" << wrapper.extraInstructions[0] << "]" << endl;
+
+    cout << "typedumper.structsToDefine.size() " << wrapper.typeDumper->structsToDefine.size() << endl;
+    // ASSERT_EQ(1u, wrapper.typeDumper->structsToDefine.size());
+    // ASSERT_EQ(myStructType, *(wrapper.typeDumper->structsToDefine.begin()));
+}
+
 }
