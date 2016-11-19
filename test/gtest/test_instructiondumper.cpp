@@ -338,40 +338,35 @@ TEST(test_instructiondumper, globalexpr) {
 }
 
 TEST(test_instructiondumper, alloca) {
-    LLVMContext context;
-    unique_ptr<Module>M(new Module("module", context));
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+    LLVMContext &context = myblock.context;
 
-    // Value *a = ConstantInt::getSigned(IntegerType::get(context, 32), 123);
-    // Value *b = ConstantInt::getSigned(IntegerType::get(context, 32), 47);
-    // Instruction *add = BinaryOperator::Create(Instruction::FAdd, a, b);
-    GlobalNames globalNames;
-    LocalNames localNames;
-    TypeDumper typeDumper(&globalNames);
-    FunctionNamesMap functionNamesMap;
+    InstructionDumperWrapper wrapper;
+    InstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    std::vector<AllocaInfo> allocaDeclarations;
-    std::set<llvm::Value *> variablesToDeclare;
-    std::set<llvm::Value *> sharedVariablesToDeclare;
-    std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
-    std::set<llvm::Function *> neededFunctions;
+    AllocaInst *aAlloca = builder.CreateAlloca(IntegerType::get(context, 32));
+    LoadInst *aLoad = builder.CreateLoad(aAlloca);
 
-    std::map<llvm::Value *, std::string> globalExpressionByValue;
-    std::map<llvm::Value *, std::string> localExpressionByValue;
+    // we should create allocas really, and load those.  I guess?
+    AllocaInst *bAlloca = builder.CreateAlloca(IntegerType::get(context, 32));
+    StoreInst *bstore = builder.CreateStore(aLoad, bAlloca);
 
-    InstructionDumper instructionDumper(&globalNames, &localNames, &typeDumper, &functionNamesMap,
-        &allocaDeclarations, &variablesToDeclare, &sharedVariablesToDeclare, &shimFunctionsNeeded,
-        &neededFunctions,
-        &globalExpressionByValue, &localExpressionByValue);
-    vector<string> extraInstructions;
+    myblock.block->dump();
 
-    AllocaInst *alloca = new AllocaInst(IntegerType::get(context, 32));
+    wrapper.runRhsGeneration(bAlloca);
+    string expr = wrapper.getExpr(bAlloca);
 
-    std::set< llvm::Function *> dumpedFunctions;
-    map<Function *, Type *>returnTypeByFunction;
-    instructionDumper.runRhsGeneration(alloca, &extraInstructions, dumpedFunctions, returnTypeByFunction);
-    // cout << "last expression " << instructionDumper.lastExpression << endl;
-    string expr = instructionDumper.localExpressionByValue->operator[](alloca);
+    // string expr = instructionDumper.localExpressionByValue->operator[](alloca);
     cout << "expr " << expr << endl;
+    ASSERT_EQ("v1", expr);
+    cout << "allocaDeclarations.size() " << instructionDumper->allocaDeclarations->size() << endl;
+    AllocaInfo allocaInfo = instructionDumper->allocaDeclarations->operator[](0);
+    ASSERT_EQ(bAlloca, allocaInfo.alloca);
+    allocaInfo.refValue->dump();
+    ASSERT_EQ(aLoad, allocaInfo.refValue);
+    cout << "allocaInfo->definition [" << allocaInfo.definition << "]" << endl;
+    ASSERT_EQ("int v1[1]", allocaInfo.definition);
 }
 
 }

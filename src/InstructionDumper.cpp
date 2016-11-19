@@ -394,6 +394,7 @@ void InstructionDumper::dumpAlloca(llvm::AllocaInst *alloca) {
         localExpressionByValue->operator[](alloca) = name;
         if(count == 1) {
             if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
+                cout << "alloca, is arraytype" << endl;
                 int innercount = arrayType->getNumElements();
                 Type *elementType = arrayType->getElementType();
                 string allocaDeclaration = typeDumper->dumpType(elementType) + " " + 
@@ -404,15 +405,17 @@ void InstructionDumper::dumpAlloca(llvm::AllocaInst *alloca) {
                 allocaDeclarations->push_back(allocaInfo);
                 return;
             } else {
+                cout << "alloca, non-arraytype" << endl;
                 Value *refInstruction = alloca;
                 // if the elementType is a pointer, assume its global?
                 if(isa<PointerType>(ptrElementType)) {
+                    cout << "alloca, pointertype" << endl;
                     // find the store
                     for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
                         User *user = *it;
                         if(StoreInst *store = dyn_cast<StoreInst>(user)) {
                             int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
-                            refInstruction = store->getOperand(0);
+                            // refInstruction = store->getOperand(0);
                             if(storeop0space == 1) {
                                 gencode += "global ";
                                 updateAddressSpace(alloca, 1);
@@ -423,7 +426,16 @@ void InstructionDumper::dumpAlloca(llvm::AllocaInst *alloca) {
                     }
                 }
                 string allocaDeclaration = gencode + typestring + " " + dumpOperand(alloca) + "[1]";
-                // just declare this at the head of th efunction
+                // find the store
+                for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
+                    User *user = *it;
+                    if(StoreInst *store = dyn_cast<StoreInst>(user)) {
+                        cout << "found store:" << endl;
+                        store->dump();
+                        cout << endl;
+                        refInstruction = store->getOperand(0);
+                    }
+                }
                 allocaInfo.alloca = alloca;
                 allocaInfo.refValue = refInstruction;
                 allocaInfo.definition = allocaDeclaration;
