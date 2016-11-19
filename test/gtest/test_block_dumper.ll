@@ -115,3 +115,9 @@ define i32 @usestructs(%"struct.mystruct" *%structs) {
 
   ret i32 0
 }
+
+define void @storefloat(float *%data) {
+  %1 = fadd float 5.0, 3.0
+  store float %1, float *%data
+  ret void
+}

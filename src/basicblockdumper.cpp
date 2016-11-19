@@ -92,12 +92,12 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
     vector<string> reslines;
     // InstructionDumper instructionDumper;
     instructionDumper->runRhsGeneration(instruction, &reslines, dumpedFunctions, returnTypeByFunction);
+    clcode.insert(clcode.end(), reslines.begin(), reslines.end());
     if(instructionDumper->localExpressionByValue->find(instruction) == instructionDumper->localExpressionByValue->end()) {
         return true;
     }
     string instructionCode = instructionDumper->localExpressionByValue->at(instruction);
     cout << "basicblockdumper dumpInstruction instrucitoncode=" << instructionCode << " reslines.size() " << reslines.size() << endl;
-    clcode.insert(clcode.end(), reslines.begin(), reslines.end());
     if(instructionCode == "" || isa<AllocaInst>(instruction)) {
         return true;
     }

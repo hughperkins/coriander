@@ -465,6 +465,7 @@ std::string InstructionDumper::dumpStore(llvm::StoreInst *instr) {
     string rhs = dumpOperand(instr->getOperand(0));
     rhs = stripOuterParams(rhs);
     gencode += dumpOperand(instr->getOperand(1)) + "[0] = " + rhs;
+    cout << "dumpStore, gencode=[" << gencode << "]" << endl;
     // (*localExpressionByValue)[instr] = 
     return gencode;
 }
