@@ -127,7 +127,7 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
     User *use_user = 0;
     // bool weArePointer = isa<PointerType>(instruction->getType());
     // bool useIsPointer = false;
-    // bool useIsAStore = false;
+    bool useIsAStore = false;
     bool useIsExtractValue = false;
     bool useIsAPhi = false;
     // bool useIsALoad = false;
@@ -138,14 +138,18 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
         // cout << "one use" << endl;
         use = &*instruction->use_begin();
         use_user = use->getUser();
-        // useIsAStore = isa<StoreInst>(use_user);
+        useIsAStore = isa<StoreInst>(use_user);
         // useIsPointer = isa<PointerType>(use_user->getType());
         useIsExtractValue = isa<ExtractValueInst>(use_user);
         useIsAPhi = isa<PHINode>(use_user);
         // useIsALoad = isa<LoadInst>(use_user);
     }
-    if(!useIsAPhi && !useIsExtractValue && instruction->getNumUses() <= 1 && !isa<LoadInst>(instruction)
-            && !isa<StoreInst>(instruction)
+    if(     instruction->getNumUses() <= 1
+            && !useIsExtractValue 
+            && !useIsAPhi
+            && !isa<LoadInst>(instruction)
+            // && !isa<StoreInst>(instruction)
+            && !useIsAStore
             && !isa<CallInst>(instruction)) { // } && !useIsAStore) {
         // cout << "handling as single use" << endl;
         if(!isSingleExpression(instructionCode)) {

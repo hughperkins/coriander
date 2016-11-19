@@ -143,6 +143,45 @@ TEST(test_instructiondumper, add_two_declared_variables) {
     ASSERT_EQ(0u, wrapper.allocaDeclarations.size());
 }
 
+TEST(test_instructiondumper, store) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+
+    LLVMContext &context = myblock.context;
+    // create an alloca,and store into that?
+    AllocaInst *a = builder.CreateAlloca(IntegerType::get(context, 32));
+    AllocaInst *b = builder.CreateAlloca(IntegerType::get(context, 32));
+
+    LoadInst *aLoad = builder.CreateLoad(a);
+
+    InstructionDumperWrapper wrapper;
+
+    // since they are declared, we expect to find them in localnames:
+    wrapper.localNames.getOrCreateName(aLoad, "v_a");
+    wrapper.localNames.getOrCreateName(b, "v_b");
+
+    StoreInst *bStore = builder.CreateStore(aLoad, b);
+
+    wrapper.runRhsGeneration(bStore);
+    ASSERT_EQ(0u, wrapper.instructionDumper->localExpressionByValue->size()); 
+
+    cout << "variablesToDeclare.size() " << wrapper.variablesToDeclare.size() << endl;
+    cout << "additionalLines.size() " << wrapper.extraInstructions.size() << endl;
+    cout << "additionalline [" << wrapper.extraInstructions[0] << "]" << endl;
+    ASSERT_EQ("v_b[0] = v_a", wrapper.extraInstructions[0]);
+
+    // if we check local names, we should NOT find the add, since we havent declared it
+    // ASSERT_FALSE(wrapper.localNames.hasValue(add));
+
+    // but we should find an expression for it:
+    /// oh ... we already tested this :-)
+
+    // we should not find a requirement to declare the variable
+    // ASSERT_EQ(0u, wrapper.variablesToDeclare.size());
+    // ... and no allocas
+    // ASSERT_EQ(0u, wrapper.allocaDeclarations.size());
+}
+
 TEST(test_instructiondumper, callsomething) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);

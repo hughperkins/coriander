@@ -451,6 +451,7 @@ std::string InstructionDumper::dumpStore(llvm::StoreInst *instr) {
     string rhs = dumpOperand(instr->getOperand(0));
     rhs = stripOuterParams(rhs);
     gencode += dumpOperand(instr->getOperand(1)) + "[0] = " + rhs;
+    // (*localExpressionByValue)[instr] = 
     return gencode;
 }
 
@@ -1033,6 +1034,7 @@ bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::ve
     }
     if(isa<StoreInst>(instruction)) {
         additionalLinesNeeded->push_back(instructionCode);
+        // (*localExpressionByValue[instruction] = )
         return true;
     }
     if(instructionCode != "") {

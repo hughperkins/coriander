@@ -86,8 +86,14 @@ TEST(test_block_dumper, basic) {
     string expectedBlockCl = R"(    v2 = (5 + 3) + 7;
     v3 = 8.0f + 3.0f;
     v4 = v3 + 9.0f;
+    v5 = v4 / v3;
     v7 = v6[0];
-    v8[0] = v4 / v3;
+    v16 = v7;
+    v17 = v7;
+    v18 = (int)v4;
+    v19 = (int)v4;
+    v20 = (float)v2;
+    v21 = (float)v2;
     v26 = v25[0];
     v26.f0 = 4;
     v28 = v26;
