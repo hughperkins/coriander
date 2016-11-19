@@ -91,7 +91,9 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
     // lets dump the original isntruction, commented out
     vector<string> reslines;
     // InstructionDumper instructionDumper;
-    instructionDumper->runRhsGeneration(instruction, &reslines, dumpedFunctions, returnTypeByFunction);
+    if(!instructionDumper->runRhsGeneration(instruction, &reslines, dumpedFunctions, returnTypeByFunction)) {
+        return false;
+    }
     clcode.insert(clcode.end(), reslines.begin(), reslines.end());
     if(instructionDumper->localExpressionByValue->find(instruction) == instructionDumper->localExpressionByValue->end()) {
         return true;
