@@ -91,6 +91,8 @@ public:
     std::vector<AllocaInfo> allocaDeclarations;
     std::set<llvm::Value *> variablesToDeclare;
     std::set<llvm::Value *> sharedVariablesToDeclare;
+    // std::set<llvm::StructType *> structsToDeclare;
+
     std::set<std::string> shimFunctionsNeeded;
     std::set<llvm::Function *> neededFunctions;
 
@@ -312,6 +314,52 @@ TEST(test_instructiondumper, alloca) {
     ASSERT_EQ(aLoad, allocaInfo.refValue);
     cout << "allocaInfo->definition [" << allocaInfo.definition << "]" << endl;
     ASSERT_EQ("int v1[1]", allocaInfo.definition);
+}
+
+TEST(test_instructiondumper, alloca_struct) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+    LLVMContext &context = myblock.context;
+
+    InstructionDumperWrapper wrapper;
+    InstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    Type *structElements[] = {
+        IntegerType::get(context, 32),
+        IntegerType::get(context, 32)
+    };
+    StructType *myStructType = StructType::create(
+        context, structElements, "struct.mystruct"
+    );
+    myStructType->dump();
+    cout << endl;
+
+    AllocaInst *aAlloca = builder.CreateAlloca(myStructType);
+    LoadInst *aLoad = builder.CreateLoad(aAlloca);
+
+    // we should create allocas really, and load those.  I guess?
+    AllocaInst *bAlloca = builder.CreateAlloca(myStructType);
+    StoreInst *bstore = builder.CreateStore(aLoad, bAlloca);
+
+    myblock.block->dump();
+
+    wrapper.runRhsGeneration(bAlloca);
+    string expr = wrapper.getExpr(bAlloca);
+
+    // string expr = instructionDumper.localExpressionByValue->operator[](alloca);
+    cout << "expr " << expr << endl;
+    ASSERT_EQ("v1", expr);
+    cout << "allocaDeclarations.size() " << instructionDumper->allocaDeclarations->size() << endl;
+    AllocaInfo allocaInfo = instructionDumper->allocaDeclarations->operator[](0);
+    ASSERT_EQ(bAlloca, allocaInfo.alloca);
+    allocaInfo.refValue->dump();
+    ASSERT_EQ(aLoad, allocaInfo.refValue);
+    cout << "allocaInfo->definition [" << allocaInfo.definition << "]" << endl;
+    ASSERT_EQ("struct mystruct v1[1]", allocaInfo.definition);
+
+    cout << "typedumper.structsToDefine.size() " << wrapper.typeDumper->structsToDefine.size() << endl;
+    ASSERT_EQ(1u, wrapper.typeDumper->structsToDefine.size());
+    ASSERT_EQ(myStructType, *(wrapper.typeDumper->structsToDefine.begin()));
 }
 
 }

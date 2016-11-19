@@ -36,6 +36,8 @@ InstructionDumper::InstructionDumper(
     allocaDeclarations(allocaDeclarations),
     variablesToDeclare(variablesToDeclare),
     sharedVariablesToDeclare(sharedVariablesToDeclare),
+    // structsToDeclare(structsToDeclare),
+
     shimFunctionsNeeded(shimFunctionsNeeded),
     neededFunctions(neededFunctions),
 

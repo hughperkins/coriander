@@ -42,7 +42,10 @@ public:
     InstructionDumper(
             GlobalNames *globalNames, LocalNames *localNames, TypeDumper *typeDumper, const FunctionNamesMap *functionNamesMap,
             std::vector<AllocaInfo> *allocaDeclarations, std::set<llvm::Value *> *variablesToDeclare,
-            std::set<llvm::Value *> *sharedVariablesToDeclare, std::set<std::string> *shimFunctionsNeeded,
+            std::set<llvm::Value *> *sharedVariablesToDeclare,
+            // std::set<llvm::StructType *> *structsToDeclare,
+
+            std::set<std::string> *shimFunctionsNeeded,
             std::set<llvm::Function *> *neededFunctions,
             std::map<llvm::Value *, std::string> *globalExpressionByValue, std::map<llvm::Value *, std::string> *localExpressionByValue
             );
@@ -86,6 +89,8 @@ public:
     std::vector<AllocaInfo> *allocaDeclarations = 0;
     std::set<llvm::Value *> *variablesToDeclare = 0;
     std::set<llvm::Value *> *sharedVariablesToDeclare = 0;
+    // std::set<llvm::StructType *> *structsToDeclare = 0;
+
     std::set<std::string> *shimFunctionsNeeded = 0; // for __shfldown_3 etc, that we provide as opencl directly
     std::set<llvm::Function *> *neededFunctions = 0;
 
