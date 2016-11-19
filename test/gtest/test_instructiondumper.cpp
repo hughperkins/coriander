@@ -249,61 +249,6 @@ TEST(test_instructiondumper, callsomething) {
     ASSERT_EQ(call, it->first);
 }
 
-TEST(test_instructiondumper, basic) {
-    LLVMContext context;
-    unique_ptr<Module>M(new Module("module", context));
-
-    Value *a = ConstantInt::getSigned(IntegerType::get(context, 32), 123);
-    Value *b = ConstantInt::getSigned(IntegerType::get(context, 32), 47);
-    Instruction *add = BinaryOperator::Create(Instruction::FAdd, a, b);
-    GlobalNames globalNames;
-    LocalNames localNames;
-    TypeDumper typeDumper(&globalNames);
-    FunctionNamesMap functionNamesMap;
-
-    std::vector<AllocaInfo> allocaDeclarations;
-    std::set<llvm::Value *> variablesToDeclare;
-    std::set<llvm::Value *> sharedVariablesToDeclare;
-    std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
-    std::set<llvm::Function *> neededFunctions;
-
-    std::map<llvm::Value *, std::string> globalExpressionByValue;
-    std::map<llvm::Value *, std::string> localExpressionByValue;
-
-    InstructionDumper instructionDumper(&globalNames, &localNames, &typeDumper, &functionNamesMap,
-        &allocaDeclarations, &variablesToDeclare, &sharedVariablesToDeclare, &shimFunctionsNeeded,
-        &neededFunctions,
-        &globalExpressionByValue, &localExpressionByValue);
-    vector<string> extraInstructions;
-    std::set< llvm::Function *> dumpedFunctions;
-    map<Function *, Type *>returnTypeByFunction;
-    instructionDumper.runRhsGeneration(add, &extraInstructions, dumpedFunctions, returnTypeByFunction);
-    string expr = instructionDumper.localExpressionByValue->operator[](add);
-
-    cout << "expr " << expr << endl;
-    ASSERT_EQ("123 + 47", expr);
-
-    instructionDumper.localExpressionByValue->operator[](a) = "v1";
-    instructionDumper.runRhsGeneration(add, &extraInstructions, dumpedFunctions, returnTypeByFunction);
-    expr = instructionDumper.localExpressionByValue->operator[](add);
-    cout << "expr " << expr << endl;
-
-    a = new AllocaInst(IntegerType::get(context, 32));
-    b = new AllocaInst(IntegerType::get(context, 32));
-    instructionDumper.localExpressionByValue->operator[](a) = "v3";
-    instructionDumper.localExpressionByValue->operator[](b) = "v4";
-    add = BinaryOperator::Create(Instruction::Add, a, b);
-    instructionDumper.runRhsGeneration(add, &extraInstructions, dumpedFunctions, returnTypeByFunction);
-    expr = instructionDumper.localExpressionByValue->operator[](add);
-    cout << "expr " << expr << endl;
-
-    instructionDumper.localExpressionByValue->operator[](add) = "v5";
-    // expr = instructionDumper.dumpInstructionRhs(add, &extraInstructions);
-    instructionDumper.runRhsGeneration(add, &extraInstructions, dumpedFunctions, returnTypeByFunction);
-    expr = instructionDumper.localExpressionByValue->operator[](add);
-    cout << "expr " << expr << endl;
-}
-
 TEST(test_instructiondumper, globalexpr) {
     LLVMContext context;
     unique_ptr<Module>M(new Module("module", context));
