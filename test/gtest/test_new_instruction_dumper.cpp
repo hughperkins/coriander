@@ -288,7 +288,7 @@ TEST(test_new_instruction_dumper, insert_value) {
     AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(context, 32));
     LoadInst *intLoad = builder.CreateLoad(intAlloca);
 
-    unsigned int idxs0[] = {0};
+    unsigned int idxs0[] = {3};
     InsertValueInst *insert = cast<InsertValueInst>(builder.CreateInsertValue(aAlloca, intLoad, idxs0));
 
     myblock.block->dump();
@@ -306,7 +306,8 @@ TEST(test_new_instruction_dumper, insert_value) {
     instructionDumper->runGeneration(insertInfo);
 
     cout << "hasexpr " << insertInfo->hasExpr() << endl;
-    // ASSERT_FALSE(bStoreInfo->hasExpr());
+    ASSERT_TRUE(insertInfo->hasExpr());
+    cout << "expr: " << insertInfo->getExpr() << endl;
 
     ostringstream oss;
     insertInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
@@ -316,7 +317,25 @@ TEST(test_new_instruction_dumper, insert_value) {
     oss.str("");
     insertInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
-    // ASSERT_EQ("    b[0] = aLoad;\n", oss.str());
+    ASSERT_EQ("    aAlloca[3] = intLoad;\n", oss.str());
+
+    cout << "after setAsAssigned:" << endl;
+    insertInfo->setAsAssigned();
+
+    cout << "hasexpr " << insertInfo->hasExpr() << endl;
+    ASSERT_TRUE(insertInfo->hasExpr());
+    cout << "expr: " << insertInfo->getExpr() << endl;
+
+    // ostringstream oss;
+    oss.str("");
+    insertInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    // ASSERT_EQ("", oss.str());
+
+    oss.str("");
+    insertInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    // ASSERT_EQ("    aAlloca[3] = intLoad;\n", oss.str());
 
 }
 

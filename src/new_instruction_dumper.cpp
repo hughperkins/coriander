@@ -108,16 +108,19 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
         int idx = indices[d];
         Type *newType = 0;
         if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
+            cout << "insertvalue: pointer or array type" << endl;
             if(d == 0) {
                 if(isa<ArrayType>(currentType->getPointerElementType())) {
                     lhs = "(&" + lhs + ")";
                 }
             }
-            Value *thisop = instr->getOperand(d + 1);
-            LocalValueInfo* thisvalueinfo = localValueInfos->at(thisop).get();
-            lhs += string("[") + thisvalueinfo->getExpr() + "]";
+            // Value *thisop = instr->getOperand(d + 1);
+            // LocalValueInfo* thisvalueinfo = localValueInfos->at(thisop).get();
+            // lhs += string("[") + thisvalueinfo->getExpr() + "]";
+            lhs += string("[") + easycl::toString(idx) + "]";
             newType = currentType->getPointerElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
+            cout << "insertvalue: struct type" << endl;
             string structName = getName(structtype);
             if(structName == "struct.float4") {
                 Type *elementType = structtype->getElementType(idx);
