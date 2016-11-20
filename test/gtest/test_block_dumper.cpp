@@ -158,7 +158,6 @@ TEST(test_block_dumper, basic) {
 //     ASSERT_EQ(expectedDeclarations, blockDumper.writeDeclarations("    "));
 }
 
-/*
 TEST(test_block_dumper, basic2) {
     Function *F = getFunction("someKernel");
     F->dump();
@@ -175,22 +174,39 @@ TEST(test_block_dumper, basic2) {
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
+    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+        Argument *arg = &*it;
+        // sring name = localNames.getOrCreateName(arg, arg->getName().str());
+        arg->dump();
+        LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &blockDumper.localValueInfos, arg, arg->getName().str());
+        localValueInfo->setExpression(localValueInfo->name);
+    }
     ostringstream oss;
-    std::set< llvm::Function *> dumpedFunctions;
+    // std::set< llvm::Function *> dumpedFunctions;
     map<Function *, Type *>returnTypeByFunction;
-    blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
+    blockDumper.runGeneration(returnTypeByFunction);
     blockDumper.toCl(oss);
     string cl = oss.str();
     cout << "cl:\n" << cl << endl;
-    cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
+    cout << "declarations:" << endl;
+    oss.str("");
+    blockDumper.writeDeclarations("    ", oss);
+    cout << oss.str() << endl;
+    // cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
 
     for(auto it=blockDumper.neededFunctions.begin(); it != blockDumper.neededFunctions.end(); it++) {
         cout << "called function " << (*it)->getName().str() << endl;
     }
     ASSERT_EQ(1u, blockDumper.neededFunctions.size());
-    ASSERT_EQ(getFunction("someFunc"), *blockDumper.neededFunctions.begin());
+    Function *neededFunction = *blockDumper.neededFunctions.begin();
+    neededFunction->dump();
+    cout << endl;
+    cout << neededFunction->getName().str() << endl;
+    ASSERT_EQ("someFunc_gp", neededFunction->getName().str());
+    // ASSERT_EQ(getFunction("someFunc"), *blockDumper.neededFunctions.begin());
 }
 
+/*
 TEST(test_block_dumper, usesShared) {
     Function *F = getFunction("usesShared");
     F->dump();
