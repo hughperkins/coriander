@@ -28,6 +28,8 @@ public:
     void dumpAddrSpaceCast(LocalValueInfo *localValueInfo);
     void dumpBinaryOperator(LocalValueInfo *localValueInfo, std::string opstring);
 
+    void dumpSelect(LocalValueInfo *localValueInfo);
+
     void dumpAlloca(cocl::LocalValueInfo *localValueInfo);
     void dumpStore(cocl::LocalValueInfo *localValueInfo);
     void dumpInsertValue(cocl::LocalValueInfo *localValueInfo);

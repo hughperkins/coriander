@@ -236,6 +236,29 @@ void NewInstructionDumper::dumpAddrSpaceCast(cocl::LocalValueInfo *localValueInf
     // return gencode;
 }
 
+void NewInstructionDumper::dumpSelect(cocl::LocalValueInfo *localValueInfo) {
+    localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
+    Instruction *instr = cast<Instruction>(localValueInfo->value);
+
+    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
+    LocalValueInfo *op2info = localValueInfos->at(instr->getOperand(2)).get();
+
+    string op0 = op0info->getExpr();
+    string op1 = op1info->getExpr();
+    string op2 = op2info->getExpr();
+
+    string gencode = "";
+    copyAddressSpace(instr->getOperand(1), instr);
+    localValueInfo->setAddressSpaceFrom(instr->getOperand(1));
+    gencode += op0 + " ? ";
+    gencode += op1 + " : ";
+    gencode += op2;
+
+    localValueInfo->setExpression(gencode);
+    // return gencode;
+}
+
 void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new StoreClWriter(localValueInfo));
     StoreInst *instr = cast<StoreInst>(localValueInfo->value);
@@ -471,9 +494,9 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo) {
         // // case Instruction::IntToPtr:
         // //     instructionCode = dumpInttoPtr(cast<IntToPtrInst>(instruction));
         // //     break;
-        // case Instruction::Select:
-        //     instructionCode = dumpSelect(cast<SelectInst>(instruction));
-        //     break;
+        case Instruction::Select:
+            dumpSelect(localValueInfo);
+            break;
         // case Instruction::GetElementPtr:
         //     instructionCode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
         //     break;

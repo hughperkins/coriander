@@ -871,4 +871,62 @@ TEST(test_new_instruction_dumper, test_addrspacecast) {
     ASSERT_EQ("myinstr", expr);
 }
 
+TEST(test_new_instruction_dumper, test_select) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+    LLVMContext &context = myblock.context;
+    InstructionDumperWrapper wrapper;
+    NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    AllocaInst *conditionAlloca = builder.CreateAlloca(IntegerType::get(context, 1));
+    AllocaInst *aAlloca = builder.CreateAlloca(Type::getFloatTy(context));
+    AllocaInst *bAlloca = builder.CreateAlloca(Type::getFloatTy(context));
+
+    LoadInst *condition = builder.CreateLoad(conditionAlloca);
+    LoadInst *a = builder.CreateLoad(aAlloca);
+    LoadInst *b = builder.CreateLoad(bAlloca);
+
+    wrapper.declareVariable(condition, "mycondition");
+    wrapper.declareVariable(a, "v_a");
+    wrapper.declareVariable(b, "v_b");
+
+    Instruction *instr = cast<Instruction>(builder.CreateSelect(condition, a, b));
+
+    LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
+    instructionDumper->runGeneration(instrInfo);
+
+    string expr = instrInfo->getExpr();
+    cout << "expr " << expr << endl;
+    ASSERT_EQ("mycondition ? v_a : v_b", expr);
+
+    ostringstream oss;
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    cout << "after setAsAssigned:" << endl;
+    instrInfo->setAsAssigned();
+
+    oss.str("");
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    float myinstr;\n", oss.str());
+
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    // we just ignore address space casts, since thye're not actually possible in opencl 1.2 :-P,
+    // and because, everywhere they're used, ignoring them works ok
+    ASSERT_EQ("    myinstr = mycondition ? v_a : v_b;\n", oss.str());
+
+    expr = instrInfo->getExpr();
+    cout << "expr " << expr << endl;
+    ASSERT_EQ("myinstr", expr);
+}
+
 }
