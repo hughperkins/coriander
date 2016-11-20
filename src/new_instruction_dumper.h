@@ -21,11 +21,11 @@ public:
 
     void dumpIcmp(LocalValueInfo *localValueInfo);
     void dumpFcmp(LocalValueInfo *localValueInfo);
-    void dumpSExt(LocalValueInfo *localValueInfo);
-    void dumpZExt(LocalValueInfo *localValueInfo);
-    void dumpFPExt(LocalValueInfo *localValueInfo);
-    void dumpFPTrunc(LocalValueInfo *localValueInfo);
+
+    void dumpExt(LocalValueInfo *localValueInfo);
+    void dumpTrunc(LocalValueInfo *localValueInfo);
     void dumpBinaryOperator(LocalValueInfo *localValueInfo, std::string opstring);
+
     void dumpAlloca(cocl::LocalValueInfo *localValueInfo);
     void dumpStore(cocl::LocalValueInfo *localValueInfo);
     void dumpInsertValue(cocl::LocalValueInfo *localValueInfo);

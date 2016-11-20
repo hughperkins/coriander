@@ -719,7 +719,6 @@ TEST(test_new_instruction_dumper, test_fpext) {
     ASSERT_EQ("myinstr", expr);
 }
 
-
 TEST(test_new_instruction_dumper, test_fptrunc) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
