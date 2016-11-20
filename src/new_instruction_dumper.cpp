@@ -749,7 +749,7 @@ void NewInstructionDumper::dumpBinaryOperator(LocalValueInfo *localValueInfo, st
     LocalValueInfo *op2info = getOperand(instr->getOperand(1));
     gencode += op2info->getExpr();
 
-    localValueInfo->setExpression(gencode);
+    localValueInfo->setExpression("(" + gencode + ")");
     localValueInfo->setAddressSpace(0);
     localValueInfo->clWriter.reset(new BinaryClWriter(localValueInfo));
     // localValueInfo->setAddressSpace()

@@ -299,10 +299,20 @@ bool BasicBlockDumper::runGeneration(const std::map<llvm::Function *, llvm::Type
 }
 
 void BasicBlockDumper::toCl(ostream &os) {
+    for(auto it=block->begin(); it != instruction_it; it++) {
     // ostringstream oss;
     // for(auto it=clcode.begin(); it != clcode.end(); it++) {
     //     os << "    " << *it << ";\n";
-    // }
+        Value *value = &*it;
+        if(isa<ReturnInst>(value) || isa<PHINode>(value) || isa<BranchInst>(value)) {
+            continue;
+        }
+        cout << "basicblockdumper value:" << endl;
+        value->dump();
+        cout << endl;
+        LocalValueInfo *valueInfo = localValueInfos.at(value).get();
+        valueInfo->writeInlineCl("    ", os);
+    }
     // return oss.str();
 }
 

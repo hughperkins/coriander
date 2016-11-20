@@ -115,7 +115,7 @@ TEST(test_new_instruction_dumper, test_add) {
     // string expr = wrapper.getExpr(add);
     string expr = addInfo->getExpr();
     cout << "expr " << expr << endl;
-    ASSERT_EQ("v_a + v_b", expr);
+    ASSERT_EQ("(v_a + v_b)", expr);
 
     ostringstream oss;
     addInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);

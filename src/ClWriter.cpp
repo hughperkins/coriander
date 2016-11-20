@@ -19,6 +19,7 @@
 #include "mutations.h"
 #include "EasyCL/util/easycl_stringhelper.h"
 #include "InstructionDumper.h"
+#include "ExpressionsHelper.h"
 
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Constants.h"
@@ -49,7 +50,8 @@ void ClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes a
             cout << "expression for " << localValueInfo->name + " not defined" << endl;
             throw runtime_error("expression for " + localValueInfo->name + " not defined");
         }
-        os << indent << localValueInfo->name << " = " << localValueInfo->expression << ";\n";
+        string expression = stripOuterParams(localValueInfo->expression);
+        os << indent << localValueInfo->name << " = " << expression << ";\n";
     }
     // expression = name;
 }
