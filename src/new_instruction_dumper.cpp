@@ -201,7 +201,7 @@ void NewInstructionDumper::dumpAlloca(cocl::LocalValueInfo *localValueInfo) {
 
 void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new InsertValueClWriter(localValueInfo));
-    InsertValueClWriter *clWriter = dynamic_cast<InsertValueClWriter *>(localValueInfo->clWriter.get());
+    InsertValueClWriter *clWriter = cast<InsertValueClWriter>(localValueInfo->clWriter.get());
     InsertValueInst *instr = cast<InsertValueInst>(localValueInfo->value);
 
     // bool incomingIsUndef = false;
