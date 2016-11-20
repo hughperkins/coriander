@@ -59,6 +59,9 @@ LocalValueInfo *LocalValueInfo::setExpression(std::string expression) {
 }
 
 std::string LocalValueInfo::getExpr() {
+    if(toBeDeclared) {
+        return name;
+    }
     if(!expressionValid) {
         throw std::runtime_error("expression not yet assigned, name " + name);
     }

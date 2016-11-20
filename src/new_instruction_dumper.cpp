@@ -48,6 +48,74 @@ NewInstructionDumper::NewInstructionDumper(
         {
 }
 
+void NewInstructionDumper::dumpIcmp(cocl::LocalValueInfo *localValueInfo) {
+    localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
+    CmpInst *instr = cast<CmpInst>(localValueInfo->value);
+    localValueInfo->setAddressSpace(0);
+
+    cout << "newinstructiondumpre, dumpicmp, instr:" << endl;
+    instr->dump();
+    cout << endl;
+    string gencode = "";
+    // CmpInst::Predicate predicate = instr->getSignedPredicate();  // note: we should detect signedness...
+    CmpInst::Predicate predicate = instr->getPredicate();  // note: we should detect signedness...
+    // cout << "predicate " << instr->getPredicate() << endl;
+    // cout << "signed predicate " << predicate << endl;
+    // cout << "unsigned predicate " << instr->getUnsignedPredicate() << endl;
+    string predicate_string = "";
+    switch(predicate) {
+        case CmpInst::ICMP_SLT:
+        case CmpInst::ICMP_ULT:
+            cout << "slt" << endl;
+            predicate_string = "<";
+            break;
+        case CmpInst::ICMP_SGT:
+        case CmpInst::ICMP_UGT:
+            cout << "sgt" << endl;
+            predicate_string = ">";
+            break;
+        case CmpInst::ICMP_SGE:
+        case CmpInst::ICMP_UGE:
+            cout << "sge" << endl;
+            predicate_string = ">=";
+            break;
+        case CmpInst::ICMP_SLE:
+        case CmpInst::ICMP_ULE:
+            predicate_string = "<=";
+            break;
+        case CmpInst::ICMP_EQ:
+            predicate_string = "==";
+            break;
+        case CmpInst::ICMP_NE:
+            predicate_string = "!=";
+            break;
+        default:
+            cout << "predicate " << predicate << endl;
+            throw runtime_error("predicate not supported");
+    }
+    cout << "newinstructiondumepr::dumpIcmp, predicatestring: " << predicate_string << endl;
+
+    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
+
+    string op0 = op0info->getExpr();
+    string op1 = op1info->getExpr();
+
+    // handle case like `a & 3 == 0`
+    if(op0.find('&') == string::npos) {
+        op0 = stripOuterParams(op0);
+    }
+    if(op1.find('&') == string::npos) {
+        op1 = stripOuterParams(op1);
+    }
+    gencode += op0;
+    gencode += " " + predicate_string + " ";
+    gencode += op1;
+
+    localValueInfo->setExpression(gencode);
+    // return gencode;
+}
+
 void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new StoreClWriter(localValueInfo));
     StoreInst *instr = cast<StoreInst>(localValueInfo->value);
@@ -248,9 +316,9 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo) {
         case Instruction::AShr:
             dumpBinaryOperator(localValueInfo, ">>");
             break;
-        // case Instruction::ICmp:
-        //     instructionCode = dumpIcmp(cast<ICmpInst>(instruction));
-        //     break;
+        case Instruction::ICmp:
+            dumpIcmp(localValueInfo);
+            break;
         // case Instruction::FCmp:
         //     instructionCode = dumpFcmp(cast<FCmpInst>(instruction));
         //     break;

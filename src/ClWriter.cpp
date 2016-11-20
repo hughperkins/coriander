@@ -45,7 +45,11 @@ void ClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes a
         os << indent << *it << ";\n";
     }
     if(localValueInfo->toBeDeclared) {
-        os << indent << localValueInfo->name << " = " << localValueInfo->getExpr() << ";\n";
+        if(!localValueInfo->expressionValid) {
+            cout << "expression for " << localValueInfo->name + " not defined" << endl;
+            throw runtime_error("expression for " + localValueInfo->name + " not defined");
+        }
+        os << indent << localValueInfo->name << " = " << localValueInfo->expression << ";\n";
     }
     // expression = name;
 }

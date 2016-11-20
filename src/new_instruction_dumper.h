@@ -18,6 +18,7 @@ public:
             std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos,
             std::vector<AllocaInfo> *allocaDeclarations
 );
+    void dumpIcmp(LocalValueInfo *localValueInfo);
     void dumpBinaryOperator(LocalValueInfo *localValueInfo, std::string opstring);
     void dumpAlloca(cocl::LocalValueInfo *localValueInfo);
     void dumpStore(cocl::LocalValueInfo *localValueInfo);

@@ -60,12 +60,16 @@ public:
     virtual ~InstructionDumperWrapper() {
 
     }
-    // void runRhsGeneration(Instruction *inst) {
-    //     // instructionDumper->runRhsGeneration(inst, &extraInstructions, dumpedFunctions, returnTypeByFunction);
-    // }
-    // string getExpr(Instruction *inst) {
-    //     return instructionDumper->localExpressionByValue->at(inst);
-    // }
+    void declareVariable(Value *var, string name) {
+        LocalValueInfo *valueInfo = LocalValueInfo::getOrCreate(
+            &localNames, &localValueInfos, var, name);
+        valueInfo->setExpression(valueInfo->name);
+    }
+    LocalValueInfo *createInfo(Value *var, string name) {        
+        LocalValueInfo *valueInfo = LocalValueInfo::getOrCreate(
+            &localNames, &localValueInfos, var, name);
+        return valueInfo;
+    }
 
     GlobalNames globalNames;
     LocalNames localNames;
@@ -454,6 +458,62 @@ TEST(test_new_instruction_dumper, insert_value_from_undef_f1) {
     insertInfo->setAsAssigned();
 
     ASSERT_TRUE(insertInfo->toBeDeclared);
+}
+
+TEST(test_new_instruction_dumper, test_icmp) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+    LLVMContext &context = myblock.context;
+    InstructionDumperWrapper wrapper;
+    NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    AllocaInst *a = builder.CreateAlloca(IntegerType::get(context, 32));
+    AllocaInst *b = builder.CreateAlloca(IntegerType::get(context, 32));
+
+    LoadInst *aLoad = builder.CreateLoad(a);
+    LoadInst *bLoad = builder.CreateLoad(b);
+
+    wrapper.declareVariable(aLoad, "v_a");
+    wrapper.declareVariable(bLoad, "v_b");
+
+    ICmpInst *instr = cast<ICmpInst>(builder.CreateICmpSLT(aLoad, bLoad));
+    instr->dump();
+    cout << endl;
+    cout << "instr->  predicate " << instr->getPredicate() << endl;
+
+    LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
+    instructionDumper->runGeneration(instrInfo);
+
+    string expr = instrInfo->getExpr();
+    cout << "expr " << expr << endl;
+    ASSERT_EQ("v_a < v_b", expr);
+
+    ostringstream oss;
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    cout << "after setAsAssigned:" << endl;
+    instrInfo->setAsAssigned();
+
+    oss.str("");
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    bool myinstr;\n", oss.str());
+
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    myinstr = v_a < v_b;\n", oss.str());
+
+    expr = instrInfo->getExpr();
+    cout << "expr " << expr << endl;
+    ASSERT_EQ("myinstr", expr);
 }
 
 }
