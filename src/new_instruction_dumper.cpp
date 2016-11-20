@@ -200,6 +200,19 @@ void NewInstructionDumper::dumpFPExt(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->setExpression(op0);
 }
 
+void NewInstructionDumper::dumpFPTrunc(cocl::LocalValueInfo *localValueInfo) {
+    localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
+    Instruction *instr = cast<Instruction>(localValueInfo->value);
+
+    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    string op0 = op0info->getExpr();
+
+    // since this is float point trunc, lets just assume we're going from double to float
+    // fix any exceptiosn to this rule later
+    string typestr = typeDumper->dumpType(instr->getType());
+    localValueInfo->setExpression("(" + typestr + ")" + op0);
+}
+
 void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new StoreClWriter(localValueInfo));
     StoreInst *instr = cast<StoreInst>(localValueInfo->value);
@@ -415,9 +428,9 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo) {
         case Instruction::FPExt:
             dumpFPExt(localValueInfo);
             break;
-        // case Instruction::FPTrunc:
-        //     instructionCode = dumpFPTrunc(cast<CastInst>(instruction));
-        //     break;
+        case Instruction::FPTrunc:
+            dumpFPTrunc(localValueInfo);
+            break;
         // case Instruction::Trunc:
         //     instructionCode = dumpTrunc(cast<CastInst>(instruction));
         //     break;
