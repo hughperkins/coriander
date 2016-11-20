@@ -70,78 +70,90 @@ void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
 
 void NewInstructionDumper::dumpAlloca(cocl::LocalValueInfo *localValueInfo) {
     string gencode = "";
-    AllocaInst *alloca = cast<AllocaInst>(localValueInfo->value);
+    // AllocaInst *alloca = cast<AllocaInst>(localValueInfo->value);
     AllocaInfo allocaInfo;
     localValueInfo->clWriter.reset(new AllocaClWriter(localValueInfo));
     string name = localValueInfo->name;
     localValueInfo->setExpression(name);
+}
 
-    // if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
-    //     Type *ptrElementType = allocatypeptr->getPointerElementType();
-    //     std::string typestring = typeDumper->dumpType(ptrElementType);
-    //     int count = readInt32Constant(alloca->getOperand(0));
-    //     // string name = localNames->getOrCreateName(alloca);
-    //     string name = localValueInfo->name;
-    //     // cout << "alloca var name [" << name << "]" << endl;
-    //     // localExpressionByValue->operator[](alloca) = name;
-    //     localValueInfo->setExpression(name);
-    //     if(count == 1) {
-    //         if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
-    //             cout << "alloca, is arraytype" << endl;
-    //             int innercount = arrayType->getNumElements();
-    //             Type *elementType = arrayType->getElementType();
-    //             string allocaDeclaration = typeDumper->dumpType(elementType) + " " + 
-    //                 localValueInfo->name + "[" + easycl::toString(innercount) + "]";
-    //             allocaInfo.alloca = alloca;
-    //             allocaInfo.refValue = alloca;
-    //             allocaInfo.definition = allocaDeclaration;
-    //             allocaDeclarations->push_back(allocaInfo);
-    //             return;
-    //         } else {
-    //             cout << "alloca, non-arraytype" << endl;
-    //             Value *refInstruction = alloca;
-    //             // if the elementType is a pointer, assume its global?
-    //             if(isa<PointerType>(ptrElementType)) {
-    //                 cout << "alloca, pointertype" << endl;
-    //                 // find the store
-    //                 for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
-    //                     User *user = *it;
-    //                     if(StoreInst *store = dyn_cast<StoreInst>(user)) {
-    //                         int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
-    //                         // refInstruction = store->getOperand(0);
-    //                         if(storeop0space == 1) {
-    //                             gencode += "global ";
-    //                             updateAddressSpace(alloca, 1);
-    //                         }
-    //                         copyAddressSpace(user, alloca);
-    //                         typestring = typeDumper->dumpType(ptrElementType);
-    //                     }
-    //                 }
-    //             }
-    //             string allocaDeclaration = gencode + typestring + " " + localValueInfo->name + "[1]";
-    //             // find the store
-    //             for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
-    //                 User *user = *it;
-    //                 if(StoreInst *store = dyn_cast<StoreInst>(user)) {
-    //                     cout << "found store:" << endl;
-    //                     store->dump();
-    //                     cout << endl;
-    //                     refInstruction = store->getOperand(0);
-    //                 }
-    //             }
-    //             allocaInfo.alloca = alloca;
-    //             allocaInfo.refValue = refInstruction;
-    //             allocaInfo.definition = allocaDeclaration;
-    //             allocaDeclarations->push_back(allocaInfo);
-    //             return;
-    //         }
-    //     } else {
-    //         throw runtime_error("not implemented: alloca for count != 1");
-    //     }
-    // } else {
-    //     alloca->dump();
-    //     throw runtime_error("dumpalloca not implemented for non pointer type");
+void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo) {
+    localValueInfo->clWriter.reset(new InsertValueClWriter(localValueInfo));
+    InsertValueInst *instr = cast<InsertValueInst>(localValueInfo->value);
+
+    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
+
+    string lhs = "";
+
+    // cout << "lhs undef value? " << isa<UndefValue>(instr->getOperand(0)) << endl;
+    // string incomingOperand = dumpOperand(instr->getOperand(0));
+    string incomingOperand = op0info->getExpr();
+    // if rhs is empty, that means its 'undef', so we better declare it, I guess...
+    Type *currentType = instr->getType();
+    bool declaredVar = false;
+    if(incomingOperand == "") {
+        cout << "incomingoperand is undef, so adding insertvalue instr to variables to declare" << endl;
+        localValueInfo->toBeDeclared = true;
+        // variablesToDeclare->insert(instr);
+        // localNames->getOrCreateName(instr);
+        // incomingOperand = dumpOperand(instr);
+        incomingOperand = localValueInfo->getExpr();
+        declaredVar = true;
+    }
+    lhs += incomingOperand;
+    ArrayRef<unsigned> indices = instr->getIndices();
+    int numIndices = instr->getNumIndices();
+    for(int d=0; d < numIndices; d++) {
+        int idx = indices[d];
+        Type *newType = 0;
+        if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
+            if(d == 0) {
+                if(isa<ArrayType>(currentType->getPointerElementType())) {
+                    lhs = "(&" + lhs + ")";
+                }
+            }
+            Value *thisop = instr->getOperand(d + 1);
+            LocalValueInfo* thisvalueinfo = localValueInfos->at(thisop).get();
+            lhs += string("[") + thisvalueinfo->getExpr() + "]";
+            newType = currentType->getPointerElementType();
+        } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
+            string structName = getName(structtype);
+            if(structName == "struct.float4") {
+                Type *elementType = structtype->getElementType(idx);
+                Type *castType = PointerType::get(elementType, 0);
+                newType = elementType;
+                lhs = "((" + typeDumper->dumpType(castType) + ")&" + lhs + ")";
+                lhs += string("[") + easycl::toString(idx) + "]";
+            } else {
+                // generic struct
+                Type *elementType = structtype->getElementType(idx);
+                lhs += string(".f") + easycl::toString(idx);
+                newType = elementType;
+            }
+        } else {
+            currentType->dump();
+            throw runtime_error("type not implemented in insertvalue");
+        }
+        currentType = newType;
+    }
+    // std::vector<std::string> res;
+    // string updateline = lhs + " = " + dumpOperand(instr->getOperand(1));
+    string updateline = lhs + " = " + op1info->getExpr();
+    // extralines->push_back(updateline);
+    localValueInfo->inlineCl.push_back(updateline);
+    // res.push_back(lhs + " = " + dumpOperand(instr->getOperand(1)));
+    cout << "dumpinsertvalue lhs=" << lhs << endl;
+    // if(false && declaredVar) {
+    //     // variablesToDeclare->insert(instr);
+    //     string assignline = dumpOperand(instr) + " = " + incomingOperand;
+    //     cout << "declaredvar=" << declaredVar << " so adding line " << assignline << endl;
+    //     extralines->push_back(assignline);
     // }
+    // (*localExpressionByValue)[instr] = dumpOperand(instr);
+    // (*localExpressionByValue)[instr] = incomingOperand;
+    localValueInfo->setExpression(incomingOperand);
+    // return "";
 }
 
 void NewInstructionDumper::dumpBinaryOperator(LocalValueInfo *localValueInfo, std::string opstring) {
@@ -271,10 +283,11 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo) {
         // case Instruction::GetElementPtr:
         //     instructionCode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
         //     break;
-        // case Instruction::InsertValue:
-        //     dumpInsertValue(localValueInfo);
-        //     return;
-        //     // return true;
+        case Instruction::InsertValue:
+            dumpInsertValue(localValueInfo);
+            break;
+            // return;
+            // return true;
         // case Instruction::ExtractValue:
         //     instructionCode = dumpExtractValue(cast<ExtractValueInst>(instruction));
         //     break;

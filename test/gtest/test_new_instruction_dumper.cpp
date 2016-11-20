@@ -231,9 +231,6 @@ TEST(test_new_instruction_dumper, store) {
 
     StoreInst *bStore = builder.CreateStore(aLoad, b);
 
-    // wrapper.runRhsGeneration(bStore);
-    // ASSERT_EQ(0u, wrapper.instructionDumper->localExpressionByValue->size()); 
-
     LocalValueInfo *bStoreInfo = LocalValueInfo::getOrCreate(
         &wrapper.localNames, &wrapper.localValueInfos, bStore);
     instructionDumper->runGeneration(bStoreInfo);
@@ -264,6 +261,63 @@ TEST(test_new_instruction_dumper, store) {
     bStoreInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
     ASSERT_EQ("    b[0] = aLoad;\n", oss.str());
+}
+
+
+TEST(test_new_instruction_dumper, insert_value) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+    LLVMContext &context = myblock.context;
+
+    Type *structElements[] = {
+        IntegerType::get(context, 32),
+        IntegerType::get(context, 32)
+    };
+    StructType *myStructType = StructType::create(
+        context, structElements, "struct.mystruct"
+    );
+    myStructType->dump();
+    cout << endl;
+
+    InstructionDumperWrapper wrapper;
+    NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    AllocaInst *aAlloca = builder.CreateAlloca(myStructType);
+    LoadInst *aLoad = builder.CreateLoad(aAlloca);
+
+    AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(context, 32));
+    LoadInst *intLoad = builder.CreateLoad(intAlloca);
+
+    unsigned int idxs0[] = {0};
+    InsertValueInst *insert = cast<InsertValueInst>(builder.CreateInsertValue(aAlloca, intLoad, idxs0));
+
+    myblock.block->dump();
+
+    LocalValueInfo *aAllocaInfo = LocalValueInfo::getOrCreate(
+        &wrapper.localNames, &wrapper.localValueInfos, aAlloca, "aAlloca");
+    aAllocaInfo->setExpression(aAllocaInfo->name);
+
+    LocalValueInfo *intLoadInfo = LocalValueInfo::getOrCreate(
+        &wrapper.localNames, &wrapper.localValueInfos, intLoad, "intLoad");
+    intLoadInfo->setExpression(intLoadInfo->name);
+
+    LocalValueInfo *insertInfo = LocalValueInfo::getOrCreate(
+        &wrapper.localNames, &wrapper.localValueInfos, insert);
+    instructionDumper->runGeneration(insertInfo);
+
+    cout << "hasexpr " << insertInfo->hasExpr() << endl;
+    // ASSERT_FALSE(bStoreInfo->hasExpr());
+
+    ostringstream oss;
+    insertInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    // ASSERT_EQ("", oss.str());
+
+    oss.str("");
+    insertInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    // ASSERT_EQ("    b[0] = aLoad;\n", oss.str());
+
 }
 
 }

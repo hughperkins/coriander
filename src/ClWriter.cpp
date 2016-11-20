@@ -80,7 +80,7 @@ void AllocaClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
                 return;
             } else {
                 cout << "alloca, non-arraytype" << endl;
-                Value *refInstruction = alloca;
+                // Value *refInstruction = alloca;
                 // if the elementType is a pointer, assume its global?
                 if(isa<PointerType>(ptrElementType)) {
                     cout << "alloca, pointertype" << endl;
@@ -107,7 +107,7 @@ void AllocaClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
                         cout << "found store:" << endl;
                         store->dump();
                         cout << endl;
-                        refInstruction = store->getOperand(0);
+                        // refInstruction = store->getOperand(0);
                     }
                 }
                 // allocaInfo.alloca = alloca;

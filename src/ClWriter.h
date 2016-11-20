@@ -67,6 +67,16 @@ public:
     virtual void writeInlineCl(std::string indent, std::ostream &os);
 };
 
+class InsertValueClWriter : public ClWriter {
+public:
+    InsertValueClWriter(LocalValueInfo *localValueInfo) :
+        ClWriter(localValueInfo) {
+
+        }
+    // virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {} // do nothing :-P
+    // virtual void writeInlineCl(std::string indent, std::ostream &os);
+};
+
 class BinaryClWriter : public ClWriter {
 public:
     BinaryClWriter(LocalValueInfo *localValueInfo) :
