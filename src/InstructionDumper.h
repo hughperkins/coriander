@@ -20,16 +20,18 @@
 #include "GlobalNames.h"
 #include "type_dumper.h"
 #include "function_names_map.h"
+#include "LocalValueInfo.h"
 
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Constants.h"
 
 #include <vector>
 #include <string>
+#include <memory>
 
 namespace cocl {
 
-class AllocaInfo {
+class AllocaInfo final {
 public:
     llvm::AllocaInst *alloca = 0;
     llvm::Value *refValue = 0;
@@ -41,18 +43,18 @@ class InstructionDumper {
 public:
     InstructionDumper(
             GlobalNames *globalNames, LocalNames *localNames, TypeDumper *typeDumper, const FunctionNamesMap *functionNamesMap,
-            std::vector<AllocaInfo> *allocaDeclarations, std::set<llvm::Value *> *variablesToDeclare,
-            std::set<llvm::Value *> *sharedVariablesToDeclare,
-            // std::set<llvm::StructType *> *structsToDeclare,
 
             std::set<std::string> *shimFunctionsNeeded,
             std::set<llvm::Function *> *neededFunctions,
-            std::map<llvm::Value *, std::string> *globalExpressionByValue, std::map<llvm::Value *, std::string> *localExpressionByValue
+
+            std::map<llvm::Value *, std::string> *globalExpressionByValue,
+            std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos,
+            std::vector<AllocaInfo> *allocaDeclarations
             );
     virtual ~InstructionDumper();
 
     // std::string dumpInstructionRhs(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded);
-    bool runRhsGeneration(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded, const std::set< llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
+    void runRhsGeneration(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
     std::string dumpOperand(llvm::Value *value);
     void dumpConstant(std::ostream &oss, llvm::Constant *constant);
 
@@ -78,41 +80,30 @@ public:
     std::string dumpExtractValue(llvm::ExtractValueInst *instr);
     std::string dumpLoad(llvm::LoadInst *instr);
     std::string dumpStore(llvm::StoreInst *instr);
-    void dumpAlloca(llvm::AllocaInst *alloca);
+    void dumpAlloca(LocalValueInfo *localValueInfo);
     std::string dumpGetElementPtr(llvm::GetElementPtrInst *instr);
     std::string dumpSelect(llvm::SelectInst *instr);
     std::string dumpMemcpyCharCharLong(llvm::CallInst *instr);
     std::string dumpCall(llvm::CallInst *instr, const std::set< llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
 
-    std::vector<std::string> generatedCl;
+    // std::vector<std::string> generatedCl;
 
-    std::vector<AllocaInfo> *allocaDeclarations = 0;
-    std::set<llvm::Value *> *variablesToDeclare = 0;
-    std::set<llvm::Value *> *sharedVariablesToDeclare = 0;
-    // std::set<llvm::StructType *> *structsToDeclare = 0;
+    cocl::GlobalNames *globalNames = 0;
+    cocl::LocalNames *localNames = 0;   // these are names for instructions etc, doesnt say anything about whether they've been declared
+                                        // they're always some single idnetifier, eg "v3", never compound, ie never "v1 + v3"
+    cocl::TypeDumper *typeDumper = 0;
+    const cocl::FunctionNamesMap *functionNamesMap = 0;
 
     std::set<std::string> *shimFunctionsNeeded = 0; // for __shfldown_3 etc, that we provide as opencl directly
     std::set<llvm::Function *> *neededFunctions = 0;
 
     std::map<llvm::Value *, std::string> *globalExpressionByValue = 0;
-    std::map<llvm::Value *, std::string> *localExpressionByValue = 0; // this is something one can put on the right-hand side, could be eg "v1", could be eg "v1 + v3"
-
-    cocl::LocalNames *localNames = 0;   // these are names that are concretely declared in the funciton, eg "int v1 = ...;".  an instruction which is not assigned to a
-                                        // local variable will:
-                                        // - have a correponsindg local expressoin value, eg "v1 + v2"
-                                        // - NOT be in localNames
-                                        // hence anything in localExpressions and localNames should be useable on the rhs
-                                        // ideally, any value that is in localNames will also be in localExpressions, with the exact same string/name/value, eg "v1"
-                                        // hence ,should be sufficient to read only from localexpressions, if one wants a useable rhs value for a Value
-    cocl::TypeDumper *typeDumper = 0;
-    cocl::GlobalNames *globalNames = 0;
+    std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos = 0;
+    std::vector<AllocaInfo> *allocaDeclarations = 0;
 
     bool needDependencies = false;
 
     // std::string lastExpression;
-
-protected:
-    const cocl::FunctionNamesMap *functionNamesMap = 0;
 
     bool forceSingle = true;
 };

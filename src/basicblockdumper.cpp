@@ -98,35 +98,36 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
         return false;
     }
     clcode.insert(clcode.end(), reslines.begin(), reslines.end());
-    if(instructionDumper->localExpressionByValue->find(instruction) == instructionDumper->localExpressionByValue->end()) {
-        return true;
-    }
-    string instructionCode = instructionDumper->localExpressionByValue->at(instruction);
+    // if(instructionDumper->localExpressionByValue->find(instruction) == instructionDumper->localExpressionByValue->end()) {
+    // LocalValueInfo *localValueInfo
+    //     return true;
+    // }
+    // string instructionCode = instructionDumper->localExpressionByValue->at(instruction);
     // cout << "basicblockdumper dumpInstruction instrucitoncode=" << instructionCode << " reslines.size() " << reslines.size() << endl;
-    if(instructionCode == "" || isa<AllocaInst>(instruction)) {
-        return true;
-    }
+    // if(instructionCode == "" || isa<AllocaInst>(instruction)) {
+    //     return true;
+    // }
     // cout << "basicblockdumper dumpinstruction updating localexpressionbyvalue with [" << resultName << "]" << endl;
     // localExpressionByValue[instruction] = resultName;
-    string resultType = typeDumper->dumpType(instruction->getType());
+    // string resultType = typeDumper->dumpType(instruction->getType());
 
-    string originalInstruction ="";
-    originalInstruction += resultType + " " + resultName + " =";
-    originalInstruction += " " + string(instruction->getOpcodeName());
-    for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
-        Value *op = &*it->get();
-        originalInstruction += " ";
-        string originalName = localNames->getNameOrEmpty(op);
-        if(originalName == "") {
-            originalName = "<unk>";
-        }
-        originalInstruction += originalName;
-        // if(origNameByValue.find(op) != exprByValue.end()) {
-        //     originalInstruction += exprByValue[op];
-        // } else {
-        //     originalInstruction += "<unk>";
-        // }
-    }
+    // string originalInstruction ="";
+    // originalInstruction += resultType + " " + resultName + " =";
+    // originalInstruction += " " + string(instruction->getOpcodeName());
+    // for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
+    //     Value *op = &*it->get();
+    //     originalInstruction += " ";
+    //     string originalName = localNames->getNameOrEmpty(op);
+    //     if(originalName == "") {
+    //         originalName = "<unk>";
+    //     }
+    //     originalInstruction += originalName;
+    //     // if(origNameByValue.find(op) != exprByValue.end()) {
+    //     //     originalInstruction += exprByValue[op];
+    //     // } else {
+    //     //     originalInstruction += "<unk>";
+    //     // }
+    // }
 
     string typestr = typeDumper->dumpType(instruction->getType());
     Use *use = 0;
@@ -162,12 +163,13 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
             instructionCode= "(" + instructionCode + ")";
         }
         cout << "basicblockdumper.dumpinstruction, updating localexpressionbyvalue to [" << instructionCode << "]" << endl;
-        localExpressionByValue[instruction] = instructionCode;
+        localValueInfo->setExpression(instructionCode);
+        // localExpressionByValue[instruction] = instructionCode;
         // cout << "storing expression for " << localNames->getName(instruction) << ": [" << instructionCode << "]" << endl;
         // nameByValue[instruction] = instructionCode;
         if(_addIRToCl) {
             // return "/* " + originalInstruction + " */\n" + indent;
-            clcode.push_back("/* " + originalInstruction + " */");
+            // clcode.push_back("/* " + originalInstruction + " */");
             return true;
         } else {
             // return "";
@@ -176,7 +178,7 @@ bool BasicBlockDumper::dumpInstruction(Instruction *instruction, const std::set<
     } else {
         // cout << "not single use, assigning to variable" << endl;
         if(_addIRToCl) {
-            clcode.push_back("/* " + originalInstruction + " */");
+            // clcode.push_back("/* " + originalInstruction + " */");
         }
         if(instructionCode != "") {
             // gencode += indent;

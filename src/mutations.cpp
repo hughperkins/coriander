@@ -124,6 +124,9 @@ llvm::Constant *createInt32Constant(llvm::LLVMContext *context, int value) {
 }
 
 void updateAddressSpace(Value *value, int newSpace) {
+    if(!isa<PointerType>(value->getType())) {
+        return;
+    }
     Type *elementType = value->getType()->getPointerElementType();
     Type *newType = PointerType::get(elementType, newSpace);
     value->mutateType(newType);

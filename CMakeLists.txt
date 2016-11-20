@@ -231,10 +231,21 @@ if(BUILD_TESTS)
         add_library(cocl_gtest third_party/gtest/gtest-all.cc)
     endif()
 
+    add_executable(test_new_instructiondumper test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
+      src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/ConstantDumper.cpp
+      src/mutations.cpp src/ExpressionsHelper.cpp src/readIR.cpp
+      src/function_names_map.cpp src/LocalValueInfo.cpp
+      src/new_instruction_dumper.cpp test/gtest/test_new_instruction_dumper.cpp)
+    target_include_directories(test_new_instructiondumper PRIVATE src)
+    target_include_directories(test_new_instructiondumper PRIVATE third_party/gtest)
+    target_include_directories(test_new_instructiondumper PRIVATE ${CLANG_HOME}/include)
+    target_link_libraries(test_new_instructiondumper "${LLVM_LIBS}" cocl_gtest easycl ${LLVM_SYSLIBS})
+    target_compile_options(test_new_instructiondumper PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
+
     add_executable(test_instructiondumper test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
       src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/ConstantDumper.cpp
       src/mutations.cpp src/ExpressionsHelper.cpp src/readIR.cpp
-      src/function_names_map.cpp
+      src/function_names_map.cpp src/LocalValueInfo.cpp
       src/InstructionDumper.cpp test/gtest/test_instructiondumper.cpp)
     target_include_directories(test_instructiondumper PRIVATE src)
     target_include_directories(test_instructiondumper PRIVATE third_party/gtest)

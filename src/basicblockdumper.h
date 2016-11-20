@@ -46,8 +46,8 @@ public:
              {
         instructionDumper.reset(
             new InstructionDumper(globalNames, localNames, typeDumper, functionNamesMap,
-            &allocaDeclarations, &variablesToDeclare, &sharedVariablesToDeclare,
-            &shimFunctionsNeeded, &neededFunctions, &globalExpressionByValue, &localExpressionByValue));
+            &shimFunctionsNeeded, &neededFunctions,
+            &globalExpressionByValue, &localValueInfos, &allocaDeclarations));
         instruction_it = block->begin();
     }
     bool runGeneration(const std::set< llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
@@ -67,11 +67,12 @@ public:
 
     std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
     std::set<llvm::Function *> neededFunctions;
-    std::set<llvm::Value *> variablesToDeclare;
-    std::set<llvm::Value *> sharedVariablesToDeclare;
-    std::vector<AllocaInfo> allocaDeclarations;
+    // std::set<llvm::Value *> variablesToDeclare;
+    // std::set<llvm::Value *> sharedVariablesToDeclare;
     std::map<llvm::Value *, std::string> globalExpressionByValue;
-    std::map<llvm::Value *, std::string> localExpressionByValue;
+    std::map<llvm::Value *, std::unique_ptr<cocl::LocalValueInfo> > localValueInfos;
+    std::vector<AllocaInfo> allocaDeclarations;
+    // std::map<llvm::Value *, std::string> localExpressionByValue;
     std::vector<std::string> clcode;
 
     int maxInstructionsToGenerate = -1; // -1 means no limit, 0 will cause runGeneration to do nothing; otherwise however many instructions to process

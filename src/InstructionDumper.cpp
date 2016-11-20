@@ -28,32 +28,31 @@ namespace cocl {
 
 InstructionDumper::InstructionDumper(
         GlobalNames *globalNames, LocalNames *localNames, TypeDumper *typeDumper, const FunctionNamesMap *functionNamesMap,
-        std::vector<AllocaInfo> *allocaDeclarations, std::set<llvm::Value *> *variablesToDeclare,
-        std::set<llvm::Value *> *sharedVariablesToDeclare, std::set<std::string> *shimFunctionsNeeded,
+
+        std::set<std::string> *shimFunctionsNeeded,
         std::set<llvm::Function *> *neededFunctions,
-        std::map<llvm::Value *, std::string> *globalExpressionByValue, std::map<llvm::Value *, std::string> *localExpressionByValue
+
+        std::map<llvm::Value *, std::string> *globalExpressionByValue,
+        std::map<llvm::Value *, unique_ptr<LocalValueInfo > > *localValueInfos,
+        std::vector<AllocaInfo> *allocaDeclarations
         ) :
-    allocaDeclarations(allocaDeclarations),
-    variablesToDeclare(variablesToDeclare),
-    sharedVariablesToDeclare(sharedVariablesToDeclare),
-    // structsToDeclare(structsToDeclare),
+    globalNames(globalNames),
+    localNames(localNames),
+    typeDumper(typeDumper),
+    functionNamesMap(functionNamesMap),
 
     shimFunctionsNeeded(shimFunctionsNeeded),
     neededFunctions(neededFunctions),
 
     globalExpressionByValue(globalExpressionByValue),
-    localExpressionByValue(localExpressionByValue),
-
-    localNames(localNames),
-    typeDumper(typeDumper),
-    globalNames(globalNames),
-
-    functionNamesMap(functionNamesMap)
+    localValueInfos(localValueInfos),
+    allocaDeclarations(allocaDeclarations)
         {
 }
 InstructionDumper::~InstructionDumper() {
 }
 
+// this might turn out to be a global constant
 void InstructionDumper::dumpConstant(std::ostream &oss, llvm::Constant *constant) {
 // maybe this should be somewhere more generic?
 // string BasicBlockDumper::dumpConstant(Constant *constant) {
@@ -94,16 +93,25 @@ void InstructionDumper::dumpConstant(std::ostream &oss, llvm::Constant *constant
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
             int addressspace = pointerType->getAddressSpace();
             if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
-                sharedVariablesToDeclare->insert(global);
+                // sharedVariablesToDeclare->insert(global);
                 string name = global->getName().str();
-                localNames->getOrCreateName(global, name);
-                (*localExpressionByValue)[global] = name;
-                cout << "shared memory, creating in localnames name=" << name << endl;
+                name = localNames->getOrCreateName(global, name);
+
+                LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, global, name);
+                localValueInfo->setAddressSpace(3);
+                // localValueInfo->setToBeDeclared();
+                localValueInfo->setExpression(name);
+                // localValueInfo->declarationCl.push_back(
+                //     typeDumper->dumpType(pointerType) + " " + name + "[1]");
+                // }
+                // (*localExpressionByValue)[global] = name;
+                // cout << "shared memory, creating in localnames name=" << name << endl;
                 oss << name;
                 return;
                 // return name;
             }
         }
+        // at about this point we should pehaps swap to come global-specific class to handle this?
         if(globalNames->hasName(constant)) {
             cout << "found constnat in globalanesm, returning" << endl;
            // return globalNames->getName(constant);
@@ -136,49 +144,63 @@ void InstructionDumper::dumpConstant(std::ostream &oss, llvm::Constant *constant
     // return oss.str();
 }
 
-string InstructionDumper::dumpConstantExpr(ConstantExpr *expr) {
+// lets assumes hit is always local for now
+// we'll create some separate thing for global constants, maybe just copy and paste, so we
+// dont have to think about how to generalize local vs constant instruction dumping...
+std::string InstructionDumper::dumpConstantExpr(ConstantExpr *expr) {
     // this means things like:
     // shared memory 
     cout << "dumping constnat expr:" << endl;
     expr->dump();
     cout << endl;
     Instruction *instr = expr->getAsInstruction();
+    cout << "dumpConstantExpr" << endl;
+    instr->dump();
+    cout << endl;
+    // LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(localnames, localValueInfos, instr,)
     // InstructionDumper childInstructionDumper;
     // string rhs = dumpInstruction(instr);
-    vector<string> excessLines;
-    std::set< llvm::Function *> dumpedFunctions;
+    // vector<string> excessLines;
+    // std::set< llvm::Function *> dumpedFunctions;
     std::map<llvm::Function *, llvm::Type*> returnTypeByFunction;
-    runRhsGeneration(instr, &excessLines, dumpedFunctions, returnTypeByFunction);
-    string rhs = (*localExpressionByValue)[instr];
+    LocalValueInfo *instrValueInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, instr);
+    runRhsGeneration(instrValueInfo, returnTypeByFunction);
+    string rhs = instrValueInfo->getExpr();
+    // string rhs = (*localExpressionByValue)[instr];
     // string rhs = dumpInstructionRhs(instr, &excessLines);
     cout << "rhs: [" << rhs << "]" << endl;
-    if(excessLines.size() > 0) {
-        throw runtime_error("InstructionDumper::dumpConstantExpr cannot handle excess lines > 0");
-    }
-    string thisinstrstr = "";
-    if((*localExpressionByValue).find(instr) != localExpressionByValue->end()) {
-        thisinstrstr = (*localExpressionByValue)[instr];
-    } else {
-        thisinstrstr = (*globalExpressionByValue)[instr];
-    }
+    // if(excessLines.size() > 0) {
+    //     throw runtime_error("InstructionDumper::dumpConstantExpr cannot handle excess lines > 0");
+    // }
+    return rhs;  // this is kind of broken for now...
+    // throw 
+    // string thisinstrstr = "";
+    // if((*localExpressionByValue).find(instr) != localExpressionByValue->end()) {
+    //     thisinstrstr = (*localExpressionByValue)[instr];
+    // } else {
+    //     thisinstrstr = (*globalExpressionByValue)[instr];
+    // }
     // string thisinstrstr = globalExpressionByValue->operator[](instr);
-    cout << "thisinstrstr: [" << thisinstrstr << "]" << endl;
-    return thisinstrstr;
+    // cout << "thisinstrstr: [" << thisinstrstr << "]" << endl;
+    // return thisinstrstr;
     // throw runtime_error("not implemented");
 }
 
 string InstructionDumper::dumpOperand(Value *value) {
-    if(localExpressionByValue->find(value) != localExpressionByValue->end()) {
-        return localExpressionByValue->operator[](value);
+    if(localValueInfos->find(value) != localValueInfos->end()) {
+    // if(localExpressionByValue->find(value) != localExpressionByValue->end()) {
+        // return localExpressionByValue->operator[](value);
+        LocalValueInfo *localValueInfo = localValueInfos->at(value).get();
+        return localValueInfo->getExpr();  // no point in getting hte name, fi the name isnt declared
     }
     if(Constant *constant = dyn_cast<Constant>(value)) {
         ostringstream oss;
         dumpConstant(oss, constant);
         return oss.str();
     }
-    if(localNames->hasValue(value)) {
-        return localNames->getName(value);
-    }
+    // if(localNames->hasValue(value)) {
+    //     return localNames->getName(value);
+    // }
     // if(isa<BasicBlock>(value)) {
     //     storeValueName(value);
     //     return nameByValue[value];
@@ -384,16 +406,19 @@ std::string InstructionDumper::dumpTrunc(llvm::CastInst *instr) {
     return gencode;
 }
 
-void InstructionDumper::dumpAlloca(llvm::AllocaInst *alloca) {
+void InstructionDumper::dumpAlloca(cocl::LocalValueInfo *localValueInfo) {
     string gencode = "";
+    AllocaInst *alloca = cast<AllocaInst>(localValueInfo->value);
     AllocaInfo allocaInfo;
     if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
         Type *ptrElementType = allocatypeptr->getPointerElementType();
         std::string typestring = typeDumper->dumpType(ptrElementType);
         int count = readInt32Constant(alloca->getOperand(0));
-        string name = localNames->getOrCreateName(alloca);
+        // string name = localNames->getOrCreateName(alloca);
+        string name = localValueInfo->name;
         // cout << "alloca var name [" << name << "]" << endl;
-        localExpressionByValue->operator[](alloca) = name;
+        // localExpressionByValue->operator[](alloca) = name;
+        localValueInfo->setExpression(name);
         if(count == 1) {
             if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
                 cout << "alloca, is arraytype" << endl;
@@ -917,7 +942,8 @@ std::string InstructionDumper::dumpCall(llvm::CallInst *instr, const std::set< l
     return gencode;
 }
 
-bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::vector<std::string> *additionalLinesNeeded, const std::set< llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
+void InstructionDumper::runRhsGeneration(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
+    Instruction *instruction = cast<Instruction>(localValueInfo->value);
     needDependencies = false;
     auto opcode = instruction->getOpcode();
     string instructionCode = "";
@@ -1022,8 +1048,9 @@ bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::ve
             instructionCode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
             break;
         case Instruction::InsertValue:
-            dumpInsertValue(cast<InsertValueInst>(instruction), additionalLinesNeeded);
-            return true;
+            dumpInsertValue(localValueInfo);
+            return;
+            // return true;
         case Instruction::ExtractValue:
             instructionCode = dumpExtractValue(cast<ExtractValueInst>(instruction));
             break;
@@ -1031,15 +1058,16 @@ bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::ve
             instructionCode = dumpStore(cast<StoreInst>(instruction));
             break;
         case Instruction::Call:
-            instructionCode = dumpCall(cast<CallInst>(instruction), dumpedFunctions, returnTypeByFunction);
+            instructionCode = dumpCall(localValueInfo, returnTypeByFunction);
             break;
         case Instruction::Load:
             instructionCode = dumpLoad(cast<LoadInst>(instruction));
             break;
         case Instruction::Alloca:
-            dumpAlloca(cast<AllocaInst>(instruction));
+            dumpAlloca(localValueInfo);
             // return "";
-            return true;
+            return;
+            // return true;
         // case Instruction::Br:
         //     instructionCode = dumpBranch(cast<BranchInst>(instruction));
         //     return instructionCode;
@@ -1056,21 +1084,21 @@ bool InstructionDumper::runRhsGeneration(llvm::Instruction *instruction, std::ve
             cout << "opcode string " << instruction->getOpcodeName() << endl;
             throw runtime_error("unknown opcode");
     }
-    if(isa<StoreInst>(instruction)) {
-        additionalLinesNeeded->push_back(instructionCode);
-        // (*localExpressionByValue[instruction] = )
-        return true;
-    }
-    if(instructionCode != "") {
-        // cout << "instructiondumper.runRhsGeneration instructioncode=[" << instructionCode <<"] localnames hasvalue? " <<
-        //     localNames->hasValue(instruction) << " additionalines.size()=" << additionalLinesNeeded->size() << endl;
-        (*localExpressionByValue)[instruction] = instructionCode;
-    }
-    if(needDependencies) {
-        cout << "dumpinstruction: need dependencies" << endl;
-        return false;
-    }
-    return true;
+    // if(isa<StoreInst>(instruction)) {
+    //     additionalLinesNeeded->push_back(instructionCode);
+    //     // (*localExpressionByValue[instruction] = )
+    //     return true;
+    // }
+    // if(instructionCode != "") {
+    //     // cout << "instructiondumper.runRhsGeneration instructioncode=[" << instructionCode <<"] localnames hasvalue? " <<
+    //     //     localNames->hasValue(instruction) << " additionalines.size()=" << additionalLinesNeeded->size() << endl;
+    //     (*localExpressionByValue)[instruction] = instructionCode;
+    // }
+    // if(needDependencies) {
+    //     cout << "dumpinstruction: need dependencies" << endl;
+    //     return false;
+    // }
+    // return true;
 }
 
 } // namespace cocl
