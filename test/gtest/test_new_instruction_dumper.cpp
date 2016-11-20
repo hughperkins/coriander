@@ -103,24 +103,11 @@ TEST(test_new_instruction_dumper, test_add) {
     InstructionDumperWrapper wrapper;
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    // since they are declared, we expect to find them in localnames:
-    // wrapper.localNames.getOrCreateName(aLoad, "v_a");
-    // wrapper.localNames.getOrCreateName(bLoad, "v_b");
+    wrapper.declareVariable(aLoad, "v_a");
+    wrapper.declareVariable(bLoad, "v_b");
 
-    LocalValueInfo *aLoadInfo = LocalValueInfo::getOrCreate(
-        &wrapper.localNames, &wrapper.localValueInfos, aLoad, "v_a");
-    aLoadInfo->setExpression(aLoadInfo->name);
-    // aLoadInfo->setAsAssigned();
-    LocalValueInfo *bLoadInfo = LocalValueInfo::getOrCreate(
-        &wrapper.localNames, &wrapper.localValueInfos, bLoad, "v_b");
-    bLoadInfo->setExpression(bLoadInfo->name);
-    // bLoadInfo->setAsAssigned();
-
-    // Instruction *add = BinaryOperator::Create(Instruction::FAdd, aLoad, bLoad);
     Instruction *add = cast<Instruction>(builder.CreateAdd(aLoad, bLoad));
-
-    LocalValueInfo *addInfo = LocalValueInfo::getOrCreate(
-        &wrapper.localNames, &wrapper.localValueInfos, add);
+    LocalValueInfo *addInfo = wrapper.createInfo(add, "v1");
     instructionDumper->runGeneration(addInfo);
 
     // wrapper.runRhsGeneration(add);
@@ -151,17 +138,6 @@ TEST(test_new_instruction_dumper, test_add) {
     addInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
     ASSERT_EQ("    v1 = v_a + v_b;\n", oss.str());
-
-    // if we check local names, we should NOT find the add, since we havent declared it
-    // ASSERT_FALSE(wrapper.localNames.hasValue(add));
-
-    // but we should find an expression for it:
-    /// oh ... we already tested this :-)
-
-    // we should not find a requirement to declare the variable
-    // ASSERT_EQ(0u, wrapper.variablesToDeclare.size());
-    // ... and no allocas
-    // ASSERT_EQ(0u, wrapper.allocaDeclarations.size());
 }
 
 TEST(test_new_instruction_dumper, test_alloca) {
