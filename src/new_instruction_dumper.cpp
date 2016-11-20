@@ -7,6 +7,7 @@
 #include "function_names_map.h"
 #include "LocalValueInfo.h"
 #include "mutations.h"
+#include "ExpressionsHelper.h"
 #include "readIR.h"
 #include "EasyCL/util/easycl_stringhelper.h"
 
@@ -45,6 +46,26 @@ NewInstructionDumper::NewInstructionDumper(
     localValueInfos(localValueInfos),
     allocaDeclarations(allocaDeclarations)
         {
+}
+
+void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
+    localValueInfo->clWriter.reset(new StoreClWriter(localValueInfo));
+    StoreInst *instr = cast<StoreInst>(localValueInfo->value);
+    // string gencode = "";
+    localValueInfo->setAddressSpaceFrom(instr->getOperand(1));
+    copyAddressSpace(instr->getOperand(0), instr->getOperand(1));
+
+    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
+
+    string rhs = op0info->getExpr(); // dumpOperand(instr->getOperand(0));
+    rhs = stripOuterParams(rhs);
+    string inlinecode = op1info->getExpr() + "[0] = " + rhs;
+    cout << "dumpStore, gencode=[" << inlinecode << "]" << endl;
+    localValueInfo->inlineCl.push_back(inlinecode);
+    // localValueInfo->setExpression(o1info->getExpr());
+    // (*localExpressionByValue)[instr] = 
+    // return gencode;
 }
 
 void NewInstructionDumper::dumpAlloca(cocl::LocalValueInfo *localValueInfo) {
@@ -254,9 +275,9 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo) {
         // case Instruction::ExtractValue:
         //     instructionCode = dumpExtractValue(cast<ExtractValueInst>(instruction));
         //     break;
-        // case Instruction::Store:
-        //     instructionCode = dumpStore(cast<StoreInst>(instruction));
-        //     break;
+        case Instruction::Store:
+            dumpStore(localValueInfo);
+            break;
         // case Instruction::Call:
         //     instructionCode = dumpCall(localValueInfo, returnTypeByFunction);
         //     break;
@@ -266,7 +287,8 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo) {
         case Instruction::Alloca:
             dumpAlloca(localValueInfo);
             // return "";
-            return;
+            // return;
+            break;
             // return true;
         // case Instruction::Br:
         //     instructionCode = dumpBranch(cast<BranchInst>(instruction));

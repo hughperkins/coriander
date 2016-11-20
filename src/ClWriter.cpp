@@ -126,6 +126,13 @@ void AllocaClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
     }
 }
 
+void StoreClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes any cl required, eg if we toggled setAsAssigned, we need to do the assignment
+                                          // some instructoins will *always* write something, eg stores
+    for(auto it = localValueInfo->inlineCl.begin(); it != localValueInfo->inlineCl.end(); it++) {
+        os << indent << *it << ";\n";
+    }
+}
+
 void AllocaClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes any cl required, eg if we toggled setAsAssigned, we need to do the assignment
                                           // some instructoins will *always* write something, eg stores
     // for(auto it = localValueInfo->inlineCl.begin(); it != localValueInfo->inlineCl.end(); it++) {

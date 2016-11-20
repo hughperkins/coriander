@@ -65,6 +65,7 @@ public:
     LocalValueInfo *setAddressSpace(int addressSpace);
     LocalValueInfo *setAddressSpaceFrom(llvm::Value *source);
     LocalValueInfo *setExpression(std::string expression);
+    bool hasExpr() { return expressionValid; }
     std::string getExpr();
     LocalValueInfo *setAsAssigned();
     virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os);  // if we set this as to be assigned, this will write something, otherwise it wont

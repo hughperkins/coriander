@@ -201,17 +201,69 @@ TEST(test_new_instruction_dumper, test_alloca) {
     expr = aInfo->getExpr();
     cout << "expr " << expr << endl;
     ASSERT_EQ("v1", expr);
+}
 
-    // if we check local names, we should NOT find the add, since we havent declared it
-    // ASSERT_FALSE(wrapper.localNames.hasValue(add));
+TEST(test_new_instruction_dumper, store) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
 
-    // but we should find an expression for it:
-    /// oh ... we already tested this :-)
+    LLVMContext &context = myblock.context;
+    // create an alloca,and store into that?
+    AllocaInst *a = builder.CreateAlloca(IntegerType::get(context, 32));
+    AllocaInst *b = builder.CreateAlloca(IntegerType::get(context, 32));
 
-    // we should not find a requirement to declare the variable
-    // ASSERT_EQ(0u, wrapper.variablesToDeclare.size());
-    // ... and no allocas
-    // ASSERT_EQ(0u, wrapper.allocaDeclarations.size());
+    LoadInst *aLoad = builder.CreateLoad(a);
+
+    InstructionDumperWrapper wrapper;
+    NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    // since they are declared, we expect to find them in localnames:
+    // wrapper.localNames.getOrCreateName(aLoad, "v_a");
+    // wrapper.localNames.getOrCreateName(b, "v_b");
+
+    LocalValueInfo *aLoadInfo = LocalValueInfo::getOrCreate(
+        &wrapper.localNames, &wrapper.localValueInfos, aLoad, "aLoad");
+    aLoadInfo->setExpression(aLoadInfo->name);
+
+    LocalValueInfo *bInfo = LocalValueInfo::getOrCreate(
+        &wrapper.localNames, &wrapper.localValueInfos, b, "b");
+    bInfo->setExpression(bInfo->name);
+
+    StoreInst *bStore = builder.CreateStore(aLoad, b);
+
+    // wrapper.runRhsGeneration(bStore);
+    // ASSERT_EQ(0u, wrapper.instructionDumper->localExpressionByValue->size()); 
+
+    LocalValueInfo *bStoreInfo = LocalValueInfo::getOrCreate(
+        &wrapper.localNames, &wrapper.localValueInfos, bStore);
+    instructionDumper->runGeneration(bStoreInfo);
+
+    ASSERT_FALSE(bStoreInfo->hasExpr());
+
+    ostringstream oss;
+    bStoreInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    oss.str("");
+    bStoreInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    b[0] = aLoad;\n", oss.str());
+
+    cout << "after setAsAssigned:" << endl;
+    bStoreInfo->setAsAssigned();
+
+    ASSERT_FALSE(bStoreInfo->hasExpr());
+
+    oss.str("");
+    bStoreInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    oss.str("");
+    bStoreInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    b[0] = aLoad;\n", oss.str());
 }
 
 }
