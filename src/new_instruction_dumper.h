@@ -31,6 +31,7 @@ public:
     void dumpSelect(LocalValueInfo *localValueInfo);
     void dumpGetElementPtr(cocl::LocalValueInfo *localValueInfo);
     void dumpAlloca(cocl::LocalValueInfo *localValueInfo);
+    void dumpLoad(cocl::LocalValueInfo *localValueInfo);
     void dumpStore(cocl::LocalValueInfo *localValueInfo);
     void dumpInsertValue(cocl::LocalValueInfo *localValueInfo);
     void dumpExtractValue(cocl::LocalValueInfo *localValueInfo);

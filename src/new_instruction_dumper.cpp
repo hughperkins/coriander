@@ -514,6 +514,17 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     // return rhs;
 }
 
+void NewInstructionDumper::dumpLoad(cocl::LocalValueInfo *localValueInfo) {
+    localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
+    Instruction *instr = cast<Instruction>(localValueInfo->value);
+
+    string rhs = getOperand(instr->getOperand(0))->getExpr() + "[0]";
+    copyAddressSpace(instr->getOperand(0), instr);
+    localValueInfo->setAddressSpaceFrom(instr->getOperand(0));
+    // return rhs;
+    localValueInfo->setExpression(rhs);
+}
+
 void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new StoreClWriter(localValueInfo));
     StoreInst *instr = cast<StoreInst>(localValueInfo->value);
@@ -831,9 +842,9 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo) {
         // case Instruction::Call:
         //     instructionCode = dumpCall(localValueInfo, returnTypeByFunction);
         //     break;
-        // case Instruction::Load:
-        //     instructionCode = dumpLoad(cast<LoadInst>(instruction));
-        //     break;
+        case Instruction::Load:
+            dumpLoad(localValueInfo);
+            break;
         case Instruction::Alloca:
             dumpAlloca(localValueInfo);
             // return "";

@@ -132,19 +132,25 @@ TEST(test_new_instruction_dumper, test_add) {
     ostringstream oss;
     addInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
     cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
     oss.str("");
     addInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
     cout << "after setAsAssigned:" << endl;
     addInfo->setAsAssigned();
 
     oss.str("");
     addInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
     cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    int v1;\n", oss.str());
 
     oss.str("");
     addInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    v1 = v_a + v_b;\n", oss.str());
 
     // if we check local names, we should NOT find the add, since we havent declared it
     // ASSERT_FALSE(wrapper.localNames.hasValue(add));
@@ -221,22 +227,12 @@ TEST(test_new_instruction_dumper, store) {
     InstructionDumperWrapper wrapper;
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    // since they are declared, we expect to find them in localnames:
-    // wrapper.localNames.getOrCreateName(aLoad, "v_a");
-    // wrapper.localNames.getOrCreateName(b, "v_b");
-
-    LocalValueInfo *aLoadInfo = LocalValueInfo::getOrCreate(
-        &wrapper.localNames, &wrapper.localValueInfos, aLoad, "aLoad");
-    aLoadInfo->setExpression(aLoadInfo->name);
-
-    LocalValueInfo *bInfo = LocalValueInfo::getOrCreate(
-        &wrapper.localNames, &wrapper.localValueInfos, b, "b");
-    bInfo->setExpression(bInfo->name);
+    wrapper.declareVariable(aLoad, "aLoad");
+    wrapper.declareVariable(b, "b");
 
     StoreInst *bStore = builder.CreateStore(aLoad, b);
+    LocalValueInfo *bStoreInfo = wrapper.createInfo(bStore, "bStore");
 
-    LocalValueInfo *bStoreInfo = LocalValueInfo::getOrCreate(
-        &wrapper.localNames, &wrapper.localValueInfos, bStore);
     instructionDumper->runGeneration(bStoreInfo);
 
     ASSERT_FALSE(bStoreInfo->hasExpr());
