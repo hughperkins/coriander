@@ -59,6 +59,7 @@ public:
     std::string getAllocaDeclarations(std::string indent);
     std::string writeDeclarations(std::string indent);
     void writeDeclaration(std::ostream &os, llvm::Value *value);
+    bool checkIfNeedsAssign(llvm::Instruction *instruction);
 
     BasicBlockDumper *addIRToCl(bool set=true) {
         _addIRToCl = set;

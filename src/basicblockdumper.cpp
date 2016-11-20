@@ -239,6 +239,40 @@ std::string BasicBlockDumper::getAllocaDeclarations(string indent) {
     return oss.str();
 }
 
+bool BasicBlockDumper::checkIfNeedsAssign(Instruction *instruction) {
+    Use *use = 0;
+    User *use_user = 0;
+    // bool weArePointer = isa<PointerType>(instruction->getType());
+    // bool useIsPointer = false;
+    bool useIsAStore = false;
+    bool useIsExtractValue = false;
+    bool useIsAPhi = false;
+    // bool useIsALoad = false;
+    // cout << "end of dumpinstruction for " << localNames->getName(instruction) << endl;
+    // exprByValue[instruction] = instructionCode;
+    // cout << "numuses " << instruction->getNumUses() << " useisaphi " << useIsAPhi << " useIsExtractValue=" << useIsExtractValue << endl;
+    if(instruction->getNumUses() == 1) {
+        // cout << "one use" << endl;
+        use = &*instruction->use_begin();
+        use_user = use->getUser();
+        useIsAStore = isa<StoreInst>(use_user);
+        // useIsPointer = isa<PointerType>(use_user->getType());
+        useIsExtractValue = isa<ExtractValueInst>(use_user);
+        useIsAPhi = isa<PHINode>(use_user);
+        // useIsALoad = isa<LoadInst>(use_user);
+    }
+    if(     instruction->getNumUses() <= 1
+            && !useIsExtractValue 
+            && !useIsAPhi
+            && !isa<LoadInst>(instruction)
+            // && !isa<StoreInst>(instruction)
+            && !useIsAStore
+            && !isa<CallInst>(instruction)) { // } && !useIsAStore) {
+        return false;
+    }
+    return true;
+}
+
 void BasicBlockDumper::writeDeclaration(std::ostream &os, llvm::Value *value) {
     // value->dump();
     os << typeDumper->dumpType(value->getType(), true) + " " + localNames->getName(value);
@@ -274,6 +308,9 @@ bool BasicBlockDumper::runGeneration(const std::map<llvm::Function *, llvm::Type
             inst->dump();
             cout << endl;
             instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
+            if(checkIfNeedsAssign(inst)) {
+                instrInfo->setAsAssigned();
+            }
             if(instrInfo->needDependencies) {
                 cout << "basicblockdumper::dumpinstruction, instr:" << endl;
                 inst->dump();
