@@ -53,6 +53,8 @@ public:
         ClWriter(localValueInfo) {
 
         }
+    virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os);
+    virtual void writeInlineCl(std::string indent, std::ostream &os);
 };
 
 class BinaryClWriter : public ClWriter {

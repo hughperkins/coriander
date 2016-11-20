@@ -173,24 +173,34 @@ TEST(test_new_instruction_dumper, test_alloca) {
 
     string expr = aInfo->getExpr();
     cout << "expr " << expr << endl;
-    // ASSERT_EQ("v_a + v_b", expr);
+    ASSERT_EQ("v1", expr);
 
     ostringstream oss;
     aInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
     cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    int v1[1];\n", oss.str());
+
     oss.str("");
     aInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
     cout << "after setAsAssigned:" << endl;
     aInfo->setAsAssigned();
 
     oss.str("");
     aInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
     cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    int v1[1];\n", oss.str());
 
     oss.str("");
     aInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    expr = aInfo->getExpr();
+    cout << "expr " << expr << endl;
+    ASSERT_EQ("v1", expr);
 
     // if we check local names, we should NOT find the add, since we havent declared it
     // ASSERT_FALSE(wrapper.localNames.hasValue(add));
