@@ -126,7 +126,11 @@ TEST(test_block_dumper, basic) {
     // ASSERT_EQ(expectedAllocaDeclarations, blockDumper.getAllocaDeclarations("    "));
 
     cout << "variable declarations:" << endl;
-    // cout << blockDumper.writeDeclarations("    ") << endl;
+    // ostringstream oss;
+    oss.str("");
+    blockDumper.writeDeclarations("    ", oss);
+    cout << oss.str() << endl;
+
     // ASSERT_EQ(14u, blockDumper.variablesToDeclare.size());
     // set<string> declaredVariableStrings;
     // for(auto it=blockDumper.variablesToDeclare.begin(); it != blockDumper.variablesToDeclare.end(); it++) {

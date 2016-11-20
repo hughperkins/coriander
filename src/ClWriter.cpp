@@ -31,7 +31,7 @@ using namespace llvm;
 namespace cocl {
 
 void ClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {  // if we set this as to be assigned, this will write something, otherwise it wont
-    cout << "ClWriter::writeDelcaratoin" << endl;
+    // cout << "ClWriter::writeDelcaratoin" << endl;
     for(auto it = localValueInfo->declarationCl.begin(); it != localValueInfo->declarationCl.end(); it++) {
         os << indent << *it << ";\n";
     }
@@ -57,7 +57,7 @@ void ClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes a
 }
 
 void AllocaClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {
-    cout << "AllocaClWriter::writeDelcaratoin" << endl;
+    // cout << "AllocaClWriter::writeDelcaratoin" << endl;
     string gencode = "";
     LocalValueInfo *l = localValueInfo;
     AllocaInst *alloca = cast<AllocaInst>(l->value);
@@ -73,7 +73,7 @@ void AllocaClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
         localValueInfo->setExpression(name);
         if(count == 1) {
             if(ArrayType *arrayType = dyn_cast<ArrayType>(ptrElementType)) {
-                cout << "alloca, is arraytype" << endl;
+                // cout << "alloca, is arraytype" << endl;
                 int innercount = arrayType->getNumElements();
                 Type *elementType = arrayType->getElementType();
                 string allocaDeclaration = typeDumper->dumpType(elementType) + " " + 
@@ -85,11 +85,11 @@ void AllocaClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
                 os << indent << allocaDeclaration << ";\n";
                 return;
             } else {
-                cout << "alloca, non-arraytype" << endl;
+                // cout << "alloca, non-arraytype" << endl;
                 // Value *refInstruction = alloca;
                 // if the elementType is a pointer, assume its global?
                 if(isa<PointerType>(ptrElementType)) {
-                    cout << "alloca, pointertype" << endl;
+                    // cout << "alloca, pointertype" << endl;
                     // find the store
                     for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
                         User *user = *it;
@@ -107,15 +107,15 @@ void AllocaClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
                 }
                 string allocaDeclaration = gencode + typestring + " " + localValueInfo->name + "[1]";
                 // find the store
-                for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
-                    User *user = *it;
-                    if(StoreInst *store = dyn_cast<StoreInst>(user)) {
-                        cout << "found store:" << endl;
-                        store->dump();
-                        cout << endl;
+                // for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
+                    // User *user = *it;
+                    // if(StoreInst *store = dyn_cast<StoreInst>(user)) {
+                        // cout << "found store:" << endl;
+                        // store->dump();
+                        // cout << endl;
                         // refInstruction = store->getOperand(0);
-                    }
-                }
+                    // }
+                // }
                 // allocaInfo.alloca = alloca;
                 // allocaInfo.refValue = refInstruction;
                 // allocaInfo.definition = allocaDeclaration;
@@ -158,7 +158,7 @@ void InsertValueClWriter::writeInlineCl(std::string indent, std::ostream &os) { 
 }
 
 void InsertValueClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {  // if we set this as to be assigned, this will write something, otherwise it wont
-    cout << "ClWriter::writeDelcaratoin" << endl;
+    // cout << "ClWriter::writeDelcaratoin" << endl;
     for(auto it = localValueInfo->declarationCl.begin(); it != localValueInfo->declarationCl.end(); it++) {
         os << indent << *it << ";\n";
     }

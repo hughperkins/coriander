@@ -242,17 +242,17 @@ void NewInstructionDumper::dumpIcmp(cocl::LocalValueInfo *localValueInfo) {
     switch(predicate) {
         case CmpInst::ICMP_SLT:
         case CmpInst::ICMP_ULT:
-            cout << "slt" << endl;
+            // cout << "slt" << endl;
             predicate_string = "<";
             break;
         case CmpInst::ICMP_SGT:
         case CmpInst::ICMP_UGT:
-            cout << "sgt" << endl;
+            // cout << "sgt" << endl;
             predicate_string = ">";
             break;
         case CmpInst::ICMP_SGE:
         case CmpInst::ICMP_UGE:
-            cout << "sge" << endl;
+            // cout << "sge" << endl;
             predicate_string = ">=";
             break;
         case CmpInst::ICMP_SLE:
@@ -269,7 +269,7 @@ void NewInstructionDumper::dumpIcmp(cocl::LocalValueInfo *localValueInfo) {
             cout << "predicate " << predicate << endl;
             throw runtime_error("predicate not supported");
     }
-    cout << "newinstructiondumepr::dumpIcmp, predicatestring: " << predicate_string << endl;
+    // cout << "newinstructiondumepr::dumpIcmp, predicatestring: " << predicate_string << endl;
 
     // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
     // LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
@@ -522,7 +522,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     updateAddressSpace(instr, addressspace);
     localValueInfo->setAddressSpace(addressspace);
     rhs = "(&" + rhs + ")";
-    cout << "gep rhs=" << rhs << endl;
+    // cout << "gep rhs=" << rhs << endl;
 
     localValueInfo->setExpression(rhs);
     // return rhs;
@@ -555,7 +555,7 @@ void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
     string rhs = op0info->getExpr(); // dumpOperand(instr->getOperand(0));
     rhs = stripOuterParams(rhs);
     string inlinecode = op1info->getExpr() + "[0] = " + rhs;
-    cout << "dumpStore, gencode=[" << inlinecode << "]" << endl;
+    // cout << "dumpStore, gencode=[" << inlinecode << "]" << endl;
     localValueInfo->inlineCl.push_back(inlinecode);
     // localValueInfo->setExpression(o1info->getExpr());
     // (*localExpressionByValue)[instr] = 
@@ -660,7 +660,7 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
     // bool declaredVar = false;
     string incomingOperand = "";
     if(clWriter->fromUndef) {
-        cout << "incomingoperand is undef, so adding insertvalue instr to variables to declare" << endl;
+        // cout << "incomingoperand is undef, so adding insertvalue instr to variables to declare" << endl;
         localValueInfo->toBeDeclared = true;
         // variablesToDeclare->insert(instr);
         // localNames->getOrCreateName(instr);
@@ -679,7 +679,7 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
         int idx = indices[d];
         Type *newType = 0;
         if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
-            cout << "insertvalue: pointer or array type" << endl;
+            // cout << "insertvalue: pointer or array type" << endl;
             if(d == 0) {
                 if(isa<ArrayType>(currentType->getPointerElementType())) {
                     lhs = "(&" + lhs + ")";
@@ -691,10 +691,10 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
             lhs += string("[") + easycl::toString(idx) + "]";
             newType = currentType->getPointerElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
-            cout << "insertvalue: struct type" << endl;
+            // cout << "insertvalue: struct type" << endl;
             string structName = getName(structtype);
             if(structName == "struct.float4") {
-                cout << "is struct.float4" << endl;
+                // cout << "is struct.float4" << endl;
                 Type *elementType = structtype->getElementType(idx);
                 Type *castType = PointerType::get(elementType, 0);
                 newType = elementType;
@@ -702,7 +702,7 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
                 lhs += string("[") + easycl::toString(idx) + "]";
             } else {
                 // generic struct
-                cout << "is generic struct" << endl;
+                // cout << "is generic struct" << endl;
                 Type *elementType = structtype->getElementType(idx);
                 lhs += string(".f") + easycl::toString(idx);
                 newType = elementType;
@@ -719,7 +719,7 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
     // extralines->push_back(updateline);
     localValueInfo->inlineCl.push_back(updateline);
     // res.push_back(lhs + " = " + dumpOperand(instr->getOperand(1)));
-    cout << "dumpinsertvalue lhs=" << lhs << endl;
+    // cout << "dumpinsertvalue lhs=" << lhs << endl;
     // if(false && declaredVar) {
     //     // variablesToDeclare->insert(instr);
     //     string assignline = dumpOperand(instr) + " = " + incomingOperand;
@@ -736,7 +736,7 @@ void NewInstructionDumper::dumpBinaryOperator(LocalValueInfo *localValueInfo, st
     Instruction *instr = cast<Instruction>(localValueInfo->value);
     string gencode = "";
     // copyAddressSpace(instr->getOperand(0), instr);
-    Value *op1 = instr->getOperand(0);
+    // Value *op1 = instr->getOperand(0);
     // LocalValueInfo *op1info = localValueInfos->at(op1).get();
     LocalValueInfo *op1info = getOperand(instr->getOperand(0));
     // gencode += dumpOperand(op1) + " ";
@@ -744,7 +744,7 @@ void NewInstructionDumper::dumpBinaryOperator(LocalValueInfo *localValueInfo, st
 
     gencode += opstring + " ";
 
-    Value *op2 = instr->getOperand(1);
+    // Value *op2 = instr->getOperand(1);
     // LocalValueInfo *op2info = localValueInfos->at(op2).get();
     LocalValueInfo *op2info = getOperand(instr->getOperand(1));
     gencode += op2info->getExpr();

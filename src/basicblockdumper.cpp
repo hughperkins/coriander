@@ -278,9 +278,20 @@ void BasicBlockDumper::writeDeclaration(std::ostream &os, llvm::Value *value) {
     os << typeDumper->dumpType(value->getType(), true) + " " + localNames->getName(value);
 }
 
-std::string BasicBlockDumper::writeDeclarations(std::string indent) {
+void BasicBlockDumper::writeDeclarations(std::string indent, ostream &os) {
+    // ostringstream os;
+    for(auto it=block->begin(); it != instruction_it; it++) {
+        Value *value = &*it;
+        if(isa<ReturnInst>(value) || isa<PHINode>(value) || isa<BranchInst>(value)) {
+            continue;
+        }
+        // cout << "basicblockdumper value:" << endl;
+        // value->dump();
+        // cout << endl;
+        LocalValueInfo *valueInfo = localValueInfos.at(value).get();
+        valueInfo->writeDeclaration("    ", typeDumper, os);
+    }
     // string gencode = "";
-    ostringstream os;
     // for(auto it=variablesToDeclare.begin(); it != variablesToDeclare.end(); it++) {
     //     Value *value = *it;
     //     if(_addIRToCl) {
@@ -290,7 +301,7 @@ std::string BasicBlockDumper::writeDeclarations(std::string indent) {
     //     writeDeclaration(os, value);
     //     os << ";\n";
     // }
-    return os.str();
+    // return os.str();
 }
 
 bool BasicBlockDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
@@ -304,9 +315,9 @@ bool BasicBlockDumper::runGeneration(const std::map<llvm::Function *, llvm::Type
         }
         try {
             LocalValueInfo *instrInfo = LocalValueInfo::getOrCreate(localNames, &localValueInfos, inst);
-            cout << "basicblockdumper rungeneration on inst:" << endl;
-            inst->dump();
-            cout << endl;
+            // cout << "basicblockdumper rungeneration on inst:" << endl;
+            // inst->dump();
+            // cout << endl;
             instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
             if(checkIfNeedsAssign(inst)) {
                 instrInfo->setAsAssigned();
@@ -337,20 +348,16 @@ bool BasicBlockDumper::runGeneration(const std::map<llvm::Function *, llvm::Type
 
 void BasicBlockDumper::toCl(ostream &os) {
     for(auto it=block->begin(); it != instruction_it; it++) {
-    // ostringstream oss;
-    // for(auto it=clcode.begin(); it != clcode.end(); it++) {
-    //     os << "    " << *it << ";\n";
         Value *value = &*it;
         if(isa<ReturnInst>(value) || isa<PHINode>(value) || isa<BranchInst>(value)) {
             continue;
         }
-        cout << "basicblockdumper value:" << endl;
-        value->dump();
-        cout << endl;
+        // cout << "basicblockdumper value:" << endl;
+        // value->dump();
+        // cout << endl;
         LocalValueInfo *valueInfo = localValueInfos.at(value).get();
         valueInfo->writeInlineCl("    ", os);
     }
-    // return oss.str();
 }
 
 } // namespace cocl

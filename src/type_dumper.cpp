@@ -105,7 +105,7 @@ std::string TypeDumper::addStructToGlobalNames(StructType *type) {
         // outs() << "name " << name << "\n";
         name = easycl::replaceGlobal(name, ".", "_");
         name = easycl::replaceGlobal(name, ":", "_");
-        cout << "typedumper::dumpstructtype, name=" << name << endl;
+        // cout << "typedumper::dumpstructtype, name=" << name << endl;
         if(name == "struct_float4") {
             name = "float4";
             name = globalNames->getOrCreateName(type, name);
@@ -254,14 +254,14 @@ std::string TypeDumper::dumpStructDefinitions() {
             if(dumped.find(structType) != dumped.end()) {
                 continue;
             }
-            cout << "checking " << structType->getName().str() << endl;
+            // cout << "checking " << structType->getName().str() << endl;
             // check if we already defined its members
             bool dumpable = true;
             for(auto it2=structType->element_begin(); it2 != structType->element_end(); it2++) {
                 // Type *structElementType = *it2;
                 if(StructType *elementStructType = dyn_cast<StructType>(*it2)) {
                     if(dumped.find(elementStructType) == dumped.end()) {
-                        cout << "      ... depends on " << elementStructType->getName().str() << endl;
+                        // cout << "      ... depends on " << elementStructType->getName().str() << endl;
                         structsToDefine.insert(elementStructType);
                         dumpable = false;
                         break;
@@ -273,7 +273,7 @@ std::string TypeDumper::dumpStructDefinitions() {
             }
             dumped.insert(structType);
             addStructToGlobalNames(structType);
-            cout << "dumping struct " << structType->getName().str() << endl;
+            // cout << "dumping struct " << structType->getName().str() << endl;
             gencode += dumpStructDefinition(structType, globalNames->getName(structType));
         }
     }
