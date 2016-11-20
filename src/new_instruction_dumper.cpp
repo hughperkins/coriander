@@ -79,12 +79,13 @@ void NewInstructionDumper::dumpAlloca(cocl::LocalValueInfo *localValueInfo) {
 
 void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new InsertValueClWriter(localValueInfo));
+    InsertValueClWriter *clWriter = dynamic_cast<InsertValueClWriter *>(localValueInfo->clWriter.get());
     InsertValueInst *instr = cast<InsertValueInst>(localValueInfo->value);
 
-    bool incomingIsUndef = false;
+    // bool incomingIsUndef = false;
     LocalValueInfo *op0info = 0;
     if(isa<UndefValue>(instr->getOperand(0))) {
-        incomingIsUndef = true;
+        clWriter->fromUndef = true;
     } else {
         op0info = localValueInfos->at(instr->getOperand(0)).get();
     }
@@ -96,9 +97,9 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
     // string incomingOperand = dumpOperand(instr->getOperand(0));
     // if rhs is empty, that means its 'undef', so we better declare it, I guess...
     Type *currentType = instr->getType();
-    bool declaredVar = false;
+    // bool declaredVar = false;
     string incomingOperand = "";
-    if(incomingIsUndef) {
+    if(clWriter->fromUndef) {
         cout << "incomingoperand is undef, so adding insertvalue instr to variables to declare" << endl;
         localValueInfo->toBeDeclared = true;
         // variablesToDeclare->insert(instr);

@@ -73,8 +73,9 @@ public:
         ClWriter(localValueInfo) {
 
         }
-    // virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {} // do nothing :-P
+    virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os);
     virtual void writeInlineCl(std::string indent, std::ostream &os);
+    bool fromUndef = false;
 };
 
 class BinaryClWriter : public ClWriter {

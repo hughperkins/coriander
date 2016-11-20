@@ -288,14 +288,18 @@ TEST(test_new_instruction_dumper, insert_value_already_defined) {
     AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(context, 32));
     LoadInst *intLoad = builder.CreateLoad(intAlloca);
 
-    unsigned int idxs0[] = {3};
-    InsertValueInst *insert = cast<InsertValueInst>(builder.CreateInsertValue(aAlloca, intLoad, idxs0));
+    unsigned int idxs0[] = {1};
+    InsertValueInst *insert = cast<InsertValueInst>(builder.CreateInsertValue(aLoad, intLoad, idxs0));
 
     myblock.block->dump();
 
-    LocalValueInfo *aAllocaInfo = LocalValueInfo::getOrCreate(
-        &wrapper.localNames, &wrapper.localValueInfos, aAlloca, "aAlloca");
-    aAllocaInfo->setExpression(aAllocaInfo->name);
+    // LocalValueInfo *aAllocaInfo = LocalValueInfo::getOrCreate(
+    //     &wrapper.localNames, &wrapper.localValueInfos, aAlloca, "aAlloca");
+    // aAllocaInfo->setExpression(aAllocaInfo->name);
+
+    LocalValueInfo *aLoadInfo = LocalValueInfo::getOrCreate(
+        &wrapper.localNames, &wrapper.localValueInfos, aLoad, "aLoad");
+    aLoadInfo->setExpression(aLoadInfo->name);
 
     LocalValueInfo *intLoadInfo = LocalValueInfo::getOrCreate(
         &wrapper.localNames, &wrapper.localValueInfos, intLoad, "intLoad");
@@ -308,16 +312,19 @@ TEST(test_new_instruction_dumper, insert_value_already_defined) {
     cout << "hasexpr " << insertInfo->hasExpr() << endl;
     ASSERT_TRUE(insertInfo->hasExpr());
     cout << "expr: " << insertInfo->getExpr() << endl;
+    ASSERT_EQ("aLoad", insertInfo->getExpr());
 
     ostringstream oss;
     insertInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
     cout << "declaration [" << oss.str() << "]" << endl;
-    // ASSERT_EQ("", oss.str());
+    ASSERT_EQ("", oss.str());
 
     oss.str("");
     insertInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
-    ASSERT_EQ("    aAlloca[3] = intLoad;\n", oss.str());
+    ASSERT_EQ("    aLoad.f1 = intLoad;\n", oss.str());
+
+    ASSERT_FALSE(insertInfo->toBeDeclared);
 
     cout << "after setAsAssigned:" << endl;
     insertInfo->setAsAssigned();
@@ -326,17 +333,15 @@ TEST(test_new_instruction_dumper, insert_value_already_defined) {
     ASSERT_TRUE(insertInfo->hasExpr());
     cout << "expr: " << insertInfo->getExpr() << endl;
 
-    // ostringstream oss;
     oss.str("");
     insertInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
     cout << "declaration [" << oss.str() << "]" << endl;
-    // ASSERT_EQ("", oss.str());
+    ASSERT_EQ("", oss.str());
 
     oss.str("");
     insertInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
-    // ASSERT_EQ("    aAlloca[3] = intLoad;\n", oss.str());
-
+    ASSERT_EQ("    aLoad.f1 = intLoad;\n", oss.str());
 }
 
 TEST(test_new_instruction_dumper, insert_value_from_undef) {

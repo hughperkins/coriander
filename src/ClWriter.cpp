@@ -151,4 +151,14 @@ void InsertValueClWriter::writeInlineCl(std::string indent, std::ostream &os) { 
     }
 }
 
+void InsertValueClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {  // if we set this as to be assigned, this will write something, otherwise it wont
+    cout << "ClWriter::writeDelcaratoin" << endl;
+    for(auto it = localValueInfo->declarationCl.begin(); it != localValueInfo->declarationCl.end(); it++) {
+        os << indent << *it << ";\n";
+    }
+    if(fromUndef) {
+        os << indent << typeDumper->dumpType(localValueInfo->value->getType()) << " " << localValueInfo->name << ";\n";
+    }
+}
+
 } // namespace cocl;
