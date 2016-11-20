@@ -64,6 +64,7 @@ public:
     std::unique_ptr<ClWriter> clWriter;
     LocalValueInfo *setAddressSpace(int addressSpace);
     LocalValueInfo *setAddressSpaceFrom(llvm::Value *source);
+    LocalValueInfo *setAddressSpaceFrom(LocalValueInfo *sourceInfo);
     LocalValueInfo *setExpression(std::string expression);
     bool hasExpr() { return expressionValid; }
     std::string getExpr();

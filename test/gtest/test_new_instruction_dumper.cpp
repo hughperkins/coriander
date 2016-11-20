@@ -929,4 +929,59 @@ TEST(test_new_instruction_dumper, test_select) {
     ASSERT_EQ("myinstr", expr);
 }
 
+TEST(test_new_instruction_dumper, getelementptr_struct) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+    LLVMContext &context = myblock.context;
+
+    Type *structElements[] = {
+        IntegerType::get(context, 32),
+        IntegerType::get(context, 32)
+    };
+    StructType *myStructType = StructType::create(
+        context, structElements, "struct.mystruct"
+    );
+    myStructType->dump();
+    cout << endl;
+
+    InstructionDumperWrapper wrapper;
+    NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    AllocaInst *structAlloca = builder.CreateAlloca(myStructType);
+    // LoadInst *structLoad = builder.CreateLoad(structAlloca);
+
+    // AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(context, 32));
+    // LoadInst *intLoad = builder.CreateLoad(intAlloca);
+
+    wrapper.declareVariable(structAlloca, "structAlloca");
+
+    // unsigned int idxs0[] = {0};
+    GetElementPtrInst *instr = cast<GetElementPtrInst>(builder.CreateConstGEP2_32(myStructType, structAlloca, 0, 1));
+    LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
+
+    myblock.block->dump();
+
+    instructionDumper->runGeneration(instrInfo);
+
+    cout << "hasexpr " << instrInfo->hasExpr() << endl;
+    // ASSERT_TRUE(instrInfo->hasExpr());
+    // cout << "expr: " << instrInfo->getExpr() << endl;
+    // ASSERT_EQ("v1", instrInfo->getExpr());
+
+    ostringstream oss;
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    // ASSERT_EQ("    struct mystruct v1;\n", oss.str());
+
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    // ASSERT_EQ("    v1.f0 = intLoad;\n", oss.str());
+
+    cout << "after setAsAssigned:" << endl;
+    instrInfo->setAsAssigned();
+
+    // ASSERT_TRUE(instrInfo->toBeDeclared);
+}
+
 }

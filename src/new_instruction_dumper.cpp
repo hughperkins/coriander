@@ -48,6 +48,181 @@ NewInstructionDumper::NewInstructionDumper(
         {
 }
 
+LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
+// maybe this should be somewhere more generic?
+// string BasicBlockDumper::dumpConstant(Constant *constant) {
+    LocalValueInfo *constantInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, constant, constant->getName().str());
+    unsigned int valueTy = constant->getValueID();
+    // ostringstream oss;
+    if(ConstantInt *constantInt = dyn_cast<ConstantInt>(constant)) {
+        constantInfo->setAddressSpace(0);
+        constantInfo->setExpression(easycl::toString(constantInt->getSExtValue()));
+        constantInfo->clWriter.reset(new ClWriter(constantInfo));
+        // string constantintval = oss.str();
+        // return constantintval;
+        return constantInfo;
+    } else if(isa<ConstantStruct>(constant)) {
+        throw runtime_error("constantStruct not implemented in basicblockdumper.dumpconstant");
+    } else if(ConstantExpr *expr = dyn_cast<ConstantExpr>(constant)) {
+        // cout << "constantexpr" << endl;
+        // return dumpConstantExpr(expr);
+        dumpConstantExpr(constantInfo);
+        return constantInfo;
+        // throw runtime_error("constantExpr not implemented in basicblockdumper.dumpconstnat");
+        // Instruction *instr = expr->getAsInstruction();
+        // cout << "dumping:" << endl;
+        // instr->dump();
+        // copyAddressSpace(constant, instr);
+        // string dcires = dumpInstruction(instr);
+        // cout << "calling dci" << endl;
+        // string dcires = dumpChainedInstruction(0, instr, true);
+        // cout << "dcires " << dcires << endl;
+        // // copyAddressSpace(instr, constant);
+        // nameByValue[constant] = dcires;
+        // cout << "exprByValue has constant? " << (exprByValue.find(constant) != exprByValue.end()) << endl;
+        // exprByValue[constant] = dcires;
+        // return dcires;
+    } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
+        constantInfo->clWriter.reset(new ClWriter(constantInfo));
+        constantInfo->setAddressSpace(0);
+        constantInfo->setExpression(dumpFloatConstant(forceSingle, constantFP));
+        return constantInfo;
+    } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
+        cout << "globalvalue" << endl;
+        // throw runtime_error("GlobalValue not implemented in basicblockdumper.dumpconstant");
+        if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
+            int addressspace = pointerType->getAddressSpace();
+            if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
+                // sharedVariablesToDeclare->insert(global);
+                // string name = global->getName().str();
+                // name = localNames->getOrCreateName(global, name);
+
+                // LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, global, name);
+                constantInfo->clWriter.reset(new ClWriter(constantInfo));
+                constantInfo->setAddressSpace(3);
+                constantInfo->setAsAssigned();
+                constantInfo->setExpression(constantInfo->name);
+                // localValueInfo->declarationCl.push_back(
+                //     typeDumper->dumpType(pointerType) + " " + name + "[1]");
+                // }
+                // (*localExpressionByValue)[global] = name;
+                // cout << "shared memory, creating in localnames name=" << name << endl;
+                // constantInfo->
+                // oss << name;
+                return constantInfo;
+                // return name;
+            }
+        }
+        // at about this point we should pehaps swap to come global-specific class to handle this?
+        if(globalNames->hasName(constant)) {
+            cout << "found constnat in globalanesm, returning" << endl;
+           // return globalNames->getName(constant);
+            // hmmmm, shouldwe be handling global values too???
+            constantInfo->clWriter.reset(new ClWriter(constantInfo));
+            constantInfo->setAddressSpace(4);
+            constantInfo->setExpression(globalNames->getName(constant));
+            // oss << globalNames->getName(constant);
+            return constantInfo;
+        }
+        string name = global->getName().str();
+        cout << "using global's native name " << name << endl;
+        string ourinstrstr = "(&" + name + ")";
+        updateAddressSpace(constant, 4);  // 4 means constant
+        constantInfo->setAddressSpace(4);
+        constantInfo->clWriter.reset(new ClWriter(constantInfo));
+        cout << "adding to globalExpressionByValue [" << ourinstrstr << "]" << endl;
+        globalExpressionByValue->operator[](constant) = ourinstrstr;
+
+        constantInfo->setExpression(ourinstrstr);
+        // oss << ourinstrstr;
+        return constantInfo;
+        // return ourinstrstr;
+    } else if(isa<UndefValue>(constant)) {
+        // return "";
+        cout << "undef, not hnalded" << endl;
+        throw runtime_error("dumpconstnat, doesnt handle undef, for now");
+        // return;
+    } else if(isa<ConstantPointerNull>(constant)) {
+        // return "0";
+        // oss << "0";
+        constantInfo->clWriter.reset(new ClWriter(constantInfo));
+        constantInfo->setAddressSpace(0);
+        constantInfo->setExpression("0");
+        return constantInfo;
+    } else {
+        cout << "dumpconstant, unhandled valuetype valueTy " << valueTy << endl;
+        // oss << "unknown";
+        constant->dump();
+        cout << endl;
+        throw runtime_error("unknown constnat type");
+    }
+    // return oss.str();
+}
+
+// lets assumes hit is always local for now
+// we'll create some separate thing for global constants, maybe just copy and paste, so we
+// dont have to think about how to generalize local vs constant instruction dumping...
+void NewInstructionDumper::dumpConstantExpr(LocalValueInfo *localValueInfo) {
+    ConstantExpr *expr = cast<ConstantExpr>(localValueInfo->value);
+    // this means things like:
+    // shared memory 
+    cout << "dumping constnat expr:" << endl;
+    expr->dump();
+    cout << endl;
+    Instruction *instr = expr->getAsInstruction();
+    cout << "dumpConstantExpr" << endl;
+    instr->dump();
+    cout << endl;
+    // LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(localnames, localValueInfos, instr,)
+    // InstructionDumper childInstructionDumper;
+    // string rhs = dumpInstruction(instr);
+    // vector<string> excessLines;
+    // std::set< llvm::Function *> dumpedFunctions;
+    std::map<llvm::Function *, llvm::Type*> returnTypeByFunction;
+    LocalValueInfo *instrValueInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, instr);
+    runGeneration(instrValueInfo);
+    // runRhsGeneration(instrValueInfo, returnTypeByFunction);
+
+    string rhs = instrValueInfo->getExpr();
+    // string rhs = (*localExpressionByValue)[instr];
+    // string rhs = dumpInstructionRhs(instr, &excessLines);
+    cout << "rhs: [" << rhs << "]" << endl;
+    // if(excessLines.size() > 0) {
+    //     throw runtime_error("InstructionDumper::dumpConstantExpr cannot handle excess lines > 0");
+    // }
+    localValueInfo->setAddressSpaceFrom(instrValueInfo);
+    localValueInfo->setExpression(rhs);
+    // return rhs;  // this is kind of broken for now...
+    // throw 
+    // string thisinstrstr = "";
+    // if((*localExpressionByValue).find(instr) != localExpressionByValue->end()) {
+    //     thisinstrstr = (*localExpressionByValue)[instr];
+    // } else {
+    //     thisinstrstr = (*globalExpressionByValue)[instr];
+    // }
+    // string thisinstrstr = globalExpressionByValue->operator[](instr);
+    // cout << "thisinstrstr: [" << thisinstrstr << "]" << endl;
+    // return thisinstrstr;
+    // throw runtime_error("not implemented");
+}
+
+LocalValueInfo *NewInstructionDumper::getOperand(Value *op) {
+    if(localValueInfos->find(op) != localValueInfos->end()) {
+        return localValueInfos->at(op).get();
+    }
+    if(Constant *constant = dyn_cast<Constant>(op)) {
+        LocalValueInfo *valueInfo = dumpConstant(constant);
+        return valueInfo;
+        // ostringstream oss;
+        // dumpConstant(oss, constant);
+        // return oss.str();
+    }
+    cout << "getoperand not implemented for:" << endl;
+    op->dump();
+    cout << endl;
+    throw runtime_error("not implemented");
+}
+
 void NewInstructionDumper::dumpIcmp(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     CmpInst *instr = cast<CmpInst>(localValueInfo->value);
@@ -257,6 +432,86 @@ void NewInstructionDumper::dumpSelect(cocl::LocalValueInfo *localValueInfo) {
 
     localValueInfo->setExpression(gencode);
     // return gencode;
+}
+
+void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInfo) {
+    localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
+    GetElementPtrInst *instr = cast<GetElementPtrInst>(localValueInfo->value);
+
+    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+
+    string gencode = "";
+    int numOperands = instr->getNumOperands();
+    string rhs = "";
+    rhs += "" + op0info->getExpr();  // dumpOperand(instr->getOperand(0));
+    Type *currentType = instr->getOperand(0)->getType();
+    PointerType *op0typeptr = dyn_cast<PointerType>(instr->getOperand(0)->getType());
+    if(op0typeptr == 0) {
+        throw runtime_error("dumpgetelementptr op0typeptr is 0");
+    }
+    int addressspace = op0typeptr->getAddressSpace();
+    if(addressspace == 3) { // local/shared memory
+        // pointer into shared memory.
+        // so, this isnt a local value in llvm, its a global one
+        // so, we need to choose to add it as a local variable
+        Value *sharedValue = instr->getOperand(0);
+        LocalValueInfo *sharedInfo = LocalValueInfo::getOrCreate(
+            localNames, localValueInfos, sharedValue, sharedValue->getName().str());
+        sharedInfo->setAddressSpace(3);
+        sharedInfo->setAsAssigned();
+        // sharedVariablesToDeclare->insert();
+    }
+    for(int d=0; d < numOperands - 1; d++) {
+        Type *newType = 0;
+        if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
+            if(d == 0) {
+                if(isa<ArrayType>(currentType->getPointerElementType())) {
+                    rhs = "(&" + rhs + ")";
+                }
+            }
+            // LocalValueInfo *thisInfo = localValueInfos->at(instr->getOperand(d + 1)).get();
+            LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
+            string idxstring = thisInfo->getExpr();
+            idxstring = stripOuterParams(idxstring);
+            rhs += string("[") + idxstring + "]";
+            newType = currentType->getPointerElementType();
+        } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
+            string structName = getName(structtype);
+            if(structName == "struct.float4") {
+                int idx = readInt32Constant(instr->getOperand(d + 1));
+                Type *elementType = structtype->getElementType(idx);
+                Type *castType = PointerType::get(elementType, addressspace);
+                newType = elementType;
+                rhs = "((" + typeDumper->dumpType(castType) + ")&" + rhs + ")";
+                rhs += string("[") + easycl::toString(idx) + "]";
+            } else {
+                // generic struct
+                int idx = readInt32Constant(instr->getOperand(d + 1));
+                Type *elementType = structtype->getElementType(idx);
+                rhs += string(".f") + easycl::toString(idx);
+                newType = elementType;
+                if(isa<PointerType>(newType)) {
+                    // if its a pointer in a struct, hackily assume gloal for now
+                    addressspace = 1;
+                } else {
+                    addressspace = 0;
+                }
+            }
+        } else {
+            currentType->dump();
+            throw runtime_error("type not implemented in gpe");
+        }
+        // if new type is a pointer, and old type was a struct, then we assume its a global pointer, and therefore
+        // update the addressspace to be global, ie 1.  This is a bit hacky I know
+        currentType = newType;
+    }
+    updateAddressSpace(instr, addressspace);
+    localValueInfo->setAddressSpace(addressspace);
+    rhs = "(&" + rhs + ")";
+    cout << "gep rhs=" << rhs << endl;
+
+    localValueInfo->setExpression(rhs);
+    // return rhs;
 }
 
 void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
@@ -497,9 +752,9 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo) {
         case Instruction::Select:
             dumpSelect(localValueInfo);
             break;
-        // case Instruction::GetElementPtr:
-        //     instructionCode = dumpGetElementPtr(cast<GetElementPtrInst>(instruction));
-        //     break;
+        case Instruction::GetElementPtr:
+            dumpGetElementPtr(localValueInfo);
+            break;
         case Instruction::InsertValue:
             dumpInsertValue(localValueInfo);
             break;

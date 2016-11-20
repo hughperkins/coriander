@@ -29,10 +29,15 @@ public:
     void dumpBinaryOperator(LocalValueInfo *localValueInfo, std::string opstring);
 
     void dumpSelect(LocalValueInfo *localValueInfo);
-
+    void dumpGetElementPtr(cocl::LocalValueInfo *localValueInfo);
     void dumpAlloca(cocl::LocalValueInfo *localValueInfo);
     void dumpStore(cocl::LocalValueInfo *localValueInfo);
     void dumpInsertValue(cocl::LocalValueInfo *localValueInfo);
+
+    LocalValueInfo *getOperand(llvm::Value *op);
+    LocalValueInfo *dumpConstant(llvm::Constant *constant);
+    void dumpConstantExpr(LocalValueInfo *localValueInfo);
+    // LocalValueInfo *CreateConstantInfo(Consant *constant);
 
     void runGeneration(LocalValueInfo *localValueInfo);
 

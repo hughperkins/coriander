@@ -52,6 +52,11 @@ LocalValueInfo *LocalValueInfo::setAddressSpaceFrom(Value *source) {
     return this;
 }
 
+LocalValueInfo *LocalValueInfo::setAddressSpaceFrom(LocalValueInfo *srcInfo) {
+    setAddressSpaceFrom(srcInfo->value);
+    return this;
+}
+
 LocalValueInfo *LocalValueInfo::setExpression(std::string expression) {
     this->expression = expression;
     expressionValid = true;
