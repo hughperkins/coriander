@@ -59,7 +59,8 @@ public:
                                         // this->name + " = " this->getExpr()
                                         // this is already handled by getExpr()
     std::vector<std::string> declarationCl;  // eg ["int v5;"]
-    bool clGenerationDone = false; // are both inlineCl and declarationCl complete and valid?
+    // bool clGenerationDone = false; // are both inlineCl and declarationCl complete and valid?
+    bool needDependencies = false;
 
     std::unique_ptr<ClWriter> clWriter;
     LocalValueInfo *setAddressSpace(int addressSpace);

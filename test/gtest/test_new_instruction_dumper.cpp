@@ -108,7 +108,8 @@ TEST(test_new_instruction_dumper, test_add) {
 
     Instruction *add = cast<Instruction>(builder.CreateAdd(aLoad, bLoad));
     LocalValueInfo *addInfo = wrapper.createInfo(add, "v1");
-    instructionDumper->runGeneration(addInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(addInfo, returnTypeByFunction);
 
     // wrapper.runRhsGeneration(add);
     // string expr = wrapper.getExpr(add);
@@ -155,7 +156,8 @@ TEST(test_new_instruction_dumper, test_alloca) {
 
     LocalValueInfo *aInfo = LocalValueInfo::getOrCreate(
         &wrapper.localNames, &wrapper.localValueInfos, a);
-    instructionDumper->runGeneration(aInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(aInfo, returnTypeByFunction);
 
     string expr = aInfo->getExpr();
     cout << "expr " << expr << endl;
@@ -209,7 +211,8 @@ TEST(test_new_instruction_dumper, store) {
     StoreInst *bStore = builder.CreateStore(aLoad, b);
     LocalValueInfo *bStoreInfo = wrapper.createInfo(bStore, "bStore");
 
-    instructionDumper->runGeneration(bStoreInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(bStoreInfo, returnTypeByFunction);
 
     ASSERT_FALSE(bStoreInfo->hasExpr());
 
@@ -283,7 +286,8 @@ TEST(test_new_instruction_dumper, insert_value_already_defined) {
 
     LocalValueInfo *insertInfo = LocalValueInfo::getOrCreate(
         &wrapper.localNames, &wrapper.localValueInfos, insert);
-    instructionDumper->runGeneration(insertInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(insertInfo, returnTypeByFunction);
 
     cout << "hasexpr " << insertInfo->hasExpr() << endl;
     ASSERT_TRUE(insertInfo->hasExpr());
@@ -353,7 +357,8 @@ TEST(test_new_instruction_dumper, insert_value_from_undef) {
 
     LocalValueInfo *insertInfo = LocalValueInfo::getOrCreate(
         &wrapper.localNames, &wrapper.localValueInfos, insert);
-    instructionDumper->runGeneration(insertInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(insertInfo, returnTypeByFunction);
 
     cout << "hasexpr " << insertInfo->hasExpr() << endl;
     ASSERT_TRUE(insertInfo->hasExpr());
@@ -409,7 +414,8 @@ TEST(test_new_instruction_dumper, insert_value_from_undef_f1) {
 
     LocalValueInfo *insertInfo = LocalValueInfo::getOrCreate(
         &wrapper.localNames, &wrapper.localValueInfos, insert);
-    instructionDumper->runGeneration(insertInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(insertInfo, returnTypeByFunction);
 
     cout << "hasexpr " << insertInfo->hasExpr() << endl;
     ASSERT_TRUE(insertInfo->hasExpr());
@@ -454,7 +460,8 @@ TEST(test_new_instruction_dumper, test_icmp) {
     cout << "instr->  predicate " << instr->getPredicate() << endl;
 
     LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
-    instructionDumper->runGeneration(instrInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
     string expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
@@ -507,7 +514,8 @@ TEST(test_new_instruction_dumper, test_fcmp) {
     FCmpInst *instr = cast<FCmpInst>(builder.CreateFCmpOLT(aLoad, bLoad));
 
     LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
-    instructionDumper->runGeneration(instrInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
     string expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
@@ -557,7 +565,8 @@ TEST(test_new_instruction_dumper, test_sext) {
     Instruction *instr = cast<Instruction>(builder.CreateSExt(aLoad, IntegerType::get(context, 32)));
 
     LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
-    instructionDumper->runGeneration(instrInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
     string expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
@@ -607,7 +616,8 @@ TEST(test_new_instruction_dumper, test_zext) {
     Instruction *instr = cast<Instruction>(builder.CreateZExt(aLoad, IntegerType::get(context, 32)));
 
     LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
-    instructionDumper->runGeneration(instrInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
     string expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
@@ -657,7 +667,8 @@ TEST(test_new_instruction_dumper, test_fpext) {
     Instruction *instr = cast<Instruction>(builder.CreateFPExt(aLoad, Type::getDoubleTy(context)));
 
     LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
-    instructionDumper->runGeneration(instrInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
     string expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
@@ -707,7 +718,8 @@ TEST(test_new_instruction_dumper, test_fptrunc) {
     Instruction *instr = cast<Instruction>(builder.CreateFPTrunc(aLoad, Type::getFloatTy(context)));
 
     LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
-    instructionDumper->runGeneration(instrInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
     string expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
@@ -757,7 +769,8 @@ TEST(test_new_instruction_dumper, test_bitcast) {
     Instruction *instr = cast<Instruction>(builder.CreateBitCast(aLoad, IntegerType::get(context, 32)));
 
     LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
-    instructionDumper->runGeneration(instrInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
     string expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
@@ -807,7 +820,8 @@ TEST(test_new_instruction_dumper, test_addrspacecast) {
     Instruction *instr = cast<Instruction>(builder.CreateAddrSpaceCast(a, PointerType::get(Type::getFloatTy(context), 1)));
 
     LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
-    instructionDumper->runGeneration(instrInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
     string expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
@@ -865,7 +879,8 @@ TEST(test_new_instruction_dumper, test_select) {
     Instruction *instr = cast<Instruction>(builder.CreateSelect(condition, a, b));
 
     LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
-    instructionDumper->runGeneration(instrInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
     string expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
@@ -933,7 +948,8 @@ TEST(test_new_instruction_dumper, getelementptr_struct) {
 
     myblock.block->dump();
 
-    instructionDumper->runGeneration(instrInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
     cout << "hasexpr " << instrInfo->hasExpr() << endl;
     ASSERT_TRUE(instrInfo->hasExpr());
@@ -1003,7 +1019,8 @@ TEST(test_new_instruction_dumper, extractvalue_struct) {
 
     myblock.block->dump();
 
-    instructionDumper->runGeneration(instrInfo);
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
     cout << "hasexpr " << instrInfo->hasExpr() << endl;
     ASSERT_TRUE(instrInfo->hasExpr());

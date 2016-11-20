@@ -40,8 +40,10 @@ public:
     LocalValueInfo *dumpConstant(llvm::Constant *constant);
     void dumpConstantExpr(LocalValueInfo *localValueInfo);
     // LocalValueInfo *CreateConstantInfo(Consant *constant);
+    void dumpMemcpyCharCharLong(LocalValueInfo *localValueInfo);
+    void dumpCall(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
 
-    void runGeneration(LocalValueInfo *localValueInfo);
+    void runGeneration(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
 
     cocl::GlobalNames *globalNames = 0;
     cocl::LocalNames *localNames = 0;   // these are names for instructions etc, doesnt say anything about whether they've been declared

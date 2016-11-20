@@ -13,6 +13,7 @@
 
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Constants.h"
+#include "llvm/Transforms/Utils/Cloning.h"
 
 #include <vector>
 #include <string>
@@ -180,7 +181,7 @@ void NewInstructionDumper::dumpConstantExpr(LocalValueInfo *localValueInfo) {
     // std::set< llvm::Function *> dumpedFunctions;
     std::map<llvm::Function *, llvm::Type*> returnTypeByFunction;
     LocalValueInfo *instrValueInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, instr);
-    runGeneration(instrValueInfo);
+    runGeneration(instrValueInfo, returnTypeByFunction);
     // runRhsGeneration(instrValueInfo, returnTypeByFunction);
 
     string rhs = instrValueInfo->getExpr();
@@ -735,7 +736,335 @@ void NewInstructionDumper::dumpBinaryOperator(LocalValueInfo *localValueInfo, st
     // return gencode;
 }
 
-void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo) {
+void NewInstructionDumper::dumpMemcpyCharCharLong(LocalValueInfo *localValueInfo) {
+    // std::string gencode = "";
+    Instruction *instr = cast<Instruction>(localValueInfo->value);
+    int totalLength = cast<ConstantInt>(instr->getOperand(2))->getSExtValue();
+    int align = cast<ConstantInt>(instr->getOperand(3))->getSExtValue();
+    string dstAddressSpaceStr = typeDumper->dumpAddressSpace(instr->getOperand(0)->getType());
+    string srcAddressSpaceStr = typeDumper->dumpAddressSpace(instr->getOperand(1)->getType());
+    string elementTypeString = "";
+    if(align == 4) {
+        elementTypeString = "int";
+    } else if(align == 8) {
+        elementTypeString = "int2";
+    } else if(align == 16) {
+        elementTypeString = "int4";
+    } else {
+        throw runtime_error("not implemented dumpmemcpy for align " + easycl::toString(align));
+    }
+    int numElements = totalLength / align;
+    if(numElements >1) {
+        localValueInfo->inlineCl.push_back("#pragma unroll");
+        localValueInfo->inlineCl.push_back("for(int __i=0; __i < " + easycl::toString(numElements) + "; __i++) {");
+        localValueInfo->inlineCl.push_back("    ((" + dstAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(0))->getExpr() + ")[__i] = " +
+            "((" + srcAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(1))->getExpr() + ")[__i]");
+        localValueInfo->inlineCl.push_back("}\n");
+    } else {
+        localValueInfo->inlineCl.push_back("((" + dstAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(0))->getExpr() + ")[0] = " +
+            "((" + srcAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(1))->getExpr() + ")[0]");
+    }
+    // return gencode;
+    // localValueInfo
+}
+
+void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
+    localValueInfo->clWriter.reset(new InsertValueClWriter(localValueInfo));
+    ClWriter *clWriter = cast<ClWriter>(localValueInfo->clWriter.get());
+    CallInst *instr = cast<CallInst>(localValueInfo->value);
+
+    // string gencode = "";
+    string functionName = instr->getCalledValue()->getName().str();
+    bool internalfunc = false;
+    if(functionName == "llvm.ptx.read.tid.x") {
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("get_local_id(0)");
+        return;
+    } else if(functionName == "llvm.ptx.read.tid.y") {
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("get_local_id(1)");
+        return;
+    } else if(functionName == "llvm.ptx.read.tid.z") {
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("get_local_id(2)");
+        return;
+    } else if(functionName == "llvm.ptx.read.ctaid.x") {
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("get_group_id(0)");
+        return;
+    } else if(functionName == "llvm.ptx.read.ctaid.y") {
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("get_group_id(1)");
+        return;
+    } else if(functionName == "llvm.ptx.read.ctaid.z") {
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("get_group_id(2)");
+        return;
+    } else if(functionName == "llvm.ptx.read.nctaid.x") {
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("get_num_groups(0)");
+        return;
+    } else if(functionName == "llvm.ptx.read.nctaid.y") {
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("get_num_groups(1)");
+        return;
+    } else if(functionName == "llvm.ptx.read.nctaid.z") {
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("get_num_groups(2)");
+        return;
+    } else if(functionName == "llvm.ptx.read.ntid.x") {
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("get_local_size(0)");
+        return;
+    } else if(functionName == "llvm.ptx.read.ntid.y") {
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("get_local_size(1)");
+        return;
+    } else if(functionName == "llvm.ptx.read.ntid.z") {
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("get_local_size(2)");
+        return;
+    } else if(functionName == "llvm.cuda.syncthreads" || functionName == "_Z11syncthreadsv") {
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("barrier(CLK_GLOBAL_MEM_FENCE)");
+        return;
+    } else if(functionName == "llvm.dbg.value") {
+        // ignore
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("");
+        return;
+    } else if(functionName == "llvm.dbg.declare") {
+        // ignore
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("");
+        // return "";
+        return;
+    } else if(functionName == "_Z11__shfl_downIfET_S0_ii") {
+        string gencode = "";
+        gencode += "__shfl_down_3(scratch, ";
+        int i = 0;
+        for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
+            Value *op = &*it->get();
+            if(i > 0) {
+                gencode += ", ";
+            }
+            gencode += stripOuterParams(getOperand(op)->getExpr());
+            i++;
+        }
+        gencode += ")";
+        cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
+        shimFunctionsNeeded->insert("__shfl_down_3");
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression(gencode);
+        return;
+    } else if(functionName == "_Z11__shfl_downIfET_S0_i") {
+        string gencode = "__shfl_down_2(scratch, ";
+        int i = 0;
+        for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
+            Value *op = &*it->get();
+            if(i > 0) {
+                gencode += ", ";
+            }
+            gencode += stripOuterParams(getOperand(op)->getExpr());
+            i++;
+        }
+        gencode += ")";
+        cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
+        shimFunctionsNeeded->insert("__shfl_down_2");
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression(gencode);
+        return;
+        // return gencode;
+    } else if(functionName == "_Z13__threadfencev") {
+        // Not sure if this is correct?
+        // seems to be correct-ish???
+        // what I understand:
+        // (from https://stackoverflow.com/questions/5232689/cuda-threadfence/5233737#5233737 )
+        // threadfence orders writes to memory, so if you do:
+        // - write data
+        // - threadfence
+        // - write flag
+        // => then if another thread sees the flag, the data that was written is guaranteed to be visible
+        // to it too
+        // I *think* that barrier(CLK_GLOBAL_MEM_FENCE) achieves the same thing, though it might be
+        // a bit too "strong" (ie slow)?
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("barrier(CLK_GLOBAL_MEM_FENCE)");
+        return;
+    } else if(functionName == "llvm.lifetime.start") {
+        // return "";  // just ignore for now
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("");
+        return;
+    } else if(functionName == "llvm.lifetime.end") {
+        // return "";  // just ignore for now
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("");
+        return;
+    } else if(functionName == "_Z11make_float4ffff") {
+        // change this into something like: (float4)(a, b, c, d)
+        functionName = "(float4)";
+        internalfunc = true;
+    } else if(functionName == "_GLOBAL__sub_I_struct_initializer.cu") {
+        cerr << "WARNING: skipping _GLOBAL__sub_I_struct_initializer.cu" << endl;
+        // return "";
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("");
+        return;
+    } else if(functionName == "__nvvm_reflect") {
+        localValueInfo->setExpression("0"); //ignore, (but pretend to return 0)
+        localValueInfo->setAddressSpace(0);
+        return;
+    } else if(functionName == "llvm.memcpy.p0i8.p0i8.i64") {
+        dumpMemcpyCharCharLong(localValueInfo);  // just ignore for now
+        return;
+    } else if(functionNamesMap->isMappedFunction(functionName)) {
+        functionName = functionNamesMap->getFunctionMappedName(functionName);
+        internalfunc = true;
+    }
+    string gencode = functionName + "(";
+    int i = 0;
+    for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
+        Value *op = &*it->get();
+        if(i > 0) {
+            gencode += ", ";
+        }
+        gencode += stripOuterParams(getOperand(op)->getExpr());
+        i++;
+    }
+    if(!internalfunc) {
+        if(i > 0) {
+            gencode += ", ";
+        }
+        gencode += "scratch";
+        Module *M = instr->getModule();
+        Function *F = M->getFunction(StringRef(functionName));
+        if(F != 0) {
+            // check arguments...
+            bool addressSpacesMatch = true;
+            // auto callit = instr->arg_begin();
+            int i = 0;
+            ostringstream manglingpostfix;
+            for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+                Value *callArg = instr->getArgOperand(i);
+                Argument *calleeArg = &*it;
+                if(PointerType *callPtr = dyn_cast<PointerType>(callArg->getType())) {
+                    PointerType *calleePtr = cast<PointerType>(calleeArg->getType());
+                    char thisaddressspacechar = 'p'; // private
+                    switch(callPtr->getAddressSpace()) {
+                        case 0:
+                            break;
+                        case 1:
+                            thisaddressspacechar = 'g';  // global
+                            break;
+                        case 3:
+                            thisaddressspacechar = 's';  // shared
+                            break;
+                        case 4:
+                            thisaddressspacechar = 'c';  // constant
+                            break;
+                        default:
+                            cout << "address space: " << callPtr->getAddressSpace() << endl;
+                            throw runtime_error("unhandled address space");
+                    }
+                    manglingpostfix << thisaddressspacechar;
+                    if(callPtr->getAddressSpace() != calleePtr->getAddressSpace()) {
+                        addressSpacesMatch = false;
+                        cout << "arg " << callArg->getName().str() << " needs address space mutation" << endl;
+                        // break;
+                    }
+                }
+                i++;
+            }
+            if(!addressSpacesMatch) {
+                string newName = F->getName().str() + "_" + manglingpostfix.str();
+                cout << "new name [" << newName << "]" << endl;
+                bool alreadyExists = globalNames->hasName(newName);
+                cout << "alreadyeists? " << alreadyExists << endl;
+
+                int numArgs = instr->getNumArgOperands();
+                cout << "numArgs " << numArgs << endl;
+                int i;
+
+                Function *newFunc = 0;
+                if(!alreadyExists) {
+                    cout << "cloning new funciton " << newName << endl;
+                    ValueToValueMapTy valueMap;
+                    newFunc = CloneFunction(F,
+                                   valueMap,
+                                   false);
+                    newFunc->setName(newName);
+                    i = 0;
+                    for(auto it=newFunc->arg_begin(); it != newFunc->arg_end(); it++) {
+                        // Argument *callArg = callit->;
+                        Value *callArg = instr->getArgOperand(i);
+                        Argument *calleeArg = &*it;
+                        copyAddressSpace(callArg, calleeArg);
+                        i++;
+                    }
+                    if(globalNames->getOrCreateName(newFunc, newName) != newName) {
+                        cout << "somehow created same name twice" << endl;
+                        throw runtime_error("somehow created same name twice");
+                    }
+                }
+                newFunc = cast<Function>(globalNames->getValueByName(newName));
+                // at this point, we only really want to insert it into needed functions if 
+                // its not there already yet
+                // also we need to mangle the name anyway....
+                // maybe we use the name mangling to check if it's already there???
+                cout << "inserting new funciton into neededfunctions" << endl;
+                neededFunctions->insert(newFunc);
+                if(isa<PointerType>(newFunc->getReturnType()) && returnTypeByFunction.find(newFunc) == returnTypeByFunction.end()) {
+                    needDependencies = true;
+                    localValueInfo->needDependencies = true;
+                    return;
+                }
+                F = newFunc;
+                functionName = newName;
+            } else {
+                neededFunctions->insert(F);
+                if(isa<PointerType>(F->getReturnType()) && returnTypeByFunction.find(F) == returnTypeByFunction.end()) {
+                    needDependencies = true;
+                    localValueInfo->needDependencies = true;
+                    return;
+                }
+            // do we need to walk this function first?
+            // check the return code
+            }
+
+            gencode = functionName + "(";
+            i = 0;
+            for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
+                Value *op = &*it->get();
+                if(i > 0) {
+                    gencode += ", ";
+                }
+                gencode += stripOuterParams(getOperand(op)->getExpr());
+                i++;
+            }
+            if(isa<PointerType>(F->getReturnType())) {
+                Type *returnType = returnTypeByFunction.at(F);
+                cout << "function return type:" << endl;
+                returnType->dump();
+                cout << endl;
+                if(PointerType *retptr = dyn_cast<PointerType>(returnType)) {
+                    int functionReturnAddressSpace = retptr->getAddressSpace();
+                    cout << " updating call instruction to addressspace " << functionReturnAddressSpace << endl;
+                    updateAddressSpace(instr, functionReturnAddressSpace);
+                    localValueInfo->setAddressSpace(functionReturnAddressSpace);
+                }
+            }
+        } else {
+            cout << "couldnt find function " + functionName << endl;
+            throw runtime_error("couldnt find function " + functionName);
+        }
+    }
+    gencode += ")";
+    // return gencode;
+    localValueInfo->setExpression(gencode);
+}
+
+void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
     Instruction *instruction = cast<Instruction>(localValueInfo->value);
     needDependencies = false;
     auto opcode = instruction->getOpcode();
@@ -839,9 +1168,9 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo) {
         case Instruction::Store:
             dumpStore(localValueInfo);
             break;
-        // case Instruction::Call:
-        //     instructionCode = dumpCall(localValueInfo, returnTypeByFunction);
-        //     break;
+        case Instruction::Call:
+            dumpCall(localValueInfo, returnTypeByFunction);
+            break;
         case Instruction::Load:
             dumpLoad(localValueInfo);
             break;
