@@ -28,7 +28,7 @@ before_install:
 
 script:
   - cd ${BASEDIR}/build
-  - ./test_newinstructiondumper
+  - ./test_new_instructiondumper
   #- ./cocl_unittests
   #- mkdir ${BASEDIR}/foo
   #- cd ${BASEDIR}/foo
