@@ -53,9 +53,9 @@ void NewInstructionDumper::dumpIcmp(cocl::LocalValueInfo *localValueInfo) {
     CmpInst *instr = cast<CmpInst>(localValueInfo->value);
     localValueInfo->setAddressSpace(0);
 
-    cout << "newinstructiondumpre, dumpicmp, instr:" << endl;
-    instr->dump();
-    cout << endl;
+    // cout << "newinstructiondumpre, dumpicmp, instr:" << endl;
+    // instr->dump();
+    // cout << endl;
     string gencode = "";
     // CmpInst::Predicate predicate = instr->getSignedPredicate();  // note: we should detect signedness...
     CmpInst::Predicate predicate = instr->getPredicate();  // note: we should detect signedness...
@@ -108,6 +108,60 @@ void NewInstructionDumper::dumpIcmp(cocl::LocalValueInfo *localValueInfo) {
     if(op1.find('&') == string::npos) {
         op1 = stripOuterParams(op1);
     }
+    gencode += op0;
+    gencode += " " + predicate_string + " ";
+    gencode += op1;
+
+    localValueInfo->setExpression(gencode);
+    // return gencode;
+}
+
+void NewInstructionDumper::dumpFcmp(cocl::LocalValueInfo *localValueInfo) {
+    localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
+    CmpInst *instr = cast<CmpInst>(localValueInfo->value);
+    localValueInfo->setAddressSpace(0);
+
+    string gencode = "";
+    CmpInst::Predicate predicate = instr->getPredicate();
+    string predicate_string = "";
+    switch(predicate) {
+        case CmpInst::FCMP_ULT:
+        case CmpInst::FCMP_OLT:
+            predicate_string = "<";
+            break;
+        case CmpInst::FCMP_UGT:
+        case CmpInst::FCMP_OGT:
+            predicate_string = ">";
+            break;
+        case CmpInst::FCMP_UGE:
+        case CmpInst::FCMP_OGE:
+            predicate_string = ">=";
+            break;
+        case CmpInst::FCMP_ULE:
+        case CmpInst::FCMP_OLE:
+            predicate_string = "<=";
+            break;
+        case CmpInst::FCMP_UEQ:
+        case CmpInst::FCMP_OEQ:
+            predicate_string = "==";
+            break;
+        case CmpInst::FCMP_UNE:
+        case CmpInst::FCMP_ONE:
+            predicate_string = "!=";
+            break;
+        default:
+            cout << "predicate " << predicate << endl;
+            throw runtime_error("predicate not supported");
+    }
+
+    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
+
+    string op0 = op0info->getExpr();
+    string op1 = op1info->getExpr();
+
+    op0 = stripOuterParams(op0);
+    op1 = stripOuterParams(op1);
     gencode += op0;
     gencode += " " + predicate_string + " ";
     gencode += op1;
@@ -319,9 +373,9 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo) {
         case Instruction::ICmp:
             dumpIcmp(localValueInfo);
             break;
-        // case Instruction::FCmp:
-        //     instructionCode = dumpFcmp(cast<FCmpInst>(instruction));
-        //     break;
+        case Instruction::FCmp:
+            dumpFcmp(localValueInfo);
+            break;
         // case Instruction::SExt:
         //     instructionCode = dumpSExt(cast<CastInst>(instruction));
         //     break;

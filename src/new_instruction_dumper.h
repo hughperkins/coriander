@@ -9,7 +9,7 @@ namespace cocl {
 
 class NewInstructionDumper {
 public:
-    NewInstructionDumper(            GlobalNames *globalNames, LocalNames *localNames, TypeDumper *typeDumper, const FunctionNamesMap *functionNamesMap,
+    NewInstructionDumper(GlobalNames *globalNames, LocalNames *localNames, TypeDumper *typeDumper, const FunctionNamesMap *functionNamesMap,
 
             std::set<std::string> *shimFunctionsNeeded,
             std::set<llvm::Function *> *neededFunctions,
@@ -17,8 +17,10 @@ public:
             std::map<llvm::Value *, std::string> *globalExpressionByValue,
             std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos,
             std::vector<AllocaInfo> *allocaDeclarations
-);
+    );
+
     void dumpIcmp(LocalValueInfo *localValueInfo);
+    void dumpFcmp(LocalValueInfo *localValueInfo);
     void dumpBinaryOperator(LocalValueInfo *localValueInfo, std::string opstring);
     void dumpAlloca(cocl::LocalValueInfo *localValueInfo);
     void dumpStore(cocl::LocalValueInfo *localValueInfo);

@@ -516,4 +516,57 @@ TEST(test_new_instruction_dumper, test_icmp) {
     ASSERT_EQ("myinstr", expr);
 }
 
+TEST(test_new_instruction_dumper, test_fcmp) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+    LLVMContext &context = myblock.context;
+    InstructionDumperWrapper wrapper;
+    NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    AllocaInst *a = builder.CreateAlloca(Type::getFloatTy(context));
+    AllocaInst *b = builder.CreateAlloca(Type::getFloatTy(context));
+
+    LoadInst *aLoad = builder.CreateLoad(a);
+    LoadInst *bLoad = builder.CreateLoad(b);
+
+    wrapper.declareVariable(aLoad, "v_a");
+    wrapper.declareVariable(bLoad, "v_b");
+
+    FCmpInst *instr = cast<FCmpInst>(builder.CreateFCmpOLT(aLoad, bLoad));
+
+    LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
+    instructionDumper->runGeneration(instrInfo);
+
+    string expr = instrInfo->getExpr();
+    cout << "expr " << expr << endl;
+    ASSERT_EQ("v_a < v_b", expr);
+
+    ostringstream oss;
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    cout << "after setAsAssigned:" << endl;
+    instrInfo->setAsAssigned();
+
+    oss.str("");
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    bool myinstr;\n", oss.str());
+
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    myinstr = v_a < v_b;\n", oss.str());
+
+    expr = instrInfo->getExpr();
+    cout << "expr " << expr << endl;
+    ASSERT_EQ("myinstr", expr);
+}
+
 }
