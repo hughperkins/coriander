@@ -33,6 +33,7 @@ public:
     void dumpAlloca(cocl::LocalValueInfo *localValueInfo);
     void dumpStore(cocl::LocalValueInfo *localValueInfo);
     void dumpInsertValue(cocl::LocalValueInfo *localValueInfo);
+    void dumpExtractValue(cocl::LocalValueInfo *localValueInfo);
 
     LocalValueInfo *getOperand(llvm::Value *op);
     LocalValueInfo *dumpConstant(llvm::Constant *constant);

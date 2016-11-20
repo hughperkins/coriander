@@ -535,12 +535,76 @@ void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
 }
 
 void NewInstructionDumper::dumpAlloca(cocl::LocalValueInfo *localValueInfo) {
-    string gencode = "";
+    // string gencode = "";
     // AllocaInst *alloca = cast<AllocaInst>(localValueInfo->value);
     AllocaInfo allocaInfo;
     localValueInfo->clWriter.reset(new AllocaClWriter(localValueInfo));
     string name = localValueInfo->name;
     localValueInfo->setExpression(name);
+}
+
+void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo) {
+    localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
+    ExtractValueInst *instr = cast<ExtractValueInst>(localValueInfo->value);
+    // string gencode = "";
+
+    // string incomingOperand = getOperand(instr->getAggregateOperand());
+    // if rhs is empty, that means its 'undef', so we better declare it, I guess...
+    // Type *currentType = instr->getAggregateOperand()->getType();
+
+
+    LocalValueInfo *aggInfo = getOperand(instr->getAggregateOperand());
+    localValueInfo->setAddressSpaceFrom(aggInfo);
+    copyAddressSpace(instr, aggInfo->value);
+
+    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    string gencode = "";
+    string lhs = "";
+    // string incomingOperand = dumpOperand(instr->getAggregateOperand());
+    // LocalValueInfo *incomingOperandInfo = this->getOperand(instr->getAggregateOperand());
+    // string incomingOperand = incomingOperandInfo->getExpr();
+    string incomingOperand = aggInfo->getExpr();
+    // if rhs is empty, that means its 'undef', so we better declare it, I guess...
+    Type *currentType = instr->getAggregateOperand()->getType();
+    lhs += incomingOperand;
+    ArrayRef<unsigned> indices = instr->getIndices();
+    int numIndices = instr->getNumIndices();
+    for(int d=0; d < numIndices; d++) {
+        int idx = indices[d];
+        Type *newType = 0;
+        if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
+            if(d == 0) {
+                if(isa<ArrayType>(currentType->getPointerElementType())) {
+                    lhs = "(&" + lhs + ")";
+                }
+            }
+            LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
+            lhs += string("[") + thisInfo->getExpr() + "]";
+            newType = currentType->getPointerElementType();
+        } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
+            string structName = getName(structtype);
+            if(structName == "struct.float4") {
+                Type *elementType = structtype->getElementType(idx);
+                Type *castType = PointerType::get(elementType, 0);
+                newType = elementType;
+                lhs = "((" + typeDumper->dumpType(castType) + ")&" + lhs + ")";
+                lhs += string("[") + easycl::toString(idx) + "]";
+            } else {
+                // generic struct
+                Type *elementType = structtype->getElementType(idx);
+                lhs += string(".f") + easycl::toString(idx);
+                newType = elementType;
+            }
+        } else {
+            currentType->dump();
+            throw runtime_error("type not implemented in extractvalue");
+        }
+        currentType = newType;
+    }
+    gencode += lhs;
+    // return gencode;
+    cout << "gencode " << gencode << endl;
+    localValueInfo->setExpression(gencode);
 }
 
 void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo) {
@@ -758,11 +822,9 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo) {
         case Instruction::InsertValue:
             dumpInsertValue(localValueInfo);
             break;
-            // return;
-            // return true;
-        // case Instruction::ExtractValue:
-        //     instructionCode = dumpExtractValue(cast<ExtractValueInst>(instruction));
-        //     break;
+        case Instruction::ExtractValue:
+            dumpExtractValue(localValueInfo);
+            break;
         case Instruction::Store:
             dumpStore(localValueInfo);
             break;

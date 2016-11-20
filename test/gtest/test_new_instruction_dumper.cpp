@@ -999,4 +999,74 @@ TEST(test_new_instruction_dumper, getelementptr_struct) {
     ASSERT_EQ("    myinstr = (&structAlloca[0].f1);\n", oss.str());
 }
 
+TEST(test_new_instruction_dumper, extractvalue_struct) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+    LLVMContext &context = myblock.context;
+
+    Type *structElements[] = {
+        IntegerType::get(context, 32),
+        IntegerType::get(context, 32)
+    };
+    StructType *myStructType = StructType::create(
+        context, structElements, "struct.mystruct"
+    );
+    myStructType->dump();
+    cout << endl;
+
+    InstructionDumperWrapper wrapper;
+    NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    AllocaInst *structAlloca = builder.CreateAlloca(myStructType);
+    LoadInst *structLoad = builder.CreateLoad(structAlloca);
+
+    // AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(context, 32));
+    // LoadInst *intLoad = builder.CreateLoad(intAlloca);
+
+    wrapper.declareVariable(structLoad, "structLoad");
+
+    unsigned int idxs[] = {0};
+    ExtractValueInst *instr = cast<ExtractValueInst>(builder.CreateExtractValue(structLoad, ArrayRef<unsigned>(idxs)));
+    LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
+
+    myblock.block->dump();
+
+    instructionDumper->runGeneration(instrInfo);
+
+    cout << "hasexpr " << instrInfo->hasExpr() << endl;
+    ASSERT_TRUE(instrInfo->hasExpr());
+    cout << "expr: " << instrInfo->getExpr() << endl;
+    ASSERT_EQ("structLoad.f0", instrInfo->getExpr());
+
+    ostringstream oss;
+
+    oss.str("");
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    cout << "after setAsAssigned:" << endl;
+    instrInfo->setAsAssigned();
+
+    cout << "hasexpr " << instrInfo->hasExpr() << endl;
+    ASSERT_TRUE(instrInfo->hasExpr());
+    cout << "expr: " << instrInfo->getExpr() << endl;
+    ASSERT_EQ("myinstr", instrInfo->getExpr());
+
+    oss.str("");
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    int myinstr;\n", oss.str());
+
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    myinstr = structLoad.f0;\n", oss.str());
+}
+
 }
