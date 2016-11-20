@@ -569,4 +569,54 @@ TEST(test_new_instruction_dumper, test_fcmp) {
     ASSERT_EQ("myinstr", expr);
 }
 
+TEST(test_new_instruction_dumper, test_sext) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+    LLVMContext &context = myblock.context;
+    InstructionDumperWrapper wrapper;
+    NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    AllocaInst *a = builder.CreateAlloca(IntegerType::get(context, 8));
+
+    LoadInst *aLoad = builder.CreateLoad(a);
+
+    wrapper.declareVariable(aLoad, "v_a");
+
+    Instruction *instr = cast<Instruction>(builder.CreateSExt(aLoad, IntegerType::get(context, 32)));
+
+    LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
+    instructionDumper->runGeneration(instrInfo);
+
+    string expr = instrInfo->getExpr();
+    cout << "expr " << expr << endl;
+    ASSERT_EQ("v_a", expr);
+
+    ostringstream oss;
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    cout << "after setAsAssigned:" << endl;
+    instrInfo->setAsAssigned();
+
+    oss.str("");
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    int myinstr;\n", oss.str());
+
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    myinstr = v_a;\n", oss.str());
+
+    expr = instrInfo->getExpr();
+    cout << "expr " << expr << endl;
+    ASSERT_EQ("myinstr", expr);
+}
+
 }

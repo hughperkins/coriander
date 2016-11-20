@@ -170,6 +170,16 @@ void NewInstructionDumper::dumpFcmp(cocl::LocalValueInfo *localValueInfo) {
     // return gencode;
 }
 
+void NewInstructionDumper::dumpSExt(cocl::LocalValueInfo *localValueInfo) {
+    localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
+    Instruction *instr = cast<Instruction>(localValueInfo->value);
+
+    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    string op0 = op0info->getExpr();
+
+    localValueInfo->setExpression(op0);
+}
+
 void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new StoreClWriter(localValueInfo));
     StoreInst *instr = cast<StoreInst>(localValueInfo->value);
@@ -376,9 +386,9 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo) {
         case Instruction::FCmp:
             dumpFcmp(localValueInfo);
             break;
-        // case Instruction::SExt:
-        //     instructionCode = dumpSExt(cast<CastInst>(instruction));
-        //     break;
+        case Instruction::SExt:
+            dumpSExt(localValueInfo);
+            break;
         // case Instruction::ZExt:
         //     instructionCode = dumpZExt(cast<CastInst>(instruction));
         //     break;

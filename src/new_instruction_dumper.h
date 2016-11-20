@@ -21,10 +21,12 @@ public:
 
     void dumpIcmp(LocalValueInfo *localValueInfo);
     void dumpFcmp(LocalValueInfo *localValueInfo);
+    void dumpSExt(LocalValueInfo *localValueInfo);
     void dumpBinaryOperator(LocalValueInfo *localValueInfo, std::string opstring);
     void dumpAlloca(cocl::LocalValueInfo *localValueInfo);
     void dumpStore(cocl::LocalValueInfo *localValueInfo);
     void dumpInsertValue(cocl::LocalValueInfo *localValueInfo);
+
     void runGeneration(LocalValueInfo *localValueInfo);
 
     cocl::GlobalNames *globalNames = 0;
