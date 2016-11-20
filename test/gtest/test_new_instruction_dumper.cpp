@@ -154,4 +154,54 @@ TEST(test_new_instruction_dumper, test_add) {
     // ASSERT_EQ(0u, wrapper.allocaDeclarations.size());
 }
 
+TEST(test_new_instruction_dumper, test_alloca) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+
+    LLVMContext &context = myblock.context;
+    // we should create allocas really, and load those.  I guess?
+    AllocaInst *a = builder.CreateAlloca(IntegerType::get(context, 32));
+
+    InstructionDumperWrapper wrapper;
+    NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    // Instruction *add = cast<Instruction>(builder.CreateAdd(aLoad, bLoad));
+
+    LocalValueInfo *aInfo = LocalValueInfo::getOrCreate(
+        &wrapper.localNames, &wrapper.localValueInfos, a);
+    instructionDumper->runGeneration(aInfo);
+
+    string expr = aInfo->getExpr();
+    cout << "expr " << expr << endl;
+    // ASSERT_EQ("v_a + v_b", expr);
+
+    ostringstream oss;
+    aInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    oss.str("");
+    aInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    cout << "after setAsAssigned:" << endl;
+    aInfo->setAsAssigned();
+
+    oss.str("");
+    aInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+
+    oss.str("");
+    aInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+
+    // if we check local names, we should NOT find the add, since we havent declared it
+    // ASSERT_FALSE(wrapper.localNames.hasValue(add));
+
+    // but we should find an expression for it:
+    /// oh ... we already tested this :-)
+
+    // we should not find a requirement to declare the variable
+    // ASSERT_EQ(0u, wrapper.variablesToDeclare.size());
+    // ... and no allocas
+    // ASSERT_EQ(0u, wrapper.allocaDeclarations.size());
+}
+
 }

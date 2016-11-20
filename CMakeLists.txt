@@ -103,25 +103,25 @@ foreach(LIB ${LLVM_LIBFILES})
    endif()
 endforeach()
 
-add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp)
-target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
-target_include_directories(ir-to-opencl PRIVATE ${CLANG_HOME}/include)
-target_compile_options(ir-to-opencl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-target_link_libraries(ir-to-opencl cocl ${LLVM_SYSLIBS})
-# if(OFFSET_32BIT)
-#     target_compile_definitions(ir-to-opencl PRIVATE -DOFFSET_32BIT)
-# endif()
+# add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp)
+# target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
+# target_include_directories(ir-to-opencl PRIVATE ${CLANG_HOME}/include)
+# target_compile_options(ir-to-opencl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
+# target_link_libraries(ir-to-opencl cocl ${LLVM_SYSLIBS})
+# # if(OFFSET_32BIT)
+# #     target_compile_definitions(ir-to-opencl PRIVATE -DOFFSET_32BIT)
+# # endif()
 
-add_executable(patch-hostside
-    src/patch-hostside.cpp src/struct_clone.cpp src/mutations.cpp src/readIR.cpp
-    third_party/argparsecpp/argparsecpp.cpp src/type_dumper.cpp src/GlobalNames.cpp
-    src/EasyCL/util/easycl_stringhelper.cpp
-)
-target_include_directories(patch-hostside PRIVATE ${CLANG_HOME}/include)
-target_include_directories(patch-hostside PRIVATE third_party/argparsecpp)
-target_include_directories(patch-hostside PRIVATE src/EasyCL)
-target_compile_options(patch-hostside PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-target_link_libraries(patch-hostside "${LLVM_LIBS}"  ${LLVM_SYSLIBS})
+# add_executable(patch-hostside
+#     src/patch-hostside.cpp src/struct_clone.cpp src/mutations.cpp src/readIR.cpp
+#     third_party/argparsecpp/argparsecpp.cpp src/type_dumper.cpp src/GlobalNames.cpp
+#     src/EasyCL/util/easycl_stringhelper.cpp
+# )
+# target_include_directories(patch-hostside PRIVATE ${CLANG_HOME}/include)
+# target_include_directories(patch-hostside PRIVATE third_party/argparsecpp)
+# target_include_directories(patch-hostside PRIVATE src/EasyCL)
+# target_compile_options(patch-hostside PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
+# target_link_libraries(patch-hostside "${LLVM_LIBS}"  ${LLVM_SYSLIBS})
 
 add_library(clew SHARED src/EasyCL/thirdparty/clew/src/clew.c)
 target_include_directories(clew PRIVATE src/EasyCL/thirdparty/clew/include)
@@ -132,25 +132,25 @@ target_include_directories(easycl PRIVATE src/EasyCL/thirdparty/clew/include)
 target_include_directories(easycl PRIVATE src/EasyCL)
 target_link_libraries(easycl clew)
 
-add_library(cocl SHARED ${COCL_SRCS})
-target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
-target_include_directories(cocl PRIVATE src/CLBlast/include)
-target_include_directories(cocl PRIVATE include)
-target_include_directories(cocl PRIVATE src)
-target_include_directories(cocl PRIVATE third_party/argparsecpp)
-target_include_directories(cocl PRIVATE ${CLANG_HOME}/include)
-target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include)
-if(COCL_SPAM)
-    set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DCOCL_SPAM)
-endif()
-if(OFFSET_32BIT)
-    set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DOFFSET_32BIT)
-endif()
-if(COCL_DEFINITIONS)
-    target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
-endif()
-target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-target_link_libraries(cocl easycl ${LLVM_LIBS} ${LLVM_SYSLIBS})
+# add_library(cocl SHARED ${COCL_SRCS})
+# target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
+# target_include_directories(cocl PRIVATE src/CLBlast/include)
+# target_include_directories(cocl PRIVATE include)
+# target_include_directories(cocl PRIVATE src)
+# target_include_directories(cocl PRIVATE third_party/argparsecpp)
+# target_include_directories(cocl PRIVATE ${CLANG_HOME}/include)
+# target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include)
+# if(COCL_SPAM)
+#     set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DCOCL_SPAM)
+# endif()
+# if(OFFSET_32BIT)
+#     set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DOFFSET_32BIT)
+# endif()
+# if(COCL_DEFINITIONS)
+#     target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
+# endif()
+# target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
+# target_link_libraries(cocl easycl ${LLVM_LIBS} ${LLVM_SYSLIBS})
 
 # ==================================================================================================
 
@@ -191,14 +191,14 @@ foreach(ROUTINE ${CLBLAST_LEVELX_ROUTINES})
   set(CLBLAST_SOURCES ${CLBLAST_SOURCES} src/CLBlast/src/routines/levelx/${ROUTINE}.cpp)
 endforeach()
 
-include_directories(src/CLBlast/src)
-add_library(clblast SHARED ${CLBLAST_SOURCES})
-target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
-target_include_directories(clblast PRIVATE src/CLBlast/include)
-target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include)
-target_link_libraries(clblast clew)
+# include_directories(src/CLBlast/src)
+# add_library(clblast SHARED ${CLBLAST_SOURCES})
+# target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
+# target_include_directories(clblast PRIVATE src/CLBlast/include)
+# target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include)
+# target_link_libraries(clblast clew)
 
-target_link_libraries(cocl clblast)
+# target_link_libraries(cocl clblast)
 
 # ==================================================================================================
 # tests
@@ -233,8 +233,8 @@ if(BUILD_TESTS)
 
     add_executable(test_new_instructiondumper test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
       src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/ConstantDumper.cpp
-      src/mutations.cpp src/ExpressionsHelper.cpp src/readIR.cpp
-      src/function_names_map.cpp src/LocalValueInfo.cpp
+      src/mutations.cpp src/ExpressionsHelper.cpp src/readIR.cpp src/ClWriter.cpp
+      src/function_names_map.cpp src/LocalValueInfo.cpp src/readIR.cpp
       src/new_instruction_dumper.cpp test/gtest/test_new_instruction_dumper.cpp)
     target_include_directories(test_new_instructiondumper PRIVATE src)
     target_include_directories(test_new_instructiondumper PRIVATE third_party/gtest)
@@ -242,28 +242,28 @@ if(BUILD_TESTS)
     target_link_libraries(test_new_instructiondumper "${LLVM_LIBS}" cocl_gtest easycl ${LLVM_SYSLIBS})
     target_compile_options(test_new_instructiondumper PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 
-    add_executable(test_instructiondumper test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
-      src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/ConstantDumper.cpp
-      src/mutations.cpp src/ExpressionsHelper.cpp src/readIR.cpp
-      src/function_names_map.cpp src/LocalValueInfo.cpp
-      src/InstructionDumper.cpp test/gtest/test_instructiondumper.cpp)
-    target_include_directories(test_instructiondumper PRIVATE src)
-    target_include_directories(test_instructiondumper PRIVATE third_party/gtest)
-    target_include_directories(test_instructiondumper PRIVATE ${CLANG_HOME}/include)
-    target_link_libraries(test_instructiondumper "${LLVM_LIBS}" cocl_gtest easycl ${LLVM_SYSLIBS})
-    target_compile_options(test_instructiondumper PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
+    # add_executable(test_instructiondumper test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
+    #   src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/ConstantDumper.cpp
+    #   src/mutations.cpp src/ExpressionsHelper.cpp src/readIR.cpp
+    #   src/function_names_map.cpp src/LocalValueInfo.cpp
+    #   src/InstructionDumper.cpp test/gtest/test_instructiondumper.cpp)
+    # target_include_directories(test_instructiondumper PRIVATE src)
+    # target_include_directories(test_instructiondumper PRIVATE third_party/gtest)
+    # target_include_directories(test_instructiondumper PRIVATE ${CLANG_HOME}/include)
+    # target_link_libraries(test_instructiondumper "${LLVM_LIBS}" cocl_gtest easycl ${LLVM_SYSLIBS})
+    # target_compile_options(test_instructiondumper PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 
-    add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
-        test/gtest/test_block_dumper.cpp test/gtest/test_instructiondumper.cpp
-        test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
-        test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
-        test/gtest/test_kernel_dumper.cpp test/gtest/test_global_constants.cpp
-    )
-    target_include_directories(cocl_unittests PRIVATE src)
-    target_include_directories(cocl_unittests PRIVATE third_party/gtest)
-    target_include_directories(cocl_unittests PRIVATE ${CLANG_HOME}/include)
-    target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} ${LLVM_SYSLIBS})
-    target_compile_options(cocl_unittests PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
+    # add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
+    #     test/gtest/test_block_dumper.cpp test/gtest/test_instructiondumper.cpp
+    #     test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
+    #     test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
+    #     test/gtest/test_kernel_dumper.cpp test/gtest/test_global_constants.cpp
+    # )
+    # target_include_directories(cocl_unittests PRIVATE src)
+    # target_include_directories(cocl_unittests PRIVATE third_party/gtest)
+    # target_include_directories(cocl_unittests PRIVATE ${CLANG_HOME}/include)
+    # target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} ${LLVM_SYSLIBS})
+    # target_compile_options(cocl_unittests PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 endif(BUILD_TESTS)
 
 FILE(GLOB_RECURSE COCL_HEADERS
@@ -273,23 +273,23 @@ set(CLEW_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/thirdparty/clew/include/
 FILE(GLOB EASYCL_HEADERS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/*.h)
 # FILE(GLOB CLEW_PROXYHEADERS) ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/thirdparty/clew/include/proxy-opencl/*.h)
 
-CONFIGURE_FILE(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cocl.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl.cmake" @ONLY)
-INSTALL(FILES ${COCL_HEADERS} DESTINATION include/cocl)
-# INSTALL(FILES ${CLEW_PROXYHEADERS} DESTINATION include/clew/proxy-opencl)
-INSTALL(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl DESTINATION bin)
-# INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/share/cocl/cocl.Makefile DESTINATION share/cocl)
-INSTALL(FILES ${CLEW_HEADERS} DESTINATION include)
-INSTALL(FILES ${EASYCL_HEADERS_ROOT} DESTINATION include/EasyCL)
-# INSTALL(FILES ${CMAKE_SOURCE_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
-INSTALL(FILES ${CMAKE_BINARY_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
-install(TARGETS easycl clew clblast cocl patch-hostside ir-to-opencl EXPORT cocl-targets
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    RUNTIME DESTINATION bin
-)
-install(EXPORT cocl-targets DESTINATION lib/cocl)
+# CONFIGURE_FILE(
+#   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cocl.cmake.in"
+#   "${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl.cmake" @ONLY)
+# INSTALL(FILES ${COCL_HEADERS} DESTINATION include/cocl)
+# # INSTALL(FILES ${CLEW_PROXYHEADERS} DESTINATION include/clew/proxy-opencl)
+# INSTALL(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl DESTINATION bin)
+# # INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/share/cocl/cocl.Makefile DESTINATION share/cocl)
+# INSTALL(FILES ${CLEW_HEADERS} DESTINATION include)
+# INSTALL(FILES ${EASYCL_HEADERS_ROOT} DESTINATION include/EasyCL)
+# # INSTALL(FILES ${CMAKE_SOURCE_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
+# INSTALL(FILES ${CMAKE_BINARY_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
+# install(TARGETS easycl clew clblast cocl patch-hostside ir-to-opencl EXPORT cocl-targets
+#     LIBRARY DESTINATION lib
+#     ARCHIVE DESTINATION lib
+#     RUNTIME DESTINATION bin
+# )
+# install(EXPORT cocl-targets DESTINATION lib/cocl)
 
 ########### Add uninstall target ###############
 CONFIGURE_FILE(

@@ -18,7 +18,7 @@
 #include "GlobalNames.h"
 #include "type_dumper.h"
 #include "function_names_map.h"
-#include "LocalValueInfo.h"
+#include "ClWriter.h"
 
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Constants.h"
@@ -37,11 +37,12 @@ namespace cocl {
 // - we want to know any functions this value needs
 // - we want to know if generaiton has run on this value, and/or if it needs dependencies (and what dependencies perhaps?)
 // - we want to be able to assign to a new local variable, and know what the name of that local variable is
-class LocalValueInfo final {
+class LocalValueInfo {
 public:
     LocalValueInfo(llvm::Value *value, std::string name) : value(value), name(name) {
 
     }
+    virtual ~LocalValueInfo(){}
     llvm::Value *const  value;
     const std::string name;  // name of this value, always a single identifier, like "v3"
 
@@ -60,16 +61,25 @@ public:
     std::vector<std::string> declarationCl;  // eg ["int v5;"]
     bool clGenerationDone = false; // are both inlineCl and declarationCl complete and valid?
 
+    std::unique_ptr<ClWriter> clWriter;
     LocalValueInfo *setAddressSpace(int addressSpace);
     LocalValueInfo *setAddressSpaceFrom(llvm::Value *source);
     LocalValueInfo *setExpression(std::string expression);
     std::string getExpr();
     LocalValueInfo *setAsAssigned();
-    void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os);  // if we set this as to be assigned, this will write something, otherwise it wont
-    void writeInlineCl(std::string indent, std::ostream &os); // writes any cl required, eg if we toggled setAsAssigned, we need to do the assignment
+    virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os);  // if we set this as to be assigned, this will write something, otherwise it wont
+    virtual void writeInlineCl(std::string indent, std::ostream &os); // writes any cl required, eg if we toggled setAsAssigned, we need to do the assignment
                                           // some instructoins will *always* write something, eg stores
 
     static LocalValueInfo *getOrCreate(cocl::LocalNames *localNames, std::map<llvm::Value *, std::unique_ptr< LocalValueInfo> > *localValueInfos, llvm::Value *value, std::string suggestedName="");
 };
+
+// class AllocaValueInfo : public LocalValueInfo {
+// public:
+//     AllocaValueInfo(llvm::Value *value, std::string name) : LocalValueInfo(value, name) {
+
+//     }
+//     virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) override;
+// };
 
 } // namespace cocl
