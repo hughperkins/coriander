@@ -19,7 +19,7 @@
 #include "type_dumper.h"
 #include "ExpressionsHelper.h"
 #include "function_names_map.h"
-#include "InstructionDumper.h"
+#include "new_instruction_dumper.h"
 
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Instructions.h"
@@ -45,16 +45,16 @@ public:
         functionNamesMap(functionNamesMap)
              {
         instructionDumper.reset(
-            new InstructionDumper(globalNames, localNames, typeDumper, functionNamesMap,
+            new NewInstructionDumper(globalNames, localNames, typeDumper, functionNamesMap,
             &shimFunctionsNeeded, &neededFunctions,
-            &globalExpressionByValue, &localValueInfos, &allocaDeclarations));
+            &globalExpressionByValue, &localValueInfos));
         instruction_it = block->begin();
     }
-    bool runGeneration(const std::set< llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
+    bool runGeneration(const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
     void toCl(std::ostream &os);
     // void storeValueName(llvm::Value *value);
     std::string dumpChainedInstruction(int level, llvm::Instruction * instr, bool ignoreCasts=false);
-    bool dumpInstruction(llvm::Instruction *instruction, const std::set< llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
+    // bool dumpInstruction(llvm::Instruction *instruction, const std::set< llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
 
     std::string getAllocaDeclarations(std::string indent);
     std::string writeDeclarations(std::string indent);
@@ -71,9 +71,9 @@ public:
     // std::set<llvm::Value *> sharedVariablesToDeclare;
     std::map<llvm::Value *, std::string> globalExpressionByValue;
     std::map<llvm::Value *, std::unique_ptr<cocl::LocalValueInfo> > localValueInfos;
-    std::vector<AllocaInfo> allocaDeclarations;
+    // std::vector<AllocaInfo> allocaDeclarations;
     // std::map<llvm::Value *, std::string> localExpressionByValue;
-    std::vector<std::string> clcode;
+    // std::vector<std::string> clcode;
 
     int maxInstructionsToGenerate = -1; // -1 means no limit, 0 will cause runGeneration to do nothing; otherwise however many instructions to process
     llvm::BasicBlock::iterator instruction_it;
@@ -86,7 +86,7 @@ protected:
     GlobalNames *globalNames;
     LocalNames *localNames;
     TypeDumper *typeDumper;
-    std::unique_ptr<InstructionDumper> instructionDumper;
+    std::unique_ptr<NewInstructionDumper> instructionDumper;
 
     const FunctionNamesMap *functionNamesMap;
 };

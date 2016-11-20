@@ -236,7 +236,9 @@ if(BUILD_TESTS)
       src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/ConstantDumper.cpp
       src/mutations.cpp src/ExpressionsHelper.cpp src/readIR.cpp src/ClWriter.cpp
       src/function_names_map.cpp src/LocalValueInfo.cpp src/readIR.cpp
-      src/new_instruction_dumper.cpp test/gtest/test_new_instruction_dumper.cpp)
+      src/new_instruction_dumper.cpp test/gtest/test_new_instruction_dumper.cpp
+      test/gtest/test_block_dumper.cpp src/basicblockdumper.cpp
+    )
     target_include_directories(test_new_instructiondumper PRIVATE src)
     target_include_directories(test_new_instructiondumper PRIVATE third_party/gtest)
     target_include_directories(test_new_instructiondumper PRIVATE ${CLANG_HOME}/include)

@@ -68,6 +68,7 @@ std::string LocalValueInfo::getExpr() {
         return name;
     }
     if(!expressionValid) {
+        cout << "expression not yet assigned for " << name << endl;
         throw std::runtime_error("expression not yet assigned, name " + name);
     }
     return expression;

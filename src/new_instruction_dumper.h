@@ -15,8 +15,8 @@ public:
             std::set<llvm::Function *> *neededFunctions,
 
             std::map<llvm::Value *, std::string> *globalExpressionByValue,
-            std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos,
-            std::vector<AllocaInfo> *allocaDeclarations
+            std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos
+            // std::vector<AllocaInfo> *allocaDeclarations
     );
 
     void dumpIcmp(LocalValueInfo *localValueInfo);
@@ -56,9 +56,9 @@ public:
 
     std::map<llvm::Value *, std::string> *globalExpressionByValue = 0;
     std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos = 0;
-    std::vector<AllocaInfo> *allocaDeclarations = 0;
+    // std::vector<AllocaInfo> *allocaDeclarations = 0;
 
-    bool needDependencies = false;
+    // bool needDependencies = false;
 
     // std::string lastExpression;
 

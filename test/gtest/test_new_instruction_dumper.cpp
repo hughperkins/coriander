@@ -55,7 +55,7 @@ public:
         instructionDumper.reset(new NewInstructionDumper(&globalNames, &localNames, typeDumper.get(), &functionNamesMap,
             &shimFunctionsNeeded,
             &neededFunctions,
-            &globalExpressionByValue, &localValueInfos, &allocaDeclarations));
+            &globalExpressionByValue, &localValueInfos));
     }
     virtual ~InstructionDumperWrapper() {
 
@@ -83,7 +83,7 @@ public:
 
     std::map<llvm::Value *, std::string> globalExpressionByValue;
     map<Value *, unique_ptr<LocalValueInfo> > localValueInfos;
-    std::vector<AllocaInfo> allocaDeclarations;
+    // std::vector<AllocaInfo> allocaDeclarations;
 
     unique_ptr<NewInstructionDumper> instructionDumper;
 };
@@ -1099,7 +1099,7 @@ TEST(test_new_instruction_dumper, callsomething) {
     std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
     instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
-    ASSERT_TRUE(instructionDumper->needDependencies);
+    ASSERT_TRUE(instrInfo->needDependencies);
     ASSERT_EQ(1u, instructionDumper->neededFunctions->size());
     cout << "needed function:" << endl;
     (*instructionDumper->neededFunctions->begin())->dump();
@@ -1131,7 +1131,7 @@ TEST(test_new_instruction_dumper, callsomething) {
     returnTypeByFunction[childF] = PointerType::get(IntegerType::get(context, 8), 1);
     instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
-    ASSERT_FALSE(instructionDumper->needDependencies);
+    ASSERT_FALSE(instrInfo->needDependencies);
     ASSERT_EQ(1u, instructionDumper->neededFunctions->size());
 
     cout << "hasexpr " << instrInfo->hasExpr() << endl;

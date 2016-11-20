@@ -32,8 +32,8 @@ NewInstructionDumper::NewInstructionDumper(
         std::set<llvm::Function *> *neededFunctions,
 
         std::map<llvm::Value *, std::string> *globalExpressionByValue,
-        std::map<llvm::Value *, unique_ptr<LocalValueInfo > > *localValueInfos,
-        std::vector<AllocaInfo> *allocaDeclarations
+        std::map<llvm::Value *, unique_ptr<LocalValueInfo > > *localValueInfos
+        // std::vector<AllocaInfo> *allocaDeclarations
         ) :
     globalNames(globalNames),
     localNames(localNames),
@@ -44,8 +44,8 @@ NewInstructionDumper::NewInstructionDumper(
     neededFunctions(neededFunctions),
 
     globalExpressionByValue(globalExpressionByValue),
-    localValueInfos(localValueInfos),
-    allocaDeclarations(allocaDeclarations)
+    localValueInfos(localValueInfos)
+    // allocaDeclarations(allocaDeclarations)
         {
 }
 
@@ -271,8 +271,10 @@ void NewInstructionDumper::dumpIcmp(cocl::LocalValueInfo *localValueInfo) {
     }
     cout << "newinstructiondumepr::dumpIcmp, predicatestring: " << predicate_string << endl;
 
-    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
-    LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
+    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    // LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
+    LocalValueInfo *op0info = getOperand(instr->getOperand(0));
+    LocalValueInfo *op1info = getOperand(instr->getOperand(1));
 
     string op0 = op0info->getExpr();
     string op1 = op1info->getExpr();
@@ -330,8 +332,10 @@ void NewInstructionDumper::dumpFcmp(cocl::LocalValueInfo *localValueInfo) {
             throw runtime_error("predicate not supported");
     }
 
-    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
-    LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
+    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    // LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
+    LocalValueInfo *op0info = getOperand(instr->getOperand(0));
+    LocalValueInfo *op1info = getOperand(instr->getOperand(1));
 
     string op0 = op0info->getExpr();
     string op1 = op1info->getExpr();
@@ -349,7 +353,8 @@ void NewInstructionDumper::dumpExt(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     Instruction *instr = cast<Instruction>(localValueInfo->value);
 
-    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    LocalValueInfo *op0info = getOperand(instr->getOperand(0));
+    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
     string op0 = op0info->getExpr();
 
     localValueInfo->setExpression(op0);
@@ -359,7 +364,8 @@ void NewInstructionDumper::dumpTrunc(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     Instruction *instr = cast<Instruction>(localValueInfo->value);
 
-    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    LocalValueInfo *op0info = getOperand(instr->getOperand(0));
     string op0 = op0info->getExpr();
 
     // since this is float point trunc, lets just assume we're going from double to float
@@ -372,7 +378,8 @@ void NewInstructionDumper::dumpBitCast(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     BitCastInst *instr = cast<BitCastInst>(localValueInfo->value);
 
-    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    LocalValueInfo *op0info = getOperand(instr->getOperand(0));
     string op0 = op0info->getExpr();
 
     string gencode = "";
@@ -397,7 +404,8 @@ void NewInstructionDumper::dumpAddrSpaceCast(cocl::LocalValueInfo *localValueInf
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     AddrSpaceCastInst *instr = cast<AddrSpaceCastInst>(localValueInfo->value);
 
-    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    LocalValueInfo *op0info = getOperand(instr->getOperand(0));
     string op0 = op0info->getExpr();
 
     string gencode = "";
@@ -416,9 +424,13 @@ void NewInstructionDumper::dumpSelect(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     Instruction *instr = cast<Instruction>(localValueInfo->value);
 
-    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
-    LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
-    LocalValueInfo *op2info = localValueInfos->at(instr->getOperand(2)).get();
+    LocalValueInfo *op0info = getOperand(instr->getOperand(0));
+    LocalValueInfo *op1info = getOperand(instr->getOperand(1));
+    LocalValueInfo *op2info = getOperand(instr->getOperand(2));
+
+    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    // LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
+    // LocalValueInfo *op2info = localValueInfos->at(instr->getOperand(2)).get();
 
     string op0 = op0info->getExpr();
     string op1 = op1info->getExpr();
@@ -439,7 +451,8 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     GetElementPtrInst *instr = cast<GetElementPtrInst>(localValueInfo->value);
 
-    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    LocalValueInfo *op0info = getOperand(instr->getOperand(0));
 
     string gencode = "";
     int numOperands = instr->getNumOperands();
@@ -533,8 +546,11 @@ void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->setAddressSpaceFrom(instr->getOperand(1));
     copyAddressSpace(instr->getOperand(0), instr->getOperand(1));
 
-    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
-    LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
+    LocalValueInfo *op0info = getOperand(instr->getOperand(0));
+    LocalValueInfo *op1info = getOperand(instr->getOperand(1));
+
+    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    // LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
 
     string rhs = op0info->getExpr(); // dumpOperand(instr->getOperand(0));
     rhs = stripOuterParams(rhs);
@@ -629,9 +645,11 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
     if(isa<UndefValue>(instr->getOperand(0))) {
         clWriter->fromUndef = true;
     } else {
-        op0info = localValueInfos->at(instr->getOperand(0)).get();
+        op0info = getOperand(instr->getOperand(0));
+        // op0info = localValueInfos->at(instr->getOperand(0)).get();
     }
-    LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
+    LocalValueInfo *op1info = getOperand(instr->getOperand(1));
+    // LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
 
     string lhs = "";
 
@@ -719,14 +737,16 @@ void NewInstructionDumper::dumpBinaryOperator(LocalValueInfo *localValueInfo, st
     string gencode = "";
     // copyAddressSpace(instr->getOperand(0), instr);
     Value *op1 = instr->getOperand(0);
-    LocalValueInfo *op1info = localValueInfos->at(op1).get();
+    // LocalValueInfo *op1info = localValueInfos->at(op1).get();
+    LocalValueInfo *op1info = getOperand(instr->getOperand(0));
     // gencode += dumpOperand(op1) + " ";
     gencode += op1info->getExpr() + " ";
 
     gencode += opstring + " ";
 
     Value *op2 = instr->getOperand(1);
-    LocalValueInfo *op2info = localValueInfos->at(op2).get();
+    // LocalValueInfo *op2info = localValueInfos->at(op2).get();
+    LocalValueInfo *op2info = getOperand(instr->getOperand(1));
     gencode += op2info->getExpr();
 
     localValueInfo->setExpression(gencode);
@@ -936,6 +956,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         if(i > 0) {
             gencode += ", ";
         }
+        localValueInfo->needDependencies = false;
         gencode += "scratch";
         Module *M = instr->getModule();
         Function *F = M->getFunction(StringRef(functionName));
@@ -1015,7 +1036,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
                 cout << "inserting new funciton into neededfunctions" << endl;
                 neededFunctions->insert(newFunc);
                 if(isa<PointerType>(newFunc->getReturnType()) && returnTypeByFunction.find(newFunc) == returnTypeByFunction.end()) {
-                    needDependencies = true;
+                    // needDependencies = true;
                     localValueInfo->needDependencies = true;
                     return;
                 }
@@ -1024,7 +1045,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
             } else {
                 neededFunctions->insert(F);
                 if(isa<PointerType>(F->getReturnType()) && returnTypeByFunction.find(F) == returnTypeByFunction.end()) {
-                    needDependencies = true;
+                    // needDependencies = true;
                     localValueInfo->needDependencies = true;
                     return;
                 }
@@ -1066,7 +1087,8 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
 
 void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
     Instruction *instruction = cast<Instruction>(localValueInfo->value);
-    needDependencies = false;
+    // needDependencies = false;
+    localValueInfo->needDependencies = false;
     auto opcode = instruction->getOpcode();
     string instructionCode = "";
     switch(opcode) {
