@@ -264,7 +264,7 @@ TEST(test_new_instruction_dumper, store) {
 }
 
 
-TEST(test_new_instruction_dumper, insert_value) {
+TEST(test_new_instruction_dumper, insert_value_already_defined) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
     LLVMContext &context = myblock.context;
@@ -337,6 +337,118 @@ TEST(test_new_instruction_dumper, insert_value) {
     cout << "inelineCl [" << oss.str() << "]" << endl;
     // ASSERT_EQ("    aAlloca[3] = intLoad;\n", oss.str());
 
+}
+
+TEST(test_new_instruction_dumper, insert_value_from_undef) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+    LLVMContext &context = myblock.context;
+
+    Type *structElements[] = {
+        IntegerType::get(context, 32),
+        IntegerType::get(context, 32)
+    };
+    StructType *myStructType = StructType::create(
+        context, structElements, "struct.mystruct"
+    );
+    myStructType->dump();
+    cout << endl;
+
+    InstructionDumperWrapper wrapper;
+    NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(context, 32));
+    LoadInst *intLoad = builder.CreateLoad(intAlloca);
+
+    LocalValueInfo *intLoadInfo = LocalValueInfo::getOrCreate(
+        &wrapper.localNames, &wrapper.localValueInfos, intLoad, "intLoad");
+    intLoadInfo->setExpression(intLoadInfo->name);
+
+    Value *undefInput = UndefValue::get(myStructType);
+    unsigned int idxs0[] = {0};
+    InsertValueInst *insert = cast<InsertValueInst>(builder.CreateInsertValue(undefInput, intLoad, idxs0));
+
+    myblock.block->dump();
+
+    LocalValueInfo *insertInfo = LocalValueInfo::getOrCreate(
+        &wrapper.localNames, &wrapper.localValueInfos, insert);
+    instructionDumper->runGeneration(insertInfo);
+
+    cout << "hasexpr " << insertInfo->hasExpr() << endl;
+    ASSERT_TRUE(insertInfo->hasExpr());
+    cout << "expr: " << insertInfo->getExpr() << endl;
+    ASSERT_EQ("v1", insertInfo->getExpr());
+
+    ostringstream oss;
+    insertInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    struct mystruct v1;\n", oss.str());
+
+    oss.str("");
+    insertInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    v1.f0 = intLoad;\n", oss.str());
+
+    cout << "after setAsAssigned:" << endl;
+    insertInfo->setAsAssigned();
+
+    ASSERT_TRUE(insertInfo->toBeDeclared);
+}
+
+TEST(test_new_instruction_dumper, insert_value_from_undef_f1) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+    LLVMContext &context = myblock.context;
+
+    Type *structElements[] = {
+        IntegerType::get(context, 32),
+        IntegerType::get(context, 32)
+    };
+    StructType *myStructType = StructType::create(
+        context, structElements, "struct.mystruct"
+    );
+    myStructType->dump();
+    cout << endl;
+
+    InstructionDumperWrapper wrapper;
+    NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(context, 32));
+    LoadInst *intLoad = builder.CreateLoad(intAlloca);
+
+    LocalValueInfo *intLoadInfo = LocalValueInfo::getOrCreate(
+        &wrapper.localNames, &wrapper.localValueInfos, intLoad, "intLoad");
+    intLoadInfo->setExpression(intLoadInfo->name);
+
+    Value *undefInput = UndefValue::get(myStructType);
+    unsigned int idxs0[] = {1};
+    InsertValueInst *insert = cast<InsertValueInst>(builder.CreateInsertValue(undefInput, intLoad, idxs0));
+
+    myblock.block->dump();
+
+    LocalValueInfo *insertInfo = LocalValueInfo::getOrCreate(
+        &wrapper.localNames, &wrapper.localValueInfos, insert);
+    instructionDumper->runGeneration(insertInfo);
+
+    cout << "hasexpr " << insertInfo->hasExpr() << endl;
+    ASSERT_TRUE(insertInfo->hasExpr());
+    cout << "expr: " << insertInfo->getExpr() << endl;
+    ASSERT_EQ("v1", insertInfo->getExpr());
+
+    ostringstream oss;
+    insertInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    struct mystruct v1;\n", oss.str());
+
+    oss.str("");
+    insertInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    v1.f1 = intLoad;\n", oss.str());
+
+    cout << "after setAsAssigned:" << endl;
+    insertInfo->setAsAssigned();
+
+    ASSERT_TRUE(insertInfo->toBeDeclared);
 }
 
 }

@@ -74,7 +74,7 @@ public:
 
         }
     // virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {} // do nothing :-P
-    // virtual void writeInlineCl(std::string indent, std::ostream &os);
+    virtual void writeInlineCl(std::string indent, std::ostream &os);
 };
 
 class BinaryClWriter : public ClWriter {

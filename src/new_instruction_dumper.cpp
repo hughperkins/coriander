@@ -81,25 +81,35 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
     localValueInfo->clWriter.reset(new InsertValueClWriter(localValueInfo));
     InsertValueInst *instr = cast<InsertValueInst>(localValueInfo->value);
 
-    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    bool incomingIsUndef = false;
+    LocalValueInfo *op0info = 0;
+    if(isa<UndefValue>(instr->getOperand(0))) {
+        incomingIsUndef = true;
+    } else {
+        op0info = localValueInfos->at(instr->getOperand(0)).get();
+    }
     LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
 
     string lhs = "";
 
     // cout << "lhs undef value? " << isa<UndefValue>(instr->getOperand(0)) << endl;
     // string incomingOperand = dumpOperand(instr->getOperand(0));
-    string incomingOperand = op0info->getExpr();
     // if rhs is empty, that means its 'undef', so we better declare it, I guess...
     Type *currentType = instr->getType();
     bool declaredVar = false;
-    if(incomingOperand == "") {
+    string incomingOperand = "";
+    if(incomingIsUndef) {
         cout << "incomingoperand is undef, so adding insertvalue instr to variables to declare" << endl;
         localValueInfo->toBeDeclared = true;
         // variablesToDeclare->insert(instr);
         // localNames->getOrCreateName(instr);
         // incomingOperand = dumpOperand(instr);
+        localValueInfo->toBeDeclared = true;
+        localValueInfo->setExpression(localValueInfo->name);
         incomingOperand = localValueInfo->getExpr();
-        declaredVar = true;
+        // declaredVar = true;
+    } else {
+        incomingOperand = op0info->getExpr();
     }
     lhs += incomingOperand;
     ArrayRef<unsigned> indices = instr->getIndices();
@@ -123,6 +133,7 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
             cout << "insertvalue: struct type" << endl;
             string structName = getName(structtype);
             if(structName == "struct.float4") {
+                cout << "is struct.float4" << endl;
                 Type *elementType = structtype->getElementType(idx);
                 Type *castType = PointerType::get(elementType, 0);
                 newType = elementType;
@@ -130,6 +141,7 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
                 lhs += string("[") + easycl::toString(idx) + "]";
             } else {
                 // generic struct
+                cout << "is generic struct" << endl;
                 Type *elementType = structtype->getElementType(idx);
                 lhs += string(".f") + easycl::toString(idx);
                 newType = elementType;
