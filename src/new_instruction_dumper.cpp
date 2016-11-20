@@ -217,6 +217,25 @@ void NewInstructionDumper::dumpBitCast(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->setExpression(gencode);
 }
 
+void NewInstructionDumper::dumpAddrSpaceCast(cocl::LocalValueInfo *localValueInfo) {
+    localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
+    AddrSpaceCastInst *instr = cast<AddrSpaceCastInst>(localValueInfo->value);
+
+    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    string op0 = op0info->getExpr();
+
+    string gencode = "";
+    string op0str = op0;
+    copyAddressSpace(instr->getOperand(0), instr);
+    localValueInfo->setAddressSpaceFrom(instr->getOperand(0));
+    // hackily ignore casts if shared address space
+    // actually, just ignore all address space casts, since they're all illegal in opencl...
+    // gencode += "((" + typeDumper->dumpType(instr->getType()) + ")" + op0str + ")";
+    gencode += op0str;
+    localValueInfo->setExpression(gencode);
+    // return gencode;
+}
+
 void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new StoreClWriter(localValueInfo));
     StoreInst *instr = cast<StoreInst>(localValueInfo->value);
@@ -443,9 +462,9 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo) {
         case Instruction::BitCast:
             dumpBitCast(localValueInfo);
             break;
-        // case Instruction::AddrSpaceCast:
-        //     instructionCode = dumpAddrSpaceCast(cast<AddrSpaceCastInst>(instruction));
-        //     break;
+        case Instruction::AddrSpaceCast:
+            dumpAddrSpaceCast(localValueInfo);
+            break;
         // // case Instruction::PtrToInt:
         // //     instructionCode = dumpPtrToInt(cast<PtrToIntInst>(instruction));
         // //     break;

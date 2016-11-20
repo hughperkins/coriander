@@ -25,6 +25,7 @@ public:
     void dumpExt(LocalValueInfo *localValueInfo);
     void dumpTrunc(LocalValueInfo *localValueInfo);
     void dumpBitCast(LocalValueInfo *localValueInfo);
+    void dumpAddrSpaceCast(LocalValueInfo *localValueInfo);
     void dumpBinaryOperator(LocalValueInfo *localValueInfo, std::string opstring);
 
     void dumpAlloca(cocl::LocalValueInfo *localValueInfo);
