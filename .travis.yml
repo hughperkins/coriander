@@ -24,18 +24,19 @@ before_install:
   - echo CLANG_HOME ${CLANG_HOME}
   - cmake .. -DCLANG_HOME=${CLANG_HOME} -DBUILD_TESTS=ON
   - make -j 8
-  - make install
+  #- make install
 
 script:
   - cd ${BASEDIR}/build
-  - ./cocl_unittests
-  - mkdir ${BASEDIR}/foo
-  - cd ${BASEDIR}/foo
-  - cp ${BASEDIR}/test/cocl/cuda_sample.cu .
-  - CLANG_HOME=${CLANG_HOME} SETX=1 cocl cuda_sample.cu
-  - COCL_DEVICES_ALL=1 ./cuda_sample
-  - pwd
-  - ls -lh
+  - ./test_newinstructiondumper
+  #- ./cocl_unittests
+  #- mkdir ${BASEDIR}/foo
+  #- cd ${BASEDIR}/foo
+  #- cp ${BASEDIR}/test/cocl/cuda_sample.cu .
+  #- CLANG_HOME=${CLANG_HOME} SETX=1 cocl cuda_sample.cu
+  #- COCL_DEVICES_ALL=1 ./cuda_sample
+  #- pwd
+  #- ls -lh
 
 notifications:
   email:
