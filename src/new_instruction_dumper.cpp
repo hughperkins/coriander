@@ -167,7 +167,6 @@ void NewInstructionDumper::dumpFcmp(cocl::LocalValueInfo *localValueInfo) {
     gencode += op1;
 
     localValueInfo->setExpression(gencode);
-    // return gencode;
 }
 
 void NewInstructionDumper::dumpExt(cocl::LocalValueInfo *localValueInfo) {
@@ -180,26 +179,6 @@ void NewInstructionDumper::dumpExt(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->setExpression(op0);
 }
 
-// void NewInstructionDumper::dumpZExt(cocl::LocalValueInfo *localValueInfo) {
-//     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
-//     Instruction *instr = cast<Instruction>(localValueInfo->value);
-
-//     LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
-//     string op0 = op0info->getExpr();
-
-//     localValueInfo->setExpression(op0);
-// }
-
-// void NewInstructionDumper::dumpFPExt(cocl::LocalValueInfo *localValueInfo) {
-//     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
-//     Instruction *instr = cast<Instruction>(localValueInfo->value);
-
-//     LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
-//     string op0 = op0info->getExpr();
-
-//     localValueInfo->setExpression(op0);
-// }
-
 void NewInstructionDumper::dumpTrunc(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     Instruction *instr = cast<Instruction>(localValueInfo->value);
@@ -211,6 +190,31 @@ void NewInstructionDumper::dumpTrunc(cocl::LocalValueInfo *localValueInfo) {
     // fix any exceptiosn to this rule later
     string typestr = typeDumper->dumpType(instr->getType());
     localValueInfo->setExpression("(" + typestr + ")" + op0);
+}
+
+void NewInstructionDumper::dumpBitCast(cocl::LocalValueInfo *localValueInfo) {
+    localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
+    BitCastInst *instr = cast<BitCastInst>(localValueInfo->value);
+
+    LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
+    string op0 = op0info->getExpr();
+
+    string gencode = "";
+    string op0str = op0;
+    localValueInfo->setAddressSpace(0);
+    if(PointerType *srcType = dyn_cast<PointerType>(instr->getSrcTy())) {
+        if(PointerType *destType = dyn_cast<PointerType>(instr->getDestTy())) {
+            Type *castType = PointerType::get(destType->getElementType(), srcType->getAddressSpace());
+            gencode += "((" + typeDumper->dumpType(castType) + ")" + op0str + ")";
+            copyAddressSpace(instr->getOperand(0), instr);
+            localValueInfo->setAddressSpaceFrom(instr->getOperand(0));
+        }
+    } else {
+        // just pass through?
+        // cout << "bitcast, not a pointer" << endl;
+        gencode += "*(" + typeDumper->dumpType(instr->getDestTy()) + " *)&(" + op0str + ")";
+    }
+    localValueInfo->setExpression(gencode);
 }
 
 void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
@@ -436,9 +440,9 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo) {
             dumpTrunc(localValueInfo);
             break;
 
-        // case Instruction::BitCast:
-        //     instructionCode = dumpBitCast(cast<BitCastInst>(instruction));
-        //     break;
+        case Instruction::BitCast:
+            dumpBitCast(localValueInfo);
+            break;
         // case Instruction::AddrSpaceCast:
         //     instructionCode = dumpAddrSpaceCast(cast<AddrSpaceCastInst>(instruction));
         //     break;
