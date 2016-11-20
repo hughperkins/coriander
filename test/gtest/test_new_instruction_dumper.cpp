@@ -1058,4 +1058,131 @@ TEST(test_new_instruction_dumper, extractvalue_struct) {
     ASSERT_EQ("    myinstr = structLoad.f0;\n", oss.str());
 }
 
+TEST(test_new_instruction_dumper, callsomething) {
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+    LLVMContext &context = myblock.context;
+    Module *M = myblock.M.get();
+
+    InstructionDumperWrapper wrapper;
+    NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    AllocaInst *charArray = builder.CreateAlloca(IntegerType::get(context, 8));
+    cout << "charArray:" << endl;
+    charArray->dump();
+    cout << endl;
+
+    Function *childF = cast<Function>(M->getOrInsertFunction(
+        "mychildfunc",
+        PointerType::get(IntegerType::get(context, 8), 0),
+        PointerType::get(IntegerType::get(context, 8), 0),
+        NULL));
+    cout << "childF:" << endl;
+    childF->dump();
+    cout << endl;
+
+    Value *args[] = {charArray};
+    CallInst *call = builder.CreateCall(childF, ArrayRef<Value *>(args));
+    cout << "call:" << endl;
+    call->dump();
+    cout << endl;
+
+    wrapper.declareVariable(charArray, "charArray");
+
+    // wrapper.localNames.getOrCreateName(charArray, "myCharArray");
+    // ASSERT_EQ(0u, instructionDumper->localExpressionByValue->size());
+
+    LocalValueInfo *instrInfo = wrapper.createInfo(call, "myinstr");
+
+    myblock.block->dump();
+
+    std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
+
+    ASSERT_TRUE(instructionDumper->needDependencies);
+    ASSERT_EQ(1u, instructionDumper->neededFunctions->size());
+    cout << "needed function:" << endl;
+    (*instructionDumper->neededFunctions->begin())->dump();
+    cout << endl;
+    ASSERT_EQ(childF, (*instructionDumper->neededFunctions->begin()));
+    // ASSERT_EQ(0u, instructionDumper->generatedCl.size());
+    // ASSERT_EQ(0u, instructionDumper->variablesToDeclare->size());
+    // ASSERT_EQ(0u, instructionDumper->globalExpressionByValue->size());
+    // ASSERT_EQ(0u, instructionDumper->localExpressionByValue->size());
+
+    cout << "hasexpr " << instrInfo->hasExpr() << endl;
+    ASSERT_FALSE(instrInfo->hasExpr());
+
+    ostringstream oss;
+
+    oss.str("");
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    cout << "================" << endl;
+    cout << "After marking th efunction defined:" << endl;
+
+    returnTypeByFunction[childF] = PointerType::get(IntegerType::get(context, 8), 1);
+    instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
+
+    ASSERT_FALSE(instructionDumper->needDependencies);
+    ASSERT_EQ(1u, instructionDumper->neededFunctions->size());
+
+    cout << "hasexpr " << instrInfo->hasExpr() << endl;
+    ASSERT_TRUE(instrInfo->hasExpr());
+    cout << "expr: " << instrInfo->getExpr() << endl;
+    ASSERT_EQ("mychildfunc(charArray)", instrInfo->getExpr());
+
+    oss.str("");
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+
+    // (*instructionDumper->neededFunctions->begin())->dump();
+    // cout << endl;
+    // ASSERT_EQ(childF, (*instructionDumper->neededFunctions->begin()));
+    // ASSERT_EQ(0u, instructionDumper->generatedCl.size());
+    // ASSERT_EQ(0u, instructionDumper->variablesToDeclare->size());
+    // ASSERT_EQ(0u, instructionDumper->globalExpressionByValue->size());
+    // ASSERT_EQ(1u, instructionDumper->localExpressionByValue->size());
+    // auto it = instructionDumper->localExpressionByValue->begin();
+    // cout << "localexpr name=[" << it->second << "]" << endl;
+    // cout << "local expr value=" << endl;
+    // it->first->dump();
+    // cout << endl;
+    // cout << wrapper.getExpr(call) << endl;
+    // ASSERT_EQ("mychildfunc(myCharArray)", it->second);
+    // ASSERT_EQ(call, it->first);
+
+    cout << "----------------------------" << endl;
+    cout << "after setAsAssigned:" << endl;
+    instrInfo->setAsAssigned();
+
+    cout << "hasexpr " << instrInfo->hasExpr() << endl;
+    ASSERT_TRUE(instrInfo->hasExpr());
+    cout << "expr: " << instrInfo->getExpr() << endl;
+    ASSERT_EQ("myinstr", instrInfo->getExpr());
+
+    oss.str("");
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    global char* myinstr;\n", oss.str());
+
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    myinstr = mychildfunc(charArray);\n", oss.str());
+}
+
 }

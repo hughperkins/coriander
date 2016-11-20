@@ -769,8 +769,8 @@ void NewInstructionDumper::dumpMemcpyCharCharLong(LocalValueInfo *localValueInfo
 }
 
 void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
-    localValueInfo->clWriter.reset(new InsertValueClWriter(localValueInfo));
-    ClWriter *clWriter = cast<ClWriter>(localValueInfo->clWriter.get());
+    localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
+    // ClWriter *clWriter = cast<ClWriter>(localValueInfo->clWriter.get());
     CallInst *instr = cast<CallInst>(localValueInfo->value);
 
     // string gencode = "";
