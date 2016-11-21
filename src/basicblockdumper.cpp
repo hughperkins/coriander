@@ -280,17 +280,22 @@ void BasicBlockDumper::writeDeclaration(std::ostream &os, llvm::Value *value) {
 
 void BasicBlockDumper::writeDeclarations(std::string indent, ostream &os) {
     // ostringstream os;
-    for(auto it=block->begin(); it != instruction_it; it++) {
-        Value *value = &*it;
-        if(isa<ReturnInst>(value) || isa<PHINode>(value) || isa<BranchInst>(value)) {
-            continue;
-        }
-        // cout << "basicblockdumper value:" << endl;
-        // value->dump();
-        // cout << endl;
-        LocalValueInfo *valueInfo = localValueInfos.at(value).get();
-        valueInfo->writeDeclaration("    ", typeDumper, os);
+    for(auto it = localValueInfos.begin(); it != localValueInfos.end(); it++) {
+        LocalValueInfo *localValueInfo = it->second.get();
+        it->first->dump();
+        localValueInfo->writeDeclaration("    ", typeDumper, os);
     }
+    // for(auto it=block->begin(); it != instruction_it; it++) {
+    //     Value *value = &*it;
+    //     if(isa<ReturnInst>(value) || isa<PHINode>(value) || isa<BranchInst>(value)) {
+    //         continue;
+    //     }
+    //     // cout << "basicblockdumper value:" << endl;
+    //     // value->dump();
+    //     // cout << endl;
+    //     LocalValueInfo *valueInfo = localValueInfos.at(value).get();
+    //     valueInfo->writeDeclaration("    ", typeDumper, os);
+    // }
     // string gencode = "";
     // for(auto it=variablesToDeclare.begin(); it != variablesToDeclare.end(); it++) {
     //     Value *value = *it;

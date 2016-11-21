@@ -31,6 +31,7 @@ LocalValueInfo *LocalValueInfo::getOrCreate(cocl::LocalNames *localNames, std::m
     string name = localNames->getOrCreateName(value, suggestedName);
     unique_ptr<LocalValueInfo >localValueInfo;
     localValueInfo.reset(new LocalValueInfo(value, name));
+    localValueInfo->clWriter.reset(new ClWriter(localValueInfo.get()));
     (*localValueInfos).insert(std::make_pair(value, std::move(localValueInfo)));
     return localValueInfos->at(value).get();
 }

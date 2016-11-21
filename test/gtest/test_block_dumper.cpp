@@ -206,7 +206,6 @@ TEST(test_block_dumper, basic2) {
     // ASSERT_EQ(getFunction("someFunc"), *blockDumper.neededFunctions.begin());
 }
 
-/*
 TEST(test_block_dumper, usesShared) {
     Function *F = getFunction("usesShared");
     F->dump();
@@ -219,31 +218,48 @@ TEST(test_block_dumper, usesShared) {
         Value *value = arg;
         localNames.getOrCreateName(value, name);
     }
+
+    GlobalValue *globalValue = M->getNamedValue("mysharedmem");
+    globalValue->dump();
+
     cout << localNames.dumpNames();
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
+    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+        Argument *arg = &*it;
+        // sring name = localNames.getOrCreateName(arg, arg->getName().str());
+        arg->dump();
+        LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &blockDumper.localValueInfos, arg, arg->getName().str());
+        localValueInfo->setExpression(localValueInfo->name);
+    }
     ostringstream oss;
-    std::set< llvm::Function *> dumpedFunctions;
+    // std::set< llvm::Function *> dumpedFunctions;
     map<Function *, Type *>returnTypeByFunction;
-    blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
+    blockDumper.runGeneration(returnTypeByFunction);
     blockDumper.toCl(oss);
     string cl = oss.str();
     cout << "cl:\n" << cl << endl;
-    cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
+    // cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
 
-    cout << "num shared variables to declare: " << blockDumper.sharedVariablesToDeclare.size() << endl;
-    ASSERT_EQ(1u, blockDumper.sharedVariablesToDeclare.size());
-    for(auto it=blockDumper.sharedVariablesToDeclare.begin(); it !=blockDumper.sharedVariablesToDeclare.end(); it++) {
-        Value *value = *it;
-        cout << "shared:" << endl;
-        value->dump();
-        cout << endl;
-    }
-    Value *shared = *blockDumper.sharedVariablesToDeclare.begin();
-    shared->dump();
+    // oss.str("");
+    // blockDumper.writeDeclarations("    ", oss);
+    // // cout << oss.str() << endl;
+    // cout << "declarations: [" << oss.str() << "]" << endl;
+
+    // cout << "num shared variables to declare: " << blockDumper.sharedVariablesToDeclare.size() << endl;
+    // ASSERT_EQ(1u, blockDumper.sharedVariablesToDeclare.size());
+    // for(auto it=blockDumper.sharedVariablesToDeclare.begin(); it !=blockDumper.sharedVariablesToDeclare.end(); it++) {
+    //     Value *value = *it;
+    //     cout << "shared:" << endl;
+    //     value->dump();
+    //     cout << endl;
+    // }
+    // Value *shared = *blockDumper.sharedVariablesToDeclare.begin();
+    // shared->dump();
 }
 
+/*
 TEST(test_block_dumper, usesPointerFunction) {
     Function *F = getFunction("usesPointerFunction");
     F->dump();

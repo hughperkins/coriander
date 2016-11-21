@@ -167,4 +167,18 @@ void InsertValueClWriter::writeDeclaration(std::string indent, TypeDumper *typeD
     }
 }
 
+void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {
+    Value *value = localValueInfo->value;
+    // Type *valueType = value->getType();
+    PointerType *pointerType = cast<PointerType>(value->getType());
+    int addressspace = pointerType->getAddressSpace();
+    if(addressspace != 3) {
+        throw runtime_error("shouldnt be here");
+    }
+    Type *elementType = pointerType->getPointerElementType();
+    int count = pointerType->getArrayNumElements();
+    cout << "num elements " << count << endl;
+    os << indent << localValueInfo->name << " " << typeDumper->dumpType(elementType, false) << "[" << count << "];\n";
+}
+
 } // namespace cocl;

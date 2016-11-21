@@ -40,7 +40,8 @@ public:
          CLW_Alloca,
          CLW_Store,
          CLW_InsertValue,
-         CLW_Binary
+         CLW_Binary,
+         CLW_Shared
      };
 
     ClWriter(LocalValueInfo *localValueInfo, ClWriterKind kind=CLW_Base) :
@@ -121,6 +122,20 @@ public:
     static bool classof(const ClWriter *clWriter) {
         return clWriter->getKind() == CLW_Binary;
     }
+};
+
+class SharedClWriter : public ClWriter {
+public:
+    SharedClWriter(LocalValueInfo *localValueInfo) :
+        ClWriter(localValueInfo, CLW_Shared) {
+            
+        }
+
+    static bool classof(const ClWriter *clWriter) {
+        return clWriter->getKind() == CLW_Shared;
+    }
+    virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os);
+    virtual void writeInlineCl(std::string indent, std::ostream &os) {}
 };
 
 } // namespace cocl

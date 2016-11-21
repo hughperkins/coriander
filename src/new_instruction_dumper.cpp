@@ -99,7 +99,7 @@ LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
                 // name = localNames->getOrCreateName(global, name);
 
                 // LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, global, name);
-                constantInfo->clWriter.reset(new ClWriter(constantInfo));
+                constantInfo->clWriter.reset(new SharedClWriter(constantInfo));
                 constantInfo->setAddressSpace(3);
                 constantInfo->setAsAssigned();
                 constantInfo->setExpression(constantInfo->name);
@@ -471,6 +471,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         Value *sharedValue = instr->getOperand(0);
         LocalValueInfo *sharedInfo = LocalValueInfo::getOrCreate(
             localNames, localValueInfos, sharedValue, sharedValue->getName().str());
+        sharedInfo->clWriter.reset(new SharedClWriter(sharedInfo));
         sharedInfo->setAddressSpace(3);
         sharedInfo->setAsAssigned();
         // sharedVariablesToDeclare->insert();
