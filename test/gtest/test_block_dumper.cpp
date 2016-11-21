@@ -237,15 +237,25 @@ TEST(test_block_dumper, usesShared) {
     // std::set< llvm::Function *> dumpedFunctions;
     map<Function *, Type *>returnTypeByFunction;
     blockDumper.runGeneration(returnTypeByFunction);
+
+    oss.str("");
     blockDumper.toCl(oss);
     string cl = oss.str();
-    cout << "cl:\n" << cl << endl;
-    // cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
+    cout << "cl: [" << cl << "]" << endl;
+    ASSERT_EQ(R"(    v5 = (&(&mysharedmem)[0][0]);
+    v7 = (&(&mysharedmem)[0][2]);
+    v5[0] = 4.0f;
+    v7[0] = 3.0f;
+)", oss.str());
 
-    // oss.str("");
-    // blockDumper.writeDeclarations("    ", oss);
-    // // cout << oss.str() << endl;
-    // cout << "declarations: [" << oss.str() << "]" << endl;
+    oss.str("");
+    blockDumper.writeDeclarations("    ", oss);
+    // cout << oss.str() << endl;
+    cout << "declarations: [" << oss.str() << "]" << endl;
+    ASSERT_EQ(R"(    local mysharedmem float[8];
+    local float* v5;
+    local float* v7;
+)", oss.str());
 
     // cout << "num shared variables to declare: " << blockDumper.sharedVariablesToDeclare.size() << endl;
     // ASSERT_EQ(1u, blockDumper.sharedVariablesToDeclare.size());

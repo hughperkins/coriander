@@ -73,7 +73,9 @@ define void @someKernel(float addrspace(1) * %d1, float addrspace(1) * %d2) {
 define void @usesShared(float addrspace(1) *%d1) {
     %1 = getelementptr inbounds [8 x float], [8 x float]* addrspacecast ([8 x float] addrspace(3) *@mysharedmem to [8 x float]*), i32 0
     %2 = getelementptr inbounds [8 x float], [8 x float]* addrspacecast ([8 x float] addrspace(3)* @mysharedmem to [8 x float]*), i64 0, i64 0
-    ;store float addrspace(3) *%2, float 3.0
+    %3 = getelementptr inbounds [8 x float], [8 x float]* addrspacecast ([8 x float] addrspace(3)* @mysharedmem to [8 x float]*), i64 0, i64 2
+    store float 4.0, float *%2
+    store float 3.0, float *%3
     ret void
 }
 
