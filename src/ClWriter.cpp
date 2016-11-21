@@ -31,13 +31,20 @@ using namespace llvm;
 namespace cocl {
 
 void ClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {  // if we set this as to be assigned, this will write something, otherwise it wont
-    // cout << "ClWriter::writeDelcaratoin" << endl;
+    cout << "base ClWriter::writeDelcaratoin" << endl;
     for(auto it = localValueInfo->declarationCl.begin(); it != localValueInfo->declarationCl.end(); it++) {
+        cout << "in localvalueinfo->declarationCl:" << endl;
+        cout << indent << *it << ";" << endl;
         os << indent << *it << ";\n";
     }
     if(localValueInfo->toBeDeclared) {
-        os << indent << typeDumper->dumpType(localValueInfo->value->getType()) << " " << localValueInfo->name << ";\n";
+        cout << "in localvalueinfo.toBeDeclared:" << endl;
+        cout << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name << ";" << endl;
+        os << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name << ";\n";
     }
+    // if(localValueInfo->toBeDeclared) {
+    //     os << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name;\n";
+    // }
 }
 
 void ClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes any cl required, eg if we toggled setAsAssigned, we need to do the assignment
