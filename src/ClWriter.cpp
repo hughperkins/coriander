@@ -170,13 +170,13 @@ void InsertValueClWriter::writeDeclaration(std::string indent, TypeDumper *typeD
 void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {
     cout << "sharedclwriter::writedeclaration" << endl;
     Value *value = localValueInfo->value;
-    cout << "value:" << endl;
-    value->dump();
-    cout << endl;
+    // cout << "value:" << endl;
+    // value->dump();
+    // cout << endl;
     // Type *valueType = value->getType();
     // if(GlobalVariable *globalVariable = dyn_cast<GlobalVariable>(value)) {
-    cout << "value type:" << endl;
-    value->getType()->dump();
+    // cout << "value type:" << endl;
+    // value->getType()->dump();
     if(PointerType *pointerType = dyn_cast<PointerType>(value->getType())) {
         // cout << "globalvariable" << endl;
         // globalVariable->dump();
@@ -185,22 +185,22 @@ void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
         // type->dump();
         // int addressSpace = globalVariable->getAddressSpace();
         int addressSpace = pointerType->getAddressSpace();
-        cout << "addressSpace " << addressSpace << endl;
+        // cout << "addressSpace " << addressSpace << endl;
         if(addressSpace != 3) {
             throw runtime_error("shouldnt be here");
         }
         Type *elementType = pointerType->getPointerElementType();
-        cout << "elementType:" << endl;
-        elementType->dump();
-        cout << endl;
+        // cout << "elementType:" << endl;
+        // elementType->dump();
+        // cout << endl;
         int numElements = 0;
         Type *primitiveType = 0;
         if(ArrayType *arrayType = dyn_cast<ArrayType>(elementType)) {
-            cout << "got array type" << endl;
+            // cout << "got array type" << endl;
             numElements = arrayType->getNumElements();
             primitiveType = arrayType->getElementType();
-            cout << "numElements " << numElements << endl;
-            primitiveType->dump();
+            // cout << "numElements " << numElements << endl;
+            // primitiveType->dump();
         } else {
             cout << "sharedclwriter::writedlecaraiotn, not implemneted for:" << endl;
             value->dump();

@@ -1185,7 +1185,7 @@ TEST(test_new_instruction_dumper, callsomething) {
     ASSERT_EQ("    myinstr = mychildfunc(charArray);\n", oss.str());
 }
 
-TEST(test_new_instruction_dumper, sharedmem) {
+TEST(test_new_instruction_dumper, sharedmem_nocast) {
     // so, sharedmem is declared globally in the IR, but it's actually a local
     // thing, so let's test it locally
     StandaloneBlock myblock;
@@ -1214,19 +1214,91 @@ TEST(test_new_instruction_dumper, sharedmem) {
 
     LocalValueInfo *instrInfo = instructionDumper->dumpConstant(globalVariable);
 
-    // LocalValueInfo *instrInfo = wrapper.createInfo(globalVariable, "");
+    cout << "hasexpr " << instrInfo->hasExpr() << endl;
+    ASSERT_TRUE(instrInfo->hasExpr());
+    cout << "expr: " << instrInfo->getExpr() << endl;
+    ASSERT_EQ("mysharedmem", instrInfo->getExpr());
 
-    // std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
-    // instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
+    ostringstream oss;
 
-    // unsigned int idxs[] = {0};
-    // ExtractValueInst *instr = cast<ExtractValueInst>(builder.CreateExtractValue(structLoad, ArrayRef<unsigned>(idxs)));
-    // LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
+    oss.str("");
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    local mysharedmem float[32];\n", oss.str());
 
-    // myblock.block->dump();
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
 
-    // std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
-    // instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
+    cout << "after setAsAssigned:" << endl;
+    instrInfo->setAsAssigned();
+
+    cout << "hasexpr " << instrInfo->hasExpr() << endl;
+    ASSERT_TRUE(instrInfo->hasExpr());
+    cout << "expr: " << instrInfo->getExpr() << endl;
+    ASSERT_EQ("mysharedmem", instrInfo->getExpr());
+
+    oss.str("");
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    local mysharedmem float[32];\n", oss.str());
+
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inlineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
+}
+
+TEST(test_new_instruction_dumper, sharedmem_with_cast) {
+    // so, sharedmem is declared globally in the IR, but it's actually a local
+    // thing, so let's test it locally
+    StandaloneBlock myblock;
+    IRBuilder<> builder(myblock.block);
+    LLVMContext &context = myblock.context;
+    Module *M = myblock.M.get();
+
+    InstructionDumperWrapper wrapper;
+    NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
+
+    ArrayType *arrayType = ArrayType::get(Type::getFloatTy(context), 32);
+    cout << "arrayType:" << endl;
+    arrayType->dump();
+    GlobalVariable *globalVariable = new GlobalVariable(
+        arrayType, false, GlobalValue::LinkageTypes::InternalLinkage,
+        0, "mysharedmem",
+        GlobalValue::ThreadLocalMode::NotThreadLocal, 3, false);
+        // M);
+    globalVariable->setInitializer(ConstantAggregateZero::get(arrayType));
+
+    cout << "globalVariable:" << endl;
+    globalVariable->dump();
+
+    M->getGlobalList().push_back(globalVariable);
+    cout << "M:" << endl;
+    M->dump();
+
+    // AddrSpaceCastInst *addrSpaceCast = new AddrSpaceCastInst(
+    //     globalVariable, PointerType::get(arrayType, 0));
+    Constant *addrSpaceCast = ConstantExpr::getAddrSpaceCast(globalVariable, PointerType::get(arrayType, 0));
+    cout << "addrSpaceCast:" << endl;
+    addrSpaceCast->dump();
+
+    // int idxs[] = {0};
+    Value *constant_0 = ConstantInt::get(IntegerType::get(context, 32), 0);
+    GetElementPtrInst *getElementPtrInst = GetElementPtrInst::CreateInBounds(
+        addrSpaceCast, ArrayRef<Value *>(constant_0));
+/*    GetElementPtrInst *getElementPtrInst = cast<GetElementPtrInst>(builder.CreateInBoundsGEP(
+        arrayType, addrSpaceCast, constant_0));
+*/    // GetElementPtrInst *getElementPtrInst = builder.CreateInBoundsGEP1_32(arrayType, addrSpaceCast, 0);
+    cout << "getelementptrinst:" << endl;
+    getElementPtrInst->dump();
+    builder.Insert(getElementPtrInst);
+
+    cout << "M:" << endl;
+    M->dump();
+
+    LocalValueInfo *instrInfo = instructionDumper->dumpConstant(globalVariable);
 
     cout << "hasexpr " << instrInfo->hasExpr() << endl;
     ASSERT_TRUE(instrInfo->hasExpr());
