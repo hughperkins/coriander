@@ -31,15 +31,15 @@ using namespace llvm;
 namespace cocl {
 
 void ClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {  // if we set this as to be assigned, this will write something, otherwise it wont
-    cout << "base ClWriter::writeDelcaratoin" << endl;
+    // cout << "base ClWriter::writeDelcaratoin" << endl;
     for(auto it = localValueInfo->declarationCl.begin(); it != localValueInfo->declarationCl.end(); it++) {
-        cout << "in localvalueinfo->declarationCl:" << endl;
-        cout << indent << *it << ";" << endl;
+        // cout << "in localvalueinfo->declarationCl:" << endl;
+        // cout << indent << *it << ";" << endl;
         os << indent << *it << ";\n";
     }
     if(localValueInfo->toBeDeclared) {
-        cout << "in localvalueinfo.toBeDeclared:" << endl;
-        cout << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name << ";" << endl;
+        // cout << "in localvalueinfo.toBeDeclared:" << endl;
+        // cout << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name << ";" << endl;
         os << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name << ";\n";
     }
     // if(localValueInfo->toBeDeclared) {
@@ -175,7 +175,7 @@ void InsertValueClWriter::writeDeclaration(std::string indent, TypeDumper *typeD
 }
 
 void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {
-    cout << "sharedclwriter::writedeclaration" << endl;
+    // cout << "sharedclwriter::writedeclaration" << endl;
     Value *value = localValueInfo->value;
     // cout << "value:" << endl;
     // value->dump();

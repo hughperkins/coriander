@@ -53,9 +53,9 @@ LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
 // maybe this should be somewhere more generic?
 // string BasicBlockDumper::dumpConstant(Constant *constant) {
     LocalValueInfo *constantInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, constant, constant->getName().str());
-    cout << "dumpConstant " << constantInfo->name << endl;
-    constant->dump();
-    cout << endl;
+    // cout << "dumpConstant " << constantInfo->name << endl;
+    // constant->dump();
+    // cout << endl;
     unsigned int valueTy = constant->getValueID();
     // ostringstream oss;
     if(ConstantInt *constantInt = dyn_cast<ConstantInt>(constant)) {
@@ -69,11 +69,11 @@ LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
     } else if(isa<ConstantStruct>(constant)) {
         throw runtime_error("constantStruct not implemented in basicblockdumper.dumpconstant");
     } else if(ConstantExpr *expr = dyn_cast<ConstantExpr>(constant)) {
-        cout << "constantexpr " << constantInfo->name << endl;
+        // cout << "constantexpr " << constantInfo->name << endl;
         // cout << "constantexpr" << endl;
         // return dumpConstantExpr(expr);
         dumpConstantExpr(constantInfo);
-        cout << "dumpconstant, constantexpr, " << constantInfo->name << " needs declraation? " << constantInfo->toBeDeclared << endl;
+        // cout << "dumpconstant, constantexpr, " << constantInfo->name << " needs declraation? " << constantInfo->toBeDeclared << endl;
         return constantInfo;
         // throw runtime_error("constantExpr not implemented in basicblockdumper.dumpconstnat");
         // Instruction *instr = expr->getAsInstruction();
@@ -95,12 +95,12 @@ LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
         constantInfo->setExpression(dumpFloatConstant(forceSingle, constantFP));
         return constantInfo;
     } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
-        cout << "dumpconstnat, globalvalue" << endl;
+        // cout << "dumpconstnat, globalvalue" << endl;
         // throw runtime_error("GlobalValue not implemented in basicblockdumper.dumpconstant");
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
             int addressspace = pointerType->getAddressSpace();
             if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
-                cout << "dumpconstnat, globalvalue, addressspace 3 " << constantInfo->name << endl;
+                // cout << "dumpconstnat, globalvalue, addressspace 3 " << constantInfo->name << endl;
                 // sharedVariablesToDeclare->insert(global);
                 // string name = global->getName().str();
                 // name = localNames->getOrCreateName(global, name);
@@ -117,36 +117,36 @@ LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
                 // cout << "shared memory, creating in localnames name=" << name << endl;
                 // constantInfo->
                 // oss << name;
-                cout << "returning constantinfo" << endl;
-                cout << "dumpconstant, globalvalue, addresspace 3 " <<  constantInfo->name << " needs declraation? " << constantInfo->toBeDeclared << endl;
+                // cout << "returning constantinfo" << endl;
+                // cout << "dumpconstant, globalvalue, addresspace 3 " <<  constantInfo->name << " needs declraation? " << constantInfo->toBeDeclared << endl;
                 return constantInfo;
                 // return name;
             }
         }
         // at about this point we should pehaps swap to come global-specific class to handle this?
         if(globalNames->hasName(constant)) {
-            cout << "found constnat in globalanesm, returning" << endl;
+            // cout << "found constnat in globalanesm, returning" << endl;
            // return globalNames->getName(constant);
             // hmmmm, shouldwe be handling global values too???
             constantInfo->clWriter.reset(new ClWriter(constantInfo));
             constantInfo->setAddressSpace(4);
             constantInfo->setExpression(globalNames->getName(constant));
             // oss << globalNames->getName(constant);
-            cout << "dumpconstant, globalvalue, constant, add 4 " << constantInfo->name << " needs declraation? " << constantInfo->toBeDeclared << endl;
+            // cout << "dumpconstant, globalvalue, constant, add 4 " << constantInfo->name << " needs declraation? " << constantInfo->toBeDeclared << endl;
             return constantInfo;
         }
         string name = global->getName().str();
-        cout << "using global's native name " << name << endl;
+        // cout << "using global's native name " << name << endl;
         string ourinstrstr = "(&" + name + ")";
         updateAddressSpace(constant, 4);  // 4 means constant
         constantInfo->setAddressSpace(4);
         constantInfo->clWriter.reset(new ClWriter(constantInfo));
-        cout << "adding to globalExpressionByValue [" << ourinstrstr << "]" << endl;
+        // cout << "adding to globalExpressionByValue [" << ourinstrstr << "]" << endl;
         globalExpressionByValue->operator[](constant) = ourinstrstr;
 
         constantInfo->setExpression(ourinstrstr);
         // oss << ourinstrstr;
-        cout << "dumpconstant, globalvalue, not addresspace 3 " << constantInfo->name << " needs declraation? " << constantInfo->toBeDeclared << endl;
+        // cout << "dumpconstant, globalvalue, not addresspace 3 " << constantInfo->name << " needs declraation? " << constantInfo->toBeDeclared << endl;
         return constantInfo;
         // return ourinstrstr;
     } else if(isa<UndefValue>(constant)) {
@@ -178,13 +178,13 @@ void NewInstructionDumper::dumpConstantExpr(LocalValueInfo *localValueInfo) {
     ConstantExpr *expr = cast<ConstantExpr>(localValueInfo->value);
     // this means things like:
     // shared memory 
-    cout << "dumping constnat expr " << localValueInfo->name << ":" << endl;
-    expr->dump();
-    cout << endl;
+    // cout << "dumping constnat expr " << localValueInfo->name << ":" << endl;
+    // expr->dump();
+    // cout << endl;
     Instruction *instr = expr->getAsInstruction();
-    cout << "dumpConstantExpr" << endl;
-    instr->dump();
-    cout << endl;
+    // cout << "dumpConstantExpr" << endl;
+    // instr->dump();
+    // cout << endl;
     // LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(localnames, localValueInfos, instr,)
     // InstructionDumper childInstructionDumper;
     // string rhs = dumpInstruction(instr);
@@ -193,15 +193,15 @@ void NewInstructionDumper::dumpConstantExpr(LocalValueInfo *localValueInfo) {
     std::map<llvm::Function *, llvm::Type*> returnTypeByFunction;
     LocalValueInfo *instrValueInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, instr);
     runGeneration(instrValueInfo, returnTypeByFunction);
-    cout << "dumpconstantexpr" << endl;
-    ostringstream temposs;
-    cout << instrValueInfo->name << " needs declraation? " << instrValueInfo->toBeDeclared << endl;
+    // cout << "dumpconstantexpr" << endl;
+    // ostringstream temposs;
+    // cout << instrValueInfo->name << " needs declraation? " << instrValueInfo->toBeDeclared << endl;
     // runRhsGeneration(instrValueInfo, returnTypeByFunction);
 
     string rhs = instrValueInfo->getExpr();
     // string rhs = (*localExpressionByValue)[instr];
     // string rhs = dumpInstructionRhs(instr, &excessLines);
-    cout << "dumpConstantExpr rhs: [" << rhs << "]" << endl;
+    // cout << "dumpConstantExpr rhs: [" << rhs << "]" << endl;
     // if(excessLines.size() > 0) {
     //     throw runtime_error("InstructionDumper::dumpConstantExpr cannot handle excess lines > 0");
     // }

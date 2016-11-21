@@ -27,7 +27,7 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include <iostream>
+// #include <iostream>
 
 namespace cocl {
 
@@ -49,7 +49,7 @@ public:
         localValueInfo(localValueInfo),
         Kind(kind)
          {
-            std::cout << "creating baseclwriter" << std::endl;
+            // std::cout << "creating baseclwriter" << std::endl;
     }
     virtual ~ClWriter() {
 
@@ -130,7 +130,7 @@ class SharedClWriter : public ClWriter {
 public:
     SharedClWriter(LocalValueInfo *localValueInfo) :
         ClWriter(localValueInfo, CLW_Shared) {
-            std::cout << "creating sharedclwriter" << std::endl;
+            // std::cout << "creating sharedclwriter" << std::endl;
         }
 
     static bool classof(const ClWriter *clWriter) {
