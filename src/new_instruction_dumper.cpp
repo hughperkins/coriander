@@ -646,7 +646,7 @@ void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo
     }
     gencode += lhs;
     // return gencode;
-    cout << "gencode " << gencode << endl;
+    // cout << "gencode " << gencode << endl;
     localValueInfo->setExpression(gencode);
 }
 
