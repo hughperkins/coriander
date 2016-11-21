@@ -50,12 +50,16 @@ NewInstructionDumper::NewInstructionDumper(
 }
 
 LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
+        cout << "dumpConstant" << endl;
+        constant->dump();
+        cout << endl;
 // maybe this should be somewhere more generic?
 // string BasicBlockDumper::dumpConstant(Constant *constant) {
     LocalValueInfo *constantInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, constant, constant->getName().str());
     unsigned int valueTy = constant->getValueID();
     // ostringstream oss;
     if(ConstantInt *constantInt = dyn_cast<ConstantInt>(constant)) {
+        cout << "constantint" << endl;
         constantInfo->setAddressSpace(0);
         constantInfo->setExpression(easycl::toString(constantInt->getSExtValue()));
         constantInfo->clWriter.reset(new ClWriter(constantInfo));
@@ -65,6 +69,7 @@ LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
     } else if(isa<ConstantStruct>(constant)) {
         throw runtime_error("constantStruct not implemented in basicblockdumper.dumpconstant");
     } else if(ConstantExpr *expr = dyn_cast<ConstantExpr>(constant)) {
+        cout << "constantexpr" << endl;
         // cout << "constantexpr" << endl;
         // return dumpConstantExpr(expr);
         dumpConstantExpr(constantInfo);
@@ -89,11 +94,12 @@ LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
         constantInfo->setExpression(dumpFloatConstant(forceSingle, constantFP));
         return constantInfo;
     } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
-        cout << "globalvalue" << endl;
+        cout << "dumpconstnat, globalvalue" << endl;
         // throw runtime_error("GlobalValue not implemented in basicblockdumper.dumpconstant");
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
             int addressspace = pointerType->getAddressSpace();
             if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
+                cout << "dumpconstnat, globalvalue, addressspace 3" << endl;
                 // sharedVariablesToDeclare->insert(global);
                 // string name = global->getName().str();
                 // name = localNames->getOrCreateName(global, name);
@@ -110,6 +116,7 @@ LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
                 // cout << "shared memory, creating in localnames name=" << name << endl;
                 // constantInfo->
                 // oss << name;
+                cout << "returning constantinfo" << endl;
                 return constantInfo;
                 // return name;
             }

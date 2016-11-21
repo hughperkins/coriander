@@ -1196,40 +1196,28 @@ TEST(test_new_instruction_dumper, sharedmem) {
     InstructionDumperWrapper wrapper;
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    // @mysharedmem = internal addrspace(3) global [8 x float] zeroinitializer, align 4
-
     ArrayType *arrayType = ArrayType::get(Type::getFloatTy(context), 32);
-    // PointerType *ptrArrayType = PointerType::get(arrayType, 3);
-    // cout << "ptrArrayType:" << endl;
-    // ptrArrayType->dump();
-    // GlobalValue *globalValue = cast<GlobalValue>(M->getOrInsertGlobal(StringRef("mysharedmem"), arrayType));
-    // globalValue->setLinkage(GlobalValue::LinkageTypes::InternalLinkage);
-
-  // GlobalVariable(Type *Ty, bool isConstant, LinkageTypes Linkage,
-  //                Constant *Initializer = nullptr, const Twine &Name = "",
-  //                ThreadLocalMode = NotThreadLocal, unsigned AddressSpace = 0,
-  //                bool isExternallyInitialized = false);
     GlobalVariable *globalVariable = new GlobalVariable(
         arrayType, false, GlobalValue::LinkageTypes::InternalLinkage,
         0, "mysharedmem",
         GlobalValue::ThreadLocalMode::NotThreadLocal, 3, false);
         // M);
     globalVariable->setInitializer(ConstantAggregateZero::get(arrayType));
-    // GlobalVariable *globalVariable = cast<GlobalVariable>(globalValue);
 
     cout << "globalVariable:" << endl;
     globalVariable->dump();
 
-    // M->getOrInsertGlobal(StringRef("mysharedmem"), globalVariable);
     M->getGlobalList().push_back(globalVariable);
 
     cout << "M:" << endl;
     M->dump();
 
-    // AllocaInst *structAlloca = builder.CreateAlloca(myStructType);
-    // LoadInst *structLoad = builder.CreateLoad(structAlloca);
+    LocalValueInfo *instrInfo = instructionDumper->dumpConstant(globalVariable);
 
-    // wrapper.declareVariable(structLoad, "structLoad");
+    // LocalValueInfo *instrInfo = wrapper.createInfo(globalVariable, "");
+
+    // std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    // instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
     // unsigned int idxs[] = {0};
     // ExtractValueInst *instr = cast<ExtractValueInst>(builder.CreateExtractValue(structLoad, ArrayRef<unsigned>(idxs)));
@@ -1240,40 +1228,40 @@ TEST(test_new_instruction_dumper, sharedmem) {
     // std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
     // instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
-    // cout << "hasexpr " << instrInfo->hasExpr() << endl;
-    // ASSERT_TRUE(instrInfo->hasExpr());
-    // cout << "expr: " << instrInfo->getExpr() << endl;
-    // ASSERT_EQ("structLoad.f0", instrInfo->getExpr());
+    cout << "hasexpr " << instrInfo->hasExpr() << endl;
+    ASSERT_TRUE(instrInfo->hasExpr());
+    cout << "expr: " << instrInfo->getExpr() << endl;
+    ASSERT_EQ("mysharedmem", instrInfo->getExpr());
 
-    // ostringstream oss;
+    ostringstream oss;
 
-    // oss.str("");
-    // instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
-    // cout << "declaration [" << oss.str() << "]" << endl;
-    // ASSERT_EQ("", oss.str());
+    oss.str("");
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    local mysharedmem float[32];\n", oss.str());
 
-    // oss.str("");
-    // instrInfo->writeInlineCl("    ", oss);
-    // cout << "inelineCl [" << oss.str() << "]" << endl;
-    // ASSERT_EQ("", oss.str());
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inelineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
 
-    // cout << "after setAsAssigned:" << endl;
-    // instrInfo->setAsAssigned();
+    cout << "after setAsAssigned:" << endl;
+    instrInfo->setAsAssigned();
 
-    // cout << "hasexpr " << instrInfo->hasExpr() << endl;
-    // ASSERT_TRUE(instrInfo->hasExpr());
-    // cout << "expr: " << instrInfo->getExpr() << endl;
-    // ASSERT_EQ("myinstr", instrInfo->getExpr());
+    cout << "hasexpr " << instrInfo->hasExpr() << endl;
+    ASSERT_TRUE(instrInfo->hasExpr());
+    cout << "expr: " << instrInfo->getExpr() << endl;
+    ASSERT_EQ("mysharedmem", instrInfo->getExpr());
 
-    // oss.str("");
-    // instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
-    // cout << "declaration [" << oss.str() << "]" << endl;
-    // ASSERT_EQ("    int myinstr;\n", oss.str());
+    oss.str("");
+    instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
+    cout << "declaration [" << oss.str() << "]" << endl;
+    ASSERT_EQ("    local mysharedmem float[32];\n", oss.str());
 
-    // oss.str("");
-    // instrInfo->writeInlineCl("    ", oss);
-    // cout << "inelineCl [" << oss.str() << "]" << endl;
-    // ASSERT_EQ("    myinstr = structLoad.f0;\n", oss.str());
+    oss.str("");
+    instrInfo->writeInlineCl("    ", oss);
+    cout << "inlineCl [" << oss.str() << "]" << endl;
+    ASSERT_EQ("", oss.str());
 }
 
 }

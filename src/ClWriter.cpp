@@ -168,17 +168,55 @@ void InsertValueClWriter::writeDeclaration(std::string indent, TypeDumper *typeD
 }
 
 void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {
+    cout << "sharedclwriter::writedeclaration" << endl;
     Value *value = localValueInfo->value;
+    cout << "value:" << endl;
+    value->dump();
+    cout << endl;
     // Type *valueType = value->getType();
-    PointerType *pointerType = cast<PointerType>(value->getType());
-    int addressspace = pointerType->getAddressSpace();
-    if(addressspace != 3) {
-        throw runtime_error("shouldnt be here");
+    // if(GlobalVariable *globalVariable = dyn_cast<GlobalVariable>(value)) {
+    cout << "value type:" << endl;
+    value->getType()->dump();
+    if(PointerType *pointerType = dyn_cast<PointerType>(value->getType())) {
+        // cout << "globalvariable" << endl;
+        // globalVariable->dump();
+        // cout << "globalvariable->getType()" << endl;
+        // Type *type = globalVariable->getType();
+        // type->dump();
+        // int addressSpace = globalVariable->getAddressSpace();
+        int addressSpace = pointerType->getAddressSpace();
+        cout << "addressSpace " << addressSpace << endl;
+        if(addressSpace != 3) {
+            throw runtime_error("shouldnt be here");
+        }
+        Type *elementType = pointerType->getPointerElementType();
+        cout << "elementType:" << endl;
+        elementType->dump();
+        cout << endl;
+        int numElements = 0;
+        Type *primitiveType = 0;
+        if(ArrayType *arrayType = dyn_cast<ArrayType>(elementType)) {
+            cout << "got array type" << endl;
+            numElements = arrayType->getNumElements();
+            primitiveType = arrayType->getElementType();
+            cout << "numElements " << numElements << endl;
+            primitiveType->dump();
+        } else {
+            cout << "sharedclwriter::writedlecaraiotn, not implemneted for:" << endl;
+            value->dump();
+            cout << endl;
+            throw runtime_error("not handled/implemented");
+        }
+        // GlobalVariable *globalVariable = cast<GlobalVariable>(value);
+        // int count = pointerType->getArrayNumElements();
+        // cout << "num elements " << count << endl;
+        os << indent << "local " << localValueInfo->name << " " << typeDumper->dumpType(primitiveType) << "[" << numElements << "];\n";
+    } else {
+        cout << "sharedclwriter writedeclaration not implmeneted for htis type:" << endl;
+        value->dump();
+        cout << endl;
+        throw runtime_error("not implemented: sharedclwriter for this type");
     }
-    Type *elementType = pointerType->getPointerElementType();
-    int count = pointerType->getArrayNumElements();
-    cout << "num elements " << count << endl;
-    os << indent << localValueInfo->name << " " << typeDumper->dumpType(elementType, false) << "[" << count << "];\n";
 }
 
 } // namespace cocl;
