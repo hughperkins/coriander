@@ -264,36 +264,6 @@ TEST(test_block_dumper, usesPointerFunction) {
 
     ostringstream oss;
 
-    // Function *F = getFunction("usesPointerFunction");
-    // F->dump();
-    // BasicBlock *block = &*F->begin();
-    // GlobalNames globalNames;
-    // LocalNames localNames;
-    // for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-    //     Argument *arg = &*it;
-    //     string name = arg->getName().str();
-    //     Value *value = arg;
-    //     localNames.getOrCreateName(value, name);
-    // }
-
-    // cout << localNames.dumpNames();
-    // TypeDumper typeDumper(&globalNames);
-    // FunctionNamesMap functionNamesMap;
-    // BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
-    // for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-    //     Argument *arg = &*it;
-    //     // sring name = localNames.getOrCreateName(arg, arg->getName().str());
-    //     arg->dump();
-    //     LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &blockDumper.localValueInfos, arg, arg->getName().str());
-    //     localValueInfo->setExpression(localValueInfo->name);
-    // }
-    // ostringstream oss;
-    // map<Function *, Type *>returnTypeByFunction;
-
-    // (*blockDumper.instruction_it).dump();
-    // // blockDumper.maxInstructionsToGenerate = 1;
-    // blockDumper.runGeneration(returnTypeByFunction);
-
     oss.str("");
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
@@ -312,19 +282,6 @@ TEST(test_block_dumper, usesPointerFunction) {
     LocalWrapper wrapper2(G, "returnsPointer");
     BasicBlockDumper *blockDumper2 = wrapper2.blockDumper.get();
 
-    // wrapper2.runGeneration();
-    // ostringstream oss;
-
-    // Function *F2 = getFunction("returnsPointer");
-    // LocalNames localNames2;
-    // BasicBlockDumper blockDumper2(block, &globalNames, &localNames2, &typeDumper, &functionNamesMap);
-    // for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-    //     Argument *arg = &*it;
-    //     // sring name = localNames.getOrCreateName(arg, arg->getName().str());
-    //     arg->dump();
-    //     LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames2, &blockDumper2.localValueInfos, arg, arg->getName().str());
-    //     localValueInfo->setExpression(localValueInfo->name);
-    // }
     dumpCompleted = wrapper2.runGeneration(returnTypeByFunction);
     EXPECT_TRUE(dumpCompleted);
 
