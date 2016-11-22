@@ -109,6 +109,9 @@ define i32 @usestructs(%"struct.mystruct" *%structs) {
   %7 = insertvalue %struct.mystruct %6, float 3.5, 1
   store %struct.mystruct %7, %struct.mystruct *%structs
 
+  %8 = extractvalue %struct.mystruct %7, 1
+  store float %8, float *%3
+
   ;%1 = insertvalue %struct.mystruct undef, i32 %somevalue, 0, !dbg !1226
   ;%2 = insertvalue %struct.mystruct %1, float 4.500000e+00, 1, !dbg !1226
 
