@@ -308,6 +308,7 @@ TEST(test_block_dumper, usesPointerFunction) {
     // Value *shared = *blockDumper.sharedVariablesToDeclare.begin();
     // shared->dump();
 }
+*/
 
 TEST(test_block_dumper, containsLlvmDebug) {
     Function *F = getFunction("containsLlvmDebug");
@@ -321,23 +322,38 @@ TEST(test_block_dumper, containsLlvmDebug) {
         Value *value = arg;
         localNames.getOrCreateName(value, name);
     }
+
     cout << localNames.dumpNames();
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
-    std::set< llvm::Function *> dumpedFunctions;
-    map<Function *, Type *>returnTypeByFunction;
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
+    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+        Argument *arg = &*it;
+        // sring name = localNames.getOrCreateName(arg, arg->getName().str());
+        arg->dump();
+        LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &blockDumper.localValueInfos, arg, arg->getName().str());
+        localValueInfo->setExpression(localValueInfo->name);
+    }
     ostringstream oss;
-    blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
+    map<Function *, Type *>returnTypeByFunction;
+
+    (*blockDumper.instruction_it).dump();
+    blockDumper.maxInstructionsToGenerate = 1;
+    blockDumper.runGeneration(returnTypeByFunction);
+
+    cout << "instr0" << endl;
+    oss.str("");
     blockDumper.toCl(oss);
     string cl = oss.str();
-    cout << "cl:\n" << cl << endl;
+    cout << "cl: [" << cl << "]" << endl;
+    EXPECT_EQ(R"()", oss.str());
 
-    cout << "variable declarations:" << endl;
-    ASSERT_EQ(0u, blockDumper.variablesToDeclare.size());
-    cout << blockDumper.writeDeclarations("    ") << endl;
+    oss.str("");
+    blockDumper.writeDeclarations("    ", oss);
+    // cout << oss.str() << endl;
+    cout << "declarations: [" << oss.str() << "]" << endl;
+    EXPECT_EQ(R"()", oss.str());
 }
-*/
 
 TEST(test_block_dumper, usestructs) {
     Function *F = getFunction("usestructs");
