@@ -88,7 +88,6 @@ TEST(test_function_dumper, basic) {
     ASSERT_EQ("someFunc_gp", (*functionDumper.neededFunctions.begin())->getName().str());
 }
 
-/*
 TEST(test_function_dumper, usesShared1) {
     Function *F = getFunction("usesShared");
     F->dump();
@@ -98,19 +97,18 @@ TEST(test_function_dumper, usesShared1) {
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
-    std::set< llvm::Function *> dumpedFunctions;
     map<Function *, Type *>returnTypeByFunction;
-    functionDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
+    functionDumper.runGeneration(returnTypeByFunction);
     ostringstream os;
     functionDumper.toCl(os);
     string cl = os.str();
     cout << "cl:\n" << cl << endl;
 
-    ASSERT_EQ(1u, functionDumper.sharedVariablesToDeclare.size());
-    string sharedDefinitions = functionDumper.dumpSharedDefinitions("    ");
-    cout << "shareddefinitions: " << sharedDefinitions << endl;
-    string expected_shared = "    local float mysharedmem[8];\n";
-    ASSERT_EQ(expected_shared, sharedDefinitions);
+    // ASSERT_EQ(1u, functionDumper.sharedVariablesToDeclare.size());
+    // string sharedDefinitions = functionDumper.dumpSharedDefinitions("    ");
+    // cout << "shareddefinitions: " << sharedDefinitions << endl;
+    // string expected_shared = "    local float mysharedmem[8];\n";
+    // ASSERT_EQ(expected_shared, sharedDefinitions);
 }
 
 TEST(test_function_dumper, usesShared2) {
@@ -122,14 +120,13 @@ TEST(test_function_dumper, usesShared2) {
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
-    std::set< llvm::Function *> dumpedFunctions;
     map<Function *, Type *>returnTypeByFunction;
-    functionDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
+    functionDumper.runGeneration(returnTypeByFunction);
     ostringstream os;
     functionDumper.toCl(os);
     string cl = os.str();
     cout << "cl:\n" << cl << endl;
-
+/*
     ASSERT_EQ(2u, functionDumper.sharedVariablesToDeclare.size());
     string sharedDefinitions = functionDumper.dumpSharedDefinitions("    ");
     cout << "shareddefinitions: " << sharedDefinitions << endl;
@@ -137,6 +134,7 @@ TEST(test_function_dumper, usesShared2) {
     local int anothershared[12];
 )";
     ASSERT_EQ(expected_shared, sharedDefinitions);
+    */
 }
 
 TEST(test_function_dumper, usesPointerFunction) {
@@ -148,15 +146,14 @@ TEST(test_function_dumper, usesPointerFunction) {
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
-    std::set< llvm::Function *> dumpedFunctions;
     map<Function *, Type *>returnTypeByFunction;
-    bool genresult = functionDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
+    bool genresult = functionDumper.runGeneration(returnTypeByFunction);
     ASSERT_FALSE(genresult);
     ostringstream os;
     functionDumper.toCl(os);
     string cl = os.str();
     cout << "cl:\n" << cl << endl;
-
+/*
     Function *F2 = getFunction("returnsPointer");
     F2->dump();
     FunctionDumper functionDumper2(F2, true, &globalNames, &typeDumper, &functionNamesMap);
@@ -166,6 +163,7 @@ TEST(test_function_dumper, usesPointerFunction) {
     functionDumper2.toCl(os2);
     string cl2 = os2.str();
     cout << "cl2:\n" << cl2 << endl;
-}
 */
+}
+
 } // test_block_dumper
