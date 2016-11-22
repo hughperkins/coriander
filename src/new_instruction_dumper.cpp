@@ -192,6 +192,7 @@ void NewInstructionDumper::dumpConstantExpr(LocalValueInfo *localValueInfo) {
     // std::set< llvm::Function *> dumpedFunctions;
     std::map<llvm::Function *, llvm::Type*> returnTypeByFunction;
     LocalValueInfo *instrValueInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, instr);
+    // instrValueInfo->_storeAllocatedValue.reset(instr);
     runGeneration(instrValueInfo, returnTypeByFunction);
     // cout << "dumpconstantexpr" << endl;
     // ostringstream temposs;

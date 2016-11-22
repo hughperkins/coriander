@@ -40,31 +40,43 @@ unique_ptr<Module>M;
 
 string ll_path = "../test/gtest/test_function_dumper.ll";  // this is a bit hacky, but fine-ish for now
 
-Module *getM() {
-    if(M == nullptr) {
+class Wrapper {
+public:
+    Wrapper() {
+        context.reset(new LLVMContext());
         SMDiagnostic smDiagnostic;
-        M = parseIRFile(StringRef(ll_path), smDiagnostic, context);
+        M = parseIRFile(ll_path, smDiagnostic, *context);
         if(!M) {
             smDiagnostic.print("irtopencl", errs());
             // return "";
             throw runtime_error("failed to parse IR");
-            }
+        }
     }
-    return M.get();
-}
+    virtual ~Wrapper() {
+        M.release();
+        context.release();
+    }
+    Module *getM() {
+        return M.get();
+    }
 
-Function *getFunction(string name) {
-    // Module *M = getM();
-    getM();
-    Function *F = M->getFunction(StringRef(name));
-    if(F == 0) {
-        throw runtime_error("Function " + name + " not found");
+    Function *getFunction(string name) {
+        // Module *M = getM();
+        getM();
+        Function *F = M->getFunction(name);
+        if(F == 0) {
+            throw runtime_error("Function " + name + " not found");
+        }
+        return F;
     }
-    return F;
-}
+
+    unique_ptr<LLVMContext> context;
+    unique_ptr<Module> M;
+};
 
 TEST(test_function_dumper, basic) {
-    Function *F = getFunction("someKernel");
+    Wrapper wrapper;
+    Function *F = wrapper.getFunction("someKernel");
     F->dump();
     // BasicBlock *block = &*F->begin();
     GlobalNames globalNames;
@@ -89,7 +101,8 @@ TEST(test_function_dumper, basic) {
 }
 
 TEST(test_function_dumper, usesShared1) {
-    Function *F = getFunction("usesShared");
+    Wrapper wrapper;
+    Function *F = wrapper.getFunction("usesShared");
     F->dump();
     // BasicBlock *block = &*F->begin();
     GlobalNames globalNames;
@@ -112,7 +125,8 @@ TEST(test_function_dumper, usesShared1) {
 }
 
 TEST(test_function_dumper, usesShared2) {
-    Function *F = getFunction("usesShared2");
+    Wrapper wrapper;
+    Function *F = wrapper.getFunction("usesShared2");
     F->dump();
     // BasicBlock *block = &*F->begin();
     GlobalNames globalNames;
@@ -138,7 +152,8 @@ TEST(test_function_dumper, usesShared2) {
 }
 
 TEST(test_function_dumper, usesPointerFunction) {
-    Function *F = getFunction("usesPointerFunction");
+    Wrapper wrapper;
+    Function *F = wrapper.getFunction("usesPointerFunction");
     F->dump();
     // BasicBlock *block = &*F->begin();
     GlobalNames globalNames;

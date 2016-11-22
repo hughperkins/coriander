@@ -7963,6 +7963,7 @@ class NativeArray {
     if (relation == kReference) {
       array_ = array;
     } else {
+      // std::cout << "copying elements " << a_size << std::endl;
       Element* const copy = new Element[a_size];
       CopyArray(array, a_size, copy);
       array_ = copy;

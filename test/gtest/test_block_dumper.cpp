@@ -33,56 +33,63 @@ using namespace std;
 using namespace cocl;
 using namespace llvm;
 
-namespace test_block_dumper {
-
-LLVMContext context;
-unique_ptr<Module>M;
+namespace {
 
 string ll_path = "../test/gtest/test_block_dumper.ll";  // this is a bit hacky, but fine-ish for now
 
-Module *getM() {
-    if(M == nullptr) {
+class GlobalWrapper {
+public:
+    GlobalWrapper() {
+        context.reset(new LLVMContext());
+        // M.reset(new Module("mymodule", *context));
+
         SMDiagnostic smDiagnostic;
-        M = parseIRFile(StringRef(ll_path), smDiagnostic, context);
+        M = parseIRFile(StringRef(ll_path), smDiagnostic, *context);
         if(!M) {
             smDiagnostic.print("irtopencl", errs());
             // return "";
             throw runtime_error("failed to parse IR");
-            }
+        }
+        typeDumper.reset(new TypeDumper(&globalNames));
     }
-    return M.get();
-}
-
-Function *getFunction(string name) {
-    // Module *M = getM();
-    getM();
-    Function *F = M->getFunction(StringRef(name));
-    if(F == 0) {
-        throw runtime_error("Function " + name + " not found");
+    virtual ~GlobalWrapper() {
+        typeDumper.release();
+        M.release();
+        context.release();
     }
-    return F;
-}
 
-class GlobalWrapper {
-public:
-    GlobalWrapper() :
-        typeDumper(&globalNames) {
-
+    Module *getM() {
+        return M.get();
     }
+
+    Function *getFunction(string name) {
+        // Module *M = getM();
+        // getM();
+        Function *F = M->getFunction(StringRef(name));
+        if(F == 0) {
+            throw runtime_error("Function " + name + " not found");
+        }
+        return F;
+    }
+
+    unique_ptr<LLVMContext> context;
+    unique_ptr<Module> M;
+
     GlobalNames globalNames;
-    TypeDumper typeDumper;
+    unique_ptr<TypeDumper> typeDumper;
     FunctionNamesMap functionNamesMap;
     std::map<llvm::Value *, std::string> globalExpressionByValue;
+    map<Function *, Type *>returnTypeByFunction;
 };
 
 class LocalWrapper {
 public:
     LocalWrapper(GlobalWrapper &G, string functionName) :
             G(G) {
-        F = getFunction(functionName);
+        F = G.getFunction(functionName);
         block = &*F->begin();
         blockDumper.reset(new BasicBlockDumper(
-            block, &G.globalNames, &localNames, &G.typeDumper, &G.functionNamesMap,
+            block, &G.globalNames, &localNames, G.typeDumper.get(), &G.functionNamesMap,
             &G.globalExpressionByValue, &localValueInfos
         ));
         for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
@@ -95,12 +102,11 @@ public:
         }
     }
     bool runGeneration() {
-        map<Function *, Type *>returnTypeByFunction;
-        return blockDumper->runGeneration(returnTypeByFunction);
+        return blockDumper->runGeneration(G.returnTypeByFunction);
     }
-    bool runGeneration(map<Function *, Type *> &returnTypeByFunction) {
-        return blockDumper->runGeneration(returnTypeByFunction);
-    }
+    // bool runGeneration(map<Function *, Type *> &returnTypeByFunction) {
+    //     return blockDumper->runGeneration(returnTypeByFunction);
+    // }
 
     GlobalWrapper &G;
 
@@ -258,8 +264,8 @@ TEST(test_block_dumper, usesPointerFunction) {
     LocalWrapper wrapper(G, "usesPointerFunction");
     BasicBlockDumper *blockDumper = wrapper.blockDumper.get();
 
-    map<Function *, Type *> returnTypeByFunction;
-    bool dumpCompleted = wrapper.runGeneration(returnTypeByFunction);
+    // map<Function *, Type *> returnTypeByFunction;
+    bool dumpCompleted = wrapper.runGeneration();
     EXPECT_FALSE(dumpCompleted);
 
     ostringstream oss;
@@ -282,7 +288,7 @@ TEST(test_block_dumper, usesPointerFunction) {
     LocalWrapper wrapper2(G, "returnsPointer");
     BasicBlockDumper *blockDumper2 = wrapper2.blockDumper.get();
 
-    dumpCompleted = wrapper2.runGeneration(returnTypeByFunction);
+    dumpCompleted = wrapper2.runGeneration();
     EXPECT_TRUE(dumpCompleted);
 
     oss.str("");
@@ -299,8 +305,8 @@ TEST(test_block_dumper, usesPointerFunction) {
     cout << "=========" << endl;
     cout << "redumping function usesPointerFunction" << endl;
 
-    returnTypeByFunction[wrapper2.F] = PointerType::get(Type::getFloatTy(context), 0);
-    dumpCompleted = wrapper.runGeneration(returnTypeByFunction);
+    G.returnTypeByFunction[wrapper2.F] = PointerType::get(Type::getFloatTy(*G.context), 0);
+    dumpCompleted = wrapper.runGeneration();
     EXPECT_TRUE(dumpCompleted);
 
     oss.str("");

@@ -75,6 +75,8 @@ public:
                                           // some instructoins will *always* write something, eg stores
 
     static LocalValueInfo *getOrCreate(cocl::LocalNames *localNames, std::map<llvm::Value *, std::unique_ptr< LocalValueInfo> > *localValueInfos, llvm::Value *value, std::string suggestedName="");
+
+    // std::unique_ptr<llvm::Value> _storeAllocatedValue; // this is for ConstantExpr::getAsInstruction, which allocates, and never frees
 };
 
 } // namespace cocl
