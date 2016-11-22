@@ -79,6 +79,7 @@ public:
     unique_ptr<TypeDumper> typeDumper;
     FunctionNamesMap functionNamesMap;
     std::map<llvm::Value *, std::string> globalExpressionByValue;
+
     map<Function *, Type *>returnTypeByFunction;
 };
 
@@ -666,4 +667,4 @@ TEST(test_block_dumper, storefloat) {
 )", oss.str());
 }
 
-} // test_block_dumper
+} // namespace
