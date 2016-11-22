@@ -90,8 +90,8 @@ Behind the scenes, there are a few parts:
 
 New!
 - the device-IR to OpenCL step happens at runtime now
-- surprisingly, this actually is faster than doing it offline
-- thats because we generate only for the specific kernel we need, rather than the entire IR file
+  - surprisingly, this actually is faster than doing it offline
+  - thats because the GPU driver only needs to compile the small amount of OpenCL needed for a specific kernel, rather than an entire IR file
 - in addition, address-space deduction is significantly facilitated
 
 ## What it provides
