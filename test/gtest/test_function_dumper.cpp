@@ -211,35 +211,61 @@ v1:;
 }
 
 TEST(test_function_dumper, usesPointerFunction) {
-    /*
-    Wrapper wrapper;
-    Function *F = wrapper.getFunction("usesPointerFunction");
+    GlobalWrapper G;
+
+    LocalWrapper wrapper(G, "usesPointerFunction");
+    Function *F = wrapper.F;
+    FunctionDumper *functionDumper = &wrapper.functionDumper;
     F->dump();
-    // BasicBlock *block = &*F->begin();
-    GlobalNames globalNames;
-    LocalNames localNames;
-    TypeDumper typeDumper(&globalNames);
-    FunctionNamesMap functionNamesMap;
-    FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
-    map<Function *, Type *>returnTypeByFunction;
-    bool genresult = functionDumper.runGeneration(returnTypeByFunction);
-    ASSERT_FALSE(genresult);
+
+    bool res;
     ostringstream os;
-    functionDumper->toCl(os);
-    string cl = os.str();
-    cout << "cl:\n" << cl << endl;
-    */
-/*
-    Function *F2 = getFunction("returnsPointer");
+
+    res = wrapper.runGeneration();
+    EXPECT_FALSE(res);
+    EXPECT_FALSE(functionDumper->generationDone());
+
+    LocalWrapper wrapper2(G, "returnsPointer");
+    Function *F2 = wrapper2.F;
+    FunctionDumper *functionDumper2 = &wrapper2.functionDumper;
     F2->dump();
-    FunctionDumper functionDumper2(F2, true, &globalNames, &typeDumper, &functionNamesMap);
-    bool genresult2 = functionDumper2.runGeneration(dumpedFunctions, returnTypeByFunction);
-    ASSERT_TRUE(genresult2);
-    ostringstream os2;
-    functionDumper2.toCl(os2);
-    string cl2 = os2.str();
-    cout << "cl2:\n" << cl2 << endl;
-*/
+
+    res = wrapper2.runGeneration();
+    EXPECT_TRUE(res);
+    EXPECT_TRUE(functionDumper2->generationDone());
+
+    os.str("");
+    functionDumper2->toCl(os);
+    cout << "cl, F2: [" << os.str() << "]" << endl;
+    EXPECT_EQ(R"(kernel global float* returnsPointer(global float* in, long in_offset, local int *scratch) {
+    in += in_offset;
+
+
+v1:;
+    return in;
+}
+)", os.str());
+
+    G.returnTypeByFunction[F2] = F2->getReturnType();
+
+    res = wrapper.runGeneration();
+    EXPECT_TRUE(res);
+    EXPECT_TRUE(functionDumper->generationDone());
+
+    os.str("");
+    functionDumper->toCl(os);
+    cout << "cl, F: [" << os.str() << "]" << endl;
+//     EXPECT_EQ(R"(kernel void usesPointerFunction(global float* in, long in_offset, local int *scratch) {
+//     in += in_offset;
+//     in += in_offset;
+
+//     global float* v2;
+
+// v1:;
+//     v2 = returnsPointer(in);
+//     return;
+// }
+// )", os.str());
 }
 
 } // namespace

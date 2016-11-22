@@ -431,7 +431,14 @@ bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *
     return true;
 }
 
+bool FunctionDumper::generationDone() {
+    return block_it == F->end();
+}
+
 void FunctionDumper::toCl(ostream &os) {
+    if(block_it != F->end()) {
+        throw runtime_error("Need to run generation completely first");
+    }
     if(returnType != 0) {
         declaration = typeDumper->dumpType(returnType) + " " + declaration;
     } else {

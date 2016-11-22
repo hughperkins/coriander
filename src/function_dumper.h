@@ -51,6 +51,8 @@ public:
 
     bool runGeneration(const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
     void toCl(std::ostream &os);
+    bool generationDone();
+
     std::string createOffsetDeclaration(std::string argName);
     std::string createOffsetShim(llvm::Type *argType, std::string argName);
     std::string dumpFunctionDeclarationWithoutReturn(llvm::Function *F);
