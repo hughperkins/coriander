@@ -258,7 +258,6 @@ TEST(test_block_dumper, usesShared) {
 )", oss.str());
 }
 
-/*
 TEST(test_block_dumper, usesPointerFunction) {
     Function *F = getFunction("usesPointerFunction");
     F->dump();
@@ -271,44 +270,83 @@ TEST(test_block_dumper, usesPointerFunction) {
         Value *value = arg;
         localNames.getOrCreateName(value, name);
     }
+
     cout << localNames.dumpNames();
     TypeDumper typeDumper(&globalNames);
     FunctionNamesMap functionNamesMap;
     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
+    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+        Argument *arg = &*it;
+        // sring name = localNames.getOrCreateName(arg, arg->getName().str());
+        arg->dump();
+        LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &blockDumper.localValueInfos, arg, arg->getName().str());
+        localValueInfo->setExpression(localValueInfo->name);
+    }
     ostringstream oss;
-    std::set< llvm::Function *> dumpedFunctions;
     map<Function *, Type *>returnTypeByFunction;
-    bool generation_result = blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
-    cout << "generation_result " << generation_result << endl;
-    ASSERT_FALSE(generation_result);
+
+    (*blockDumper.instruction_it).dump();
+    // blockDumper.maxInstructionsToGenerate = 1;
+    blockDumper.runGeneration(returnTypeByFunction);
+
+    oss.str("");
     blockDumper.toCl(oss);
-    string cl = oss.str();
-    cout << "cl:\n" << cl << endl;
-    // cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
+    cout << "cl: [" << oss.str() << "]" << endl;
+    EXPECT_EQ(R"()", oss.str());
 
-    // Function *F2 = getFunction("returnsPointer");
+    oss.str("");
+    blockDumper.writeDeclarations("    ", oss);
+    // cout << oss.str() << endl;
+    cout << "declarations: [" << oss.str() << "]" << endl;
+    EXPECT_EQ(R"()", oss.str());
 
-    // BasicBlockDumper blockDumper2(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
-    // ostringstream oss;
-    // bool generation_result = blockDumper2.runGeneration();
-    // cout << "generation_result " << generation_result << endl;
-    // ASSERT_FALSE(generation_result);
-    // blockDumper.toCl(oss);
-    // string cl = oss.str();
-    // cout << "cl:\n" << cl << endl;
+    cout << "=========" << endl;
+    cout << "dumping function returnsPointer" << endl;
+    Function *F2 = getFunction("returnsPointer");
+    LocalNames localNames2;
+    BasicBlockDumper blockDumper2(block, &globalNames, &localNames2, &typeDumper, &functionNamesMap);
+    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+        Argument *arg = &*it;
+        // sring name = localNames.getOrCreateName(arg, arg->getName().str());
+        arg->dump();
+        LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames2, &blockDumper2.localValueInfos, arg, arg->getName().str());
+        localValueInfo->setExpression(localValueInfo->name);
+    }
+    bool done = blockDumper2.runGeneration(returnTypeByFunction);
+    EXPECT_FALSE(done);
 
-    // cout << "num shared variables to declare: " << blockDumper.sharedVariablesToDeclare.size() << endl;
-    // ASSERT_EQ(1, blockDumper.sharedVariablesToDeclare.size());
-    // for(auto it=blockDumper.sharedVariablesToDeclare.begin(); it !=blockDumper.sharedVariablesToDeclare.end(); it++) {
-    //     Value *value = *it;
-    //     cout << "shared:" << endl;
-    //     value->dump();
-    //     cout << endl;
-    // }
-    // Value *shared = *blockDumper.sharedVariablesToDeclare.begin();
-    // shared->dump();
+    oss.str("");
+    blockDumper2.toCl(oss);
+    cout << "cl: [" << oss.str() << "]" << endl;
+    EXPECT_EQ(R"()", oss.str());
+
+    oss.str("");
+    blockDumper2.writeDeclarations("    ", oss);
+    // cout << oss.str() << endl;
+    cout << "declarations: [" << oss.str() << "]" << endl;
+    EXPECT_EQ(R"()", oss.str());
+
+    cout << "=========" << endl;
+    cout << "redumping function usesPointerFunction" << endl;
+
+    returnTypeByFunction[F2] = PointerType::get(Type::getFloatTy(context), 0);
+    done = blockDumper.runGeneration(returnTypeByFunction);
+    EXPECT_TRUE(done);
+
+    oss.str("");
+    blockDumper.toCl(oss);
+    cout << "cl: [" << oss.str() << "]" << endl;
+    EXPECT_EQ(R"(    v1 = returnsPointer(in);
+)", oss.str());
+
+    oss.str("");
+    blockDumper.writeDeclarations("    ", oss);
+    // cout << oss.str() << endl;
+    cout << "declarations: [" << oss.str() << "]" << endl;
+    EXPECT_EQ(R"(    float* v1;
+)", oss.str());
+
 }
-*/
 
 TEST(test_block_dumper, containsLlvmDebug) {
     Function *F = getFunction("containsLlvmDebug");
