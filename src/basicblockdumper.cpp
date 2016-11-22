@@ -280,7 +280,7 @@ void BasicBlockDumper::writeDeclaration(std::ostream &os, llvm::Value *value) {
 
 void BasicBlockDumper::writeDeclarations(std::string indent, ostream &os) {
     // ostringstream os;
-    for(auto it = localValueInfos.begin(); it != localValueInfos.end(); it++) {
+    for(auto it = localValueInfos->begin(); it != localValueInfos->end(); it++) {
         LocalValueInfo *localValueInfo = it->second.get();
         it->first->dump();
         localValueInfo->writeDeclaration("    ", typeDumper, os);
@@ -319,7 +319,7 @@ bool BasicBlockDumper::runGeneration(const std::map<llvm::Function *, llvm::Type
             continue;
         }
         try {
-            LocalValueInfo *instrInfo = LocalValueInfo::getOrCreate(localNames, &localValueInfos, inst);
+            LocalValueInfo *instrInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, inst);
             // cout << "basicblockdumper rungeneration on inst:" << endl;
             // inst->dump();
             // cout << endl;
@@ -360,7 +360,7 @@ void BasicBlockDumper::toCl(ostream &os) {
         // cout << "basicblockdumper value:" << endl;
         // value->dump();
         // cout << endl;
-        LocalValueInfo *valueInfo = localValueInfos.at(value).get();
+        LocalValueInfo *valueInfo = localValueInfos->at(value).get();
         valueInfo->writeInlineCl("    ", os);
     }
 }

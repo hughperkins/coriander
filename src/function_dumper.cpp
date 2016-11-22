@@ -41,12 +41,6 @@ string FunctionDumper::createOffsetShim(Type *argType, string argName) {
     return shim;
 }
 
-            // GlobalNames *globalNames, LocalNames *localNames, TypeDumper *typeDumper, const FunctionNamesMap *functionNamesMap,
-            // std::vector<AllocaInfo> *allocaDeclarations, std::set<llvm::Value *> *variablesToDeclare,
-            // std::set<llvm::Value *> *sharedVariablesToDeclare, std::set<std::string> *shimFunctionsNeeded,
-            // std::set<llvm::Function *> *neededFunctions,
-            // std::map<llvm::Value *, std::string> *globalExpressionByValue, std::map<llvm::Value *, std::string> *localExpressionByValue
-
 std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock) {
     std::string gencode = "";
     for(auto it = nextBlock->begin(); it != nextBlock->end(); it++) {
@@ -59,14 +53,21 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
             BasicBlock *ourBlock = branchInstr->getParent();
             Value *sourceValue = phi->getIncomingValueForBlock(ourBlock);
             vector<AllocaInfo> allocaInfos;
-            InstructionDumper instructionDumper(globalNames, &localNames, typeDumper, functionNamesMap,
-                &allocaInfos, &variablesToDeclare,
-                &sharedVariablesToDeclare, &shimFunctionsNeeded,
-                &neededFunctions,
-                &globalExpressionByValue, &localExpressionByValue);
-            vector<string> reslines;
+            NewInstructionDumper instructionDumper(
+                globalNames, &localNames, typeDumper, functionNamesMap,
+                // &allocaInfos, &variablesToDeclare,
+                // &sharedVariablesToDeclare,
+                &shimFunctionsNeeded, &neededFunctions,
+                &globalExpressionByValue, &localValueInfos
+                // &localExpressionByValue
+            );
+            // vector<string> reslines;
             // string sourceValueCode = instructionDumper.runRhsGeneration(sourceValue, &reslines);
-            string sourceValueCode = instructionDumper.dumpOperand(sourceValue);
+            LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(
+                &localNames, &localValueInfos, sourceValue);
+            const std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+            instructionDumper.runGeneration(localValueInfo, returnTypeByFunction);
+            string sourceValueCode = localValueInfo->getExpr();
 
             // string sourceValueCode = localNames.getName(sourceValue);
             // COCL_PRINT(cout << "adding phi " << sourceValueCode << endl);
@@ -84,14 +85,15 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
     return gencode;
 }
 
-std::string FunctionDumper::dumpReturn(Type **pReturnType, ReturnInst *retInst, std::map<llvm::Value *, std::string> &localExpressionByValue) {
+std::string FunctionDumper::dumpReturn(Type **pReturnType, ReturnInst *retInst) {
     std::string gencode = "";
     Value *retValue = retInst->getReturnValue();
     if(retValue != 0) {
         Function *F = retInst->getFunction();
         copyAddressSpace(retValue, F);
         *pReturnType = retValue->getType();
-        gencode += "return " + localExpressionByValue[retValue];
+        // gencode += "return " + localExpressionByValue[retValue];
+        gencode += "return " + localValueInfos.at(retValue)->getExpr();
         // gencode += "return " + dumpOperand(retValue);
     } else {
         // we still need to have "return" if no value, since some loops terminate with a `return` in the middle
@@ -101,10 +103,11 @@ std::string FunctionDumper::dumpReturn(Type **pReturnType, ReturnInst *retInst, 
     return gencode;
 }
 
-std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr, std::map<Value *, std::string> &localExpressionByValue) {
+std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr) {
     string gencode = "";
     if(instr->isConditional()) {
-        string conditionstring = localExpressionByValue[instr->getCondition()];
+        // string conditionstring = localExpressionByValue[instr->getCondition()];
+        string conditionstring = localValueInfos.at(instr->getCondition())->getExpr();
         if(!isSingleExpression(conditionstring) || conditionstring[0] != '(') {
             conditionstring = "(" + conditionstring + ")";
         }
@@ -188,51 +191,51 @@ void FunctionDumper::addPHIDeclaration(llvm::PHINode *phi) {
 
 std::vector<std::string> FunctionDumper::dumpSharedDefinition(llvm::Value *value) {
     std::vector<std::string> declarations;
-    value ->dump();
-    if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
-        string name = glob->getName().str();
-        string declaration = "";
-        Type *type = glob->getType();
-        if(ArrayType *arraytype = dyn_cast<ArrayType>(type->getPointerElementType())) {
-            int length = arraytype->getNumElements();
-            Type *elementType = arraytype->getElementType();
-            string typestr = typeDumper->dumpType(elementType);
-            declarations.push_back("local " + typestr + " " + name + "[" + easycl::toString(length) + "]");
-            // declarations.push_back("local " + typestr + "** " + name + " = &" + name + "__");
-            localExpressionByValue[value] = name;
-            // nameByValue[value] = name;
-            // currentFunctionSharedDeclarations += declaration;
+    // value ->dump();
+    // if(GlobalVariable *glob = dyn_cast<GlobalVariable>(value)) {
+    //     string name = glob->getName().str();
+    //     string declaration = "";
+    //     Type *type = glob->getType();
+    //     if(ArrayType *arraytype = dyn_cast<ArrayType>(type->getPointerElementType())) {
+    //         int length = arraytype->getNumElements();
+    //         Type *elementType = arraytype->getElementType();
+    //         string typestr = typeDumper->dumpType(elementType);
+    //         declarations.push_back("local " + typestr + " " + name + "[" + easycl::toString(length) + "]");
+    //         // declarations.push_back("local " + typestr + "** " + name + " = &" + name + "__");
+    //         localExpressionByValue[value] = name;
+    //         // nameByValue[value] = name;
+    //         // currentFunctionSharedDeclarations += declaration;
             return declarations;
-        } else {
-            cout << "dumpshared definition called with:" << endl;
-            value->dump();
-            cout << endl;
-            throw runtime_error("didnt expect ot be here, globalvaraible, not array.  dumpshareddefinition, for htis value");
-        }
-    } else {
-        cout << "dumpshared definition called with:" << endl;
-        value->dump();
-        cout << endl;
-        throw runtime_error("didnt expect ot be here.  dumpshareddefinition, for htis value");
-    }
+    //     } else {
+    //         cout << "dumpshared definition called with:" << endl;
+    //         value->dump();
+    //         cout << endl;
+    //         throw runtime_error("didnt expect ot be here, globalvaraible, not array.  dumpshareddefinition, for htis value");
+    //     }
+    // } else {
+    //     cout << "dumpshared definition called with:" << endl;
+    //     value->dump();
+    //     cout << endl;
+    //     throw runtime_error("didnt expect ot be here.  dumpshareddefinition, for htis value");
+    // }
 }
 
 std::string FunctionDumper::dumpSharedDefinitions(std::string indent) {
     ostringstream oss;
-    for(auto it=sharedVariablesToDeclare.begin(); it != sharedVariablesToDeclare.end(); it++) {
-        Value *variable = *it;
-        // cout << "declaring:" << endl;
-        // variable->dump();
-        // cout << endl;
-        std::vector<std::string> declarations = dumpSharedDefinition(variable);
-        for(auto it2=declarations.begin(); it2 != declarations.end(); it2++) {
-            oss << indent << *it2 << ";\n";
-        }
-        // string definition = dumpSharedDefinition(variable);
-        // cout << "defnition: " << definition << endl;
-        // gencode += definition;
-        // oss << indent << definition << ";\n";
-    }
+    // for(auto it=sharedVariablesToDeclare.begin(); it != sharedVariablesToDeclare.end(); it++) {
+    //     Value *variable = *it;
+    //     // cout << "declaring:" << endl;
+    //     // variable->dump();
+    //     // cout << endl;
+    //     std::vector<std::string> declarations = dumpSharedDefinition(variable);
+    //     for(auto it2=declarations.begin(); it2 != declarations.end(); it2++) {
+    //         oss << indent << *it2 << ";\n";
+    //     }
+    //     // string definition = dumpSharedDefinition(variable);
+    //     // cout << "defnition: " << definition << endl;
+    //     // gencode += definition;
+    //     // oss << indent << definition << ";\n";
+    // }
     return oss.str();
 }
 
@@ -339,13 +342,13 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
     return declaration;
 }
 
-std::string FunctionDumper::dumpTerminator(Type **pReturnType, Instruction *terminator, std::map<llvm::Value *, std::string> &localExpressionByValue) {
+std::string FunctionDumper::dumpTerminator(Type **pReturnType, Instruction *terminator) {
     string terminatorCl = "";
     if(ReturnInst *retInst = dyn_cast<ReturnInst>(terminator)) {
-        terminatorCl = "    " + dumpReturn(pReturnType, retInst, localExpressionByValue) + ";\n";
+        terminatorCl = "    " + dumpReturn(pReturnType, retInst) + ";\n";
         // returnType = retInst->getOperand(0)->getType();
     } else if(BranchInst *branch = dyn_cast<BranchInst>(terminator)) {
-        terminatorCl = dumpBranch(branch, localExpressionByValue);
+        terminatorCl = dumpBranch(branch);
     } else {
         cout << "unhandled terminator type:";
         terminator->dump();
@@ -366,13 +369,21 @@ void FunctionDumper::generateBlockIndex() {
     }
 }
 
-bool FunctionDumper::runGeneration(const std::set<llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
+bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
     // returns true means finished, false means missing some dependnecy, like a sub fucntion walk
 
     generateBlockIndex();
 
     // first time initializes the types of hte args and so on
     declaration = dumpFunctionDeclarationWithoutReturn(F);
+
+    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+        Argument *arg = &*it;
+        // sring name = localNames.getOrCreateName(arg, arg->getName().str());
+        arg->dump();
+        LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &localValueInfos, arg, arg->getName().str());
+        localValueInfo->setExpression(localValueInfo->name);
+    }
 
     for(; block_it != F->end(); block_it++) {
         BasicBlock *basicBlock = &*block_it;
@@ -386,11 +397,12 @@ bool FunctionDumper::runGeneration(const std::set<llvm::Function *> &dumpedFunct
         }
 
         BasicBlockDumper basicBlockDumper(
-            basicBlock, globalNames, &localNames, typeDumper, functionNamesMap);
+            basicBlock, globalNames, &localNames, typeDumper, functionNamesMap,
+            &globalExpressionByValue, &localValueInfos);
         if(_addIRToCl) {
             basicBlockDumper.addIRToCl();
         }
-        if(!basicBlockDumper.runGeneration(dumpedFunctions, returnTypeByFunction)) {
+        if(!basicBlockDumper.runGeneration(returnTypeByFunction)) {
             cout << "blockdumper generation didnt run to completion" << endl;
             neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
             for(auto it2=neededFunctions.begin(); it2 != neededFunctions.end(); it2++) {
@@ -405,14 +417,16 @@ bool FunctionDumper::runGeneration(const std::set<llvm::Function *> &dumpedFunct
         basicBlockDumper.toCl(ouros);
         // bodyCl += oss.str();
 
-        functionDeclarations += basicBlockDumper.getAllocaDeclarations("    ");
-        functionDeclarations += basicBlockDumper.writeDeclarations("    ");
+        // functionDeclarations += basicBlockDumper.getAllocaDeclarations("    ");
+        ostringstream funcdecos;
+        basicBlockDumper.writeDeclarations("    ", funcdecos);
+        functionDeclarations += funcdecos.str();
 
-        sharedVariablesToDeclare.insert(basicBlockDumper.sharedVariablesToDeclare.begin(), basicBlockDumper.sharedVariablesToDeclare.end());
+        // sharedVariablesToDeclare.insert(basicBlockDumper.sharedVariablesToDeclare.begin(), basicBlockDumper.sharedVariablesToDeclare.end());
         shimFunctionsNeeded.insert(basicBlockDumper.shimFunctionsNeeded.begin(), basicBlockDumper.shimFunctionsNeeded.end());
         neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
 
-        ouros << dumpTerminator(&returnType, basicBlock->getTerminator(), basicBlockDumper.localExpressionByValue);
+        ouros << dumpTerminator(&returnType, basicBlock->getTerminator());
     }
     return true;
 }

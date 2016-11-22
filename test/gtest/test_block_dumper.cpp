@@ -63,27 +63,64 @@ Function *getFunction(string name) {
     return F;
 }
 
-TEST(test_block_dumper, basic) {
-    Function *F = getFunction("main");
-    F->dump();
-    BasicBlock *block = &*F->begin();
-    GlobalNames globalNames;
-    LocalNames localNames;
-    TypeDumper typeDumper(&globalNames);
-    FunctionNamesMap functionNamesMap;
-    BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
-    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        Argument *arg = &*it;
-        // sring name = localNames.getOrCreateName(arg, arg->getName().str());
-        arg->dump();
-        LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &blockDumper.localValueInfos, arg, arg->getName().str());
-        localValueInfo->setExpression(localValueInfo->name);
+class GlobalWrapper {
+public:
+    GlobalWrapper() :
+        typeDumper(&globalNames) {
+
     }
+    GlobalNames globalNames;
+    TypeDumper typeDumper;
+    FunctionNamesMap functionNamesMap;
+    std::map<llvm::Value *, std::string> globalExpressionByValue;
+};
+
+class LocalWrapper {
+public:
+    LocalWrapper(GlobalWrapper &G, string functionName) :
+            G(G) {
+        F = getFunction(functionName);
+        block = &*F->begin();
+        blockDumper.reset(new BasicBlockDumper(
+            block, &G.globalNames, &localNames, &G.typeDumper, &G.functionNamesMap,
+            &G.globalExpressionByValue, &localValueInfos
+        ));
+        for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+            Argument *arg = &*it;
+            // sring name = localNames.getOrCreateName(arg, arg->getName().str());
+            arg->dump();
+            LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(
+                &localNames, &localValueInfos, arg, arg->getName().str());
+            localValueInfo->setExpression(localValueInfo->name);
+        }
+    }
+    bool runGeneration() {
+        map<Function *, Type *>returnTypeByFunction;
+        return blockDumper->runGeneration(returnTypeByFunction);
+    }
+    bool runGeneration(map<Function *, Type *> &returnTypeByFunction) {
+        return blockDumper->runGeneration(returnTypeByFunction);
+    }
+
+    GlobalWrapper &G;
+
+    Function *F = 0;
+    BasicBlock *block = 0;
+    LocalNames localNames;
+    std::map<llvm::Value *, std::unique_ptr<cocl::LocalValueInfo> > localValueInfos;
+
+    unique_ptr<BasicBlockDumper> blockDumper;
+};
+
+TEST(test_block_dumper, basic) {
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "main");
+    BasicBlockDumper *blockDumper = wrapper.blockDumper.get();
+
     ostringstream oss;
-    // std::set< llvm::Function *> dumpedFunctions;
-    map<Function *, Type *>returnTypeByFunction;
-    blockDumper.runGeneration(returnTypeByFunction);
-    blockDumper.toCl(oss);
+    wrapper.runGeneration();
+
+    blockDumper->toCl(oss);
     string cl = oss.str();
     cout << cl << endl;
     string expectedBlockCl = R"(    v2 = (5 + 3) + 7;
@@ -117,7 +154,7 @@ TEST(test_block_dumper, basic) {
     // ASSERT_EQ(expectedBlockCl, cl);
 
     cout << "alloca declrations:" << endl;
-    cout << blockDumper.getAllocaDeclarations("    ") << endl;
+    cout << blockDumper->getAllocaDeclarations("    ") << endl;
     string expectedAllocaDeclarations = R"(    int v6[1];
     float v8[1];
     struct mystruct v25[1];
@@ -128,7 +165,7 @@ TEST(test_block_dumper, basic) {
     cout << "variable declarations:" << endl;
     // ostringstream oss;
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     cout << oss.str() << endl;
 
     // ASSERT_EQ(14u, blockDumper.variablesToDeclare.size());
@@ -146,7 +183,7 @@ TEST(test_block_dumper, basic) {
     // ASSERT_TRUE(declaredVariableStrings.find("float v4") != declaredVariableStrings.end());
     // ASSERT_TRUE(declaredVariableStrings.find("int v7") != declaredVariableStrings.end());
 
-    // cout << blockDumper.writeDeclarations("    ") << endl;
+    // cout << blockDumper->writeDeclarations("    ") << endl;
 //     string expectedDeclarations = R"(    int v2;
 //     float v3;
 //     float v4;
@@ -155,50 +192,31 @@ TEST(test_block_dumper, basic) {
 //     struct mystruct v28;
 //     struct mystruct v29;
 // )";
-//     ASSERT_EQ(expectedDeclarations, blockDumper.writeDeclarations("    "));
+//     ASSERT_EQ(expectedDeclarations, blockDumper->writeDeclarations("    "));
 }
 
 TEST(test_block_dumper, basic2) {
-    Function *F = getFunction("someKernel");
-    F->dump();
-    BasicBlock *block = &*F->begin();
-    GlobalNames globalNames;
-    LocalNames localNames;
-    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        Argument *arg = &*it;
-        string name = arg->getName().str();
-        Value *value = arg;
-        localNames.getOrCreateName(value, name);
-    }
-    cout << localNames.dumpNames();
-    TypeDumper typeDumper(&globalNames);
-    FunctionNamesMap functionNamesMap;
-    BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
-    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        Argument *arg = &*it;
-        // sring name = localNames.getOrCreateName(arg, arg->getName().str());
-        arg->dump();
-        LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &blockDumper.localValueInfos, arg, arg->getName().str());
-        localValueInfo->setExpression(localValueInfo->name);
-    }
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "someKernel");
+    BasicBlockDumper *blockDumper = wrapper.blockDumper.get();
+
+    wrapper.runGeneration();
     ostringstream oss;
-    // std::set< llvm::Function *> dumpedFunctions;
-    map<Function *, Type *>returnTypeByFunction;
-    blockDumper.runGeneration(returnTypeByFunction);
-    blockDumper.toCl(oss);
+
+    blockDumper->toCl(oss);
     string cl = oss.str();
     cout << "cl:\n" << cl << endl;
     cout << "declarations:" << endl;
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     cout << oss.str() << endl;
     // cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
 
-    for(auto it=blockDumper.neededFunctions.begin(); it != blockDumper.neededFunctions.end(); it++) {
+    for(auto it=blockDumper->neededFunctions.begin(); it != blockDumper->neededFunctions.end(); it++) {
         cout << "called function " << (*it)->getName().str() << endl;
     }
-    ASSERT_EQ(1u, blockDumper.neededFunctions.size());
-    Function *neededFunction = *blockDumper.neededFunctions.begin();
+    ASSERT_EQ(1u, blockDumper->neededFunctions.size());
+    Function *neededFunction = *blockDumper->neededFunctions.begin();
     neededFunction->dump();
     cout << endl;
     cout << neededFunction->getName().str() << endl;
@@ -207,39 +225,15 @@ TEST(test_block_dumper, basic2) {
 }
 
 TEST(test_block_dumper, usesShared) {
-    Function *F = getFunction("usesShared");
-    F->dump();
-    BasicBlock *block = &*F->begin();
-    GlobalNames globalNames;
-    LocalNames localNames;
-    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        Argument *arg = &*it;
-        string name = arg->getName().str();
-        Value *value = arg;
-        localNames.getOrCreateName(value, name);
-    }
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "usesShared");
+    BasicBlockDumper *blockDumper = wrapper.blockDumper.get();
 
-    GlobalValue *globalValue = M->getNamedValue("mysharedmem");
-    globalValue->dump();
-
-    cout << localNames.dumpNames();
-    TypeDumper typeDumper(&globalNames);
-    FunctionNamesMap functionNamesMap;
-    BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
-    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        Argument *arg = &*it;
-        // sring name = localNames.getOrCreateName(arg, arg->getName().str());
-        arg->dump();
-        LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &blockDumper.localValueInfos, arg, arg->getName().str());
-        localValueInfo->setExpression(localValueInfo->name);
-    }
+    wrapper.runGeneration();
     ostringstream oss;
-    // std::set< llvm::Function *> dumpedFunctions;
-    map<Function *, Type *>returnTypeByFunction;
-    blockDumper.runGeneration(returnTypeByFunction);
 
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     string cl = oss.str();
     cout << "cl: [" << cl << "]" << endl;
     ASSERT_EQ(R"(    v5 = (&(&mysharedmem)[0][0]);
@@ -249,7 +243,7 @@ TEST(test_block_dumper, usesShared) {
 )", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     // cout << oss.str() << endl;
     cout << "declarations: [" << oss.str() << "]" << endl;
     ASSERT_EQ(R"(    local mysharedmem float[8];
@@ -259,69 +253,88 @@ TEST(test_block_dumper, usesShared) {
 }
 
 TEST(test_block_dumper, usesPointerFunction) {
-    Function *F = getFunction("usesPointerFunction");
-    F->dump();
-    BasicBlock *block = &*F->begin();
-    GlobalNames globalNames;
-    LocalNames localNames;
-    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        Argument *arg = &*it;
-        string name = arg->getName().str();
-        Value *value = arg;
-        localNames.getOrCreateName(value, name);
-    }
+    GlobalWrapper G;
 
-    cout << localNames.dumpNames();
-    TypeDumper typeDumper(&globalNames);
-    FunctionNamesMap functionNamesMap;
-    BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
-    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        Argument *arg = &*it;
-        // sring name = localNames.getOrCreateName(arg, arg->getName().str());
-        arg->dump();
-        LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &blockDumper.localValueInfos, arg, arg->getName().str());
-        localValueInfo->setExpression(localValueInfo->name);
-    }
+    LocalWrapper wrapper(G, "usesPointerFunction");
+    BasicBlockDumper *blockDumper = wrapper.blockDumper.get();
+
+    map<Function *, Type *> returnTypeByFunction;
+    bool dumpCompleted = wrapper.runGeneration(returnTypeByFunction);
+    EXPECT_FALSE(dumpCompleted);
+
     ostringstream oss;
-    map<Function *, Type *>returnTypeByFunction;
 
-    (*blockDumper.instruction_it).dump();
-    // blockDumper.maxInstructionsToGenerate = 1;
-    blockDumper.runGeneration(returnTypeByFunction);
+    // Function *F = getFunction("usesPointerFunction");
+    // F->dump();
+    // BasicBlock *block = &*F->begin();
+    // GlobalNames globalNames;
+    // LocalNames localNames;
+    // for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+    //     Argument *arg = &*it;
+    //     string name = arg->getName().str();
+    //     Value *value = arg;
+    //     localNames.getOrCreateName(value, name);
+    // }
+
+    // cout << localNames.dumpNames();
+    // TypeDumper typeDumper(&globalNames);
+    // FunctionNamesMap functionNamesMap;
+    // BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
+    // for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+    //     Argument *arg = &*it;
+    //     // sring name = localNames.getOrCreateName(arg, arg->getName().str());
+    //     arg->dump();
+    //     LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &blockDumper.localValueInfos, arg, arg->getName().str());
+    //     localValueInfo->setExpression(localValueInfo->name);
+    // }
+    // ostringstream oss;
+    // map<Function *, Type *>returnTypeByFunction;
+
+    // (*blockDumper.instruction_it).dump();
+    // // blockDumper.maxInstructionsToGenerate = 1;
+    // blockDumper.runGeneration(returnTypeByFunction);
 
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"()", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     // cout << oss.str() << endl;
     cout << "declarations: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"()", oss.str());
 
     cout << "=========" << endl;
+
     cout << "dumping function returnsPointer" << endl;
-    Function *F2 = getFunction("returnsPointer");
-    LocalNames localNames2;
-    BasicBlockDumper blockDumper2(block, &globalNames, &localNames2, &typeDumper, &functionNamesMap);
-    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        Argument *arg = &*it;
-        // sring name = localNames.getOrCreateName(arg, arg->getName().str());
-        arg->dump();
-        LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames2, &blockDumper2.localValueInfos, arg, arg->getName().str());
-        localValueInfo->setExpression(localValueInfo->name);
-    }
-    bool done = blockDumper2.runGeneration(returnTypeByFunction);
-    EXPECT_FALSE(done);
+
+    LocalWrapper wrapper2(G, "returnsPointer");
+    BasicBlockDumper *blockDumper2 = wrapper2.blockDumper.get();
+
+    // wrapper2.runGeneration();
+    // ostringstream oss;
+
+    // Function *F2 = getFunction("returnsPointer");
+    // LocalNames localNames2;
+    // BasicBlockDumper blockDumper2(block, &globalNames, &localNames2, &typeDumper, &functionNamesMap);
+    // for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+    //     Argument *arg = &*it;
+    //     // sring name = localNames.getOrCreateName(arg, arg->getName().str());
+    //     arg->dump();
+    //     LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames2, &blockDumper2.localValueInfos, arg, arg->getName().str());
+    //     localValueInfo->setExpression(localValueInfo->name);
+    // }
+    dumpCompleted = wrapper2.runGeneration(returnTypeByFunction);
+    EXPECT_TRUE(dumpCompleted);
 
     oss.str("");
-    blockDumper2.toCl(oss);
+    blockDumper2->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"()", oss.str());
 
     oss.str("");
-    blockDumper2.writeDeclarations("    ", oss);
+    blockDumper2->writeDeclarations("    ", oss);
     // cout << oss.str() << endl;
     cout << "declarations: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"()", oss.str());
@@ -329,24 +342,26 @@ TEST(test_block_dumper, usesPointerFunction) {
     cout << "=========" << endl;
     cout << "redumping function usesPointerFunction" << endl;
 
-    returnTypeByFunction[F2] = PointerType::get(Type::getFloatTy(context), 0);
-    done = blockDumper.runGeneration(returnTypeByFunction);
-    EXPECT_TRUE(done);
+    returnTypeByFunction[wrapper2.F] = PointerType::get(Type::getFloatTy(context), 0);
+    dumpCompleted = wrapper.runGeneration(returnTypeByFunction);
+    EXPECT_TRUE(dumpCompleted);
 
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    v1 = returnsPointer(in);
 )", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     // cout << oss.str() << endl;
     cout << "declarations: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    float* v1;
 )", oss.str());
 
 }
+
+/*
 
 TEST(test_block_dumper, containsLlvmDebug) {
     Function *F = getFunction("containsLlvmDebug");
@@ -381,13 +396,13 @@ TEST(test_block_dumper, containsLlvmDebug) {
 
     cout << "instr0" << endl;
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     string cl = oss.str();
     cout << "cl: [" << cl << "]" << endl;
     EXPECT_EQ(R"()", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     // cout << oss.str() << endl;
     cout << "declarations: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"()", oss.str());
@@ -426,13 +441,13 @@ TEST(test_block_dumper, usestructs) {
 
     cout << "instr0" << endl;
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     string cl = oss.str();
     cout << "cl: [" << cl << "]" << endl;
     ASSERT_EQ(R"()", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     // cout << oss.str() << endl;
     cout << "declarations: [" << oss.str() << "]" << endl;
     ASSERT_EQ(R"(    struct mystruct v1[1];
@@ -446,13 +461,13 @@ TEST(test_block_dumper, usestructs) {
     blockDumper.runGeneration(returnTypeByFunction);
 
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     ASSERT_EQ(R"(    v2 = v1[0];
 )", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
     ASSERT_EQ(R"(    struct mystruct v1[1];
     struct mystruct v2;
@@ -466,14 +481,14 @@ TEST(test_block_dumper, usestructs) {
     blockDumper.runGeneration(returnTypeByFunction);
 
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     ASSERT_EQ(R"(    v2 = v1[0];
     v3 = (&v1[0].f1);
 )", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
     ASSERT_EQ(R"(    struct mystruct v1[1];
     struct mystruct v2;
@@ -488,14 +503,14 @@ TEST(test_block_dumper, usestructs) {
     blockDumper.runGeneration(returnTypeByFunction);
 
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     ASSERT_EQ(R"(    v2 = v1[0];
     v3 = (&v1[0].f1);
 )", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
     ASSERT_EQ(R"(    struct mystruct v1[1];
     struct mystruct v2;
@@ -511,7 +526,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper.runGeneration(returnTypeByFunction);
 
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     ASSERT_EQ(R"(    v2 = v1[0];
     v3 = (&v1[0].f1);
@@ -519,7 +534,7 @@ TEST(test_block_dumper, usestructs) {
 )", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
     ASSERT_EQ(R"(    struct mystruct v1[1];
     struct mystruct v2;
@@ -536,7 +551,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper.runGeneration(returnTypeByFunction);
 
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     ASSERT_EQ(R"(    v2 = v1[0];
     v3 = (&v1[0].f1);
@@ -545,7 +560,7 @@ TEST(test_block_dumper, usestructs) {
 )", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
     ASSERT_EQ(R"(    struct mystruct v1[1];
     struct mystruct v2;
@@ -563,7 +578,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper.runGeneration(returnTypeByFunction);
 
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    v2 = v1[0];
     v3 = (&v1[0].f1);
@@ -573,7 +588,7 @@ TEST(test_block_dumper, usestructs) {
 )", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    struct mystruct v1[1];
     struct mystruct v2;
@@ -591,7 +606,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper.runGeneration(returnTypeByFunction);
 
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    v2 = v1[0];
     v3 = (&v1[0].f1);
@@ -602,7 +617,7 @@ TEST(test_block_dumper, usestructs) {
 )", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    struct mystruct v1[1];
     struct mystruct v2;
@@ -620,7 +635,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper.runGeneration(returnTypeByFunction);
 
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    v2 = v1[0];
     v3 = (&v1[0].f1);
@@ -632,7 +647,7 @@ TEST(test_block_dumper, usestructs) {
 )", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    struct mystruct v1[1];
     struct mystruct v2;
@@ -650,7 +665,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper.runGeneration(returnTypeByFunction);
 
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    v2 = v1[0];
     v3 = (&v1[0].f1);
@@ -663,7 +678,7 @@ TEST(test_block_dumper, usestructs) {
 )", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    struct mystruct v1[1];
     struct mystruct v2;
@@ -682,7 +697,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper.runGeneration(returnTypeByFunction);
 
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    v2 = v1[0];
     v3 = (&v1[0].f1);
@@ -696,7 +711,7 @@ TEST(test_block_dumper, usestructs) {
 )", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    struct mystruct v1[1];
     struct mystruct v2;
@@ -739,7 +754,7 @@ TEST(test_block_dumper, storefloat) {
     blockDumper.runGeneration(returnTypeByFunction);
 
     oss.str("");
-    blockDumper.toCl(oss);
+    blockDumper->toCl(oss);
     string cl = oss.str();
     cout << "cl: [" << cl << "]" << endl;
     ASSERT_EQ(R"(    v1 = 5.0f + 3.0f;
@@ -747,11 +762,12 @@ TEST(test_block_dumper, storefloat) {
 )", oss.str());
 
     oss.str("");
-    blockDumper.writeDeclarations("    ", oss);
+    blockDumper->writeDeclarations("    ", oss);
     // cout << oss.str() << endl;
     cout << "declarations: [" << oss.str() << "]" << endl;
     ASSERT_EQ(R"(    float v1;
 )", oss.str());
 }
+*/
 
 } // test_block_dumper

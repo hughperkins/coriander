@@ -9,14 +9,17 @@ namespace cocl {
 
 class NewInstructionDumper {
 public:
-    NewInstructionDumper(GlobalNames *globalNames, LocalNames *localNames, TypeDumper *typeDumper, const FunctionNamesMap *functionNamesMap,
+    NewInstructionDumper(
+        GlobalNames *globalNames,
+        LocalNames *localNames,
+        TypeDumper *typeDumper,
+        const FunctionNamesMap *functionNamesMap,
 
-            std::set<std::string> *shimFunctionsNeeded,
-            std::set<llvm::Function *> *neededFunctions,
+        std::set<std::string> *shimFunctionsNeeded,
+        std::set<llvm::Function *> *neededFunctions,
 
-            std::map<llvm::Value *, std::string> *globalExpressionByValue,
-            std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos
-            // std::vector<AllocaInfo> *allocaDeclarations
+        std::map<llvm::Value *, std::string> *globalExpressionByValue,
+        std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos
     );
 
     void dumpIcmp(LocalValueInfo *localValueInfo);
@@ -56,11 +59,6 @@ public:
 
     std::map<llvm::Value *, std::string> *globalExpressionByValue = 0;
     std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos = 0;
-    // std::vector<AllocaInfo> *allocaDeclarations = 0;
-
-    // bool needDependencies = false;
-
-    // std::string lastExpression;
 
     bool forceSingle = true;
 };

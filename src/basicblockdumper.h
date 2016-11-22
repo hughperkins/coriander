@@ -36,18 +36,30 @@ public:
     // - ignores branches
     // - ignores returns
     // - ignores phis
-    BasicBlockDumper(llvm::BasicBlock *block, GlobalNames *globalNames, LocalNames *localNames,
-            TypeDumper *typeDumper, const FunctionNamesMap *functionNamesMap) :
+    BasicBlockDumper(
+            llvm::BasicBlock *block,
+            GlobalNames *globalNames,
+            LocalNames *localNames,
+            TypeDumper *typeDumper,
+            const FunctionNamesMap *functionNamesMap,
+
+            std::map<llvm::Value *, std::string> *globalExpressionByValue,
+            std::map<llvm::Value *, std::unique_ptr<cocl::LocalValueInfo> > *localValueInfos
+            ) :
         block(block),
         globalNames(globalNames),
         localNames(localNames),
         typeDumper(typeDumper),
-        functionNamesMap(functionNamesMap)
+        functionNamesMap(functionNamesMap),
+
+        globalExpressionByValue(globalExpressionByValue),
+        localValueInfos(localValueInfos)
              {
         instructionDumper.reset(
-            new NewInstructionDumper(globalNames, localNames, typeDumper, functionNamesMap,
-            &shimFunctionsNeeded, &neededFunctions,
-            &globalExpressionByValue, &localValueInfos));
+            new NewInstructionDumper(
+                globalNames, localNames, typeDumper, functionNamesMap,
+                &shimFunctionsNeeded, &neededFunctions,
+                globalExpressionByValue, localValueInfos));
         instruction_it = block->begin();
     }
     bool runGeneration(const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
@@ -70,8 +82,6 @@ public:
     std::set<llvm::Function *> neededFunctions;
     // std::set<llvm::Value *> variablesToDeclare;
     // std::set<llvm::Value *> sharedVariablesToDeclare;
-    std::map<llvm::Value *, std::string> globalExpressionByValue;
-    std::map<llvm::Value *, std::unique_ptr<cocl::LocalValueInfo> > localValueInfos;
     // std::vector<AllocaInfo> allocaDeclarations;
     // std::map<llvm::Value *, std::string> localExpressionByValue;
     // std::vector<std::string> clcode;
@@ -87,9 +97,12 @@ protected:
     GlobalNames *globalNames;
     LocalNames *localNames;
     TypeDumper *typeDumper;
-    std::unique_ptr<NewInstructionDumper> instructionDumper;
-
     const FunctionNamesMap *functionNamesMap;
+
+    std::map<llvm::Value *, std::string> *globalExpressionByValue = 0;
+    std::map<llvm::Value *, std::unique_ptr<cocl::LocalValueInfo> > *localValueInfos = 0;
+
+    std::unique_ptr<NewInstructionDumper> instructionDumper;
 };
 
 } // namespace cocl

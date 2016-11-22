@@ -238,6 +238,8 @@ if(BUILD_TESTS)
       src/function_names_map.cpp src/LocalValueInfo.cpp src/readIR.cpp
       src/new_instruction_dumper.cpp test/gtest/test_new_instruction_dumper.cpp
       test/gtest/test_block_dumper.cpp src/basicblockdumper.cpp
+      test/gtest/test_function_dumper.cpp
+      src/function_dumper.cpp src/struct_clone.cpp
     )
     target_include_directories(test_new_instructiondumper PRIVATE src)
     target_include_directories(test_new_instructiondumper PRIVATE third_party/gtest)
