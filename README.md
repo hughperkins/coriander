@@ -2,9 +2,6 @@
 
 Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 
-This fork moves opencl generation to runtime.  Means we have better information available, specifically we know
-which kernel we want to run.  This is going to help with address space determination.
-
 ## Concept
 
 - *Compile* using `cocl`
@@ -90,6 +87,12 @@ Behind the scenes, there are a few parts:
 <img src="doc/img/cudairtoopenclarchitecture6.png?raw=true" width="900" height="400" />
 
 [More detail](doc/how-it-works.md)
+
+New!
+- the device-IR to OpenCL step happens at runtime now
+- surprisingly, this actually is faster than doing it offline
+- thats because we generate only for the specific kernel we need, rather than the entire IR file
+- in addition, address-space deduction is significantly facilitated
 
 ## What it provides
 
