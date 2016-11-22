@@ -13,7 +13,10 @@ define void @someKernel(float * %d1, float * %d2) {
 @anothershared = internal addrspace(3) global [12 x i32] zeroinitializer, align 4
 
 define void @usesShared(float addrspace(1) *%d1) {
-    %1 = getelementptr inbounds [8 x float], [8 x float]* addrspacecast ([8 x float] addrspace(3) *@mysharedmem to [8 x float]*), i32 0
+    %1 = getelementptr inbounds [8 x float], [8 x float]* addrspacecast ([8 x float] addrspace(3) *@mysharedmem to [8 x float]*), i32 0, i32 3
+    %2 = alloca float, i32 1
+    %3 = load float, float* %2
+    store float %3, float * %1
     ret void
 }
 

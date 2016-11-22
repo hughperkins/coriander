@@ -108,13 +108,29 @@ TEST(test_function_dumper, basic1) {
     Function *F = wrapper.F;
     FunctionDumper *functionDumper = &wrapper.functionDumper;
     F->dump();
+
     bool res = wrapper.runGeneration();
     EXPECT_TRUE(res);
 
     ostringstream os;
+
+    os.str("");
     functionDumper->toCl(os);
-    string cl = os.str();
-    cout << "cl:\n" << cl << endl;
+    cout << "cl: [" << os.str() << "]" << endl;
+    EXPECT_EQ(R"(kernel void someKernel(global float* d1, long d1_offset, global float* d2, long d2_offset, local int *scratch) {
+    d2 += d2_offset;
+    d1 += d1_offset;
+
+    float* v2[1];
+    float* v3;
+    float v4;
+
+v1:;
+    v3 = v2[0];
+    v4 = someFunc_gp(d1, v3);
+    return;
+}
+)", os.str());
 
     for(auto it=functionDumper->neededFunctions.begin(); it != functionDumper->neededFunctions.end(); it++) {
         Function *childF = *it;
@@ -123,23 +139,36 @@ TEST(test_function_dumper, basic1) {
     ASSERT_EQ(1u, functionDumper->neededFunctions.size());
     ASSERT_EQ("someFunc_gp", (*functionDumper->neededFunctions.begin())->getName().str());
 }
-/*
 TEST(test_function_dumper, usesShared1) {
-    Wrapper wrapper;
-    Function *F = wrapper.getFunction("usesShared");
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "usesShared");
+    Function *F = wrapper.F;
+    FunctionDumper *functionDumper = &wrapper.functionDumper;
     F->dump();
-    // BasicBlock *block = &*F->begin();
-    GlobalNames globalNames;
-    LocalNames localNames;
-    TypeDumper typeDumper(&globalNames);
-    FunctionNamesMap functionNamesMap;
-    FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
-    map<Function *, Type *>returnTypeByFunction;
-    functionDumper.runGeneration(returnTypeByFunction);
+
+    bool res = wrapper.runGeneration();
+    EXPECT_TRUE(res);
+
     ostringstream os;
+
+    os.str("");
     functionDumper->toCl(os);
-    string cl = os.str();
-    cout << "cl:\n" << cl << endl;
+    cout << "cl: [" << os.str() << "]" << endl;
+    EXPECT_EQ(R"(kernel void usesShared(global float* d1, long d1_offset, local int *scratch) {
+    d1 += d1_offset;
+
+    local mysharedmem float[8];
+    local float* v2;
+    float v7[1];
+    float v8;
+
+v1:;
+    v2 = (&(&mysharedmem)[0][3]);
+    v8 = v7[0];
+    v2[0] = v8;
+    return;
+}
+)", os.str());
 
     // ASSERT_EQ(1u, functionDumper.sharedVariablesToDeclare.size());
     // string sharedDefinitions = functionDumper.dumpSharedDefinitions("    ");
@@ -147,6 +176,8 @@ TEST(test_function_dumper, usesShared1) {
     // string expected_shared = "    local float mysharedmem[8];\n";
     // ASSERT_EQ(expected_shared, sharedDefinitions);
 }
+
+/*
 
 TEST(test_function_dumper, usesShared2) {
     Wrapper wrapper;
