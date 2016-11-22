@@ -169,44 +169,47 @@ v1:;
     return;
 }
 )", os.str());
-
-    // ASSERT_EQ(1u, functionDumper.sharedVariablesToDeclare.size());
-    // string sharedDefinitions = functionDumper.dumpSharedDefinitions("    ");
-    // cout << "shareddefinitions: " << sharedDefinitions << endl;
-    // string expected_shared = "    local float mysharedmem[8];\n";
-    // ASSERT_EQ(expected_shared, sharedDefinitions);
 }
-
-/*
 
 TEST(test_function_dumper, usesShared2) {
-    Wrapper wrapper;
-    Function *F = wrapper.getFunction("usesShared2");
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "usesShared2");
+    Function *F = wrapper.F;
+    FunctionDumper *functionDumper = &wrapper.functionDumper;
     F->dump();
-    // BasicBlock *block = &*F->begin();
-    GlobalNames globalNames;
-    LocalNames localNames;
-    TypeDumper typeDumper(&globalNames);
-    FunctionNamesMap functionNamesMap;
-    FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
-    map<Function *, Type *>returnTypeByFunction;
-    functionDumper.runGeneration(returnTypeByFunction);
+
+    bool res = wrapper.runGeneration();
+    EXPECT_TRUE(res);
+
     ostringstream os;
+
+    os.str("");
     functionDumper->toCl(os);
-    string cl = os.str();
-    cout << "cl:\n" << cl << endl;
-/*
-    ASSERT_EQ(2u, functionDumper.sharedVariablesToDeclare.size());
-    string sharedDefinitions = functionDumper.dumpSharedDefinitions("    ");
-    cout << "shareddefinitions: " << sharedDefinitions << endl;
-    string expected_shared = R"(    local float mysharedmem[8];
-    local int anothershared[12];
-)";
-    ASSERT_EQ(expected_shared, sharedDefinitions);
-    */
-/*
+    cout << "cl [" << os.str() << "]" << endl;
+    EXPECT_EQ(R"(kernel void usesShared2(global float* d1, long d1_offset, local int *scratch) {
+    d1 += d1_offset;
+
+    local mysharedmem float[8];
+    local anothershared int[12];
+    local float* v2;
+    local int* v7;
+    float v11[1];
+    int v12[1];
+    float v13;
+    int v14;
+
+v1:;
+    v2 = (&(&mysharedmem)[0][3]);
+    v7 = (&(&anothershared)[0][7]);
+    v13 = v11[0];
+    v14 = v12[0];
+    v2[0] = v13;
+    v7[0] = v14;
+    return;
 }
-*/
+)", os.str());
+}
+
 TEST(test_function_dumper, usesPointerFunction) {
     /*
     Wrapper wrapper;

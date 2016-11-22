@@ -21,8 +21,14 @@ define void @usesShared(float addrspace(1) *%d1) {
 }
 
 define void @usesShared2(float addrspace(1) *%d1) {
-    %1 = getelementptr inbounds [8 x float], [8 x float]* addrspacecast ([8 x float] addrspace(3) *@mysharedmem to [8 x float]*), i32 0
-    %2 = getelementptr inbounds [12 x i32], [12 x i32]* addrspacecast ([12 x i32] addrspace(3) *@anothershared to [12 x i32]*), i32 0
+    %1 = getelementptr inbounds [8 x float], [8 x float]* addrspacecast ([8 x float] addrspace(3) *@mysharedmem to [8 x float]*), i32 0, i32 3
+    %2 = getelementptr inbounds [12 x i32], [12 x i32]* addrspacecast ([12 x i32] addrspace(3) *@anothershared to [12 x i32]*), i32 0, i32 7
+    %3 = alloca float, i32 1
+    %4 = alloca i32, i32 1
+    %5 = load float, float *%3
+    %6 = load i32, i32 *%4
+    store float %5, float *%1
+    store i32 %6, i32 *%2
     ret void
 }
 
