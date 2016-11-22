@@ -100,10 +100,14 @@ define void @containsLlvmDebug(float *%d1) {
 define i32 @usestructs(%"struct.mystruct" *%structs) {
   %1 = alloca %struct.mystruct, i32 1
   %2 = load %struct.mystruct, %struct.mystruct* %1
-  %3 = getelementptr %struct.mystruct , %struct.mystruct *%1, i32 0, i32 0
-  store %struct.mystruct %2, %struct.mystruct *%structs
-  %4 = insertvalue %struct.mystruct undef, i32 45, 0
-  %5 = insertvalue %struct.mystruct %4, float 3.5, 1
+  %3 = getelementptr %struct.mystruct , %struct.mystruct *%1, i32 0, i32 1
+  %4 = alloca float, i32 1
+  %5 = load float, float *%4
+  store float %5, float *%3
+
+  %6 = insertvalue %struct.mystruct undef, i32 45, 0
+  %7 = insertvalue %struct.mystruct %6, float 3.5, 1
+  store %struct.mystruct %7, %struct.mystruct *%structs
 
   ;%1 = insertvalue %struct.mystruct undef, i32 %somevalue, 0, !dbg !1226
   ;%2 = insertvalue %struct.mystruct %1, float 4.500000e+00, 1, !dbg !1226
