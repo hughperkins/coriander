@@ -361,38 +361,13 @@ TEST(test_block_dumper, usesPointerFunction) {
 
 }
 
-/*
-
 TEST(test_block_dumper, containsLlvmDebug) {
-    Function *F = getFunction("containsLlvmDebug");
-    F->dump();
-    BasicBlock *block = &*F->begin();
-    GlobalNames globalNames;
-    LocalNames localNames;
-    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        Argument *arg = &*it;
-        string name = arg->getName().str();
-        Value *value = arg;
-        localNames.getOrCreateName(value, name);
-    }
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "containsLlvmDebug");
+    BasicBlockDumper *blockDumper = wrapper.blockDumper.get();
 
-    cout << localNames.dumpNames();
-    TypeDumper typeDumper(&globalNames);
-    FunctionNamesMap functionNamesMap;
-    BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
-    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        Argument *arg = &*it;
-        // sring name = localNames.getOrCreateName(arg, arg->getName().str());
-        arg->dump();
-        LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &blockDumper.localValueInfos, arg, arg->getName().str());
-        localValueInfo->setExpression(localValueInfo->name);
-    }
+    wrapper.runGeneration();
     ostringstream oss;
-    map<Function *, Type *>returnTypeByFunction;
-
-    (*blockDumper.instruction_it).dump();
-    blockDumper.maxInstructionsToGenerate = 1;
-    blockDumper.runGeneration(returnTypeByFunction);
 
     cout << "instr0" << endl;
     oss.str("");
@@ -409,35 +384,15 @@ TEST(test_block_dumper, containsLlvmDebug) {
 }
 
 TEST(test_block_dumper, usestructs) {
-    Function *F = getFunction("usestructs");
-    F->dump();
-    BasicBlock *block = &*F->begin();
-    GlobalNames globalNames;
-    LocalNames localNames;
-    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        Argument *arg = &*it;
-        string name = arg->getName().str();
-        Value *value = arg;
-        localNames.getOrCreateName(value, name);
-    }
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "usestructs");
+    BasicBlockDumper *blockDumper = wrapper.blockDumper.get();
 
-    cout << localNames.dumpNames();
-    TypeDumper typeDumper(&globalNames);
-    FunctionNamesMap functionNamesMap;
-    BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
-    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        Argument *arg = &*it;
-        // sring name = localNames.getOrCreateName(arg, arg->getName().str());
-        arg->dump();
-        LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &blockDumper.localValueInfos, arg, arg->getName().str());
-        localValueInfo->setExpression(localValueInfo->name);
-    }
     ostringstream oss;
-    map<Function *, Type *>returnTypeByFunction;
 
-    (*blockDumper.instruction_it).dump();
-    blockDumper.maxInstructionsToGenerate = 1;
-    blockDumper.runGeneration(returnTypeByFunction);
+    (*blockDumper->instruction_it).dump();
+    blockDumper->maxInstructionsToGenerate = 1;
+    wrapper.runGeneration();
 
     cout << "instr0" << endl;
     oss.str("");
@@ -456,9 +411,9 @@ TEST(test_block_dumper, usestructs) {
     cout << "\n=======================" << endl;
     cout << "instr1" << endl;
 
-    (*blockDumper.instruction_it).dump();
-    blockDumper.maxInstructionsToGenerate = 1;
-    blockDumper.runGeneration(returnTypeByFunction);
+    (*blockDumper->instruction_it).dump();
+    blockDumper->maxInstructionsToGenerate = 1;
+    wrapper.runGeneration();
 
     oss.str("");
     blockDumper->toCl(oss);
@@ -476,9 +431,9 @@ TEST(test_block_dumper, usestructs) {
     cout << "\n=======================" << endl;
     cout << "instr2" << endl;
 
-    (*blockDumper.instruction_it).dump();
-    blockDumper.maxInstructionsToGenerate = 1;
-    blockDumper.runGeneration(returnTypeByFunction);
+    (*blockDumper->instruction_it).dump();
+    blockDumper->maxInstructionsToGenerate = 1;
+    wrapper.runGeneration();
 
     oss.str("");
     blockDumper->toCl(oss);
@@ -498,9 +453,9 @@ TEST(test_block_dumper, usestructs) {
     cout << "\n=======================" << endl;
     cout << "instr3" << endl;
 
-    (*blockDumper.instruction_it).dump();
-    blockDumper.maxInstructionsToGenerate = 1;
-    blockDumper.runGeneration(returnTypeByFunction);
+    (*blockDumper->instruction_it).dump();
+    blockDumper->maxInstructionsToGenerate = 1;
+    wrapper.runGeneration();
 
     oss.str("");
     blockDumper->toCl(oss);
@@ -521,9 +476,9 @@ TEST(test_block_dumper, usestructs) {
     cout << "\n=======================" << endl;
     cout << "instr4" << endl;
 
-    (*blockDumper.instruction_it).dump();
-    blockDumper.maxInstructionsToGenerate = 1;
-    blockDumper.runGeneration(returnTypeByFunction);
+    (*blockDumper->instruction_it).dump();
+    blockDumper->maxInstructionsToGenerate = 1;
+    wrapper.runGeneration();
 
     oss.str("");
     blockDumper->toCl(oss);
@@ -546,9 +501,9 @@ TEST(test_block_dumper, usestructs) {
     cout << "\n=======================" << endl;
     cout << "instr5" << endl;
 
-    (*blockDumper.instruction_it).dump();
-    blockDumper.maxInstructionsToGenerate = 1;
-    blockDumper.runGeneration(returnTypeByFunction);
+    (*blockDumper->instruction_it).dump();
+    blockDumper->maxInstructionsToGenerate = 1;
+    wrapper.runGeneration();
 
     oss.str("");
     blockDumper->toCl(oss);
@@ -573,9 +528,9 @@ TEST(test_block_dumper, usestructs) {
     cout << "\n=======================" << endl;
     cout << "instr6" << endl;
 
-    (*blockDumper.instruction_it).dump();
-    blockDumper.maxInstructionsToGenerate = 1;
-    blockDumper.runGeneration(returnTypeByFunction);
+    (*blockDumper->instruction_it).dump();
+    blockDumper->maxInstructionsToGenerate = 1;
+    wrapper.runGeneration();
 
     oss.str("");
     blockDumper->toCl(oss);
@@ -601,9 +556,9 @@ TEST(test_block_dumper, usestructs) {
     cout << "\n=======================" << endl;
     cout << "instr7" << endl;
 
-    (*blockDumper.instruction_it).dump();
-    blockDumper.maxInstructionsToGenerate = 1;
-    blockDumper.runGeneration(returnTypeByFunction);
+    (*blockDumper->instruction_it).dump();
+    blockDumper->maxInstructionsToGenerate = 1;
+    wrapper.runGeneration();
 
     oss.str("");
     blockDumper->toCl(oss);
@@ -630,9 +585,9 @@ TEST(test_block_dumper, usestructs) {
     cout << "\n=======================" << endl;
     cout << "instr8" << endl;
 
-    (*blockDumper.instruction_it).dump();
-    blockDumper.maxInstructionsToGenerate = 1;
-    blockDumper.runGeneration(returnTypeByFunction);
+    (*blockDumper->instruction_it).dump();
+    blockDumper->maxInstructionsToGenerate = 1;
+    wrapper.runGeneration();
 
     oss.str("");
     blockDumper->toCl(oss);
@@ -660,9 +615,9 @@ TEST(test_block_dumper, usestructs) {
     cout << "\n=======================" << endl;
     cout << "instr9" << endl;
 
-    (*blockDumper.instruction_it).dump();
-    blockDumper.maxInstructionsToGenerate = 1;
-    blockDumper.runGeneration(returnTypeByFunction);
+    (*blockDumper->instruction_it).dump();
+    blockDumper->maxInstructionsToGenerate = 1;
+    wrapper.runGeneration();
 
     oss.str("");
     blockDumper->toCl(oss);
@@ -692,9 +647,9 @@ TEST(test_block_dumper, usestructs) {
     cout << "\n=======================" << endl;
     cout << "instr10" << endl;
 
-    (*blockDumper.instruction_it).dump();
-    blockDumper.maxInstructionsToGenerate = 1;
-    blockDumper.runGeneration(returnTypeByFunction);
+    (*blockDumper->instruction_it).dump();
+    blockDumper->maxInstructionsToGenerate = 1;
+    wrapper.runGeneration();
 
     oss.str("");
     blockDumper->toCl(oss);
@@ -725,33 +680,12 @@ TEST(test_block_dumper, usestructs) {
 }
 
 TEST(test_block_dumper, storefloat) {
-    Function *F = getFunction("storefloat");
-    F->dump();
-    BasicBlock *block = &*F->begin();
-    GlobalNames globalNames;
-    LocalNames localNames;
-    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        Argument *arg = &*it;
-        string name = arg->getName().str();
-        Value *value = arg;
-        localNames.getOrCreateName(value, name);
-    }
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "storefloat");
+    BasicBlockDumper *blockDumper = wrapper.blockDumper.get();
 
-    cout << localNames.dumpNames();
-    TypeDumper typeDumper(&globalNames);
-    FunctionNamesMap functionNamesMap;
-    BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
-    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        Argument *arg = &*it;
-        // sring name = localNames.getOrCreateName(arg, arg->getName().str());
-        arg->dump();
-        LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &blockDumper.localValueInfos, arg, arg->getName().str());
-        localValueInfo->setExpression(localValueInfo->name);
-    }
+    wrapper.runGeneration();
     ostringstream oss;
-    // std::set< llvm::Function *> dumpedFunctions;
-    map<Function *, Type *>returnTypeByFunction;
-    blockDumper.runGeneration(returnTypeByFunction);
 
     oss.str("");
     blockDumper->toCl(oss);
@@ -768,6 +702,5 @@ TEST(test_block_dumper, storefloat) {
     ASSERT_EQ(R"(    float v1;
 )", oss.str());
 }
-*/
 
 } // test_block_dumper
