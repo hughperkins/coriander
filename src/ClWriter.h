@@ -54,6 +54,7 @@ public:
     virtual ~ClWriter() {
 
     }
+    virtual std::string getExpr();
     virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os);  // if we set this as to be assigned, this will write something, otherwise it wont
     virtual void writeInlineCl(std::string indent, std::ostream &os); // writes any cl required, eg if we toggled setAsAssigned, we need to do the assignment
                                           // some instructoins will *always* write something, eg stores
@@ -77,8 +78,8 @@ public:
         ClWriter(localValueInfo, CLW_Alloca) {
 
         }
-    virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os);
-    virtual void writeInlineCl(std::string indent, std::ostream &os);
+    virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) override;
+    virtual void writeInlineCl(std::string indent, std::ostream &os) override;
 
     static bool classof(const ClWriter *clWriter) {
         return clWriter->getKind() == CLW_Alloca;
@@ -91,8 +92,8 @@ public:
         ClWriter(localValueInfo, CLW_Store) {
 
         }
-    virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {} // do nothing :-P
-    virtual void writeInlineCl(std::string indent, std::ostream &os);
+    virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) override {} // do nothing :-P
+    virtual void writeInlineCl(std::string indent, std::ostream &os) override;
 
     static bool classof(const ClWriter *clWriter) {
         return clWriter->getKind() == CLW_Store;
@@ -105,8 +106,9 @@ public:
         ClWriter(localValueInfo, CLW_InsertValue) {
 
         }
-    virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os);
-    virtual void writeInlineCl(std::string indent, std::ostream &os);
+    virtual std::string getExpr() override;
+    virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) override;
+    virtual void writeInlineCl(std::string indent, std::ostream &os) override;
     bool fromUndef = false;
 
     static bool classof(const ClWriter *clWriter) {
@@ -136,8 +138,8 @@ public:
     static bool classof(const ClWriter *clWriter) {
         return clWriter->getKind() == CLW_Shared;
     }
-    virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os);
-    virtual void writeInlineCl(std::string indent, std::ostream &os) {}
+    virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) override;
+    virtual void writeInlineCl(std::string indent, std::ostream &os) override {}
 };
 
 } // namespace cocl

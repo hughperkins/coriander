@@ -30,6 +30,17 @@ using namespace llvm;
 
 namespace cocl {
 
+std::string ClWriter::getExpr() {
+    if(localValueInfo->toBeDeclared) {
+        return localValueInfo->name;
+    }
+    if(!localValueInfo->expressionValid) {
+        cout << "expression not yet assigned for " << localValueInfo->name << endl;
+        throw std::runtime_error("expression not yet assigned, name " + localValueInfo->name);
+    }
+    return localValueInfo->expression;
+}
+
 void ClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {  // if we set this as to be assigned, this will write something, otherwise it wont
     // cout << "base ClWriter::writeDelcaratoin" << endl;
     for(auto it = localValueInfo->declarationCl.begin(); it != localValueInfo->declarationCl.end(); it++) {
@@ -155,6 +166,17 @@ void StoreClWriter::writeInlineCl(std::string indent, std::ostream &os) { // wri
     for(auto it = localValueInfo->inlineCl.begin(); it != localValueInfo->inlineCl.end(); it++) {
         os << indent << *it << ";\n";
     }
+}
+
+std::string InsertValueClWriter::getExpr() {
+    // if(localValueInfo->toBeDeclared) {
+    //     return localValueInfo->name;
+    // }
+    // if(!localValueInfo->expressionValid) {
+    //     cout << "expression not yet assigned for " << localValueInfo->name << endl;
+    //     throw std::runtime_error("expression not yet assigned, name " + localValueInfo->name);
+    // }
+    return localValueInfo->expression;
 }
 
 void InsertValueClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes any cl required, eg if we toggled setAsAssigned, we need to do the assignment

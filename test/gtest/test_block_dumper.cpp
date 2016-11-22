@@ -568,24 +568,25 @@ TEST(test_block_dumper, usestructs) {
     oss.str("");
     blockDumper.toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
-//     EXPECT_EQ(R"(    v2 = v1[0];
-//     v3 = (&v1[0].f1);
-//     v6 = v5[0];
-//     v3[0] = v6;
-//     v8.f0 = 45;
-//     v8.f1 = 3.5f;
-// )", oss.str());
+    EXPECT_EQ(R"(    v2 = v1[0];
+    v3 = (&v1[0].f1);
+    v6 = v5[0];
+    v3[0] = v6;
+    v8.f0 = 45;
+    v8.f1 = 3.5f;
+    structs[0] = v8;
+)", oss.str());
 
     oss.str("");
     blockDumper.writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
-//     EXPECT_EQ(R"(    struct mystruct v1[1];
-//     struct mystruct v2;
-//     float* v3;
-//     float v5[1];
-//     float v6;
-//     struct mystruct v8;
-// )", oss.str());
+    EXPECT_EQ(R"(    struct mystruct v1[1];
+    struct mystruct v2;
+    float* v3;
+    float v5[1];
+    float v6;
+    struct mystruct v8;
+)", oss.str());
 
 }
 

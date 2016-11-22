@@ -312,6 +312,7 @@ TEST(test_new_instruction_dumper, insert_value_already_defined) {
     cout << "hasexpr " << insertInfo->hasExpr() << endl;
     ASSERT_TRUE(insertInfo->hasExpr());
     cout << "expr: " << insertInfo->getExpr() << endl;
+    EXPECT_EQ("aLoad", insertInfo->getExpr());
 
     oss.str("");
     insertInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);

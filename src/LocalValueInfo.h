@@ -77,12 +77,4 @@ public:
     static LocalValueInfo *getOrCreate(cocl::LocalNames *localNames, std::map<llvm::Value *, std::unique_ptr< LocalValueInfo> > *localValueInfos, llvm::Value *value, std::string suggestedName="");
 };
 
-// class AllocaValueInfo : public LocalValueInfo {
-// public:
-//     AllocaValueInfo(llvm::Value *value, std::string name) : LocalValueInfo(value, name) {
-
-//     }
-//     virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) override;
-// };
-
 } // namespace cocl
