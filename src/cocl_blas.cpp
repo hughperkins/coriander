@@ -116,15 +116,15 @@ std::size_t cublasSgemm(cublasHandle_t blas, int transA, int transB, int M, int 
 
     CoclBlas *coclBlas = (CoclBlas *)blas;
 
-    Memory *AMemory = findMemory((char *)deviceA);
+    Memory *AMemory = findMemory((const char *)deviceA);
     // note that CLBlast offsets are in floats (cf bytes, for clmem offsets, in general)
-    size_t A_offset = AMemory->getOffset((char *)deviceA) >> 2;
+    size_t A_offset = AMemory->getOffset((const char *)deviceA) >> 2;
 
-    Memory *BMemory = findMemory((char *)deviceB);
-    size_t B_offset = BMemory->getOffset((char *)deviceB) >> 2;
+    Memory *BMemory = findMemory((const char *)deviceB);
+    size_t B_offset = BMemory->getOffset((const char *)deviceB) >> 2;
 
-    Memory *CMemory = findMemory((char *)deviceC);
-    size_t C_offset = CMemory->getOffset((char *)deviceC) >> 2;
+    Memory *CMemory = findMemory((const char *)deviceC);
+    size_t C_offset = CMemory->getOffset((const char *)deviceC) >> 2;
     // cout << "offsets " << A_offset << " " << B_offset << " " << C_offset << endl;
     // cout << "sizes " << AMemory->bytes<< " " << BMemory->bytes << " " << CMemory->bytes << endl;
 

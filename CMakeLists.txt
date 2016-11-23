@@ -45,7 +45,7 @@ set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/plat
 
 # message("CLANG_HOME: ${CLANG_HOME}")
 
-set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/InstructionDumper.cpp
+set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new_instruction_dumper.cpp
     src/ConstantDumper.cpp
     src/struct_clone.cpp src/basicblockdumper.cpp src/ExpressionsHelper.cpp src/readIR.cpp
     src/function_names_map.cpp src/function_dumper.cpp src/kernel_dumper.cpp src/mutations.cpp
@@ -133,25 +133,25 @@ target_include_directories(easycl PRIVATE src/EasyCL/thirdparty/clew/include)
 target_include_directories(easycl PRIVATE src/EasyCL)
 target_link_libraries(easycl clew)
 
-# add_library(cocl SHARED ${COCL_SRCS})
-# target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
-# target_include_directories(cocl PRIVATE src/CLBlast/include)
-# target_include_directories(cocl PRIVATE include)
-# target_include_directories(cocl PRIVATE src)
-# target_include_directories(cocl PRIVATE third_party/argparsecpp)
-# target_include_directories(cocl PRIVATE ${CLANG_HOME}/include)
-# target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include)
-# if(COCL_SPAM)
-#     set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DCOCL_SPAM)
-# endif()
-# if(OFFSET_32BIT)
-#     set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DOFFSET_32BIT)
-# endif()
-# if(COCL_DEFINITIONS)
-#     target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
-# endif()
-# target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-# target_link_libraries(cocl easycl ${LLVM_LIBS} ${LLVM_SYSLIBS})
+add_library(cocl SHARED ${COCL_SRCS})
+target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
+target_include_directories(cocl PRIVATE src/CLBlast/include)
+target_include_directories(cocl PRIVATE include)
+target_include_directories(cocl PRIVATE src)
+target_include_directories(cocl PRIVATE third_party/argparsecpp)
+target_include_directories(cocl PRIVATE ${CLANG_HOME}/include)
+target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include)
+if(COCL_SPAM)
+    set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DCOCL_SPAM)
+endif()
+if(OFFSET_32BIT)
+    set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DOFFSET_32BIT)
+endif()
+if(COCL_DEFINITIONS)
+    target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
+endif()
+target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
+target_link_libraries(cocl easycl ${LLVM_LIBS} ${LLVM_SYSLIBS})
 
 # ==================================================================================================
 

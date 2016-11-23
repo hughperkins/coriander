@@ -63,7 +63,7 @@ GlobalVariable *addGlobalVariable(Module *M, string name, string value) {
     LLVMContext &context = M->getContext();
     ArrayType *strtype = ArrayType::get(IntegerType::get(context, 8), N);
     M->getOrInsertGlobal(StringRef(name), strtype);
-    ConstantDataArray *constchararray = cast<ConstantDataArray>(ConstantDataArray::get(context, ArrayRef<uint8_t>((uint8_t *)value.c_str(), N)));
+    ConstantDataArray *constchararray = cast<ConstantDataArray>(ConstantDataArray::get(context, ArrayRef<uint8_t>((const uint8_t *)value.c_str(), N)));
     GlobalVariable *str = M->getNamedGlobal(StringRef(name));
     str->setInitializer(constchararray);
     return str;
