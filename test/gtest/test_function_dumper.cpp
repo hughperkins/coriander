@@ -380,4 +380,46 @@ v2:;
 )", os.str());
 }
 
+TEST(test_function_dumper, testBranches_phifromfuture) {
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "testBranches_phifromfuture");
+    Function *F = wrapper.F;
+    FunctionDumper *functionDumper = &wrapper.functionDumper;
+    F->dump();
+
+    bool res = wrapper.runGeneration();
+    EXPECT_TRUE(res);
+
+    ostringstream os;
+
+    os.str("");
+    functionDumper->toCl(os);
+    cout << "cl [" << os.str() << "]" << endl;
+    EXPECT_EQ(R"(kernel void testBranches_phifromfuture(global float* d1, long d1_offset, local int *scratch) {
+    d1 += d1_offset;
+
+    float v12;
+    float v4;
+    float v7;
+    float v8;
+
+v1:;
+    v4 = 3.0f + 4.0f;
+    v7 = v4;
+v2:;
+    v8 = v7 + 7.0f;
+    if (v8 > 6.0f) {
+        goto v1;
+    } else {
+        v7 = v8;
+        goto v2;
+    }
+v3:;
+    v12 = 8.0f + 2.0f;
+    v7 = v12;
+    goto v2;
+}
+)", os.str());
+}
+
 } // namespace

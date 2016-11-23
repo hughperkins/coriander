@@ -69,3 +69,19 @@ label2:
     %3 = fcmp ogt float %2, 6.0
     br i1 %3, label %label1, label %label2
 }
+
+define void @testBranches_phifromfuture(float *%d1) {
+label1:
+    %0 = fadd float 3.0, 4.0
+    br label %label2
+
+label2:
+    %1 = phi float [%0, %label1], [%2, %label2], [%4, %label3]
+    %2 = fadd float %1, 7.0
+    %3 = fcmp ogt float %2, 6.0
+    br i1 %3, label %label1, label %label2
+
+label3:
+    %4 = fadd float 8.0, 2.0
+    br label %label2
+}
