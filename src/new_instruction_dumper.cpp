@@ -775,6 +775,7 @@ void NewInstructionDumper::dumpBinaryOperator(LocalValueInfo *localValueInfo, st
 
 void NewInstructionDumper::dumpMemcpyCharCharLong(LocalValueInfo *localValueInfo) {
     // std::string gencode = "";
+    localValueInfo->clWriter.reset(new NoExpressionClWriter(localValueInfo));
     Instruction *instr = cast<Instruction>(localValueInfo->value);
     int totalLength = cast<ConstantInt>(instr->getOperand(2))->getSExtValue();
     int align = cast<ConstantInt>(instr->getOperand(3))->getSExtValue();
@@ -792,7 +793,7 @@ void NewInstructionDumper::dumpMemcpyCharCharLong(LocalValueInfo *localValueInfo
     }
     int numElements = totalLength / align;
     if(numElements >1) {
-        localValueInfo->inlineCl.push_back("#pragma unroll");
+        // localValueInfo->inlineCl.push_back("#pragma unroll");
         localValueInfo->inlineCl.push_back("for(int __i=0; __i < " + easycl::toString(numElements) + "; __i++) {");
         localValueInfo->inlineCl.push_back("    ((" + dstAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(0))->getExpr() + ")[__i] = " +
             "((" + srcAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(1))->getExpr() + ")[__i]");

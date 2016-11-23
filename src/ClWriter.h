@@ -42,7 +42,8 @@ public:
          CLW_Store,
          CLW_InsertValue,
          CLW_Binary,
-         CLW_Shared
+         CLW_Shared,
+         CLW_NoExpression
      };
 
     ClWriter(LocalValueInfo *localValueInfo, ClWriterKind kind=CLW_Base) :
@@ -140,6 +141,20 @@ public:
     }
     virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) override;
     virtual void writeInlineCl(std::string indent, std::ostream &os) override {}
+};
+
+class NoExpressionClWriter : public ClWriter {
+public:
+    NoExpressionClWriter(LocalValueInfo *localValueInfo) :
+        ClWriter(localValueInfo, CLW_NoExpression) {
+            // std::cout << "creating sharedclwriter" << std::endl;
+        }
+
+    static bool classof(const ClWriter *clWriter) {
+        return clWriter->getKind() == CLW_NoExpression;
+    }
+    virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) override {} // do nothing
+    virtual void writeInlineCl(std::string indent, std::ostream &os) override;
 };
 
 } // namespace cocl

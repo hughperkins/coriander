@@ -71,6 +71,7 @@ void ClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes a
     }
     if(localValueInfo->toBeDeclared) {
         if(!localValueInfo->expressionValid) {
+            localValueInfo->value->dump();
             cout << "expression for " << localValueInfo->name + " not defined" << endl;
             throw runtime_error("expression for " + localValueInfo->name + " not defined");
         }
@@ -251,6 +252,16 @@ void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
         value->dump();
         cout << endl;
         throw runtime_error("not implemented: sharedclwriter for this type");
+    }
+}
+
+void NoExpressionClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes any cl required, eg if we toggled setAsAssigned, we need to do the assignment
+                                          // some instructoins will *always* write something, eg stores
+    if(localValueInfo->_skip) {
+        return;
+    }
+    for(auto it = localValueInfo->inlineCl.begin(); it != localValueInfo->inlineCl.end(); it++) {
+        os << indent << *it << ";\n";
     }
 }
 
