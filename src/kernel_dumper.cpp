@@ -155,12 +155,28 @@ std::string KernelDumper::toCl() {
     int nothingHappenedCount = 0;
     while(returnTypeByFunction.size() < neededFunctions.size()) {
         bool changedSomething = false;
+        // put the functions in a list ordered by name first, so we get repeatable output
+        vector<string> neededFunctionNames;
+        map<string, Function*> neededFunctionByName;
         for(auto it = neededFunctions.begin(); it != neededFunctions.end(); it++) {
             Function *childF = *it;
             if(returnTypeByFunction.find(childF) != returnTypeByFunction.end()) {
                 continue;
             }
-            cout << "dumping function " << childF->getName().str() << endl;
+            string functionName = childF->getName().str();
+            neededFunctionNames.push_back(functionName);
+            neededFunctionByName[functionName] = childF;
+        }
+        std::sort(neededFunctionNames.begin(), neededFunctionNames.end());
+        // for(auto it = neededFunctions.begin(); it != neededFunctions.end(); it++) {
+        for(auto it = neededFunctionNames.begin(); it != neededFunctionNames.end(); it++) {
+            string functionName = *it;
+            // Function *childF = *it;
+            Function *childF = neededFunctionByName.at(functionName);
+            // if(returnTypeByFunction.find(childF) != returnTypeByFunction.end()) {
+            //     continue;
+            // }
+            cout << "dumping function " << functionName << endl;
             bool _isKernel = isKernel.find(childF) != isKernel.end();
             FunctionDumper childFunctionDumper(childF, _isKernel, &globalNames, typeDumper.get(), &functionNamesMap);
             if(_addIRToCl) {

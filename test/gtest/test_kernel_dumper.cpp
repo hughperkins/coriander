@@ -93,16 +93,6 @@ v1:;
     v6 = someFunc_gg(d1, d1);
     return;
 }
-float someFunc_pg(float* d1, global float* v11, local int *scratch) {
-    float v5;
-    float* v6;
-
-v1:;
-    v5 = d1[0];
-    v6 = (&d1[3]);
-    v6[0] = v5;
-    return 4.5f;
-}
 float someFunc_gg(global float* d1, global float* v11, local int *scratch) {
     float v5;
     global float* v6;
@@ -116,6 +106,16 @@ v1:;
 float someFunc_gp(global float* d1, float* v11, local int *scratch) {
     float v5;
     global float* v6;
+
+v1:;
+    v5 = d1[0];
+    v6 = (&d1[3]);
+    v6[0] = v5;
+    return 4.5f;
+}
+float someFunc_pg(float* d1, global float* v11, local int *scratch) {
+    float v5;
+    float* v6;
 
 v1:;
     v5 = d1[0];
@@ -156,6 +156,8 @@ v2:;
     }
 }
 )", cl);
+
+    // FIXME PHIS BROKEN
 }
 
 /*
