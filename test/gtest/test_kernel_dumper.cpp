@@ -162,22 +162,44 @@ v3:;
 
 }
 
-/*
-
 TEST(test_kernel_dumper, usesPointerFunction) {
-    Module *M = getM();
+    GlobalWrapper G("usesPointerFunction");
+    KernelDumper *kernelDumper = G.kernelDumper.get();
+    // Module *M = getM();
 
-    // GlobalNames globalNames;
-    // LocalNames localNames;
-    // TypeDumper typeDumper(&globalNames);
-    // FunctionNamesMap functionNamesMap;
-    // FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
+    string cl = kernelDumper->toCl();
+    cout << "kernel cl: [" << cl << "]" << endl;
+    EXPECT_EQ(R"(
+float* returnsPointer(float* in, local int *scratch);
+global float* returnsPointer_g(global float* in, local int *scratch);
+kernel void usesPointerFunction(global float* in, long in_offset, local int *scratch);
 
-    KernelDumper kernelDumper(M, "usesPointerFunction");
-    string cl = kernelDumper.toCl();
-    cout << "kernel cl:\n" << cl << endl;
-    ASSERT_TRUE(cl.find("returnsPointer") != string::npos);
+global float* returnsPointer_g(global float* in, local int *scratch) {
+
+v1:;
+    return in;
 }
-*/
+float* returnsPointer(float* in, local int *scratch) {
+
+v1:;
+    return in;
+}
+kernel void usesPointerFunction(global float* in, long in_offset, local int *scratch) {
+    in += in_offset;
+
+    float v3[1];
+    float* v4;
+    global float* v2;
+
+v1:;
+    v2 = returnsPointer_g(in);
+    v4 = returnsPointer(v3);
+    return;
+}
+)", cl);
+
+    EXPECT_TRUE(cl.find("\nfloat* returnsPointer(") != string::npos);
+    EXPECT_TRUE(cl.find("\nglobal float* returnsPointer_g(") != string::npos);
+}
 
 } // namespace
