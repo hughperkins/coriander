@@ -283,7 +283,8 @@ void BasicBlockDumper::writeDeclarations(std::string indent, ostream &os) {
     vector<string> declarations;
     for(auto it = localValueInfos->begin(); it != localValueInfos->end(); it++) {
         LocalValueInfo *localValueInfo = it->second.get();
-        // it->first->dump();
+        cout << "basicblockdumper, writing declration for " << localValueInfo->name << ":" << endl;
+        it->first->dump();
         ostringstream oss;
         localValueInfo->writeDeclaration("    ", typeDumper, oss);
         declarations.push_back(oss.str());

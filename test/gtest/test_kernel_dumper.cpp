@@ -66,8 +66,6 @@ TEST(test_kernel_dumper, basic) {
     GlobalWrapper G("someKernel");
     KernelDumper *kernelDumper = G.kernelDumper.get();
 
-    // KernelDumper kernelDumper(M, "someKernel");
-
     string cl = kernelDumper->toCl();
     cout << "kernel cl: [" << cl << "]" << endl;
     EXPECT_EQ(R"(
@@ -131,13 +129,6 @@ TEST(test_kernel_dumper, kernelBranches) {
     KernelDumper *kernelDumper = G.kernelDumper.get();
     // Module *M = getM();
 
-    // GlobalNames globalNames;
-    // LocalNames localNames;
-    // TypeDumper typeDumper(&globalNames);
-    // FunctionNamesMap functionNamesMap;
-    // FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
-
-    // KernelDumper kernelDumper(M, "kernelBranches");
     string cl = kernelDumper->toCl();
     cout << "kernel cl: [" << cl << "]" << endl;
     EXPECT_EQ(R"(

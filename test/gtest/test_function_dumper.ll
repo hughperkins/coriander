@@ -44,3 +44,28 @@ define void @usesPointerFunction(float *%in) {
 define float @returnsFloatConstant(float *%in) {
     ret float 4.5
 }
+
+define void @testBranches_nophi(float *%d1) {
+label1:
+    %0 = fadd float 3.0, 4.0
+    %1 = alloca float, i32 1
+    store float %0, float *%1
+    br label %label2
+
+label2:
+    %2 = fadd float 5.0, 7.0
+    %3 = fcmp ogt float %2, 6.0
+    br i1 %3, label %label1, label %label2
+}
+
+define void @testBranches_onephi(float *%d1) {
+label1:
+    %0 = fadd float 3.0, 4.0
+    br label %label2
+
+label2:
+    %1 = phi float [%0, %label1], [%2, %label2]
+    %2 = fadd float %1, 7.0
+    %3 = fcmp ogt float %2, 6.0
+    br i1 %3, label %label1, label %label2
+}

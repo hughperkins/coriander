@@ -45,9 +45,21 @@ public:
             structCloner(typeDumper, globalNames),
             functionNamesMap(functionNamesMap) {
         block_it = F->begin();
+        instructionDumper.reset(new NewInstructionDumper(
+            globalNames,
+            &localNames,
+            typeDumper,
+            functionNamesMap,
+
+            &shimFunctionsNeeded,
+            &neededFunctions,
+
+            &globalExpressionByValue,
+            &localValueInfos
+        ));
     }
     virtual ~FunctionDumper() {
-
+        instructionDumper.release();
     }
 
     bool runGeneration(const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
@@ -62,11 +74,12 @@ public:
     void addPHIDeclaration(llvm::PHINode *phi);
     std::string dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock);
     std::string dumpBranch(llvm::BranchInst *instr);
-    std::string dumpReturn(NewInstructionDumper *instructionDumper, llvm::Type **pReturnType, llvm::ReturnInst *retInst);
-    std::string dumpTerminator(NewInstructionDumper *instructionDumper, llvm::Type **pReturnType, llvm::Instruction *terminator);
+    std::string dumpReturn(llvm::Type **pReturnType, llvm::ReturnInst *retInst);
+    std::string dumpTerminator(llvm::Type **pReturnType, llvm::Instruction *terminator);
     std::vector<std::string> dumpSharedDefinition(llvm::Value *value);
     std::string dumpSharedDefinitions(std::string indent);
     std::string getDeclaration();
+    void writeDeclarations(std::string indent, std::ostream &os);
 
     FunctionDumper *addIRToCl() {
         _addIRToCl = true;
@@ -103,6 +116,8 @@ protected:
     TypeDumper *typeDumper;
     StructCloner structCloner;
     const FunctionNamesMap *functionNamesMap;
+
+    std::unique_ptr<NewInstructionDumper> instructionDumper;
 };
 
 } // namespace cocl

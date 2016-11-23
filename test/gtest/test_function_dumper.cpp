@@ -309,4 +309,75 @@ v1:;
 )", os.str());
 }
 
+TEST(test_function_dumper, testBranches_nophi) {
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "testBranches_nophi");
+    Function *F = wrapper.F;
+    FunctionDumper *functionDumper = &wrapper.functionDumper;
+    F->dump();
+
+    bool res = wrapper.runGeneration();
+    EXPECT_TRUE(res);
+
+    ostringstream os;
+
+    os.str("");
+    functionDumper->toCl(os);
+    cout << "cl [" << os.str() << "]" << endl;
+    EXPECT_EQ(R"(kernel void testBranches_nophi(global float* d1, long d1_offset, local int *scratch) {
+    d1 += d1_offset;
+
+    float v3;
+    float v6[1];
+
+v1:;
+    v3 = 3.0f + 4.0f;
+    v6[0] = v3;
+v2:;
+    if (5.0f + 7.0f > 6.0f) {
+        goto v1;
+    } else {
+        goto v2;
+    }
+}
+)", os.str());
+}
+
+TEST(test_function_dumper, testBranches_onephi) {
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "testBranches_onephi");
+    Function *F = wrapper.F;
+    FunctionDumper *functionDumper = &wrapper.functionDumper;
+    F->dump();
+
+    bool res = wrapper.runGeneration();
+    EXPECT_TRUE(res);
+
+    ostringstream os;
+
+    os.str("");
+    functionDumper->toCl(os);
+    cout << "cl [" << os.str() << "]" << endl;
+    EXPECT_EQ(R"(kernel void testBranches_onephi(global float* d1, long d1_offset, local int *scratch) {
+    d1 += d1_offset;
+
+    float v3;
+    float v6;
+    float v7;
+
+v1:;
+    v3 = 3.0f + 4.0f;
+    v6 = v3;
+v2:;
+    v7 = v6 + 7.0f;
+    if (v7 > 6.0f) {
+        goto v1;
+    } else {
+        v6 = v7;
+        goto v2;
+    }
+}
+)", os.str());
+}
+
 } // namespace
