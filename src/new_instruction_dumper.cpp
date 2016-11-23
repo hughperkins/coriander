@@ -525,7 +525,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                     // if its a pointer in a struct, hackily assume gloal for now
                     addressspace = 1;
                 } else {
-                    addressspace = 0;
+                    // addressspace = 0;
                 }
             }
         } else {
@@ -538,7 +538,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     }
     updateAddressSpace(instr, addressspace);
     localValueInfo->setAddressSpace(addressspace);
-    rhs = "(&" + rhs + ")";
+    rhs = "(&(" + rhs + "))";
     // cout << "gep rhs=" << rhs << endl;
 
     localValueInfo->setExpression(rhs);
