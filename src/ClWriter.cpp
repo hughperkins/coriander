@@ -245,7 +245,7 @@ void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
         // GlobalVariable *globalVariable = cast<GlobalVariable>(value);
         // int count = pointerType->getArrayNumElements();
         // cout << "num elements " << count << endl;
-        os << indent << "local " << localValueInfo->name << " " << typeDumper->dumpType(primitiveType) << "[" << numElements << "];\n";
+        os << indent << "local " << typeDumper->dumpType(primitiveType) << " " << localValueInfo->name << "[" << numElements << "];\n";
     } else {
         cout << "sharedclwriter writedeclaration not implmeneted for htis type:" << endl;
         value->dump();

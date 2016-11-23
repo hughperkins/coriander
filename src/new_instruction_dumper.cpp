@@ -457,6 +457,7 @@ void NewInstructionDumper::dumpSelect(cocl::LocalValueInfo *localValueInfo) {
     gencode += op0 + " ? ";
     gencode += op1 + " : ";
     gencode += op2;
+    gencode = "(" + gencode + ")";
 
     localValueInfo->setExpression(gencode);
     // return gencode;
