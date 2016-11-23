@@ -126,9 +126,9 @@ TEST(test_function_dumper, basic1) {
     d2 += d2_offset;
     d1 += d1_offset;
 
+    float v4;
     float* v2[1];
     float* v3;
-    float v4;
 
 v1:;
     v3 = v2[0];
@@ -162,10 +162,10 @@ TEST(test_function_dumper, usesShared1) {
     EXPECT_EQ(R"(kernel void usesShared(global float* d1, long d1_offset, local int *scratch) {
     d1 += d1_offset;
 
-    local mysharedmem float[8];
-    local float* v2;
     float v7[1];
     float v8;
+    local float* v2;
+    local mysharedmem float[8];
 
 v1:;
     v2 = (&(&mysharedmem)[0][3]);
@@ -194,14 +194,14 @@ TEST(test_function_dumper, usesShared2) {
     EXPECT_EQ(R"(kernel void usesShared2(global float* d1, long d1_offset, local int *scratch) {
     d1 += d1_offset;
 
-    local mysharedmem float[8];
+    float v11[1];
+    float v13;
+    int v12[1];
+    int v14;
     local anothershared int[12];
     local float* v2;
     local int* v7;
-    float v11[1];
-    int v12[1];
-    float v13;
-    int v14;
+    local mysharedmem float[8];
 
 v1:;
     v2 = (&(&mysharedmem)[0][3]);

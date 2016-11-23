@@ -280,10 +280,17 @@ void BasicBlockDumper::writeDeclaration(std::ostream &os, llvm::Value *value) {
 
 void BasicBlockDumper::writeDeclarations(std::string indent, ostream &os) {
     // ostringstream os;
+    vector<string> declarations;
     for(auto it = localValueInfos->begin(); it != localValueInfos->end(); it++) {
         LocalValueInfo *localValueInfo = it->second.get();
-        it->first->dump();
-        localValueInfo->writeDeclaration("    ", typeDumper, os);
+        // it->first->dump();
+        ostringstream oss;
+        localValueInfo->writeDeclaration("    ", typeDumper, oss);
+        declarations.push_back(oss.str());
+    }
+    std::sort(declarations.begin(), declarations.end());
+    for(auto it=declarations.begin(); it != declarations.end(); it++) {
+        os << *it;
     }
     // for(auto it=block->begin(); it != instruction_it; it++) {
     //     Value *value = &*it;

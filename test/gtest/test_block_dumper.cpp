@@ -253,9 +253,9 @@ TEST(test_block_dumper, usesShared) {
     blockDumper->writeDeclarations("    ", oss);
     // cout << oss.str() << endl;
     cout << "declarations: [" << oss.str() << "]" << endl;
-    ASSERT_EQ(R"(    local mysharedmem float[8];
-    local float* v5;
+    ASSERT_EQ(R"(    local float* v5;
     local float* v7;
+    local mysharedmem float[8];
 )", oss.str());
 }
 
@@ -402,16 +402,16 @@ TEST(test_block_dumper, usestructs) {
     oss.str("");
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
-    ASSERT_EQ(R"(    v2 = v1[0];
+    EXPECT_EQ(R"(    v2 = v1[0];
     v3 = (&v1[0].f1);
 )", oss.str());
 
     oss.str("");
     blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
-    ASSERT_EQ(R"(    struct mystruct v1[1];
+    EXPECT_EQ(R"(    float* v3;
+    struct mystruct v1[1];
     struct mystruct v2;
-    float* v3;
 )", oss.str());
 
     cout << "\n=======================" << endl;
@@ -424,17 +424,17 @@ TEST(test_block_dumper, usestructs) {
     oss.str("");
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
-    ASSERT_EQ(R"(    v2 = v1[0];
+    EXPECT_EQ(R"(    v2 = v1[0];
     v3 = (&v1[0].f1);
 )", oss.str());
 
     oss.str("");
     blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
-    ASSERT_EQ(R"(    struct mystruct v1[1];
-    struct mystruct v2;
+    EXPECT_EQ(R"(    float v5[1];
     float* v3;
-    float v5[1];
+    struct mystruct v1[1];
+    struct mystruct v2;
 )", oss.str());
 
     cout << "\n=======================" << endl;
@@ -447,7 +447,7 @@ TEST(test_block_dumper, usestructs) {
     oss.str("");
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
-    ASSERT_EQ(R"(    v2 = v1[0];
+    EXPECT_EQ(R"(    v2 = v1[0];
     v3 = (&v1[0].f1);
     v6 = v5[0];
 )", oss.str());
@@ -455,11 +455,11 @@ TEST(test_block_dumper, usestructs) {
     oss.str("");
     blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
-    ASSERT_EQ(R"(    struct mystruct v1[1];
-    struct mystruct v2;
-    float* v3;
-    float v5[1];
+    EXPECT_EQ(R"(    float v5[1];
     float v6;
+    float* v3;
+    struct mystruct v1[1];
+    struct mystruct v2;
 )", oss.str());
 
     cout << "\n=======================" << endl;
@@ -472,7 +472,7 @@ TEST(test_block_dumper, usestructs) {
     oss.str("");
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
-    ASSERT_EQ(R"(    v2 = v1[0];
+    EXPECT_EQ(R"(    v2 = v1[0];
     v3 = (&v1[0].f1);
     v6 = v5[0];
     v3[0] = v6;
@@ -481,11 +481,11 @@ TEST(test_block_dumper, usestructs) {
     oss.str("");
     blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
-    ASSERT_EQ(R"(    struct mystruct v1[1];
-    struct mystruct v2;
-    float* v3;
-    float v5[1];
+    EXPECT_EQ(R"(    float v5[1];
     float v6;
+    float* v3;
+    struct mystruct v1[1];
+    struct mystruct v2;
 )", oss.str());
 
 
@@ -509,11 +509,11 @@ TEST(test_block_dumper, usestructs) {
     oss.str("");
     blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
-    EXPECT_EQ(R"(    struct mystruct v1[1];
-    struct mystruct v2;
-    float* v3;
-    float v5[1];
+    EXPECT_EQ(R"(    float v5[1];
     float v6;
+    float* v3;
+    struct mystruct v1[1];
+    struct mystruct v2;
     struct mystruct v8;
 )", oss.str());
 
@@ -538,11 +538,11 @@ TEST(test_block_dumper, usestructs) {
     oss.str("");
     blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
-    EXPECT_EQ(R"(    struct mystruct v1[1];
-    struct mystruct v2;
-    float* v3;
-    float v5[1];
+    EXPECT_EQ(R"(    float v5[1];
     float v6;
+    float* v3;
+    struct mystruct v1[1];
+    struct mystruct v2;
     struct mystruct v8;
 )", oss.str());
 
@@ -568,11 +568,11 @@ TEST(test_block_dumper, usestructs) {
     oss.str("");
     blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
-    EXPECT_EQ(R"(    struct mystruct v1[1];
-    struct mystruct v2;
-    float* v3;
-    float v5[1];
+    EXPECT_EQ(R"(    float v5[1];
     float v6;
+    float* v3;
+    struct mystruct v1[1];
+    struct mystruct v2;
     struct mystruct v8;
 )", oss.str());
 
@@ -599,13 +599,13 @@ TEST(test_block_dumper, usestructs) {
     oss.str("");
     blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
-    EXPECT_EQ(R"(    struct mystruct v1[1];
-    struct mystruct v2;
-    float* v3;
+    EXPECT_EQ(R"(    float v13;
     float v5[1];
     float v6;
+    float* v3;
+    struct mystruct v1[1];
+    struct mystruct v2;
     struct mystruct v8;
-    float v13;
 )", oss.str());
 
     cout << "\n=======================" << endl;
@@ -632,13 +632,13 @@ TEST(test_block_dumper, usestructs) {
     oss.str("");
     blockDumper->writeDeclarations("    ", oss);
     cout << "declarations: [" << oss.str() << "]" << endl;
-    EXPECT_EQ(R"(    struct mystruct v1[1];
-    struct mystruct v2;
-    float* v3;
+    EXPECT_EQ(R"(    float v13;
     float v5[1];
     float v6;
+    float* v3;
+    struct mystruct v1[1];
+    struct mystruct v2;
     struct mystruct v8;
-    float v13;
 )", oss.str());
 
 }
