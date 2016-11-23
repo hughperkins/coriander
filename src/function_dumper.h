@@ -77,11 +77,8 @@ public:
     std::set<llvm::StructType *> structsToDefine;
     std::map<llvm::Value *, std::string> globalExpressionByValue;
     std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > localValueInfos;
-    // std::map<llvm::Value *, std::string> localExpressionByValue;
+
     std::map<std::string, std::string> phiDeclarationsByName;
-    // std::set<llvm::Value *> sharedVariablesToDeclare;
-    // std::set<llvm::Value *> variablesToDeclare;
-    // std::set<std::string> allocaDeclarations;
 
     std::string shimCode = "";
     std::string functionDeclaration;
@@ -91,7 +88,7 @@ public:
 
 protected:
     llvm::Function::iterator block_it;
-    // std::string bodyCl = "";
+
     std::ostringstream ouros;
     std::string declaration;
 

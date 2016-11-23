@@ -372,6 +372,11 @@ void FunctionDumper::generateBlockIndex() {
 bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
     // returns true means finished, false means missing some dependnecy, like a sub fucntion walk
 
+    // these vars being instance variables is ugly and should probably be rethought sometime....
+    ouros.str("");
+    declaration = "";
+    shimCode = "";
+
     generateBlockIndex();
 
     // first time initializes the types of hte args and so on
