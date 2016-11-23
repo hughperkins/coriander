@@ -866,13 +866,15 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         return;
     } else if(functionName == "llvm.dbg.value") {
         // ignore
-        localValueInfo->setAddressSpace(0);
-        localValueInfo->setExpression("");
+        localValueInfo->skip();
+        // localValueInfo->setAddressSpace(0);
+        // localValueInfo->setExpression("");
         return;
     } else if(functionName == "llvm.dbg.declare") {
         // ignore
-        localValueInfo->setAddressSpace(0);
-        localValueInfo->setExpression("");
+        localValueInfo->skip();
+        // localValueInfo->setAddressSpace(0);
+        // localValueInfo->setExpression("");
         // return "";
         return;
     } else if(functionName == "_Z11__shfl_downIfET_S0_ii") {

@@ -43,6 +43,9 @@ std::string ClWriter::getExpr() {
 
 void ClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {  // if we set this as to be assigned, this will write something, otherwise it wont
     // cout << "base ClWriter::writeDelcaratoin" << endl;
+    if(localValueInfo->_skip) {
+        return;
+    }
     for(auto it = localValueInfo->declarationCl.begin(); it != localValueInfo->declarationCl.end(); it++) {
         // cout << "in localvalueinfo->declarationCl:" << endl;
         // cout << indent << *it << ";" << endl;
@@ -60,6 +63,9 @@ void ClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std:
 
 void ClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes any cl required, eg if we toggled setAsAssigned, we need to do the assignment
                                           // some instructoins will *always* write something, eg stores
+    if(localValueInfo->_skip) {
+        return;
+    }
     for(auto it = localValueInfo->inlineCl.begin(); it != localValueInfo->inlineCl.end(); it++) {
         os << indent << *it << ";\n";
     }

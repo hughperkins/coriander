@@ -49,6 +49,8 @@ public:
     std::string expression = ""; // best expression for this value, might be compound, eg "v1 + v2"
     bool expressionValid = false;   // have we assigned some value to expression?
 
+    bool _skip = false;
+
     bool toBeDeclared = false;  // do we plan on declaring it?
     // bool declared = false;  // have we declared it?
 
@@ -63,6 +65,10 @@ public:
     bool needDependencies = false;
 
     std::unique_ptr<ClWriter> clWriter;
+    LocalValueInfo *skip() {
+        this->_skip = true;
+        return this;
+    }
     LocalValueInfo *setAddressSpace(int addressSpace);
     LocalValueInfo *setAddressSpaceFrom(llvm::Value *source);
     LocalValueInfo *setAddressSpaceFrom(LocalValueInfo *sourceInfo);
