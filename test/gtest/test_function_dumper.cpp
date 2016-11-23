@@ -422,4 +422,96 @@ v3:;
 )", os.str());
 }
 
+TEST(test_function_dumper, testBranches_phifromfloat) {
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "testBranches_phifromfloat");
+    Function *F = wrapper.F;
+    FunctionDumper *functionDumper = &wrapper.functionDumper;
+    F->dump();
+
+    bool res = wrapper.runGeneration();
+    EXPECT_TRUE(res);
+
+    ostringstream os;
+
+    os.str("");
+    functionDumper->toCl(os);
+    cout << "cl [" << os.str() << "]" << endl;
+    EXPECT_EQ(R"(kernel void testBranches_phifromfloat(global float* d1, uint d1_offset, local int *scratch) {
+    d1 += d1_offset;
+
+    float v13;
+    float v8;
+    float v9;
+
+v1:;
+    v8 = 123.0f;
+v2:;
+    v9 = v8 + 7.0f;
+    if (v9 > 6.0f) {
+        goto v1;
+    } else {
+        v8 = v9;
+        goto v2;
+    }
+v3:;
+    v13 = 8.0f + 2.0f;
+    v8 = v13;
+    goto v2;
+}
+)", os.str());
+}
+
+TEST(test_function_dumper, multigpu_Z8getValuePf) {
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "multigpu_Z8getValuePf");
+    Function *F = wrapper.F;
+    FunctionDumper *functionDumper = &wrapper.functionDumper;
+    F->dump();
+
+    bool res = wrapper.runGeneration();
+    EXPECT_TRUE(res);
+
+    ostringstream os;
+
+    os.str("");
+    functionDumper->toCl(os);
+    cout << "cl [" << os.str() << "]" << endl;
+    EXPECT_EQ(R"(kernel void multigpu_Z8getValuePf(global float* outdata, uint outdata_offset, local int *scratch) {
+    outdata += outdata_offset;
+
+    float v10;
+    float v15;
+    float v21;
+    float v22;
+    float v27;
+    float v7;
+    int v23;
+    int v5;
+
+v1:;
+    v5 = 1;
+v7 = 0.0f;
+    goto v3;
+v3:;
+    v10 = (&outdata[v5])[0];
+    v15 = (&outdata[v5 + 1])[0];
+    v21 = (&outdata[v5 + 2])[0];
+    v22 = ((v7 + v10) + v15) + v21;
+    v23 = v5 + 3;
+    if (v23 == 1024) {
+        v27 = v22;
+        goto v2;
+    } else {
+        v5 = v23;
+v7 = v22;
+        goto v3;
+    }
+v2:;
+    outdata[0] = v27;
+    return;
+}
+)", os.str());
+}
+
 } // namespace

@@ -67,10 +67,13 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
             // );
             // vector<string> reslines;
             // string sourceValueCode = instructionDumper.runRhsGeneration(sourceValue, &reslines);
-            LocalValueInfo *sourceValueInfo = LocalValueInfo::getOrCreate(
-                &localNames, &localValueInfos, sourceValue);
+            LocalValueInfo *sourceValueInfo = instructionDumper->getOperand(sourceValue);
+            // LocalValueInfo *sourceValueInfo = LocalValueInfo::getOrCreate(
+            //     &localNames, &localValueInfos, sourceValue);
             // const std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
             // instructionDumper->runGeneration(sourceValueInfo, returnTypeByFunction);
+            cout << "getting expr from sourcevalue:" << endl;
+            sourceValue->dump();
             string sourceValueCode = sourceValueInfo->getExpr();
 
             // string sourceValueCode = localNames.getName(sourceValue);
@@ -83,6 +86,8 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
             LocalValueInfo *phiValueInfo = LocalValueInfo::getOrCreate(
                 &localNames, &localValueInfos, phi);
             phiValueInfo->setAsAssigned();
+            cout << "getting expression for:" << endl;
+            phi->dump();
             string phivarname = phiValueInfo->getExpr();
             gencode += phivarname + " = ";
             // gencode += localNames.getName(phi) + " = ";
@@ -415,60 +420,102 @@ bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *
         localValueInfo->setExpression(localValueInfo->name);
     }
 
-    for(; block_it != F->end(); block_it++) {
-        BasicBlock *basicBlock = &*block_it;
-        string label = localNames.getOrCreateName(basicBlock);
-        cout << "dumping block " << basicBlock->getName().str() << endl;
+    //  set<BasicBlock *> blocksToDump;
+    size_t numBlocks = 0;
+    for(auto block_it=F->begin(); block_it != F->end(); block_it++) {
+        // BasicBlock *basicBlock = &*block_it;
+        // blocksToDump.insert(basicBlock);
+        numBlocks++;
+    }
+    set<BasicBlock *> blocksDumped;
 
-        BasicBlockDumper basicBlockDumper(
-            basicBlock, globalNames, &localNames, typeDumper, functionNamesMap,
-            &globalExpressionByValue, &localValueInfos);
-        if(_addIRToCl) {
-            basicBlockDumper.addIRToCl();
-        }
-        if(!basicBlockDumper.runGeneration(returnTypeByFunction)) {
-            cout << "blockdumper generation didnt run to completion" << endl;
-            neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
-            for(auto it2=neededFunctions.begin(); it2 != neededFunctions.end(); it2++) {
-                cout << "function dumper, needed function: " << (*it2)->getName().str() << endl;
+    int iteration = 0;
+    while(blocksDumped.size() < numBlocks) {
+        cout << "iteration " << iteration << endl;
+        for(auto block_it = F->begin(); block_it != F->end(); block_it++) {
+        // for(auto it = blocksToDump.begin(); it != blocksToDump.end(); it++) {
+            BasicBlock *basicBlock = &*block_it;
+            if(blocksDumped.find(basicBlock) != blocksDumped.end()) {
+                // already dumped this block
+                continue;
             }
-            // throw runtime_error("blockdumper generation didnt run to completion");
-            return false;
+            string label = localNames.getOrCreateName(basicBlock);
+            cout << "dumping block " << basicBlock->getName().str() << endl;
+
+            // check whether we have the address space for the phis yet
+            bool phisOutstanding = false;
+            for(auto phi_it=basicBlock->begin(); phi_it != basicBlock->end(); phi_it++) {
+                Instruction *inst = &*phi_it;
+                if(!isa<PHINode>(inst)) {
+                    // phisOutstanding = true;
+                    break;
+                }
+                PHINode *phi = cast<PHINode>(inst);
+                if(localValueInfos.find(phi) == localValueInfos.end()) {
+                    phisOutstanding = true;
+                    break;
+                }
+            }
+            if(phisOutstanding) {
+                cout << "some phis outstanding => skipping block" << endl;
+                continue;
+            }
+            cout << "all phis ok => continuing to dump block" << endl;
+
+            BasicBlockDumper basicBlockDumper(
+                basicBlock, globalNames, &localNames, typeDumper, functionNamesMap,
+                &globalExpressionByValue, &localValueInfos);
+            if(_addIRToCl) {
+                basicBlockDumper.addIRToCl();
+            }
+            if(!basicBlockDumper.runGeneration(returnTypeByFunction)) {
+                cout << "blockdumper generation didnt run to completion" << endl;
+                neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
+                for(auto it2=neededFunctions.begin(); it2 != neededFunctions.end(); it2++) {
+                    cout << "function dumper, needed function: " << (*it2)->getName().str() << endl;
+                }
+                // throw runtime_error("blockdumper generation didnt run to completion");
+                return false;
+            }
+
+            // for(auto it2=basicBlock->begin(); it2 != basicBlock->end(); it2++) {
+            //     Instruction *instr = &*it2;
+            //     if(PHINode *phi = dyn_cast<PHINode>(instr)) {
+            //         addPHIDeclaration(phi);
+            //     }
+            // }
+
+            // bodyCl += label + ":;\n";
+            // ostringstream oss;
+            ostringstream blockstream;
+            blockstream << label << ":;\n";
+            basicBlockDumper.toCl(blockstream);
+            cout << "block cl [" << blockstream.str() << "]" << endl;
+            ouros << blockstream.str();
+            // bodyCl += blockstream.str();
+
+            // functionDeclarations += basicBlockDumper.getAllocaDeclarations("    ");
+            // ostringstream funcdecos;
+            // basicBlockDumper.writeDeclarations("    ", funcdecos);
+            // functionDeclarations += funcdecos.str();
+
+            // sharedVariablesToDeclare.insert(basicBlockDumper.sharedVariablesToDeclare.begin(), basicBlockDumper.sharedVariablesToDeclare.end());
+            shimFunctionsNeeded.insert(basicBlockDumper.shimFunctionsNeeded.begin(), basicBlockDumper.shimFunctionsNeeded.end());
+            neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
+
+            ouros << dumpTerminator(&returnType, basicBlock->getTerminator());
+            blocksDumped.insert(basicBlock);
         }
-
-        // for(auto it2=basicBlock->begin(); it2 != basicBlock->end(); it2++) {
-        //     Instruction *instr = &*it2;
-        //     if(PHINode *phi = dyn_cast<PHINode>(instr)) {
-        //         addPHIDeclaration(phi);
-        //     }
-        // }
-
-        // bodyCl += label + ":;\n";
-        // ostringstream oss;
-        ostringstream blockstream;
-        blockstream << label << ":;\n";
-        basicBlockDumper.toCl(blockstream);
-        cout << "block cl [" << blockstream.str() << "]" << endl;
-        ouros << blockstream.str();
-        // bodyCl += blockstream.str();
-
-        // functionDeclarations += basicBlockDumper.getAllocaDeclarations("    ");
-        // ostringstream funcdecos;
-        // basicBlockDumper.writeDeclarations("    ", funcdecos);
-        // functionDeclarations += funcdecos.str();
-
-        // sharedVariablesToDeclare.insert(basicBlockDumper.sharedVariablesToDeclare.begin(), basicBlockDumper.sharedVariablesToDeclare.end());
-        shimFunctionsNeeded.insert(basicBlockDumper.shimFunctionsNeeded.begin(), basicBlockDumper.shimFunctionsNeeded.end());
-        neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
-
-        ouros << dumpTerminator(&returnType, basicBlock->getTerminator());
+        iteration++;
     }
 
+    _generationDone = true;
     return true;
 }
 
 bool FunctionDumper::generationDone() {
-    return block_it == F->end();
+    // return block_it == F->end();
+    return _generationDone;
 }
 
 void FunctionDumper::writeDeclarations(std::string indent, ostream &os) {
@@ -488,7 +535,8 @@ void FunctionDumper::writeDeclarations(std::string indent, ostream &os) {
 }
 
 void FunctionDumper::toCl(ostream &os) {
-    if(block_it != F->end()) {
+    // if(block_it != F->end()) {
+    if(!_generationDone) {
         throw runtime_error("Need to run generation completely first");
     }
     if(returnType != 0) {

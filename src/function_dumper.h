@@ -44,7 +44,7 @@ public:
             typeDumper(typeDumper),
             structCloner(typeDumper, globalNames),
             functionNamesMap(functionNamesMap) {
-        block_it = F->begin();
+        // block_it = F->begin();
         instructionDumper.reset(new NewInstructionDumper(
             globalNames,
             &localNames,
@@ -101,8 +101,9 @@ public:
     llvm::Type *returnType = 0;
 
 protected:
-    llvm::Function::iterator block_it;
+    // llvm::Function::iterator block_it;
 
+    bool _generationDone = false;
     std::ostringstream ouros;
     std::string declaration;
 

@@ -85,3 +85,50 @@ label3:
     %4 = fadd float 8.0, 2.0
     br label %label2
 }
+
+define void @testBranches_phifromfloat(float *%d1) {
+label1:
+    %0 = fadd float 3.0, 4.0
+    br label %label2
+
+label2:
+    %1 = phi float [123.0, %label1], [%2, %label2], [%4, %label3]
+    %2 = fadd float %1, 7.0
+    %3 = fcmp ogt float %2, 6.0
+    br i1 %3, label %label1, label %label2
+
+label3:
+    %4 = fadd float 8.0, 2.0
+    br label %label2
+}
+
+; from test/cocl/multigpu.cu
+define void @multigpu_Z8getValuePf(float* nocapture %outdata) {
+  br label %2
+
+; <label>:1                                       ; preds = %2
+  %.lcssa = phi float [ %16, %2 ]
+  store float %.lcssa, float* %outdata
+  ret void
+
+; <label>:2                                       ; preds = %2, %0
+  %i.02 = phi i32 [ 1, %0 ], [ %17, %2 ]
+  %sum.01 = phi float [ 0.000000e+00, %0 ], [ %16, %2 ]
+  %3 = sext i32 %i.02 to i64
+  %4 = getelementptr inbounds float, float* %outdata, i64 %3
+  %5 = load float, float* %4
+  %6 = fadd float %sum.01, %5
+  %7 = add nuw nsw i32 %i.02, 1
+  %8 = sext i32 %7 to i64
+  %9 = getelementptr inbounds float, float* %outdata, i64 %8
+  %10 = load float, float* %9
+  %11 = fadd float %6, %10
+  %12 = add nsw i32 %i.02, 2
+  %13 = sext i32 %12 to i64
+  %14 = getelementptr inbounds float, float* %outdata, i64 %13
+  %15 = load float, float* %14
+  %16 = fadd float %11, %15
+  %17 = add nsw i32 %i.02, 3
+  %exitcond.2 = icmp eq i32 %17, 1024
+  br i1 %exitcond.2, label %1, label %2
+}
