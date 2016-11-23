@@ -17,15 +17,20 @@ define void @someKernel(float * %d1, float * %d2) {
 
 ;  %29 = getelementptr %struct.mystruct , %struct.mystruct *%24, i32 0, i32 0
 
-define void @kernelBranches(float *%d1) {
+define void @testBranches_phifromfuture(float *%d1) {
 label1:
     %0 = fadd float 3.0, 4.0
     br label %label2
 
 label2:
-    %1 = fadd float 5.0, 7.0
-    %2 = fcmp ogt float %1, 6.0
-    br i1 %2, label %label1, label %label2
+    %1 = phi float [%0, %label1], [%2, %label2], [%4, %label3]
+    %2 = fadd float %1, 7.0
+    %3 = fcmp ogt float %2, 6.0
+    br i1 %3, label %label1, label %label2
+
+label3:
+    %4 = fadd float 8.0, 2.0
+    br label %label2
 }
 
 define float *@returnsPointer(float *%in) {

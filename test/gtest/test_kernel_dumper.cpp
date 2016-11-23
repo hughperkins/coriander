@@ -124,31 +124,42 @@ v1:;
 )", cl);
 }
 
-TEST(test_kernel_dumper, kernelBranches) {
-    GlobalWrapper G("kernelBranches");
+TEST(test_kernel_dumper, testBranches_phifromfuture) {
+    GlobalWrapper G("testBranches_phifromfuture");
     KernelDumper *kernelDumper = G.kernelDumper.get();
     // Module *M = getM();
 
     string cl = kernelDumper->toCl();
     cout << "kernel cl: [" << cl << "]" << endl;
     EXPECT_EQ(R"(
-kernel void kernelBranches(global float* d1, long d1_offset, local int *scratch);
+kernel void testBranches_phifromfuture(global float* d1, long d1_offset, local int *scratch);
 
-kernel void kernelBranches(global float* d1, long d1_offset, local int *scratch) {
+kernel void testBranches_phifromfuture(global float* d1, long d1_offset, local int *scratch) {
     d1 += d1_offset;
 
+    float v12;
+    float v4;
+    float v7;
+    float v8;
 
 v1:;
+    v4 = 3.0f + 4.0f;
+    v7 = v4;
 v2:;
-    if (5.0f + 7.0f > 6.0f) {
+    v8 = v7 + 7.0f;
+    if (v8 > 6.0f) {
         goto v1;
     } else {
+        v7 = v8;
         goto v2;
     }
+v3:;
+    v12 = 8.0f + 2.0f;
+    v7 = v12;
+    goto v2;
 }
 )", cl);
 
-    // FIXME PHIS BROKEN
 }
 
 /*
