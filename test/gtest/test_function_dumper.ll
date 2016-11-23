@@ -40,3 +40,7 @@ define void @usesPointerFunction(float *%in) {
     call float *@returnsPointer(float *%in)
     ret void
 }
+
+define float @returnsFloatConstant(float *%in) {
+    ret float 4.5
+}

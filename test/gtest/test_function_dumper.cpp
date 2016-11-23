@@ -284,4 +284,29 @@ v1:;
 )", os.str());
 }
 
+TEST(test_function_dumper, returnsFloatConstant) {
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "returnsFloatConstant");
+    Function *F = wrapper.F;
+    FunctionDumper *functionDumper = &wrapper.functionDumper;
+    F->dump();
+
+    bool res = wrapper.runGeneration();
+    EXPECT_TRUE(res);
+
+    ostringstream os;
+
+    os.str("");
+    functionDumper->toCl(os);
+    cout << "cl [" << os.str() << "]" << endl;
+    EXPECT_EQ(R"(kernel float returnsFloatConstant(global float* in, long in_offset, local int *scratch) {
+    in += in_offset;
+
+
+v1:;
+    return 4.5f;
+}
+)", os.str());
+}
+
 } // namespace

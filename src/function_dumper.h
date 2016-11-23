@@ -20,6 +20,7 @@
 #include "type_dumper.h"
 #include "struct_clone.h"
 #include "LocalValueInfo.h"
+#include "new_instruction_dumper.h"
 
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Instructions.h"
@@ -61,8 +62,8 @@ public:
     void addPHIDeclaration(llvm::PHINode *phi);
     std::string dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock);
     std::string dumpBranch(llvm::BranchInst *instr);
-    std::string dumpReturn(llvm::Type **pReturnType, llvm::ReturnInst *retInst);
-    std::string dumpTerminator(llvm::Type **pReturnType, llvm::Instruction *terminator);
+    std::string dumpReturn(NewInstructionDumper *instructionDumper, llvm::Type **pReturnType, llvm::ReturnInst *retInst);
+    std::string dumpTerminator(NewInstructionDumper *instructionDumper, llvm::Type **pReturnType, llvm::Instruction *terminator);
     std::vector<std::string> dumpSharedDefinition(llvm::Value *value);
     std::string dumpSharedDefinitions(std::string indent);
     std::string getDeclaration();

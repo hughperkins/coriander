@@ -18,6 +18,7 @@
 #include "mutations.h"
 #include "basicblockdumper.h"
 #include "EasyCL/util/easycl_stringhelper.h"
+#include "new_instruction_dumper.h"
 
 #include "llvm/IR/Function.h"
 
@@ -85,15 +86,21 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
     return gencode;
 }
 
-std::string FunctionDumper::dumpReturn(Type **pReturnType, ReturnInst *retInst) {
+std::string FunctionDumper::dumpReturn(NewInstructionDumper *instructionDumper, Type **pReturnType, ReturnInst *retInst) {
     std::string gencode = "";
     Value *retValue = retInst->getReturnValue();
+    cout << "retValue == 0 " << (retValue == 0) << endl;
     if(retValue != 0) {
+        cout << "retVAlue:" << endl;
+        retValue->dump();
         Function *F = retInst->getFunction();
         copyAddressSpace(retValue, F);
         *pReturnType = retValue->getType();
         // gencode += "return " + localExpressionByValue[retValue];
-        gencode += "return " + localValueInfos.at(retValue)->getExpr();
+        // string retvaluestr = instructionDumper
+        string retValueStr = instructionDumper->getOperand(retValue)->getExpr();
+        gencode += "return " + retValueStr;
+        // gencode += "return " + localValueInfos.at(retValue)->getExpr();
         // gencode += "return " + dumpOperand(retValue);
     } else {
         // we still need to have "return" if no value, since some loops terminate with a `return` in the middle
@@ -342,10 +349,11 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
     return declaration;
 }
 
-std::string FunctionDumper::dumpTerminator(Type **pReturnType, Instruction *terminator) {
+std::string FunctionDumper::dumpTerminator(NewInstructionDumper *instructionDumper, Type **pReturnType, Instruction *terminator) {
     string terminatorCl = "";
+    // LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &localValueInfos, terminator);
     if(ReturnInst *retInst = dyn_cast<ReturnInst>(terminator)) {
-        terminatorCl = "    " + dumpReturn(pReturnType, retInst) + ";\n";
+        terminatorCl = "    " + dumpReturn(instructionDumper, pReturnType, retInst) + ";\n";
         // returnType = retInst->getOperand(0)->getType();
     } else if(BranchInst *branch = dyn_cast<BranchInst>(terminator)) {
         terminatorCl = dumpBranch(branch);
@@ -381,6 +389,19 @@ bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *
 
     // first time initializes the types of hte args and so on
     declaration = dumpFunctionDeclarationWithoutReturn(F);
+
+    NewInstructionDumper instructionDumper(
+        globalNames,
+        &localNames,
+        typeDumper,
+        functionNamesMap,
+
+        &shimFunctionsNeeded,
+        &neededFunctions,
+
+        &globalExpressionByValue,
+        &localValueInfos
+    );
 
     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
         Argument *arg = &*it;
@@ -431,7 +452,7 @@ bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *
         shimFunctionsNeeded.insert(basicBlockDumper.shimFunctionsNeeded.begin(), basicBlockDumper.shimFunctionsNeeded.end());
         neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
 
-        ouros << dumpTerminator(&returnType, basicBlock->getTerminator());
+        ouros << dumpTerminator(&instructionDumper, &returnType, basicBlock->getTerminator());
     }
     return true;
 }

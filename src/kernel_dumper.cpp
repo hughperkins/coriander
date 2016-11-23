@@ -130,7 +130,7 @@ std::string KernelDumper::toCl() {
 
     ostringstream moduleClStream;
 
-    set<Function *> dumpedFunctions;
+    // set<Function *> dumpedFunctions;
     set<Function *> neededFunctions;
     set<Function *> isKernel;
     map<Function *, Type *> returnTypeByFunction;
@@ -153,11 +153,11 @@ std::string KernelDumper::toCl() {
     // structsToDefine.insert(functionDumper.structsToDefine.begin(), functionDumper.structsToDefine.end());
 
     int nothingHappenedCount = 0;
-    while(dumpedFunctions.size() < neededFunctions.size()) {
+    while(returnTypeByFunction.size() < neededFunctions.size()) {
         bool changedSomething = false;
         for(auto it = neededFunctions.begin(); it != neededFunctions.end(); it++) {
             Function *childF = *it;
-            if(dumpedFunctions.find(childF) != dumpedFunctions.end()) {
+            if(returnTypeByFunction.find(childF) != returnTypeByFunction.end()) {
                 continue;
             }
             cout << "dumping function " << childF->getName().str() << endl;
@@ -166,7 +166,7 @@ std::string KernelDumper::toCl() {
             if(_addIRToCl) {
                 childFunctionDumper.addIRToCl();
             }
-            if(!childFunctionDumper.runGeneration(dumpedFunctions, returnTypeByFunction)) {
+            if(!childFunctionDumper.runGeneration(returnTypeByFunction)) {
                 cout << "couldnt run generation to completion yet for " << childF->getName().str() << endl;
                 neededFunctions.insert(childFunctionDumper.neededFunctions.begin(), childFunctionDumper.neededFunctions.end());
                 for(auto it2=neededFunctions.begin(); it2 != neededFunctions.end(); it2++) {
@@ -175,7 +175,7 @@ std::string KernelDumper::toCl() {
                 continue;
             }
 
-            dumpedFunctions.insert(childF);
+            // dumpedFunctions.insert(childF);
             returnTypeByFunction[childF] = childFunctionDumper.returnType;
             changedSomething = true;
             ostringstream os;
