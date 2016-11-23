@@ -122,7 +122,7 @@ TEST(test_function_dumper, basic1) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl: [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void someKernel(global float* d1, long d1_offset, global float* d2, long d2_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void someKernel(global float* d1, uint d1_offset, global float* d2, uint d2_offset, local int *scratch) {
     d2 += d2_offset;
     d1 += d1_offset;
 
@@ -159,7 +159,7 @@ TEST(test_function_dumper, usesShared1) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl: [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void usesShared(global float* d1, long d1_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void usesShared(global float* d1, uint d1_offset, local int *scratch) {
     d1 += d1_offset;
 
     float v7[1];
@@ -191,7 +191,7 @@ TEST(test_function_dumper, usesShared2) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void usesShared2(global float* d1, long d1_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void usesShared2(global float* d1, uint d1_offset, local int *scratch) {
     d1 += d1_offset;
 
     float v11[1];
@@ -251,7 +251,7 @@ TEST(test_function_dumper, usesPointerFunction) {
     os.str("");
     functionDumper2->toCl(os);
     cout << "cl, F2: [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel global float* returnsPointer_g(global float* in, long in_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel global float* returnsPointer_g(global float* in, uint in_offset, local int *scratch) {
     in += in_offset;
 
 
@@ -272,7 +272,7 @@ v1:;
     os.str("");
     functionDumper->toCl(os);
     cout << "cl, F: [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void usesPointerFunction(global float* in, long in_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void usesPointerFunction(global float* in, uint in_offset, local int *scratch) {
     in += in_offset;
 
     global float* v2;
@@ -299,7 +299,7 @@ TEST(test_function_dumper, returnsFloatConstant) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel float returnsFloatConstant(global float* in, long in_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel float returnsFloatConstant(global float* in, uint in_offset, local int *scratch) {
     in += in_offset;
 
 
@@ -324,7 +324,7 @@ TEST(test_function_dumper, testBranches_nophi) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void testBranches_nophi(global float* d1, long d1_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void testBranches_nophi(global float* d1, uint d1_offset, local int *scratch) {
     d1 += d1_offset;
 
     float v3;
@@ -358,7 +358,7 @@ TEST(test_function_dumper, testBranches_onephi) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void testBranches_onephi(global float* d1, long d1_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void testBranches_onephi(global float* d1, uint d1_offset, local int *scratch) {
     d1 += d1_offset;
 
     float v3;
@@ -395,7 +395,7 @@ TEST(test_function_dumper, testBranches_phifromfuture) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void testBranches_phifromfuture(global float* d1, long d1_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void testBranches_phifromfuture(global float* d1, uint d1_offset, local int *scratch) {
     d1 += d1_offset;
 
     float v12;

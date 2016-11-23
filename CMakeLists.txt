@@ -52,7 +52,7 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
     third_party/argparsecpp/argparsecpp.cpp
     src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cpp src/cocl_device.cpp src/cocl_error.cpp
     src/cocl_memory.cpp src/cocl_properties.cpp src/cocl_streams.cpp src/cocl_clsources.cpp src/cocl_context.cpp
-    src/ir-to-opencl.cpp src/shims.cpp
+    src/ir-to-opencl.cpp src/shims.cpp src/LocalValueInfo.cpp src/ClWriter.cpp
 )
 
 set(CMAKE_CC_FLAGS "-fPIC")
@@ -69,7 +69,6 @@ message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 STRING(REGEX REPLACE " " ";" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-std=c\\+\\+0x" ";-std=c++11" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
-# string(REGEX REPLACE ";-fno-rtti" ";-fexceptions" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-fno-exceptions" ";-fexceptions" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-DNDEBUG" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-isysroot;[^;]" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
@@ -192,14 +191,14 @@ foreach(ROUTINE ${CLBLAST_LEVELX_ROUTINES})
   set(CLBLAST_SOURCES ${CLBLAST_SOURCES} src/CLBlast/src/routines/levelx/${ROUTINE}.cpp)
 endforeach()
 
-# include_directories(src/CLBlast/src)
-# add_library(clblast SHARED ${CLBLAST_SOURCES})
-# target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
-# target_include_directories(clblast PRIVATE src/CLBlast/include)
-# target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include)
-# target_link_libraries(clblast clew)
+include_directories(src/CLBlast/src)
+add_library(clblast SHARED ${CLBLAST_SOURCES})
+target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
+target_include_directories(clblast PRIVATE src/CLBlast/include)
+target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include)
+target_link_libraries(clblast clew)
 
-# target_link_libraries(cocl clblast)
+target_link_libraries(cocl clblast)
 
 # ==================================================================================================
 # tests
@@ -232,44 +231,17 @@ if(BUILD_TESTS)
         add_library(cocl_gtest third_party/gtest/gtest-all.cc)
     endif()
 
-    add_executable(test_new_instructiondumper test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
-      src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/ConstantDumper.cpp
-      src/mutations.cpp src/ExpressionsHelper.cpp src/readIR.cpp src/ClWriter.cpp
-      src/function_names_map.cpp src/LocalValueInfo.cpp src/readIR.cpp
-      src/new_instruction_dumper.cpp test/gtest/test_new_instruction_dumper.cpp
-      test/gtest/test_block_dumper.cpp src/basicblockdumper.cpp
-      test/gtest/test_function_dumper.cpp
-      src/function_dumper.cpp src/struct_clone.cpp
-      test/gtest/test_kernel_dumper.cpp src/kernel_dumper.cpp src/shims.cpp
+    add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
+        test/gtest/test_block_dumper.cpp test/gtest/test_new_instruction_dumper.cpp
+        test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
+        test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
+        test/gtest/test_kernel_dumper.cpp test/gtest/test_global_constants.cpp
     )
-    target_include_directories(test_new_instructiondumper PRIVATE src)
-    target_include_directories(test_new_instructiondumper PRIVATE third_party/gtest)
-    target_include_directories(test_new_instructiondumper PRIVATE ${CLANG_HOME}/include)
-    target_link_libraries(test_new_instructiondumper "${LLVM_LIBS}" cocl_gtest easycl ${LLVM_SYSLIBS})
-    target_compile_options(test_new_instructiondumper PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-
-    # add_executable(test_instructiondumper test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
-    #   src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/ConstantDumper.cpp
-    #   src/mutations.cpp src/ExpressionsHelper.cpp src/readIR.cpp
-    #   src/function_names_map.cpp src/LocalValueInfo.cpp
-    #   src/InstructionDumper.cpp test/gtest/test_instructiondumper.cpp)
-    # target_include_directories(test_instructiondumper PRIVATE src)
-    # target_include_directories(test_instructiondumper PRIVATE third_party/gtest)
-    # target_include_directories(test_instructiondumper PRIVATE ${CLANG_HOME}/include)
-    # target_link_libraries(test_instructiondumper "${LLVM_LIBS}" cocl_gtest easycl ${LLVM_SYSLIBS})
-    # target_compile_options(test_instructiondumper PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-
-    # add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
-    #     test/gtest/test_block_dumper.cpp test/gtest/test_instructiondumper.cpp
-    #     test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
-    #     test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
-    #     test/gtest/test_kernel_dumper.cpp test/gtest/test_global_constants.cpp
-    # )
-    # target_include_directories(cocl_unittests PRIVATE src)
-    # target_include_directories(cocl_unittests PRIVATE third_party/gtest)
-    # target_include_directories(cocl_unittests PRIVATE ${CLANG_HOME}/include)
-    # target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} ${LLVM_SYSLIBS})
-    # target_compile_options(cocl_unittests PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
+    target_include_directories(cocl_unittests PRIVATE src)
+    target_include_directories(cocl_unittests PRIVATE third_party/gtest)
+    target_include_directories(cocl_unittests PRIVATE ${CLANG_HOME}/include)
+    target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} ${LLVM_SYSLIBS})
+    target_compile_options(cocl_unittests PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 endif(BUILD_TESTS)
 
 FILE(GLOB_RECURSE COCL_HEADERS

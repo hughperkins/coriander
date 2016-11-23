@@ -63,41 +63,41 @@ Function *getFunction(string name) {
     return F;
 }
 
-TEST(test_global_constant, test_union) {
-    Function *F = getFunction("test_union");
-    F->dump();
-    BasicBlock *block = &*F->begin();
-    GlobalNames globalNames;
-    LocalNames localNames;
-    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
-        Argument *arg = &*it;
-        string name = arg->getName().str();
-        Value *value = arg;
-        localNames.getOrCreateName(value, name);
-    }
-    cout << localNames.dumpNames();
-    TypeDumper typeDumper(&globalNames);
-    FunctionNamesMap functionNamesMap;
-    BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
-    std::set< llvm::Function *> dumpedFunctions;
-    map<Function *, Type *>returnTypeByFunction;
-    blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
-    ostringstream oss;
-    blockDumper.toCl(oss);
-    string cl = oss.str();
-    cout << "cl:\n" << cl << endl;
-    cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
+// TEST(test_global_constant, test_union) {
+//     Function *F = getFunction("test_union");
+//     F->dump();
+//     BasicBlock *block = &*F->begin();
+//     GlobalNames globalNames;
+//     LocalNames localNames;
+//     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+//         Argument *arg = &*it;
+//         string name = arg->getName().str();
+//         Value *value = arg;
+//         localNames.getOrCreateName(value, name);
+//     }
+//     cout << localNames.dumpNames();
+//     TypeDumper typeDumper(&globalNames);
+//     FunctionNamesMap functionNamesMap;
+//     BasicBlockDumper blockDumper(block, &globalNames, &localNames, &typeDumper, &functionNamesMap);
+//     std::set< llvm::Function *> dumpedFunctions;
+//     map<Function *, Type *>returnTypeByFunction;
+//     blockDumper.runGeneration(dumpedFunctions, returnTypeByFunction);
+//     ostringstream oss;
+//     blockDumper.toCl(oss);
+//     string cl = oss.str();
+//     cout << "cl:\n" << cl << endl;
+//     cout << "allocas: \n" << blockDumper.getAllocaDeclarations("    ") << endl;
 
-    // cout << "num shared variables to declare: " << blockDumper.sharedVariablesToDeclare.size() << endl;
-    // ASSERT_EQ(1, blockDumper.sharedVariablesToDeclare.size());
-    // for(auto it=blockDumper.sharedVariablesToDeclare.begin(); it !=blockDumper.sharedVariablesToDeclare.end(); it++) {
-    //     Value *value = *it;
-    //     cout << "shared:" << endl;
-    //     value->dump();
-    //     cout << endl;
-    // }
-    // Value *shared = *blockDumper.sharedVariablesToDeclare.begin();
-    // shared->dump();
-}
+//     // cout << "num shared variables to declare: " << blockDumper.sharedVariablesToDeclare.size() << endl;
+//     // ASSERT_EQ(1, blockDumper.sharedVariablesToDeclare.size());
+//     // for(auto it=blockDumper.sharedVariablesToDeclare.begin(); it !=blockDumper.sharedVariablesToDeclare.end(); it++) {
+//     //     Value *value = *it;
+//     //     cout << "shared:" << endl;
+//     //     value->dump();
+//     //     cout << endl;
+//     // }
+//     // Value *shared = *blockDumper.sharedVariablesToDeclare.begin();
+//     // shared->dump();
+// }
 
 } // namespace

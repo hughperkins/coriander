@@ -72,9 +72,9 @@ TEST(test_kernel_dumper, basic) {
 float someFunc_gg(global float* d1, global float* v11, local int *scratch);
 float someFunc_gp(global float* d1, float* v11, local int *scratch);
 float someFunc_pg(float* d1, global float* v11, local int *scratch);
-kernel void someKernel(global float* d1, long d1_offset, global float* d2, long d2_offset, local int *scratch);
+kernel void someKernel(global float* d1, uint d1_offset, global float* d2, uint d2_offset, local int *scratch);
 
-kernel void someKernel(global float* d1, long d1_offset, global float* d2, long d2_offset, local int *scratch) {
+kernel void someKernel(global float* d1, uint d1_offset, global float* d2, uint d2_offset, local int *scratch) {
     d2 += d2_offset;
     d1 += d1_offset;
 
@@ -132,9 +132,9 @@ TEST(test_kernel_dumper, testBranches_phifromfuture) {
     string cl = kernelDumper->toCl();
     cout << "kernel cl: [" << cl << "]" << endl;
     EXPECT_EQ(R"(
-kernel void testBranches_phifromfuture(global float* d1, long d1_offset, local int *scratch);
+kernel void testBranches_phifromfuture(global float* d1, uint d1_offset, local int *scratch);
 
-kernel void testBranches_phifromfuture(global float* d1, long d1_offset, local int *scratch) {
+kernel void testBranches_phifromfuture(global float* d1, uint d1_offset, local int *scratch) {
     d1 += d1_offset;
 
     float v12;
@@ -172,7 +172,7 @@ TEST(test_kernel_dumper, usesPointerFunction) {
     EXPECT_EQ(R"(
 float* returnsPointer(float* in, local int *scratch);
 global float* returnsPointer_g(global float* in, local int *scratch);
-kernel void usesPointerFunction(global float* in, long in_offset, local int *scratch);
+kernel void usesPointerFunction(global float* in, uint in_offset, local int *scratch);
 
 global float* returnsPointer_g(global float* in, local int *scratch) {
 
@@ -184,7 +184,7 @@ float* returnsPointer(float* in, local int *scratch) {
 v1:;
     return in;
 }
-kernel void usesPointerFunction(global float* in, long in_offset, local int *scratch) {
+kernel void usesPointerFunction(global float* in, uint in_offset, local int *scratch) {
     in += in_offset;
 
     float v3[1];

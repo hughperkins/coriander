@@ -28,8 +28,7 @@ before_install:
 
 script:
   - cd ${BASEDIR}/build
-  - ./test_new_instructiondumper
-  #- ./cocl_unittests
+  - ./cocl_unittests
   #- mkdir ${BASEDIR}/foo
   #- cd ${BASEDIR}/foo
   #- cp ${BASEDIR}/test/cocl/cuda_sample.cu .
