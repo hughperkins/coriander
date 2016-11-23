@@ -3,10 +3,14 @@ Try to run a tf kernel
 Check does/doesnt work
 """
 import os
+from os.path import join
 import numpy as np
 import pyopencl as cl
 import subprocess
 from test import test_common
+
+
+CLANG_HOME = os.environ['CLANG_HOME']
 
 
 def test_cwise_sqrt(context, q, float_data, float_data_gpu):
@@ -28,7 +32,7 @@ def test_cwise_sqrt(context, q, float_data, float_data_gpu):
     print('opt_options', opt_options)
     print('iropencl_options', iropencl_options)
     res = subprocess.run([
-        'opt-3.8'
+        join(CLANG_HOME, 'bin/opt')
     ] + opt_options + [
         '-S',
         'test/tf/samples/cwise_op_gpu_sqrt-device-noopt.ll',
@@ -121,7 +125,7 @@ def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
     print('iropencl_options', iropencl_options)
     if 'NOREBUILD' not in os.environ:
         res = subprocess.run([
-            'opt-3.8'
+            join(CLANG_HOME, 'bin/opt')
         ] + opt_options + [
             '-S',
             'test/tf/samples/cwise_op_gpu_sqrt-device-noopt.ll',

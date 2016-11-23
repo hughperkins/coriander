@@ -145,6 +145,7 @@ kernel void testBranches_phifromfuture(global float* d1, uint d1_offset, local i
 v1:;
     v4 = 3.0f + 4.0f;
     v7 = v4;
+    goto v2;
 v2:;
     v8 = v7 + 7.0f;
     if (v8 > 6.0f) {

@@ -164,8 +164,8 @@ TEST(test_function_dumper, usesShared1) {
 
     float v7[1];
     float v8;
+    local float mysharedmem[8];
     local float* v2;
-    local mysharedmem float[8];
 
 v1:;
     v2 = (&(&mysharedmem)[0][3]);
@@ -198,10 +198,10 @@ TEST(test_function_dumper, usesShared2) {
     float v13;
     int v12[1];
     int v14;
-    local anothershared int[12];
+    local float mysharedmem[8];
     local float* v2;
+    local int anothershared[12];
     local int* v7;
-    local mysharedmem float[8];
 
 v1:;
     v2 = (&(&mysharedmem)[0][3]);
@@ -333,6 +333,7 @@ TEST(test_function_dumper, testBranches_nophi) {
 v1:;
     v3 = 3.0f + 4.0f;
     v6[0] = v3;
+    goto v2;
 v2:;
     if (5.0f + 7.0f > 6.0f) {
         goto v1;
@@ -368,6 +369,7 @@ TEST(test_function_dumper, testBranches_onephi) {
 v1:;
     v3 = 3.0f + 4.0f;
     v6 = v3;
+    goto v2;
 v2:;
     v7 = v6 + 7.0f;
     if (v7 > 6.0f) {
@@ -406,6 +408,7 @@ TEST(test_function_dumper, testBranches_phifromfuture) {
 v1:;
     v4 = 3.0f + 4.0f;
     v7 = v4;
+    goto v2;
 v2:;
     v8 = v7 + 7.0f;
     if (v8 > 6.0f) {
@@ -446,6 +449,7 @@ TEST(test_function_dumper, testBranches_phifromfloat) {
 
 v1:;
     v8 = 123.0f;
+    goto v2;
 v2:;
     v9 = v8 + 7.0f;
     if (v9 > 6.0f) {

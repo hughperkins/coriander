@@ -253,9 +253,9 @@ TEST(test_block_dumper, usesShared) {
     blockDumper->writeDeclarations("    ", oss);
     // cout << oss.str() << endl;
     cout << "declarations: [" << oss.str() << "]" << endl;
-    ASSERT_EQ(R"(    local float* v5;
+    ASSERT_EQ(R"(    local float mysharedmem[8];
+    local float* v5;
     local float* v7;
-    local mysharedmem float[8];
 )", oss.str());
 }
 
