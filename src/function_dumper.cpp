@@ -56,7 +56,7 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
             // string name = localNames.getOrCreateName(phi);
             BasicBlock *ourBlock = branchInstr->getParent();
             Value *sourceValue = phi->getIncomingValueForBlock(ourBlock);
-            vector<AllocaInfo> allocaInfos;
+            // vector<AllocaInfo> allocaInfos;
             // NewInstructionDumper instructionDumper(
             //     globalNames, &localNames, typeDumper, functionNamesMap,
             //     // &allocaInfos, &variablesToDeclare,
@@ -67,6 +67,10 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
             // );
             // vector<string> reslines;
             // string sourceValueCode = instructionDumper.runRhsGeneration(sourceValue, &reslines);
+            if(isa<UndefValue>(sourceValue)) {
+                cout << "source value is undef => ignore" << endl;
+                continue;
+            }
             LocalValueInfo *sourceValueInfo = instructionDumper->getOperand(sourceValue);
             // LocalValueInfo *sourceValueInfo = LocalValueInfo::getOrCreate(
             //     &localNames, &localValueInfos, sourceValue);
@@ -78,9 +82,9 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
 
             // string sourceValueCode = localNames.getName(sourceValue);
             // COCL_PRINT(cout << "adding phi " << sourceValueCode << endl);
-            if(sourceValueCode == "") { // this is a hack really..
-                continue;  // assume its an undef. which it might be
-            }
+            // if(sourceValueCode == "") { // this is a hack really..
+            //     continue;  // assume its an undef. which it might be
+            // }
             // variablesToDeclare.insert(phi);
             copyAddressSpace(sourceValue, phi);
             LocalValueInfo *phiValueInfo = LocalValueInfo::getOrCreate(
@@ -188,15 +192,15 @@ std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr) {
             if(phicode != "") {
                 gencode += "    " + phicode;
             }
-            bool needGoto = true;
-            if(instr->getNextNode() == 0) {
-                if(functionBlockIndex[nextBlock] == functionBlockIndex[instr->getParent()] + 1) {
-                    needGoto = false;
-                }
-            }
-            if(needGoto) {
+            // bool needGoto = true;
+            // if(instr->getNextNode() == 0) {
+            //     if(functionBlockIndex[nextBlock] == functionBlockIndex[instr->getParent()] + 1) {
+            //         needGoto = false;
+            //     }
+            // }
+            // if(needGoto) {
                 gencode += "    goto " + localNames.getName(instr->getSuccessor(0)) + ";\n";
-            }
+            // }
         } else {
             throw runtime_error("not implemented sucessors != 1 for unconditional br");
         }
