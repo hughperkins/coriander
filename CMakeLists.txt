@@ -251,23 +251,23 @@ set(CLEW_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/thirdparty/clew/include/
 FILE(GLOB EASYCL_HEADERS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/*.h)
 # FILE(GLOB CLEW_PROXYHEADERS) ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/thirdparty/clew/include/proxy-opencl/*.h)
 
-# CONFIGURE_FILE(
-#   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cocl.cmake.in"
-#   "${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl.cmake" @ONLY)
-# INSTALL(FILES ${COCL_HEADERS} DESTINATION include/cocl)
-# # INSTALL(FILES ${CLEW_PROXYHEADERS} DESTINATION include/clew/proxy-opencl)
-# INSTALL(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl DESTINATION bin)
-# # INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/share/cocl/cocl.Makefile DESTINATION share/cocl)
-# INSTALL(FILES ${CLEW_HEADERS} DESTINATION include)
-# INSTALL(FILES ${EASYCL_HEADERS_ROOT} DESTINATION include/EasyCL)
-# # INSTALL(FILES ${CMAKE_SOURCE_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
-# INSTALL(FILES ${CMAKE_BINARY_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
-# install(TARGETS easycl clew clblast cocl patch-hostside ir-to-opencl EXPORT cocl-targets
-#     LIBRARY DESTINATION lib
-#     ARCHIVE DESTINATION lib
-#     RUNTIME DESTINATION bin
-# )
-# install(EXPORT cocl-targets DESTINATION lib/cocl)
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cocl.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl.cmake" @ONLY)
+INSTALL(FILES ${COCL_HEADERS} DESTINATION include/cocl)
+# INSTALL(FILES ${CLEW_PROXYHEADERS} DESTINATION include/clew/proxy-opencl)
+INSTALL(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl DESTINATION bin)
+# INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/share/cocl/cocl.Makefile DESTINATION share/cocl)
+INSTALL(FILES ${CLEW_HEADERS} DESTINATION include)
+INSTALL(FILES ${EASYCL_HEADERS_ROOT} DESTINATION include/EasyCL)
+# INSTALL(FILES ${CMAKE_SOURCE_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
+INSTALL(FILES ${CMAKE_BINARY_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
+install(TARGETS easycl clew clblast cocl patch-hostside ir-to-opencl EXPORT cocl-targets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+)
+install(EXPORT cocl-targets DESTINATION lib/cocl)
 
 ########### Add uninstall target ###############
 CONFIGURE_FILE(
