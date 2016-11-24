@@ -247,6 +247,7 @@ bool BasicBlockDumper::checkIfNeedsAssign(Instruction *instruction) {
     bool useIsAStore = false;
     bool useIsExtractValue = false;
     bool useIsAPhi = false;
+    bool useIsABitcast = false;
     // bool useIsALoad = false;
     // cout << "end of dumpinstruction for " << localNames->getName(instruction) << endl;
     // exprByValue[instruction] = instructionCode;
@@ -259,11 +260,13 @@ bool BasicBlockDumper::checkIfNeedsAssign(Instruction *instruction) {
         // useIsPointer = isa<PointerType>(use_user->getType());
         useIsExtractValue = isa<ExtractValueInst>(use_user);
         useIsAPhi = isa<PHINode>(use_user);
+        useIsABitcast = isa<BitCastInst>(use_user);
         // useIsALoad = isa<LoadInst>(use_user);
     }
     if(     instruction->getNumUses() <= 1
             && !useIsExtractValue 
             && !useIsAPhi
+            && !useIsABitcast
             && !isa<LoadInst>(instruction)
             // && !isa<StoreInst>(instruction)
             && !useIsAStore

@@ -397,6 +397,12 @@ void NewInstructionDumper::dumpBitCast(cocl::LocalValueInfo *localValueInfo) {
     LocalValueInfo *op0info = getOperand(instr->getOperand(0));
     string op0 = op0info->getExpr();
 
+    // we will split the code into two parts:
+    // assignment, like:  v3 = incoming-expression;
+    // bitcast, like v4 = *(int *)&v3;
+    // actually, we can do this by just tweaking the conitions in which we do assign
+    // lets do that for now
+
     string gencode = "";
     string op0str = op0;
     localValueInfo->setAddressSpace(0);
@@ -934,13 +940,15 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         return;
     } else if(functionName == "llvm.lifetime.start") {
         // return "";  // just ignore for now
-        localValueInfo->setAddressSpace(0);
-        localValueInfo->setExpression("");
+        localValueInfo->skip();
+        // localValueInfo->setAddressSpace(0);
+        // localValueInfo->setExpression("");
         return;
     } else if(functionName == "llvm.lifetime.end") {
         // return "";  // just ignore for now
-        localValueInfo->setAddressSpace(0);
-        localValueInfo->setExpression("");
+        localValueInfo->skip();
+        // localValueInfo->setAddressSpace(0);
+        // localValueInfo->setExpression("");
         return;
     } else if(functionName == "_Z11make_float4ffff") {
         // change this into something like: (float4)(a, b, c, d)
@@ -1084,6 +1092,10 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
                 gencode += stripOuterParams(getOperand(op)->getExpr());
                 i++;
             }
+            if(i > 0) {
+                gencode += ", ";
+            }
+            gencode += "scratch";
             if(isa<PointerType>(F->getReturnType())) {
                 Type *returnType = returnTypeByFunction.at(F);
                 cout << "function return type:" << endl;

@@ -313,7 +313,7 @@ TEST(test_block_dumper, usesPointerFunction) {
     oss.str("");
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
-    EXPECT_EQ(R"(    v1 = returnsPointer(in);
+    EXPECT_EQ(R"(    v1 = returnsPointer(in, scratch);
 )", oss.str());
 
     oss.str("");
@@ -664,6 +664,32 @@ TEST(test_block_dumper, storefloat) {
     // cout << oss.str() << endl;
     cout << "declarations: [" << oss.str() << "]" << endl;
     ASSERT_EQ(R"(    float v1;
+)", oss.str());
+}
+
+TEST(test_block_dumper, test_bitcast) {
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "test_bitcast");
+    BasicBlockDumper *blockDumper = wrapper.blockDumper.get();
+
+    wrapper.runGeneration();
+    ostringstream oss;
+
+    oss.str("");
+    blockDumper->toCl(oss);
+    string cl = oss.str();
+    cout << "cl: [" << cl << "]" << endl;
+    EXPECT_EQ(R"(    v1 = 5.0f + 3.0f;
+    v4 = *(int *)&(v1);
+    data[0] = v4;
+)", oss.str());
+
+    oss.str("");
+    blockDumper->writeDeclarations("    ", oss);
+    // cout << oss.str() << endl;
+    cout << "declarations: [" << oss.str() << "]" << endl;
+    EXPECT_EQ(R"(    float v1;
+    int v4;
 )", oss.str());
 }
 

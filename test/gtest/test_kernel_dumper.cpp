@@ -86,9 +86,9 @@ kernel void someKernel(global float* d1, uint d1_offset, global float* d2, uint 
 
 v1:;
     v3 = v2[0];
-    v4 = someFunc_gp(d1, v3);
-    v5 = someFunc_pg(v3, d1);
-    v6 = someFunc_gg(d1, d1);
+    v4 = someFunc_gp(d1, v3, scratch);
+    v5 = someFunc_pg(v3, d1, scratch);
+    v6 = someFunc_gg(d1, d1, scratch);
     return;
 }
 float someFunc_gg(global float* d1, global float* v11, local int *scratch) {
@@ -193,8 +193,8 @@ kernel void usesPointerFunction(global float* in, uint in_offset, local int *scr
     global float* v2;
 
 v1:;
-    v2 = returnsPointer_g(in);
-    v4 = returnsPointer(v3);
+    v2 = returnsPointer_g(in, scratch);
+    v4 = returnsPointer(v3, scratch);
     return;
 }
 )", cl);

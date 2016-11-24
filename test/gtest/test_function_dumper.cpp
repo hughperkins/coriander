@@ -132,7 +132,7 @@ TEST(test_function_dumper, basic1) {
 
 v1:;
     v3 = v2[0];
-    v4 = someFunc_gp(d1, v3);
+    v4 = someFunc_gp(d1, v3, scratch);
     return;
 }
 )", os.str());
@@ -278,7 +278,7 @@ v1:;
     global float* v2;
 
 v1:;
-    v2 = returnsPointer_g(in);
+    v2 = returnsPointer_g(in, scratch);
     return;
 }
 )", os.str());

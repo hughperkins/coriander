@@ -120,3 +120,10 @@ define void @storefloat(float *%data) {
   store float %1, float *%data
   ret void
 }
+
+define void @test_bitcast(i32 *%data) {
+  %1 = fadd float 5.0, 3.0
+  %2 = bitcast float %1 to i32
+  store i32 %2, i32* %data
+  ret void
+}
