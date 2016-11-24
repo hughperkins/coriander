@@ -236,6 +236,11 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 ## News
 
+- Nov 24:
+  - merge from branch clwriter:
+    - lots of refactorization under-the-hood
+    - can handle determining the address-space of functions returning pointers
+    - opencl generation is at runtime now => facilitates determining address-space; and counter-intuitively is actually faster, because less OpenCL to compile by the GPU driver
 - Nov 18:
   - Mac build working :-)  https://travis-ci.org/hughperkins/cuda-on-cl/builds/176997220#L1356
 - Nov 17:
