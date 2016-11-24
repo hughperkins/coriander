@@ -43,7 +43,8 @@ public:
          CLW_InsertValue,
          CLW_Binary,
          CLW_Shared,
-         CLW_NoExpression
+         CLW_NoExpression,
+         CLW_Call
      };
 
     ClWriter(LocalValueInfo *localValueInfo, ClWriterKind kind=CLW_Base) :
@@ -141,6 +142,22 @@ public:
     }
     virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) override;
     virtual void writeInlineCl(std::string indent, std::ostream &os) override {}
+};
+
+class CallClWriter : public ClWriter {
+    // basically, this should not store the result if it returns void,
+    // but it still needs to write the call out to the inlinecl
+public:
+    CallClWriter(LocalValueInfo *localValueInfo) :
+        ClWriter(localValueInfo, CLW_Shared) {
+            // std::cout << "creating sharedclwriter" << std::endl;
+        }
+
+    static bool classof(const ClWriter *clWriter) {
+        return clWriter->getKind() == CLW_Call;
+    }
+    virtual void writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) override;
+    virtual void writeInlineCl(std::string indent, std::ostream &os) override;
 };
 
 class NoExpressionClWriter : public ClWriter {
