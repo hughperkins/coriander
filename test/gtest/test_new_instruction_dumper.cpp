@@ -94,13 +94,12 @@ public:
 
 TEST(test_new_instruction_dumper, test_add) {
     StandaloneBlock myblock;
-/*
     IRBuilder<> builder(myblock.block);
 
-    LLVMContext &context = myblock.context;
+    LLVMContext *context = myblock.context.get();
     // we should create allocas really, and load those.  I guess?
-    AllocaInst *a = builder.CreateAlloca(IntegerType::get(context, 32));
-    AllocaInst *b = builder.CreateAlloca(IntegerType::get(context, 32));
+    AllocaInst *a = builder.CreateAlloca(IntegerType::get(*context, 32));
+    AllocaInst *b = builder.CreateAlloca(IntegerType::get(*context, 32));
 
     LoadInst *aLoad = builder.CreateLoad(a);
     LoadInst *bLoad = builder.CreateLoad(b);
@@ -143,18 +142,17 @@ TEST(test_new_instruction_dumper, test_add) {
     addInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
     // ASSERT_EQ("    v1 = v_a + v_b;\n", oss.str());
-    */
 }
-/*
+
 TEST(test_new_instruction_dumper, test_alloca) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
 
-    LLVMContext &context = myblock.context;
+    LLVMContext *context = myblock.context.get();
     // we should create allocas really, and load those.  I guess?
-    AllocaInst *a = builder.CreateAlloca(IntegerType::get(context, 32));
+    AllocaInst *a = builder.CreateAlloca(IntegerType::get(*context, 32));
 
-    InstructionDumperWrapper wrapper;
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
     // Instruction *add = cast<Instruction>(builder.CreateAdd(aLoad, bLoad));
@@ -200,14 +198,14 @@ TEST(test_new_instruction_dumper, store) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
 
-    LLVMContext &context = myblock.context;
+    LLVMContext *context = myblock.context.get();
     // create an alloca,and store into that?
-    AllocaInst *a = builder.CreateAlloca(IntegerType::get(context, 32));
-    AllocaInst *b = builder.CreateAlloca(IntegerType::get(context, 32));
+    AllocaInst *a = builder.CreateAlloca(IntegerType::get(*context, 32));
+    AllocaInst *b = builder.CreateAlloca(IntegerType::get(*context, 32));
 
     LoadInst *aLoad = builder.CreateLoad(a);
 
-    InstructionDumperWrapper wrapper;
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
     wrapper.declareVariable(aLoad, "aLoad");
@@ -247,29 +245,28 @@ TEST(test_new_instruction_dumper, store) {
     ASSERT_EQ("    b[0] = aLoad;\n", oss.str());
 }
 
-
 TEST(test_new_instruction_dumper, insert_value_already_defined) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
+    LLVMContext *context = myblock.context.get();
 
     Type *structElements[] = {
-        IntegerType::get(context, 32),
-        IntegerType::get(context, 32)
+        IntegerType::get(*context, 32),
+        IntegerType::get(*context, 32)
     };
     StructType *myStructType = StructType::create(
-        context, structElements, "struct.mystruct"
+        *context, structElements, "struct.mystruct"
     );
     myStructType->dump();
     cout << endl;
 
-    InstructionDumperWrapper wrapper;
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
     AllocaInst *aAlloca = builder.CreateAlloca(myStructType);
     LoadInst *aLoad = builder.CreateLoad(aAlloca);
 
-    AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(context, 32));
+    AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(*context, 32));
     LoadInst *intLoad = builder.CreateLoad(intAlloca);
 
     unsigned int idxs0[] = {1};
@@ -333,22 +330,22 @@ TEST(test_new_instruction_dumper, insert_value_already_defined) {
 TEST(test_new_instruction_dumper, insert_value_from_undef) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
+    LLVMContext *context = myblock.context.get();
 
     Type *structElements[] = {
-        IntegerType::get(context, 32),
-        IntegerType::get(context, 32)
+        IntegerType::get(*context, 32),
+        IntegerType::get(*context, 32)
     };
     StructType *myStructType = StructType::create(
-        context, structElements, "struct.mystruct"
+        *context, structElements, "struct.mystruct"
     );
     myStructType->dump();
     cout << endl;
 
-    InstructionDumperWrapper wrapper;
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(context, 32));
+    AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(*context, 32));
     LoadInst *intLoad = builder.CreateLoad(intAlloca);
 
     LocalValueInfo *intLoadInfo = LocalValueInfo::getOrCreate(
@@ -391,22 +388,22 @@ TEST(test_new_instruction_dumper, insert_value_from_undef) {
 TEST(test_new_instruction_dumper, insert_value_from_undef_f1) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
+    LLVMContext *context = myblock.context.get();
 
     Type *structElements[] = {
-        IntegerType::get(context, 32),
-        IntegerType::get(context, 32)
+        IntegerType::get(*context, 32),
+        IntegerType::get(*context, 32)
     };
     StructType *myStructType = StructType::create(
-        context, structElements, "struct.mystruct"
+        *context, structElements, "struct.mystruct"
     );
     myStructType->dump();
     cout << endl;
 
-    InstructionDumperWrapper wrapper;
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(context, 32));
+    AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(*context, 32));
     LoadInst *intLoad = builder.CreateLoad(intAlloca);
 
     LocalValueInfo *intLoadInfo = LocalValueInfo::getOrCreate(
@@ -448,12 +445,12 @@ TEST(test_new_instruction_dumper, insert_value_from_undef_f1) {
 TEST(test_new_instruction_dumper, test_icmp) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
-    InstructionDumperWrapper wrapper;
+    LLVMContext *context = myblock.context.get();
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    AllocaInst *a = builder.CreateAlloca(IntegerType::get(context, 32));
-    AllocaInst *b = builder.CreateAlloca(IntegerType::get(context, 32));
+    AllocaInst *a = builder.CreateAlloca(IntegerType::get(*context, 32));
+    AllocaInst *b = builder.CreateAlloca(IntegerType::get(*context, 32));
 
     LoadInst *aLoad = builder.CreateLoad(a);
     LoadInst *bLoad = builder.CreateLoad(b);
@@ -505,12 +502,12 @@ TEST(test_new_instruction_dumper, test_icmp) {
 TEST(test_new_instruction_dumper, test_fcmp) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
-    InstructionDumperWrapper wrapper;
+    LLVMContext *context = myblock.context.get();
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    AllocaInst *a = builder.CreateAlloca(Type::getFloatTy(context));
-    AllocaInst *b = builder.CreateAlloca(Type::getFloatTy(context));
+    AllocaInst *a = builder.CreateAlloca(Type::getFloatTy(*context));
+    AllocaInst *b = builder.CreateAlloca(Type::getFloatTy(*context));
 
     LoadInst *aLoad = builder.CreateLoad(a);
     LoadInst *bLoad = builder.CreateLoad(b);
@@ -559,17 +556,17 @@ TEST(test_new_instruction_dumper, test_fcmp) {
 TEST(test_new_instruction_dumper, test_sext) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
-    InstructionDumperWrapper wrapper;
+    LLVMContext *context = myblock.context.get();
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    AllocaInst *a = builder.CreateAlloca(IntegerType::get(context, 8));
+    AllocaInst *a = builder.CreateAlloca(IntegerType::get(*context, 8));
 
     LoadInst *aLoad = builder.CreateLoad(a);
 
     wrapper.declareVariable(aLoad, "v_a");
 
-    Instruction *instr = cast<Instruction>(builder.CreateSExt(aLoad, IntegerType::get(context, 32)));
+    Instruction *instr = cast<Instruction>(builder.CreateSExt(aLoad, IntegerType::get(*context, 32)));
 
     LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
     std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
@@ -610,17 +607,17 @@ TEST(test_new_instruction_dumper, test_sext) {
 TEST(test_new_instruction_dumper, test_zext) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
-    InstructionDumperWrapper wrapper;
+    LLVMContext *context = myblock.context.get();
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    AllocaInst *a = builder.CreateAlloca(IntegerType::get(context, 8));
+    AllocaInst *a = builder.CreateAlloca(IntegerType::get(*context, 8));
 
     LoadInst *aLoad = builder.CreateLoad(a);
 
     wrapper.declareVariable(aLoad, "v_a");
 
-    Instruction *instr = cast<Instruction>(builder.CreateZExt(aLoad, IntegerType::get(context, 32)));
+    Instruction *instr = cast<Instruction>(builder.CreateZExt(aLoad, IntegerType::get(*context, 32)));
 
     LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
     std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
@@ -661,17 +658,17 @@ TEST(test_new_instruction_dumper, test_zext) {
 TEST(test_new_instruction_dumper, test_fpext) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
-    InstructionDumperWrapper wrapper;
+    LLVMContext *context = myblock.context.get();
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    AllocaInst *a = builder.CreateAlloca(Type::getFloatTy(context));
+    AllocaInst *a = builder.CreateAlloca(Type::getFloatTy(*context));
 
     LoadInst *aLoad = builder.CreateLoad(a);
 
     wrapper.declareVariable(aLoad, "v_a");
 
-    Instruction *instr = cast<Instruction>(builder.CreateFPExt(aLoad, Type::getDoubleTy(context)));
+    Instruction *instr = cast<Instruction>(builder.CreateFPExt(aLoad, Type::getDoubleTy(*context)));
 
     LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
     std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
@@ -712,17 +709,17 @@ TEST(test_new_instruction_dumper, test_fpext) {
 TEST(test_new_instruction_dumper, test_fptrunc) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
-    InstructionDumperWrapper wrapper;
+    LLVMContext *context = myblock.context.get();
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    AllocaInst *a = builder.CreateAlloca(Type::getDoubleTy(context));
+    AllocaInst *a = builder.CreateAlloca(Type::getDoubleTy(*context));
 
     LoadInst *aLoad = builder.CreateLoad(a);
 
     wrapper.declareVariable(aLoad, "v_a");
 
-    Instruction *instr = cast<Instruction>(builder.CreateFPTrunc(aLoad, Type::getFloatTy(context)));
+    Instruction *instr = cast<Instruction>(builder.CreateFPTrunc(aLoad, Type::getFloatTy(*context)));
 
     LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
     std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
@@ -763,17 +760,17 @@ TEST(test_new_instruction_dumper, test_fptrunc) {
 TEST(test_new_instruction_dumper, test_bitcast) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
-    InstructionDumperWrapper wrapper;
+    LLVMContext *context = myblock.context.get();
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    AllocaInst *a = builder.CreateAlloca(Type::getFloatTy(context));
+    AllocaInst *a = builder.CreateAlloca(Type::getFloatTy(*context));
 
     LoadInst *aLoad = builder.CreateLoad(a);
 
     wrapper.declareVariable(aLoad, "v_a");
 
-    Instruction *instr = cast<Instruction>(builder.CreateBitCast(aLoad, IntegerType::get(context, 32)));
+    Instruction *instr = cast<Instruction>(builder.CreateBitCast(aLoad, IntegerType::get(*context, 32)));
 
     LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
     std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
@@ -814,17 +811,17 @@ TEST(test_new_instruction_dumper, test_bitcast) {
 TEST(test_new_instruction_dumper, test_addrspacecast) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
-    InstructionDumperWrapper wrapper;
+    LLVMContext *context = myblock.context.get();
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    AllocaInst *a = builder.CreateAlloca(Type::getFloatTy(context));
+    AllocaInst *a = builder.CreateAlloca(Type::getFloatTy(*context));
 
     // LoadInst *aLoad = builder.CreateLoad(a);
 
     wrapper.declareVariable(a, "v_a");
 
-    Instruction *instr = cast<Instruction>(builder.CreateAddrSpaceCast(a, PointerType::get(Type::getFloatTy(context), 1)));
+    Instruction *instr = cast<Instruction>(builder.CreateAddrSpaceCast(a, PointerType::get(Type::getFloatTy(*context), 1)));
 
     LocalValueInfo *instrInfo = wrapper.createInfo(instr, "myinstr");
     std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
@@ -867,13 +864,13 @@ TEST(test_new_instruction_dumper, test_addrspacecast) {
 TEST(test_new_instruction_dumper, test_select) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
-    InstructionDumperWrapper wrapper;
+    LLVMContext *context = myblock.context.get();
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    AllocaInst *conditionAlloca = builder.CreateAlloca(IntegerType::get(context, 1));
-    AllocaInst *aAlloca = builder.CreateAlloca(Type::getFloatTy(context));
-    AllocaInst *bAlloca = builder.CreateAlloca(Type::getFloatTy(context));
+    AllocaInst *conditionAlloca = builder.CreateAlloca(IntegerType::get(*context, 1));
+    AllocaInst *aAlloca = builder.CreateAlloca(Type::getFloatTy(*context));
+    AllocaInst *bAlloca = builder.CreateAlloca(Type::getFloatTy(*context));
 
     LoadInst *condition = builder.CreateLoad(conditionAlloca);
     LoadInst *a = builder.CreateLoad(aAlloca);
@@ -891,7 +888,7 @@ TEST(test_new_instruction_dumper, test_select) {
 
     string expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
-    ASSERT_EQ("mycondition ? v_a : v_b", expr);
+    ASSERT_EQ("(mycondition ? v_a : v_b)", expr);
 
     ostringstream oss;
     instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
@@ -926,25 +923,25 @@ TEST(test_new_instruction_dumper, test_select) {
 TEST(test_new_instruction_dumper, getelementptr_struct) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
+    LLVMContext *context = myblock.context.get();
 
     Type *structElements[] = {
-        IntegerType::get(context, 32),
-        IntegerType::get(context, 32)
+        IntegerType::get(*context, 32),
+        IntegerType::get(*context, 32)
     };
     StructType *myStructType = StructType::create(
-        context, structElements, "struct.mystruct"
+        *context, structElements, "struct.mystruct"
     );
     myStructType->dump();
     cout << endl;
 
-    InstructionDumperWrapper wrapper;
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
     AllocaInst *structAlloca = builder.CreateAlloca(myStructType);
     // LoadInst *structLoad = builder.CreateLoad(structAlloca);
 
-    // AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(context, 32));
+    // AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(*context, 32));
     // LoadInst *intLoad = builder.CreateLoad(intAlloca);
 
     wrapper.declareVariable(structAlloca, "structAlloca");
@@ -997,25 +994,25 @@ TEST(test_new_instruction_dumper, getelementptr_struct) {
 TEST(test_new_instruction_dumper, extractvalue_struct) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
+    LLVMContext *context = myblock.context.get();
 
     Type *structElements[] = {
-        IntegerType::get(context, 32),
-        IntegerType::get(context, 32)
+        IntegerType::get(*context, 32),
+        IntegerType::get(*context, 32)
     };
     StructType *myStructType = StructType::create(
-        context, structElements, "struct.mystruct"
+        *context, structElements, "struct.mystruct"
     );
     myStructType->dump();
     cout << endl;
 
-    InstructionDumperWrapper wrapper;
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
     AllocaInst *structAlloca = builder.CreateAlloca(myStructType);
     LoadInst *structLoad = builder.CreateLoad(structAlloca);
 
-    // AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(context, 32));
+    // AllocaInst *intAlloca = builder.CreateAlloca(IntegerType::get(*context, 32));
     // LoadInst *intLoad = builder.CreateLoad(intAlloca);
 
     wrapper.declareVariable(structLoad, "structLoad");
@@ -1068,21 +1065,21 @@ TEST(test_new_instruction_dumper, extractvalue_struct) {
 TEST(test_new_instruction_dumper, callsomething) {
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
+    LLVMContext *context = myblock.context.get();
     Module *M = myblock.M.get();
 
-    InstructionDumperWrapper wrapper;
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    AllocaInst *charArray = builder.CreateAlloca(IntegerType::get(context, 8));
+    AllocaInst *charArray = builder.CreateAlloca(IntegerType::get(*context, 8));
     cout << "charArray:" << endl;
     charArray->dump();
     cout << endl;
 
     Function *childF = cast<Function>(M->getOrInsertFunction(
         "mychildfunc",
-        PointerType::get(IntegerType::get(context, 8), 0),
-        PointerType::get(IntegerType::get(context, 8), 0),
+        PointerType::get(IntegerType::get(*context, 8), 0),
+        PointerType::get(IntegerType::get(*context, 8), 0),
         NULL));
     cout << "childF:" << endl;
     childF->dump();
@@ -1135,7 +1132,7 @@ TEST(test_new_instruction_dumper, callsomething) {
     cout << "================" << endl;
     cout << "After marking th efunction defined:" << endl;
 
-    returnTypeByFunction[childF] = PointerType::get(IntegerType::get(context, 8), 1);
+    returnTypeByFunction[childF] = PointerType::get(IntegerType::get(*context, 8), 1);
     instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
     ASSERT_FALSE(instrInfo->needDependencies);
@@ -1197,13 +1194,13 @@ TEST(test_new_instruction_dumper, sharedmem_nocast) {
     // thing, so let's test it locally
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
+    LLVMContext *context = myblock.context.get();
     Module *M = myblock.M.get();
 
-    InstructionDumperWrapper wrapper;
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    ArrayType *arrayType = ArrayType::get(Type::getFloatTy(context), 32);
+    ArrayType *arrayType = ArrayType::get(Type::getFloatTy(*context), 32);
     GlobalVariable *globalVariable = new GlobalVariable(
         arrayType, false, GlobalValue::LinkageTypes::InternalLinkage,
         0, "mysharedmem",
@@ -1231,7 +1228,7 @@ TEST(test_new_instruction_dumper, sharedmem_nocast) {
     oss.str("");
     instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
     cout << "declaration [" << oss.str() << "]" << endl;
-    ASSERT_EQ("    local mysharedmem float[32];\n", oss.str());
+    ASSERT_EQ("    local float mysharedmem[32];\n", oss.str());
 
     oss.str("");
     instrInfo->writeInlineCl("    ", oss);
@@ -1249,7 +1246,7 @@ TEST(test_new_instruction_dumper, sharedmem_nocast) {
     oss.str("");
     instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
     cout << "declaration [" << oss.str() << "]" << endl;
-    ASSERT_EQ("    local mysharedmem float[32];\n", oss.str());
+    ASSERT_EQ("    local float mysharedmem[32];\n", oss.str());
 
     oss.str("");
     instrInfo->writeInlineCl("    ", oss);
@@ -1262,13 +1259,13 @@ TEST(test_new_instruction_dumper, sharedmem_with_cast) {
     // thing, so let's test it locally
     StandaloneBlock myblock;
     IRBuilder<> builder(myblock.block);
-    LLVMContext &context = myblock.context;
+    LLVMContext *context = myblock.context.get();
     Module *M = myblock.M.get();
 
-    InstructionDumperWrapper wrapper;
+    InstructionDumperWrapper wrapper(myblock);
     NewInstructionDumper *instructionDumper = wrapper.instructionDumper.get();
 
-    ArrayType *arrayType = ArrayType::get(Type::getFloatTy(context), 32);
+    ArrayType *arrayType = ArrayType::get(Type::getFloatTy(*context), 32);
     cout << "arrayType:" << endl;
     arrayType->dump();
     GlobalVariable *globalVariable = new GlobalVariable(
@@ -1292,7 +1289,7 @@ TEST(test_new_instruction_dumper, sharedmem_with_cast) {
     addrSpaceCast->dump();
 
     // int idxs[] = {0};
-    Value *constant_0 = ConstantInt::get(IntegerType::get(context, 32), 0);
+    Value *constant_0 = ConstantInt::get(IntegerType::get(*context, 32), 0);
     GetElementPtrInst *getElementPtrInst = GetElementPtrInst::CreateInBounds(
         addrSpaceCast, ArrayRef<Value *>(constant_0));
 //    GetElementPtrInst *getElementPtrInst = cast<GetElementPtrInst>(builder.CreateInBoundsGEP(
@@ -1370,5 +1367,5 @@ TEST(test_new_instruction_dumper, sharedmem_with_cast) {
     cout << "inlineCl [" << oss.str() << "]" << endl;
     // ASSERT_EQ("", oss.str());
 }
-*/
+
 }
