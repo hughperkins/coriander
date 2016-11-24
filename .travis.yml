@@ -30,13 +30,13 @@ before_install:
   - cd ${BASEDIR}
   - wget https://pypi.python.org/packages/source/v/virtualenv/virtualenv-14.0.6.tar.gz
   - tar -xf virtualenv-14.0.6.tar.gz
-  - echo -------- python 3.4 ----------
+  - echo -------- python 3.5 ----------
   - cd ${BASEDIR}
-  - wget https://www.python.org/ftp/python/3.4.4/python-3.4.4-macosx10.6.pkg
-  - sudo installer -pkg python-3.4.4-macosx10.6.pkg -target /
+  - wget https://www.python.org/ftp/python/3.5.2/python-3.5.2-macosx10.6.pkg
+  - sudo installer -pkg python-3.5.2-macosx10.6.pkg -target /
   - python3 -V
-  - ${BASEDIR}/virtualenv-14.0.6/virtualenv.py -p python3 ~/env34
-  - source ~/env34/bin/activate
+  - ${BASEDIR}/virtualenv-14.0.6/virtualenv.py -p python3 ~/env35
+  - source ~/env35/bin/activate
   - pip install -U pip
   - pip install -U setuptools
   - pip install wheel
@@ -56,9 +56,9 @@ script:
   - ls -lh
   - echo ======== py.test tests ==============
   - cd ${BASEDIR}
-  - source ~/env34/bin/activate
+  - source ~/env35/bin/activate
   - export COCL_DEVICES_ALL=1
-  - COCL_DEVICES_ALL=1 CLANG_HOME=${CLANG_HOME} OFFSET_32BIT=1 py.test -v
+  - COCL_DEVICES_ALL=1 CLANG_HOME=${CLANG_HOME} OFFSET_32BIT=1 py.test test/test_branching.py -v
 
 notifications:
   email:
