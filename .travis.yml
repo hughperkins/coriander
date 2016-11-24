@@ -58,7 +58,7 @@ script:
   - cd ${BASEDIR}
   - source ~/env34/bin/activate
   - export COCL_DEVICES_ALL=1
-  - COCL_DEVICES_ALL=1 CLANG_HOME=${CLANG_HOME} OFFSET_32BIT=1 py.test -v
+  - # COCL_DEVICES_ALL=1 CLANG_HOME=${CLANG_HOME} OFFSET_32BIT=1 py.test -v
 
 notifications:
   email:
