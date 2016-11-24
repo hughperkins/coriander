@@ -25,6 +25,19 @@ before_install:
   - cmake .. -DCLANG_HOME=${CLANG_HOME} -DBUILD_TESTS=ON
   - make -j 8
   - make install
+  - echo ====== python 3.4 ==============
+  - cd ${BASEDIR}
+  - wget https://www.python.org/ftp/python/3.4.4/python-3.4.4-macosx10.6.pkg
+  - sudo installer -pkg python-3.4.4-macosx10.6.pkg -target /
+  - python3 -V
+  - ${BASEDIR}/virtualenv-14.0.6/virtualenv.py -p python3 ~/env34
+  - source ~/env34/bin/activate
+  - pip install -U pip
+  - pip install -U setuptools
+  - pip install wheel
+  - pip install numpy
+  - pip install -r ${BASEDIR}/test/requirements.txt
+  - python -c 'import numpy'
 
 script:
   - cd ${BASEDIR}/build
