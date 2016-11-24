@@ -275,6 +275,7 @@ bool BasicBlockDumper::checkIfNeedsAssign(Instruction *instruction) {
             && !useIsAPhi
             && !useIsABitcast
             && !isa<LoadInst>(instruction)
+            && !isa<StoreInst>(instruction)
             // && !isa<StoreInst>(instruction)
             && !useIsAStore
             && !isa<CallInst>(instruction)) { // } && !useIsAStore) {
