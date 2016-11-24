@@ -127,3 +127,16 @@ define void @test_bitcast(i32 *%data) {
   store i32 %2, i32* %data
   ret void
 }
+
+define void @test_ieee_doubles(double *%data) {
+  store double 0x43EFFE0000000000, double* %data
+  %1 = getelementptr inbounds double, double* %data, i64 0
+  store double 0x43DFFC0000000000, double* %1
+  %2 = getelementptr inbounds double, double* %data, i64 1
+  store double 0xFFF0000000000000, double* %2   ; -INFINITY
+  %3 = getelementptr inbounds double, double* %data, i64 2
+  store double 0x7FF0000000000000, double* %3   ; INFINITY
+  %4 = getelementptr inbounds double, double* %data, i64 3
+  store double 0xFFEFFFFFFFFFFFFF, double* %4   ; -INFINITY
+  ret void
+}

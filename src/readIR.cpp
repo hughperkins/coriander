@@ -91,6 +91,15 @@ string dumpFloatConstant(bool forceSingle, ConstantFP *constantFP) {
     } else if(valuestr == "-inf") {
         return "-INFINITY";
     }
+    float asFloat = readFloatConstant(constantFP);
+    oss.str("");
+    oss << asFloat;
+    valuestr = oss.str();
+    if(valuestr == "inf") {
+        return "INFINITY";
+    } else if(valuestr == "-inf") {
+        return "-INFINITY";
+    }
     if(valuestr.find('.') == string::npos) {
         valuestr += ".0";
     }
@@ -125,6 +134,7 @@ float readFloatConstant(Value *value) {
         default:
             throw runtime_error("unrecognized type");
     }
+    cout << "readfloatConstant returning " << res << endl;
     return res;
     // cout << "float constant as double " << valueasdouble << endl;
     // cout << "float constant as float " << valueasfloat << endl;

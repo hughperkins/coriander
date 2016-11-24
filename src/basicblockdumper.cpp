@@ -286,8 +286,8 @@ void BasicBlockDumper::writeDeclarations(std::string indent, ostream &os) {
     vector<string> declarations;
     for(auto it = localValueInfos->begin(); it != localValueInfos->end(); it++) {
         LocalValueInfo *localValueInfo = it->second.get();
-        cout << "basicblockdumper, writing declration for " << localValueInfo->name << ":" << endl;
-        it->first->dump();
+        // cout << "basicblockdumper, writing declration for " << localValueInfo->name << ":" << endl;
+        // it->first->dump();
         ostringstream oss;
         localValueInfo->writeDeclaration("    ", typeDumper, oss);
         declarations.push_back(oss.str());
@@ -331,9 +331,9 @@ bool BasicBlockDumper::runGeneration(const std::map<llvm::Function *, llvm::Type
         }
         try {
             LocalValueInfo *instrInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, inst);
-            cout << "basicblockdumper rungeneration on inst:" << endl;
-            inst->dump();
-            cout << endl;
+            // cout << "basicblockdumper rungeneration on inst:" << endl;
+            // inst->dump();
+            // cout << endl;
             instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
             if(instrInfo->needDependencies) {
                 cout << "basicblockdumper::dumpinstruction, instr:" << endl;

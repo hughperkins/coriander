@@ -693,4 +693,38 @@ TEST(test_block_dumper, test_bitcast) {
 )", oss.str());
 }
 
+TEST(test_block_dumper, test_ieee_doubles) {
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "test_ieee_doubles");
+    BasicBlockDumper *blockDumper = wrapper.blockDumper.get();
+
+    wrapper.runGeneration();
+    ostringstream oss;
+
+    oss.str("");
+    blockDumper->toCl(oss);
+    string cl = oss.str();
+    cout << "cl: [" << cl << "]" << endl;
+    EXPECT_EQ(R"(    data[0] = 1.84422e+19f;
+    v3 = (&data[0]);
+    v3[0] = 9.21887e+18f;
+    v7 = (&data[1]);
+    v7[0] = -INFINITY;
+    v11 = (&data[2]);
+    v11[0] = INFINITY;
+    v15 = (&data[3]);
+    v15[0] = -INFINITY;
+)", oss.str());
+
+    oss.str("");
+    blockDumper->writeDeclarations("    ", oss);
+    // cout << oss.str() << endl;
+    cout << "declarations: [" << oss.str() << "]" << endl;
+    EXPECT_EQ(R"(    float* v11;
+    float* v15;
+    float* v3;
+    float* v7;
+)", oss.str());
+}
+
 } // namespace

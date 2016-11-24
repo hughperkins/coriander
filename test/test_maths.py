@@ -15,7 +15,7 @@ limitations under the License.
 import numpy as np
 import pyopencl as cl
 import os
-import subprocess
+import math
 from test import test_common
 from test.test_common import offset_type
 
@@ -64,67 +64,39 @@ __global__ void myKernel(float *data) {
     assert float_data[1] > 100000000
     assert float_data[2] > 100000000
     assert float_data[3] > 100000000
-    assert float_data[4] < -100000000
-    assert float_data[5] > 100000000
-    assert float_data[6] > 100000000
-    assert float_data[7] < -100000000
+    assert float_data[4] == - np.inf
+    assert float_data[5] == np.inf
+    assert float_data[6] == np.inf
+    assert float_data[7] == - np.inf
 
 
-# def test_doubleconstants(context, q, float_data, float_data_gpu):
-
-#     code = """
-# __global__ void myKernel(double *data) {
-#     data[0] = 18442240474082181120.0f; // 0xFFF0000000000000
-#     data[1] = 9218868437227405312.0f; // 0x7FF0000000000000
-#     data[6] = INFINITY;
-#     data[7] = -INFINITY;
-#     // data[8] = 0xFFEFFFFFFFFFFFFF;
-# }
-# """
-#     kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['double *']))['kernel']
-#     kernel(
-#         q, (32,), (32,),
-#         float_data_gpu, offset_type(0), cl.LocalMemory(4))
-#     q.finish()
-#     cl.enqueue_copy(q, float_data, float_data_gpu)
-#     q.finish()
-#     print('float_data[0]', float_data[0])
-#     print('float_data[1]', float_data[1])
-#     print('float_data[6]', float_data[6])
-#     print('float_data[7]', float_data[7])
-#     assert float_data[0] > 100000000
-#     assert float_data[1] > 100000000
-#     assert float_data[6] > 100000000
-#     assert float_data[7] < -100000000
-
-
-def test_ieeefloats():
-    """
-    we're going to create an ll file, and convert to cl, and see what pops out
-    """
-    print(subprocess.check_output([
-        'build/ir-to-opencl',
-        '--inputfile', 'test/testdoubles.ll',
-        '--outputfile', '/tmp/out.cl',
-        '--kernelname', '_Z8myKernelPd'
-    ]).decode('utf-8'))
-    with open('/tmp/out.cl') as f:
-        content = f.read()
-    values = {}
-    for line in content.split('\n'):
-        if 'data[' in line:
-            index = int(line.split('[')[1].split(']')[0])
-            value = line.strip().split('=')[1].strip().replace(';', '')
-            values[index] = value
-    print('values[6]', values[6])
-    print('values[7]', values[7])
-    print('values[8]', values[8])
-    assert 'nan' not in values[6]
-    assert 'nan' not in values[7]
-    assert 'nan' not in values[8]
-    assert values[6] == '-INFINITY'
-    assert values[7] == 'INFINITY'
-    # assert values[8] == '-INFINITY'
+def test_ieeefloats(context, q, float_data, float_data_gpu):
+    cu_code = """
+__global__ void mykernel(double *data) {
+    double d_neginfinity = -INFINITY;
+    double d_posinfinity = INFINITY;
+    float f_neginfinity = -INFINITY;
+    float f_posinfinity = INFINITY;
+    data[0] = INFINITY;
+    data[1] = -INFINITY;
+    data[2] = f_neginfinity;
+    data[3] = f_posinfinity;
+}
+"""
+    kernel_name = test_common.mangle('mykernel', ['double*'])
+    cl_code = test_common.cu_to_cl(cu_code, kernel_name)
+    kernel = test_common.build_kernel(context, cl_code, kernel_name)
+    kernel(
+        q, (32,), (32,),
+        float_data_gpu, offset_type(0), cl.LocalMemory(4))
+    q.finish()
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    print(float_data[:4])
+    assert float_data[0] == np.inf
+    assert float_data[1] == - np.inf
+    assert float_data[2] == - np.inf
+    assert float_data[3] == np.inf
 
 
 def test_pow(context, q, float_data, float_data_gpu):
@@ -165,12 +137,11 @@ __global__ void myKernel(float *data) {
 }
 """
     kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['float *']))['kernel']
-    # float_data[1] = 1.5
-    # float_data[2] = 4.6
-    # float_data[4] = -1.5
-    # float_data[5] = 4.6
-    # float_data[7] = 1.5
-    # float_data[8] = -4.6
+    float_data[0] = 1.5
+    float_data[1] = 4.6
+    float_data[2] = -1.5
+    float_data[3] = 0
+    float_data_orig = np.copy(float_data)
     cl.enqueue_copy(q, float_data_gpu, float_data)
     kernel(
         q, (32,), (32,),
@@ -178,8 +149,13 @@ __global__ void myKernel(float *data) {
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
-    for i in range(8):
-        print('float_data[]', i, float_data[i])
+    print('float_data[:4]', float_data[:4])
+    for i in range(4):
+        if float_data_orig[i] >= 0:
+            assert abs(float_data[i] - math.sqrt(float_data_orig[i])) <= 1e-4
+        else:
+            assert math.isnan(float_data[i])
+        # print('float_data[]', i, float_data[i])
 
 
 def test_fptosi(context, q, float_data, float_data_gpu, int_data, int_data_gpu):
