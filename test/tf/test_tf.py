@@ -8,13 +8,12 @@ import numpy as np
 import pyopencl as cl
 import subprocess
 from test import test_common
-import pytest
+from test.test_common import offset_type
 
 
 CLANG_HOME = os.environ['CLANG_HOME']
 
 
-# @pytest.mark.xfail(reason='currently broken, needs fixing...')
 def test_cwise_sqrt(context, q, float_data, float_data_gpu):
     options = test_common.cocl_options()
     i = 0
@@ -107,7 +106,6 @@ def test_cwise_sqrt(context, q, float_data, float_data_gpu):
     assert np.abs(expected[:N] - eval_ptr0[:N]).max() < 1e-4
 
 
-@pytest.mark.xfail(reason='currently broken, needs fixing...')
 def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
     options = test_common.cocl_options()
     i = 0
@@ -173,8 +171,8 @@ def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
     src_host = np.random.uniform(0, 1, size=(N,)).astype(np.float32) + 1.0
     dst_host = np.zeros(N, dtype=np.float32)
 
-    src_offset = 128
-    dst_offset = 256
+    src_offset_bytes = 128
+    dst_offset_bytes = 256
 
     huge_buf_gpu = cl.Buffer(context, cl.mem_flags.READ_WRITE, size=4096)
     # huge_buf_gpu_spare = cl.Buffer(context, cl.mem_flags.READ_WRITE, size=4096)
@@ -182,16 +180,16 @@ def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
     eval_nopointers_gpu = cl.Buffer(context, cl.mem_flags.READ_WRITE, size=4096)
 
     eval_ptr0_gpu = huge_buf_gpu
-    eval_ptr0_offset = dst_offset
+    eval_ptr0_offset = dst_offset_bytes // 4
 
     eval_ptr1_gpu = huge_buf_gpu
-    eval_ptr1_offset = src_offset
+    eval_ptr1_offset = src_offset_bytes // 4
 
     size = N
 
     # copy our host memory across
     # cl.enqueue_copy(q, huge_buf_gpu_spare, src_host, device_offset=256, size=N * 4)
-    test_common.enqueue_write_buffer_ext(cl, queue, huge_buf_gpu, src_host, device_offset=src_offset, size=N * 4)
+    test_common.enqueue_write_buffer_ext(cl, queue, huge_buf_gpu, src_host, device_offset=src_offset_bytes, size=N * 4)
 
     global_size = 256
     workgroup_size = 256
@@ -200,15 +198,15 @@ def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
     prog.__getattr__('_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_')(
         queue, (global_size,), (workgroup_size,),
         eval_nopointers_gpu,
-        eval_ptr0_gpu, np.int32(eval_ptr0_offset),
-        eval_ptr1_gpu, np.int32(eval_ptr1_offset),
+        eval_ptr0_gpu, offset_type(eval_ptr0_offset),
+        eval_ptr1_gpu, offset_type(eval_ptr1_offset),
         np.int32(size),
         cl.LocalMemory(scratch)
     )
     # check for errors
     queue.finish()
 
-    test_common.enqueue_read_buffer_ext(cl, queue, huge_buf_gpu, dst_host, device_offset=dst_offset, size=N * 4)
+    test_common.enqueue_read_buffer_ext(cl, queue, huge_buf_gpu, dst_host, device_offset=dst_offset_bytes, size=N * 4)
     # cl.enqueue_copy(queue, dst_host, huge_buf_gpu, device_offset=128, size=N * 4)
     queue.finish()
     print('dst_host[:N]', dst_host[:N])
