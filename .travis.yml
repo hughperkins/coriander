@@ -25,7 +25,12 @@ before_install:
   - cmake .. -DCLANG_HOME=${CLANG_HOME} -DBUILD_TESTS=ON
   - make -j 8
   - make install
-  - echo ====== python 3.4 ==============
+  - echo ====== python, for running python-based unit tests ==============
+  - echo -------- virtualenv ----------
+  - cd ${BASEDIR}
+  - wget https://pypi.python.org/packages/source/v/virtualenv/virtualenv-14.0.6.tar.gz
+  - tar -xf virtualenv-14.0.6.tar.gz
+  - echo -------- python 3.4 ----------
   - cd ${BASEDIR}
   - wget https://www.python.org/ftp/python/3.4.4/python-3.4.4-macosx10.6.pkg
   - sudo installer -pkg python-3.4.4-macosx10.6.pkg -target /
