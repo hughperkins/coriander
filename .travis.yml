@@ -59,6 +59,7 @@ script:
   - source ~/env35/bin/activate
   - COCL_DEVICES_ALL=1 CLANG_HOME=${CLANG_HOME} OFFSET_32BIT=1 py.test test/test_branching.py -v
   - COCL_DEVICES_ALL=1 CLANG_HOME=${CLANG_HOME} OFFSET_32BIT=1 py.test test/test_cloutput.py -v
+  - COCL_DEVICES_ALL=1 CLANG_HOME=${CLANG_HOME} OFFSET_32BIT=1 py.test test/test_maths.py -v
 
 notifications:
   email:
