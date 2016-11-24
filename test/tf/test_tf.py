@@ -14,7 +14,7 @@ import pytest
 CLANG_HOME = os.environ['CLANG_HOME']
 
 
-@pytest.mark.xfail(reason='currently broken, needs fixing...')
+# @pytest.mark.xfail(reason='currently broken, needs fixing...')
 def test_cwise_sqrt(context, q, float_data, float_data_gpu):
     options = test_common.cocl_options()
     i = 0
@@ -133,18 +133,20 @@ def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
             '-S',
             'test/tf/samples/cwise_op_gpu_sqrt-device-noopt.ll',
             '-o', '/tmp/test-opt.ll'
-        ], stdout=subprocess.PIPE)
+        ], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         print(' '.join(res.args))
+        print(res.stdout.decode('utf-8'))
         assert res.returncode == 0
 
         res = subprocess.run([
             'build/ir-to-opencl'
         ] + iropencl_options + [
             '--inputfile', '/tmp/test-opt.ll',
-            '--outputfile', '/tmp/test-device.cl'
+            '--outputfile', '/tmp/test-device.cl',
             '--kernelname', '_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_'
-        ], stdout=subprocess.PIPE)
+        ], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         print(' '.join(res.args))
+        print(res.stdout.decode('utf-8'))
         assert res.returncode == 0
 
     with open('/tmp/test-device.cl', 'r') as f:
@@ -198,8 +200,8 @@ def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
     prog.__getattr__('_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_')(
         queue, (global_size,), (workgroup_size,),
         eval_nopointers_gpu,
-        eval_ptr0_gpu, np.int64(eval_ptr0_offset),
-        eval_ptr1_gpu, np.int64(eval_ptr1_offset),
+        eval_ptr0_gpu, np.int32(eval_ptr0_offset),
+        eval_ptr1_gpu, np.int32(eval_ptr1_offset),
         np.int32(size),
         cl.LocalMemory(scratch)
     )
