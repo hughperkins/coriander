@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 
     cuMemcpyHtoDAsync((CUdeviceptr)(((float *)deviceFloats1)), hostFloats1, N * sizeof(float), stream);
 
-    getValue<<<dim3(4,1,1), dim3(256,1,1), 0, stream>>>(((float *)deviceFloats1));
+    getValue<<<dim3(4,1,1), dim3(128,1,1), 0, stream>>>(((float *)deviceFloats1));
 
     cuMemcpyDtoHAsync(hostFloats1, deviceFloats1, N * sizeof(float), stream);
     cuStreamSynchronize(stream);
