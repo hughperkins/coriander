@@ -419,7 +419,7 @@ bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *
     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
         Argument *arg = &*it;
         // sring name = localNames.getOrCreateName(arg, arg->getName().str());
-        arg->dump();
+        // arg->dump();
         LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(&localNames, &localValueInfos, arg, arg->getName().str());
         localValueInfo->setExpression(localValueInfo->name);
     }
