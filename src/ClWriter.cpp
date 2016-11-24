@@ -265,4 +265,53 @@ void NoExpressionClWriter::writeInlineCl(std::string indent, std::ostream &os) {
     }
 }
 
+void CallClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {  // if we set this as to be assigned, this will write something, otherwise it wont
+    // cout << "base ClWriter::writeDelcaratoin" << endl;
+    if(localValueInfo->_skip) {
+        return;
+    }
+    // if return type is void, we dont need a declaration
+    if(localValueInfo->value->getType()->isVoidTy()) {
+        return;
+    }
+    for(auto it = localValueInfo->declarationCl.begin(); it != localValueInfo->declarationCl.end(); it++) {
+        // cout << "in localvalueinfo->declarationCl:" << endl;
+        // cout << indent << *it << ";" << endl;
+        os << indent << *it << ";\n";
+    }
+    if(localValueInfo->toBeDeclared) {
+        // cout << "in localvalueinfo.toBeDeclared:" << endl;
+        // cout << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name << ";" << endl;
+        os << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name << ";\n";
+    }
+    // if(localValueInfo->toBeDeclared) {
+    //     os << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name;\n";
+    // }
+}
+
+void CallClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes any cl required, eg if we toggled setAsAssigned, we need to do the assignment
+                                          // some instructoins will *always* write something, eg stores
+    if(localValueInfo->_skip) {
+        return;
+    }
+    if(localValueInfo->value->getType()->isVoidTy()) {
+        // we still need to write out hte call...
+        os << indent << localValueInfo->expression << ";\n";
+        return;
+    }
+    for(auto it = localValueInfo->inlineCl.begin(); it != localValueInfo->inlineCl.end(); it++) {
+        os << indent << *it << ";\n";
+    }
+    if(localValueInfo->toBeDeclared) {
+        if(!localValueInfo->expressionValid) {
+            localValueInfo->value->dump();
+            cout << "expression for " << localValueInfo->name + " not defined" << endl;
+            throw runtime_error("expression for " + localValueInfo->name + " not defined");
+        }
+        string expression = stripOuterParams(localValueInfo->expression);
+        os << indent << localValueInfo->name << " = " << expression << ";\n";
+    }
+    // expression = name;
+}
+
 } // namespace cocl;

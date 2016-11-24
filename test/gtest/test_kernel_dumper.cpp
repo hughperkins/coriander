@@ -219,6 +219,7 @@ kernel void usesFunctionReturningVoid(global float* in, uint in_offset, local in
 
 
 v1:;
+    returnsVoid_g(in, scratch);
     return;
 }
 void returnsVoid_g(global float* in, local int *scratch) {
@@ -229,7 +230,7 @@ v1:;
 }
 )", cl);
 
-    EXPECT_FALSE(cl.find("void v") != string::npos);
+    EXPECT_FALSE(cl.find(" = returnsVoid") != string::npos);
 }
 
 } // namespace

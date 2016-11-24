@@ -814,7 +814,7 @@ void NewInstructionDumper::dumpMemcpyCharCharLong(LocalValueInfo *localValueInfo
 }
 
 void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
-    localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
+    localValueInfo->clWriter.reset(new CallClWriter(localValueInfo));
     // ClWriter *clWriter = cast<ClWriter>(localValueInfo->clWriter.get());
     CallInst *instr = cast<CallInst>(localValueInfo->value);
 
@@ -1115,6 +1115,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
     }
     gencode += ")";
     // return gencode;
+    cout << "dumpCall gencode[" << gencode << "]" << endl;
     localValueInfo->setExpression(gencode);
 }
 
