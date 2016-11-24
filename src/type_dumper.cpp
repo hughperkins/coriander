@@ -277,7 +277,7 @@ std::string TypeDumper::dumpStructDefinitions() {
             gencode += dumpStructDefinition(structType, globalNames->getName(structType));
         }
     }
-    cout << "all structs dumped" << endl;
+    // cout << "all structs dumped" << endl;
     return gencode;
 }
 

@@ -176,18 +176,18 @@ std::string KernelDumper::toCl() {
             // if(returnTypeByFunction.find(childF) != returnTypeByFunction.end()) {
             //     continue;
             // }
-            cout << "dumping function " << functionName << endl;
+            // cout << "dumping function " << functionName << endl;
             bool _isKernel = isKernel.find(childF) != isKernel.end();
             FunctionDumper childFunctionDumper(childF, _isKernel, &globalNames, typeDumper.get(), &functionNamesMap);
             if(_addIRToCl) {
                 childFunctionDumper.addIRToCl();
             }
             if(!childFunctionDumper.runGeneration(returnTypeByFunction)) {
-                cout << "couldnt run generation to completion yet for " << childF->getName().str() << endl;
+                // cout << "couldnt run generation to completion yet for " << childF->getName().str() << endl;
                 neededFunctions.insert(childFunctionDumper.neededFunctions.begin(), childFunctionDumper.neededFunctions.end());
-                for(auto it2=neededFunctions.begin(); it2 != neededFunctions.end(); it2++) {
-                    cout << "needed function: " << (*it2)->getName().str() << endl;
-                }
+                // for(auto it2=neededFunctions.begin(); it2 != neededFunctions.end(); it2++) {
+                //     cout << "needed function: " << (*it2)->getName().str() << endl;
+                // }
                 continue;
             }
 
@@ -202,9 +202,9 @@ std::string KernelDumper::toCl() {
             functionDeclarations.insert(childFunctionDumper.getDeclaration());
             shimFunctionsNeeded.insert(childFunctionDumper.shimFunctionsNeeded.begin(), childFunctionDumper.shimFunctionsNeeded.end());
             neededFunctions.insert(childFunctionDumper.neededFunctions.begin(), childFunctionDumper.neededFunctions.end());
-            for(auto it2=neededFunctions.begin(); it2 != neededFunctions.end(); it2++) {
-                cout << "needed function: " << (*it2)->getName().str() << endl;
-            }
+            // for(auto it2=neededFunctions.begin(); it2 != neededFunctions.end(); it2++) {
+            //     cout << "needed function: " << (*it2)->getName().str() << endl;
+            // }
 
             // cout << "childFunctionCl:\n" << childFunctionCl << endl;
             moduleClStream << childFunctionCl;
@@ -223,7 +223,7 @@ std::string KernelDumper::toCl() {
     // get all shim names
     for(auto it=shimFunctionsNeeded.begin(); it != shimFunctionsNeeded.end(); it++) {
         string shimName = *it;
-        cout << "kerneldumper, shim name needed=" << shimName << endl;
+        // cout << "kerneldumper, shim name needed=" << shimName << endl;
         set<string> dependencies = shims.getDependenciesByName(shimName);
         shimFunctionsNeeded.insert(dependencies.begin(), dependencies.end());
     }

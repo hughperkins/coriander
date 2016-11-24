@@ -343,10 +343,10 @@ bool BasicBlockDumper::runGeneration(const std::map<llvm::Function *, llvm::Type
             // cout << endl;
             instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
             if(instrInfo->needDependencies) {
-                cout << "basicblockdumper::dumpinstruction, instr:" << endl;
-                inst->dump();
-                cout << endl;
-                cout << "insturcion needs depenendnecies" << endl;
+                // cout << "basicblockdumper::dumpinstruction, instr:" << endl;
+                // inst->dump();
+                // cout << endl;
+                // cout << "insturcion needs depenendnecies" << endl;
                 return false;
             }
             if(checkIfNeedsAssign(inst)) {

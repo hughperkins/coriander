@@ -899,7 +899,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
             i++;
         }
         gencode += ")";
-        cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
+        // cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
         shimFunctionsNeeded->insert("__shfl_down_3");
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression(gencode);
@@ -916,7 +916,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
             i++;
         }
         gencode += ")";
-        cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
+        // cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
         shimFunctionsNeeded->insert("__shfl_down_2");
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression(gencode);
@@ -1020,7 +1020,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
                     manglingpostfix << thisaddressspacechar;
                     if(callPtr->getAddressSpace() != calleePtr->getAddressSpace()) {
                         addressSpacesMatch = false;
-                        cout << "arg " << callArg->getName().str() << " needs address space mutation" << endl;
+                        // cout << "arg " << callArg->getName().str() << " needs address space mutation" << endl;
                         // break;
                     }
                 }
@@ -1028,17 +1028,17 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
             }
             if(!addressSpacesMatch) {
                 string newName = F->getName().str() + "_" + manglingpostfix.str();
-                cout << "new name [" << newName << "]" << endl;
+                // cout << "new name [" << newName << "]" << endl;
                 bool alreadyExists = globalNames->hasName(newName);
-                cout << "alreadyeists? " << alreadyExists << endl;
+                // cout << "alreadyeists? " << alreadyExists << endl;
 
                 int numArgs = instr->getNumArgOperands();
-                cout << "numArgs " << numArgs << endl;
+                // cout << "numArgs " << numArgs << endl;
                 int i;
 
                 Function *newFunc = 0;
                 if(!alreadyExists) {
-                    cout << "cloning new funciton " << newName << endl;
+                    // cout << "cloning new funciton " << newName << endl;
                     ValueToValueMapTy valueMap;
                     newFunc = CloneFunction(F,
                                    valueMap,
@@ -1062,7 +1062,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
                 // its not there already yet
                 // also we need to mangle the name anyway....
                 // maybe we use the name mangling to check if it's already there???
-                cout << "inserting new funciton into neededfunctions" << endl;
+                // cout << "inserting new funciton into neededfunctions" << endl;
                 neededFunctions->insert(newFunc);
                 if(isa<PointerType>(newFunc->getReturnType()) && returnTypeByFunction.find(newFunc) == returnTypeByFunction.end()) {
                     // needDependencies = true;
@@ -1098,12 +1098,12 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
             gencode += "scratch";
             if(isa<PointerType>(F->getReturnType())) {
                 Type *returnType = returnTypeByFunction.at(F);
-                cout << "function return type:" << endl;
-                returnType->dump();
-                cout << endl;
+                // cout << "function return type:" << endl;
+                // returnType->dump();
+                // cout << endl;
                 if(PointerType *retptr = dyn_cast<PointerType>(returnType)) {
                     int functionReturnAddressSpace = retptr->getAddressSpace();
-                    cout << " updating call instruction to addressspace " << functionReturnAddressSpace << endl;
+                    // cout << " updating call instruction to addressspace " << functionReturnAddressSpace << endl;
                     updateAddressSpace(instr, functionReturnAddressSpace);
                     localValueInfo->setAddressSpace(functionReturnAddressSpace);
                 }
@@ -1115,7 +1115,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
     }
     gencode += ")";
     // return gencode;
-    cout << "dumpCall gencode[" << gencode << "]" << endl;
+    // cout << "dumpCall gencode[" << gencode << "]" << endl;
     localValueInfo->setExpression(gencode);
 }
 

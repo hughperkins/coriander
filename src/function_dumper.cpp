@@ -43,7 +43,7 @@ string FunctionDumper::createOffsetShim(Type *argType, string argName) {
 }
 
 std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock) {
-    cout << "dumpPhi() block: [" << nextBlock->getName().str() << "]" << endl;
+    // cout << "dumpPhi() block: [" << nextBlock->getName().str() << "]" << endl;
     std::string gencode = "";
     for(auto it = nextBlock->begin(); it != nextBlock->end(); it++) {
         Instruction *instr = &*it;
@@ -51,8 +51,8 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
             break;
         }
         if(PHINode *phi = dyn_cast<PHINode>(instr)) {
-            cout << "dumping phi:" << endl;
-            instr->dump();
+            // cout << "dumping phi:" << endl;
+            // instr->dump();
             // string name = localNames.getOrCreateName(phi);
             BasicBlock *ourBlock = branchInstr->getParent();
             Value *sourceValue = phi->getIncomingValueForBlock(ourBlock);
@@ -68,7 +68,7 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
             // vector<string> reslines;
             // string sourceValueCode = instructionDumper.runRhsGeneration(sourceValue, &reslines);
             if(isa<UndefValue>(sourceValue)) {
-                cout << "source value is undef => ignore" << endl;
+                // cout << "source value is undef => ignore" << endl;
                 continue;
             }
             LocalValueInfo *sourceValueInfo = instructionDumper->getOperand(sourceValue);
@@ -76,8 +76,8 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
             //     &localNames, &localValueInfos, sourceValue);
             // const std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
             // instructionDumper->runGeneration(sourceValueInfo, returnTypeByFunction);
-            cout << "getting expr from sourcevalue:" << endl;
-            sourceValue->dump();
+            // cout << "getting expr from sourcevalue:" << endl;
+            // sourceValue->dump();
             string sourceValueCode = sourceValueInfo->getExpr();
 
             // string sourceValueCode = localNames.getName(sourceValue);
@@ -90,8 +90,8 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
             LocalValueInfo *phiValueInfo = LocalValueInfo::getOrCreate(
                 &localNames, &localValueInfos, phi);
             phiValueInfo->setAsAssigned();
-            cout << "getting expression for:" << endl;
-            phi->dump();
+            // cout << "getting expression for:" << endl;
+            // phi->dump();
             string phivarname = phiValueInfo->getExpr();
             gencode += phivarname + " = ";
             // gencode += localNames.getName(phi) + " = ";
@@ -131,8 +131,8 @@ std::string FunctionDumper::dumpReturn(Type **pReturnType, ReturnInst *retInst) 
 }
 
 std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr) {
-    cout << "dumpbranch" << endl;
-    instr->dump();
+    // cout << "dumpbranch" << endl;
+    // instr->dump();
     string gencode = "";
     if(instr->isConditional()) {
         // string conditionstring = localExpressionByValue[instr->getCondition()];
@@ -211,13 +211,13 @@ std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr) {
 // adds declaratoin of the phi, to the start of hte functoin (via currentFunctionPhiDeclarationsByName)
 // the address space should be correct on phi by the time this function is called
 void FunctionDumper::addPHIDeclaration(llvm::PHINode *phi) {
-    cout << "addphideclaration" << endl;
-    phi->dump();
+    // cout << "addphideclaration" << endl;
+    // phi->dump();
     // storeValueName(phi);
     // string name = nameByValue[phi];
     string name = localNames.getOrCreateName(phi);
     string declaration = typeDumper->dumpType(phi->getType()) + " " + name;
-    cout << "phi declaration: [" << declaration << "]" << endl;
+    // cout << "phi declaration: [" << declaration << "]" << endl;
     phiDeclarationsByName[name] = declaration;
 }
 
@@ -435,7 +435,7 @@ bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *
 
     int iteration = 0;
     while(blocksDumped.size() < numBlocks) {
-        cout << "iteration " << iteration << endl;
+        // cout << "iteration " << iteration << endl;
         for(auto block_it = F->begin(); block_it != F->end(); block_it++) {
         // for(auto it = blocksToDump.begin(); it != blocksToDump.end(); it++) {
             BasicBlock *basicBlock = &*block_it;
@@ -444,7 +444,7 @@ bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *
                 continue;
             }
             string label = localNames.getOrCreateName(basicBlock);
-            cout << "dumping block " << basicBlock->getName().str() << endl;
+            // cout << "dumping block " << basicBlock->getName().str() << endl;
 
             // check whether we have the address space for the phis yet
             bool phisOutstanding = false;
@@ -461,10 +461,10 @@ bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *
                 }
             }
             if(phisOutstanding) {
-                cout << "some phis outstanding => skipping block" << endl;
+                // cout << "some phis outstanding => skipping block" << endl;
                 continue;
             }
-            cout << "all phis ok => continuing to dump block" << endl;
+            // cout << "all phis ok => continuing to dump block" << endl;
 
             BasicBlockDumper basicBlockDumper(
                 basicBlock, globalNames, &localNames, typeDumper, functionNamesMap,
@@ -494,7 +494,7 @@ bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *
             ostringstream blockstream;
             blockstream << label << ":;\n";
             basicBlockDumper.toCl(blockstream);
-            cout << "block cl [" << blockstream.str() << "]" << endl;
+            // cout << "block cl [" << blockstream.str() << "]" << endl;
             ouros << blockstream.str();
             // bodyCl += blockstream.str();
 
