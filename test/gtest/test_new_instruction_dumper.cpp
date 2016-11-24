@@ -958,19 +958,19 @@ TEST(test_new_instruction_dumper, getelementptr_struct) {
     cout << "hasexpr " << instrInfo->hasExpr() << endl;
     ASSERT_TRUE(instrInfo->hasExpr());
     cout << "expr: " << instrInfo->getExpr() << endl;
-    ASSERT_EQ("(&structAlloca[0].f1)", instrInfo->getExpr());
+    EXPECT_EQ("(&(structAlloca[0].f1))", instrInfo->getExpr());
 
     ostringstream oss;
 
     oss.str("");
     instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
     cout << "declaration [" << oss.str() << "]" << endl;
-    ASSERT_EQ("", oss.str());
+    EXPECT_EQ("", oss.str());
 
     oss.str("");
     instrInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
-    ASSERT_EQ("", oss.str());
+    EXPECT_EQ("", oss.str());
 
     cout << "after setAsAssigned:" << endl;
     instrInfo->setAsAssigned();
@@ -978,17 +978,17 @@ TEST(test_new_instruction_dumper, getelementptr_struct) {
     cout << "hasexpr " << instrInfo->hasExpr() << endl;
     ASSERT_TRUE(instrInfo->hasExpr());
     cout << "expr: " << instrInfo->getExpr() << endl;
-    ASSERT_EQ("myinstr", instrInfo->getExpr());
+    EXPECT_EQ("myinstr", instrInfo->getExpr());
 
     oss.str("");
     instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
     cout << "declaration [" << oss.str() << "]" << endl;
-    ASSERT_EQ("    int* myinstr;\n", oss.str());
+    EXPECT_EQ("    int* myinstr;\n", oss.str());
 
     oss.str("");
     instrInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
-    ASSERT_EQ("    myinstr = (&structAlloca[0].f1);\n", oss.str());
+    EXPECT_EQ("    myinstr = (&(structAlloca[0].f1));\n", oss.str());
 }
 
 TEST(test_new_instruction_dumper, extractvalue_struct) {

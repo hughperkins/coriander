@@ -168,7 +168,7 @@ TEST(test_function_dumper, usesShared1) {
     local float* v2;
 
 v1:;
-    v2 = (&(&mysharedmem)[0][3]);
+    v2 = (&((&mysharedmem)[0][3]));
     v8 = v7[0];
     v2[0] = v8;
     return;
@@ -204,8 +204,8 @@ TEST(test_function_dumper, usesShared2) {
     local int* v7;
 
 v1:;
-    v2 = (&(&mysharedmem)[0][3]);
-    v7 = (&(&anothershared)[0][7]);
+    v2 = (&((&mysharedmem)[0][3]));
+    v7 = (&((&anothershared)[0][7]));
     v13 = v11[0];
     v14 = v12[0];
     v2[0] = v13;
@@ -498,9 +498,9 @@ v1:;
     v7 = 0.0f;
     goto v3;
 v3:;
-    v10 = (&outdata[v5])[0];
-    v15 = (&outdata[v5 + 1])[0];
-    v21 = (&outdata[v5 + 2])[0];
+    v10 = (&(outdata[v5]))[0];
+    v15 = (&(outdata[v5 + 1]))[0];
+    v21 = (&(outdata[v5 + 2]))[0];
     v22 = ((v7 + v10) + v15) + v21;
     v23 = v5 + 3;
     if (v23 == 1024) {

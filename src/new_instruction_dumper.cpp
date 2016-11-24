@@ -544,7 +544,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     }
     updateAddressSpace(instr, addressspace);
     localValueInfo->setAddressSpace(addressspace);
-    rhs = stripOuterParams("(" + rhs + ")");
+    rhs = "(" + stripOuterParams(rhs) + ")";
     rhs = "(&" + rhs + ")";
     // cout << "gep rhs=" << rhs << endl;
 

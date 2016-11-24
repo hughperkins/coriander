@@ -243,8 +243,8 @@ TEST(test_block_dumper, usesShared) {
     blockDumper->toCl(oss);
     string cl = oss.str();
     cout << "cl: [" << cl << "]" << endl;
-    ASSERT_EQ(R"(    v5 = (&(&mysharedmem)[0][0]);
-    v7 = (&(&mysharedmem)[0][2]);
+    ASSERT_EQ(R"(    v5 = (&((&mysharedmem)[0][0]));
+    v7 = (&((&mysharedmem)[0][2]));
     v5[0] = 4.0f;
     v7[0] = 3.0f;
 )", oss.str());
@@ -403,7 +403,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    v2 = v1[0];
-    v3 = (&v1[0].f1);
+    v3 = (&(v1[0].f1));
 )", oss.str());
 
     oss.str("");
@@ -425,7 +425,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    v2 = v1[0];
-    v3 = (&v1[0].f1);
+    v3 = (&(v1[0].f1));
 )", oss.str());
 
     oss.str("");
@@ -448,7 +448,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    v2 = v1[0];
-    v3 = (&v1[0].f1);
+    v3 = (&(v1[0].f1));
     v6 = v5[0];
 )", oss.str());
 
@@ -473,7 +473,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    v2 = v1[0];
-    v3 = (&v1[0].f1);
+    v3 = (&(v1[0].f1));
     v6 = v5[0];
     v3[0] = v6;
 )", oss.str());
@@ -500,7 +500,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    v2 = v1[0];
-    v3 = (&v1[0].f1);
+    v3 = (&(v1[0].f1));
     v6 = v5[0];
     v3[0] = v6;
     v8.f0 = 45;
@@ -528,7 +528,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    v2 = v1[0];
-    v3 = (&v1[0].f1);
+    v3 = (&(v1[0].f1));
     v6 = v5[0];
     v3[0] = v6;
     v8.f0 = 45;
@@ -557,7 +557,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    v2 = v1[0];
-    v3 = (&v1[0].f1);
+    v3 = (&(v1[0].f1));
     v6 = v5[0];
     v3[0] = v6;
     v8.f0 = 45;
@@ -587,7 +587,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    v2 = v1[0];
-    v3 = (&v1[0].f1);
+    v3 = (&(v1[0].f1));
     v6 = v5[0];
     v3[0] = v6;
     v8.f0 = 45;
@@ -619,7 +619,7 @@ TEST(test_block_dumper, usestructs) {
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
     EXPECT_EQ(R"(    v2 = v1[0];
-    v3 = (&v1[0].f1);
+    v3 = (&(v1[0].f1));
     v6 = v5[0];
     v3[0] = v6;
     v8.f0 = 45;
@@ -706,13 +706,13 @@ TEST(test_block_dumper, test_ieee_doubles) {
     string cl = oss.str();
     cout << "cl: [" << cl << "]" << endl;
     EXPECT_EQ(R"(    data[0] = 1.84422e+19f;
-    v3 = (&data[0]);
+    v3 = (&(data[0]));
     v3[0] = 9.21887e+18f;
-    v7 = (&data[1]);
+    v7 = (&(data[1]));
     v7[0] = -INFINITY;
-    v11 = (&data[2]);
+    v11 = (&(data[2]));
     v11[0] = INFINITY;
-    v15 = (&data[3]);
+    v15 = (&(data[3]));
     v15[0] = -INFINITY;
 )", oss.str());
 
