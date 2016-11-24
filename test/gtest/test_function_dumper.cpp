@@ -495,7 +495,7 @@ TEST(test_function_dumper, multigpu_Z8getValuePf) {
 
 v1:;
     v5 = 1;
-v7 = 0.0f;
+    v7 = 0.0f;
     goto v3;
 v3:;
     v10 = (&outdata[v5])[0];
@@ -508,7 +508,7 @@ v3:;
         goto v2;
     } else {
         v5 = v23;
-v7 = v22;
+        v7 = v22;
         goto v3;
     }
 v2:;

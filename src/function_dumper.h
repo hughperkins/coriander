@@ -72,7 +72,7 @@ public:
     void generateBlockIndex();
 
     void addPHIDeclaration(llvm::PHINode *phi);
-    std::string dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock);
+    std::string dumpPhi(std::string indent, llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock);
     std::string dumpBranch(llvm::BranchInst *instr);
     std::string dumpReturn(llvm::Type **pReturnType, llvm::ReturnInst *retInst);
     std::string dumpTerminator(llvm::Type **pReturnType, llvm::Instruction *terminator);

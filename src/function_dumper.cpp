@@ -42,7 +42,7 @@ string FunctionDumper::createOffsetShim(Type *argType, string argName) {
     return shim;
 }
 
-std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock) {
+std::string FunctionDumper::dumpPhi(std::string indent, llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock) {
     // cout << "dumpPhi() block: [" << nextBlock->getName().str() << "]" << endl;
     std::string gencode = "";
     for(auto it = nextBlock->begin(); it != nextBlock->end(); it++) {
@@ -93,7 +93,7 @@ std::string FunctionDumper::dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBl
             // cout << "getting expression for:" << endl;
             // phi->dump();
             string phivarname = phiValueInfo->getExpr();
-            gencode += phivarname + " = ";
+            gencode += indent + phivarname + " = ";
             // gencode += localNames.getName(phi) + " = ";
             // string phivarname = localVal
             gencode += sourceValueCode + ";\n";
@@ -143,9 +143,9 @@ std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr) {
         // gencode += "if " + conditionstring + " {\n";
         string trueSection = "";
         bool needTrueSection = false;
-        string phicode = dumpPhi(instr, instr->getSuccessor(0));
+        string phicode = dumpPhi("        ", instr, instr->getSuccessor(0));
         if(phicode != "") {
-            trueSection += "        " + phicode;
+            trueSection += phicode;
             needTrueSection = true;
         }
         if(instr->getNextNode() == 0) { // && functionBlockIndex[instr->getSuccessor(0)] != functionBlockIndex[instr->getParent()] + 1) {
@@ -157,9 +157,9 @@ std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr) {
         if(instr->getNumSuccessors() == 1) {
         } else if(instr->getNumSuccessors() == 2) {
             // gencode += "    } else {\n";
-            string phicode = dumpPhi(instr, instr->getSuccessor(1));
+            string phicode = dumpPhi("        ", instr, instr->getSuccessor(1));
             if(phicode != "") {
-                falseSection += "        " + phicode;
+                falseSection += phicode;
                 needFalseSection = true;
             }
             if(instr->getNextNode() == 0) { //} && functionBlockIndex[instr->getSuccessor(1)] != functionBlockIndex[instr->getParent()] + 1) {
@@ -188,9 +188,9 @@ std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr) {
     } else {
         if(instr->getNumSuccessors() == 1) {
             BasicBlock *nextBlock = instr->getSuccessor(0);
-            string phicode = dumpPhi(instr, nextBlock);
+            string phicode = dumpPhi("    ", instr, nextBlock);
             if(phicode != "") {
-                gencode += "    " + phicode;
+                gencode += phicode;
             }
             // bool needGoto = true;
             // if(instr->getNextNode() == 0) {
