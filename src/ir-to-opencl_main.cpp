@@ -36,6 +36,7 @@ int main(int argc, char *argv[]) {
     string ClFilename;
     string kernelname = "";
     bool add_ir_to_cl = false;
+    // bool dumpCl = false;
     // string rcFile = "";
 
     argparsecpp::ArgumentParser parser;
@@ -47,7 +48,8 @@ int main(int argc, char *argv[]) {
     //     ->help("Path to rcfile, containing default options, set to blank to disable")
     //     ->defaultValue("~/.coclrc");
     // parser.add_bool_argument("--no-load_rcfile", &add_ir_to_cl)->help("Dont load the ~/.coclrc file");
-    parser.add_bool_argument("--add_ir_to_cl", &add_ir_to_cl);
+    parser.add_bool_argument("--add_ir_to_cl", &add_ir_to_cl)->help("Adds some approximation of the original IR to the opencl code, for debugging");
+    // parser.add_bool_argument("--dump_cl", &dumpCl)->help("prints the opencl code to stdout");
     // parser.add_bool_argument("--run_branching_transforms", &runBranchingTransforms)->help("might make the kernels more acceptable to your gpu driver; buggy though...");
     // parser.add_bool_argument("--branches_as_switch", &branchesAsSwitch)->help("might make the kernels more acceptable to your gpu driver; slow though...");
     // parser.add_bool_argument("--dump_transforms", &dumpTransforms)->help("mostly for dev/debug.  prints the results of branching transforms");
@@ -68,6 +70,9 @@ int main(int argc, char *argv[]) {
     if(add_ir_to_cl) {
         kernelDumper.addIRToCl();
     }
+    // if(dumpCl) {
+    //     kernelDumper.setDumpCl();
+    // }
     string cl = kernelDumper.toCl();
 
     ofstream of;

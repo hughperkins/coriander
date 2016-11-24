@@ -332,14 +332,14 @@ string convertModuleToCl(Module *M, string specificFunction) {
 
 string convertLlStringToCl(string llString, string specificFunction) {
     StringRef llStringRef(llString);
-    cout << "got llstringref" << endl;
+    // cout << "got llstringref" << endl;
     unique_ptr<MemoryBuffer> llMemoryBuffer = MemoryBuffer::getMemBuffer(llStringRef);
-    cout << "got memory buffer " << endl;
+    // cout << "got memory buffer " << endl;
     llvm::LLVMContext context;
     SMDiagnostic smDiagnostic;
     unique_ptr<Module> M = parseIR(llMemoryBuffer->getMemBufferRef(), smDiagnostic,
                                 context);
-    cout << "parsed module" << endl;
+    // cout << "parsed module" << endl;
     if(!M) {
         smDiagnostic.print("irtopencl", errs());
         // return "";

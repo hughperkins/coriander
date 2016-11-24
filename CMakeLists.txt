@@ -9,6 +9,7 @@ option(TESTS_DEVICELL_INSTCOMBINE "cocl option for tests" ON)
 set(TESTS_DEVICELL_OPT "O2" CACHE STRING "cocl option for tests")
 option(OFFSET_32BIT "type to use for offsets. off lets you use more memory.  on is necessary on beignet" ON)
 option(EXPLAIN_CL "Add IR code into OpenCL.  For maintainers mostly" OFF)
+option(TESTS_DUMP_CL "Writes OpenCL for tests to stdout.  For maintainers mostly" OFF)
 option(COCL_SPAM "Lots of scrolly debug text.  Mostly for maintainer usage" OFF)
 set(CLANG_HOME "/usr/lib/llvm-3.8" CACHE STRING "eg the downloaded clang-3.8.0 folder, containing lib, bin etc")
 
@@ -32,6 +33,9 @@ endif()
 if(EXPLAIN_CL)
 set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--add_ir_to_cl)
 endif()
+# if(TESTS_DUMP_CL)
+# set($ENV{COCL_DUMP_CL} "1")
+# endif()
 
 set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/platforminfo_helper.cpp src/EasyCL/EasyCL.cpp
     src/EasyCL/deviceinfo_helper.cpp src/EasyCL/util/easycl_stringhelper.cpp src/EasyCL/DevicesInfo.cpp src/EasyCL/DeviceInfo.cpp)
@@ -65,21 +69,21 @@ execute_process(
     OUTPUT_VARIABLE LLVM_CXXFLAGS
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
+# message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 STRING(REGEX REPLACE " " ";" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
-message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
+# message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-std=c\\+\\+0x" ";-std=c++11" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-fno-exceptions" ";-fexceptions" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-DNDEBUG" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-isysroot;[^;]" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
-message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
+# message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 
 # split LLVM_CXXFLAGS into defines vs other options
 STRING(REGEX MATCHALL ";-D[^;]+" LLVM_DEFINES "${LLVM_CXXFLAGS}")
 STRING(REGEX REPLACE ";+" ";" LLVM_DEFINES "${LLVM_DEFINES}")
 STRING(REGEX REPLACE ";-D[^;]+" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
-message("LLVM_DEFINES ${LLVM_DEFINES}")
-message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
+# message("LLVM_DEFINES ${LLVM_DEFINES}")
+# message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 
 execute_process(
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/llvm-syslibs.sh ${CLANG_HOME}
@@ -213,10 +217,13 @@ if(BUILD_TESTS)
         singlebuffer
     )
 
+    if(TESTS_DUMP_CL)
+        set(COCL_DUMP_CL_STR "COCL_DUMP_CL=1")
+    endif()
     foreach(TEST ${TESTS})
         add_cocl_executable(${TEST} test/cocl/${TEST}.cu)
         add_custom_target(run-${TEST}
-            COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TEST}
+            COMMAND ${COCL_DUMP_CL_STR} ${CMAKE_CURRENT_BINARY_DIR}/${TEST}
             DEPENDS ${TEST}
         )
         set(TEST_TARGETS ${TEST_TARGETS} run-${TEST})

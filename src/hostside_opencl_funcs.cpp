@@ -234,6 +234,10 @@ namespace cocl {
             f << clSourcecode << endl;
             f.close();
         }
+        if(getenv("COCL_DUMP_CL") != 0 && string(getenv("COCL_DUMP_CL")) == "1") {
+            cout << "cocl dump cl set" << endl;
+            cout << "cl: [" << clSourcecode << "]" << endl;
+        }
 
         CLKernel *kernel = 0;
         try {

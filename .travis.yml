@@ -22,7 +22,7 @@ before_install:
   - mkdir build
   - cd build
   - echo CLANG_HOME ${CLANG_HOME}
-  - cmake .. -DCLANG_HOME=${CLANG_HOME} -DBUILD_TESTS=ON
+  - cmake .. -DCLANG_HOME=${CLANG_HOME} -DBUILD_TESTS=ON -DTESTS_DUMP_CL=ON
   - make -j 8
   - make install
   - echo ====== python, for running python-based unit tests ==============
