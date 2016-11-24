@@ -48,7 +48,7 @@ script:
   - cd ${BASEDIR}/build
   - ./cocl_unittests
   - export COCL_DEVICES_ALL=1
-  - OFFSET_32BIT=1 make run-tests
+  - OFFSET_32BIT=1 make run-tests-travis
   - mkdir ${BASEDIR}/foo
   - cd ${BASEDIR}/foo
   - cp ${BASEDIR}/test/cocl/cuda_sample.cu .
