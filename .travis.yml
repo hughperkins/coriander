@@ -47,6 +47,7 @@ before_install:
 script:
   - cd ${BASEDIR}/build
   - ./cocl_unittests
+  - OFFSET_32BIT=1 make run-tests
   - mkdir ${BASEDIR}/foo
   - cd ${BASEDIR}/foo
   - cp ${BASEDIR}/test/cocl/cuda_sample.cu .
