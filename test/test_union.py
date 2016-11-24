@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from test import test_common
+import pytest
 
 
 def try_build(context, ll_filepath, kernelname):
@@ -22,6 +23,7 @@ def try_build(context, ll_filepath, kernelname):
     test_common.build_kernel(context, clcode, kernelname)
 
 
+@pytest.mark.xfail(reason='need to (re-)implement global constants first')
 def test_program_compiles(context):
     # ok these names were obtained empirically :-P
     # ie, I first ran `cocl`, then examined the resulting testprog-device.ll file to get the names
