@@ -203,4 +203,33 @@ v1:;
     EXPECT_TRUE(cl.find("\nglobal float* returnsPointer_g(") != string::npos);
 }
 
+TEST(test_kernel_dumper, usesFunctionReturningVoid) {
+    GlobalWrapper G("usesFunctionReturningVoid");
+    KernelDumper *kernelDumper = G.kernelDumper.get();
+    // Module *M = getM();
+
+    string cl = kernelDumper->toCl();
+    cout << "kernel cl: [" << cl << "]" << endl;
+    EXPECT_EQ(R"(
+kernel void usesFunctionReturningVoid(global float* in, uint in_offset, local int *scratch);
+void returnsVoid_g(global float* in, local int *scratch);
+
+kernel void usesFunctionReturningVoid(global float* in, uint in_offset, local int *scratch) {
+    in += in_offset;
+
+
+v1:;
+    return;
+}
+void returnsVoid_g(global float* in, local int *scratch) {
+
+v1:;
+    in[0] = 3.0f;
+    return;
+}
+)", cl);
+
+    EXPECT_FALSE(cl.find("void v") != string::npos);
+}
+
 } // namespace

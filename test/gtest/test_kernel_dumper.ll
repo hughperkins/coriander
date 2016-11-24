@@ -43,3 +43,13 @@ define void @usesPointerFunction(float *%in) {
     call float *@returnsPointer(float *%2)
     ret void
 }
+
+define void @returnsVoid(float *%in) {
+    store float 3.0, float * %in
+    ret void
+}
+
+define void @usesFunctionReturningVoid(float *%in) {
+    call void @returnsVoid(float *%in)
+    ret void
+}

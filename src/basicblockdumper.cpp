@@ -248,6 +248,12 @@ bool BasicBlockDumper::checkIfNeedsAssign(Instruction *instruction) {
     bool useIsExtractValue = false;
     bool useIsAPhi = false;
     bool useIsABitcast = false;
+    // bool instIsNonvoidCall = false;
+    if(CallInst *call = dyn_cast<CallInst>(instruction)) {
+        if(call->getType()->isVoidTy()) {
+            return false;
+        }
+    }
     // bool useIsALoad = false;
     // cout << "end of dumpinstruction for " << localNames->getName(instruction) << endl;
     // exprByValue[instruction] = instructionCode;
