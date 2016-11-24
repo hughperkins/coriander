@@ -1,10 +1,11 @@
 import os
+from os.path import join
 import subprocess
 import numpy as np
 import pyopencl as cl
 
 
-clang_path = 'clang++-3.8'
+clang_path = join(os.environ['CLANG_HOME'], 'bin', 'clang++')
 
 
 def run_process(cmdline_list):
