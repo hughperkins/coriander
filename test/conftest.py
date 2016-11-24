@@ -15,7 +15,11 @@ def context():
     i = 0
     ctx = None
     for platform in platforms:
-        gpu_devices = platform.get_devices(device_type=cl.device_type.GPU)
+        if os.environ.get('COCL_DEVICES_ALL', None) == '1':
+            print('Warning!  Using COCL_DEVICES_ALL.  This is a maintainer-oriented option, and is likely to lead to errors')
+            gpu_devices = platform.get_devices(device_type=cl.device_type.ALL)
+        else:
+            gpu_devices = platform.get_devices(device_type=cl.device_type.GPU)
         if gpu_idx < i + len(gpu_devices):
             ctx = cl.Context(devices=[gpu_devices[gpu_idx - i]])
             break
