@@ -102,6 +102,8 @@ New!
 
 ## How to build
 
+[![Build Status](https://travis-ci.org/hughperkins/cuda-on-cl.svg?branch=master)](https://travis-ci.org/hughperkins/cuda-on-cl)
+
 ### Pre-requisites
 
 - Operating system:
