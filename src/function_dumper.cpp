@@ -93,6 +93,29 @@ std::string FunctionDumper::dumpPhi(std::string indent, llvm::BranchInst *branch
             // cout << "getting expression for:" << endl;
             // phi->dump();
             string phivarname = phiValueInfo->getExpr();
+            if(_addIRToCl) {
+
+                string originalInstruction = typeDumper->dumpType(phi->getType()) + " " + phiValueInfo->name + " =";
+                originalInstruction += " phi " + sourceValueInfo->name;
+                // originalInstruction += " " + string(phi->getOpcodeName());
+                // for(auto it=phi->op_begin(); it != phi->op_end(); it++) {
+                //     Value *op = &*it->get();
+                //     originalInstruction += " ";
+                //     // originalInstruction += getOperand(op)->getExpr();
+                //     if(localNames.hasValue(op)) {
+                //         originalInstruction += localNames.getName(op);
+                //     } else {
+                //         originalInstruction += "<unk>";
+                //     }
+                //     // if(origNameByValue.find(op) != origNameByValue.end()) {
+                //     //     originalInstruction += origNameByValue[op];
+                //     // } else {
+                //     //     originalInstruction += "<unk>";
+                //     // }
+                // }
+                gencode += indent + "/* " + originalInstruction + " */\n";
+                // gencode += indent + "/* phi " + 
+            }
             gencode += indent + phivarname + " = ";
             // gencode += localNames.getName(phi) + " = ";
             // string phivarname = localVal
@@ -137,6 +160,12 @@ std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr) {
     if(instr->isConditional()) {
         // string conditionstring = localExpressionByValue[instr->getCondition()];
         string conditionstring = localValueInfos.at(instr->getCondition())->getExpr();
+
+        if(_addIRToCl) {
+            string originalInstruction = "if(" + localValueInfos.at(instr->getCondition())->name + ")";
+            gencode += "    /* " + originalInstruction + " */\n";
+        }
+
         if(!isSingleExpression(conditionstring) || conditionstring[0] != '(') {
             conditionstring = "(" + conditionstring + ")";
         }

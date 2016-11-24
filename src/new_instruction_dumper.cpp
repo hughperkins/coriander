@@ -1124,6 +1124,27 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo, const s
     // needDependencies = false;
     localValueInfo->needDependencies = false;
     auto opcode = instruction->getOpcode();
+    if(_addIRToCl) {
+        string originalInstruction = "";
+        originalInstruction += typeDumper->dumpType(instruction->getType()) + " " + localValueInfo->name + " =";
+        originalInstruction += " " + string(instruction->getOpcodeName());
+        for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
+            Value *op = &*it->get();
+            originalInstruction += " ";
+            // originalInstruction += getOperand(op)->getExpr();
+            if(localNames->hasValue(op)) {
+                originalInstruction += localNames->getName(op);
+            } else {
+                originalInstruction += "<unk>";
+            }
+            // if(origNameByValue.find(op) != origNameByValue.end()) {
+            //     originalInstruction += origNameByValue[op];
+            // } else {
+            //     originalInstruction += "<unk>";
+            // }
+        }
+        localValueInfo->inlineCl.push_back("/* " + originalInstruction + " */");
+    }
     string instructionCode = "";
     switch(opcode) {
         case Instruction::FAdd:

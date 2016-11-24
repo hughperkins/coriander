@@ -74,7 +74,8 @@ public:
     bool checkIfNeedsAssign(llvm::Instruction *instruction);
 
     BasicBlockDumper *addIRToCl(bool set=true) {
-        _addIRToCl = set;
+        // _addIRToCl = set;
+        instructionDumper->addIRToCl(set);
         return this;
     }
 
@@ -91,7 +92,7 @@ public:
 
 protected:
     llvm::BasicBlock *block;
-    bool _addIRToCl = false;
+    // bool _addIRToCl = false;
     bool forceSingle = true;
 
     GlobalNames *globalNames;

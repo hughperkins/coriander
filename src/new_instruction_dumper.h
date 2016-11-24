@@ -48,6 +48,11 @@ public:
 
     void runGeneration(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
 
+    NewInstructionDumper *addIRToCl(bool set=true) {
+        _addIRToCl = set;
+        return this;
+    }
+
     cocl::GlobalNames *globalNames = 0;
     cocl::LocalNames *localNames = 0;   // these are names for instructions etc, doesnt say anything about whether they've been declared
                                         // they're always some single idnetifier, eg "v3", never compound, ie never "v1 + v3"
@@ -61,6 +66,7 @@ public:
     std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos = 0;
 
     bool forceSingle = true;
+    bool _addIRToCl = false;
 };
 
 } // namespace cocl
