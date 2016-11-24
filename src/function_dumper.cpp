@@ -148,7 +148,7 @@ std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr) {
             trueSection += "        " + phicode;
             needTrueSection = true;
         }
-        if(instr->getNextNode() == 0 && functionBlockIndex[instr->getSuccessor(0)] != functionBlockIndex[instr->getParent()] + 1) {
+        if(instr->getNextNode() == 0) { // && functionBlockIndex[instr->getSuccessor(0)] != functionBlockIndex[instr->getParent()] + 1) {
             trueSection += "        goto " + localNames.getName(instr->getSuccessor(0)) + ";\n";
             needTrueSection = true;
         }
@@ -162,7 +162,7 @@ std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr) {
                 falseSection += "        " + phicode;
                 needFalseSection = true;
             }
-            if(instr->getNextNode() == 0 && functionBlockIndex[instr->getSuccessor(1)] != functionBlockIndex[instr->getParent()] + 1) {
+            if(instr->getNextNode() == 0) { //} && functionBlockIndex[instr->getSuccessor(1)] != functionBlockIndex[instr->getParent()] + 1) {
                 falseSection += "        goto " + localNames.getName(instr->getSuccessor(1)) + ";\n";
                 needFalseSection = true;
             }
