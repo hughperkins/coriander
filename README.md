@@ -109,7 +109,7 @@ New!
 - Operating system:
   - Tested/developed on Ubuntu 16.04
   - Ubuntu 14.04 does seem to work ok too (not tested very much though...)
-  - Mac OS X ~~very close to working~~ working, https://travis-ci.org/hughperkins/cuda-on-cl/builds/176997220#L1356, (and screenshot earlier)
+  - Mac OS X, see https://travis-ci.org/hughperkins/cuda-on-cl
   - Other operating systems, and clang/llvm versions, might work too, but untested.  Your mileage may vary :-)
 - OpenCL-enabled GPU, and appropriate OpenCL drivers installed for the GPU
 
