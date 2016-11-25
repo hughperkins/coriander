@@ -113,6 +113,7 @@ int main(int argc, char *argv[]) {
 
     cublasHandle_t blas;
     cublasCreate(&blas);
+    // cout << "blas " << (void *)blas << endl;
     cublasSetStream(blas, stream);
 
     float alpha = 1;
@@ -137,7 +138,7 @@ int main(int argc, char *argv[]) {
 
     assertEqual(hostCCheck, hostC, M, N);
 
-    cublasDestroy(blas);
+    // cublasDestroy(blas);
 
     cuMemFree(deviceA);
     cuMemFree(deviceB);
