@@ -16,8 +16,11 @@ import numpy as np
 import pyopencl as cl
 from test import test_common
 from test.test_common import offset_type
+import pytest
+import os
 
 
+@pytest.mark.skipif(os.environ.get('TRAVIS', None) == 'true', reason='fails on travis mac cpu, because uses shared memory')
 def test_local(context, q, float_data, float_data_gpu):
     cu_source = """
     __global__ void foo(float *data) {

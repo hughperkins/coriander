@@ -222,7 +222,7 @@ __global__ void testTwoFors(float *data, int N) {
     assert abs(float_data[0] - sum) <= 1e-4
 
 
-@pytest.mark.skipif(os.environ.get('TRAVIS', None) == 'true', reason='this test fails on travis mac for some reason')
+@pytest.mark.skipif(os.environ.get('TRAVIS', None) == 'true', reason='this test fails on travis mac cpu for some reason')
 def test_nested_for(context, q, float_data, float_data_gpu):
     source = """
 __device__ void myfunc(float *data, int a, int b) {
