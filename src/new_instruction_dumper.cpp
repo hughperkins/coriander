@@ -68,7 +68,7 @@ LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
         return constantInfo;
     } else if(isa<ConstantStruct>(constant)) {
         throw runtime_error("constantStruct not implemented in basicblockdumper.dumpconstant");
-    } else if(ConstantExpr *expr = dyn_cast<ConstantExpr>(constant)) {
+    } else if(isa<ConstantExpr>(constant)) {
         // cout << "constantexpr " << constantInfo->name << endl;
         // cout << "constantexpr" << endl;
         // return dumpConstantExpr(expr);
@@ -233,10 +233,15 @@ LocalValueInfo *NewInstructionDumper::getOperand(Value *op) {
         // dumpConstant(oss, constant);
         // return oss.str();
     }
-    cout << "getoperand not implemented for:" << endl;
-    op->dump();
-    cout << endl;
-    throw runtime_error("not implemented");
+    // cout << "newinstrucoitndumper::getoperand: need dependent value:" << endl;
+    // op->dump();
+    throw NeedValueDependencyException(op);
+
+    // needDependencies.insert(new ValueDependency(op));
+    // return 0;
+    // cout << "getoperand not implemented for:" << endl;
+    // cout << endl;
+    // throw runtime_error("not implemented");
 }
 
 void NewInstructionDumper::dumpIcmp(cocl::LocalValueInfo *localValueInfo) {
@@ -1032,7 +1037,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
                 bool alreadyExists = globalNames->hasName(newName);
                 // cout << "alreadyeists? " << alreadyExists << endl;
 
-                int numArgs = instr->getNumArgOperands();
+                // int numArgs = instr->getNumArgOperands();
                 // cout << "numArgs " << numArgs << endl;
                 int i;
 

@@ -502,12 +502,23 @@ bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *
             if(_addIRToCl) {
                 basicBlockDumper.addIRToCl();
             }
-            if(!basicBlockDumper.runGeneration(returnTypeByFunction)) {
-                cout << "blockdumper generation didnt run to completion" << endl;
+            bool finished = false;
+            try {
+                finished = basicBlockDumper.runGeneration(returnTypeByFunction);
+            } catch(NeedValueDependencyException &e) {
+                // cout << "need dependent value!" << endl;
+                // e.value->dump();
+                continue;
+            }
+            // } catch(...) {
+            //     cout << "caught SOMETHING" << endl;
+            // }
+            if(!finished) {
+                // cout << "blockdumper generation didnt run to completion" << endl;
                 neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
-                for(auto it2=neededFunctions.begin(); it2 != neededFunctions.end(); it2++) {
-                    cout << "function dumper, needed function: " << (*it2)->getName().str() << endl;
-                }
+                // for(auto it2=neededFunctions.begin(); it2 != neededFunctions.end(); it2++) {
+                //     cout << "function dumper, needed function: " << (*it2)->getName().str() << endl;
+                // }
                 // throw runtime_error("blockdumper generation didnt run to completion");
                 return false;
             }

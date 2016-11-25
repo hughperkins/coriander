@@ -3,9 +3,68 @@
 #include "LocalValueInfo.h"
 #include "InstructionDumper.h"
 
+// #include "llvm/Support/Casting.h"
+
 #include <string>
+#include <stdexcept>
 
 namespace cocl {
+
+class NeedValueDependencyException : public std::exception {
+public:
+    NeedValueDependencyException(llvm::Value *value) : value(value) {
+    }
+    virtual const char* what() const throw()
+    {
+        value->dump();
+        return "Need dependent value";
+    }
+    llvm::Value *value;
+};
+
+// class Dependency {
+// public:
+//     virtual ~Dependency() {}
+
+// // http://llvm.org/docs/HowToSetUpLLVMStyleRTTI.html
+//     enum DependencyKind {
+//         DependencyKind_Base,
+//         DependencyKind_Function,
+//         DependencyKind_Value
+//     };
+//     Dependency(DependencyKind kind=DependencyKind_Base) : Kind(kind) {}
+//     DependencyKind getKind() const { return Kind; }
+//     static bool classof(const Dependency *target) {
+//         return target->getKind() == DependencyKind_Base;
+//     }
+
+// private:
+//     const DependencyKind Kind;
+// };
+
+// class FunctionDependency : public Dependency {
+// public:
+//     FunctionDependency(llvm::Function *F) : Dependency(DependencyKind_Function), F(F) {}
+//     virtual ~FunctionDependency() {}
+
+//     static bool classof(const Dependency *target) {
+//         return target->getKind() == DependencyKind_Function;
+//     }
+
+//     llvm::Function *F;
+// };
+
+// class ValueDependency : public Dependency {
+// public:
+//     ValueDependency(llvm::Value *value) : Dependency(DependencyKind_Value), value(value) {}
+//     virtual ~ValueDependency() {}
+
+//     static bool classof(const Dependency *target) {
+//         return target->getKind() == DependencyKind_Value;
+//     }
+
+//     llvm::Value *value;
+// };
 
 class NewInstructionDumper {
 public:
@@ -61,6 +120,7 @@ public:
 
     std::set<std::string> *shimFunctionsNeeded = 0; // for __shfldown_3 etc, that we provide as opencl directly
     std::set<llvm::Function *> *neededFunctions = 0;
+    // std::set<std::unique_ptr<Dependency> > neededDependencies; // this will probably replace neededFunctions soon, but for now is only for needed values
 
     std::map<llvm::Value *, std::string> *globalExpressionByValue = 0;
     std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos = 0;
