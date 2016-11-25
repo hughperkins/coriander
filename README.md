@@ -239,8 +239,6 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 ## News
 
-- Nov 25:
-  - Eigen argmax/argmin tests work now :-)  (in cuda-on-cl 4.0.1 or better)
 - Nov 24:
   - merge from branch clwriter:
     - lots of refactorization under-the-hood
