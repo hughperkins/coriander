@@ -139,6 +139,11 @@ eval[0].f1.f1.f0.f0[0] = eval_nopointers[0].f1.f1.f0.f0[0];
 eval[0].f1.f1.f1.f0 = eval_nopointers[0].f1.f1.f1.f0;
 eval[0].f1.f1.f2.f0 = eval_nopointers[0].f1.f1.f2.f0;
 eval[0].f1.f1.f3.f0[0] = eval_nopointers[0].f1.f1.f3.f0[0];
+
+//eval_ptr0[0] = eval_nopointers[0].f1.f1.f3.f0[0] + 1;
+//eval_ptr0[0] = 125.0f;
+//return;
+
 eval[0].f1.f1.f4.f0[0] = eval_nopointers[0].f1.f1.f4.f0[0];
 eval[0].f1.f1.f5.f0[0] = eval_nopointers[0].f1.f1.f5.f0[0];
 eval[0].f1.f1.f6.f0.f1.f0.f0[0] = eval_nopointers[0].f1.f1.f6.f0.f0.f0.f0[0];
@@ -234,13 +239,13 @@ eval[0].f1.f1.f6.f0.f0 = eval_ptr2;
     /* int* v32 = getelementptr eval v29 <unk> <unk> */;
     /* int** v33 = getelementptr eval v29 <unk> <unk> */;
     /* int* v34 = getelementptr eval v29 <unk> <unk> */;
-    v34 = eval[0].f1.f4;
+    v34 = &eval[0].f1.f4;
     /* long* v35 = bitcast v34 */;
     /* struct Eigen__Tuple* v36 = load v28 */;
     v36 = eval[0].f1.f1.f8;
     /* bool v37 = icmp v36 <unk> */;
     /* int inner_size = load v30 */;
-    inner_size = eval[0].f1.f1.f3.f0;
+    inner_size = eval[0].f1.f1.f3.f0[0];
     /* bool v40 = icmp inner_size <unk> */;
     /* float* input_data = load v31 */;
     input_data = eval_ptr2;
@@ -266,6 +271,9 @@ block3:;
     /* long v53 = sext global_pos */;
     /* int* v54 = getelementptr v36 v53 0 */;
     /* int v55 = load v54 */;
+//eval_ptr0[0] = global_pos;
+//eval_ptr0[0] = 125.0f;
+//return;
     v56 = v36[global_pos].f0;
     /* int v56 = phi v55 */
     // v56 = v55;
@@ -429,6 +437,8 @@ block15:;
     /* if(v44) */
     if (v43 < 0) {
         /* int v117 = phi v56 */
+        output_data[0] =12344;
+        return;
         v117 = v56;
         goto block17;
     }
