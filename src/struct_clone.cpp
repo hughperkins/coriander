@@ -124,15 +124,15 @@ std::string StructCloner::writeClCopyNoPtrToPtrfull(llvm::StructType *ptrfullTyp
     // outs() << "writeStructCopyCodeNoPointers " << dumpType(structType) << "\n";
     for(auto it=ptrfullType->element_begin(); it != ptrfullType->element_end(); it++) {
         Type *childType = *it;
+        string childSrcName = srcName + ".f" + easycl::toString(srcidx);
+        string childDstName = destName + ".f" + easycl::toString(dstidx);
         if(isa<PointerType>(childType)) {
             // ignore
             // srcidx++;
+            gencode += childDstName + " = 0;\n";
             dstidx++;
             continue;
-        }
-        string childSrcName = srcName + ".f" + easycl::toString(srcidx);
-        string childDstName = destName + ".f" + easycl::toString(dstidx);
-        if(StructType *childStructType = dyn_cast<StructType>(childType)) {
+        } else if(StructType *childStructType = dyn_cast<StructType>(childType)) {
             gencode += writeClCopyNoPtrToPtrfull(childStructType, childSrcName, childDstName);
             srcidx++;
             dstidx++;
