@@ -146,10 +146,11 @@ Note that you'll need to continue to export `CLANG_HOME` environment variable wh
 
 ## Test
 
-There are three sets of tests:
+There are the following tests:
 - low-level tests, using gtest
 - mid-level tests, using `py.test`
 - end-to-end tests
+- Eigen tests, in Eigen repo, https://bitbucket.org/hughperkins/eigen/src/eigen-cl/unsupported/test/cuda-on-cl/?at=eigen-cl
 
 ### gtest tests
 
@@ -238,6 +239,8 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 ## News
 
+- Nov 25:
+  - Eigen argmax/argmin tests work now :-)  (in cuda-on-cl 4.0.1 or better)
 - Nov 24:
   - merge from branch clwriter:
     - lots of refactorization under-the-hood
