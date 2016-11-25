@@ -331,13 +331,17 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
                             // StructType *globalizedStruct = structCloner.createGlobalizedPointerStruct(oldnew, structType);
                             // cout << "globalizedstruct:" << endl;
                             // globalizedStruct->dump();
-
+                            // structType->dump();
+                            // if(structType->getName().str() == "") {
+                            //     throw runtime_error("anonymous struct");
+                            // }
                             // globalNames->getOrCreateName(structType, structType->getName().str());
                             StructType *noptrType = structCloner.cloneNoPointers(structType);
                             noptrType->setName(structType->getName().str() + "_nopointers");
                             // argType = PointerType::get(globalizedStruct, 0);
                             // arg->mutateType(argType);
                             // structsToDefine.insert(globalizedStruct);
+                            // noptrType->dump();
                             structsToDefine.insert(noptrType);
                             is_struct_needs_cloning = true;
                             argdeclaration = "global " + typeDumper->dumpType(noptrType) + "* " + argName + "_nopointers";

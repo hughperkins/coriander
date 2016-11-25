@@ -94,17 +94,26 @@ StructType *StructCloner::cloneNoPointers(StructType *inType) {
     // string name = globalNames->getName(inType);
     // string newName = name + "_nopointers";
     string newName = inType->getName().str() + "_nopointers";
+    // cout << newName << " cloning " << newName << endl;
     vector<Type *>newChildren;
     for(auto it=inType->element_begin(); it != inType->element_end(); it++) {
         Type *childType = *it;
+        // cout << newName << " child element:" << endl;
+        // childType->dump();
         if(StructType *childStructType = dyn_cast<StructType>(childType)) {
+            // cout << newName << " child is struct, so cloning that" << endl;
             childType = cloneNoPointers(childStructType);
             newChildren.push_back(childType);
         } else if(isa<PointerType>(childType)) {
             // ignore
         } else {
+            // cout << newName << " child is neither pointer nor struct, so blindly adding..." << endl;
             newChildren.push_back(childType);
         }
+    }
+    if(newChildren.size() == 0) {
+        // add some dummy thing...
+        newChildren.push_back(IntegerType::get(context, 32));
     }
     // outs() << "newchildren.size() " << newChildren.size() << "\n";
     StructType *newType = 0;
@@ -114,6 +123,8 @@ StructType *StructCloner::cloneNoPointers(StructType *inType) {
         newType = StructType::get(context);
     }
     pointerlessTypeByOriginalType[inType] = newType;
+    // cout << newName << " final struct:" << endl;
+    // newType->dump();
     return newType;
 }
 

@@ -100,6 +100,8 @@ std::string TypeDumper::addStructToGlobalNames(StructType *type) {
     if(globalNames->hasName(type)) {
         return globalNames->getName(type);
     }
+    // cout << "typedumper:;addstructtoglobalnames" << endl;
+    // type->dump();
     if(type->hasName()) {
         string name = type->getName();
         // outs() << "name " << name << "\n";
@@ -203,6 +205,7 @@ std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {
 std::string TypeDumper::dumpStructDefinition(StructType *type, string name) {
     std::string declaration = "";
     // structDeclarations.insert(name);
+    // cout << "dumping struct " << name << endl;
     declaration += name + " {\n";
     int i = 0;
     for(auto it=type->element_begin(); it != type->element_end(); it++) {
@@ -257,11 +260,18 @@ std::string TypeDumper::dumpStructDefinitions() {
             // cout << "checking " << structType->getName().str() << endl;
             // check if we already defined its members
             bool dumpable = true;
+            // cout << "dumping elements of " << structType->getName().str() << endl;
+            // cout << "num elements " << structType->getNumElements() << endl;
             for(auto it2=structType->element_begin(); it2 != structType->element_end(); it2++) {
                 // Type *structElementType = *it2;
                 if(StructType *elementStructType = dyn_cast<StructType>(*it2)) {
                     if(dumped.find(elementStructType) == dumped.end()) {
                         // cout << "      ... depends on " << elementStructType->getName().str() << endl;
+                        // cout << "adding to structs to define" << endl;
+                        // elementStructType->dump();
+                        // if(elementStructType->getName().str() == "") {
+                        //     throw runtime_error("anonymous struct");
+                        // }
                         structsToDefine.insert(elementStructType);
                         dumpable = false;
                         break;
