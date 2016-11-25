@@ -232,7 +232,7 @@ if(BUILD_TESTS)
         DEPENDS ${TEST_TARGETS})
     add_custom_target(run-tests-travis
       DEPENDS run-cuda_sample run-context run-offsetkernelargs run-test_callbacks run-testcumemcpy
-          run-testneg run-testnullpointer run-testpartialcopy run-teststream run-singlebuffer)
+          run-testnullpointer run-testpartialcopy run-teststream run-singlebuffer)
 
     if(UNIX)
         add_library(cocl_gtest SHARED third_party/gtest/gtest-all.cc)
