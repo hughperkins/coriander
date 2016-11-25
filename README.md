@@ -115,10 +115,25 @@ New!
 
 ### Install clang/llvm-3.8
 
-Either:
-- download from http://llvm.org/releases/download.html , and set `CLANG_HOME` to point to the root of this unzipped folder, or
-- on ubuntu you can do `sudo apt-get install llvm-3.8 llvm-3.8-dev clang-3.8`
-  - but you still need to set `CLANG_HOME` :-)  In this case, to: `/usr/lib/llvm-3.8`
+#### Mac OS X
+
+```
+brew install llvm38
+```
+
+set `CLANG_HOME` to something like `/usr/local/Cellar/llvm38/3.8.1/lib/llvm-3.8`
+
+#### Ubuntu 16.04
+```
+sudo apt-get install llvm-3.8 llvm-3.8-dev clang-3.8
+```
+
+set `CLANG_HOME` to `/usr/lib/llvm-3.8`
+
+#### Other systems
+
+- download from http://llvm.org/releases/download.html , and decompress
+- set `CLANG_HOME` to point to the resulting directory, the one that contains `bin`, and `lib`
 
 ### Other libraries
 
@@ -128,7 +143,7 @@ sudo apt-get install git cmake cmake-curses-gui libc6-dev-i386 make gcc g++
 ```
 
 On other systems:
-- somehow install the same things as for Ubuntu 16.04 section
+- somehow install similar things as for Ubuntu 16.04 section
 
 ### Procedure
 
