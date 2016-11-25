@@ -1,0 +1,2 @@
+export CLANG_HOME=@CLANG_HOME@
+@CMAKE_INSTALL_PREFIX@/bin/cocl_wrapped "$@"
