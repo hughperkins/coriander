@@ -106,12 +106,12 @@ display_help () {
       Options passed through to clang compiler:
         -fPIC
         -I<INCLUDEDIR>
+        -D<SYMBOL>[=<VALUE>]
         -g
 
       Options ignored currently:
         -O
         -G
-        -D<SYMBOL>[=<VALUE>]
         -U
         -M
         -x <something>
@@ -146,7 +146,7 @@ while [ x$1 != x ]; do {
             DONE=1
             ;;
         -D)
-            # PASSTHRU="$PASSTHRU $1"
+            PASSTHRU="$PASSTHRU $1"
             DONE=1
             ;;
         -O)

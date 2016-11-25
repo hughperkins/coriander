@@ -239,6 +239,11 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 ## News
 
+- Nov 25:
+  - created release 4.0.2:
+    - all current Eigen tests, https://bitbucket.org/hughperkins/eigen/src/eigen-cl/unsupported/test/cuda-on-cl/?at=eigen-cl , pass for me currently, using this release, on both beignet 1.2.1, on hd5500, and on NVIDIA 940M, using driver 367.57
+    - fixes some issues with walk-dependency order during cl walk/generation
+    - fixed an issue with un-initialized pointers, in structs passed as kernel parameters, into GPU kernels
 - Nov 24:
   - merge from branch clwriter:
     - lots of refactorization under-the-hood

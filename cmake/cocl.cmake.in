@@ -4,11 +4,15 @@ macro(add_cocl_executable OUTPUT SRCFILE)
     foreach(INCDIR ${CURRENT_INCLUDE})
         SET(INCLUDE_ARGS ${INCLUDE_ARGS} -I ${INCDIR})
     endforeach()
-
+    get_directory_property(DirDefs DIRECTORY ${CMAKE_SOURCE_DIR} COMPILE_DEFINITIONS)
+    set(DEF_CMDLINE)
+    foreach(DEF ${DirDefs})
+        SET(DEF_CMDLINE ${DEF_CMDLINE} -D${DEF})
+    endforeach()
     add_custom_command(
         OUTPUT ${OUTPUT}
-        COMMENT "@CMAKE_INSTALL_PREFIX@/bin/cocl ${INCLUDE_ARGS} ${SRCFILE} -o ${OUTPUT} ${_TESTS_COCL_OPTIONS}"
-        COMMAND @CMAKE_INSTALL_PREFIX@/bin/cocl ${INCLUDE_ARGS} ${SRCFILE} -o ${OUTPUT} ${_TESTS_COCL_OPTIONS}
+        COMMENT "CLANG_HOME=@CLANG_HOME@ @CMAKE_INSTALL_PREFIX@/bin/cocl ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${OUTPUT} ${_TESTS_COCL_OPTIONS}"
+        COMMAND CLANG_HOME=@CLANG_HOME@ @CMAKE_INSTALL_PREFIX@/bin/cocl ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${OUTPUT} ${_TESTS_COCL_OPTIONS}
         #DEPENDS @CMAKE_INSTALL_PREFIX@/bin/cocl clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
     )
     add_custom_target(build_${OUTPUT} ALL
