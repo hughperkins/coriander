@@ -35,6 +35,7 @@
 inline double rsqrt(double x) {
     return sqrt(1.0 / x);
 }
+inline int __clz(int value);
 #define rsqrtf(x) rsqrt(x)
 #define sinpif sinpi
 #define normcdff normcdf

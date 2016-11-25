@@ -57,6 +57,7 @@ void FunctionNamesMap::populateKnownValues() {
     knownFunctionsMap["_Z16our_pretend_tanhf"] = "tanh";
     knownFunctionsMap["_Z15our_pretend_logf"] = "log";
     knownFunctionsMap["_Z15our_pretend_expf"] = "exp";
+    knownFunctionsMap["_Z5__clzi"] = "clz";
 
     knownFunctionsMap["_ZSt16our_pretend_tanhf"] = "tanh";
     knownFunctionsMap["_ZSt15our_pretend_logf"] = "log";

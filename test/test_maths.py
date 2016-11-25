@@ -208,3 +208,25 @@ __global__ void myKernel(float *float_data, int *int_data) {
     print('float_data[0]', float_data[0])
     # expected = pow(float_data[1], float_data[2])
     assert float_data[0] == 5
+
+
+def test_clz(context, q, float_data, float_data_gpu, int_data, int_data_gpu):
+
+    code = """
+__global__ void myKernel(int *int_data) {
+    int_data[0] = __clz(int_data[1]);
+}
+"""
+    kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['int *']))['kernel']
+    int_data[1] = 15
+    cl.enqueue_copy(q, int_data_gpu, int_data)
+    kernel(
+        q, (32,), (32,),
+        int_data_gpu, offset_type(0),
+        cl.LocalMemory(4))
+    q.finish()
+    cl.enqueue_copy(q, int_data, int_data_gpu)
+    q.finish()
+    print('int_data[:2]', int_data[:2])
+    # expected = pow(float_data[1], float_data[2])
+    # assert float_data[0] == 5
