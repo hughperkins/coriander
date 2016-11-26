@@ -336,6 +336,7 @@ LLVM_LINK_FLAGS=`${CLANG_HOME}/bin/llvm-config --ldflags --system-libs --libs al
 # echo LLVM_COMPILE_FLAGS ${LLVM_COMPILE_FLAGS}
 # echo LLVM_LINK_FLAGS ${LLVM_LINK_FLAGS}
 
+set -x
 ${CLANG_HOME}/bin/clang++ ${PASSTHRU} -DUSE_CLEW \
     -std=c++11 -x cuda \
     --cuda-gpu-arch=sm_30 --cuda-device-only -emit-llvm -O0 -S \
