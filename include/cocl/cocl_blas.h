@@ -18,6 +18,10 @@ extern "C" {
     std::size_t cublasCreate(cublasHandle_t *phandle);
     std::size_t cublasDestroy(cublasHandle_t handle);
     std::size_t cublasSaxpy(cublasHandle_t blas, int n, const float *p_alpha, const float *x, int incx, float *y, int incy);
+    std::size_t cublasSscal(cublasHandle_t blas, int n, const float *alpha, float *x, int incx);
+    std::size_t cublasSgemv(
+        cublasHandle_t blas, int trans, int m, int n, const float *p_alpha, const float *A, int lda,
+        const float *x, int incx, const float *beta, float *p_y, int incy);
     std::size_t cublasSgemm(cublasHandle_t blas, int transA, int transB, int M, int N, int K,
          float *alpha, const float * deviceA, int lda, const float * deviceB, int ldb, float *beta, float * deviceC, int ldc);
     std::size_t cublasSetPointerMode(cublasHandle_t handle, cublasPointerMode_t mode);
