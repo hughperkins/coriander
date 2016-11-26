@@ -51,7 +51,7 @@ extern "C" {
     size_t cuMemcpyHtoDAsync(CUdeviceptr gpu_dst, const void *host_src, size_t size, char*queue);
     size_t cuMemcpyDtoHAsync(void *host_dst, CUdeviceptr gpu_src, size_t size, char*queue);
 
-    size_t cuDeviceTotalMem(uint64_t *value, CUdeviceptr device);
+    size_t cuDeviceTotalMem(size_t *value, CUdeviceptr device);
 }
 
 #define cuMemcpyHtoDAsync_v2 cuMemcpyHtoDAsync

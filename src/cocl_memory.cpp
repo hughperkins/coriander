@@ -250,7 +250,7 @@ size_t cuMemsetD32(CUdeviceptr location, unsigned int value, uint32_t count) {
     return 0;
 }
 
-size_t cuDeviceTotalMem(uint64_t *value, CUdeviceptr device) {
+size_t cuDeviceTotalMem(size_t *value, CUdeviceptr device) {
     // COCL_PRINT(cout << "cuDeviceTotalMem redirected" << endl);
     ThreadVars *v = getThreadVars();
     cl_device_id deviceid = getDeviceByIdx(v->currentDevice);
