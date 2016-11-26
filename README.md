@@ -118,10 +118,12 @@ New!
 #### Mac OS X
 
 ```
-brew install llvm38
+cd ~
+wget http://llvm.org/releases/3.8.0/clang+llvm-3.8.0-x86_64-apple-darwin.tar.xz
+tar -xf clang+llvm-3.8.0-x86_64-apple-darwin.tar.xz
 ```
 
-set `CLANG_HOME` to something like `/usr/local/Cellar/llvm38/3.8.1/lib/llvm-3.8`
+set `CLANG_HOME` to the root of this directory, ie `export CLANG_HOME=$HOME/clang+llvm-3.8.0-x86_64-apple-darwin`
 
 #### Ubuntu 16.04
 ```
