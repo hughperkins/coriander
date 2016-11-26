@@ -164,4 +164,45 @@ extern "C" {
         cudnnTensorDescriptor_t tensorDesc2,
         float * tensor2
     );
+    size_t cudnnPoolingForward(
+        cudnnHandle_t handle,
+        cudnnPoolingDescriptor_t poolDesc,
+        float *p_alpha,
+        cudnnTensorDescriptor_t convDesc,
+        float *conv,
+        float *p_beta,
+        cudnnTensorDescriptor_t poolDesc,
+        float *pool
+    );
+    size_t cudnnActivationForward(
+        cudnnHandle_t handle,
+        cudnnActivationDescriptor_t activationDesc,
+        float *p_alpha,
+        cudnnTensorDescriptor_t tensor1Desc,
+        float *tensor1,
+        float *p_beta,
+        cudnnTensorDescriptor_t tensor2Desc,
+        float *tensor2
+    );
+    size_t cudnnSoftmaxForward(
+        cudnnHandle_t handle,
+        Layout softmaxMode,
+        Layout softmaxChannel,
+        float *p_alpha,
+        cudnnTensorDescriptor_t tensor1Desc,
+        float *tensor1_data,
+        float *p_beta,
+        cudnnTensorDescriptor_t tensor2Desc,
+        float *out_data
+    );
+    size_t cudnnGetConvolutionBackwardFilterAlgorithm(
+        cudnnHandle_t handle,
+        cudnnTensorDescriptor_t tensor1Desc,
+        cudnnTensorDescriptor_t tensor2Desc,
+        cudnnConvolutionDescriptor_t convDesc,
+        cudnnFilterDescriptor_t filterDesc,
+        Layout filterMode,
+        int a,
+        cudnnConvolutionFwdAlgo_t fwdAlgo
+    );
 }

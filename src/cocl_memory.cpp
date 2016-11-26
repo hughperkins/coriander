@@ -378,6 +378,10 @@ size_t cuMemAlloc(CUdeviceptr*_pMemory, size_t bytes) {
     return cudaMalloc((void **)_pMemory, bytes);
 }
 
+size_t cudaMalloc(float **pMemory, size_t N) {
+    return ::cudaMalloc((void **)pMemory, N);
+}
+
 size_t cudaFree(void *_memory) {
     Memory *memory = findMemory((char *)_memory);
     // COCL_PRINT(cout << "cudafree using opencl memory=" << memory << endl);

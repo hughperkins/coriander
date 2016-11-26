@@ -232,6 +232,9 @@ while [ x$1 != x ]; do {
                 # clang doesnt like this => ignore
                 # PASSTHRU="$PASSTHRU $1"
                 ;;
+            -ferror-limit)
+                PASSTHRU="$PASSTHRU $1"
+                ;;
             -fPIC)
                 PASSTHRU="$PASSTHRU $1"
                 ;;

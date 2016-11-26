@@ -38,7 +38,7 @@ extern "C" {
 
     size_t cudaMemsetAsync(void *devPtr, int value, size_t count, char *queue);
     size_t cudaMemcpy(void *dst, const void *, size_t, size_t cudaMemcpyKind);
-    size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t kind, char *queue);
+    size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t kind, char *queue=0);
 
     size_t cuMemGetInfo(size_t *free, size_t *total);
     size_t cuMemsetD8(CUdeviceptr location, unsigned char value, uint32_t count);
@@ -53,6 +53,8 @@ extern "C" {
 
     size_t cuDeviceTotalMem(size_t *value, CUdeviceptr device);
 }
+
+size_t cudaMalloc(float **pMemory, size_t N);
 
 #define cuMemcpyHtoDAsync_v2 cuMemcpyHtoDAsync
 #define cuMemcpyDtoHAsync_v2 cuMemcpyDtoHAsync
