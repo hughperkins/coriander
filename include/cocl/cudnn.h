@@ -118,7 +118,38 @@ extern "C" {
         cudnnFilterDescriptor_t filter,
         cudnnConvolutionDescriptor_t conv,
         cudnnTensorDescriptor_t dstTensor,
-        Layout algo,
+        cudnnConvolutionFwdAlgo_t algo,
         size_t *p_size_bytes
+    );
+    size_t cudnnGetConvolution2dForwardOutputDim(
+        cudnnConvolutionDescriptor_t conv,
+        cudnnTensorDescriptor_t srcTensor,
+        cudnnFilterDescriptor_t filter,
+        int *N, int *C, int *H, int *W);
+    size_t cudnnGetConvolutionForwardAlgorithm(
+        cudnnHandle_t handle,
+        cudnnTensorDescriptor_t srcTensor,
+        cudnnFilterDescriptor_t filter,
+        cudnnConvolutionDescriptor_t conv,
+        cudnnTensorDescriptor_t dstTensor,
+        Layout algoPreference,
+        int a,
+        cudnnConvolutionFwdAlgo_t *p_algo
+    );
+
+    size_t cudnnConvolutionForward(
+        cudnnHandle_t handle,
+        float *p_alpha,
+        cudnnTensorDescriptor_t poolTensor,
+        float * pool,
+        cudnnFilterDescriptor_t filterDesc,
+        float *conv,
+        cudnnConvolutionDescriptor_t conv2Desc,
+        cudnnConvolutionFwdAlgo_t conv2algo,
+        void *workspace,
+        size_t workspaceSize,
+        float *p_beta,
+        cudnnTensorDescriptor_t tensorDesc,
+        cudnnConvolutionDescriptor_t convDesc
     );
 }
