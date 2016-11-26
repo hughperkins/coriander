@@ -205,4 +205,19 @@ extern "C" {
         int a,
         cudnnConvolutionFwdAlgo_t fwdAlgo
     );
+    size_t cudnnConvolutionBackwardFilter(
+        cudnnHandle_t handle,
+        float *p_alpha,
+        cudnnTensorDescriptor_t tensor1Desc,
+        float *tensor1_data,
+        cudnnTensorDescriptor_t tensor2Desc,
+        float *tensor2_data,
+        cudnnConvolutionDescriptor_t convDesc,
+        cudnnConvolutionBwdFilterAlgo_t algo,
+        void *workspace,
+        size_t workspaceSize,
+        float *p_beta,
+        cudnnFilterDescriptor_t filterDesc,
+        float *out
+    );
 }
