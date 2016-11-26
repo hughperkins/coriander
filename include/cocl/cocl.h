@@ -150,3 +150,11 @@ enum cujitenum {
 };
 
 #define CUDART_CB
+
+// we'll need to hack this call later on, when we write out the OpenCL.  At least, this placeholder lets us compile to IR
+// for now
+// __device___ bool __isGlobal(void *ptr);
+
+bool __isGlobal(const void *ptr) {
+    return true;
+}
