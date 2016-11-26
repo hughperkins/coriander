@@ -154,7 +154,7 @@ extern "C" {
         size_t workspaceSize,
         float *p_beta,
         cudnnTensorDescriptor_t tensorDesc,
-        float *conv
+        float *conv2
     );
     size_t cudnnAddTensor(
         cudnnHandle_t handle,
@@ -172,7 +172,7 @@ extern "C" {
         cudnnTensorDescriptor_t convDesc,
         float *conv,
         float *p_beta,
-        cudnnTensorDescriptor_t poolDesc,
+        cudnnTensorDescriptor_t poolDesc2,
         float *pool
     );
     size_t cudnnActivationForward(
@@ -221,6 +221,22 @@ extern "C" {
         cudnnFilterDescriptor_t filterDesc,
         float *out
     );
+    size_t cudnnConvolutionBackwardData(
+        cudnnHandle_t handle,
+        float *p_alpha,
+        cudnnTensorDescriptor_t tensor1Desc,
+        float *tensor1_data,
+        cudnnTensorDescriptor_t tensor2Desc,
+        float *tensor2_data,
+        cudnnConvolutionDescriptor_t convDesc,
+        cudnnConvolutionBwdFilterAlgo_t algo,
+        void *workspace,
+        size_t workspaceSize,
+        float *p_beta,
+        cudnnFilterDescriptor_t filterDesc,
+        float *out
+    );
+
     size_t cudnnGetConvolutionBackwardFilterWorkspaceSize(
         cudnnHandle_t handle,
         cudnnTensorDescriptor_t tensor1Desc,
@@ -248,5 +264,19 @@ extern "C" {
         cudnnTensorDescriptor_t tensor2Desc,
         cudnnConvolutionBwdDataAlgo_t algo,
         size_t *p_size
+    );
+    size_t cudnnActivationBackward(
+        cudnnHandle_t handle,
+        cudnnActivationDescriptor_t activationDesc,
+        float *p_alpha,
+        cudnnTensorDescriptor_t tensor1Desc,
+        float *tensor1,
+        cudnnTensorDescriptor_t tensor2Desc,
+        float *tensor2,
+        cudnnTensorDescriptor_t tensor3Desc,
+        float *tensor3,
+        float *p_beta,
+        cudnnTensorDescriptor_t tensor4Desc,
+        float *tensor4
     );
 }
