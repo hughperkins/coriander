@@ -146,3 +146,15 @@ std::size_t cublasSgemm(cublasHandle_t blas, int transA, int transB, int M, int 
     }
     return 0;
 }
+
+std::size_t cublasSaxpy(cublasHandle_t blas, int n, const float *p_alpha, const float *x, int incx, float *y, int incy) {
+    throw runtime_error("not implemented");
+}
+std::size_t cublasSscal(cublasHandle_t blas, int n, const float *alpha, float *x, int incx) {
+    throw runtime_error("not implemented");
+}
+std::size_t cublasSgemv(
+    cublasHandle_t blas, int trans, int m, int n, const float *p_alpha, const float *A, int lda,
+    const float *x, int incx, const float *beta, float *p_y, int incy) {
+    throw runtime_error("not implemented");
+}

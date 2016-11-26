@@ -104,3 +104,7 @@ size_t cudaSetDevice (CUdevice device) {
 size_t cudaDeviceReset() {
     //throw runtime_error("Not yet implemented, please raise an issue at https://github.com/hughperkins/cuda-on-cl/issues");
 }
+
+size_t cudaDeviceSynchronize() {
+    throw runtime_error("Not yet implemented, please raise an issue at https://github.com/hughperkins/cuda-on-cl/issues");
+}
