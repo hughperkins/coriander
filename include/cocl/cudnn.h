@@ -63,7 +63,10 @@ enum Layout {
     CUDNN_PROPAGATE_NAN,
     CUDNN_ACTIVATION_RELU,
     CUDNN_CROSS_CORRELATION,
-    CUDNN_CONVOLUTION_FWD_PREFER_FASTEST
+    CUDNN_CONVOLUTION_FWD_PREFER_FASTEST,
+    CUDNN_SOFTMAX_ACCURATE,
+    CUDNN_SOFTMAX_MODE_CHANNEL,
+    CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST
 };
 
 extern "C" {
@@ -150,6 +153,15 @@ extern "C" {
         size_t workspaceSize,
         float *p_beta,
         cudnnTensorDescriptor_t tensorDesc,
-        cudnnConvolutionDescriptor_t convDesc
+        float *conv
+    );
+    size_t cudnnAddTensor(
+        cudnnHandle_t handle,
+        float *p_alpha,
+        cudnnTensorDescriptor_t tensorDesc1,
+        float *tensor,
+        float *p_beta,
+        cudnnTensorDescriptor_t tensorDesc2,
+        float * tensor2
     );
 }
