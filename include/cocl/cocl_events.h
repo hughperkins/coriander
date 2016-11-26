@@ -31,3 +31,5 @@ enum EventEnum {
     CU_EVENT_DEFAULT = 70000,
     CU_EVENT_DISABLE_TIMING
 };
+
+typedef cocl::Event *cudaEvent_t;
