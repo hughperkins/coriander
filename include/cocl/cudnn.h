@@ -1,0 +1,124 @@
+#pragma once
+
+// targeted at running: https://github.com/tbennun/cudnn-training/blob/master/lenet.cu
+
+namespace cocl {
+namespace dnn {
+
+class Dnn {
+public:
+};
+
+class TensorDescriptor {
+public:
+};
+
+class FilterDescriptor {
+
+};
+
+class ConvolutionDescriptor {
+public:
+};
+
+class PoolingDescriptor {
+public:
+};
+
+class ActivationDescriptor {
+public:
+};
+
+} // namespace dnn
+} // namespace Cocl
+
+typedef cocl::dnn::Dnn *cudnnHandle_t;
+typedef cocl::dnn::TensorDescriptor *cudnnTensorDescriptor_t;
+typedef cocl::dnn::FilterDescriptor *cudnnFilterDescriptor_t;
+typedef cocl::dnn::ConvolutionDescriptor *cudnnConvolutionDescriptor_t;
+typedef cocl::dnn::PoolingDescriptor *cudnnPoolingDescriptor_t;
+typedef cocl::dnn::ActivationDescriptor *cudnnActivationDescriptor_t;
+
+enum dnnStatusCodes {
+    CUDNN_STATUS_SUCCESS = 0  // success is typically 0, I think?
+};
+
+enum cudnnConvolutionFwdAlgo_t {
+   cudnnConvolutionFwdAlgo_t_foo = 126742
+};
+
+enum cudnnConvolutionBwdDataAlgo_t {
+   efwef = 315315
+};
+
+enum cudnnConvolutionBwdFilterAlgo_t {
+   cudnnConvolutionBwdAlgo_t_foo = 563543
+};
+// cudnnConvolutionBwdFilterAlgo_t
+
+enum Layout {
+    CUDNN_TENSOR_NCHW = 35333,
+    CUDNN_DATA_FLOAT,
+    CUDNN_POOLING_MAX,
+    CUDNN_PROPAGATE_NAN,
+    CUDNN_ACTIVATION_RELU,
+    CUDNN_CROSS_CORRELATION,
+    CUDNN_CONVOLUTION_FWD_PREFER_FASTEST
+};
+
+extern "C" {
+    size_t cudnnCreate(cudnnHandle_t *p_handle);
+    size_t cudnnDestroy(cudnnHandle_t handle);
+
+    const char *cudnnGetErrorString(size_t error);
+    size_t cudnnCreateTensorDescriptor(cudnnTensorDescriptor_t *p_tensor);
+    size_t cudnnCreateActivationDescriptor(cudnnActivationDescriptor_t *p_descr);
+    size_t cudnnCreateFilterDescriptor(cudnnFilterDescriptor_t *p_desc);
+    size_t cudnnCreateConvolutionDescriptor(cudnnConvolutionDescriptor_t *p_desc);
+    size_t cudnnCreatePoolingDescriptor(cudnnPoolingDescriptor_t *p_desc);
+
+    size_t cudnnDestroyTensorDescriptor(cudnnTensorDescriptor_t desc);
+    size_t cudnnDestroyActivationDescriptor(cudnnActivationDescriptor_t desc);
+    size_t cudnnDestroyFilterDescriptor(cudnnFilterDescriptor_t desc);
+    size_t cudnnDestroyConvolutionDescriptor(cudnnConvolutionDescriptor_t desc);
+    size_t cudnnDestroyPoolingDescriptor(cudnnPoolingDescriptor_t desc);
+
+    size_t cudnnSetTensor4dDescriptor(
+        cudnnTensorDescriptor_t tensor,
+        Layout layout,
+        Layout datatype,
+        int N, int C, int H, int W);
+    size_t cudnnSetPooling2dDescriptor(
+        cudnnPoolingDescriptor_t pool,
+        Layout type,
+        Layout propagate,
+        int kH, int kW,
+        int padH, int padW,
+        int strideH, int strideW
+    );
+
+    size_t cudnnSetActivationDescriptor(
+        cudnnActivationDescriptor_t act, Layout activationType, Layout propagate,
+            float probability);
+    size_t cudnnSetFilter4dDescriptor(
+        cudnnFilterDescriptor_t filter,
+        Layout layout,
+        Layout dataType,
+        int N, int C, int H, int W
+    );
+    size_t cudnnSetConvolution2dDescriptor(
+        cudnnConvolutionDescriptor_t conv,
+        int a, int b, int c, int d, int e, int f,
+        Layout correlationType
+    );
+
+    size_t cudnnGetConvolutionForwardWorkspaceSize(
+        cudnnHandle_t handle,
+        cudnnTensorDescriptor_t srcTensor,
+        cudnnFilterDescriptor_t filter,
+        cudnnConvolutionDescriptor_t conv,
+        cudnnTensorDescriptor_t dstTensor,
+        Layout algo,
+        size_t *p_size_bytes
+    );
+}

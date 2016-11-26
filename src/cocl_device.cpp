@@ -100,3 +100,7 @@ size_t cudaSetDevice (CUdevice device) {
     v->currentDevice = device;
     return 0;
 }
+
+size_t cudaDeviceReset() {
+    //throw runtime_error("Not yet implemented, please raise an issue at https://github.com/hughperkins/cuda-on-cl/issues");
+}
