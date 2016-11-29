@@ -15,6 +15,17 @@ import pytest
 CLANG_HOME = os.environ['CLANG_HOME']
 
 
+def myrun(cmd_list):
+    print('running [%s]' % ' '.join(cmd_list))
+    f_out = open('/tmp/testout.txt', 'w+')
+    res = subprocess.run(cmd_list, stdout=f_out, stderr=subprocess.STDOUT)
+    f_out.seek(0)
+    contents = f_out.read()
+    f_out.close()
+    print(contents)
+    assert res.returncode == 0
+
+
 @pytest.mark.skipif(os.environ.get('TRAVIS', None) == 'true', reason='fails on travis mac cpu, not looked into why yet')
 def test_cwise_sqrt(context, q, float_data, float_data_gpu):
     options = test_common.cocl_options()
@@ -34,30 +45,29 @@ def test_cwise_sqrt(context, q, float_data, float_data_gpu):
         i += 1
     print('opt_options', opt_options)
     print('iropencl_options', iropencl_options)
-    res = subprocess.run([
+    myrun([
         join(CLANG_HOME, 'bin/opt')
     ] + opt_options + [
         '-S',
         'test/tf/samples/cwise_op_gpu_sqrt-device-noopt.ll',
         '-o', '/tmp/test-opt.ll'
-    ], stdout=subprocess.PIPE)
-    print(' '.join(res.args))
-    assert res.returncode == 0
+    ])
 
-    res = subprocess.run([
+    myrun([
         'build/ir-to-opencl'
     ] + iropencl_options + [
         '--inputfile', '/tmp/test-opt.ll',
         '--outputfile', '/tmp/test-device.cl',
         '--kernelname', '_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_'
-    ], stdout=subprocess.PIPE)
-    print(' '.join(res.args))
-    assert res.returncode == 0
+    ])
 
     with open('/tmp/test-device.cl', 'r') as f:
         cl_sourcecode = f.read()
 
-    prog = cl.Program(context, cl_sourcecode).build()
+    print('creating program...')
+    prog_unbuilt = cl.Program(context, cl_sourcecode)
+    print('building kernel...')
+    prog = prog_unbuilt.build()
 
     N = 10
 
@@ -88,11 +98,12 @@ def test_cwise_sqrt(context, q, float_data, float_data_gpu):
     workgroup_size = 256
     scratch = workgroup_size * 4
 
+    print('running kernel...')
     prog.__getattr__('_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_')(
         q, (global_size,), (workgroup_size,),
         eval_nopointers_gpu,
-        eval_ptr0_gpu, np.int32(eval_ptr0_offset),
-        eval_ptr1_gpu, np.int32(eval_ptr1_offset),
+        eval_ptr0_gpu, offset_type(eval_ptr0_offset),
+        eval_ptr1_gpu, offset_type(eval_ptr1_offset),
         np.int32(size),
         cl.LocalMemory(scratch)
     )
