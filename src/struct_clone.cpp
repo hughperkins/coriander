@@ -106,6 +106,7 @@ StructType *StructCloner::cloneNoPointers(StructType *inType) {
             newChildren.push_back(childType);
         } else if(isa<PointerType>(childType)) {
             // ignore
+            // cout << newName << " child is pointer type => ignoring" << endl;
         } else {
             // cout << newName << " child is neither pointer nor struct, so blindly adding..." << endl;
             newChildren.push_back(childType);
@@ -137,10 +138,18 @@ std::string StructCloner::writeClCopyNoPtrToPtrfull(llvm::StructType *ptrfullTyp
         Type *childType = *it;
         string childSrcName = srcName + ".f" + easycl::toString(srcidx);
         string childDstName = destName + ".f" + easycl::toString(dstidx);
-        if(isa<PointerType>(childType)) {
+        if(PointerType *pointerType = dyn_cast<PointerType>(childType)) {
             // ignore
             // srcidx++;
-            gencode += childDstName + " = 0;\n";
+            // as long as not pointer to pointer, set to 0 for now (think about how to generalize better later)
+            if(!isa<PointerType>(pointerType->getPointerElementType())) {
+                // pointerType->getPointerElementType()->dump();
+                // if(isa<PointerType>(pointerType->getPointerElementType())) {
+                //     cout << "pointer elemnet type is also poitner" << endl;
+                // }
+                // cout << "writing " << childDstName + " = 0;" << endl;
+                gencode += childDstName + " = 0;\n";
+            }
             dstidx++;
             continue;
         } else if(StructType *childStructType = dyn_cast<StructType>(childType)) {
@@ -268,13 +277,15 @@ void StructCloner::walkType(Module *M, StructInfo *structInfo, int level, int of
         // outs() << getIndent(level) << "pointer type " << dumpType(elementType) << " addressspace " << addressspace << " offset=" << offset << "\n";
         // how to find out if this is gpu allocated or not?
         // let's just heuristically assume that all primitive*s are gpu allocated for now?
-        // and lets assume that structs are just sent one at a time now, and any contained structs are one at a time
-        // we can figure out how to generalize this later...
+        // ~~and lets assume that structs are just sent one at a time now, and any contained structs are one at a time~~
+        // ~~we can figure out how to generalize this later...~~
+        // new plan: anything htats a pointer, we assume is going to be global, therefore we should remove
+        // pointer to pointer is not allowed, so we should remove
         // actually, anything except float *s, we're just going to leave as-is (or set to zero), for now
-        if(elementType->getPrimitiveSizeInBits() != 0) {
+        // if(elementType->getPrimitiveSizeInBits() != 0) {
             // outs() << "primitive type " << dumpType(pointerType) << "\n";
             structInfo->pointerInfos.push_back(unique_ptr<PointerInfo>(new PointerInfo(offset, pointerType, indices, path)));
-        }
+        // }
     } else if(isa<ArrayType>(type)) {
         // outs() << getIndent(level) << dumpType(elemType) << "[" << count << "] offset=" << offset << "\n";
     } else if(isa<IntegerType>(type)) {

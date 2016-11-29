@@ -154,20 +154,20 @@ std::string TypeDumper::dumpArrayType(ArrayType *type, bool decayArraysToPointer
 }
 
 std::string TypeDumper::dumpFunctionType(FunctionType *fn) {
-    throw runtime_error("not implemented");
+    // throw runtime_error("not implemented");
     // // outs() << "function" << "\n";
-    // std::string params_str = "";
-    // int i = 0;
-    // for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
-    //     Type * paramType = *it;
-    //     if(i > 0) {
-    //         params_str += ", ";
-    //     }
-    //     params_str += dumpType(paramType);
-    //     i++;
-    // }
-    // // outs() << "params_str " << params_str << "\n";
-    // return params_str;
+    std::string params_str = "";
+    int i = 0;
+    for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
+        Type * paramType = *it;
+        if(i > 0) {
+            params_str += ", ";
+        }
+        params_str += dumpType(paramType);
+        i++;
+    }
+    // outs() << "params_str " << params_str << "\n";
+    return params_str;
 }
 
 std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {

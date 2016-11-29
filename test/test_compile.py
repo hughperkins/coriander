@@ -45,3 +45,16 @@ def test_compile(context, cu_filepath, kernelname):
     cl_code = test_common.cu_to_cl(cu_code, mangledname)
 
     test_common.build_kernel(context, cl_code, mangledname)
+
+
+def test_no_pointer_struct_ointer(context):
+    with open("test/pointerpointer.cu", 'r') as f:
+        cu_code = f.read()
+
+    cl_code = test_common.cu_to_cl(cu_code, '_Z11myte6kernelP16TensorEvaluator6PfP9GpuDeviceiii')
+    kernel_line = None
+    for line in cl_code.split('\n'):
+        if line.startswith('kernel'):
+            kernel_line = line
+    assert kernel_line is not None
+    assert 'class_GpuDevice_nopointers' in kernel_line
