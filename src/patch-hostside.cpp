@@ -51,6 +51,7 @@
 #include <map>
 #include <set>
 #include <stdexcept>
+#include <memory>
 #include <sstream>
 #include <fstream>
 
@@ -95,6 +96,69 @@ public:
 
 static unique_ptr<LaunchCallInfo> launchCallInfo(new LaunchCallInfo);
 
+class GenericCallInst {
+    // its children can hold a CallInst or an InvokeInst
+public:
+    // GenericCallInst() {}
+    virtual ~GenericCallInst() {}
+    static unique_ptr<GenericCallInst> create(InvokeInst *inst);
+    static unique_ptr<GenericCallInst> create(CallInst *inst);
+    virtual Value *getArgOperand(int idx) = 0;
+    virtual Value *getOperand(int idx) = 0;
+    virtual Module *getModule() = 0;
+    virtual Instruction *getInst() = 0;
+    virtual void dump() = 0;
+};
+
+class GenericCallInst_Call : public GenericCallInst {
+public:
+    GenericCallInst_Call(CallInst *inst) : inst(inst) {}
+    CallInst *inst;
+    virtual Value *getArgOperand(int idx) override {
+        return inst->getArgOperand(idx);
+    }
+    virtual Value *getOperand(int idx) override {
+        return inst->getArgOperand(idx);
+    }
+    virtual Module *getModule() {
+        return inst->getModule();
+    }
+    virtual Instruction *getInst() {
+        return inst;
+    }
+    virtual void dump() {
+        inst->dump();
+    }
+};
+
+class GenericCallInst_Invoke : public GenericCallInst {
+public:
+    GenericCallInst_Invoke(InvokeInst *inst) : inst(inst) {}
+    InvokeInst *inst;
+    virtual Value *getArgOperand(int idx) override {
+        return inst->getArgOperand(idx);
+    }
+    virtual Value *getOperand(int idx) override {
+        return inst->getArgOperand(idx);
+    }
+    virtual Module *getModule() {
+        return inst->getModule();
+    }
+    virtual Instruction *getInst() {
+        return inst;
+    }
+    virtual void dump() {
+        inst->dump();
+    }
+};
+
+unique_ptr<GenericCallInst> GenericCallInst::create(InvokeInst *inst) {
+    return unique_ptr<GenericCallInst>(new GenericCallInst_Invoke(inst));
+}
+unique_ptr<GenericCallInst> GenericCallInst::create(CallInst *inst) {
+    return unique_ptr<GenericCallInst>(new GenericCallInst_Call(inst));
+}
+
 ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
     raw_os_ostream my_raw_os_ostream(os);
     my_raw_os_ostream << "LaunchCallInfo " << info.kernelName;
@@ -125,7 +189,7 @@ ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
     return os;
 }
 
-void getLaunchTypes(CallInst *inst, LaunchCallInfo *info) {
+void getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info) {
     // input to this is a cudaLaunch instruction
     // sideeffect is to populate in info:
     // - name of the kernel
@@ -150,7 +214,7 @@ void getLaunchTypes(CallInst *inst, LaunchCallInfo *info) {
     }
 }
 
-void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
+void getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info) {
     // input to this is:
     // - inst is cudaSetupArgument instruction, with:
     //   - first operand is a value pointing to the value we want to send to the kernel
@@ -174,7 +238,7 @@ void getLaunchArgValue(CallInst *inst, LaunchCallInfo *info) {
     Instruction *bitcast = cast<Instruction>(inst->getOperand(0));
     Value *alloca = bitcast->getOperand(0);
     Instruction *load = new LoadInst(alloca, "loadCudaArg");
-    load->insertBefore(inst);
+    load->insertBefore(inst->getInst());
     info->callValuesByValue.push_back(load);
     info->callValuesAsPointers.push_back(alloca);
 }
@@ -352,22 +416,22 @@ Instruction *addSetKernelArgInst(Instruction *lastInst, Value *value, Value *val
     return lastInst;
 }
 
-void patchCudaLaunch(Function *F, CallInst *inst, vector<Instruction *> &to_replace_with_zero) {
+void patchCudaLaunch(Function *F, GenericCallInst *inst, vector<Instruction *> &to_replace_with_zero) {
     // outs() << "cudaLaunch\n";
 
     Module *M = inst->getModule();
 
     getLaunchTypes(inst, launchCallInfo.get());
-    to_replace_with_zero.push_back(inst);
+    to_replace_with_zero.push_back(inst->getInst());
     // outs() << "patching launch in " << string(F->getName()) << "\n";
 
     string kernelName = launchCallInfo->kernelName;
     Instruction *kernelNameValue = addStringInstr(M, "s_" + ::devicellcode_stringname + "_" + kernelName, kernelName);
-    kernelNameValue->insertBefore(inst);
+    kernelNameValue->insertBefore(inst->getInst());
 
     // this isnt actually needed for running, but hopefully useful for debugging
     Instruction *llSourcecodeValue = addStringInstrExistingGlobal(M, devicellcode_stringname);
-    llSourcecodeValue->insertBefore(inst);
+    llSourcecodeValue->insertBefore(inst->getInst());
 
     // Instruction *clSourcecodeValue = addStringInstrExistingGlobal(M, sourcecode_stringname);
     // clSourcecodeValue->insertBefore(inst);
@@ -381,7 +445,7 @@ void patchCudaLaunch(Function *F, CallInst *inst, vector<Instruction *> &to_repl
         NULL));
     Value *args[] = {kernelNameValue, llSourcecodeValue};
     CallInst *callConfigureKernel = CallInst::Create(configureKernel, ArrayRef<Value *>(&args[0], &args[2]));
-    callConfigureKernel->insertBefore(inst);
+    callConfigureKernel->insertBefore(inst->getInst());
     Instruction *lastInst = callConfigureKernel;
 
     // pass args now
@@ -407,27 +471,40 @@ void patchCudaLaunch(Function *F, CallInst *inst, vector<Instruction *> &to_repl
 }
 
 void patchFunction(Function *F) {
+    bool is_main = (string(F->getName().str()) == "main");
+    if(is_main) cout << "patching " << F->getName().str() << endl;    
     vector<Instruction *> to_replace_with_zero;
     IntegerType *inttype = IntegerType::get(context, 32);
     ConstantInt *constzero = ConstantInt::getSigned(inttype, 0);
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
         for(auto insit=basicBlock->begin(); insit != basicBlock->end(); insit++) {
-            if(CallInst *inst = dyn_cast<CallInst>(&*insit)) {
-                Function *called = inst->getCalledFunction();
-                if(called == 0) {
-                    continue;
-                }
-                if(!called->hasName()) {
-                    continue;
-                }
-                string calledFunctionName = called->getName();
-                if(calledFunctionName == "cudaLaunch") {
-                    patchCudaLaunch(F, inst, to_replace_with_zero);
-                } else if(calledFunctionName == "cudaSetupArgument") {
-                    getLaunchArgValue(inst, launchCallInfo.get());
-                    to_replace_with_zero.push_back(inst);
-                }
+            Instruction *inst = &*insit;
+            if(!isa<CallInst>(inst) && !isa<InvokeInst>(inst)) {
+                continue;
+            }
+            Function *called = 0;
+            unique_ptr<GenericCallInst> genCallInst;
+            if(CallInst *callInst = dyn_cast<CallInst>(inst)) {
+                called = callInst->getCalledFunction();
+                genCallInst = GenericCallInst::create(callInst);
+            } else if(InvokeInst *callInst = dyn_cast<InvokeInst>(inst)) {
+                called = callInst->getCalledFunction();
+                genCallInst = GenericCallInst::create(callInst);
+            }
+            if(called == 0) {
+                continue;
+            }
+            if(!called->hasName()) {
+                continue;
+            }
+            string calledFunctionName = called->getName();
+            if(is_main && calledFunctionName.find("cuda") != string::npos) cout << "calledfunctionname " << calledFunctionName << endl;
+            if(calledFunctionName == "cudaLaunch") {
+                patchCudaLaunch(F, genCallInst.get(), to_replace_with_zero);
+            } else if(calledFunctionName == "cudaSetupArgument") {
+                getLaunchArgValue(genCallInst.get(), launchCallInfo.get());
+                to_replace_with_zero.push_back(inst);
             }
         }
     }
