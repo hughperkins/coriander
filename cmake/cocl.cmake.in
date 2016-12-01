@@ -23,6 +23,7 @@ macro(add_cocl_executable OUTPUT SRCFILES)
             COMMENT "CLANG_HOME=@CLANG_HOME@ @CMAKE_INSTALL_PREFIX@/bin/cocl ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}"
             COMMAND CLANG_HOME=@CLANG_HOME@ @CMAKE_INSTALL_PREFIX@/bin/cocl ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}
             #DEPENDS @CMAKE_INSTALL_PREFIX@/bin/cocl clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
+            DEPENDS ${SRCFILE}
         )
         add_custom_target(build_${TARGETNAME}_o ALL
             DEPENDS ${TARGETNAME}.o
