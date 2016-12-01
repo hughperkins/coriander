@@ -51,12 +51,28 @@ public:
 };
 
 class FilterDescriptor {
-
+public:
+    Layout layout;
+    Layout dataType;
+    int N;
+    int C;
+    int H;
+    int W;
 };
 
 class ConvolutionDescriptor {
 public:
+    // cudnnTensorDescriptor_t inputTensorDesc;
+    // cudnnFilterDescriptor_t filterDesc;
+    int a;
+    int b;
+    int c;
+    int d;
+    int e;
+    int f;
+    Layout correlationType;
 };
+
 
 class PoolingDescriptor {
 public:

@@ -100,7 +100,6 @@ std::size_t cudnnSetPooling2dDescriptor(
     pool->strideW = strideW;
     return 0;
 }
-
 std::size_t cudnnSetActivationDescriptor(
     cudnnActivationDescriptor_t act, Layout activationType, Layout propagate,
         float probability) {
@@ -115,14 +114,45 @@ std::size_t cudnnSetFilter4dDescriptor(
     Layout dataType,
     int N, int C, int H, int W
 ) {
-    throw runtime_error("not implemented");
+    filter->layout = layout;
+    filter->dataType = dataType;
+    filter->N = N;
+    filter->C = C;
+    filter->H = H;
+    filter->W = W;
+    return 0;
 }
 std::size_t cudnnSetConvolution2dDescriptor(
     cudnnConvolutionDescriptor_t conv,
     int a, int b, int c, int d, int e, int f,
     Layout correlationType
 ) {
-    throw runtime_error("not implemented");
+    conv->a = a;  // eg 0
+    conv->b = b;
+    conv->c = c; // eg 1
+    conv->d = d;
+    conv->e = e;  // eg 1
+    conv->f = f;
+    conv->correlationType = correlationType;
+    return 0;
+}
+
+std::size_t cudnnGetConvolution2dForwardOutputDim(
+    cudnnConvolutionDescriptor_t conv,
+    cudnnTensorDescriptor_t srcTensor,
+    cudnnFilterDescriptor_t filter,
+    int *pN, int *pC, int *pH, int *pW) {
+    // conv->inputTensorDesc = srcTensor;
+    // conv->filterDesc = filter;
+    // conv->N = N;
+    // conv->C = C;
+    // conv->H = H;
+    // conv->W = W;
+    *pN = srcTensor->N;
+    *pC = srcTensor->C;
+    *pH = srcTensor->H; // obviously needs tweaking a bit...
+    *pW = srcTensor->W;
+    return 0;
 }
 
 std::size_t cudnnGetConvolutionForwardWorkspaceSize(
@@ -134,15 +164,37 @@ std::size_t cudnnGetConvolutionForwardWorkspaceSize(
     cudnnConvolutionFwdAlgo_t algo,
     std::size_t *p_size_bytes
 ) {
-    throw runtime_error("not implemented");
+    cout << "cudnnGetConvolutionForwardWorkspaceSize()" << endl;
+    *p_size_bytes = 0;
+    return 0;
 }
-std::size_t cudnnGetConvolution2dForwardOutputDim(
-    cudnnConvolutionDescriptor_t conv,
-    cudnnTensorDescriptor_t srcTensor,
+std::size_t cudnnGetConvolutionBackwardFilterWorkspaceSize(
+    cudnnHandle_t handle,
+    cudnnTensorDescriptor_t tensor1Desc,
+    cudnnTensorDescriptor_t tensor2Desc,
+    cudnnConvolutionDescriptor_t convDesc,
     cudnnFilterDescriptor_t filter,
-    int *N, int *C, int *H, int *W) {
-    throw runtime_error("not implemented");
+    cudnnConvolutionBwdFilterAlgo_t algo,
+    std::size_t *p_size
+) {
+    cout << "cudnnGetConvolutionBackwardFilterWorkspaceSize()" << endl;
+    *p_size = 0;
+    return 0;
 }
+std::size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
+    cudnnHandle_t handle,
+    cudnnFilterDescriptor_t filter,
+    cudnnTensorDescriptor_t tensor1Desc,
+    cudnnConvolutionDescriptor_t convDesc,
+    cudnnTensorDescriptor_t tensor2Desc,
+    cudnnConvolutionBwdDataAlgo_t algo,
+    std::size_t *p_size
+) {
+    cout << "cudnnGetConvolutionBackwardDataWorkspaceSize()" << endl;
+    *p_size = 0;
+    return 0;
+}
+
 std::size_t cudnnGetConvolutionForwardAlgorithm(
     cudnnHandle_t handle,
     cudnnTensorDescriptor_t srcTensor,
@@ -283,17 +335,6 @@ std::size_t cudnnConvolutionBackwardData(
 ) {
     throw runtime_error("not implemented");
 }
-std::size_t cudnnGetConvolutionBackwardFilterWorkspaceSize(
-    cudnnHandle_t handle,
-    cudnnTensorDescriptor_t tensor1Desc,
-    cudnnTensorDescriptor_t tensor2Desc,
-    cudnnConvolutionDescriptor_t convDesc,
-    cudnnFilterDescriptor_t filter,
-    cudnnConvolutionBwdFilterAlgo_t algo,
-    std::size_t *p_size
-) {
-    throw runtime_error("not implemented");
-}
 std::size_t cudnnGetConvolutionBackwardDataAlgorithm(
     cudnnHandle_t handle,
     cudnnFilterDescriptor_t filter,
@@ -303,17 +344,6 @@ std::size_t cudnnGetConvolutionBackwardDataAlgorithm(
     Layout convMode,
     int a,
     cudnnConvolutionBwdDataAlgo_t *p_algo
-) {
-    throw runtime_error("not implemented");
-}
-std::size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
-    cudnnHandle_t handle,
-    cudnnFilterDescriptor_t filter,
-    cudnnTensorDescriptor_t tensor1Desc,
-    cudnnConvolutionDescriptor_t convDesc,
-    cudnnTensorDescriptor_t tensor2Desc,
-    cudnnConvolutionBwdDataAlgo_t algo,
-    std::size_t *p_size
 ) {
     throw runtime_error("not implemented");
 }
