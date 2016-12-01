@@ -21,7 +21,6 @@ const char *cudnnGetErrorString(std::size_t error) {
 std::size_t cudnnCreate(cudnnHandle_t *p_handle) {
     *p_handle = new Dnn();
     return 0;
-    // throw runtime_error("not implemented");
 }
 std::size_t cudnnDestroy(cudnnHandle_t handle) {
     delete handle;
@@ -29,35 +28,45 @@ std::size_t cudnnDestroy(cudnnHandle_t handle) {
 }
 
 std::size_t cudnnCreateTensorDescriptor(cudnnTensorDescriptor_t *p_tensor) {
-    throw runtime_error("not implemented");
+    *p_tensor = new TensorDescriptor();
+    return 0;
 }
-std::size_t cudnnCreateActivationDescriptor(cudnnActivationDescriptor_t *p_descr) {
-    throw runtime_error("not implemented");
+std::size_t cudnnCreateActivationDescriptor(cudnnActivationDescriptor_t *p_desc) {
+    *p_desc = new ActivationDescriptor();
+    return 0;
 }
 std::size_t cudnnCreateFilterDescriptor(cudnnFilterDescriptor_t *p_desc) {
-    throw runtime_error("not implemented");
+    *p_desc = new FilterDescriptor();
+    return 0;
 }
 std::size_t cudnnCreateConvolutionDescriptor(cudnnConvolutionDescriptor_t *p_desc) {
-    throw runtime_error("not implemented");
+    *p_desc = new ConvolutionDescriptor();
+    return 0;
 }
 std::size_t cudnnCreatePoolingDescriptor(cudnnPoolingDescriptor_t *p_desc) {
-    throw runtime_error("not implemented");
+    *p_desc = new PoolingDescriptor();
+    return 0;
 }
 
 std::size_t cudnnDestroyTensorDescriptor(cudnnTensorDescriptor_t desc) {
-    throw runtime_error("not implemented");
+    delete desc;
+    return 0;
 }
 std::size_t cudnnDestroyActivationDescriptor(cudnnActivationDescriptor_t desc) {
-    throw runtime_error("not implemented");
+    delete desc;
+    return 0;
 }
 std::size_t cudnnDestroyFilterDescriptor(cudnnFilterDescriptor_t desc) {
-    throw runtime_error("not implemented");
+    delete desc;
+    return 0;
 }
 std::size_t cudnnDestroyConvolutionDescriptor(cudnnConvolutionDescriptor_t desc) {
-    throw runtime_error("not implemented");
+    delete desc;
+    return 0;
 }
 std::size_t cudnnDestroyPoolingDescriptor(cudnnPoolingDescriptor_t desc) {
-    throw runtime_error("not implemented");
+    delete desc;
+    return 0;
 }
 
 std::size_t cudnnSetTensor4dDescriptor(
