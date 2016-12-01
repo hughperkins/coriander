@@ -2,6 +2,37 @@
 
 // targeted at running: https://github.com/tbennun/cudnn-training/blob/master/lenet.cu
 
+enum cudnnConvolutionFwdAlgo_t {
+   cudnnConvolutionFwdAlgo_t_foo = 126742
+};
+
+enum cudnnConvolutionBwdDataAlgo_t {
+   efwef = 315315
+};
+
+enum cudnnConvolutionBwdFilterAlgo_t {
+   cudnnConvolutionBwdAlgo_t_foo = 563543
+};
+// cudnnConvolutionBwdFilterAlgo_t
+
+enum dnnStatusCodes {
+    CUDNN_STATUS_SUCCESS = 0  // success is typically 0, I think?
+};
+
+enum Layout {
+    CUDNN_TENSOR_NCHW = 35333,
+    CUDNN_DATA_FLOAT,
+    CUDNN_POOLING_MAX,
+    CUDNN_PROPAGATE_NAN,
+    CUDNN_ACTIVATION_RELU,
+    CUDNN_CROSS_CORRELATION,
+    CUDNN_CONVOLUTION_FWD_PREFER_FASTEST,
+    CUDNN_SOFTMAX_ACCURATE,
+    CUDNN_SOFTMAX_MODE_CHANNEL,
+    CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST,
+    CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST
+};
+
 namespace cocl {
 namespace dnn {
 
@@ -11,6 +42,12 @@ public:
 
 class TensorDescriptor {
 public:
+    Layout layout;
+    Layout datatype;
+    int N;
+    int C;
+    int H;
+    int W;
 };
 
 class FilterDescriptor {
@@ -38,37 +75,6 @@ typedef cocl::dnn::FilterDescriptor *cudnnFilterDescriptor_t;
 typedef cocl::dnn::ConvolutionDescriptor *cudnnConvolutionDescriptor_t;
 typedef cocl::dnn::PoolingDescriptor *cudnnPoolingDescriptor_t;
 typedef cocl::dnn::ActivationDescriptor *cudnnActivationDescriptor_t;
-
-enum dnnStatusCodes {
-    CUDNN_STATUS_SUCCESS = 0  // success is typically 0, I think?
-};
-
-enum cudnnConvolutionFwdAlgo_t {
-   cudnnConvolutionFwdAlgo_t_foo = 126742
-};
-
-enum cudnnConvolutionBwdDataAlgo_t {
-   efwef = 315315
-};
-
-enum cudnnConvolutionBwdFilterAlgo_t {
-   cudnnConvolutionBwdAlgo_t_foo = 563543
-};
-// cudnnConvolutionBwdFilterAlgo_t
-
-enum Layout {
-    CUDNN_TENSOR_NCHW = 35333,
-    CUDNN_DATA_FLOAT,
-    CUDNN_POOLING_MAX,
-    CUDNN_PROPAGATE_NAN,
-    CUDNN_ACTIVATION_RELU,
-    CUDNN_CROSS_CORRELATION,
-    CUDNN_CONVOLUTION_FWD_PREFER_FASTEST,
-    CUDNN_SOFTMAX_ACCURATE,
-    CUDNN_SOFTMAX_MODE_CHANNEL,
-    CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST,
-    CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST
-};
 
 extern "C" {
     std::size_t cudnnCreate(cudnnHandle_t *p_handle);

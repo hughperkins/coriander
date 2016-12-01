@@ -74,7 +74,13 @@ std::size_t cudnnSetTensor4dDescriptor(
     Layout layout,
     Layout datatype,
     int N, int C, int H, int W) {
-    throw runtime_error("not implemented");
+    tensor->layout = layout;
+    tensor->datatype = datatype;
+    tensor->N = N;
+    tensor->C = C;
+    tensor->H = H;
+    tensor->W = W;
+    return 0;
 }
 std::size_t cudnnSetPooling2dDescriptor(
     cudnnPoolingDescriptor_t pool,
