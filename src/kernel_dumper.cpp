@@ -21,6 +21,7 @@
 #include "function_dumper.h"
 #include "shims.h"
 #include "mutations.h"
+#include "EasyCL/util/easycl_stringhelper.h"
 
 #include "llvm/IR/Constants.h"
 
@@ -122,6 +123,24 @@ std::string KernelDumper::toCl() {
     if(F == 0) {
         throw runtime_error("Couldnt find kernel " + kernelName);
     }
+    // kernel name will simply be truncated to 32 characters
+    // other names will fit around it
+    if(kernelName.size() > 32) {
+        kernelName = kernelName.substr(0, 31);
+        F->setName(kernelName);
+    }
+    cout << "F name " << F->getName().str() << endl;
+
+    int i = 0;
+    for(auto it = M->begin(); it != M->end(); it++) {
+        Function *F = &*it;
+        string name = F->getName().str();
+        if(name.size() > 32) {
+            name = name.substr(0, 28) + easycl::toString(i);
+            i++;
+            F->setName(name);
+        }
+    }
 
     // GlobalNames globalNames;
     // TypeDumper typeDumper(&globalNames);
@@ -130,27 +149,13 @@ std::string KernelDumper::toCl() {
 
     ostringstream moduleClStream;
 
-    // set<Function *> dumpedFunctions;
     set<Function *> neededFunctions;
     set<Function *> isKernel;
     map<Function *, Type *> returnTypeByFunction;
+    map<string, string> oldNameByNewName;
 
     isKernel.insert(F);
-    // dumpedFunctions.insert(F);
     neededFunctions.insert(F);
-
-    // FunctionDumper functionDumper(F, true, &globalNames, &typeDumper, &functionNamesMap);
-    // if(_addIRToCl) {
-    //     functionDumper.addIRToCl();
-    // }
-    // string kernelFunctionCl = functionDumper.toCl();
-
-    // functionDeclarations.insert(functionDumper.getDeclaration());
-    // // cout << "kernelFunctionCl:\n" << kernelFunctionCl << endl;
-    // moduleClStream << kernelFunctionCl;
-    // shimFunctionsNeeded.insert(functionDumper.shimFunctionsNeeded.begin(), functionDumper.shimFunctionsNeeded.end());
-    // neededFunctions.insert(functionDumper.neededFunctions.begin(), functionDumper.neededFunctions.end());
-    // structsToDefine.insert(functionDumper.structsToDefine.begin(), functionDumper.structsToDefine.end());
 
     int nothingHappenedCount = 0;
     while(returnTypeByFunction.size() < neededFunctions.size()) {
@@ -182,6 +187,7 @@ std::string KernelDumper::toCl() {
             if(_addIRToCl) {
                 childFunctionDumper.addIRToCl();
             }
+            cout << " running generation on " << childF->getName().str() << endl;
             if(!childFunctionDumper.runGeneration(returnTypeByFunction)) {
                 // cout << "couldnt run generation to completion yet for " << childF->getName().str() << endl;
                 neededFunctions.insert(childFunctionDumper.neededFunctions.begin(), childFunctionDumper.neededFunctions.end());

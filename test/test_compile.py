@@ -44,7 +44,7 @@ def test_compile(context, cu_filepath, kernelname):
 
     cl_code = test_common.cu_to_cl(cu_code, mangledname)
 
-    test_common.build_kernel(context, cl_code, mangledname)
+    test_common.build_kernel(context, cl_code, mangledname[:31])
 
 
 def test_no_pointer_struct_ointer(context):
