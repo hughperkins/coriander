@@ -207,7 +207,11 @@ target_link_libraries(cocl clblast)
 # ==================================================================================================
 # tests
 
-include(cmake/cocl.cmake)
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cocl.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl-internal.cmake" @ONLY)
+
+include("${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl-internal.cmake")
 
 if(BUILD_TESTS)
     set(TESTS testblas cuda_sample context byvaluestructwithpointer multigpu multithreading

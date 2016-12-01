@@ -1,4 +1,4 @@
-macro(add_cocl_executable OUTPUT SRCFILE)
+macro(add_cocl_executable OUTPUT SRCFILES)
     get_directory_property(CURRENT_INCLUDE INCLUDE_DIRECTORIES)
     STRING(REGEX MATCHALL "[^;]+" CURRENT_INCLUDE "${CURRENT_INCLUDE}")
     foreach(INCDIR ${CURRENT_INCLUDE})
@@ -9,13 +9,37 @@ macro(add_cocl_executable OUTPUT SRCFILE)
     foreach(DEF ${DirDefs})
         SET(DEF_CMDLINE ${DEF_CMDLINE} -D${DEF})
     endforeach()
+    #message("ARGN ${ARGN}")
+    set(${OUTPUT}_OBJS)
+    set(${OUTPUT}_DEPS)
+    #set(${TA})
+    foreach(SRCFILE ${SRCFILES} ${ARGN})
+        set(SRCFILE ${CMAKE_CURRENT_SOURCE_DIR}/${SRCFILE})
+        string(REGEX REPLACE "[.].*" "" BASENAME ${SRCFILE})
+        string(REGEX REPLACE ".*/" "" TARGETNAME ${BASENAME})
+        #message("basename ${BASENAME} TARGETNAME ${TARGETNAME}")
+        add_custom_command(
+            OUTPUT ${TARGETNAME}.o
+            COMMENT "CLANG_HOME=@CLANG_HOME@ @CMAKE_INSTALL_PREFIX@/bin/cocl ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}"
+            COMMAND CLANG_HOME=@CLANG_HOME@ @CMAKE_INSTALL_PREFIX@/bin/cocl ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}
+            #DEPENDS @CMAKE_INSTALL_PREFIX@/bin/cocl clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
+        )
+        add_custom_target(build_${TARGETNAME}_o ALL
+            DEPENDS ${TARGETNAME}.o
+        )
+        set(${OUTPUT}_OBJS ${${OUTPUT}_OBJS} ${TARGETNAME}.o)
+        set(${OUTPUT}_DEPS ${${OUTPUT}_DEPS} build_${TARGETNAME}_o)
+    endforeach()
     add_custom_command(
         OUTPUT ${OUTPUT}
-        COMMENT "CLANG_HOME=@CLANG_HOME@ @CMAKE_INSTALL_PREFIX@/bin/cocl ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${OUTPUT} ${_TESTS_COCL_OPTIONS}"
-        COMMAND CLANG_HOME=@CLANG_HOME@ @CMAKE_INSTALL_PREFIX@/bin/cocl ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${OUTPUT} ${_TESTS_COCL_OPTIONS}
+        # COMMENT "CLANG_HOME=@CLANG_HOME@ @CMAKE_INSTALL_PREFIX@/bin/cocl ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}"
+        COMMAND g++ -o ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT} ${${OUTPUT}_OBJS} -lcocl -lclblast -leasycl -lclew -lpthread
+        DEPENDS ${${OUTPUT}_DEPS}
         #DEPENDS @CMAKE_INSTALL_PREFIX@/bin/cocl clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
     )
+    # add_custom_
     add_custom_target(build_${OUTPUT} ALL
         DEPENDS ${OUTPUT}
     )
+    # target_link_libraries(${OUTPUT} cocl clblast easycl clew)
 endmacro(add_cocl_executable)
