@@ -306,6 +306,7 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
     // Type *retType = F->getReturnType();
     // std::string retTypeString = typeDumper->dumpType(retType);
     string fname = F->getName().str();
+    // cout << "dump function dclaratoin [" << fname << "]" << endl;
     // declaration += typeDumper->dumpType(retType) + " " + fname + "(";
     declaration += fname + "(";
     int i = 0;
@@ -380,6 +381,11 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
             shimCode += structCloner.writeClCopyNoPtrToPtrfull(structType, argName + "_nopointers[0]", argName + "[0]");
             for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
                 PointerInfo *pointerInfo = pointerit->get();
+                Type *pointerElementType = pointerInfo->type->getPointerElementType();
+                // for now only handle pointers to primitives
+                if(pointerElementType->getPrimitiveSizeInBits() == 0) {
+                    continue;
+                }
                 pointerInfo->type = PointerType::get(pointerInfo->type->getPointerElementType(), 1);
                 string pointerArgName = argName + "_ptr" + easycl::toString(j);
                 declaration += ", " + typeDumper->dumpType(pointerInfo->type) + " " + pointerArgName;

@@ -824,7 +824,14 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
     CallInst *instr = cast<CallInst>(localValueInfo->value);
 
     // string gencode = "";
+    Value *calledValue = instr->getCalledValue();
+    string calledName = calledValue->getName().str();
+    // if(calledName.size() > 32) {
+    //     calledName = calledName.substr(0, 31);
+    //     calledValue->setName(calledName);
+    // }
     string functionName = instr->getCalledValue()->getName().str();
+    // cout << "called function: [" << functionName << "]" << endl;
     bool internalfunc = false;
     if(functionName == "llvm.ptx.read.tid.x") {
         localValueInfo->setAddressSpace(0);

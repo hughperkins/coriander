@@ -17,6 +17,7 @@
 #include "type_dumper.h"
 #include "GlobalNames.h"
 #include "LocalNames.h"
+#include "EasyCL/util/easycl_stringhelper.h"
 
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/IR/Module.h"
@@ -231,6 +232,47 @@ v1:;
 )", cl);
 
     EXPECT_FALSE(cl.find(" = returnsVoid") != string::npos);
+}
+
+TEST(test_kernel_dumper, test_long_conflicting_names) {
+    GlobalWrapper G("mysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamec");
+    KernelDumper *kernelDumper = G.kernelDumper.get();
+    // Module *M = getM();
+
+    string cl = kernelDumper->toCl();
+    cout << "kernel cl: [" << cl << "]" << endl;
+    EXPECT_TRUE(cl.find(" void mysuperlongfunctionnamemysuperl(") != string::npos);  // kernel name should be exactly 32 characters, simply truncated
+    vector<string>splitLine = easycl::split(cl, "\n");
+    for(auto it = splitLine.begin(); it != splitLine.end(); it++) {
+        string line = *it;
+        // cout << "line [" << *it << "]" << endl;
+        EXPECT_LE(line.size(), 128u);
+    }
+    EXPECT_EQ(R"(
+kernel void mysuperlongfunctionnamemysuperl(global float* d, uint d_offset, local int *scratch);
+void mysuperlongfunctionnamemysup0_g(global float* d, local int *scratch);
+void mysuperlongfunctionnamemysup1_g(global float* d, local int *scratch);
+
+kernel void mysuperlongfunctionnamemysuperl(global float* d, uint d_offset, local int *scratch) {
+    d += d_offset;
+
+
+v1:;
+    mysuperlongfunctionnamemysup0_g(d, scratch);
+    mysuperlongfunctionnamemysup1_g(d, scratch);
+    return;
+}
+void mysuperlongfunctionnamemysup0_g(global float* d, local int *scratch) {
+
+v1:;
+    return;
+}
+void mysuperlongfunctionnamemysup1_g(global float* d, local int *scratch) {
+
+v1:;
+    return;
+}
+)", cl);
 }
 
 } // namespace

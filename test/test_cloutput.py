@@ -287,3 +287,62 @@ def test_float4_test2(cuSourcecode, context, ctx, q, float_data, float_data_gpu)
     print('float_data[:8]', float_data[:8])
     for i in range(4):
         assert float_data[i] == float_data_orig[i + 4]
+
+
+def test_long_conflicting_names(context, q):
+    cu_source = """
+__device__ void mysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionname(float *d) {
+    d[1] = 1.0f;
+}
+
+__device__ void mysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnameb(float *d) {
+    d[2] = 3.0f;
+}
+
+__global__ void mysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamec(float *data) {
+    data[0] = 123.0f;
+    mysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionname(data);
+    mysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnameb(data);
+}
+"""
+    mangled_name = test_common.mangle('mysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamec', ['float *'])
+    cl_source = test_common.cu_to_cl(cu_source, mangled_name)
+    print('cl_source', cl_source)
+    for line in cl_source.split("\n"):
+        if line.strip().startswith('/*'):
+            continue
+        if not line.strip().replace('kernel ', '').strip().startswith('void'):
+            continue
+        name = line.replace('kernel ', '').replace('void ', '').split('(')[0]
+        if name != '':
+            print('name', name)
+            assert len(name) <= 32
+    test_common.build_kernel(context, cl_source, mangled_name[:31])
+
+
+def test_short_names(context):
+    cu_source = """
+__device__ void funca(float *d);
+
+__device__ void funca(float *d) {
+    d[1] = 1.0f;
+}
+
+__device__ void funcb(float *d, int c) {
+    d[2] = 3.0f + 5 - d[c];
+}
+
+__global__ void funck(float *data) {
+    data[0] = 123.0f;
+    funca(data);
+    funcb(data, (int)data[6]);
+    for(int i = 0; i < 1000; i++) {
+        funcb(data + i, (int)data[i + 100]);
+    }
+}
+"""
+    mangled_name = test_common.mangle('funck', ['float *'])
+    cl_source = test_common.cu_to_cl(cu_source, mangled_name)
+    print('cl_source', cl_source)
+
+    test_common.build_kernel(context, cl_source, mangled_name[:31])

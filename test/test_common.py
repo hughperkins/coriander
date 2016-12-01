@@ -9,12 +9,12 @@ clang_path = join(os.environ['CLANG_HOME'], 'bin', 'clang++')
 
 
 def run_process(cmdline_list):
+    print('running [%s]' % ' '.join(cmdline_list))
     fout = open('/tmp/pout.txt', 'w')
     res = subprocess.run(cmdline_list, stdout=fout, stderr=subprocess.STDOUT)
     fout.close()
     with open('/tmp/pout.txt', 'r') as f:
         output = f.read()
-    print(' '.join(res.args))
     print(output)
     assert res.returncode == 0
     return output
