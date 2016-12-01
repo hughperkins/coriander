@@ -195,19 +195,6 @@ std::size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
     return 0;
 }
 
-std::size_t cudnnGetConvolutionForwardAlgorithm(
-    cudnnHandle_t handle,
-    cudnnTensorDescriptor_t srcTensor,
-    cudnnFilterDescriptor_t filter,
-    cudnnConvolutionDescriptor_t conv,
-    cudnnTensorDescriptor_t dstTensor,
-    Layout algoPreference,
-    int a,
-    cudnnConvolutionFwdAlgo_t *p_algo
-) {
-    throw runtime_error("not implemented");
-}
-
 std::size_t cudnnConvolutionForward(
     cudnnHandle_t handle,
     float *p_alpha,
@@ -289,18 +276,6 @@ std::size_t cudnnSoftmaxForward(
 ) {
     throw runtime_error("not implemented");
 }
-std::size_t cudnnGetConvolutionBackwardFilterAlgorithm(
-    cudnnHandle_t handle,
-    cudnnTensorDescriptor_t tensor1Desc,
-    cudnnTensorDescriptor_t tensor2Desc,
-    cudnnConvolutionDescriptor_t convDesc,
-    cudnnFilterDescriptor_t filterDesc,
-    Layout filterMode,
-    int a,
-    cudnnConvolutionBwdFilterAlgo_t *p_algo
-) {
-    throw runtime_error("not implemented");
-}
 std::size_t cudnnConvolutionBackwardFilter(
     cudnnHandle_t handle,
     float *p_alpha,
@@ -335,18 +310,6 @@ std::size_t cudnnConvolutionBackwardData(
 ) {
     throw runtime_error("not implemented");
 }
-std::size_t cudnnGetConvolutionBackwardDataAlgorithm(
-    cudnnHandle_t handle,
-    cudnnFilterDescriptor_t filter,
-    cudnnTensorDescriptor_t tensor1Desc,
-    cudnnConvolutionDescriptor_t convDesc,
-    cudnnTensorDescriptor_t tensor2Desc,
-    Layout convMode,
-    int a,
-    cudnnConvolutionBwdDataAlgo_t *p_algo
-) {
-    throw runtime_error("not implemented");
-}
 std::size_t cudnnActivationBackward(
     cudnnHandle_t handle,
     cudnnActivationDescriptor_t activationDesc,
@@ -373,4 +336,44 @@ std::size_t cudnnConvolutionBackwardBias(
     float *tensor2
 ) {
     throw runtime_error("not implemented");
+}
+
+std::size_t cudnnGetConvolutionForwardAlgorithm(
+    cudnnHandle_t handle,
+    cudnnTensorDescriptor_t srcTensor,
+    cudnnFilterDescriptor_t filter,
+    cudnnConvolutionDescriptor_t conv,
+    cudnnTensorDescriptor_t dstTensor,
+    Layout algoPreference,
+    int a,
+    cudnnConvolutionFwdAlgo_t *p_algo
+) {
+    *p_algo = cudnnConvolutionFwdAlgo_t_foo;
+    return 0;
+}
+std::size_t cudnnGetConvolutionBackwardDataAlgorithm(
+    cudnnHandle_t handle,
+    cudnnFilterDescriptor_t filter,
+    cudnnTensorDescriptor_t tensor1Desc,
+    cudnnConvolutionDescriptor_t convDesc,
+    cudnnTensorDescriptor_t tensor2Desc,
+    Layout convMode,
+    int a,
+    cudnnConvolutionBwdDataAlgo_t *p_algo
+) {
+    *p_algo = efwef;
+    return 0;
+}
+std::size_t cudnnGetConvolutionBackwardFilterAlgorithm(
+    cudnnHandle_t handle,
+    cudnnTensorDescriptor_t tensor1Desc,
+    cudnnTensorDescriptor_t tensor2Desc,
+    cudnnConvolutionDescriptor_t convDesc,
+    cudnnFilterDescriptor_t filterDesc,
+    Layout filterMode,
+    int a,
+    cudnnConvolutionBwdFilterAlgo_t *p_algo
+) {
+    *p_algo = cudnnConvolutionBwdAlgo_t_foo;
+    return 0;
 }
