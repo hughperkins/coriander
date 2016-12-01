@@ -499,7 +499,7 @@ void patchFunction(Function *F) {
                 continue;
             }
             string calledFunctionName = called->getName();
-            if(is_main && calledFunctionName.find("cuda") != string::npos) cout << "calledfunctionname " << calledFunctionName << endl;
+            // if(is_main && calledFunctionName.find("cuda") != string::npos) cout << "calledfunctionname " << calledFunctionName << endl;
             if(calledFunctionName == "cudaLaunch") {
                 patchCudaLaunch(F, genCallInst.get(), to_replace_with_zero);
             } else if(calledFunctionName == "cudaSetupArgument") {
@@ -513,7 +513,7 @@ void patchFunction(Function *F) {
         BasicBlock::iterator ii(inst);
         if(InvokeInst *invoke = dyn_cast<InvokeInst>(inst)) {
             // need to add an uncondtioinal branch, after the old invoke locaiton
-            cout << "replacing an invoke, need to patch in a branch" << endl;
+            // cout << "replacing an invoke, need to patch in a branch" << endl;
             BasicBlock *oldTarget = invoke->getNormalDest();
             BranchInst *branch = BranchInst::Create(oldTarget);
             branch->insertAfter(inst);
