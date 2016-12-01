@@ -511,14 +511,21 @@ void patchFunction(Function *F) {
     for(auto it=to_replace_with_zero.begin(); it != to_replace_with_zero.end(); it++) {
         Instruction *inst = *it;
         BasicBlock::iterator ii(inst);
-        AllocaInst *alloca = new AllocaInst(IntegerType::get(context, 32));
-        alloca->insertBefore(inst);
-        StoreInst *store = new StoreInst(constzero, alloca);
-        store->insertBefore(inst);
-        LoadInst *load = new LoadInst(alloca);
-        load->insertBefore(inst);
-        ReplaceInstWithValue(inst->getParent()->getInstList(), ii, load);
-        // ReplaceInstWithValue(inst->getParent()->getInstList(), ii, constzero);
+        if(InvokeInst *invoke = dyn_cast<InvokeInst>(inst)) {
+            // need to add an uncondtioinal branch, after the old invoke locaiton
+            cout << "replacing an invoke, need to patch in a branch" << endl;
+            BasicBlock *oldTarget = invoke->getNormalDest();
+            BranchInst *branch = BranchInst::Create(oldTarget);
+            branch->insertAfter(inst);
+        }
+        // AllocaInst *alloca = new AllocaInst(IntegerType::get(context, 32));
+        // alloca->insertBefore(inst);
+        // StoreInst *store = new StoreInst(constzero, alloca);
+        // store->insertBefore(inst);
+        // LoadInst *load = new LoadInst(alloca);
+        // load->insertBefore(inst);
+        // ReplaceInstWithValue(inst->getParent()->getInstList(), ii, load);
+        ReplaceInstWithValue(inst->getParent()->getInstList(), ii, constzero);
     }
 }
 
