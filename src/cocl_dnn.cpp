@@ -104,7 +104,10 @@ std::size_t cudnnSetPooling2dDescriptor(
 std::size_t cudnnSetActivationDescriptor(
     cudnnActivationDescriptor_t act, Layout activationType, Layout propagate,
         float probability) {
-    throw runtime_error("not implemented");
+    act->activationType = activationType;
+    act->propagate = propagate;
+    act->probability = probability;
+    return 0;
 }
 std::size_t cudnnSetFilter4dDescriptor(
     cudnnFilterDescriptor_t filter,

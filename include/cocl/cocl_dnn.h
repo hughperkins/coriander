@@ -72,6 +72,9 @@ public:
 
 class ActivationDescriptor {
 public:
+    Layout activationType;
+    Layout propagate;
+    float probability;
 };
 
 } // namespace dnn
