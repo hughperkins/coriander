@@ -241,7 +241,7 @@ TEST(test_kernel_dumper, test_long_conflicting_names) {
 
     string cl = kernelDumper->toCl();
     cout << "kernel cl: [" << cl << "]" << endl;
-    EXPECT_TRUE(cl.find(" void mysuperlongfunctionnamemysuperlo(") != string::npos);  // kernel name should be exactly 32 characters, simply truncated
+    EXPECT_TRUE(cl.find(" void mysuperlongfunctionnamemysuperl(") != string::npos);  // kernel name should be exactly 32 characters, simply truncated
     vector<string>splitLine = easycl::split(cl, "\n");
     for(auto it = splitLine.begin(); it != splitLine.end(); it++) {
         string line = *it;
