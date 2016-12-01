@@ -20,9 +20,9 @@ macro(add_cocl_executable OUTPUT SRCFILES)
         #message("basename ${BASENAME} TARGETNAME ${TARGETNAME}")
         add_custom_command(
             OUTPUT ${TARGETNAME}.o
-            COMMENT "CLANG_HOME=@CLANG_HOME@ @CMAKE_INSTALL_PREFIX@/bin/cocl ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}"
-            COMMAND CLANG_HOME=@CLANG_HOME@ @CMAKE_INSTALL_PREFIX@/bin/cocl ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}
-            #DEPENDS @CMAKE_INSTALL_PREFIX@/bin/cocl clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
+            COMMENT "CLANG_HOME=@CLANG_HOME@ @THIS_COCL_PATH@ ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}"
+            COMMAND CLANG_HOME=@CLANG_HOME@ @THIS_COCL_PATH@ ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}
+            #DEPENDS @THIS_COCL_PATH@ clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
             DEPENDS ${SRCFILE}
         )
         add_custom_target(build_${TARGETNAME}_o ALL
@@ -33,10 +33,10 @@ macro(add_cocl_executable OUTPUT SRCFILES)
     endforeach()
     add_custom_command(
         OUTPUT ${OUTPUT}
-        # COMMENT "CLANG_HOME=@CLANG_HOME@ @CMAKE_INSTALL_PREFIX@/bin/cocl ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}"
+        # COMMENT "CLANG_HOME=@CLANG_HOME@ @THIS_COCL_PATH@ ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}"
         COMMAND g++ -o ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT} ${${OUTPUT}_OBJS} -lcocl -lclblast -leasycl -lclew -lpthread
         DEPENDS ${${OUTPUT}_OBJS}
-        #DEPENDS @CMAKE_INSTALL_PREFIX@/bin/cocl clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
+        #DEPENDS @THIS_COCL_PATH@ clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
     )
     # add_custom_
     add_custom_target(build_${OUTPUT} ALL
