@@ -511,7 +511,14 @@ void patchFunction(Function *F) {
     for(auto it=to_replace_with_zero.begin(); it != to_replace_with_zero.end(); it++) {
         Instruction *inst = *it;
         BasicBlock::iterator ii(inst);
-        ReplaceInstWithValue(inst->getParent()->getInstList(), ii, constzero);
+        AllocaInst *alloca = new AllocaInst(IntegerType::get(context, 32));
+        alloca->insertBefore(inst);
+        StoreInst *store = new StoreInst(constzero, alloca);
+        store->insertBefore(inst);
+        LoadInst *load = new LoadInst(alloca);
+        load->insertBefore(inst);
+        ReplaceInstWithValue(inst->getParent()->getInstList(), ii, load);
+        // ReplaceInstWithValue(inst->getParent()->getInstList(), ii, constzero);
     }
 }
 
