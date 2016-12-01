@@ -90,7 +90,15 @@ std::size_t cudnnSetPooling2dDescriptor(
     int padH, int padW,
     int strideH, int strideW
 ) {
-    throw runtime_error("not implemented");
+    pool->type = type;
+    pool->propagate = propagate;
+    pool->kH = kH;
+    pool->kW = kW;
+    pool->padH = padH;
+    pool->padW = padW;
+    pool->strideH = strideH;
+    pool->strideW = strideW;
+    return 0;
 }
 
 std::size_t cudnnSetActivationDescriptor(

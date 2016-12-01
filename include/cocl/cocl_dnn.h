@@ -60,6 +60,14 @@ public:
 
 class PoolingDescriptor {
 public:
+    Layout type;
+    Layout propagate;
+    int kH;
+    int kW;
+    int padH;
+    int padW;
+    int strideH;
+    int strideW;
 };
 
 class ActivationDescriptor {
