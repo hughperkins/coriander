@@ -102,9 +102,12 @@ size_t cudaSetDevice (CUdevice device) {
 }
 
 size_t cudaDeviceReset() {
+    cout << "ignoring cudaDeviceReset for now" << endl;
+    return 0;
     //throw runtime_error("Not yet implemented, please raise an issue at https://github.com/hughperkins/cuda-on-cl/issues");
 }
 
 size_t cudaDeviceSynchronize() {
-    throw runtime_error("Not yet implemented, please raise an issue at https://github.com/hughperkins/cuda-on-cl/issues");
+    cout << "ignoring cudaDeviceSynchronize for now" << endl;
+    return 0;
 }
