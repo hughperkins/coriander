@@ -1,4 +1,4 @@
-#include "cocl/cudnn.h"
+#include "cocl/cocl_dnn.h"
 
 #include <iostream>
 #include <string>
@@ -11,15 +11,21 @@ namespace dnn {
 } // namespace dnn
 } // namespace cocl
 
+using namespace cocl;
+using namespace cocl::dnn;
+
 const char *cudnnGetErrorString(std::size_t error) {
     throw runtime_error("not impelmented cudnnGetErrorString");
 }
 
 std::size_t cudnnCreate(cudnnHandle_t *p_handle) {
-    throw runtime_error("not implemented");
+    *p_handle = new Dnn();
+    return 0;
+    // throw runtime_error("not implemented");
 }
 std::size_t cudnnDestroy(cudnnHandle_t handle) {
-    throw runtime_error("not implemented");
+    delete handle;
+    return 0;
 }
 
 std::size_t cudnnCreateTensorDescriptor(cudnnTensorDescriptor_t *p_tensor) {
