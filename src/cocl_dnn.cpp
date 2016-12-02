@@ -116,28 +116,38 @@ std::size_t cudnnSetFilter4dDescriptor(
     cudnnFilterDescriptor_t filter,
     Layout layout,
     Layout dataType,
-    size_t N, size_t C, size_t H, size_t W
+    size_t outC, size_t inC, size_t kH, size_t kW
 ) {
     filter->layout = layout;
     filter->dataType = dataType;
-    filter->N = N;
-    filter->C = C;
-    filter->H = H;
-    filter->W = W;
+    filter->outC = outC;
+    filter->inC = inC;
+    filter->kH = kH;
+    filter->kW = kW;
     return 0;
 }
+// tensorflow uses like:
+// status = dynload::cudnnSetConvolutionNdDescriptor(
+//     parent_, handle_, convolution_descriptor.ndims(), padding.data(),
+//     strides.data(), upscale.data() ...)
 std::size_t cudnnSetConvolution2dDescriptor(
     cudnnConvolutionDescriptor_t conv,
-    size_t a, size_t b, size_t c, size_t d, size_t e, size_t f,
+    size_t padH, size_t padW, size_t dH, size_t dW, size_t scaleH, size_t scaleW,
     Layout correlationType
 ) {
-    conv->a = a;  // eg 0
-    conv->b = b;
-    conv->c = c; // eg 1
-    conv->d = d;
-    conv->e = e;  // eg 1
-    conv->f = f;
+    conv->padH = padH;  // eg 0
+    conv->padW = padW;
+    conv->dH = dW; // eg 1
+    conv->dW = dW;
+    conv->scaleH = scaleH;  // eg 1
+    conv->scaleW = scaleW;
     conv->correlationType = correlationType;
+    if(scaleH != 1 || scaleW != 1) {
+        throw runtime_error("Not implemented: scale not 1");
+    }
+    if(dW != 1 || dW != 1) {
+        throw runtime_error("Not implemented: stride not 1");
+    }
     return 0;
 }
 

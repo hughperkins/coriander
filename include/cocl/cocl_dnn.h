@@ -54,22 +54,22 @@ class FilterDescriptor {
 public:
     Layout layout;
     Layout dataType;
-    size_t N;
-    size_t C;
-    size_t H;
-    size_t W;
+    size_t outC;
+    size_t inC;
+    size_t kH;
+    size_t kW;
 };
 
 class ConvolutionDescriptor {
 public:
     // cudnnTensorDescriptor_t inputTensorDesc;
     // cudnnFilterDescriptor_t filterDesc;
-    size_t a;
-    size_t b;
-    size_t c;
-    size_t d;
-    size_t e;
-    size_t f;
+    size_t padH;
+    size_t padW;
+    size_t dH;
+    size_t dW;
+    size_t scaleH;
+    size_t scaleW;
     Layout correlationType;
 };
 
