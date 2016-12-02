@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstddef>
 
 // targeted at running: https://github.com/tbennun/cudnn-training/blob/master/lenet.cu
@@ -11,7 +13,7 @@ enum cudnnConvolutionBwdDataAlgo_t {
 };
 
 enum cudnnConvolutionBwdFilterAlgo_t {
-   cudnnConvolutionBwdAlgo_GEMM = 563543
+   cudnnConvolutionBwdFilterAlgo_GEMM = 563543
 };
 // cudnnConvolutionBwdFilterAlgo_t
 

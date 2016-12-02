@@ -27,6 +27,13 @@ size_t getColumnsNumElements(
     cudnnConvolutionDescriptor_t conv,
     cudnnTensorDescriptor_t dstTensor);
 
+size_t getOnesNumElements(
+        cudnnHandle_t handle,
+        cudnnTensorDescriptor_t srcTensor,
+        cudnnFilterDescriptor_t filter,
+        cudnnConvolutionDescriptor_t conv,
+        cudnnTensorDescriptor_t dstTensor);
+
 std::size_t cudnnGetConvolutionForwardWorkspaceSize(
     cudnnHandle_t handle,
     cudnnTensorDescriptor_t srcTensor,

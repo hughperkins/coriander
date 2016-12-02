@@ -1,6 +1,7 @@
 #include "cocl/cocl_dnn.h"
 
-#include "cocl/cocl_dnn_gemm.h"
+#include "cocl_dnn_gemm.h"
+#include "EasyCL/util/easycl_stringhelper.h"
 
 #include <iostream>
 #include <string>
@@ -179,7 +180,7 @@ std::size_t cudnnGetConvolutionForwardWorkspaceSize(
     std::size_t *p_size_bytes
 ) {
     cout << "cudnnGetConvolutionForwardWorkspaceSize()" << endl;
-    switch() {
+    switch(algo) {
         case cudnnConvolutionFwdAlgo_GEMM:
             cocl::dnn::gemm_im2col::cudnnGetConvolutionForwardWorkspaceSize(
                 handle, srcTensor, filter, conv, dstTensor, p_size_bytes);
@@ -368,7 +369,7 @@ std::size_t cudnnGetConvolutionForwardAlgorithm(
     size_t a,
     cudnnConvolutionFwdAlgo_t *p_algo
 ) {
-    *p_algo = cudnnConvolutionFwdAlgo_t_foo;
+    *p_algo = cudnnConvolutionFwdAlgo_GEMM;
     return 0;
 }
 std::size_t cudnnGetConvolutionBackwardDataAlgorithm(
@@ -381,7 +382,7 @@ std::size_t cudnnGetConvolutionBackwardDataAlgorithm(
     size_t a,
     cudnnConvolutionBwdDataAlgo_t *p_algo
 ) {
-    *p_algo = efwef;
+    *p_algo = cudnnConvolutionBwdDataAlgo_GEMM;
     return 0;
 }
 std::size_t cudnnGetConvolutionBackwardFilterAlgorithm(
@@ -394,90 +395,6 @@ std::size_t cudnnGetConvolutionBackwardFilterAlgorithm(
     size_t a,
     cudnnConvolutionBwdFilterAlgo_t *p_algo
 ) {
-    *p_algo = cudnnConvolutionBwdAlgo_t_foo;
+    *p_algo = cudnnConvolutionBwdFilterAlgo_GEMM;
     return 0;
 }
-
-// Kernels for fast unfold+copy
-static string im2ColKernelSource = R"(
-#define CL_KERNEL_LOOP(i, n)                        \
-  for (size_t i = get_group_id(0) * get_local_size(0) + get_local_id(0); \
-      i < (n);                                       \
-      i += get_local_size(0) * get_num_groups(0))
-
-kernel void im2col_kernel(const size_t n, const global float* im_data, size_t im_offset,
-    const size_t height, const size_t width, const size_t ksize_h, const size_t ksize_w, const size_t pad_h,
-    const size_t pad_w, const size_t stride_h, const size_t stride_w, const size_t height_col, const size_t width_col,
-    global float* col_data, size_t col_offset) {
-  global const float *data_im = im_data + im_offset;
-  global float *data_col = col_data + col_offset;
-
-  CL_KERNEL_LOOP(index, n) {
-    size_t w_out = index % width_col;
-    index /= width_col;
-    size_t h_out = index % height_col;
-    size_t channel_in = index / height_col;
-    size_t channel_out = channel_in * ksize_h * ksize_w;
-    size_t h_in = h_out * stride_h - pad_h;
-    size_t w_in = w_out * stride_w - pad_w;
-    data_col += (channel_out * height_col + h_out) * width_col + w_out;
-    data_im += (channel_in * height + h_in) * width + w_in;
-    for (size_t i = 0; i < ksize_h; ++i) {
-      for (size_t j = 0; j < ksize_w; ++j) {
-        size_t h = h_in + i;
-        size_t w = w_in + j;
-        *data_col = (h >= 0 && w >= 0 && h < height && w < width) ?
-          data_im[i * width + j] : 0;
-        data_col += height_col * width_col;
-      }
-    }
-  }
-}
-)";
-
-static string col2ImKernelSource = R"(
-#define CL_KERNEL_LOOP(i, n)                        \
-  for (size_t i = get_group_id(0) * get_local_size(0) + get_local_id(0); \
-      i < (n);                                       \
-      i += get_local_size(0) * get_num_groups(0))
-
-kernel void col2im_kernel(const size_t n, global const float* col_data, size_t col_offset,
-    const size_t height, const size_t width, const size_t channels, const size_t patch_h, const size_t patch_w,
-    const size_t pad_h, const size_t pad_w, const size_t stride_h, const size_t stride_w,
-    const size_t height_col, const size_t width_col,
-    global float* im_data, size_t im_offset) {
-  global float *data_im = im_data + im_offset;
-  global const float *data_col = col_data + col_offset;
-
-  CL_KERNEL_LOOP(index, n) {
-    float val = 0;
-    size_t w = index % width + pad_w;
-    size_t h = (index / width) % height + pad_h;
-    size_t c = index / (width * height);
-    // compute the start and end of the output
-    size_t w_col_start = (w < patch_w) ? 0 : (w - patch_w) / stride_w + 1;
-    size_t w_col_end = min(w / stride_w + 1, width_col);
-    size_t h_col_start = (h < patch_h) ? 0 : (h - patch_h) / stride_h + 1;
-    size_t h_col_end = min(h / stride_h + 1, height_col);
-    /*
-       for (size_t h_col = h_col_start; h_col < h_col_end; ++h_col) {
-       for (size_t w_col = w_col_start; w_col < w_col_end; ++w_col) {
-    // the col location: [c * width * height + h_out, w_out]
-    size_t c_col = c * patch_h * patch_w + (h - h_col * stride_h) * ksize + (w - w_col * stride_w);
-    val += data_col[(c_col * height_col + h_col) * width_col + w_col];
-    }
-    }
-     */
-    // equivalent implementation
-    size_t offset = (c * patch_h * patch_w + h * patch_w + w) * height_col * width_col;
-    size_t coeff_h_col = (1 - stride_h * patch_w * height_col) * width_col;
-    size_t coeff_w_col = (1 - stride_w * height_col * width_col);
-    for (size_t h_col = h_col_start; h_col < h_col_end; ++h_col) {
-      for (size_t w_col = w_col_start; w_col < w_col_end; ++w_col) {
-        val += data_col[offset + h_col * coeff_h_col + w_col * coeff_w_col];
-      }
-    }
-    data_im[index] = val;
-  }
-}
-)";
