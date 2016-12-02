@@ -190,6 +190,35 @@ size_t cudnnGetConvolutionForwardWorkspaceSize(
     }
     return 0;
 }
+size_t cudnnConvolutionForward(
+    cudnnHandle_t handle,
+    float *p_alpha,
+    cudnnTensorDescriptor_t inputTensorDesc, float *inputData,
+    cudnnFilterDescriptor_t filterDesc, float *filterData,
+    cudnnConvolutionDescriptor_t convDesc,
+    cudnnConvolutionFwdAlgo_t algo,
+    void *workspaceData, CoclDnnSizeType workspaceSize,
+    float *p_beta,
+    cudnnTensorDescriptor_t outputTensorDesc, float *outputData
+) {
+    cout << "cudnnConvolutionForward()" << endl;
+    switch(algo) {
+        case cudnnConvolutionFwdAlgo_GEMM:
+            cocl::dnn::gemm_im2col::cudnnConvolutionForward(
+                handle,
+                p_alpha,
+                inputTensorDesc, inputData,
+                filterDesc, filterData,
+                convDesc,
+                workspaceData, workspaceSize,
+                p_beta,
+                outputTensorDesc, outputData);
+            break;
+        default:
+            throw runtime_error("cudnnConvolutionForward. No implementation algorithm found for algo " + easycl::toString(algo));
+    }
+    return 0;
+}
 size_t cudnnGetConvolutionBackwardFilterWorkspaceSize(
     cudnnHandle_t handle,
     cudnnTensorDescriptor_t tensor1Desc,
@@ -217,23 +246,6 @@ size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
     return 0;
 }
 
-size_t cudnnConvolutionForward(
-    cudnnHandle_t handle,
-    float *p_alpha,
-    cudnnTensorDescriptor_t poolTensor,
-    float * pool,
-    cudnnFilterDescriptor_t filterDesc,
-    float *conv,
-    cudnnConvolutionDescriptor_t conv2Desc,
-    cudnnConvolutionFwdAlgo_t conv2algo,
-    void *workspace,
-    CoclDnnSizeType workspaceSize,
-    float *p_beta,
-    cudnnTensorDescriptor_t tensorDesc,
-    float *conv2
-) {
-    throw runtime_error("not implemented");
-}
 size_t cudnnAddTensor(
     cudnnHandle_t handle,
     float *p_alpha,

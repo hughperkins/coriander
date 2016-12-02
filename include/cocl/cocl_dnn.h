@@ -183,17 +183,13 @@ extern "C" {
     size_t cudnnConvolutionForward(
         cudnnHandle_t handle,
         float *p_alpha,
-        cudnnTensorDescriptor_t poolTensor,
-        float * pool,
-        cudnnFilterDescriptor_t filterDesc,
-        float *conv,
-        cudnnConvolutionDescriptor_t conv2Desc,
-        cudnnConvolutionFwdAlgo_t conv2algo,
-        void *workspace,
-        CoclDnnSizeType workspaceSize,
+        cudnnTensorDescriptor_t inputTensorDesc, float *inputData,
+        cudnnFilterDescriptor_t filterDesc, float *filterData,
+        cudnnConvolutionDescriptor_t convDesc,
+        cudnnConvolutionFwdAlgo_t algo,
+        void *workspaceData, CoclDnnSizeType workspaceSize,
         float *p_beta,
-        cudnnTensorDescriptor_t tensorDesc,
-        float *conv2
+        cudnnTensorDescriptor_t outputTensorDesc, float *outputData
     );
     size_t cudnnAddTensor(
         cudnnHandle_t handle,
