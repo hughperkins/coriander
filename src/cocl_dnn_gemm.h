@@ -20,14 +20,14 @@ namespace gemm_im2col {
 //     size_t onesNumElements;  // eg number of floats in ones
 // };
 
-size_t getColumnsNumElements(
+CoclDnnGeometryType getColumnsNumElements(
     cudnnHandle_t handle,
     cudnnTensorDescriptor_t srcTensor,
     cudnnFilterDescriptor_t filter,
     cudnnConvolutionDescriptor_t conv,
     cudnnTensorDescriptor_t dstTensor);
 
-size_t getOnesNumElements(
+CoclDnnGeometryType getOnesNumElements(
         cudnnHandle_t handle,
         cudnnTensorDescriptor_t srcTensor,
         cudnnFilterDescriptor_t filter,
@@ -40,7 +40,7 @@ std::size_t cudnnGetConvolutionForwardWorkspaceSize(
     cudnnFilterDescriptor_t filter,
     cudnnConvolutionDescriptor_t conv,
     cudnnTensorDescriptor_t dstTensor,
-    std::size_t *p_size_bytes
+    CoclDnnSizeType *p_size_bytes
 );
 
 } // namespace gemm_im2col

@@ -23,62 +23,62 @@ const char *cudnnGetErrorString(std::size_t error) {
     throw runtime_error("not impelmented cudnnGetErrorString");
 }
 
-std::size_t cudnnCreate(cudnnHandle_t *p_handle) {
+size_t cudnnCreate(cudnnHandle_t *p_handle) {
     *p_handle = new Dnn();
     return 0;
 }
-std::size_t cudnnDestroy(cudnnHandle_t handle) {
+size_t cudnnDestroy(cudnnHandle_t handle) {
     delete handle;
     return 0;
 }
 
-std::size_t cudnnCreateTensorDescriptor(cudnnTensorDescriptor_t *p_tensor) {
+size_t cudnnCreateTensorDescriptor(cudnnTensorDescriptor_t *p_tensor) {
     *p_tensor = new TensorDescriptor();
     return 0;
 }
-std::size_t cudnnCreateActivationDescriptor(cudnnActivationDescriptor_t *p_desc) {
+size_t cudnnCreateActivationDescriptor(cudnnActivationDescriptor_t *p_desc) {
     *p_desc = new ActivationDescriptor();
     return 0;
 }
-std::size_t cudnnCreateFilterDescriptor(cudnnFilterDescriptor_t *p_desc) {
+size_t cudnnCreateFilterDescriptor(cudnnFilterDescriptor_t *p_desc) {
     *p_desc = new FilterDescriptor();
     return 0;
 }
-std::size_t cudnnCreateConvolutionDescriptor(cudnnConvolutionDescriptor_t *p_desc) {
+size_t cudnnCreateConvolutionDescriptor(cudnnConvolutionDescriptor_t *p_desc) {
     *p_desc = new ConvolutionDescriptor();
     return 0;
 }
-std::size_t cudnnCreatePoolingDescriptor(cudnnPoolingDescriptor_t *p_desc) {
+size_t cudnnCreatePoolingDescriptor(cudnnPoolingDescriptor_t *p_desc) {
     *p_desc = new PoolingDescriptor();
     return 0;
 }
 
-std::size_t cudnnDestroyTensorDescriptor(cudnnTensorDescriptor_t desc) {
+size_t cudnnDestroyTensorDescriptor(cudnnTensorDescriptor_t desc) {
     delete desc;
     return 0;
 }
-std::size_t cudnnDestroyActivationDescriptor(cudnnActivationDescriptor_t desc) {
+size_t cudnnDestroyActivationDescriptor(cudnnActivationDescriptor_t desc) {
     delete desc;
     return 0;
 }
-std::size_t cudnnDestroyFilterDescriptor(cudnnFilterDescriptor_t desc) {
+size_t cudnnDestroyFilterDescriptor(cudnnFilterDescriptor_t desc) {
     delete desc;
     return 0;
 }
-std::size_t cudnnDestroyConvolutionDescriptor(cudnnConvolutionDescriptor_t desc) {
+size_t cudnnDestroyConvolutionDescriptor(cudnnConvolutionDescriptor_t desc) {
     delete desc;
     return 0;
 }
-std::size_t cudnnDestroyPoolingDescriptor(cudnnPoolingDescriptor_t desc) {
+size_t cudnnDestroyPoolingDescriptor(cudnnPoolingDescriptor_t desc) {
     delete desc;
     return 0;
 }
 
-std::size_t cudnnSetTensor4dDescriptor(
+size_t cudnnSetTensor4dDescriptor(
     cudnnTensorDescriptor_t tensor,
     Layout layout,
     Layout datatype,
-    size_t N, size_t C, size_t H, size_t W) {
+    CoclDnnGeometryType N, CoclDnnGeometryType C, CoclDnnGeometryType H, CoclDnnGeometryType W) {
     tensor->layout = layout;
     tensor->datatype = datatype;
     tensor->N = N;
@@ -87,13 +87,13 @@ std::size_t cudnnSetTensor4dDescriptor(
     tensor->W = W;
     return 0;
 }
-std::size_t cudnnSetPooling2dDescriptor(
+size_t cudnnSetPooling2dDescriptor(
     cudnnPoolingDescriptor_t pool,
     Layout type,
     Layout propagate,
-    size_t kH, size_t kW,
-    size_t padH, size_t padW,
-    size_t strideH, size_t strideW
+    CoclDnnGeometryType kH, CoclDnnGeometryType kW,
+    CoclDnnGeometryType padH, CoclDnnGeometryType padW,
+    CoclDnnGeometryType strideH, CoclDnnGeometryType strideW
 ) {
     pool->type = type;
     pool->propagate = propagate;
@@ -105,7 +105,7 @@ std::size_t cudnnSetPooling2dDescriptor(
     pool->strideW = strideW;
     return 0;
 }
-std::size_t cudnnSetActivationDescriptor(
+size_t cudnnSetActivationDescriptor(
     cudnnActivationDescriptor_t act, Layout activationType, Layout propagate,
         float probability) {
     act->activationType = activationType;
@@ -113,11 +113,11 @@ std::size_t cudnnSetActivationDescriptor(
     act->probability = probability;
     return 0;
 }
-std::size_t cudnnSetFilter4dDescriptor(
+size_t cudnnSetFilter4dDescriptor(
     cudnnFilterDescriptor_t filter,
     Layout layout,
     Layout dataType,
-    size_t outC, size_t inC, size_t kH, size_t kW
+    CoclDnnGeometryType outC, CoclDnnGeometryType inC, CoclDnnGeometryType kH, CoclDnnGeometryType kW
 ) {
     filter->layout = layout;
     filter->dataType = dataType;
@@ -131,9 +131,9 @@ std::size_t cudnnSetFilter4dDescriptor(
 // status = dynload::cudnnSetConvolutionNdDescriptor(
 //     parent_, handle_, convolution_descriptor.ndims(), padding.data(),
 //     strides.data(), upscale.data() ...)
-std::size_t cudnnSetConvolution2dDescriptor(
+size_t cudnnSetConvolution2dDescriptor(
     cudnnConvolutionDescriptor_t conv,
-    size_t padH, size_t padW, size_t dH, size_t dW, size_t scaleH, size_t scaleW,
+    CoclDnnGeometryType padH, CoclDnnGeometryType padW, CoclDnnGeometryType dH, CoclDnnGeometryType dW, CoclDnnGeometryType scaleH, CoclDnnGeometryType scaleW,
     Layout correlationType
 ) {
     conv->padH = padH;  // eg 0
@@ -152,11 +152,11 @@ std::size_t cudnnSetConvolution2dDescriptor(
     return 0;
 }
 
-std::size_t cudnnGetConvolution2dForwardOutputDim(
+size_t cudnnGetConvolution2dForwardOutputDim(
     cudnnConvolutionDescriptor_t conv,
     cudnnTensorDescriptor_t srcTensor,
     cudnnFilterDescriptor_t filter,
-    size_t *pN, size_t *pC, size_t *pH, size_t *pW) {
+    CoclDnnGeometryType *pN, CoclDnnGeometryType *pC, CoclDnnGeometryType *pH, CoclDnnGeometryType *pW) {
     // conv->inputTensorDesc = srcTensor;
     // conv->filterDesc = filter;
     // conv->N = N;
@@ -170,53 +170,54 @@ std::size_t cudnnGetConvolution2dForwardOutputDim(
     return 0;
 }
 
-std::size_t cudnnGetConvolutionForwardWorkspaceSize(
+size_t cudnnGetConvolutionForwardWorkspaceSize(
     cudnnHandle_t handle,
     cudnnTensorDescriptor_t srcTensor,
     cudnnFilterDescriptor_t filter,
     cudnnConvolutionDescriptor_t conv,
     cudnnTensorDescriptor_t dstTensor,
     cudnnConvolutionFwdAlgo_t algo,
-    std::size_t *p_size_bytes
+    CoclDnnSizeType *p_size_bytes
 ) {
     cout << "cudnnGetConvolutionForwardWorkspaceSize()" << endl;
     switch(algo) {
         case cudnnConvolutionFwdAlgo_GEMM:
             cocl::dnn::gemm_im2col::cudnnGetConvolutionForwardWorkspaceSize(
                 handle, srcTensor, filter, conv, dstTensor, p_size_bytes);
+            break;
         default:
             throw runtime_error("No implementation algorithm found for algo " + easycl::toString(algo));
     }
     return 0;
 }
-std::size_t cudnnGetConvolutionBackwardFilterWorkspaceSize(
+size_t cudnnGetConvolutionBackwardFilterWorkspaceSize(
     cudnnHandle_t handle,
     cudnnTensorDescriptor_t tensor1Desc,
     cudnnTensorDescriptor_t tensor2Desc,
     cudnnConvolutionDescriptor_t convDesc,
     cudnnFilterDescriptor_t filter,
     cudnnConvolutionBwdFilterAlgo_t algo,
-    std::size_t *p_size
+    CoclDnnSizeType *p_size
 ) {
     cout << "cudnnGetConvolutionBackwardFilterWorkspaceSize()" << endl;
     *p_size = 0;
     return 0;
 }
-std::size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
+size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
     cudnnHandle_t handle,
     cudnnFilterDescriptor_t filter,
     cudnnTensorDescriptor_t tensor1Desc,
     cudnnConvolutionDescriptor_t convDesc,
     cudnnTensorDescriptor_t tensor2Desc,
     cudnnConvolutionBwdDataAlgo_t algo,
-    std::size_t *p_size
+    CoclDnnSizeType *p_size
 ) {
     cout << "cudnnGetConvolutionBackwardDataWorkspaceSize()" << endl;
     *p_size = 0;
     return 0;
 }
 
-std::size_t cudnnConvolutionForward(
+size_t cudnnConvolutionForward(
     cudnnHandle_t handle,
     float *p_alpha,
     cudnnTensorDescriptor_t poolTensor,
@@ -226,14 +227,14 @@ std::size_t cudnnConvolutionForward(
     cudnnConvolutionDescriptor_t conv2Desc,
     cudnnConvolutionFwdAlgo_t conv2algo,
     void *workspace,
-    std::size_t workspaceSize,
+    CoclDnnSizeType workspaceSize,
     float *p_beta,
     cudnnTensorDescriptor_t tensorDesc,
     float *conv2
 ) {
     throw runtime_error("not implemented");
 }
-std::size_t cudnnAddTensor(
+size_t cudnnAddTensor(
     cudnnHandle_t handle,
     float *p_alpha,
     cudnnTensorDescriptor_t tensorDesc1,
@@ -244,7 +245,7 @@ std::size_t cudnnAddTensor(
 ) {
     throw runtime_error("not implemented");
 }
-std::size_t cudnnPoolingForward(
+size_t cudnnPoolingForward(
     cudnnHandle_t handle,
     cudnnPoolingDescriptor_t poolDesc,
     float *p_alpha,
@@ -256,7 +257,7 @@ std::size_t cudnnPoolingForward(
 ) {
     throw runtime_error("not implemented");
 }
-std::size_t cudnnPoolingBackward(
+size_t cudnnPoolingBackward(
     cudnnHandle_t handle,
     cudnnPoolingDescriptor_t poolDesc,
     float *p_alpha,
@@ -272,7 +273,7 @@ std::size_t cudnnPoolingBackward(
 ) {
     throw runtime_error("not implemented");
 }
-std::size_t cudnnActivationForward(
+size_t cudnnActivationForward(
     cudnnHandle_t handle,
     cudnnActivationDescriptor_t activationDesc,
     float *p_alpha,
@@ -284,7 +285,7 @@ std::size_t cudnnActivationForward(
 ) {
     throw runtime_error("not implemented");
 }
-std::size_t cudnnSoftmaxForward(
+size_t cudnnSoftmaxForward(
     cudnnHandle_t handle,
     Layout softmaxMode,
     Layout softmaxChannel,
@@ -297,7 +298,7 @@ std::size_t cudnnSoftmaxForward(
 ) {
     throw runtime_error("not implemented");
 }
-std::size_t cudnnConvolutionBackwardFilter(
+size_t cudnnConvolutionBackwardFilter(
     cudnnHandle_t handle,
     float *p_alpha,
     cudnnTensorDescriptor_t tensor1Desc,
@@ -314,7 +315,7 @@ std::size_t cudnnConvolutionBackwardFilter(
 ) {
     throw runtime_error("not implemented");
 }
-std::size_t cudnnConvolutionBackwardData(
+size_t cudnnConvolutionBackwardData(
     cudnnHandle_t handle,
     float *p_alpha,
     cudnnFilterDescriptor_t tensor1Desc,
@@ -331,7 +332,7 @@ std::size_t cudnnConvolutionBackwardData(
 ) {
     throw runtime_error("not implemented");
 }
-std::size_t cudnnActivationBackward(
+size_t cudnnActivationBackward(
     cudnnHandle_t handle,
     cudnnActivationDescriptor_t activationDesc,
     float *p_alpha,
@@ -347,7 +348,7 @@ std::size_t cudnnActivationBackward(
 ) {
     throw runtime_error("not implemented");
 }
-std::size_t cudnnConvolutionBackwardBias(
+size_t cudnnConvolutionBackwardBias(
     cudnnHandle_t handle,
     float *p_alpha,
     cudnnTensorDescriptor_t tensor1Desc,
@@ -359,40 +360,40 @@ std::size_t cudnnConvolutionBackwardBias(
     throw runtime_error("not implemented");
 }
 
-std::size_t cudnnGetConvolutionForwardAlgorithm(
+size_t cudnnGetConvolutionForwardAlgorithm(
     cudnnHandle_t handle,
     cudnnTensorDescriptor_t srcTensor,
     cudnnFilterDescriptor_t filter,
     cudnnConvolutionDescriptor_t conv,
     cudnnTensorDescriptor_t dstTensor,
     Layout algoPreference,
-    size_t a,
+    CoclDnnGeometryType a,
     cudnnConvolutionFwdAlgo_t *p_algo
 ) {
     *p_algo = cudnnConvolutionFwdAlgo_GEMM;
     return 0;
 }
-std::size_t cudnnGetConvolutionBackwardDataAlgorithm(
+size_t cudnnGetConvolutionBackwardDataAlgorithm(
     cudnnHandle_t handle,
     cudnnFilterDescriptor_t filter,
     cudnnTensorDescriptor_t tensor1Desc,
     cudnnConvolutionDescriptor_t convDesc,
     cudnnTensorDescriptor_t tensor2Desc,
     Layout convMode,
-    size_t a,
+    CoclDnnGeometryType a,
     cudnnConvolutionBwdDataAlgo_t *p_algo
 ) {
     *p_algo = cudnnConvolutionBwdDataAlgo_GEMM;
     return 0;
 }
-std::size_t cudnnGetConvolutionBackwardFilterAlgorithm(
+size_t cudnnGetConvolutionBackwardFilterAlgorithm(
     cudnnHandle_t handle,
     cudnnTensorDescriptor_t tensor1Desc,
     cudnnTensorDescriptor_t tensor2Desc,
     cudnnConvolutionDescriptor_t convDesc,
     cudnnFilterDescriptor_t filterDesc,
     Layout filterMode,
-    size_t a,
+    CoclDnnGeometryType a,
     cudnnConvolutionBwdFilterAlgo_t *p_algo
 ) {
     *p_algo = cudnnConvolutionBwdFilterAlgo_GEMM;

@@ -17,52 +17,52 @@ namespace cocl {
 namespace dnn {
 namespace gemm_im2col {
 
-size_t getColumnsNumElements(
+CoclDnnGeometryType getColumnsNumElements(
         cudnnHandle_t handle,
         cudnnTensorDescriptor_t srcTensor,
         cudnnFilterDescriptor_t filter,
         cudnnConvolutionDescriptor_t conv,
         cudnnTensorDescriptor_t dstTensor) {
 
-    size_t outN, outC, outH, outW;
+    CoclDnnGeometryType outN, outC, outH, outW;
     cudnnGetConvolution2dForwardOutputDim(
         conv,
         srcTensor,
         filter,
         &outN, &outC, &outH, &outW);
 
-    size_t inC = srcTensor->C;
-    size_t rows = inC * filter->kW * filter->kH;
-    size_t cols = outH * outW;
+    CoclDnnGeometryType inC = srcTensor->C;
+    CoclDnnGeometryType rows = inC * filter->kW * filter->kH;
+    CoclDnnGeometryType cols = outH * outW;
     return rows * cols;
 }
 
-size_t getOnesNumElements(
+CoclDnnGeometryType getOnesNumElements(
         cudnnHandle_t handle,
         cudnnTensorDescriptor_t srcTensor,
         cudnnFilterDescriptor_t filter,
         cudnnConvolutionDescriptor_t conv,
         cudnnTensorDescriptor_t dstTensor) {
 
-    size_t outN, outC, outH, outW;
+    CoclDnnGeometryType outN, outC, outH, outW;
     cudnnGetConvolution2dForwardOutputDim(
         conv,
         srcTensor,
         filter,
         &outN, &outC, &outH, &outW);
 
-    size_t rows = outH;
-    size_t cols = outW;
+    CoclDnnGeometryType rows = outH;
+    CoclDnnGeometryType cols = outW;
     return rows * cols;
 }
 
-std::size_t cudnnGetConvolutionForwardWorkspaceSize(
+size_t cudnnGetConvolutionForwardWorkspaceSize(
     cudnnHandle_t handle,
     cudnnTensorDescriptor_t srcTensor,
     cudnnFilterDescriptor_t filter,
     cudnnConvolutionDescriptor_t conv,
     cudnnTensorDescriptor_t dstTensor,
-    std::size_t *p_size_bytes
+    CoclDnnSizeType *p_size_bytes
 ) {
     cout << "gemm_im2col::cudnnGetConvolutionForwardWorkspaceSize()" << endl;
 
