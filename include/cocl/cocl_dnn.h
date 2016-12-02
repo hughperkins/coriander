@@ -3,15 +3,15 @@
 // targeted at running: https://github.com/tbennun/cudnn-training/blob/master/lenet.cu
 
 enum cudnnConvolutionFwdAlgo_t {
-   cudnnConvolutionFwdAlgo_t_foo = 126742
+   cudnnConvolutionFwdAlgo_GEMM = 126742
 };
 
 enum cudnnConvolutionBwdDataAlgo_t {
-   efwef = 315315
+   cudnnConvolutionBwdDataAlgo_GEMM = 315315
 };
 
 enum cudnnConvolutionBwdFilterAlgo_t {
-   cudnnConvolutionBwdAlgo_t_foo = 563543
+   cudnnConvolutionBwdAlgo_GEMM = 563543
 };
 // cudnnConvolutionBwdFilterAlgo_t
 
@@ -44,32 +44,32 @@ class TensorDescriptor {
 public:
     Layout layout;
     Layout datatype;
-    int N;
-    int C;
-    int H;
-    int W;
+    size_t N;
+    size_t C;
+    size_t H;
+    size_t W;
 };
 
 class FilterDescriptor {
 public:
     Layout layout;
     Layout dataType;
-    int N;
-    int C;
-    int H;
-    int W;
+    size_t N;
+    size_t C;
+    size_t H;
+    size_t W;
 };
 
 class ConvolutionDescriptor {
 public:
     // cudnnTensorDescriptor_t inputTensorDesc;
     // cudnnFilterDescriptor_t filterDesc;
-    int a;
-    int b;
-    int c;
-    int d;
-    int e;
-    int f;
+    size_t a;
+    size_t b;
+    size_t c;
+    size_t d;
+    size_t e;
+    size_t f;
     Layout correlationType;
 };
 
@@ -78,12 +78,12 @@ class PoolingDescriptor {
 public:
     Layout type;
     Layout propagate;
-    int kH;
-    int kW;
-    int padH;
-    int padW;
-    int strideH;
-    int strideW;
+    size_t kH;
+    size_t kW;
+    size_t padH;
+    size_t padW;
+    size_t strideH;
+    size_t strideW;
 };
 
 class ActivationDescriptor {
@@ -124,14 +124,14 @@ extern "C" {
         cudnnTensorDescriptor_t tensor,
         Layout layout,
         Layout datatype,
-        int N, int C, int H, int W);
+        size_t N, size_t C, size_t H, size_t W);
     std::size_t cudnnSetPooling2dDescriptor(
         cudnnPoolingDescriptor_t pool,
         Layout type,
         Layout propagate,
-        int kH, int kW,
-        int padH, int padW,
-        int strideH, int strideW
+        size_t kH, size_t kW,
+        size_t padH, size_t padW,
+        size_t strideH, size_t strideW
     );
 
     std::size_t cudnnSetActivationDescriptor(
@@ -141,11 +141,11 @@ extern "C" {
         cudnnFilterDescriptor_t filter,
         Layout layout,
         Layout dataType,
-        int N, int C, int H, int W
+        size_t N, size_t C, size_t H, size_t W
     );
     std::size_t cudnnSetConvolution2dDescriptor(
         cudnnConvolutionDescriptor_t conv,
-        int a, int b, int c, int d, int e, int f,
+        size_t a, size_t b, size_t c, size_t d, size_t e, size_t f,
         Layout correlationType
     );
 
@@ -162,7 +162,7 @@ extern "C" {
         cudnnConvolutionDescriptor_t conv,
         cudnnTensorDescriptor_t srcTensor,
         cudnnFilterDescriptor_t filter,
-        int *N, int *C, int *H, int *W);
+        size_t *N, size_t *C, size_t *H, size_t *W);
     std::size_t cudnnGetConvolutionForwardAlgorithm(
         cudnnHandle_t handle,
         cudnnTensorDescriptor_t srcTensor,
@@ -170,7 +170,7 @@ extern "C" {
         cudnnConvolutionDescriptor_t conv,
         cudnnTensorDescriptor_t dstTensor,
         Layout algoPreference,
-        int a,
+        size_t a,
         cudnnConvolutionFwdAlgo_t *p_algo
     );
 
@@ -250,7 +250,7 @@ extern "C" {
         cudnnConvolutionDescriptor_t convDesc,
         cudnnFilterDescriptor_t filterDesc,
         Layout filterMode,
-        int a,
+        size_t a,
         cudnnConvolutionBwdFilterAlgo_t *p_algo
     );
     std::size_t cudnnConvolutionBackwardFilter(
@@ -299,7 +299,7 @@ extern "C" {
         cudnnConvolutionDescriptor_t convDesc,
         cudnnTensorDescriptor_t tensor2Desc,
         Layout convMode,
-        int a,
+        size_t a,
         cudnnConvolutionBwdDataAlgo_t *p_algo
     );
     std::size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
