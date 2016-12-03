@@ -8,6 +8,7 @@
 
 #include "cocl_dnn_gemm.h"
 
+#include "cocl/cocl.h"
 #include "cocl/cocl_dnn.h"
 #include "cocl/cocl_memory.h"
 // #include "cocl/cocl_blas.h"
@@ -20,8 +21,8 @@ namespace cocl {
 namespace dnn {
 namespace gemm_im2col {
 
-static string im2col_sourcecode;
-static string col2im_sourcecode;
+static string get_im2col_sourcecode();
+static string get_col2im_sourcecode();
 
 CoclDnnGeometryType getColumnsNumElements(
         cudnnHandle_t handle,
@@ -43,75 +44,75 @@ CoclDnnGeometryType getColumnsNumElements(
     return rows * cols;
 }
 
-void im2col(THClTensor* im, const int channels,
-        const int height, const int width, const int ksize_h, const int ksize_w, const int pad_h,
-        const int pad_w, const int stride_h, const int stride_w, THClTensor* col) {
-    // We are going to launch channels * height_col * width_col kernels, each
-    // kernel responsible for copying a single-channel grid.
-    int height_col = (height + 2 * pad_h - ksize_h) / stride_h + 1;
-    int width_col = (width + 2 * pad_w - ksize_w) / stride_w + 1;
-    int num_kernels = channels * height_col * width_col;
+// void im2col(THClTensor* im, const int channels,
+//         const int height, const int width, const int ksize_h, const int ksize_w, const int pad_h,
+//         const int pad_w, const int stride_h, const int stride_w, THClTensor* col) {
+//     // We are going to launch channels * height_col * width_col kernels, each
+//     // kernel responsible for copying a single-channel grid.
+//     int height_col = (height + 2 * pad_h - ksize_h) / stride_h + 1;
+//     int width_col = (width + 2 * pad_w - ksize_w) / stride_w + 1;
+//     int num_kernels = channels * height_col * width_col;
 
-    CLKernel *getKernelForNameCl("im2col_kernel", im2col_sourcecode);
+    // CLKernel *getKernelForNameCl("im2col_kernel", im2col_sourcecode);
 
-    THClKernels k(state, kernel);
-    k.in(num_kernels);
-    k.in(im);
-    k.in(height);
-    k.in(width);
-    k.in(ksize_h);
-    k.in(ksize_w);
-    k.in(pad_h);
-    k.in(pad_w);
-    k.in(stride_h);
-    k.in(stride_w);
-    k.in(height_col);
-    k.in(width_col);
-    k.out(col);
+    // THClKernels k(state, kernel);
+    // k.in(num_kernels);
+    // k.in(im);
+    // k.in(height);
+    // k.in(width);
+    // k.in(ksize_h);
+    // k.in(ksize_w);
+    // k.in(pad_h);
+    // k.in(pad_w);
+    // k.in(stride_h);
+    // k.in(stride_w);
+    // k.in(height_col);
+    // k.in(width_col);
+    // k.out(col);
 
-    k.run(GET_BLOCKS(state, num_kernels), getNumThreads(state));
-}
+    // k.run(GET_BLOCKS(state, num_kernels), getNumThreads(state));
+// }
 
-void col2im(THClTensor* col, const int channels,
-        const int height, const int width, const int patch_h, const int patch_w, const int pad_h,
-        const int pad_w, const int stride_h, const int stride_w, THClTensor* im) {
-    int height_col = (height + 2 * pad_h - patch_h) / stride_h + 1;
-    int width_col = (width + 2 * pad_w - patch_w) / stride_w + 1;
-    int num_kernels = channels * height * width;
-    // To avoid involving atomic operations, we will launch one kernel per
-    // bottom dimension, and then in the kernel add up the top dimensions.
+// void col2im(THClTensor* col, const int channels,
+//         const int height, const int width, const int patch_h, const int patch_w, const int pad_h,
+//         const int pad_w, const int stride_h, const int stride_w, THClTensor* im) {
+//     int height_col = (height + 2 * pad_h - patch_h) / stride_h + 1;
+//     int width_col = (width + 2 * pad_w - patch_w) / stride_w + 1;
+//     int num_kernels = channels * height * width;
+//     // To avoid involving atomic operations, we will launch one kernel per
+//     // bottom dimension, and then in the kernel add up the top dimensions.
 
-    EasyCL *cl = im->storage->cl;
-    std::string uniqueName = "SpatialConvolutionMM::col2im";
-    CLKernel *kernel = 0;
-    if(cl->kernelExists(uniqueName)) {
-        kernel = cl->getKernel(uniqueName);
-    } else {
-        TemplatedKernel kernelBuilder(cl);
-        kernel = kernelBuilder.buildKernel(uniqueName, "SpatialConvolutionMM.cl",
-            SpatialConvolutionMM_getKernelTemplate(), "col2im_kernel");
-    }
+//     EasyCL *cl = im->storage->cl;
+//     std::string uniqueName = "SpatialConvolutionMM::col2im";
+//     CLKernel *kernel = 0;
+//     if(cl->kernelExists(uniqueName)) {
+//         kernel = cl->getKernel(uniqueName);
+//     } else {
+//         TemplatedKernel kernelBuilder(cl);
+//         kernel = kernelBuilder.buildKernel(uniqueName, "SpatialConvolutionMM.cl",
+//             SpatialConvolutionMM_getKernelTemplate(), "col2im_kernel");
+//     }
 
-    THClKernels k(state, kernel);
-    k.in(num_kernels);
-    k.in(col);
-    k.in(height);
-    k.in(width);
-    k.in(channels);
+//     THClKernels k(state, kernel);
+//     k.in(num_kernels);
+//     k.in(col);
+//     k.in(height);
+//     k.in(width);
+//     k.in(channels);
 
-    k.in(patch_h);
-    k.in(patch_w);
-    k.in(pad_h);
-    k.in(pad_w);
-    k.in(stride_h);
-    k.in(stride_w);
+//     k.in(patch_h);
+//     k.in(patch_w);
+//     k.in(pad_h);
+//     k.in(pad_w);
+//     k.in(stride_h);
+//     k.in(stride_w);
 
-    k.in(height_col);
-    k.in(width_col);
-    k.out(im);
+//     k.in(height_col);
+//     k.in(width_col);
+//     k.out(im);
 
-    k.run(GET_BLOCKS(state, num_kernels), getNumThreads(state));
-}
+//     k.run(GET_BLOCKS(state, num_kernels), getNumThreads(state));
+// }
 
 // CoclDnnGeometryType getOnesNumElements(
 //         cudnnHandle_t handle,
@@ -237,7 +238,7 @@ size_t cudnnConvolutionForward(
         //     output_n, n_
         // );
 
-        im2col()
+        // im2col()
 
     //     // Extract columns:
     //     im2col(
@@ -254,7 +255,8 @@ size_t cudnnConvolutionForward(
 
 // Kernel for fast unfold+copy
 // (borrowed from Caffe: https://github.com/BVLC/caffe/blob/master/src/caffe/layers/conv_layer.cu)
-string im2col_sourcecode = R"(
+string get_im2col_sourcecode() {
+    return R"(
 // CL: grid stride looping
 #define CL_KERNEL_LOOP(i, n)                        \
   for (int i = get_group_id(0) * get_local_size(0) + get_local_id(0); \
@@ -290,8 +292,10 @@ kernel void im2col_kernel(const int n, const global float* im_data, int im_offse
   }
 }
 )";
+}
 
-string col2im_sourcecode = R"(
+string get_col2im_sourcecode() {
+    return R"(
 // CL: grid stride looping
 #define CL_KERNEL_LOOP(i, n)                        \
   for (int i = get_group_id(0) * get_local_size(0) + get_local_id(0); \
@@ -338,6 +342,7 @@ kernel void col2im_kernel(const int n, global const float* col_data, int col_off
   }
 }
 )";
+}
 
 } // namespace gemm_im2col
 } // namespace dnn

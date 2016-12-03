@@ -251,8 +251,10 @@ if(BUILD_TESTS)
         test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
         test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
         test/gtest/test_kernel_dumper.cpp test/gtest/test_global_constants.cpp
+        test/gtest/test_hostside_opencl_funcs.cpp
     )
     target_include_directories(cocl_unittests PRIVATE src)
+    target_include_directories(cocl_unittests PRIVATE include)
     target_include_directories(cocl_unittests PRIVATE third_party/gtest)
     target_include_directories(cocl_unittests PRIVATE ${CLANG_HOME}/include)
     target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} ${LLVM_SYSLIBS})

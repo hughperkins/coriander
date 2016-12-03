@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#pragma once
+
 // #include <iostream>
 #include <memory>
 // #include <vector>
 // #include <map>
 // #include <set>
+#include <cstdint>
 
 #include "EasyCL/EasyCL.h"
 
@@ -32,17 +35,15 @@ namespace easycl {
 namespace cocl {
     class CoclStream;
 
-    int getNumCachedKernels(); // this should be per-context or something, though right now, it is not yet
-    int getNumKernelCalls();
-    CLKernel *getKernelForNameLl(std::string kernelName, std::string devicellsourcecode);
-    CLKernel *getKernelForNameCl(std::string kernelName, std::string clSourcecode);
+    int32_t getNumCachedKernels(); // this should be per-context or something, though right now, it is not yet
+    int32_t getNumKernelCalls();
+    std::string  convertLlToCl(std::string devicellsourcecode, std::string kernelName);
+    easycl::CLKernel *getKernelForNameCl(std::string kernelName, std::string clSourcecode);
+    easycl::CLKernel *getKernelForNameLl(std::string kernelName, std::string devicellsourcecode);
 }
 
 extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
-}
-
-extern "C" {
     void configureKernel(
         const char *kernelName, const char *llsourcecode);
 

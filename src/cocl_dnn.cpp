@@ -76,8 +76,8 @@ size_t cudnnDestroyPoolingDescriptor(cudnnPoolingDescriptor_t desc) {
 
 size_t cudnnSetTensor4dDescriptor(
     cudnnTensorDescriptor_t tensor,
-    Layout layout,
-    Layout datatype,
+    CoclDnnLayout layout,
+    CoclDnnLayout datatype,
     CoclDnnGeometryType N, CoclDnnGeometryType C, CoclDnnGeometryType H, CoclDnnGeometryType W) {
     tensor->layout = layout;
     tensor->datatype = datatype;
@@ -89,8 +89,8 @@ size_t cudnnSetTensor4dDescriptor(
 }
 size_t cudnnSetPooling2dDescriptor(
     cudnnPoolingDescriptor_t pool,
-    Layout type,
-    Layout propagate,
+    CoclDnnLayout type,
+    CoclDnnLayout propagate,
     CoclDnnGeometryType kH, CoclDnnGeometryType kW,
     CoclDnnGeometryType padH, CoclDnnGeometryType padW,
     CoclDnnGeometryType strideH, CoclDnnGeometryType strideW
@@ -106,7 +106,7 @@ size_t cudnnSetPooling2dDescriptor(
     return 0;
 }
 size_t cudnnSetActivationDescriptor(
-    cudnnActivationDescriptor_t act, Layout activationType, Layout propagate,
+    cudnnActivationDescriptor_t act, CoclDnnLayout activationType, CoclDnnLayout propagate,
         float probability) {
     act->activationType = activationType;
     act->propagate = propagate;
@@ -115,8 +115,8 @@ size_t cudnnSetActivationDescriptor(
 }
 size_t cudnnSetFilter4dDescriptor(
     cudnnFilterDescriptor_t filter,
-    Layout layout,
-    Layout dataType,
+    CoclDnnLayout layout,
+    CoclDnnLayout dataType,
     CoclDnnGeometryType outC, CoclDnnGeometryType inC, CoclDnnGeometryType kH, CoclDnnGeometryType kW
 ) {
     filter->layout = layout;
@@ -134,7 +134,7 @@ size_t cudnnSetFilter4dDescriptor(
 size_t cudnnSetConvolution2dDescriptor(
     cudnnConvolutionDescriptor_t conv,
     CoclDnnGeometryType padH, CoclDnnGeometryType padW, CoclDnnGeometryType dH, CoclDnnGeometryType dW, CoclDnnGeometryType scaleH, CoclDnnGeometryType scaleW,
-    Layout correlationType
+    CoclDnnLayout correlationType
 ) {
     conv->padH = padH;  // eg 0
     conv->padW = padW;
@@ -299,8 +299,8 @@ size_t cudnnActivationForward(
 }
 size_t cudnnSoftmaxForward(
     cudnnHandle_t handle,
-    Layout softmaxMode,
-    Layout softmaxChannel,
+    CoclDnnLayout softmaxMode,
+    CoclDnnLayout softmaxChannel,
     float *p_alpha,
     cudnnTensorDescriptor_t tensor1Desc,
     float *tensor1_data,
@@ -378,7 +378,7 @@ size_t cudnnGetConvolutionForwardAlgorithm(
     cudnnFilterDescriptor_t filter,
     cudnnConvolutionDescriptor_t conv,
     cudnnTensorDescriptor_t dstTensor,
-    Layout algoPreference,
+    CoclDnnLayout algoPreference,
     CoclDnnGeometryType a,
     cudnnConvolutionFwdAlgo_t *p_algo
 ) {
@@ -391,7 +391,7 @@ size_t cudnnGetConvolutionBackwardDataAlgorithm(
     cudnnTensorDescriptor_t tensor1Desc,
     cudnnConvolutionDescriptor_t convDesc,
     cudnnTensorDescriptor_t tensor2Desc,
-    Layout convMode,
+    CoclDnnLayout convMode,
     CoclDnnGeometryType a,
     cudnnConvolutionBwdDataAlgo_t *p_algo
 ) {
@@ -404,7 +404,7 @@ size_t cudnnGetConvolutionBackwardFilterAlgorithm(
     cudnnTensorDescriptor_t tensor2Desc,
     cudnnConvolutionDescriptor_t convDesc,
     cudnnFilterDescriptor_t filterDesc,
-    Layout filterMode,
+    CoclDnnLayout filterMode,
     CoclDnnGeometryType a,
     cudnnConvolutionBwdFilterAlgo_t *p_algo
 ) {

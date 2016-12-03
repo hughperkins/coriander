@@ -233,9 +233,9 @@ namespace cocl {
             cout << "kernel name " << kernelName << endl;
             cout << "writing ll to /tmp/failed-kernel.ll" << endl;
 
-            f.open("/tmp/failed-kernel.ll", ios_base::out);
-            f << devicellsourcecode << endl;
-            f.close();
+            // f.open("/tmp/failed-kernel.ll", ios_base::out);
+            // f << devicellsourcecode << endl;
+            // f.close();
 
             cout << "writing cl to /tmp/failed-kernel.cl" << endl;
             f.open("/tmp/failed-kernel.cl", ios_base::out);
