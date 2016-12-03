@@ -65,12 +65,3 @@ notifications:
   email:
     on_success: change
     on_failure: always
-
-addons:
-  artifacts:
-    debug: true
-    s3_region: "us-east-1" # defaults to "us-east-1"
-    paths:
-    - /Users/travis/build/hughperkins/cuda-on-cl/foo/cuda_sample-hostraw.ll
-    - /Users/travis/build/hughperkins/cuda-on-cl/foo/cuda_sample-hostpatched.ll
-    - /Users/travis/build/hughperkins/cuda-on-cl/foo/cuda_sample.o
