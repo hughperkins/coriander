@@ -27,12 +27,12 @@ CoclDnnGeometryType getColumnsNumElements(
     cudnnConvolutionDescriptor_t conv,
     cudnnTensorDescriptor_t dstTensor);
 
-CoclDnnGeometryType getOnesNumElements(
-        cudnnHandle_t handle,
-        cudnnTensorDescriptor_t srcTensor,
-        cudnnFilterDescriptor_t filter,
-        cudnnConvolutionDescriptor_t conv,
-        cudnnTensorDescriptor_t dstTensor);
+// CoclDnnGeometryType getOnesNumElements(
+//         cudnnHandle_t handle,
+//         cudnnTensorDescriptor_t srcTensor,
+//         cudnnFilterDescriptor_t filter,
+//         cudnnConvolutionDescriptor_t conv,
+//         cudnnTensorDescriptor_t dstTensor);
 
 std::size_t cudnnGetConvolutionForwardWorkspaceSize(
     cudnnHandle_t handle,

@@ -34,6 +34,8 @@ namespace cocl {
 
     int getNumCachedKernels(); // this should be per-context or something, though right now, it is not yet
     int getNumKernelCalls();
+    CLKernel *getKernelForNameLl(std::string kernelName, std::string devicellsourcecode);
+    CLKernel *getKernelForNameCl(std::string kernelName, std::string clSourcecode);
 }
 
 extern "C" {
