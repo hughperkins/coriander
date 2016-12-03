@@ -255,8 +255,8 @@ namespace cocl {
         ThreadVars *v = getThreadVars();
         EasyCL *cl = v->getContext()->getCl();
         ofstream f;
-        v->getContext()->numKernelCalls++;
         if(v->getContext()->kernelByName.find(kernelName) != v->getContext()->kernelByName.end()) {
+            v->getContext()->numKernelCalls++;
             return v->getContext()->kernelByName[kernelName];
         }
         // compile the kernel.  we are still locking the mutex, but I cnat think of a better
