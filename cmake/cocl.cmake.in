@@ -34,7 +34,7 @@ macro(add_cocl_executable OUTPUT SRCFILES)
     add_custom_command(
         OUTPUT ${OUTPUT}
         # COMMENT "CLANG_HOME=@CLANG_HOME@ @THIS_COCL_PATH@ ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}"
-        COMMAND g++ -o ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT} ${${OUTPUT}_OBJS} -lcocl -lclblast -leasycl -lclew -lpthread
+        COMMAND g++ -o ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT} ${${OUTPUT}_OBJS} -L@THIS_LIB_DIR@ -lcocl -lclblast -leasycl -lclew -lpthread
         DEPENDS ${${OUTPUT}_OBJS}
         #DEPENDS @THIS_COCL_PATH@ clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
     )
