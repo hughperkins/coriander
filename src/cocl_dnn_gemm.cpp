@@ -131,25 +131,6 @@ void col2im(cl_mem col_buf, size_t col_offset, const int channels,
     kernel->run_1d(GET_BLOCKS(num_kernels), getNumThreads());
 }
 
-// CoclDnnGeometryType getOnesNumElements(
-//         cudnnHandle_t handle,
-//         cudnnTensorDescriptor_t srcTensor,
-//         cudnnFilterDescriptor_t filter,
-//         cudnnConvolutionDescriptor_t conv,
-//         cudnnTensorDescriptor_t dstTensor) {
-
-//     CoclDnnGeometryType outN, outC, outH, outW;
-//     cudnnGetConvolution2dForwardOutputDim(
-//         conv,
-//         srcTensor,
-//         filter,
-//         &outN, &outC, &outH, &outW);
-
-//     CoclDnnGeometryType rows = outH;
-//     CoclDnnGeometryType cols = outW;
-//     return rows * cols;
-// }
-
 size_t cudnnGetConvolutionForwardWorkspaceSize(
     cudnnHandle_t handle,
     cudnnTensorDescriptor_t srcTensor,
@@ -159,11 +140,6 @@ size_t cudnnGetConvolutionForwardWorkspaceSize(
     CoclDnnSizeType *p_size_bytes
 ) {
     cout << "gemm_im2col::cudnnGetConvolutionForwardWorkspaceSize()" << endl;
-
-    // we need size of columns
-    // *p_size_bytes = getColumnsNumElements(handle, srcTensor, filter, conv, dstTensor) +
-    //     getOnesNumElements(handle, srcTensor, filter, conv, dstTensor);
-
     *p_size_bytes = getColumnsNumElements(handle, srcTensor, filter, conv, dstTensor);
     return 0;
 }
@@ -218,53 +194,37 @@ size_t cudnnConvolutionForward(
         size_t input3dOffset = inputOffset + n * input3dSize;
         size_t output3dOffset = outputOffset + n * output3dSize;
 
-        // // Do Bias first:
+        CoclDnnGeometryType nInputPlane = inputTensorDesc->C;
+        CoclDnnGeometryType inputHeight = inputTensorDesc->H;
+        CoclDnnGeometryType inputWidth = inputTensorDesc->W;
+        CoclDnnGeometryType kH = filterDesc->kH;
+        CoclDnnGeometryType kW = filterDesc->kW;
+        CoclDnnGeometryType padH = convDesc->padH;
+        CoclDnnGeometryType padW = convDesc->padW;
+        CoclDnnGeometryType dH = convDesc->dH;
+        CoclDnnGeometryType dW = convDesc->dW;
+        im2col(inputMemory->clmem, input3dOffset,
+            nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
+            outputMemory->clmem, output3dOffset
+        );
+
         // // M,N,K are dims of matrix A and B
         // // (see http://docs.nvidia.com/cuda/clblas/#clblas-lt-t-gt-gemm)
-        // CoclDnnGeometryType nOutputPlane = outputTensorDesc->C;
-        // CoclDnnGeometryType outputHeight = outputTensorDesc->H;
-        // CoclDnnGeometryType outputWidth = outputTensorDesc->W;
-
-        // CoclDnnGeometryType m_ = nOutputPlane;
-        // CoclDnnGeometryType n_ = outputHeight * outputWidth;
-        // CoclDnnGeometryType k_ = 1;
-
-        // // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
-        // StatusCode status = CLBlastSgemm(kColMajor, kYes, kNo,
-        //                                n_, m_, k_,
-        //                                1.0f,
-        //                                workspaceMemory->clmem, onesOffset, k_,
-        //                                 BMemory->clmem, B_offset, ldb,
-        //                                0.0f,
-        //                                CMemory->clmem, C_offset, ldc,
-        //                                &coclBlas->queue->queue, 0);
-        // if(status != 0) {
-        //     cout << "sgemm status code " << status << endl;
-        //     throw runtime_error("Failed call to blas sgem");
-        // }
+        // long m = weight->size[0];
+        // long n = columns->size[1];
+        // long k = weight->size[1];
 
         // // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
         // THClBlas_gemm(
         //     state,
-        //     't', 'n',
-        //     n_, m_, k_,
+        //     'n', 'n',
+        //     n, m, k,
         //     1,
-        //     ones, k_,
-        //     bias, k_,
-        //     0,
-        //     output_n, n_
+        //     columns, n,
+        //     weight, k,
+        //     1,
+        //     output_n, n
         // );
-
-        // im2col()
-
-    //     // Extract columns:
-    //     im2col(
-    //       state,
-    // //      THClState_getCurrentStream(state),
-    //       input_n,
-    //       nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
-    //       columns
-    //     );
     }
 
     return 0;
