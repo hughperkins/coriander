@@ -208,6 +208,7 @@ target_link_libraries(cocl clblast)
 # tests
 
 set(THIS_COCL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl)
+set(THIS_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cocl.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl-internal.cmake" @ONLY)
@@ -269,6 +270,7 @@ FILE(GLOB EASYCL_HEADERS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/*.h)
 # FILE(GLOB CLEW_PROXYHEADERS) ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/thirdparty/clew/include/proxy-opencl/*.h)
 
 set(THIS_COCL_PATH ${CMAKE_INSTALL_PREFIX}/bin/cocl)
+set(THIS_BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cocl.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl.cmake" @ONLY)
