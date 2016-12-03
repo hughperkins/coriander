@@ -11,6 +11,7 @@
 #include "cocl/cocl.h"
 #include "cocl/cocl_dnn.h"
 #include "cocl/cocl_memory.h"
+#include "cocl/hostside_opencl_funcs.h"
 // #include "cocl/cocl_blas.h"
 #include <clblast_c.h>
 
@@ -44,34 +45,58 @@ CoclDnnGeometryType getColumnsNumElements(
     return rows * cols;
 }
 
-// void im2col(THClTensor* im, const int channels,
-//         const int height, const int width, const int ksize_h, const int ksize_w, const int pad_h,
-//         const int pad_w, const int stride_h, const int stride_w, THClTensor* col) {
-//     // We are going to launch channels * height_col * width_col kernels, each
-//     // kernel responsible for copying a single-channel grid.
-//     int height_col = (height + 2 * pad_h - ksize_h) / stride_h + 1;
-//     int width_col = (width + 2 * pad_w - ksize_w) / stride_w + 1;
-//     int num_kernels = channels * height_col * width_col;
+inline int getNumThreads() {
+  // int blockSize = 1024;
+  // int maxWorkgroupSize = ((easycl::DeviceInfo *)state->deviceInfoByDevice[state->currentDevice])->maxWorkGroupSize;
+  // if( blockSize > maxWorkgroupSize ) {
+  //   blockSize = maxWorkgroupSize;
+  // }
+  // return blockSize;
+    return 256; // just hardcode to 256 for now, which covers amd, intel, nvidia, just not always most efficiently, but
+                // kind of ok
+}
 
-    // CLKernel *getKernelForNameCl("im2col_kernel", im2col_sourcecode);
+// CL: number of blocks for threads.
+inline int GET_BLOCKS(const int N) {
+  return (N + getNumThreads() - 1) / getNumThreads();
+}
 
-    // THClKernels k(state, kernel);
-    // k.in(num_kernels);
-    // k.in(im);
-    // k.in(height);
-    // k.in(width);
-    // k.in(ksize_h);
-    // k.in(ksize_w);
-    // k.in(pad_h);
-    // k.in(pad_w);
-    // k.in(stride_h);
-    // k.in(stride_w);
-    // k.in(height_col);
-    // k.in(width_col);
-    // k.out(col);
+void im2col(cl_mem im_buf, size_t im_offset, const CoclDnnGeometryType channels,
+        const CoclDnnGeometryType height,
+        const CoclDnnGeometryType width,
+        const CoclDnnGeometryType ksize_h,
+        const CoclDnnGeometryType ksize_w,
+        const CoclDnnGeometryType pad_h,
+        const CoclDnnGeometryType pad_w,
+        const CoclDnnGeometryType stride_h,
+        const CoclDnnGeometryType stride_w,
+        cl_mem col_buf, size_t col_offset
+        ) {
+    // We are going to launch channels * height_col * width_col kernels, each
+    // kernel responsible for copying a single-channel grid.
+    int height_col = (height + 2 * pad_h - ksize_h) / stride_h + 1;
+    int width_col = (width + 2 * pad_w - ksize_w) / stride_w + 1;
+    int num_kernels = channels * height_col * width_col;
 
-    // k.run(GET_BLOCKS(state, num_kernels), getNumThreads(state));
-// }
+    easycl::CLKernel *kernel = getKernelForNameCl("im2col_kernel", get_im2col_sourcecode());
+
+    kernel->in(num_kernels);
+    kernel->inout(&im_buf);
+    kernel->in(im_offset);
+    kernel->in(height);
+    kernel->in(width);
+    kernel->in(ksize_h);
+    kernel->in(ksize_w);
+    kernel->in(pad_h);
+    kernel->in(pad_w);
+    kernel->in(stride_h);
+    kernel->in(stride_w);
+    kernel->in(height_col);
+    kernel->in(width_col);
+    kernel->inout(&col_buf);
+    kernel->in(col_offset);
+    kernel->run_1d(GET_BLOCKS(num_kernels), getNumThreads());
+}
 
 // void col2im(THClTensor* col, const int channels,
 //         const int height, const int width, const int patch_h, const int patch_w, const int pad_h,
