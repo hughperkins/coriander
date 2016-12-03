@@ -46,7 +46,7 @@ before_install:
 
 script:
   - cd ${BASEDIR}/build
-  - ./cocl_unittests
+  - COCL_DEVICES_ALL=1 ./cocl_unittests
   - export COCL_DEVICES_ALL=1
   - OFFSET_32BIT=1 make run-tests-travis
   - mkdir ${BASEDIR}/foo
