@@ -178,7 +178,7 @@ size_t cudnnConvolutionForward(
         handle, inputTensorDesc, filterDesc, convDesc, outputTensorDesc);
     // CoclDnnGeometryType onesNumElements = getOnesNumElements(
     //     handle, inputTensorDesc, filterDesc, convDesc, outputTensorDesc);
-    size_t columnsOffet = workspaceOffset;
+    size_t columnsOffset = workspaceOffset;
     // size_t onesOffset = workspaceOffset + (columnsNumElements * sizeof(float));
 
     // float oneValue = 1.0f;
@@ -190,9 +190,9 @@ size_t cudnnConvolutionForward(
     size_t output3dSize = outputTensorDesc->C * outputTensorDesc->H * outputTensorDesc->W;
     CoclDnnGeometryType batchSize = inputTensorDesc->N;
     cout << "batchSize " << batchSize << " input3dsize " << input3dSize << " output3dsize " << output3dSize << endl;
-    for(CoclDnnGeometryType n = 0; n < batchSize; n++) {
-        size_t input3dOffset = inputOffset + n * input3dSize;
-        size_t output3dOffset = outputOffset + n * output3dSize;
+    for(CoclDnnGeometryType elt = 0; elt < batchSize; elt++) {
+        size_t input3dOffset = inputOffset + elt * input3dSize;
+        size_t output3dOffset = outputOffset + elt * output3dSize;
 
         CoclDnnGeometryType nInputPlane = inputTensorDesc->C;
         CoclDnnGeometryType inputHeight = inputTensorDesc->H;
@@ -208,23 +208,29 @@ size_t cudnnConvolutionForward(
             outputMemory->clmem, output3dOffset
         );
 
-        // // M,N,K are dims of matrix A and B
-        // // (see http://docs.nvidia.com/cuda/clblas/#clblas-lt-t-gt-gemm)
-        // long m = weight->size[0];
-        // long n = columns->size[1];
-        // long k = weight->size[1];
+        CoclDnnGeometryType nOutputPlane = outputTensorDesc->C;
+        CoclDnnGeometryType outputHeight = outputTensorDesc->H;
+        CoclDnnGeometryType outputWidth = outputTensorDesc->W;
 
-        // // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
-        // THClBlas_gemm(
-        //     state,
-        //     'n', 'n',
-        //     n, m, k,
-        //     1,
-        //     columns, n,
-        //     weight, k,
-        //     1,
-        //     output_n, n
-        // );
+        // M,N,K are dims of matrix A and B
+        // (see http://docs.nvidia.com/cuda/clblas/#clblas-lt-t-gt-gemm)
+        long m = nOutputPlane; // weight->size[0]; //nOutputPlane
+        long n = outputHeight * outputWidth; // columns->size[1];
+        long k = nInputPlane * kH * kW; // weight->size[1];
+
+        // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
+        StatusCode status = CLBlastSgemm(kColMajor, kYes, kNo,
+                                       n, m, k,
+                                       1.0f,
+                                       workspaceMemory->clmem, columnsOffset, n,
+                                       filterMemory->clmem, filterOffset, k,
+                                       0.0f,
+                                       outputMemory->clmem, output3dOffset, n,
+                                       &v->currentContext->default_stream.get()->clqueue->queue, 0);
+        if(status != 0) {
+            cout << "sgemm status code " << status << endl;
+            throw runtime_error("Failed call to blas sgem");
+        }
     }
 
     return 0;
