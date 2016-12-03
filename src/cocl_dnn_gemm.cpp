@@ -80,64 +80,56 @@ void im2col(cl_mem im_buf, size_t im_offset, const CoclDnnGeometryType channels,
 
     easycl::CLKernel *kernel = getKernelForNameCl("im2col_kernel", get_im2col_sourcecode());
 
-    kernel->in(num_kernels);
+    kernel->in((int32_t)num_kernels);
     kernel->inout(&im_buf);
-    kernel->in(im_offset);
-    kernel->in(height);
-    kernel->in(width);
-    kernel->in(ksize_h);
-    kernel->in(ksize_w);
-    kernel->in(pad_h);
-    kernel->in(pad_w);
-    kernel->in(stride_h);
-    kernel->in(stride_w);
-    kernel->in(height_col);
-    kernel->in(width_col);
+    kernel->in((int32_t)im_offset);
+    kernel->in((int32_t)height);
+    kernel->in((int32_t)width);
+    kernel->in((int32_t)ksize_h);
+    kernel->in((int32_t)ksize_w);
+    kernel->in((int32_t)pad_h);
+    kernel->in((int32_t)pad_w);
+    kernel->in((int32_t)stride_h);
+    kernel->in((int32_t)stride_w);
+    kernel->in((int32_t)height_col);
+    kernel->in((int32_t)width_col);
     kernel->inout(&col_buf);
-    kernel->in(col_offset);
+    kernel->in((int32_t)col_offset);
     kernel->run_1d(GET_BLOCKS(num_kernels), getNumThreads());
 }
 
-// void col2im(THClTensor* col, const int channels,
-//         const int height, const int width, const int patch_h, const int patch_w, const int pad_h,
-//         const int pad_w, const int stride_h, const int stride_w, THClTensor* im) {
-//     int height_col = (height + 2 * pad_h - patch_h) / stride_h + 1;
-//     int width_col = (width + 2 * pad_w - patch_w) / stride_w + 1;
-//     int num_kernels = channels * height * width;
-//     // To avoid involving atomic operations, we will launch one kernel per
-//     // bottom dimension, and then in the kernel add up the top dimensions.
+void col2im(cl_mem col_buf, size_t col_offset, const int channels,
+        const int height, const int width, const int patch_h, const int patch_w, const int pad_h,
+        const int pad_w, const int stride_h, const int stride_w,  cl_mem im_buf, size_t im_offset) {
+    int height_col = (height + 2 * pad_h - patch_h) / stride_h + 1;
+    int width_col = (width + 2 * pad_w - patch_w) / stride_w + 1;
+    int num_kernels = channels * height * width;
+    // To avoid involving atomic operations, we will launch one kernel per
+    // bottom dimension, and then in the kernel add up the top dimensions.
 
-//     EasyCL *cl = im->storage->cl;
-//     std::string uniqueName = "SpatialConvolutionMM::col2im";
-//     CLKernel *kernel = 0;
-//     if(cl->kernelExists(uniqueName)) {
-//         kernel = cl->getKernel(uniqueName);
-//     } else {
-//         TemplatedKernel kernelBuilder(cl);
-//         kernel = kernelBuilder.buildKernel(uniqueName, "SpatialConvolutionMM.cl",
-//             SpatialConvolutionMM_getKernelTemplate(), "col2im_kernel");
-//     }
+    easycl::CLKernel *kernel = getKernelForNameCl("col2im_kernel", get_col2im_sourcecode());
 
-//     THClKernels k(state, kernel);
-//     k.in(num_kernels);
-//     k.in(col);
-//     k.in(height);
-//     k.in(width);
-//     k.in(channels);
+    kernel->in((int32_t)num_kernels);
+    kernel->inout(&col_buf);
+    kernel->in((int32_t)col_offset);
+    kernel->in((int32_t)height);
+    kernel->in((int32_t)width);
+    kernel->in((int32_t)channels);
 
-//     k.in(patch_h);
-//     k.in(patch_w);
-//     k.in(pad_h);
-//     k.in(pad_w);
-//     k.in(stride_h);
-//     k.in(stride_w);
+    kernel->in((int32_t)patch_h);
+    kernel->in((int32_t)patch_w);
+    kernel->in((int32_t)pad_h);
+    kernel->in((int32_t)pad_w);
+    kernel->in((int32_t)stride_h);
+    kernel->in((int32_t)stride_w);
 
-//     k.in(height_col);
-//     k.in(width_col);
-//     k.out(im);
+    kernel->in((int32_t)height_col);
+    kernel->in((int32_t)width_col);
+    kernel->inout(&im_buf);
+    kernel->in((int32_t)im_offset);
 
-//     k.run(GET_BLOCKS(state, num_kernels), getNumThreads(state));
-// }
+    kernel->run_1d(GET_BLOCKS(num_kernels), getNumThreads());
+}
 
 // CoclDnnGeometryType getOnesNumElements(
 //         cudnnHandle_t handle,

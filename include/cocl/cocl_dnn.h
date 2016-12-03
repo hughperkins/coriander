@@ -6,7 +6,7 @@
 // targeted at running: https://github.com/tbennun/cudnn-training/blob/master/lenet.cu
 
 typedef int32_t CoclDnnGeometryType;
-typedef size_t CoclDnnSizeType;
+typedef int32_t CoclDnnSizeType;
 
 enum cudnnConvolutionFwdAlgo_t {
    cudnnConvolutionFwdAlgo_GEMM = 126742
