@@ -61,7 +61,7 @@ inline int GET_BLOCKS(const int N) {
   return (N + getNumThreads() - 1) / getNumThreads();
 }
 
-void im2col(cl_mem im_buf, size_t im_offset, const CoclDnnGeometryType channels,
+void im2col(cl_mem im_buf, size_t im_offset_bytes, const CoclDnnGeometryType channels,
         const CoclDnnGeometryType height,
         const CoclDnnGeometryType width,
         const CoclDnnGeometryType ksize_h,
@@ -70,7 +70,7 @@ void im2col(cl_mem im_buf, size_t im_offset, const CoclDnnGeometryType channels,
         const CoclDnnGeometryType pad_w,
         const CoclDnnGeometryType stride_h,
         const CoclDnnGeometryType stride_w,
-        cl_mem col_buf, size_t col_offset
+        cl_mem col_buf, size_t col_offset_bytes
         ) {
     // We are going to launch channels * height_col * width_col kernels, each
     // kernel responsible for copying a single-channel grid.
@@ -82,7 +82,7 @@ void im2col(cl_mem im_buf, size_t im_offset, const CoclDnnGeometryType channels,
 
     kernel->in((int32_t)num_kernels);
     kernel->inout(&im_buf);
-    kernel->in((int32_t)im_offset);
+    kernel->in((int32_t)(im_offset_bytes / sizeof(float)));
     kernel->in((int32_t)height);
     kernel->in((int32_t)width);
     kernel->in((int32_t)ksize_h);
@@ -94,8 +94,12 @@ void im2col(cl_mem im_buf, size_t im_offset, const CoclDnnGeometryType channels,
     kernel->in((int32_t)height_col);
     kernel->in((int32_t)width_col);
     kernel->inout(&col_buf);
-    kernel->in((int32_t)col_offset);
-    kernel->run_1d(GET_BLOCKS(num_kernels), getNumThreads());
+    kernel->in((int32_t)(col_offset_bytes / sizeof(float)));
+
+    int workgroupSize = getNumThreads();
+    int globalSize = GET_BLOCKS(num_kernels) * workgroupSize;
+    cout << "globalSize " << globalSize << " workgroupSize " << workgroupSize << endl;
+    kernel->run_1d(globalSize, workgroupSize);
 }
 
 void col2im(cl_mem col_buf, size_t col_offset, const int channels,
@@ -128,7 +132,10 @@ void col2im(cl_mem col_buf, size_t col_offset, const int channels,
     kernel->inout(&im_buf);
     kernel->in((int32_t)im_offset);
 
-    kernel->run_1d(GET_BLOCKS(num_kernels), getNumThreads());
+    int workgroupSize = getNumThreads();
+    int globalSize = GET_BLOCKS(num_kernels) * workgroupSize;
+    cout << "globalSize " << globalSize << " workgroupSize " << workgroupSize << endl;
+    kernel->run_1d(globalSize, workgroupSize);
 }
 
 size_t cudnnGetConvolutionForwardWorkspaceSize(

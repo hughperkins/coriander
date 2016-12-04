@@ -10,6 +10,8 @@
 
 #include "cocl/cocl_dnn.h"
 
+#include "EasyCL/EasyCL.h"
+
 namespace cocl {
 namespace dnn {
 namespace gemm_im2col {
@@ -19,6 +21,18 @@ namespace gemm_im2col {
 //     size_t columnsNumElements; // eg, number of floats in columns
 //     size_t onesNumElements;  // eg number of floats in ones
 // };
+
+void im2col(cl_mem im_buf, size_t im_offset, const CoclDnnGeometryType channels,
+        const CoclDnnGeometryType height,
+        const CoclDnnGeometryType width,
+        const CoclDnnGeometryType ksize_h,
+        const CoclDnnGeometryType ksize_w,
+        const CoclDnnGeometryType pad_h,
+        const CoclDnnGeometryType pad_w,
+        const CoclDnnGeometryType stride_h,
+        const CoclDnnGeometryType stride_w,
+        cl_mem col_buf, size_t col_offset
+        );
 
 CoclDnnGeometryType getColumnsNumElements(
     cudnnHandle_t handle,

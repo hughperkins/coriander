@@ -13,9 +13,11 @@
 // limitations under the License.
 
 #include "cocl/cocl_dnn.h"
+#include "cocl_dnn_gemm.h"
 
 #include "cocl/cocl.h"
 #include "EasyCL/EasyCL.h"
+#include "EasyCL/util/easycl_stringhelper.h"
 
 #include <iostream>
 #include <memory>
@@ -106,7 +108,6 @@ TEST(test_dnn, simple_cpu_im2col) {
     cout << endl;
 
     im2col_cpu(inImageStack, C, inH, inW, kH, kW, padH, padW, dH, dW, outCol);
-// int C, int inH, int inW, int kH, int kW, int padH, int padW, int dH, int dW, float *col
 
     cout << "output cols" << endl;
     for(int colRow = 0; colRow < colRows; colRow++) {
@@ -116,24 +117,6 @@ TEST(test_dnn, simple_cpu_im2col) {
         }
         cout << oss.str() << endl;
     }
-
-    // test_cpu_im2col(3, 5, 5, 3, 3);
-    // ThreadVars *v = getThreadVars();
-    // EasyCL *cl = v->getContext()->getCl();
-
-    // const int N = 1024;
-    // Memory *memory = Memory::newDeviceAlloc(N * sizeof(float));
-    // kernel1->inout(&memory->clmem);
-    // kernel1->run_1d(32, 32);
-    // float *hostdata = new float[N];
-    // cl_int err;
-    // err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, memory->clmem, CL_TRUE, 0,
-    //                                  N * sizeof(float), hostdata, 0, NULL, NULL);
-    // EasyCL::checkError(err);
-    // cout << "hostdata[0] " << hostdata[0] << endl;
-    // EXPECT_EQ(123.0f, hostdata[0]);
-
-    // delete [] hostdata;
 
     delete[] outCol;
     delete[] inImageStack;
@@ -179,7 +162,6 @@ TEST(test_dnn, simple_gpu_im2col) {
     cout << endl;
 
     im2col_cpu(inImageStack, C, inH, inW, kH, kW, padH, padW, dH, dW, outCol);
-// int C, int inH, int inW, int kH, int kW, int padH, int padW, int dH, int dW, float *col
 
     cout << "output cols" << endl;
     for(int colRow = 0; colRow < colRows; colRow++) {
@@ -193,30 +175,50 @@ TEST(test_dnn, simple_gpu_im2col) {
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getContext()->getCl();
 
-    // const int N = 1024;
     int imagesSizeFloats = C * inH * inW;
     int colSizeFloats = colCols * colRows;
-    size_t imagesOffset = 0;
-    size_t colOffset = imagesSizeFloats * sizeof(float);
+    size_t imagesOffsetBytes = 0;
+    size_t colOffsetBytes = imagesSizeFloats * sizeof(float);
     Memory *gpuMemory = Memory::newDeviceAlloc((imagesSizeFloats + colSizeFloats) * sizeof(float));
 
     cl_int err;
 
-    err = clEnqueueWriteBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, imagesOffset,
-                                     (imagesSizeFloats) * sizeof(float), hostdata, inImageStack, NULL, NULL);
+    err = clEnqueueWriteBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, imagesOffsetBytes,
+                                     (imagesSizeFloats) * sizeof(float), inImageStack, 0, NULL, NULL);
     EasyCL::checkError(err);
 
-    // kernel1->inout(&memory->clmem);
-    // kernel1->run_1d(32, 32);
+    cocl::dnn::gemm_im2col::im2col(
+        gpuMemory->clmem, imagesOffsetBytes,
+        C, inH, inW, kH, kW, padH, padW, dH, dW,
+        gpuMemory->clmem, colOffsetBytes
+    );
+
     float *gpuColHostside = new float[colSizeFloats];
-    err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, colOffset,
-                                     N * sizeof(float), gpuColHostside, 0, NULL, NULL);
+    err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, colOffsetBytes,
+                                     colSizeFloats * sizeof(float), gpuColHostside, 0, NULL, NULL);
     EasyCL::checkError(err);
-    // EasyCL
-    // cout << "hostdata[0] " << hostdata[0] << endl;
-    // EXPECT_EQ(123.0f, hostdata[0]);
+    cl->finish();
 
-    
+    cout << "gpu output cols" << endl;
+    for(int colRow = 0; colRow < colRows; colRow++) {
+        ostringstream oss;
+        for(int colCol=0; colCol < colCols; colCol++) {
+            oss << gpuColHostside[colRow * colCols + colCol] << " ";
+        }
+        cout << oss.str() << endl;
+    }
+
+    for(int colRow = 0; colRow < colRows; colRow++) {
+        ostringstream oss;
+        for(int colCol=0; colCol < colCols; colCol++) {
+            int linearPos = colRow * colCols + colCol;
+            if(abs(outCol[linearPos] - gpuColHostside[linearPos]) > 1e-4) {
+                throw runtime_error("disparity, im2col, row " + easycl::toString(colRow) + " col " + easycl::toString(colCol));
+            }
+        }
+    }
+
+    delete gpuMemory;
 
     delete [] gpuColHostside;
 
