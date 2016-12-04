@@ -135,6 +135,8 @@ __device__ T __shfl_down(T val, int offset, int warpSize);
 template<typename T>
 __device__ T __shfl_xor(T val, int offset, int warpSize);
 
+__device__ unsigned int atomicCAS(unsigned int* address, unsigned int compare, unsigned int val);
+
 inline float __int_as_float(int val) {
     return *(float *)&val;
 }
