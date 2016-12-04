@@ -68,6 +68,12 @@ void fillRandomUniform(MT19937 &random, float *target, int size, float minVal, f
     }
 }
 
+void fillRandomInt(MT19937 &random, int *target, int size, int minValInclusive, int maxValExclusive) {
+    for(int i = 0; i < size; i++) {
+        target[i] = random() % (maxValExclusive - 1 - minValInclusive) + minValInclusive;
+    }
+}
+
 TEST(test_dnn, simple_cpu_im2col) {
     int C = 3;
     int inH = 5;
@@ -336,17 +342,19 @@ TEST(test_dnn, simple_cpu_conv) {
     int inW = 6;
     int kH = 3;
     int kW = 3;
-    int padH = 3;
-    int padW = 3;
+    int padH = 1;
+    int padW = 1;
     int dH = 1;
     int dW = 1;
 
     int outH = (inH + 2 * padH - kH) / dH + 1;
     int outW = (inW + 2 * padW - kW) / dW + 1;
 
-    float *inImages = new float[N * inC * inH * inW];
+    int inLinearSize = N * inC * inH * inW;
+    int outLinearSize = N * outC * outH * outW;
+    float *inImages = new float[inLinearSize];
     float *filters = new float[inC * outC * kH * kW]; // lets say this is [outC][inC][kH][kW]
-    float *outImages = new float[N * outC * outH * outW];
+    float *outImages = new float[outLinearSize];
 
     MT19937 random;
     random.seed(123ul);
@@ -355,6 +363,19 @@ TEST(test_dnn, simple_cpu_conv) {
     fillRandomUniform(random, filters, inC * outC * kH * kW, 0.0f, 1.0f);
 
     conv_forward_cpu(inImages, filters, N, inC, outC, inH, inW, kH, kW, padH, padW, dH, dW, outImages);
+    const int numSamples = 20;
+    int *sampleIndices = new int[numSamples];
+    fillRandomInt(random, sampleIndices, numSamples, 0, outLinearSize);
+    for(int i = 0; i < numSamples; i++) {
+        int linearPos = sampleIndices[i];
+        int n = linearPos / inC / inH / inW;
+        int rem = linearPos - n * inC * inH * inW;
+        int c = rem / inH / inW;
+        rem = rem - c * inH * inW;
+        int inh = rem / inW;
+        int inw = rem % inW;
+        cout << "n=" << n << " c=" << c << " inh=" << inh << " inw=" << inw << " outImages[" << linearPos << "]=" << outImages[linearPos] << endl;
+    }
 
     delete[] outImages;
     delete[] filters;
