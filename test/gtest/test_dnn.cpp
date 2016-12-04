@@ -71,6 +71,13 @@ void im2col_cpu(float *imageStack, int C, int inH, int inW, int kH, int kW, int 
     // }
     int outH = (inH + 2 * padH - kH) / dH + 1;
     int outW = (inW + 2 * padW - kW) / dW + 1;
+    int colRows = C * kH * kW;
+    int colCols = outH * outW;
+    // zero first
+    int colLinearSize = colRows * colCols;
+    for(int i = 0; i < colLinearSize; i++) {
+        col[i] = 0.0f;
+    }
     for(int outh=0; outh < outH; outh++) {
         // cout << "outh " << outh << endl;
         for(int outw=0; outw < outW; outw++) {
@@ -85,7 +92,7 @@ void im2col_cpu(float *imageStack, int C, int inH, int inW, int kH, int kW, int 
 // --                            print('row', inPlane * kH * kW + kh * kW + kw)
 // --                            print('col', outh * outW + outw)
 // --                            print('col:size()', col:size())
-                            col[(c * kH * kW + kh * kW + kw) * outH * outW +
+                            col[(c * kH * kW + kh * kW + kw) * colCols +
                                 outh * outW + outw] = val;
                         }
                     }
