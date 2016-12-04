@@ -423,14 +423,12 @@ TEST(test_dnn, simple_gpu_conv) {
 
     cudnnHandle_t dnn_handle;
     cudnnTensorDescriptor_t inputTensorDesc;
-    // cudnnTensorDescriptor_t filterTensorDesc;
     cudnnTensorDescriptor_t outputTensorDesc;
     cudnnFilterDescriptor_t filterDesc;
     cudnnConvolutionDescriptor_t convDesc;
 
     cudnnCreate(&dnn_handle);
     cudnnCreateTensorDescriptor(&inputTensorDesc);
-    // cudnnCreateTensorDescriptor(&filterTensorDesc);
     cudnnCreateTensorDescriptor(&outputTensorDesc);
     cudnnCreateFilterDescriptor(&filterDesc);
     cudnnCreateConvolutionDescriptor(&convDesc);
@@ -538,7 +536,6 @@ TEST(test_dnn, simple_gpu_conv) {
     cudnnDestroyFilterDescriptor(filterDesc);
     cudnnDestroyConvolutionDescriptor(convDesc);
     cudnnDestroyTensorDescriptor(inputTensorDesc);
-    // cudnnDestroyTensorDescriptor(filterTensorDesc);
     cudnnDestroyTensorDescriptor(outputTensorDesc);
     cudnnDestroy(dnn_handle);
 
