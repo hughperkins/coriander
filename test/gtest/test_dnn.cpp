@@ -472,7 +472,9 @@ TEST(test_dnn, simple_gpu_conv) {
     size_t outputOffsetBytes = filterOffsetBytes + filterLinearSize * sizeof(float);
     size_t workspaceOffsetBytes = outputOffsetBytes + workspaceSizeBytes;
 
-    Memory *gpuMemory = Memory::newDeviceAlloc((inLinearSize + filterLinearSize + outLinearSize) * sizeof(float) + workspaceSizeBytes);
+    size_t gpuMemoryAllocSize = (inLinearSize + filterLinearSize + outLinearSize) * sizeof(float) + workspaceSizeBytes;
+    cout << "gpuMemoryAllocSize=" << gpuMemoryAllocSize << endl;
+    Memory *gpuMemory = Memory::newDeviceAlloc(gpuMemoryAllocSize);
 
     float *gpuDeviceInput = (float *)(((char *)gpuMemory->fakePos + inputOffsetBytes));
     float *gpuDeviceFilter = (float *)(((char *)gpuMemory->fakePos + filterOffsetBytes));
@@ -490,16 +492,16 @@ TEST(test_dnn, simple_gpu_conv) {
 
     float alpha = 1.0f;
     float beta = 0.0f;
-    // cocl::dnn::gemm_im2col::cudnnConvolutionForward(
-    //     dnn_handle,
-    //     &alpha,
-    //     inputTensorDesc, gpuDeviceInput,
-    //     filterDesc, gpuDeviceFilter,
-    //     convDesc,
-    //     gpuDeviceWorkspace, workspaceSizeBytes,
-    //     &beta,
-    //     outputTensorDesc, gpuDeviceOutput
-    // );
+    cocl::dnn::gemm_im2col::cudnnConvolutionForward(
+        dnn_handle,
+        &alpha,
+        inputTensorDesc, gpuDeviceInput,
+        filterDesc, gpuDeviceFilter,
+        convDesc,
+        gpuDeviceWorkspace, workspaceSizeBytes,
+        &beta,
+        outputTensorDesc, gpuDeviceOutput
+    );
 
     cudnnDestroyFilterDescriptor(filterDesc);
     cudnnDestroyConvolutionDescriptor(convDesc);

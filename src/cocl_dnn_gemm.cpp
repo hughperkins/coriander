@@ -147,7 +147,7 @@ size_t cudnnGetConvolutionForwardWorkspaceSize(
     CoclDnnSizeType *p_size_bytes
 ) {
     cout << "gemm_im2col::cudnnGetConvolutionForwardWorkspaceSize()" << endl;
-    *p_size_bytes = getColumnsNumElements(handle, srcTensor, filter, conv, dstTensor);
+    *p_size_bytes = getColumnsNumElements(handle, srcTensor, filter, conv, dstTensor) * sizeof(float);
     return 0;
 }
 
@@ -209,9 +209,10 @@ size_t cudnnConvolutionForward(
         CoclDnnGeometryType dW = convDesc->dW;
         cout << "nInputPlane=" << nInputPlane << " inputHeight=" << inputHeight << " inputWidth=" << inputWidth <<
             " kH=" << kH << " kW=" << kW << " padH=" << padH << " padW=" << padW << " dH=" << dH << " dW=" << dW << endl;
-        im2col(inputMemory->clmem, input3dOffset,
+        im2col(
+            inputMemory->clmem, input3dOffset,
             nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
-            outputMemory->clmem, output3dOffset
+            workspaceMemory->clmem, columnsOffset
         );
 
         CoclDnnGeometryType nOutputPlane = outputTensorDesc->C;
@@ -227,12 +228,12 @@ size_t cudnnConvolutionForward(
         cout << "m=" << m << " n=" << n << " k=" << k << endl;
 
         // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
-        StatusCode status = CLBlastSgemm(kColMajor, kYes, kNo,
+        StatusCode status = CLBlastSgemm(kColMajor, kNo, kNo,
                                        n, m, k,
                                        1.0f,
                                        workspaceMemory->clmem, columnsOffset, n,
                                        filterMemory->clmem, filterOffset, k,
-                                       0.0f,
+                                       1.0f,
                                        outputMemory->clmem, output3dOffset, n,
                                        &v->currentContext->default_stream.get()->clqueue->queue, 0);
         if(status != 0) {
