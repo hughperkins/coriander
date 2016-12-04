@@ -529,10 +529,10 @@ TEST(test_dnn, simple_gpu_conv) {
         int outw = rem % outW;
         cout << "n=" << n << " c=" << c << " outh=" << outh << " outw=" << outw << " outImages[" << linearPos << "]="
             << outImages[linearPos] << " " << gpuOutHostside[linearPos] << endl;
-        // if(abs(outImages[linearPos] - gpuOutHostside[linearPos]) > 1e-4) {
-        //     throw runtime_error(string("test_dnn, output of conv forward ,mismatch for ") +
-        //         "n=" + toString(n) + " c=" + toString(c) + " outh=" + toString(outh) + " outw=" + toString(outw));
-        // }
+        if(abs(outImages[linearPos] - gpuOutHostside[linearPos]) > 1e-4) {
+            throw runtime_error(string("test_dnn, output of conv forward ,mismatch for ") +
+                "n=" + toString(n) + " c=" + toString(c) + " outh=" + toString(outh) + " outw=" + toString(outw));
+        }
     }
 
     cudnnDestroyFilterDescriptor(filterDesc);
