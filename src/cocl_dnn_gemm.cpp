@@ -179,24 +179,24 @@ size_t cudnnConvolutionForward(
     size_t filterOffset = filterMemory->getOffset((const char *)filterData);
     size_t outputOffset = outputMemory->getOffset((const char *)outputData);
 
-    // cout << "cudnnConvolutionForward inputOffset=" << inputOffset << " workspaceOffset=" << workspaceOffset <<
-    //     " filterOffset=" << filterOffset << " outputOffset=" << outputOffset << endl;
+    cout << "cudnnConvolutionForward inputOffset=" << inputOffset << " workspaceOffset=" << workspaceOffset <<
+        " filterOffset=" << filterOffset << " outputOffset=" << outputOffset << endl;
 
     cl_int err;
 
     CoclDnnGeometryType columnsNumElements = getColumnsNumElements(
         handle, inputTensorDesc, filterDesc, convDesc, outputTensorDesc);
     size_t columnsOffset = workspaceOffset;
-    // cout << "columnsOffset=" << columnsOffset << endl;
+    cout << "columnsOffset=" << columnsOffset << endl;
 
     size_t input3dSize = inputTensorDesc->C * inputTensorDesc->H * inputTensorDesc->W;
     size_t output3dSize = outputTensorDesc->C * outputTensorDesc->H * outputTensorDesc->W;
     CoclDnnGeometryType batchSize = inputTensorDesc->N;
-    // cout << "batchSize " << batchSize << " input3dsize " << input3dSize << " output3dsize " << output3dSize << endl;
+    cout << "batchSize " << batchSize << " input3dsize " << input3dSize << " output3dsize " << output3dSize << endl;
     for(CoclDnnGeometryType elt = 0; elt < batchSize; elt++) {
-        size_t input3dOffset = inputOffset + elt * input3dSize;
-        size_t output3dOffset = outputOffset + elt * output3dSize;
-        // cout << " input3dOffset=" << input3dOffset << " output3dOffset=" << output3dOffset << endl;
+        size_t input3dOffsetBytes = inputOffset + elt * input3dSize * sizeof(float);
+        size_t output3dOffsetBytes = outputOffset + elt * output3dSize * sizeof(float);
+        cout << " input3dOffsetBytes=" << input3dOffsetBytes << " output3dOffsetBytes=" << output3dOffsetBytes << endl;
 
         CoclDnnGeometryType nInputPlane = inputTensorDesc->C;
         CoclDnnGeometryType inputHeight = inputTensorDesc->H;
@@ -207,10 +207,10 @@ size_t cudnnConvolutionForward(
         CoclDnnGeometryType padW = convDesc->padW;
         CoclDnnGeometryType dH = convDesc->dH;
         CoclDnnGeometryType dW = convDesc->dW;
-        // cout << "nInputPlane=" << nInputPlane << " inputHeight=" << inputHeight << " inputWidth=" << inputWidth <<
-        //     " kH=" << kH << " kW=" << kW << " padH=" << padH << " padW=" << padW << " dH=" << dH << " dW=" << dW << endl;
+        cout << "nInputPlane=" << nInputPlane << " inputHeight=" << inputHeight << " inputWidth=" << inputWidth <<
+            " kH=" << kH << " kW=" << kW << " padH=" << padH << " padW=" << padW << " dH=" << dH << " dW=" << dW << endl;
         im2col(
-            inputMemory->clmem, input3dOffset,
+            inputMemory->clmem, input3dOffsetBytes,
             nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
             workspaceMemory->clmem, columnsOffset
         );
@@ -218,7 +218,7 @@ size_t cudnnConvolutionForward(
         CoclDnnGeometryType nOutputPlane = outputTensorDesc->C;
         CoclDnnGeometryType outputHeight = outputTensorDesc->H;
         CoclDnnGeometryType outputWidth = outputTensorDesc->W;
-        // cout << "nOutputPlane=" << nOutputPlane << " outputHeight=" << outputHeight << " outputWidth=" << outputWidth << endl;
+        cout << "nOutputPlane=" << nOutputPlane << " outputHeight=" << outputHeight << " outputWidth=" << outputWidth << endl;
 
         // M,N,K are dims of matrix A and B
         // (see http://docs.nvidia.com/cuda/clblas/#clblas-lt-t-gt-gemm)
@@ -241,8 +241,8 @@ size_t cudnnConvolutionForward(
                                        1.0f,
                                        workspaceMemory->clmem, columnsOffset / sizeof(float), n,
                                        filterMemory->clmem, filterOffset / sizeof(float), k,
-                                       1.0f,
-                                       outputMemory->clmem, output3dOffset / sizeof(float), n,
+                                       0.0f,
+                                       outputMemory->clmem, output3dOffsetBytes / sizeof(float), n,
                                        &v->currentContext->default_stream.get()->clqueue->queue, 0);
         if(status != 0) {
             cout << "sgemm status code " << status << endl;

@@ -395,8 +395,15 @@ TEST(test_dnn, simple_gpu_conv) {
     int dH = 1;
     int dW = 1;
 
+    // N = 1;
+    // inC = 1;
+    // outC = 1;
+    // inH = 3;
+    // inW = 3;
+
     int outH = (inH + 2 * padH - kH) / dH + 1;
     int outW = (inW + 2 * padW - kW) / dW + 1;
+    cout << "outH=" << outH << " outW=" << outW << endl;
 
     int inLinearSize = N * inC * inH * inW;
     int filterLinearSize = inC * outC * kH * kW;
@@ -470,7 +477,7 @@ TEST(test_dnn, simple_gpu_conv) {
     size_t inputOffsetBytes = 0;
     size_t filterOffsetBytes = inputOffsetBytes + inLinearSize * sizeof(float);
     size_t outputOffsetBytes = filterOffsetBytes + filterLinearSize * sizeof(float);
-    size_t workspaceOffsetBytes = outputOffsetBytes + workspaceSizeBytes;
+    size_t workspaceOffsetBytes = outputOffsetBytes + outLinearSize * sizeof(float);
 
     size_t gpuMemoryAllocSize = (inLinearSize + filterLinearSize + outLinearSize) * sizeof(float) + workspaceSizeBytes;
     cout << "gpuMemoryAllocSize=" << gpuMemoryAllocSize << endl;
@@ -479,7 +486,7 @@ TEST(test_dnn, simple_gpu_conv) {
     float *gpuDeviceInput = (float *)(((char *)gpuMemory->fakePos + inputOffsetBytes));
     float *gpuDeviceFilter = (float *)(((char *)gpuMemory->fakePos + filterOffsetBytes));
     float *gpuDeviceOutput = (float *)(((char *)gpuMemory->fakePos + outputOffsetBytes));
-    float *gpuDeviceWorkspace = (float *)(((char *)gpuMemory->fakePos + workspaceSizeBytes));
+    float *gpuDeviceWorkspace = (float *)(((char *)gpuMemory->fakePos + workspaceOffsetBytes));
 
     cl_int err;
 
@@ -514,14 +521,18 @@ TEST(test_dnn, simple_gpu_conv) {
     fillRandomInt(random, sampleIndices, numSamples, 0, outLinearSize);
     for(int i = 0; i < numSamples; i++) {
         int linearPos = sampleIndices[i];
-        int n = linearPos / inC / inH / inW;
-        int rem = linearPos - n * inC * inH * inW;
-        int c = rem / inH / inW;
-        rem = rem - c * inH * inW;
-        int inh = rem / inW;
-        int inw = rem % inW;
-        cout << "n=" << n << " c=" << c << " inh=" << inh << " inw=" << inw << " outImages[" << linearPos << "]="
+        int n = linearPos / outC / outH / outW;
+        int rem = linearPos - n * outC * outH * outW;
+        int c = rem / outH / outW;
+        rem = rem - c * outH * outW;
+        int outh = rem / outW;
+        int outw = rem % outW;
+        cout << "n=" << n << " c=" << c << " outh=" << outh << " outw=" << outw << " outImages[" << linearPos << "]="
             << outImages[linearPos] << " " << gpuOutHostside[linearPos] << endl;
+        // if(abs(outImages[linearPos] - gpuOutHostside[linearPos]) > 1e-4) {
+        //     throw runtime_error(string("test_dnn, output of conv forward ,mismatch for ") +
+        //         "n=" + toString(n) + " c=" + toString(c) + " outh=" + toString(outh) + " outw=" + toString(outw));
+        // }
     }
 
     cudnnDestroyFilterDescriptor(filterDesc);
