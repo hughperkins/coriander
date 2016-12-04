@@ -98,7 +98,6 @@ void im2col(cl_mem im_buf, size_t im_offset_bytes, const CoclDnnGeometryType cha
 
     int workgroupSize = getNumThreads();
     int globalSize = GET_BLOCKS(num_kernels) * workgroupSize;
-    cout << "globalSize " << globalSize << " workgroupSize " << workgroupSize << endl;
     kernel->run_1d(globalSize, workgroupSize);
 }
 
@@ -134,7 +133,6 @@ void col2im(cl_mem col_buf, size_t col_offset_bytes, const int channels,
 
     int workgroupSize = getNumThreads();
     int globalSize = GET_BLOCKS(num_kernels) * workgroupSize;
-    cout << "globalSize " << globalSize << " workgroupSize " << workgroupSize << endl;
     kernel->run_1d(globalSize, workgroupSize);
 }
 
@@ -146,7 +144,6 @@ size_t cudnnGetConvolutionForwardWorkspaceSize(
     cudnnTensorDescriptor_t dstTensor,
     CoclDnnSizeType *p_size_bytes
 ) {
-    cout << "gemm_im2col::cudnnGetConvolutionForwardWorkspaceSize()" << endl;
     *p_size_bytes = getColumnsNumElements(handle, srcTensor, filter, conv, dstTensor) * sizeof(float);
     return 0;
 }
@@ -179,24 +176,18 @@ size_t cudnnConvolutionForward(
     size_t filterOffset = filterMemory->getOffset((const char *)filterData);
     size_t outputOffset = outputMemory->getOffset((const char *)outputData);
 
-    cout << "cudnnConvolutionForward inputOffset=" << inputOffset << " workspaceOffset=" << workspaceOffset <<
-        " filterOffset=" << filterOffset << " outputOffset=" << outputOffset << endl;
-
     cl_int err;
 
     CoclDnnGeometryType columnsNumElements = getColumnsNumElements(
         handle, inputTensorDesc, filterDesc, convDesc, outputTensorDesc);
     size_t columnsOffset = workspaceOffset;
-    cout << "columnsOffset=" << columnsOffset << endl;
 
     size_t input3dSize = inputTensorDesc->C * inputTensorDesc->H * inputTensorDesc->W;
     size_t output3dSize = outputTensorDesc->C * outputTensorDesc->H * outputTensorDesc->W;
     CoclDnnGeometryType batchSize = inputTensorDesc->N;
-    cout << "batchSize " << batchSize << " input3dsize " << input3dSize << " output3dsize " << output3dSize << endl;
     for(CoclDnnGeometryType elt = 0; elt < batchSize; elt++) {
         size_t input3dOffsetBytes = inputOffset + elt * input3dSize * sizeof(float);
         size_t output3dOffsetBytes = outputOffset + elt * output3dSize * sizeof(float);
-        cout << " input3dOffsetBytes=" << input3dOffsetBytes << " output3dOffsetBytes=" << output3dOffsetBytes << endl;
 
         CoclDnnGeometryType nInputPlane = inputTensorDesc->C;
         CoclDnnGeometryType inputHeight = inputTensorDesc->H;
@@ -207,8 +198,6 @@ size_t cudnnConvolutionForward(
         CoclDnnGeometryType padW = convDesc->padW;
         CoclDnnGeometryType dH = convDesc->dH;
         CoclDnnGeometryType dW = convDesc->dW;
-        cout << "nInputPlane=" << nInputPlane << " inputHeight=" << inputHeight << " inputWidth=" << inputWidth <<
-            " kH=" << kH << " kW=" << kW << " padH=" << padH << " padW=" << padW << " dH=" << dH << " dW=" << dW << endl;
         im2col(
             inputMemory->clmem, input3dOffsetBytes,
             nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
@@ -218,24 +207,12 @@ size_t cudnnConvolutionForward(
         CoclDnnGeometryType nOutputPlane = outputTensorDesc->C;
         CoclDnnGeometryType outputHeight = outputTensorDesc->H;
         CoclDnnGeometryType outputWidth = outputTensorDesc->W;
-        cout << "nOutputPlane=" << nOutputPlane << " outputHeight=" << outputHeight << " outputWidth=" << outputWidth << endl;
 
-        // M,N,K are dims of matrix A and B
-        // (see http://docs.nvidia.com/cuda/clblas/#clblas-lt-t-gt-gemm)
         CoclDnnGeometryType m = nOutputPlane; // weight->size[0]; //nOutputPlane
         CoclDnnGeometryType n = outputHeight * outputWidth; // columns->size[1];
         CoclDnnGeometryType k = nInputPlane * kH * kW; // weight->size[1];
-        // cout << "m=" << m << " n=" << n << " k=" << k << endl;
 
         // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
-        // cout << " from blas point of view: m=" << n << " n=" << m << " k=" << k << endl;
-        // cout << " matrix a should be " << (n * k) << " elements, or " << (n * k * 4) << " bytes" << endl;
-        // cout << "lda should be columns in matrix a, ie k=" << k << endl;
-        // cout << "ldb should be columns in matrix b, ie n=" << m << endl;
-        // cout << "ldc should be columns in matrix c, ie n=" << m << endl;
-        // cout << "lda should be rows in matrix a, ie m=" << n << endl;
-        // cout << "ldb should be rows in matrix b, ie k=" << k << endl;
-        // cout << "ldc should be rows in matrix c, ie m=" << n << endl;
         StatusCode status = CLBlastSgemm(kColMajor, kNo, kNo,
                                        n, m, k,
                                        1.0f,
@@ -249,50 +226,6 @@ size_t cudnnConvolutionForward(
             throw runtime_error("Failed call to blas sgem");
         }
     }
-
-// from cunn:
-    // long m = weight->size[0];
-    // long n = columns->size[1];
-    // long k = weight->size[1];
-    // // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
-    // THCudaBlas_gemm(
-    //     state,
-    //     'n', 'n',
-    //     n, m, k,
-    //     1,
-    //     THCudaTensor_data(state, columns), n,
-    //     THCudaTensor_data(state, weight), k,
-    //     1,
-    //     THCudaTensor_data(state, output_n), n
-    // );
-
-// from clnn:
-//     // Extract columns:
-//     im2col(
-//       state,
-// //      THClState_getCurrentStream(state),
-//       input_n,
-//       nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
-//       columns
-//     );
-
-//     // M,N,K are dims of matrix A and B
-//     // (see http://docs.nvidia.com/cuda/clblas/#clblas-lt-t-gt-gemm)
-//     long m = weight->size[0];
-//     long n = columns->size[1];
-//     long k = weight->size[1];
-
-//     // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
-//     THClBlas_gemm(
-//         state,
-//         'n', 'n',
-//         n, m, k,
-//         1,
-//         columns, n,
-//         weight, k,
-//         1,
-//         output_n, n
-//     );
 
     return 0;
 }
