@@ -102,9 +102,9 @@ void im2col(cl_mem im_buf, size_t im_offset_bytes, const CoclDnnGeometryType cha
     kernel->run_1d(globalSize, workgroupSize);
 }
 
-void col2im(cl_mem col_buf, size_t col_offset, const int channels,
+void col2im(cl_mem col_buf, size_t col_offset_bytes, const int channels,
         const int height, const int width, const int patch_h, const int patch_w, const int pad_h,
-        const int pad_w, const int stride_h, const int stride_w,  cl_mem im_buf, size_t im_offset) {
+        const int pad_w, const int stride_h, const int stride_w,  cl_mem im_buf, size_t im_offset_bytes) {
     int height_col = (height + 2 * pad_h - patch_h) / stride_h + 1;
     int width_col = (width + 2 * pad_w - patch_w) / stride_w + 1;
     int num_kernels = channels * height * width;
@@ -115,7 +115,7 @@ void col2im(cl_mem col_buf, size_t col_offset, const int channels,
 
     kernel->in((int32_t)num_kernels);
     kernel->inout(&col_buf);
-    kernel->in((int32_t)col_offset);
+    kernel->in((int32_t)(col_offset_bytes / sizeof(float)));
     kernel->in((int32_t)height);
     kernel->in((int32_t)width);
     kernel->in((int32_t)channels);
@@ -130,7 +130,7 @@ void col2im(cl_mem col_buf, size_t col_offset, const int channels,
     kernel->in((int32_t)height_col);
     kernel->in((int32_t)width_col);
     kernel->inout(&im_buf);
-    kernel->in((int32_t)im_offset);
+    kernel->in((int32_t)(im_offset_bytes / sizeof(float)));
 
     int workgroupSize = getNumThreads();
     int globalSize = GET_BLOCKS(num_kernels) * workgroupSize;
@@ -289,8 +289,8 @@ kernel void col2im_kernel(const int n, global const float* col_data, int col_off
     const int pad_h, const int pad_w, const int stride_h, const int stride_w,
     const int height_col, const int width_col,
     global float* im_data, int im_offset) {
-  global float *data_im = im_data + im_offset;
   global const float *data_col = col_data + col_offset;
+  global float *data_im = im_data + im_offset;
 
   CL_KERNEL_LOOP(index, n) {
     float val = 0;

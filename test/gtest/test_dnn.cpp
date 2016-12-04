@@ -217,10 +217,60 @@ TEST(test_dnn, simple_gpu_im2col) {
             }
         }
     }
-
     delete gpuMemory;
-
     delete [] gpuColHostside;
+
+    // now run the other way, to test col2im...
+    Memory *gpuMemory2 = Memory::newDeviceAlloc((imagesSizeFloats + colSizeFloats) * sizeof(float));
+    colOffsetBytes = 0;
+    imagesOffsetBytes = colSizeFloats * sizeof(float);
+
+    err = clEnqueueWriteBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory2->clmem, CL_TRUE, colOffsetBytes,
+                                     colSizeFloats * sizeof(float), outCol, 0, NULL, NULL);
+    EasyCL::checkError(err);
+
+    cocl::dnn::gemm_im2col::col2im(
+        gpuMemory2->clmem, colOffsetBytes,
+        C, inH, inW, kH, kW, padH, padW, dH, dW,
+        gpuMemory2->clmem, imagesOffsetBytes
+    );
+
+    float *gpuImHostside = new float[imagesSizeFloats];
+    err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory2->clmem, CL_TRUE, imagesOffsetBytes,
+                                     imagesSizeFloats * sizeof(float), gpuImHostside, 0, NULL, NULL);
+    EasyCL::checkError(err);
+    cl->finish();
+
+    cout << "gpu image stack, after col2im:" << endl;
+    for(int c=0; c < C; c++) {
+        cout << "C=" << c << endl;
+        for(int inh=0; inh < inH; inh++) {
+            ostringstream oss;
+            for(int inw=0; inw < inW; inw++) {
+                int linearPos = c * inH * inW + inh * inW + inw;
+                oss << gpuImHostside[linearPos] << " ";
+            }
+            cout << oss.str() << endl;
+        }
+        cout << endl;
+    }
+    cout << endl;
+
+    cout << "check gpu image vs col2im:" << endl;
+    for(int c=0; c < C; c++) {
+        for(int inh=0; inh < inH; inh++) {
+            for(int inw=0; inw < inW; inw++) {
+                int linearPos = c * inH * inW + inh * inW + inw;
+                if(abs(inImageStack[linearPos] - gpuImHostside[linearPos] > 1e-4)) {
+                    cout << "image val " << inImageStack[linearPos] << " after col2im " << gpuImHostside[linearPos] << endl;
+                    throw runtime_error("disparity after col2im, c=" + toString(c) + " inh=" + toString(inh) + " inw=" + toString(inw));
+                }
+            }
+        }
+    }
+
+    delete gpuMemory2;
+    delete [] gpuImHostside;
 
     delete[] outCol;
     delete[] inImageStack;

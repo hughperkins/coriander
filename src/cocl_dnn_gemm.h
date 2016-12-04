@@ -22,17 +22,33 @@ namespace gemm_im2col {
 //     size_t onesNumElements;  // eg number of floats in ones
 // };
 
-void im2col(cl_mem im_buf, size_t im_offset, const CoclDnnGeometryType channels,
-        const CoclDnnGeometryType height,
-        const CoclDnnGeometryType width,
-        const CoclDnnGeometryType ksize_h,
-        const CoclDnnGeometryType ksize_w,
-        const CoclDnnGeometryType pad_h,
-        const CoclDnnGeometryType pad_w,
-        const CoclDnnGeometryType stride_h,
-        const CoclDnnGeometryType stride_w,
-        cl_mem col_buf, size_t col_offset
-        );
+void im2col(
+    cl_mem im_buf, size_t im_offset,
+    const CoclDnnGeometryType channels,
+    const CoclDnnGeometryType height,
+    const CoclDnnGeometryType width,
+    const CoclDnnGeometryType ksize_h,
+    const CoclDnnGeometryType ksize_w,
+    const CoclDnnGeometryType pad_h,
+    const CoclDnnGeometryType pad_w,
+    const CoclDnnGeometryType stride_h,
+    const CoclDnnGeometryType stride_w,
+    cl_mem col_buf, size_t col_offset
+);
+
+void col2im(
+    cl_mem col_buf, size_t col_offset_bytes,
+    const CoclDnnGeometryType channels,
+    const CoclDnnGeometryType height,
+    const CoclDnnGeometryType width,
+    const CoclDnnGeometryType ksize_h,
+    const CoclDnnGeometryType ksize_w,
+    const CoclDnnGeometryType pad_h,
+    const CoclDnnGeometryType pad_w,
+    const CoclDnnGeometryType stride_h,
+    const CoclDnnGeometryType stride_w,
+    cl_mem im_buf, size_t im_offset_bytes
+);
 
 CoclDnnGeometryType getColumnsNumElements(
     cudnnHandle_t handle,

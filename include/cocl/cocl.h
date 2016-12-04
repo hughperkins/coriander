@@ -4,7 +4,6 @@
 #include <cmath>
 #include <random>
 
-#pragma message("cocl.h")
 #if defined(__CUDACC__) || defined(__CUDA_ARCH__)
 #define __device__ __attribute__((device))
 #define __host__ __attribute__((host))
