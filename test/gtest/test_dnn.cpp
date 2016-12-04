@@ -502,6 +502,27 @@ TEST(test_dnn, simple_gpu_conv) {
         &beta,
         outputTensorDesc, gpuDeviceOutput
     );
+    cl->finish();
+
+    float *gpuOutHostside = new float[outLinearSize];
+    err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, outputOffsetBytes,
+                                     (outLinearSize) * sizeof(float), gpuOutHostside, 0, NULL, NULL);
+    EasyCL::checkError(err);
+
+    const int numSamples = 20;
+    int *sampleIndices = new int[numSamples];
+    fillRandomInt(random, sampleIndices, numSamples, 0, outLinearSize);
+    for(int i = 0; i < numSamples; i++) {
+        int linearPos = sampleIndices[i];
+        int n = linearPos / inC / inH / inW;
+        int rem = linearPos - n * inC * inH * inW;
+        int c = rem / inH / inW;
+        rem = rem - c * inH * inW;
+        int inh = rem / inW;
+        int inw = rem % inW;
+        cout << "n=" << n << " c=" << c << " inh=" << inh << " inw=" << inw << " outImages[" << linearPos << "]="
+            << outImages[linearPos] << " " << gpuOutHostside[linearPos] << endl;
+    }
 
     cudnnDestroyFilterDescriptor(filterDesc);
     cudnnDestroyConvolutionDescriptor(convDesc);
@@ -509,37 +530,6 @@ TEST(test_dnn, simple_gpu_conv) {
     // cudnnDestroyTensorDescriptor(filterTensorDesc);
     cudnnDestroyTensorDescriptor(outputTensorDesc);
     cudnnDestroy(dnn_handle);
-
-    float *gpuOutHostside = new float[outLinearSize];
-    err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, outputOffsetBytes,
-                                     (outLinearSize) * sizeof(float), gpuOutHostside, 0, NULL, NULL);
-    EasyCL::checkError(err);
-
-// size_t cudnnConvolutionForward(
-//     cudnnHandle_t handle,
-//     float *p_alpha,
-//     cudnnTensorDescriptor_t inputTensorDesc, float *inputData,
-//     cudnnFilterDescriptor_t filterDesc, float *filterData,
-//     cudnnConvolutionDescriptor_t convDesc,
-//     cudnnConvolutionFwdAlgo_t algo,
-//     void *workspaceData, CoclDnnSizeType workspaceSize,
-//     float *p_beta,
-//     cudnnTensorDescriptor_t outputTensorDesc, float *outputData
-// ) {
-
-    // const int numSamples = 20;
-    // int *sampleIndices = new int[numSamples];
-    // fillRandomInt(random, sampleIndices, numSamples, 0, outLinearSize);
-    // for(int i = 0; i < numSamples; i++) {
-    //     int linearPos = sampleIndices[i];
-    //     int n = linearPos / inC / inH / inW;
-    //     int rem = linearPos - n * inC * inH * inW;
-    //     int c = rem / inH / inW;
-    //     rem = rem - c * inH * inW;
-    //     int inh = rem / inW;
-    //     int inw = rem % inW;
-    //     cout << "n=" << n << " c=" << c << " inh=" << inh << " inw=" << inw << " outImages[" << linearPos << "]=" << outImages[linearPos] << endl;
-    // }
 
     delete gpuMemory;
     delete[] gpuOutHostside;
