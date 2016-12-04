@@ -139,4 +139,89 @@ TEST(test_dnn, simple_cpu_im2col) {
     delete[] inImageStack;
 }
 
+TEST(test_dnn, simple_gpu_im2col) {
+    int C = 3;
+    int inH = 5;
+    int inW = 5;
+    int kH = 3;
+    int kW = 3;
+    int padH = 1;
+    int padW = 1;
+    int dH = 1;
+    int dW = 1;
+
+    int outH = (inH + 2 * padH - kH) / dH + 1;
+    int outW = (inW + 2 * padW - kW) / dW + 1;
+
+    float *inImageStack = new float[C * inH * inW];
+    int colRows = C * kH * kW;
+    int colCols = outH * outW;
+    float *outCol = new float[colRows * colCols];
+
+    MT19937 random;
+    random.seed(123ul);
+
+    fillRandomUniform(random, inImageStack, C * inH * inW, 0.0f, 1.0f);
+    im2col_cpu(inImageStack, C, inH, inW, kH, kW, padH, padW, dH, dW, outCol);
+
+    cout << "input image stack:" << endl;
+    for(int c=0; c < C; c++) {
+        cout << "C=" << c << endl;
+        for(int inh=0; inh < inH; inh++) {
+            ostringstream oss;
+            for(int inw=0; inw < inW; inw++) {
+                oss << inImageStack[c * inH * inW + inh * inW + inw] << " ";
+            }
+            cout << oss.str() << endl;
+        }
+        cout << endl;
+    }
+    cout << endl;
+
+    im2col_cpu(inImageStack, C, inH, inW, kH, kW, padH, padW, dH, dW, outCol);
+// int C, int inH, int inW, int kH, int kW, int padH, int padW, int dH, int dW, float *col
+
+    cout << "output cols" << endl;
+    for(int colRow = 0; colRow < colRows; colRow++) {
+        ostringstream oss;
+        for(int colCol=0; colCol < colCols; colCol++) {
+            oss << outCol[colRow * colCols + colCol] << " ";
+        }
+        cout << oss.str() << endl;
+    }
+
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getContext()->getCl();
+
+    // const int N = 1024;
+    int imagesSizeFloats = C * inH * inW;
+    int colSizeFloats = colCols * colRows;
+    size_t imagesOffset = 0;
+    size_t colOffset = imagesSizeFloats * sizeof(float);
+    Memory *gpuMemory = Memory::newDeviceAlloc((imagesSizeFloats + colSizeFloats) * sizeof(float));
+
+    cl_int err;
+
+    err = clEnqueueWriteBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, imagesOffset,
+                                     (imagesSizeFloats) * sizeof(float), hostdata, inImageStack, NULL, NULL);
+    EasyCL::checkError(err);
+
+    // kernel1->inout(&memory->clmem);
+    // kernel1->run_1d(32, 32);
+    float *gpuColHostside = new float[colSizeFloats];
+    err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, colOffset,
+                                     N * sizeof(float), gpuColHostside, 0, NULL, NULL);
+    EasyCL::checkError(err);
+    // EasyCL
+    // cout << "hostdata[0] " << hostdata[0] << endl;
+    // EXPECT_EQ(123.0f, hostdata[0]);
+
+    
+
+    delete [] gpuColHostside;
+
+    delete[] outCol;
+    delete[] inImageStack;
+}
+
 } // namespace
