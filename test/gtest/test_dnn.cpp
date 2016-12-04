@@ -382,4 +382,169 @@ TEST(test_dnn, simple_cpu_conv) {
     delete[] inImages;
 }
 
+TEST(test_dnn, simple_gpu_conv) {
+    int N = 4;
+    int inC = 3;
+    int outC = 5;
+    int inH = 5;
+    int inW = 6;
+    int kH = 3;
+    int kW = 3;
+    int padH = 1;
+    int padW = 1;
+    int dH = 1;
+    int dW = 1;
+
+    int outH = (inH + 2 * padH - kH) / dH + 1;
+    int outW = (inW + 2 * padW - kW) / dW + 1;
+
+    int inLinearSize = N * inC * inH * inW;
+    int filterLinearSize = inC * outC * kH * kW;
+    int outLinearSize = N * outC * outH * outW;
+
+    float *inImages = new float[inLinearSize];
+    float *filters = new float[filterLinearSize]; // lets say this is [outC][inC][kH][kW]
+    float *outImages = new float[outLinearSize];
+
+    MT19937 random;
+    random.seed(123ul);
+
+    fillRandomUniform(random, inImages, N * inC * inH * inW, 0.0f, 1.0f);
+    fillRandomUniform(random, filters, inC * outC * kH * kW, 0.0f, 1.0f);
+
+    conv_forward_cpu(inImages, filters, N, inC, outC, inH, inW, kH, kW, padH, padW, dH, dW, outImages);
+
+    cudnnHandle_t dnn_handle;
+    cudnnTensorDescriptor_t inputTensorDesc;
+    // cudnnTensorDescriptor_t filterTensorDesc;
+    cudnnTensorDescriptor_t outputTensorDesc;
+    cudnnFilterDescriptor_t filterDesc;
+    cudnnConvolutionDescriptor_t convDesc;
+
+    cudnnCreate(&dnn_handle);
+    cudnnCreateTensorDescriptor(&inputTensorDesc);
+    // cudnnCreateTensorDescriptor(&filterTensorDesc);
+    cudnnCreateTensorDescriptor(&outputTensorDesc);
+    cudnnCreateFilterDescriptor(&filterDesc);
+    cudnnCreateConvolutionDescriptor(&convDesc);
+
+    cudnnSetTensor4dDescriptor(
+        inputTensorDesc,
+        CUDNN_TENSOR_NCHW,
+        CUDNN_DATA_FLOAT,
+        N, inC, inH, inW);
+    cudnnSetTensor4dDescriptor(
+        outputTensorDesc,
+        CUDNN_TENSOR_NCHW,
+        CUDNN_DATA_FLOAT,
+        N, outC, outH, outW);
+    cudnnSetFilter4dDescriptor(
+        filterDesc,
+        CUDNN_DATA_FLOAT,
+        CUDNN_TENSOR_NCHW,
+        outC,
+        inC,
+        kH,
+        kW);
+    cudnnSetConvolution2dDescriptor(
+        convDesc,
+        padH, padW,
+        dH, dW,
+        1, 1,
+        CUDNN_CROSS_CORRELATION);
+
+    int workspaceSizeBytes = 0;
+    cocl::dnn::gemm_im2col::cudnnGetConvolutionForwardWorkspaceSize(
+        dnn_handle,
+        inputTensorDesc,
+        filterDesc,
+        convDesc,
+        outputTensorDesc,
+        &workspaceSizeBytes
+    );
+    cout << "workspaceSizeBytes=" << workspaceSizeBytes << endl;
+
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getContext()->getCl();
+
+    size_t inputOffsetBytes = 0;
+    size_t filterOffsetBytes = inputOffsetBytes + inLinearSize * sizeof(float);
+    size_t outputOffsetBytes = filterOffsetBytes + filterLinearSize * sizeof(float);
+    size_t workspaceOffsetBytes = outputOffsetBytes + workspaceSizeBytes;
+
+    Memory *gpuMemory = Memory::newDeviceAlloc((inLinearSize + filterLinearSize + outLinearSize) * sizeof(float) + workspaceSizeBytes);
+
+    float *gpuDeviceInput = (float *)(((char *)gpuMemory->fakePos + inputOffsetBytes));
+    float *gpuDeviceFilter = (float *)(((char *)gpuMemory->fakePos + filterOffsetBytes));
+    float *gpuDeviceOutput = (float *)(((char *)gpuMemory->fakePos + outputOffsetBytes));
+    float *gpuDeviceWorkspace = (float *)(((char *)gpuMemory->fakePos + workspaceSizeBytes));
+
+    cl_int err;
+
+    err = clEnqueueWriteBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, inputOffsetBytes,
+                                     (inLinearSize) * sizeof(float), inImages, 0, NULL, NULL);
+    EasyCL::checkError(err);
+    err = clEnqueueWriteBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, filterOffsetBytes,
+                                     (filterLinearSize) * sizeof(float), filters, 0, NULL, NULL);
+    EasyCL::checkError(err);
+
+    float alpha = 1.0f;
+    float beta = 0.0f;
+    // cocl::dnn::gemm_im2col::cudnnConvolutionForward(
+    //     dnn_handle,
+    //     &alpha,
+    //     inputTensorDesc, gpuDeviceInput,
+    //     filterDesc, gpuDeviceFilter,
+    //     convDesc,
+    //     gpuDeviceWorkspace, workspaceSizeBytes,
+    //     &beta,
+    //     outputTensorDesc, gpuDeviceOutput
+    // );
+
+    cudnnDestroyFilterDescriptor(filterDesc);
+    cudnnDestroyConvolutionDescriptor(convDesc);
+    cudnnDestroyTensorDescriptor(inputTensorDesc);
+    // cudnnDestroyTensorDescriptor(filterTensorDesc);
+    cudnnDestroyTensorDescriptor(outputTensorDesc);
+    cudnnDestroy(dnn_handle);
+
+    float *gpuOutHostside = new float[outLinearSize];
+    err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, outputOffsetBytes,
+                                     (outLinearSize) * sizeof(float), gpuOutHostside, 0, NULL, NULL);
+    EasyCL::checkError(err);
+
+// size_t cudnnConvolutionForward(
+//     cudnnHandle_t handle,
+//     float *p_alpha,
+//     cudnnTensorDescriptor_t inputTensorDesc, float *inputData,
+//     cudnnFilterDescriptor_t filterDesc, float *filterData,
+//     cudnnConvolutionDescriptor_t convDesc,
+//     cudnnConvolutionFwdAlgo_t algo,
+//     void *workspaceData, CoclDnnSizeType workspaceSize,
+//     float *p_beta,
+//     cudnnTensorDescriptor_t outputTensorDesc, float *outputData
+// ) {
+
+    // const int numSamples = 20;
+    // int *sampleIndices = new int[numSamples];
+    // fillRandomInt(random, sampleIndices, numSamples, 0, outLinearSize);
+    // for(int i = 0; i < numSamples; i++) {
+    //     int linearPos = sampleIndices[i];
+    //     int n = linearPos / inC / inH / inW;
+    //     int rem = linearPos - n * inC * inH * inW;
+    //     int c = rem / inH / inW;
+    //     rem = rem - c * inH * inW;
+    //     int inh = rem / inW;
+    //     int inw = rem % inW;
+    //     cout << "n=" << n << " c=" << c << " inh=" << inh << " inw=" << inw << " outImages[" << linearPos << "]=" << outImages[linearPos] << endl;
+    // }
+
+    delete gpuMemory;
+    delete[] gpuOutHostside;
+
+    delete[] outImages;
+    delete[] filters;
+    delete[] inImages;
+}
+
 } // namespace

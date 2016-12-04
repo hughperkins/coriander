@@ -179,11 +179,15 @@ size_t cudnnConvolutionForward(
     size_t filterOffset = filterMemory->getOffset((const char *)filterData);
     size_t outputOffset = outputMemory->getOffset((const char *)outputData);
 
+    cout << "cudnnConvolutionForward inputOffset=" << inputOffset << " workspaceOffset=" << workspaceOffset <<
+        " filterOffset=" << filterOffset << " outputOffset=" << outputOffset << endl;
+
     cl_int err;
 
     CoclDnnGeometryType columnsNumElements = getColumnsNumElements(
         handle, inputTensorDesc, filterDesc, convDesc, outputTensorDesc);
     size_t columnsOffset = workspaceOffset;
+    cout << "columnsOffset=" << columnsOffset << endl;
 
     size_t input3dSize = inputTensorDesc->C * inputTensorDesc->H * inputTensorDesc->W;
     size_t output3dSize = outputTensorDesc->C * outputTensorDesc->H * outputTensorDesc->W;
@@ -192,6 +196,7 @@ size_t cudnnConvolutionForward(
     for(CoclDnnGeometryType elt = 0; elt < batchSize; elt++) {
         size_t input3dOffset = inputOffset + elt * input3dSize;
         size_t output3dOffset = outputOffset + elt * output3dSize;
+        cout << " input3dOffset=" << input3dOffset << " output3dOffset=" << output3dOffset << endl;
 
         CoclDnnGeometryType nInputPlane = inputTensorDesc->C;
         CoclDnnGeometryType inputHeight = inputTensorDesc->H;
@@ -202,6 +207,8 @@ size_t cudnnConvolutionForward(
         CoclDnnGeometryType padW = convDesc->padW;
         CoclDnnGeometryType dH = convDesc->dH;
         CoclDnnGeometryType dW = convDesc->dW;
+        cout << "nInputPlane=" << nInputPlane << " inputHeight=" << inputHeight << " inputWidth=" << inputWidth <<
+            " kH=" << kH << " kW=" << kW << " padH=" << padH << " padW=" << padW << " dH=" << dH << " dW=" << dW << endl;
         im2col(inputMemory->clmem, input3dOffset,
             nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
             outputMemory->clmem, output3dOffset
@@ -210,12 +217,14 @@ size_t cudnnConvolutionForward(
         CoclDnnGeometryType nOutputPlane = outputTensorDesc->C;
         CoclDnnGeometryType outputHeight = outputTensorDesc->H;
         CoclDnnGeometryType outputWidth = outputTensorDesc->W;
+        cout << "nOutputPlane=" << nOutputPlane << " outputHeight=" << outputHeight << " outputWidth=" << outputWidth << endl;
 
         // M,N,K are dims of matrix A and B
         // (see http://docs.nvidia.com/cuda/clblas/#clblas-lt-t-gt-gemm)
         long m = nOutputPlane; // weight->size[0]; //nOutputPlane
         long n = outputHeight * outputWidth; // columns->size[1];
         long k = nInputPlane * kH * kW; // weight->size[1];
+        cout << "m=" << m << " n=" << n << " k=" << k << endl;
 
         // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
         StatusCode status = CLBlastSgemm(kColMajor, kYes, kNo,
