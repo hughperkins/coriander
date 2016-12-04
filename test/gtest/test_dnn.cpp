@@ -31,44 +31,7 @@ namespace {
 
 typedef std::mt19937 MT19937;
 
-/*
-function manualIm2col(im, inPlanes, inW, inH, kW, kH, dW, dH, padH, padW)
-  local outW = (inW + 2*padW - kW) / dW + 1;
-  local outH = (inH + 2*padH - kH) / dH + 1;
-  local col = torch.FloatTensor(inPlanes * kH * kW, outH * outW):zero()
-
-  for outh=1,outH do
-    for outw=1,outW do
---      local inGrid = torch.FloatTensor(kH, kW):zero()
-        
---      local 
-      for inPlane=1,inPlanes do
-        for kh = 1,kH do
-          local inh = outh + kh - 1 - padH
-          for kw=1,kW do
-            local inw = outw + kw - 1 - padW
-            if inh >= 1 and inh <= inH and inw >= 1 and inw <= inW then
-              local invalue = im[inPlane][inh][inw]
---              print('outh=' .. outh .. ' outw=' .. outw .. ' inplane=' .. inPlane .. ' kh= ' .. kh .. ' kw=' .. kw .. ' invalue=' .. invalue)
---              print('row', inPlane * kH * kW + kh * kW + kw)
---              print('col', outh * outW + outw)
---              print('col:size()', col:size())
-              col[(inPlane-1) * kH * kW + (kh-1) * kW + kw][(outh-1) * outW + outw] = invalue
-            end
-          end
-    --    for h_out=1,outH do
-        end
-      end
-    end
-  end
-  return col
-end
-*/
-
 void im2col_cpu(float *imageStack, int C, int inH, int inW, int kH, int kW, int padH, int padW, int dH, int dW, float *col) {
-    // if(dH != 1 || dW != 1) {
-    //     throw runtime_error("only stride 1 handled currently");
-    // }
     int outH = (inH + 2 * padH - kH) / dH + 1;
     int outW = (inW + 2 * padW - kW) / dW + 1;
     int colRows = C * kH * kW;
@@ -79,7 +42,6 @@ void im2col_cpu(float *imageStack, int C, int inH, int inW, int kH, int kW, int 
         col[i] = 0.0f;
     }
     for(int outh=0; outh < outH; outh++) {
-        // cout << "outh " << outh << endl;
         for(int outw=0; outw < outW; outw++) {
             for(int c=0; c < C; c++) {
                 for(int kh=0; kh < kH; kh++) {
@@ -88,29 +50,14 @@ void im2col_cpu(float *imageStack, int C, int inH, int inW, int kH, int kW, int 
                         int inw = outw + kw - padW;
                         if(inh >= 0 && inh < inH && inw >= 0 && inw < inW) {
                             float val = imageStack[c*inH*inW + inh * inW + inw];
-// --                            print('outh=' .. outh .. ' outw=' .. outw .. ' inplane=' .. inPlane .. ' kh= ' .. kh .. ' kw=' .. kw .. ' invalue=' .. invalue)
-// --                            print('row', inPlane * kH * kW + kh * kW + kw)
-// --                            print('col', outh * outW + outw)
-// --                            print('col:size()', col:size())
                             col[(c * kH * kW + kh * kW + kw) * colCols +
                                 outh * outW + outw] = val;
                         }
                     }
-        // --        for h_out=1,outH do
                 }
             }
         }
     }
-
-    // for(int c=0; c < C; c++) {
-    //     for(int outh=0; outh < outH; outh++) {
-    //         for(int outw=0; outw < outW; outw++) {
-    //             for(int kh=0; kh < k)
-    //             int inh = outh - padH;
-
-    //         }
-    //     }
-    // }
 }
 
 void fillRandomUniform(MT19937 &random, float *target, int size, float minVal, float maxVal) {
