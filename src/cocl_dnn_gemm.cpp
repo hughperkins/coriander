@@ -176,15 +176,7 @@ size_t cudnnConvolutionForward(
 
     CoclDnnGeometryType columnsNumElements = getColumnsNumElements(
         handle, inputTensorDesc, filterDesc, convDesc, outputTensorDesc);
-    // CoclDnnGeometryType onesNumElements = getOnesNumElements(
-    //     handle, inputTensorDesc, filterDesc, convDesc, outputTensorDesc);
     size_t columnsOffset = workspaceOffset;
-    // size_t onesOffset = workspaceOffset + (columnsNumElements * sizeof(float));
-
-    // float oneValue = 1.0f;
-    // err = clEnqueueFillBuffer(
-    //     queue, workspaceMemory->clmem, &oneValue, sizeof(float), onesOffset, , 0, NULL, NULL);
-    // EasyCL::checkError(err);
 
     size_t input3dSize = inputTensorDesc->C * inputTensorDesc->H * inputTensorDesc->W;
     size_t output3dSize = outputTensorDesc->C * outputTensorDesc->H * outputTensorDesc->W;
