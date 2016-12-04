@@ -155,6 +155,8 @@ enum cujitenum {
 // for now
 // __device___ bool __isGlobal(void *ptr);
 
-bool __isGlobal(const void *ptr) {
-    return true;
-}
+bool __isGlobal(const void *ptr);
+
+// bool __isGlobal(const void *ptr) {
+//     return true;
+// }
