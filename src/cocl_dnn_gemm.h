@@ -16,12 +16,6 @@ namespace cocl {
 namespace dnn {
 namespace gemm_im2col {
 
-// class GemmIm2col {
-// public:
-//     size_t columnsNumElements; // eg, number of floats in columns
-//     size_t onesNumElements;  // eg number of floats in ones
-// };
-
 void im2col(
     cl_mem im_buf, size_t im_offset,
     const CoclDnnGeometryType channels,
@@ -56,13 +50,6 @@ CoclDnnGeometryType getColumnsNumElements(
     cudnnFilterDescriptor_t filter,
     cudnnConvolutionDescriptor_t conv,
     cudnnTensorDescriptor_t dstTensor);
-
-// CoclDnnGeometryType getOnesNumElements(
-//         cudnnHandle_t handle,
-//         cudnnTensorDescriptor_t srcTensor,
-//         cudnnFilterDescriptor_t filter,
-//         cudnnConvolutionDescriptor_t conv,
-//         cudnnTensorDescriptor_t dstTensor);
 
 std::size_t cudnnGetConvolutionForwardWorkspaceSize(
     cudnnHandle_t handle,
