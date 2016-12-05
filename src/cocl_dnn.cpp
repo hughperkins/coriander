@@ -153,20 +153,29 @@ size_t cudnnSetConvolution2dDescriptor(
 }
 
 size_t cudnnGetConvolution2dForwardOutputDim(
-    cudnnConvolutionDescriptor_t conv,
-    cudnnTensorDescriptor_t srcTensor,
-    cudnnFilterDescriptor_t filter,
-    CoclDnnGeometryType *pN, CoclDnnGeometryType *pC, CoclDnnGeometryType *pH, CoclDnnGeometryType *pW) {
+    cudnnConvolutionDescriptor_t convDesc,
+    cudnnTensorDescriptor_t inTensorDesc,
+    cudnnFilterDescriptor_t filterDesc,
+    CoclDnnGeometryType *poutN, CoclDnnGeometryType *poutC, CoclDnnGeometryType *poutH, CoclDnnGeometryType *poutW) {
     // conv->inputTensorDesc = srcTensor;
     // conv->filterDesc = filter;
     // conv->N = N;
     // conv->C = C;
     // conv->H = H;
     // conv->W = W;
-    *pN = srcTensor->N;
-    *pC = srcTensor->C;
-    *pH = srcTensor->H; // obviously needs tweaking a bit...
-    *pW = srcTensor->W;
+    // *pC = srcTensor->C;
+    // *pH = srcTensor->H; // obviously needs tweaking a bit...
+    // *pW = srcTensor->W;
+
+    CoclDnnGeometryType outC = filterDesc->outC;
+    CoclDnnGeometryType outH = (inTensorDesc->H + 2 * convDesc->padH - filterDesc->kH) / convDesc->dH + 1;
+    CoclDnnGeometryType outW = (inTensorDesc->W + 2 * convDesc->padW - filterDesc->kW) / convDesc->dW + 1;
+
+    *poutN = inTensorDesc->N;
+    *poutC = outC;
+    *poutH = outH;
+    *poutW = outW;
+
     return 0;
 }
 

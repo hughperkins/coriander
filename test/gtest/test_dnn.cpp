@@ -458,7 +458,7 @@ TEST(test_dnn, simple_gpu_conv) {
         1, 1,
         CUDNN_CROSS_CORRELATION);
 
-    int workspaceSizeBytes = 0;
+    size_t workspaceSizeBytes = 0;
     cocl::dnn::gemm_im2col::cudnnGetConvolutionForwardWorkspaceSize(
         dnn_handle,
         inputTensorDesc,
