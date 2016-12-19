@@ -333,7 +333,7 @@ if [ ! "$COMPILE" ]; then {
 } fi
 
 
-LLVM_COMPILE_FLAGS=`${CLANG_HOME}/bin/llvm-config --cppflags --cxxflags | sed -e 's/ -fno-exceptions/ -fexceptions/g' -e 's/ -fno-rtti//g' -e 's/ -DNDEBUG//g' -e 's/ -g //g' -e 's/ -std=c++0x/ -std=c++11/g' -e 's% -isysroot [^ ]*%%g'`
+LLVM_COMPILE_FLAGS=`${CLANG_HOME}/bin/llvm-config --cppflags --cxxflags | sed -e 's/ -fno-exceptions/ -fexceptions/g' -e 's/ -fno-rtti//g' -e 's/ -DNDEBUG//g' -e 's/ -g / /g' -e 's/ -std=c++0x/ -std=c++11/g' -e 's% -isysroot [^ ]*%%g'`
 LLVM_LINK_FLAGS=`${CLANG_HOME}/bin/llvm-config --ldflags --system-libs --libs all`
 
 # echo LLVM_COMPILE_FLAGS ${LLVM_COMPILE_FLAGS}
