@@ -227,6 +227,9 @@ namespace cocl {
 
         CLKernel *kernel = 0;
         try {
+            if(kernelName.size() > 32) {
+                kernelName = kernelName.substr(0, 31);
+            }
             kernel = cl->buildKernelFromString(clSourcecode, kernelName, "", "__internal__");
         } catch(runtime_error &e) {
             cout << "failed to compile opencl sourcecode" << endl;
