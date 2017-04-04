@@ -27,6 +27,13 @@ extern "C" {
     size_t cuEventDestroy_v2(cocl::Event *event);
 }
 
+size_t cudaEventCreate(cocl::Event **pevent);
+size_t cudaEventRecord(cocl::Event *event, char *queue=0);
+size_t cudaEventSynchronize(cocl::Event *event);
+size_t cudaEventElapsedTime(float *p_elapsedTime, cocl::Event *start, cocl::Event *stop);
+
+size_t cudaProfilerStop();
+
 enum EventEnum {
     CU_EVENT_DEFAULT = 70000,
     CU_EVENT_DISABLE_TIMING,

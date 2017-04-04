@@ -15,6 +15,7 @@
 #include "cocl/cocl_error.h"
 
 #include "cocl/cocl_defs.h"
+#include "EasyCL/util/easycl_stringhelper.h"
 
 #include <iostream>
 using namespace std;
@@ -29,3 +30,9 @@ const char *cudaGetErrorString (size_t error) {
     return "all was ok?";
 }
 
+void checkCudaErrors(size_t errorcode) {
+    if(errorcode != 0) {
+        cout << "checkCudaErrors.  Nonzero errorcode " << errorcode << endl;
+        throw runtime_error("Non zero errorcode " + easycl::toString(errorcode));
+    }
+}

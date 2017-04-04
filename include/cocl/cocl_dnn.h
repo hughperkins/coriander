@@ -265,7 +265,7 @@ extern "C" {
         cudnnConvolutionDescriptor_t convDesc,
         cudnnConvolutionBwdFilterAlgo_t algo,
         void *workspace,
-        CoclDnnGeometryType workspaceSize,
+        CoclDnnSizeType workspaceSize,
         float *p_beta,
         cudnnFilterDescriptor_t filterDesc,
         float *out
@@ -280,7 +280,7 @@ extern "C" {
         cudnnConvolutionDescriptor_t convDesc,
         cudnnConvolutionBwdDataAlgo_t algo,
         void *workspace,
-        CoclDnnGeometryType workspaceSize,
+        CoclDnnSizeType workspaceSize,
         float *p_beta,
         cudnnTensorDescriptor_t filterDesc,
         float *out

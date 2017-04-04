@@ -111,3 +111,8 @@ size_t cudaDeviceSynchronize() {
     cout << "ignoring cudaDeviceSynchronize for now" << endl;
     return 0;
 }
+
+size_t findCudaDevice(int argc, const char *argv[]) {
+    return 0;
+}
+

@@ -107,6 +107,7 @@ double max(double in1, double in2);
 double min(double in1, double in2);
 float max(float in1, float in2);
 float min(float in1, float in2);
+// int min(int in1, int in2);
 
 // float pow(float in1, float in2);
 // float sqrt(float in1);
@@ -132,6 +133,10 @@ template<typename T>
 __device__ T __shfl_down(T val, int offset);
 template<typename T>
 __device__ T __shfl_down(T val, int offset, int warpSize);
+template<typename T>
+__device__ T __shfl_up(T val, int offset);
+template<typename T>
+__device__ T __shfl_up(T val, int offset, int warpSize);
 template<typename T>
 __device__ T __shfl_xor(T val, int offset, int warpSize);
 

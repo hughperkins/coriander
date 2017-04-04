@@ -24,6 +24,10 @@ namespace cocl {
     Memory *findMemory(const char *passedInPointer);
 }
 
+enum Memhostalloctype {
+    CU_MEMHOSTALLOC_PORTABLE=12345
+};
+
 typedef long long CUdeviceptr;
 
 extern "C" {
@@ -33,7 +37,7 @@ extern "C" {
     size_t cuMemAlloc(CUdeviceptr *pMemory, size_t bytes);
     size_t cuMemFree(CUdeviceptr memory);
 
-    size_t cuMemHostAlloc(void **pHostPointer, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE);
+    size_t cuMemHostAlloc(void **pHostPointer, unsigned int bytes, int type=CU_MEMHOSTALLOC_PORTABLE);
     size_t cuMemFreeHost(void *hostPointer);
 
     size_t cudaMemsetAsync(void *devPtr, int value, size_t count, char *queue);
@@ -55,6 +59,11 @@ extern "C" {
 }
 
 size_t cudaMalloc(float **pMemory, size_t N);
+size_t cudaMemset(int *target, int value, size_t count);
+size_t cudaMemset(unsigned int *target, unsigned int value, size_t count);
+size_t cudaMemset(char *target, char value, size_t count);
+size_t cudaFreeHost(void *hostPointer);
+size_t cudaMallocHost(void **pMemory, size_t N);
 
 #define cuMemcpyHtoDAsync_v2 cuMemcpyHtoDAsync
 #define cuMemcpyDtoHAsync_v2 cuMemcpyDtoHAsync

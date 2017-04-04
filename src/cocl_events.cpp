@@ -62,11 +62,29 @@ size_t cuEventCreate(Event **pevent, unsigned int flags) {
     return 0;
 }
 
+size_t cudaEventCreate(Event **pevent) {
+    return cuEventCreate(pevent, 0);
+}
+
 size_t cuEventSynchronize(Event *event) {
     COCL_PRINT(cout << "cuEventSynchronize redirected event=" << event << endl);
     cl_int err = clWaitForEvents(1, &event->event);
     EasyCL::checkError(err);
     return 0;
+}
+
+
+size_t cudaProfilerStop() {
+    return 0;
+}
+
+size_t cudaEventElapsedTime(float *p_elapsedTime, cocl::Event *start, cocl::Event *stop) {
+    *p_elapsedTime = 0.0f;
+    return 0;
+}
+
+size_t cudaEventSynchronize(cocl::Event *event) {
+    return cuEventSynchronize(event);
 }
 
 size_t cuEventRecord(Event *event, char *_queue) {
@@ -82,6 +100,10 @@ size_t cuEventRecord(Event *event, char *_queue) {
     clEnqueueMarkerWithWaitList(queue->queue, 0, 0, &clevent);
     event->event = clevent;
     return 0;
+}
+
+size_t cudaEventRecord(cocl::Event *event, char *queue) {
+    return cuEventRecord(event, queue);
 }
 
 size_t cuEventQuery(Event *event) {

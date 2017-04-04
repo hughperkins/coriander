@@ -125,16 +125,24 @@ namespace cocl {
     }
 }
 
-size_t cuMemHostAlloc(void **pHostPointer, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE) {
+size_t cuMemHostAlloc(void **pHostPointer, unsigned int bytes, int type) {
     // COCL_PRINT(cout << "cuMemHostAlloc redirected bytes=" << bytes << endl);
     *pHostPointer = malloc(bytes);
     return 0;
+}
+
+size_t cudaMallocHost(void **pHostPointer, size_t size) {
+    return cuMemHostAlloc(pHostPointer, size);
 }
 
 size_t cuMemFreeHost(void *hostPointer) {
     // COCL_PRINT(cout << "cuMemFreeHost redirected" << endl);
     free(hostPointer);
     return 0;
+}
+
+size_t cudaFreeHost(void *hostPointer) {
+    return cuMemFreeHost(hostPointer);
 }
 
 size_t cuMemGetInfo(size_t *free, size_t *total) {
@@ -248,6 +256,18 @@ size_t cuMemsetD32(CUdeviceptr location, unsigned int value, uint32_t count) {
     cl_int err = clEnqueueFillBuffer(v->currentContext->default_stream.get()->clqueue->queue, memory->clmem, &value, sizeof(int), offset, count * sizeof(int), 0, 0, 0);
     EasyCL::checkError(err);
     return 0;
+}
+
+size_t cudaMemset(int *target, int value, size_t count) {
+    return cuMemsetD32((CUdeviceptr)target, value, count);
+}
+
+size_t cudaMemset(unsigned int *target, unsigned int value, size_t count) {
+    return cuMemsetD32((CUdeviceptr)target, value, count);
+}
+
+size_t cudaMemset(char *target, char value, size_t count) {
+    return cuMemsetD8((CUdeviceptr)target, value, count);
 }
 
 size_t cuDeviceTotalMem(size_t *value, CUdeviceptr device) {
@@ -369,7 +389,7 @@ size_t  cuMemcpyDtoH(void *host_dst, CUdeviceptr gpu_src, size_t size) {
 size_t cudaMalloc(void **_pMemory, size_t N) {
     // hostside_opencl_funcs_assure_initialized();
     Memory *memory = Memory::newDeviceAlloc(N);
-    // COCL_PRINT(cout << "cudaMalloc using cl, size " << N << " memory=" << (void *)memory << " fakePos=" << memory->fakePos << endl);
+    COCL_PRINT(cout << "cudaMalloc using cl, size " << N << " memory=" << (void *)memory << " fakePos=" << memory->fakePos << endl);
     *_pMemory = (void *)memory->fakePos;
     return 0;
 }
@@ -379,7 +399,9 @@ size_t cuMemAlloc(CUdeviceptr*_pMemory, size_t bytes) {
 }
 
 size_t cudaMalloc(float **pMemory, size_t N) {
-    return ::cudaMalloc((void **)pMemory, N);
+    size_t res = ::cudaMalloc((void **)pMemory, N);
+    cout << "cudaMalloc float* pMemory= " << (void*)*pMemory << endl;
+    return res;
 }
 
 size_t cudaFree(void *_memory) {

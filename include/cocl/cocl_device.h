@@ -23,6 +23,8 @@ extern "C" {
     size_t cuDeviceGet(CUdevice *pdevice, int ordinal);
 }
 
+size_t findCudaDevice(int argc, const char *argv[]);
+
 typedef int CUdevice_attribute;
 
 namespace cocl {
