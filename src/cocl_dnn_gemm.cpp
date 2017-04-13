@@ -228,6 +228,16 @@ size_t cudnnConvolutionForward(
 
     return 0;
 }
+size_t cudnnGetConvolutionBackwardFilterWorkspaceSize(
+    cudnnHandle_t handle,
+    cudnnTensorDescriptor_t inputDesc,
+    cudnnTensorDescriptor_t outputDesc,
+    cudnnConvolutionDescriptor_t convDesc,
+    cudnnFilterDescriptor_t filterDesc,
+    CoclDnnSizeType *p_size
+) {
+    throw runtime_error("cudnnGetConvolutionBackwardFilterWorkspaceSize not implemented");
+}
 size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
     cudnnHandle_t handle,
     cudnnFilterDescriptor_t filterDesc,
@@ -363,6 +373,18 @@ size_t cudnnConvolutionBackwardData(
         }
     }
     return 0;
+}
+size_t cudnnConvolutionBackwardFilter(
+    cudnnHandle_t handle,
+    float *p_alpha,
+    cudnnTensorDescriptor_t inputDesc, float *input_data,
+    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutput_data,
+    cudnnConvolutionDescriptor_t convDesc,
+    void *workspace_data, CoclDnnGeometryType workspaceSize,
+    float *p_beta,
+    cudnnFilterDescriptor_t filterDesc, float *gradInput_data
+) {
+    throw runtime_error("not implemented");
 }
 
 // Kernel for fast unfold+copy

@@ -380,6 +380,59 @@ void conv_backward_data_cpu(
     }
 }
 
+void conv_backward_filters_cpu(
+        float *input, float *gradOutput,
+        int N, int inC, int outC,
+        int inH, int inW, int kH, int kW, int padH, int padW, int dH, int dW,
+        float *gradFilters) {
+
+    int outH = (inH + 2 * padH - kH) / dH + 1;
+    int outW = (inW + 2 * padW - kW) / dW + 1;
+
+    for(int outc = 0; outc < outC; outc++) {
+        for(int inc = 0; inc < inC; inc++) {
+            for(int kh = 0; kh < kH; kh++) {
+                for(int kw = 0; kw < kW; kw++) {
+                    int weightIndex = ((outc
+                        * inC + inc)
+                        * kH + kh)
+                        * kW + kw;
+                    float thiswchange = 0;
+                    float thisBiasChange = 0;
+                    // gradWeights:     [outc][inc][kh][kw]
+                    //       aggregate over:  [outh][outw][n]
+                    for(int outh = 0; outh < outH; outh++) {
+                        int inh = outh * dH + kh - padH;
+                        if(inh < 0 || inh >= inH) {
+                            continue;
+                        }
+                        for(int outw = 0; outw < outW; outw++) {
+                            int inw = outw * dW + kw - padW;
+                            if(inw < 0 || inw >= inW) {
+                                continue;
+                            }
+                            for(int n = 0; n < N; n++) {
+                                int outputIndex = ((n
+                                    * outC + outc)
+                                    * outH + outh)
+                                    * outW + outw;
+                                float gradOutputValue = gradOutput[outputIndex];
+                                int inputIndex = ((n
+                                    * inC + inc)
+                                    * inH + inh)
+                                    * inW + inw;
+                                float inputValue = input[inputIndex];
+                                thiswchange += gradOutputValue * inputValue;
+                            }
+                        }
+                    }
+                    gradFilters[weightIndex] = thiswchange;
+                }
+            }
+        }
+    }
+}
+
 TEST(test_dnn, simple_cpu_conv) {
     int N = 4;
     int inC = 3;
@@ -475,6 +528,60 @@ TEST(test_dnn, simple_cpu_back_data) {
     }
 
     delete[] gradInImages;
+    delete[] outImages;
+    delete[] filters;
+    delete[] inImages;
+}
+
+TEST(test_dnn, simple_cpu_back_filters) {
+    int N = 4;
+    int inC = 3;
+    int outC = 5;
+    int inH = 5;
+    int inW = 6;
+    int kH = 3;
+    int kW = 3;
+    int padH = 1;
+    int padW = 1;
+    int dH = 1;
+    int dW = 1;
+
+    int outH = (inH + 2 * padH - kH) / dH + 1;
+    int outW = (inW + 2 * padW - kW) / dW + 1;
+
+    int inLinearSize = N * inC * inH * inW;
+    int outLinearSize = N * outC * outH * outW;
+    int filtersSize = inC * outC * kH * kW;
+
+    float *inImages = new float[inLinearSize];
+    float *filters = new float[filtersSize]; // lets say this is [outC][inC][kH][kW]
+    float *outImages = new float[outLinearSize];
+    float *gradFilters = new float[filtersSize];
+
+    MT19937 random;
+    random.seed(123ul);
+
+    fillRandomUniform(random, inImages, N * inC * inH * inW, 0.0f, 1.0f);
+    fillRandomUniform(random, filters, inC * outC * kH * kW, 0.0f, 1.0f);
+
+    conv_forward_cpu(inImages, filters, N, inC, outC, inH, inW, kH, kW, padH, padW, dH, dW, outImages);
+    conv_backward_filters_cpu(inImages, outImages, N, inC, outC, inH, inW, kH, kW, padH, padW, dH, dW, gradFilters);
+
+    const int numSamples = 20;
+    int *sampleIndices = new int[numSamples];
+    fillRandomInt(random, sampleIndices, numSamples, 0, filtersSize);
+    for(int i = 0; i < numSamples; i++) {
+        int linearPos = sampleIndices[i];
+        int inc = linearPos / outC / kH / kW;
+        int rem = linearPos - inc * outC * kH * kW;
+        int outc = rem / dH / dW;
+        rem = rem - outc * dH * dW;
+        int dh = rem / dW;
+        int dw = rem % dW;
+        cout << "inn=" << inc << " outc=" << outc << " dh=" << dh << " dw=" << dw << " gradFilters[" << linearPos << "]=" << gradFilters[linearPos] << endl;
+    }
+
+    delete[] gradFilters;
     delete[] outImages;
     delete[] filters;
     delete[] inImages;

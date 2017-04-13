@@ -67,6 +67,14 @@ size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
     cudnnTensorDescriptor_t gradInputDesc,
     CoclDnnSizeType *p_size_bytes
 );
+size_t cudnnGetConvolutionBackwardFilterWorkspaceSize(
+    cudnnHandle_t handle,
+    cudnnTensorDescriptor_t inputDesc,
+    cudnnTensorDescriptor_t outputDesc,
+    cudnnConvolutionDescriptor_t convDesc,
+    cudnnFilterDescriptor_t filterDesc,
+    CoclDnnSizeType *p_size
+);
 
 size_t cudnnConvolutionForward(
     cudnnHandle_t handle,
@@ -88,6 +96,16 @@ size_t cudnnConvolutionBackwardData(
     CoclDnnGeometryType workspaceSize,
     float *p_beta,
     cudnnTensorDescriptor_t gradInputDesc, float *gradInput
+);
+size_t cudnnConvolutionBackwardFilter(
+    cudnnHandle_t handle,
+    float *p_alpha,
+    cudnnTensorDescriptor_t inputDesc, float *input_data,
+    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutput_data,
+    cudnnConvolutionDescriptor_t convDesc,
+    void *workspace_data, CoclDnnGeometryType workspaceSize,
+    float *p_beta,
+    cudnnFilterDescriptor_t filterDesc, float *gradInput_data
 );
 
 } // namespace gemm_im2col
