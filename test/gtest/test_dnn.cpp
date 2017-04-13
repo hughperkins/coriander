@@ -574,10 +574,10 @@ TEST(test_dnn, simple_cpu_back_filters) {
         int linearPos = sampleIndices[i];
         int inc = linearPos / outC / kH / kW;
         int rem = linearPos - inc * outC * kH * kW;
-        int outc = rem / dH / dW;
-        rem = rem - outc * dH * dW;
-        int dh = rem / dW;
-        int dw = rem % dW;
+        int outc = rem / kH / kW;
+        rem = rem - outc * kH * kW;
+        int dh = rem / kW;
+        int dw = rem % kW;
         cout << "inn=" << inc << " outc=" << outc << " dh=" << dh << " dw=" << dw << " gradFilters[" << linearPos << "]=" << gradFilters[linearPos] << endl;
     }
 
@@ -752,7 +752,7 @@ TEST(test_dnn, simple_gpu_conv) {
     delete[] inImages;
 }
 
-TEST(test_dnn, simple_gpu_conv_backward_data) {
+TEST(test_dnn, DISABLED_simple_gpu_conv_backward_data) {
     int N = 4;
     int inC = 3;
     int outC = 5;
@@ -956,7 +956,7 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
     delete[] gradInImages;
 }
 
-TEST(test_dnn, simple_gpu_conv_backward_filters) {
+TEST(test_dnn, DISABLED_simple_gpu_conv_backward_filters) {
     int N = 4;
     int inC = 3;
     int outC = 5;
@@ -968,6 +968,12 @@ TEST(test_dnn, simple_gpu_conv_backward_filters) {
     int padW = 1;
     int dH = 1;
     int dW = 1;
+
+    N = 1;
+    inC = 1;
+    outC = 1;
+    inH = 3;
+    inW = 3;
 
     int outH = (inH + 2 * padH - kH) / dH + 1;
     int outW = (inW + 2 * padW - kW) / dW + 1;
@@ -1134,10 +1140,10 @@ TEST(test_dnn, simple_gpu_conv_backward_filters) {
         int linearPos = sampleIndices[i];
         int inc = linearPos / outC / kH / kW;
         int rem = linearPos - inc * outC * kH * kW;
-        int outc = rem / dH / dW;
-        rem = rem - outc * dH * dW;
-        int dh = rem / dW;
-        int dw = rem % dW;
+        int outc = rem / kH / kW;
+        rem = rem - outc * kH * kW;
+        int dh = rem / kW;
+        int dw = rem % kW;
         cout << "inc=" << inc << " outc=" << outc << " dh=" << dh << " dw=" << dw << " gradFilters[" << linearPos << "]="
             << gradFilters[linearPos] << " " << gpuGradFilterHostside[linearPos] << endl;
         if(abs(gradFilters[linearPos] - gpuGradFilterHostside[linearPos]) > 1e-4) {
