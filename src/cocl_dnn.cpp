@@ -339,20 +339,36 @@ size_t cudnnConvolutionBackwardFilter(
 size_t cudnnConvolutionBackwardData(
     cudnnHandle_t handle,
     float *p_alpha,
-    cudnnFilterDescriptor_t tensor1Desc,
-    float *tensor1_data,
-    cudnnTensorDescriptor_t tensor2Desc,
-    float *tensor2_data,
+    cudnnFilterDescriptor_t filterDesc, float *filter_data,
+    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutput_data,
     cudnnConvolutionDescriptor_t convDesc,
     cudnnConvolutionBwdDataAlgo_t algo,
     void *workspace,
     CoclDnnSizeType workspaceSize,
     float *p_beta,
-    cudnnTensorDescriptor_t filterDesc,
-    float *out
+    cudnnTensorDescriptor_t gradInputDesc, float *gradInput_data
 ) {
-    throw runtime_error("not implemented");
+    cout << "cudnnConvolutionBackwardData()" << endl;
+    switch(algo) {
+        case cudnnConvolutionBwdDataAlgo_GEMM:
+            cocl::dnn::gemm_im2col::cudnnConvolutionBackwardData(
+                handle,
+                p_alpha,
+                filterDesc, filter_data,
+                gradOutputDesc, gradOutput_data,
+                convDesc,
+                workspace,
+                workspaceSize,
+                p_beta,
+                gradInputDesc, gradInput_data
+            );
+            break;
+        default:
+            throw runtime_error("cudnnConvolutionBackwardData. No implementation algorithm found for algo " + easycl::toString(algo));
+    }
+    return 0;
 }
+
 size_t cudnnActivationBackward(
     cudnnHandle_t handle,
     cudnnActivationDescriptor_t activationDesc,

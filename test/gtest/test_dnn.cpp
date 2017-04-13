@@ -334,6 +334,52 @@ void conv_forward_cpu(
     }
 }
 
+void conv_backward_data_cpu(
+        float *gradOutput, float *filters,
+        int N, int inC, int outC,
+        int inH, int inW, int kH, int kW, int padH, int padW, int dH, int dW,
+        float *gradInput) {
+
+    int outH = (inH + 2 * padH - kH) / dH + 1;
+    int outW = (inW + 2 * padW - kW) / dW + 1;
+
+    for(int n = 0; n < N; n++) {
+        for(int inc = 0; inc < inC; inc++) {
+            for(int inh = 0; inh < inH; inh++) {
+                for(int inw = 0; inw < inW; inw++) {
+                    float sumWeightTimesGradOutput = 0;
+                    // aggregate over [outc][outh][outw]
+                    for(int outc = 0; outc < outC; outc++) {
+                        for(int kh = 0; kh < kH; kh++) {
+                            for(int kw = 0; kw < kW; kw++) {
+                                int outh = (inh -kh + padH) / dH;
+                                int outw = (inw -kw + padW) / dW;
+
+                                int resultIndex = ((n
+                                    * outC + outc)
+                                    * outH + outh)
+                                    * outW + outw;
+                                float thisGradOutput = gradOutput[resultIndex];
+                                int thisWeightIndex = ((outc
+                                    * inC + inc)
+                                    * kH + kh)
+                                    * kW + kw;
+                                float thisWeight = filters[thisWeightIndex];
+                                sumWeightTimesGradOutput += thisWeight * thisGradOutput;
+                            }
+                        }
+                    }
+                    int inputIndex = ((n
+                        * inC + inc)
+                        * inH + inh)
+                        * inW + inw;
+                    gradInput[inputIndex] = sumWeightTimesGradOutput;
+                }
+            }
+        }
+    }
+}
+
 TEST(test_dnn, simple_cpu_conv) {
     int N = 4;
     int inC = 3;
@@ -377,6 +423,58 @@ TEST(test_dnn, simple_cpu_conv) {
         cout << "n=" << n << " c=" << c << " inh=" << inh << " inw=" << inw << " outImages[" << linearPos << "]=" << outImages[linearPos] << endl;
     }
 
+    delete[] outImages;
+    delete[] filters;
+    delete[] inImages;
+}
+
+TEST(test_dnn, simple_cpu_back_data) {
+    int N = 4;
+    int inC = 3;
+    int outC = 5;
+    int inH = 5;
+    int inW = 6;
+    int kH = 3;
+    int kW = 3;
+    int padH = 1;
+    int padW = 1;
+    int dH = 1;
+    int dW = 1;
+
+    int outH = (inH + 2 * padH - kH) / dH + 1;
+    int outW = (inW + 2 * padW - kW) / dW + 1;
+
+    int inLinearSize = N * inC * inH * inW;
+    int outLinearSize = N * outC * outH * outW;
+    float *inImages = new float[inLinearSize];
+    float *filters = new float[inC * outC * kH * kW]; // lets say this is [outC][inC][kH][kW]
+    float *outImages = new float[outLinearSize];
+    float *gradInImages = new float[inLinearSize];
+
+    MT19937 random;
+    random.seed(123ul);
+
+    fillRandomUniform(random, inImages, N * inC * inH * inW, 0.0f, 1.0f);
+    fillRandomUniform(random, filters, inC * outC * kH * kW, 0.0f, 1.0f);
+
+    conv_forward_cpu(inImages, filters, N, inC, outC, inH, inW, kH, kW, padH, padW, dH, dW, outImages);
+    conv_backward_data_cpu(outImages, filters, N, inC, outC, inH, inW, kH, kW, padH, padW, dH, dW, gradInImages);
+
+    const int numSamples = 20;
+    int *sampleIndices = new int[numSamples];
+    fillRandomInt(random, sampleIndices, numSamples, 0, inLinearSize);
+    for(int i = 0; i < numSamples; i++) {
+        int linearPos = sampleIndices[i];
+        int n = linearPos / inC / inH / inW;
+        int rem = linearPos - n * inC * inH * inW;
+        int c = rem / inH / inW;
+        rem = rem - c * inH * inW;
+        int inh = rem / inW;
+        int inw = rem % inW;
+        cout << "n=" << n << " c=" << c << " inh=" << inh << " inw=" << inw << " gradInImages[" << linearPos << "]=" << gradInImages[linearPos] << endl;
+    }
+
+    delete[] gradInImages;
     delete[] outImages;
     delete[] filters;
     delete[] inImages;
@@ -529,6 +627,194 @@ TEST(test_dnn, simple_gpu_conv) {
             << outImages[linearPos] << " " << gpuOutHostside[linearPos] << endl;
         if(abs(outImages[linearPos] - gpuOutHostside[linearPos]) > 1e-4) {
             throw runtime_error(string("test_dnn, output of conv forward ,mismatch for ") +
+                "n=" + toString(n) + " c=" + toString(c) + " outh=" + toString(outh) + " outw=" + toString(outw));
+        }
+    }
+
+    cudnnDestroyFilterDescriptor(filterDesc);
+    cudnnDestroyConvolutionDescriptor(convDesc);
+    cudnnDestroyTensorDescriptor(inputTensorDesc);
+    cudnnDestroyTensorDescriptor(outputTensorDesc);
+    cudnnDestroy(dnn_handle);
+
+    delete gpuMemory;
+    delete[] gpuOutHostside;
+
+    delete[] outImages;
+    delete[] filters;
+    delete[] inImages;
+}
+
+TEST(test_dnn, simple_gpu_conv_backward_data) {
+    int N = 4;
+    int inC = 3;
+    int outC = 5;
+    int inH = 5;
+    int inW = 6;
+    int kH = 3;
+    int kW = 3;
+    int padH = 1;
+    int padW = 1;
+    int dH = 1;
+    int dW = 1;
+
+    // N = 1;
+    // inC = 1;
+    // outC = 1;
+    // inH = 3;
+    // inW = 3;
+
+    int outH = (inH + 2 * padH - kH) / dH + 1;
+    int outW = (inW + 2 * padW - kW) / dW + 1;
+    cout << "outH=" << outH << " outW=" << outW << endl;
+
+    int inLinearSize = N * inC * inH * inW;
+    int filterLinearSize = inC * outC * kH * kW;
+    int outLinearSize = N * outC * outH * outW;
+
+    float *inImages = new float[inLinearSize];
+    float *filters = new float[filterLinearSize]; // lets say this is [outC][inC][kH][kW]
+    float *outImages = new float[outLinearSize];
+    float *gradInImages = new float[inLinearSize];
+
+    MT19937 random;
+    random.seed(123ul);
+
+    fillRandomUniform(random, inImages, N * inC * inH * inW, 0.0f, 1.0f);
+    fillRandomUniform(random, filters, inC * outC * kH * kW, 0.0f, 1.0f);
+
+    conv_forward_cpu(inImages, filters, N, inC, outC, inH, inW, kH, kW, padH, padW, dH, dW, outImages);
+    conv_backward_data_cpu(outImages, filters, N, inC, outC, inH, inW, kH, kW, padH, padW, dH, dW, gradInImages);
+
+    cudnnHandle_t dnn_handle;
+    cudnnTensorDescriptor_t inputTensorDesc;
+    cudnnTensorDescriptor_t outputTensorDesc;
+    cudnnFilterDescriptor_t filterDesc;
+    cudnnConvolutionDescriptor_t convDesc;
+    cudnnTensorDescriptor_t gradInputTensorDesc;
+
+    cudnnCreate(&dnn_handle);
+    cudnnCreateTensorDescriptor(&inputTensorDesc);
+    cudnnCreateTensorDescriptor(&outputTensorDesc);
+    cudnnCreateFilterDescriptor(&filterDesc);
+    cudnnCreateConvolutionDescriptor(&convDesc);
+    cudnnCreateTensorDescriptor(&gradInputTensorDesc);
+
+    cudnnSetTensor4dDescriptor(
+        inputTensorDesc,
+        CUDNN_TENSOR_NCHW,
+        CUDNN_DATA_FLOAT,
+        N, inC, inH, inW);
+    cudnnSetTensor4dDescriptor(
+        outputTensorDesc,
+        CUDNN_TENSOR_NCHW,
+        CUDNN_DATA_FLOAT,
+        N, outC, outH, outW);
+    cudnnSetFilter4dDescriptor(
+        filterDesc,
+        CUDNN_DATA_FLOAT,
+        CUDNN_TENSOR_NCHW,
+        outC,
+        inC,
+        kH,
+        kW);
+    cudnnSetConvolution2dDescriptor(
+        convDesc,
+        padH, padW,
+        dH, dW,
+        1, 1,
+        CUDNN_CROSS_CORRELATION);
+
+    size_t workspaceSizeBytes = 0;
+    cocl::dnn::gemm_im2col::cudnnGetConvolutionForwardWorkspaceSize(
+        dnn_handle,
+        inputTensorDesc,
+        filterDesc,
+        convDesc,
+        outputTensorDesc,
+        &workspaceSizeBytes
+    );
+    cout << "workspaceSizeBytes=" << workspaceSizeBytes << endl;
+
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getContext()->getCl();
+
+    size_t inputOffsetBytes = 0;
+    size_t filterOffsetBytes = inputOffsetBytes + inLinearSize * sizeof(float);
+    size_t outputOffsetBytes = filterOffsetBytes + filterLinearSize * sizeof(float);
+    size_t workspaceOffsetBytes = outputOffsetBytes + outLinearSize * sizeof(float);
+    size_t gradInputOffsetBytes = workspaceOffsetBytes + workspaceSizeBytes * sizeof(float);
+
+    size_t gpuMemoryAllocSize = (inLinearSize + filterLinearSize + outLinearSize) * sizeof(float) + workspaceSizeBytes;
+    cout << "gpuMemoryAllocSize=" << gpuMemoryAllocSize << endl;
+    Memory *gpuMemory = Memory::newDeviceAlloc(gpuMemoryAllocSize);
+
+    float *gpuDeviceInput = (float *)(((char *)gpuMemory->fakePos + inputOffsetBytes));
+    float *gpuDeviceFilter = (float *)(((char *)gpuMemory->fakePos + filterOffsetBytes));
+    float *gpuDeviceOutput = (float *)(((char *)gpuMemory->fakePos + outputOffsetBytes));
+    float *gpuDeviceWorkspace = (float *)(((char *)gpuMemory->fakePos + workspaceOffsetBytes));
+    float *gpuDeviceGradInput = (float *)(((char *)gpuMemory->fakePos + gradInputOffsetBytes));
+
+    cl_int err;
+
+    err = clEnqueueWriteBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, inputOffsetBytes,
+                                     (inLinearSize) * sizeof(float), inImages, 0, NULL, NULL);
+    EasyCL::checkError(err);
+    err = clEnqueueWriteBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, filterOffsetBytes,
+                                     (filterLinearSize) * sizeof(float), filters, 0, NULL, NULL);
+    EasyCL::checkError(err);
+
+    float alpha = 1.0f;
+    float beta = 0.0f;
+    cocl::dnn::gemm_im2col::cudnnConvolutionForward(
+        dnn_handle,
+        &alpha,
+        inputTensorDesc, gpuDeviceInput,
+        filterDesc, gpuDeviceFilter,
+        convDesc,
+        gpuDeviceWorkspace, workspaceSizeBytes,
+        &beta,
+        outputTensorDesc, gpuDeviceOutput
+    );
+    cl->finish();
+
+    cocl::dnn::gemm_im2col::cudnnConvolutionBackwardData(
+        dnn_handle,
+        &alpha,
+        filterDesc, gpuDeviceFilter,
+        outputTensorDesc, gpuDeviceOutput,
+        convDesc,
+        gpuDeviceWorkspace, workspaceSizeBytes,
+        &beta,
+        gradInputTensorDesc, gpuDeviceGradInput
+    );
+    cl->finish();
+
+    float *gpuOutHostside = new float[outLinearSize];
+    err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, outputOffsetBytes,
+                                     (outLinearSize) * sizeof(float), gpuOutHostside, 0, NULL, NULL);
+    EasyCL::checkError(err);
+
+    float *gpuGradInputHostside = new float[inLinearSize];
+    err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, gradInputOffsetBytes,
+                                     (inLinearSize) * sizeof(float), gpuGradInputHostside, 0, NULL, NULL);
+    EasyCL::checkError(err);
+
+    const int numSamples = 20;
+    int *sampleIndices = new int[numSamples];
+    fillRandomInt(random, sampleIndices, numSamples, 0, outLinearSize);
+    for(int i = 0; i < numSamples; i++) {
+        int linearPos = sampleIndices[i];
+        int n = linearPos / outC / outH / outW;
+        int rem = linearPos - n * outC * outH * outW;
+        int c = rem / outH / outW;
+        rem = rem - c * outH * outW;
+        int outh = rem / outW;
+        int outw = rem % outW;
+        cout << "n=" << n << " c=" << c << " outh=" << outh << " outw=" << outw << " outImages[" << linearPos << "]="
+            << gradInImages[linearPos] << " " << gpuGradInputHostside[linearPos] << endl;
+        if(abs(gradInImages[linearPos] - gpuGradInputHostside[linearPos]) > 1e-4) {
+            throw runtime_error(string("test_dnn, output of conv backward data, mismatch for ") +
                 "n=" + toString(n) + " c=" + toString(c) + " outh=" + toString(outh) + " outw=" + toString(outw));
         }
     }

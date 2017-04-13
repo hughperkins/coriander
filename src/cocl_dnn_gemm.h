@@ -70,6 +70,17 @@ size_t cudnnConvolutionForward(
     float *p_beta,
     cudnnTensorDescriptor_t outputTensorDesc, float *outputData
 );
+size_t cudnnConvolutionBackwardData(
+    cudnnHandle_t handle,
+    float *p_alpha,
+    cudnnFilterDescriptor_t filtersDesc, float *filters_data,
+    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutput_data,
+    cudnnConvolutionDescriptor_t convDesc,
+    void *workspace,
+    CoclDnnGeometryType workspaceSize,
+    float *p_beta,
+    cudnnTensorDescriptor_t gradInputDesc, float *gradInput
+);
 
 } // namespace gemm_im2col
 } // namespace dnn

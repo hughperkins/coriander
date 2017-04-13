@@ -147,7 +147,6 @@ size_t cudnnGetConvolutionForwardWorkspaceSize(
     *p_size_bytes = getColumnsNumElements(handle, srcTensor, filter, conv, dstTensor) * sizeof(float);
     return 0;
 }
-
 size_t cudnnConvolutionForward(
     cudnnHandle_t handle,
     float *p_alpha,
@@ -228,6 +227,19 @@ size_t cudnnConvolutionForward(
     }
 
     return 0;
+}
+size_t cudnnConvolutionBackwardData(
+    cudnnHandle_t handle,
+    float *p_alpha,
+    cudnnFilterDescriptor_t filtersDesc, float *filters_data,
+    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutput_data,
+    cudnnConvolutionDescriptor_t convDesc,
+    void *workspace,
+    CoclDnnGeometryType workspaceSize,
+    float *p_beta,
+    cudnnTensorDescriptor_t gradInputDesc, float *gradInput
+) {
+    throw runtime_error("not implemented");
 }
 
 // Kernel for fast unfold+copy

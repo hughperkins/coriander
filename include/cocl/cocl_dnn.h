@@ -273,17 +273,14 @@ extern "C" {
     size_t cudnnConvolutionBackwardData(
         cudnnHandle_t handle,
         float *p_alpha,
-        cudnnFilterDescriptor_t tensor1Desc,
-        float *tensor1_data,
-        cudnnTensorDescriptor_t tensor2Desc,
-        float *tensor2_data,
+        cudnnFilterDescriptor_t filtersDesc, float *filters_data,
+        cudnnTensorDescriptor_t gradOutputDesc, float *gradOutput_data,
         cudnnConvolutionDescriptor_t convDesc,
         cudnnConvolutionBwdDataAlgo_t algo,
         void *workspace,
         CoclDnnGeometryType workspaceSize,
         float *p_beta,
-        cudnnTensorDescriptor_t filterDesc,
-        float *out
+        cudnnTensorDescriptor_t gradInputDesc, float *gradInput
     );
     size_t cudnnGetConvolutionBackwardFilterWorkspaceSize(
         cudnnHandle_t handle,
