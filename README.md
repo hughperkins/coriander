@@ -262,6 +262,7 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 ## News
 
 - April 13:
+  - added CLBlast wrappers for: sgemv, saxpy, sscal
   - added data backprop for convolutions (still need filter backprop though)
 - April 4:
   - merged in current `dnn` branch, which provides forward convolutional implementation for cudnn API, using `im2col` over Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast)
