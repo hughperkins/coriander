@@ -228,6 +228,32 @@ size_t cudnnConvolutionForward(
 
     return 0;
 }
+size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
+    cudnnHandle_t handle,
+    cudnnFilterDescriptor_t filterDesc,
+    cudnnTensorDescriptor_t gradOutputDesc,
+    cudnnConvolutionDescriptor_t convDesc,
+    cudnnTensorDescriptor_t gradInputDesc,
+    CoclDnnSizeType *p_size_bytes
+) {
+    // from torch/cltorch:
+    // Resize temporary columns
+    // THClTensor_resize2d(state, gradColumns, nOutputPlane*kW*kH, inputHeight*inputWidth);
+
+    CoclDnnGeometryType inH = gradInputDesc->H;
+    CoclDnnGeometryType inW = gradInputDesc->W;
+
+    CoclDnnGeometryType outC = gradOutputDesc->C;
+
+    CoclDnnGeometryType kH = filterDesc->kH;
+    CoclDnnGeometryType kW = filterDesc->kW;
+
+    CoclDnnGeometryType rows = outC * kW * kH;
+    CoclDnnGeometryType cols = inH * inW;
+
+    *p_size_bytes = rows * cols * sizeof(float);
+    return 0;
+}
 size_t cudnnConvolutionBackwardData(
     cudnnHandle_t handle,
     float *p_alpha,

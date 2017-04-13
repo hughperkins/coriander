@@ -59,6 +59,14 @@ std::size_t cudnnGetConvolutionForwardWorkspaceSize(
     cudnnTensorDescriptor_t dstTensor,
     CoclDnnSizeType *p_size_bytes
 );
+size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
+    cudnnHandle_t handle,
+    cudnnFilterDescriptor_t filterDesc,
+    cudnnTensorDescriptor_t gradOutputDesc,
+    cudnnConvolutionDescriptor_t convDesc,
+    cudnnTensorDescriptor_t gradInputDesc,
+    CoclDnnSizeType *p_size_bytes
+);
 
 size_t cudnnConvolutionForward(
     cudnnHandle_t handle,

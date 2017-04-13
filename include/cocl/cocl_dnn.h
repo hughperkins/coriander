@@ -303,10 +303,10 @@ extern "C" {
     );
     size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
         cudnnHandle_t handle,
-        cudnnFilterDescriptor_t filter,
-        cudnnTensorDescriptor_t tensor1Desc,
+        cudnnFilterDescriptor_t filterDesc,
+        cudnnTensorDescriptor_t gradOutputDesc,
         cudnnConvolutionDescriptor_t convDesc,
-        cudnnTensorDescriptor_t tensor2Desc,
+        cudnnTensorDescriptor_t gradInputDesc,
         cudnnConvolutionBwdDataAlgo_t algo,
         CoclDnnSizeType *p_size
     );

@@ -243,15 +243,23 @@ size_t cudnnGetConvolutionBackwardFilterWorkspaceSize(
 }
 size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
     cudnnHandle_t handle,
-    cudnnFilterDescriptor_t filter,
-    cudnnTensorDescriptor_t tensor1Desc,
+    cudnnFilterDescriptor_t filterDesc,
+    cudnnTensorDescriptor_t gradOutputDesc,
     cudnnConvolutionDescriptor_t convDesc,
-    cudnnTensorDescriptor_t tensor2Desc,
+    cudnnTensorDescriptor_t gradInputDesc,
     cudnnConvolutionBwdDataAlgo_t algo,
-    CoclDnnSizeType *p_size
+    CoclDnnSizeType *p_size_bytes
 ) {
     cout << "cudnnGetConvolutionBackwardDataWorkspaceSize()" << endl;
-    *p_size = 0;
+    switch(algo) {
+        case cudnnConvolutionBwdDataAlgo_GEMM:
+            cocl::dnn::gemm_im2col::cudnnGetConvolutionBackwardDataWorkspaceSize(
+                handle,
+                filterDesc, gradOutputDesc, convDesc, gradInputDesc, p_size_bytes);
+            break;
+        default:
+            throw runtime_error("No implementation algorithm found for algo " + easycl::toString(algo));
+    }
     return 0;
 }
 
