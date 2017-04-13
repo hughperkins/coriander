@@ -520,24 +520,24 @@ TEST(test_dnn, simple_gpu_conv) {
     conv_forward_cpu(inImages, filters, N, inC, outC, inH, inW, kH, kW, padH, padW, dH, dW, outImages);
 
     cudnnHandle_t dnn_handle;
-    cudnnTensorDescriptor_t inputTensorDesc;
-    cudnnTensorDescriptor_t outputTensorDesc;
+    cudnnTensorDescriptor_t inputDesc;
+    cudnnTensorDescriptor_t outputDesc;
     cudnnFilterDescriptor_t filterDesc;
     cudnnConvolutionDescriptor_t convDesc;
 
     cudnnCreate(&dnn_handle);
-    cudnnCreateTensorDescriptor(&inputTensorDesc);
-    cudnnCreateTensorDescriptor(&outputTensorDesc);
+    cudnnCreateTensorDescriptor(&inputDesc);
+    cudnnCreateTensorDescriptor(&outputDesc);
     cudnnCreateFilterDescriptor(&filterDesc);
     cudnnCreateConvolutionDescriptor(&convDesc);
 
     cudnnSetTensor4dDescriptor(
-        inputTensorDesc,
+        inputDesc,
         CUDNN_TENSOR_NCHW,
         CUDNN_DATA_FLOAT,
         N, inC, inH, inW);
     cudnnSetTensor4dDescriptor(
-        outputTensorDesc,
+        outputDesc,
         CUDNN_TENSOR_NCHW,
         CUDNN_DATA_FLOAT,
         N, outC, outH, outW);
@@ -559,10 +559,10 @@ TEST(test_dnn, simple_gpu_conv) {
     size_t workspaceSizeBytes = 0;
     cocl::dnn::gemm_im2col::cudnnGetConvolutionForwardWorkspaceSize(
         dnn_handle,
-        inputTensorDesc,
+        inputDesc,
         filterDesc,
         convDesc,
-        outputTensorDesc,
+        outputDesc,
         &workspaceSizeBytes
     );
     cout << "workspaceSizeBytes=" << workspaceSizeBytes << endl;
@@ -598,12 +598,12 @@ TEST(test_dnn, simple_gpu_conv) {
     cocl::dnn::gemm_im2col::cudnnConvolutionForward(
         dnn_handle,
         &alpha,
-        inputTensorDesc, gpuDeviceInput,
+        inputDesc, gpuDeviceInput,
         filterDesc, gpuDeviceFilter,
         convDesc,
         gpuDeviceWorkspace, workspaceSizeBytes,
         &beta,
-        outputTensorDesc, gpuDeviceOutput
+        outputDesc, gpuDeviceOutput
     );
     cl->finish();
 
@@ -633,8 +633,8 @@ TEST(test_dnn, simple_gpu_conv) {
 
     cudnnDestroyFilterDescriptor(filterDesc);
     cudnnDestroyConvolutionDescriptor(convDesc);
-    cudnnDestroyTensorDescriptor(inputTensorDesc);
-    cudnnDestroyTensorDescriptor(outputTensorDesc);
+    cudnnDestroyTensorDescriptor(inputDesc);
+    cudnnDestroyTensorDescriptor(outputDesc);
     cudnnDestroy(dnn_handle);
 
     delete gpuMemory;
@@ -687,26 +687,26 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
     conv_backward_data_cpu(outImages, filters, N, inC, outC, inH, inW, kH, kW, padH, padW, dH, dW, gradInImages);
 
     cudnnHandle_t dnn_handle;
-    cudnnTensorDescriptor_t inputTensorDesc;
-    cudnnTensorDescriptor_t outputTensorDesc;
+    cudnnTensorDescriptor_t inputDesc;
+    cudnnTensorDescriptor_t outputDesc;
     cudnnFilterDescriptor_t filterDesc;
     cudnnConvolutionDescriptor_t convDesc;
-    cudnnTensorDescriptor_t gradInputTensorDesc;
+    cudnnTensorDescriptor_t gradInputDesc;
 
     cudnnCreate(&dnn_handle);
-    cudnnCreateTensorDescriptor(&inputTensorDesc);
-    cudnnCreateTensorDescriptor(&outputTensorDesc);
+    cudnnCreateTensorDescriptor(&inputDesc);
+    cudnnCreateTensorDescriptor(&outputDesc);
     cudnnCreateFilterDescriptor(&filterDesc);
     cudnnCreateConvolutionDescriptor(&convDesc);
-    cudnnCreateTensorDescriptor(&gradInputTensorDesc);
+    cudnnCreateTensorDescriptor(&gradInputDesc);
 
     cudnnSetTensor4dDescriptor(
-        inputTensorDesc,
+        inputDesc,
         CUDNN_TENSOR_NCHW,
         CUDNN_DATA_FLOAT,
         N, inC, inH, inW);
     cudnnSetTensor4dDescriptor(
-        outputTensorDesc,
+        outputDesc,
         CUDNN_TENSOR_NCHW,
         CUDNN_DATA_FLOAT,
         N, outC, outH, outW);
@@ -725,15 +725,28 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
         1, 1,
         CUDNN_CROSS_CORRELATION);
 
+    size_t forwardWorkspaceSizeBytes = 0;
+    size_t backwardDataWorkspaceSizeBytes = 0;
     size_t workspaceSizeBytes = 0;
     cocl::dnn::gemm_im2col::cudnnGetConvolutionForwardWorkspaceSize(
         dnn_handle,
-        inputTensorDesc,
+        inputDesc,
         filterDesc,
         convDesc,
-        outputTensorDesc,
-        &workspaceSizeBytes
+        outputDesc,
+        &forwardWorkspaceSizeBytes
     );
+    cout << "forward workspaceSizeBytes=" << forwardWorkspaceSizeBytes << endl;
+    cocl::dnn::gemm_im2col::cudnnGetConvolutionBackwardDataWorkspaceSize(
+        dnn_handle,
+        filterDesc,
+        outputDesc,
+        convDesc,
+        gradInputDesc,
+        &backwardDataWorkspaceSizeBytes
+    );
+    cout << "backward data workspaceSizeBytes=" << backwardDataWorkspaceSizeBytes << endl;
+    workspaceSizeBytes = std::max(forwardWorkspaceSizeBytes, backwardDataWorkspaceSizeBytes);
     cout << "workspaceSizeBytes=" << workspaceSizeBytes << endl;
 
     ThreadVars *v = getThreadVars();
@@ -769,12 +782,12 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
     cocl::dnn::gemm_im2col::cudnnConvolutionForward(
         dnn_handle,
         &alpha,
-        inputTensorDesc, gpuDeviceInput,
+        inputDesc, gpuDeviceInput,
         filterDesc, gpuDeviceFilter,
         convDesc,
         gpuDeviceWorkspace, workspaceSizeBytes,
         &beta,
-        outputTensorDesc, gpuDeviceOutput
+        outputDesc, gpuDeviceOutput
     );
     cl->finish();
 
@@ -782,11 +795,11 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
         dnn_handle,
         &alpha,
         filterDesc, gpuDeviceFilter,
-        outputTensorDesc, gpuDeviceOutput,
+        outputDesc, gpuDeviceOutput,
         convDesc,
         gpuDeviceWorkspace, workspaceSizeBytes,
         &beta,
-        gradInputTensorDesc, gpuDeviceGradInput
+        gradInputDesc, gpuDeviceGradInput
     );
     cl->finish();
 
@@ -821,8 +834,8 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
 
     cudnnDestroyFilterDescriptor(filterDesc);
     cudnnDestroyConvolutionDescriptor(convDesc);
-    cudnnDestroyTensorDescriptor(inputTensorDesc);
-    cudnnDestroyTensorDescriptor(outputTensorDesc);
+    cudnnDestroyTensorDescriptor(inputDesc);
+    cudnnDestroyTensorDescriptor(outputDesc);
     cudnnDestroy(dnn_handle);
 
     delete gpuMemory;
