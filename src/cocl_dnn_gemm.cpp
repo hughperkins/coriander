@@ -483,7 +483,7 @@ size_t cudnnConvolutionBackwardFilter(
         CoclDnnGeometryType k = inH * inW;   // inputHeight * inputWidth
 
         StatusCode status = CLBlastSgemm(kColMajor, kYes, kNo,
-                                       n, m, k,
+                                       m, n, k,
                                        1.0f,
                                        workspaceMemory->clmem, columnsOffset / sizeof(float), n,
                                        inputMemory->clmem, input3dOffsetBytes / sizeof(float), k,
@@ -495,9 +495,7 @@ size_t cudnnConvolutionBackwardFilter(
             throw runtime_error("Failed call to blas sgem");
         }
     }
-    // return 0;
-
-    throw runtime_error("not implemented");
+    return 0;
 }
 
 // Kernel for fast unfold+copy
