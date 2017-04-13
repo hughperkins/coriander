@@ -234,9 +234,24 @@ size_t cudnnGetConvolutionBackwardFilterWorkspaceSize(
     cudnnTensorDescriptor_t outputDesc,
     cudnnConvolutionDescriptor_t convDesc,
     cudnnFilterDescriptor_t filterDesc,
-    CoclDnnSizeType *p_size
+    CoclDnnSizeType *p_size_bytes
 ) {
-    throw runtime_error("cudnnGetConvolutionBackwardFilterWorkspaceSize not implemented");
+    // from torch/cltorch:
+    // // Resize temporary columns
+    // THClTensor_resize2d(state, columns, nOutputPlane*kW*kH, inputHeight*inputWidth);
+
+    CoclDnnGeometryType outC = outputDesc->C;
+
+    CoclDnnGeometryType kH = filterDesc->kH;
+    CoclDnnGeometryType kW = filterDesc->kW;
+
+    CoclDnnGeometryType inH = inputDesc->H;
+    CoclDnnGeometryType inW = inputDesc->W;
+
+    int rows = outC * kW * kH;
+    int cols = inH * inW;
+    *p_size_bytes = rows * cols * sizeof(float);
+    return 0;
 }
 size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
     cudnnHandle_t handle,
