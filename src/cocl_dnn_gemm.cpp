@@ -150,12 +150,12 @@ size_t cudnnGetConvolutionForwardWorkspaceSize(
 size_t cudnnConvolutionForward(
     cudnnHandle_t handle,
     float *p_alpha,
-    cudnnTensorDescriptor_t inputTensorDesc, float *inputData,
+    cudnnTensorDescriptor_t inputDesc, float *inputData,
     cudnnFilterDescriptor_t filterDesc, float *filterData,
     cudnnConvolutionDescriptor_t convDesc,
     void *workspaceData, CoclDnnSizeType workspaceSize,
     float *p_beta,
-    cudnnTensorDescriptor_t outputTensorDesc, float *outputData
+    cudnnTensorDescriptor_t outputDesc, float *outputData
 ) {
     if(*p_alpha != 1) {
         throw runtime_error("cudnnConvolutionForward only implemented for alpha == 1");
@@ -178,19 +178,19 @@ size_t cudnnConvolutionForward(
     cl_int err;
 
     CoclDnnGeometryType columnsNumElements = getColumnsNumElements(
-        handle, inputTensorDesc, filterDesc, convDesc, outputTensorDesc);
+        handle, inputDesc, filterDesc, convDesc, outputDesc);
     size_t columnsOffset = workspaceOffset;
 
-    size_t input3dSize = inputTensorDesc->C * inputTensorDesc->H * inputTensorDesc->W;
-    size_t output3dSize = outputTensorDesc->C * outputTensorDesc->H * outputTensorDesc->W;
-    CoclDnnGeometryType batchSize = inputTensorDesc->N;
+    size_t input3dSize = inputDesc->C * inputDesc->H * inputDesc->W;
+    size_t output3dSize = outputDesc->C * outputDesc->H * outputDesc->W;
+    CoclDnnGeometryType batchSize = inputDesc->N;
     for(CoclDnnGeometryType elt = 0; elt < batchSize; elt++) {
         size_t input3dOffsetBytes = inputOffset + elt * input3dSize * sizeof(float);
         size_t output3dOffsetBytes = outputOffset + elt * output3dSize * sizeof(float);
 
-        CoclDnnGeometryType nInputPlane = inputTensorDesc->C;
-        CoclDnnGeometryType inputHeight = inputTensorDesc->H;
-        CoclDnnGeometryType inputWidth = inputTensorDesc->W;
+        CoclDnnGeometryType nInputPlane = inputDesc->C;
+        CoclDnnGeometryType inputHeight = inputDesc->H;
+        CoclDnnGeometryType inputWidth = inputDesc->W;
         CoclDnnGeometryType kH = filterDesc->kH;
         CoclDnnGeometryType kW = filterDesc->kW;
         CoclDnnGeometryType padH = convDesc->padH;
@@ -203,9 +203,9 @@ size_t cudnnConvolutionForward(
             workspaceMemory->clmem, columnsOffset
         );
 
-        CoclDnnGeometryType nOutputPlane = outputTensorDesc->C;
-        CoclDnnGeometryType outputHeight = outputTensorDesc->H;
-        CoclDnnGeometryType outputWidth = outputTensorDesc->W;
+        CoclDnnGeometryType nOutputPlane = outputDesc->C;
+        CoclDnnGeometryType outputHeight = outputDesc->H;
+        CoclDnnGeometryType outputWidth = outputDesc->W;
 
         CoclDnnGeometryType m = nOutputPlane; // weight->size[0]; //nOutputPlane
         CoclDnnGeometryType n = outputHeight * outputWidth; // columns->size[1];
@@ -231,15 +231,84 @@ size_t cudnnConvolutionForward(
 size_t cudnnConvolutionBackwardData(
     cudnnHandle_t handle,
     float *p_alpha,
-    cudnnFilterDescriptor_t filtersDesc, float *filters_data,
-    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutput_data,
+    cudnnFilterDescriptor_t filterDesc, float *filterData,
+    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutputData,
     cudnnConvolutionDescriptor_t convDesc,
-    void *workspace,
-    CoclDnnGeometryType workspaceSize,
+    void *workspaceData, CoclDnnGeometryType workspaceSize,
     float *p_beta,
-    cudnnTensorDescriptor_t gradInputDesc, float *gradInput
+    cudnnTensorDescriptor_t gradInputDesc, float *gradInputData
 ) {
-    throw runtime_error("not implemented");
+
+    if(*p_alpha != 1) {
+        throw runtime_error("cudnnConvolutionBackwardData only implemented for alpha == 1");
+    }
+    if(*p_beta != 0) {
+        throw runtime_error("cudnnConvolutionBackwardData only implemented for beta == 0");
+    }
+    ThreadVars *v = getThreadVars();
+
+    Memory *gradOutputMemory = findMemory((const char *)gradOutputData);
+    Memory *filterMemory = findMemory((const char *)filterData);
+    Memory *gradInputMemory = findMemory((const char *)gradInputData);
+    Memory *workspaceMemory = findMemory((const char *)workspaceData);
+
+    size_t gradOutputOffset = gradOutputMemory->getOffset((const char *)gradOutputData);
+    size_t filterOffset = filterMemory->getOffset((const char *)filterData);
+    size_t gradInputOffset = gradInputMemory->getOffset((const char *)gradInputData);
+    size_t workspaceOffset = workspaceMemory->getOffset((const char *)workspaceData);
+
+    cl_int err;
+
+    CoclDnnGeometryType columnsNumElements = getColumnsNumElements(
+        handle, gradInputDesc, filterDesc, convDesc, gradOutputDesc);
+    size_t columnsOffset = workspaceOffset;
+
+    size_t input3dSize = gradInputDesc->C * gradInputDesc->H * gradInputDesc->W;
+    size_t output3dSize = gradOutputDesc->C * gradOutputDesc->H * gradOutputDesc->W;
+    CoclDnnGeometryType batchSize = gradOutputDesc->N;
+    for(CoclDnnGeometryType elt = 0; elt < batchSize; elt++) {
+        size_t input3dOffsetBytes = gradInputOffset + elt * input3dSize * sizeof(float);
+        size_t output3dOffsetBytes = gradOutputOffset + elt * output3dSize * sizeof(float);
+
+        CoclDnnGeometryType nInputPlane = gradInputDesc->C;
+        CoclDnnGeometryType inputHeight = gradInputDesc->H;
+        CoclDnnGeometryType inputWidth = gradInputDesc->W;
+
+        CoclDnnGeometryType nOutputPlane = gradOutputDesc->C;
+        CoclDnnGeometryType outputHeight = gradOutputDesc->H;
+        CoclDnnGeometryType outputWidth = gradOutputDesc->W;
+
+        CoclDnnGeometryType kH = filterDesc->kH;
+        CoclDnnGeometryType kW = filterDesc->kW;
+        CoclDnnGeometryType padH = convDesc->padH;
+        CoclDnnGeometryType padW = convDesc->padW;
+        CoclDnnGeometryType dH = convDesc->dH;
+        CoclDnnGeometryType dW = convDesc->dW;
+        im2col(
+            gradOutputMemory->clmem, output3dOffsetBytes,
+            nOutputPlane, outputHeight, outputWidth, kH, kW, padH, padW, dH, dW,
+            workspaceMemory->clmem, columnsOffset
+        );
+
+        CoclDnnGeometryType m = nOutputPlane; // weight->size[0]; //nOutputPlane
+        CoclDnnGeometryType n = outputHeight * outputWidth; // columns->size[1];
+        CoclDnnGeometryType k = nInputPlane * kH * kW; // weight->size[1];
+
+        // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
+        StatusCode status = CLBlastSgemm(kColMajor, kNo, kNo,
+                                       n, m, k,
+                                       1.0f,
+                                       workspaceMemory->clmem, columnsOffset / sizeof(float), n,
+                                       filterMemory->clmem, filterOffset / sizeof(float), k,
+                                       0.0f,
+                                       gradInputMemory->clmem, input3dOffsetBytes / sizeof(float), n,
+                                       &v->currentContext->default_stream.get()->clqueue->queue, 0);
+        if(status != 0) {
+            cout << "sgemm status code " << status << endl;
+            throw runtime_error("Failed call to blas sgem");
+        }
+    }
+    return 0;
 }
 
 // Kernel for fast unfold+copy
