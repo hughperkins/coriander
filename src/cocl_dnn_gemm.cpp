@@ -240,21 +240,13 @@ size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
     // Resize temporary columns
     // THClTensor_resize2d(state, gradColumns, nOutputPlane*kW*kH, inputHeight*inputWidth);
 
-    CoclDnnGeometryType outH = gradOutputDesc->H;
-    CoclDnnGeometryType outW = gradOutputDesc->W;
     CoclDnnGeometryType outC = gradOutputDesc->C;
+
+    CoclDnnGeometryType inH = gradInputDesc->H;
+    CoclDnnGeometryType inW = gradInputDesc->W;
 
     CoclDnnGeometryType kH = filterDesc->kH;
     CoclDnnGeometryType kW = filterDesc->kW;
-
-    CoclDnnGeometryType dH = convDesc->dH;
-    CoclDnnGeometryType dW = convDesc->dW;
-
-    CoclDnnGeometryType padH = convDesc->padH;
-    CoclDnnGeometryType padW = convDesc->padW;
-
-    CoclDnnGeometryType inH = (outH - 1) * dH - 2 * padH + kH;
-    CoclDnnGeometryType inW = (outW - 1) * dW - 2 * padW + kW;
 
     CoclDnnGeometryType rows = outC * kW * kH;
     CoclDnnGeometryType cols = inH * inW;

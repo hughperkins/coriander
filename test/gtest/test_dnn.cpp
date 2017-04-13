@@ -724,6 +724,11 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
         dH, dW,
         1, 1,
         CUDNN_CROSS_CORRELATION);
+    cudnnSetTensor4dDescriptor(
+        gradInputDesc,
+        CUDNN_TENSOR_NCHW,
+        CUDNN_DATA_FLOAT,
+        N, inC, inH, inW);
 
     size_t forwardWorkspaceSizeBytes = 0;
     size_t backwardDataWorkspaceSizeBytes = 0;
@@ -755,8 +760,8 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
     size_t inputOffsetBytes = 0;
     size_t filterOffsetBytes = inputOffsetBytes + inLinearSize * sizeof(float);
     size_t outputOffsetBytes = filterOffsetBytes + filterLinearSize * sizeof(float);
-    size_t workspaceOffsetBytes = outputOffsetBytes + outLinearSize * sizeof(float);
-    size_t gradInputOffsetBytes = workspaceOffsetBytes + workspaceSizeBytes * sizeof(float);
+    size_t gradInputOffsetBytes = outputOffsetBytes + outLinearSize * sizeof(float);
+    size_t workspaceOffsetBytes = gradInputOffsetBytes + inLinearSize * sizeof(float);
 
     size_t gpuMemoryAllocSize = (inLinearSize + filterLinearSize + outLinearSize) * sizeof(float) + workspaceSizeBytes;
     cout << "gpuMemoryAllocSize=" << gpuMemoryAllocSize << endl;
@@ -836,14 +841,17 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
     cudnnDestroyConvolutionDescriptor(convDesc);
     cudnnDestroyTensorDescriptor(inputDesc);
     cudnnDestroyTensorDescriptor(outputDesc);
+    cudnnDestroyTensorDescriptor(gradInputDesc);
     cudnnDestroy(dnn_handle);
 
     delete gpuMemory;
     delete[] gpuOutHostside;
+    delete[] gpuGradInputHostside;
 
     delete[] outImages;
     delete[] filters;
     delete[] inImages;
+    delete[] gradInImages;
 }
 
 } // namespace
