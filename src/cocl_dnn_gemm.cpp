@@ -197,6 +197,15 @@ size_t cudnnConvolutionForward(
         CoclDnnGeometryType padW = convDesc->padW;
         CoclDnnGeometryType dH = convDesc->dH;
         CoclDnnGeometryType dW = convDesc->dW;
+
+        // from torch SpatialConvolutionMM.cu:
+        // // Extract columns:
+        // im2col(
+        //   THCState_getCurrentStream(state),
+        //   THCudaTensor_data(state, input_n),
+        //   nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
+        //   1, 1, THCudaTensor_data(state, columns)
+        // );
         im2col(
             inputMemory->clmem, input3dOffsetBytes,
             nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
@@ -206,6 +215,25 @@ size_t cudnnConvolutionForward(
         CoclDnnGeometryType nOutputPlane = outputDesc->C;
         CoclDnnGeometryType outputHeight = outputDesc->H;
         CoclDnnGeometryType outputWidth = outputDesc->W;
+
+        // from torch SpatialConvolutionMM.cu:
+        // // M,N,K are dims of matrix A and B
+        // // (see http://docs.nvidia.com/cuda/cublas/#cublas-lt-t-gt-gemm)
+        // long m = nOutputPlane;
+        // long n = columns->size[1];
+        // long k = nInputPlane*kH*kW;
+
+        // // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
+        // THCudaBlas_Sgemm(
+        //     state,
+        //     'n', 'n',
+        //     n, m, k,
+        //     1,
+        //     THCudaTensor_data(state, columns), n,
+        //     THCudaTensor_data(state, weight), k,
+        //     1,
+        //     THCudaTensor_data(state, output_n), n
+        // );
 
         CoclDnnGeometryType m = nOutputPlane; // weight->size[0]; //nOutputPlane
         CoclDnnGeometryType n = outputHeight * outputWidth; // columns->size[1];
@@ -319,8 +347,10 @@ size_t cudnnConvolutionBackwardData(
 
     CoclDnnGeometryType kH = filterDesc->kH;
     CoclDnnGeometryType kW = filterDesc->kW;
+
     CoclDnnGeometryType padH = convDesc->padH;
     CoclDnnGeometryType padW = convDesc->padW;
+
     CoclDnnGeometryType dH = convDesc->dH;
     CoclDnnGeometryType dW = convDesc->dW;
 
@@ -329,6 +359,9 @@ size_t cudnnConvolutionBackwardData(
         handle, gradInputDesc, filterDesc, convDesc, gradOutputDesc);
     size_t columnsOffset = workspaceOffset;
 
+    // from torch cunn SpatialConvolutionMM.cu:
+    // THCudaTensor_resize2d(state, gradColumns, nInputPlane*kW*kH, outputHeight*outputWidth);
+
     size_t input3dSize = inC * inH * inW;
     size_t output3dSize = outC * outH * outW;
     CoclDnnGeometryType batchSize = gradOutputDesc->N;
@@ -336,56 +369,55 @@ size_t cudnnConvolutionBackwardData(
         size_t gradInput3dOffsetBytes = gradInputOffset + elt * input3dSize * sizeof(float);
         size_t gradOutput3dOffsetBytes = gradOutputOffset + elt * output3dSize * sizeof(float);
 
-        // from torch:
-        // // Extract columns:
-        // im2col(
-        //   state,
-        //   //THClState_getCurrentStream(state),
-        //   gradOutput_n,
-        //   nOutputPlane, outputHeight, outputWidth, kH, kW, padH, padW, dH, dW,
-        //   gradColumns
-        // );
-        im2col(
-            gradOutputMemory->clmem, gradOutput3dOffsetBytes,
-            outC, outH, outW, kH, kW, padH, padW, dH, dW,
-            workspaceMemory->clmem, columnsOffset
-        );
-
-        // from torch:
+        // from torch cunn SpatialConvolutionMM.cu:
         // // M,N,K are dims of matrix A and B
-        // // (see http://docs.nvidia.com/cuda/clblas/#clblas-lt-t-gt-gemm)
-        // long m = weight->size[0];
+        // // (see http://docs.nvidia.com/cuda/cublas/#cublas-lt-t-gt-gemm)
+        // long m = nInputPlane*kW*kH;
         // long n = gradColumns->size[1];
-        // long k = weight->size[1] * weight->size[2] * weight->size[3];
+        // long k = nOutputPlane;
+
         // // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
-        // THClBlas_gemm(
+        // THCudaBlas_Sgemm(
         //     state,
-        //     'n', 'n',
+        //     'n', 't',
         //     n, m, k,
         //     1,
-        //     gradColumns, n,
-        //     weight, k,
+        //     THCudaTensor_data(state, gradOutput_n), n,
+        //     THCudaTensor_data(state, weight), m,
         //     0,
-        //     gradInput_n, n
+        //     THCudaTensor_data(state, gradColumns), n
         // );
 
-        CoclDnnGeometryType m = inC * kH * kW; // weight->size[1];
-        CoclDnnGeometryType n = inH * inW; // columns->size[1];
-        CoclDnnGeometryType k = outC; // weight->size[0]; //nOutputPlane
+        CoclDnnGeometryType m = inC * kH * kW; // nInputPlane*kW*kH;
+        CoclDnnGeometryType n = outH * outW; // columns->size[1] = outputHeight*outputWidth;
+        CoclDnnGeometryType k = outC; // nOutputPlane;
 
-        // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
-        StatusCode status = CLBlastSgemm(kColMajor, kNo, kNo,
+        StatusCode status = CLBlastSgemm(kColMajor, kNo, kYes,
                                        n, m, k,
                                        1.0f,
-                                       workspaceMemory->clmem, columnsOffset / sizeof(float), n,
-                                       filterMemory->clmem, filterOffset / sizeof(float), k,
+                                       gradOutputMemory->clmem, gradOutput3dOffsetBytes / sizeof(float), n,
+                                       filterMemory->clmem, filterOffset / sizeof(float), m,
                                        0.0f,
-                                       gradInputMemory->clmem, gradInput3dOffsetBytes / sizeof(float), n,
+                                       workspaceMemory->clmem, columnsOffset / sizeof(float), n,
                                        &v->currentContext->default_stream.get()->clqueue->queue, 0);
         if(status != 0) {
             cout << "sgemm status code " << status << endl;
             throw runtime_error("Failed call to blas sgem");
         }
+
+        // from torch cunn SpatialConvolutionMM.cu:
+        // // Unpack columns back into input:
+        // col2im(
+        //   THCState_getCurrentStream(state),
+        //   THCudaTensor_data(state, gradColumns),
+        //   nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
+        //   1, 1, THCudaTensor_data(state, gradInput_n)
+        // );
+        col2im(
+            workspaceMemory->clmem, columnsOffset,
+            inC, inH, inW, kH, kW, padH, padW, dH, dW,
+            gradInputMemory->clmem, gradInput3dOffsetBytes
+        );
     }
     return 0;
 }
@@ -439,6 +471,9 @@ size_t cudnnConvolutionBackwardFilter(
         handle, inputDesc, filterDesc, convDesc, gradOutputDesc);
     size_t columnsOffset = workspaceOffset;
 
+    // from torch cunn SpatialConvolutionMM.cu:
+    // THCudaTensor_resize2d(state, columns, nInputPlane*kW*kH, outputHeight*outputWidth);
+
     size_t input3dSize = inC * inH * inW;
     size_t output3dSize = outC * outH * outW;
     CoclDnnGeometryType batchSize = gradOutputDesc->N;
@@ -446,47 +481,48 @@ size_t cudnnConvolutionBackwardFilter(
         size_t input3dOffsetBytes = inputOffset + elt * input3dSize * sizeof(float);
         size_t gradOutput3dOffsetBytes = gradOutputOffset + elt * output3dSize * sizeof(float);
 
-        // from torch:
+        // from torch cunn SpatialConvolutionMM.cu:
         // // Extract columns:
         // im2col(
-        //   state,
-        //   //THClState_getCurrentStream(state),
-        //   gradOutput_n,
-        //   nOutputPlane, outputHeight, outputWidth, kH, kW, padH, padW, dH, dW,
-        //   columns
+        //   THCState_getCurrentStream(state),
+        //   THCudaTensor_data(state, input_n),
+        //   nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
+        //   1, 1, THCudaTensor_data(state, columns)
         // );
         im2col(
-            gradOutputMemory->clmem, gradOutput3dOffsetBytes,
-            outC, outH, outW, kH, kW, padH, padW, dH, dW,
+            inputMemory->clmem, input3dOffsetBytes,
+            inC, inH, inW, kH, kW, padH, padW, dH, dW,
             workspaceMemory->clmem, columnsOffset
         );
 
-        // from torch:
+        // from torch cunn SpatialConvolutionMM.cu:
         // // M,N,K are dims of matrix A and B
-        // // (see http://docs.nvidia.com/cuda/clblas/#clblas-lt-t-gt-gemm)
-        // long n = columns->size[0];   // nOutputPlane * kh * kw
-        // long m = input_n->size[0];   // nInputPlane
-        // long k = columns->size[1];   // inputHeight * inputWidth
+        // // (see http://docs.nvidia.com/cuda/cublas/#cublas-lt-t-gt-gemm)
+        // long m = nOutputPlane;
+        // long n = nInputPlane*kW*kH;
+        // long k = columns->size[1];
+
         // // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
-        // THClBlas_gemm(
+        // THCudaBlas_Sgemm(
         //     state,
         //     't', 'n',
         //     n, m, k,
         //     scale,
-        //     columns, k,
-        //     input_n, k,
+        //     THCudaTensor_data(state, columns), k,
+        //     THCudaTensor_data(state, gradOutput_n), k,
         //     1,
-        //     gradWeight, n
+        //     THCudaTensor_data(state, gradWeight), n
         // );
-        CoclDnnGeometryType n = outC * kH * kW;   // nOutputPlane * kh * kw
-        CoclDnnGeometryType m = inC;   // nInputPlane
-        CoclDnnGeometryType k = inH * inW;   // inputHeight * inputWidth
+
+        CoclDnnGeometryType m = outC;   // nOutputPlane;
+        CoclDnnGeometryType n = inC * kW * kH;   // nInputPlane*kW*kH;
+        CoclDnnGeometryType k = outH * outW;   // columns->size[1] = outputHeight*outputWidth
 
         StatusCode status = CLBlastSgemm(kColMajor, kYes, kNo,
-                                       m, n, k,
+                                       n, m, k,
                                        1.0f,
-                                       workspaceMemory->clmem, columnsOffset / sizeof(float), n,
-                                       inputMemory->clmem, input3dOffsetBytes / sizeof(float), k,
+                                       workspaceMemory->clmem, columnsOffset / sizeof(float), k,
+                                       gradOutputMemory->clmem, gradOutput3dOffsetBytes / sizeof(float), k,
                                        1.0f,
                                        gradFilterMemory->clmem, 0 / sizeof(float), n,
                                        &v->currentContext->default_stream.get()->clqueue->queue, 0);
