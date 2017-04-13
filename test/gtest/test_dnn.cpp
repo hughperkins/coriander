@@ -658,11 +658,11 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
     int dH = 1;
     int dW = 1;
 
-    // N = 1;
-    // inC = 1;
-    // outC = 1;
-    // inH = 3;
-    // inW = 3;
+    N = 1;
+    inC = 1;
+    outC = 1;
+    inH = 3;
+    inW = 3;
 
     int outH = (inH + 2 * padH - kH) / dH + 1;
     int outW = (inW + 2 * padW - kW) / dW + 1;

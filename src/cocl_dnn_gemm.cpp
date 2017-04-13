@@ -310,15 +310,43 @@ size_t cudnnConvolutionBackwardData(
         CoclDnnGeometryType padW = convDesc->padW;
         CoclDnnGeometryType dH = convDesc->dH;
         CoclDnnGeometryType dW = convDesc->dW;
+
+        // from torch/cltorch:
+        // // Extract columns:
+        // im2col(
+        //   state,
+        //   //THClState_getCurrentStream(state),
+        //   gradOutput_n,
+        //   nOutputPlane, outputHeight, outputWidth, kH, kW, padH, padW, dH, dW,
+        //   gradColumns
+        // );
         im2col(
             gradOutputMemory->clmem, output3dOffsetBytes,
             nOutputPlane, outputHeight, outputWidth, kH, kW, padH, padW, dH, dW,
             workspaceMemory->clmem, columnsOffset
         );
 
-        CoclDnnGeometryType m = nOutputPlane; // weight->size[0]; //nOutputPlane
-        CoclDnnGeometryType n = outputHeight * outputWidth; // columns->size[1];
-        CoclDnnGeometryType k = nInputPlane * kH * kW; // weight->size[1];
+        // from torch/cltorch:
+        // // M,N,K are dims of matrix A and B
+        // // (see http://docs.nvidia.com/cuda/clblas/#clblas-lt-t-gt-gemm)
+        // long m = weight->size[0];
+        // long n = gradColumns->size[1];
+        // long k = weight->size[1] * weight->size[2] * weight->size[3];
+        // // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
+        // THClBlas_gemm(
+        //     state,
+        //     'n', 'n',
+        //     n, m, k,
+        //     1,
+        //     gradColumns, n,
+        //     weight, k,
+        //     0,
+        //     gradInput_n, n
+        // );
+
+        CoclDnnGeometryType m = nInputPlane * kH * kW; // weight->size[1];
+        CoclDnnGeometryType n = inputHeight * inputWidth; // columns->size[1];
+        CoclDnnGeometryType k = nOutputPlane; // weight->size[0]; //nOutputPlane
 
         // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
         StatusCode status = CLBlastSgemm(kColMajor, kNo, kNo,
