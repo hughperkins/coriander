@@ -43,17 +43,14 @@ namespace cocl {
 }
 
 size_t cublasCreate(cublasHandle_t *phandle) {
-    // cout << "cublasCreate redirect 3" << endl;
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getContext()->getCl();
-    // cl_context *ctx = cl->context;
     CoclBlas *coclBlas = new CoclBlas(cl);
     *phandle = (cublasHandle_t)coclBlas;
     return 0;
 }
 
 std::size_t cublasDestroy(cublasHandle_t handle) {
-    // cout << "cublasDestroy redirect" << endl;
     cout << "clearing clblast cache..." << endl;
     clblast::CacheClearAll();
     cout << "... cache cleared" << endl;
@@ -64,7 +61,6 @@ std::size_t cublasDestroy(cublasHandle_t handle) {
 
 static Transpose trans_cutocl(int trans) {
     if(trans == CUBLAS_OP_N) {
-        // cout << "trans no" << endl;
         return kNo;
     } else if(trans == CUBLAS_OP_Y) {
         return kYes;
@@ -77,11 +73,8 @@ static Transpose trans_cutocl(int trans) {
 }
 
 std::size_t cublasSetPointerMode(cublasHandle_t handle, cublasPointerMode_t mode) {
-    // cout << "cublasSetPointerMode redirect" << endl;
     if(mode == CUBLAS_POINTER_MODE_HOST) {
-        // cout << "set to host" << endl;
     } else if(mode == CUBLAS_POINTER_MODE_DEVICE) {
-        // cout << "set to device`" << endl;
     } else {
         cout << "unknown pointermode " << mode << endl;
         // since we do nothing with this mode currently, not really an error as such...
@@ -90,71 +83,120 @@ std::size_t cublasSetPointerMode(cublasHandle_t handle, cublasPointerMode_t mode
 }
 
 std::size_t cublasGetPointerMode(cublasHandle_t handle, cublasPointerMode_t *mode) {
-    // cout << "cublasGetPointerMode redirect" << endl;
     *mode = ::pointermode;
     return 0;
 }
 
 std::size_t cublasSetStream(cublasHandle_t handle, cudaStream_t streamId) {
-    // cout << "cublasSetStream redirect" << endl;
     ThreadVars *v = getThreadVars();
     CoclBlas *coclBlas = (CoclBlas *)handle;
     CoclStream *coclStream = (CoclStream *)streamId;
     if(coclStream == 0) {
-        // cout << "using dfeault queue" << endl;
         coclStream = v->getContext()->default_stream.get();
     }
     CLQueue *queue = coclStream->clqueue;
-    // CLQueue *queue = (CLQueue *)streamId;
     coclBlas->queue = queue;
     return 0;
 }
 
+// IMPORTANT: note that CLBlast offsets are in floats (cf bytes, for clmem offsets, in general)
+
 std::size_t cublasSgemm(cublasHandle_t blas, int transA, int transB, int M, int N, int K,
-     float *palpha, const float * deviceA, int lda, const float * deviceB, int ldb, float *pbeta, float * deviceC, int ldc) {
-    // cout << "sgemm redirect" << endl;
+     float *p_alpha, const float * ADevice, int lda, const float * BDevice, int ldb, float *p_beta, float * CDevice, int ldc) {
 
     CoclBlas *coclBlas = (CoclBlas *)blas;
 
-    Memory *AMemory = findMemory((const char *)deviceA);
-    // note that CLBlast offsets are in floats (cf bytes, for clmem offsets, in general)
-    size_t A_offset = AMemory->getOffset((const char *)deviceA) >> 2;
+    Memory *AMemory = findMemory((const char *)ADevice);
+    size_t A_offset = AMemory->getOffset((const char *)ADevice) >> 2;
 
-    Memory *BMemory = findMemory((const char *)deviceB);
-    size_t B_offset = BMemory->getOffset((const char *)deviceB) >> 2;
+    Memory *BMemory = findMemory((const char *)BDevice);
+    size_t B_offset = BMemory->getOffset((const char *)BDevice) >> 2;
 
-    Memory *CMemory = findMemory((const char *)deviceC);
-    size_t C_offset = CMemory->getOffset((const char *)deviceC) >> 2;
-    // cout << "offsets " << A_offset << " " << B_offset << " " << C_offset << endl;
-    // cout << "sizes " << AMemory->bytes<< " " << BMemory->bytes << " " << CMemory->bytes << endl;
+    Memory *CMemory = findMemory((const char *)CDevice);
+    size_t C_offset = CMemory->getOffset((const char *)CDevice) >> 2;
 
     Transpose transAcl = trans_cutocl(transA);
     Transpose transBcl = trans_cutocl(transB);
 
-    // cout << "run sgemm on queue " << (void *)coclBlas->queue->queue << " " << (void *)coclBlas->queue << endl;
     StatusCode status = CLBlastSgemm(kColMajor, transAcl, transBcl,
                                    M, N, K,
-                                   *palpha,
+                                   *p_alpha,
                                    AMemory->clmem, A_offset, lda,
                                    BMemory->clmem, B_offset, ldb,
-                                   *pbeta,
+                                   *p_beta,
                                    CMemory->clmem, C_offset, ldc,
                                    &coclBlas->queue->queue, 0);
     if(status != 0) {
         cout << "sgemm status code " << status << endl;
-        throw runtime_error("Failed call to blas sgem");
+        throw runtime_error("Failed call to blas sgemm");
     }
     return 0;
 }
 
-std::size_t cublasSaxpy(cublasHandle_t blas, int n, const float *p_alpha, const float *x, int incx, float *y, int incy) {
-    throw runtime_error("not implemented");
-}
-std::size_t cublasSscal(cublasHandle_t blas, int n, const float *alpha, float *x, int incx) {
-    throw runtime_error("not implemented");
-}
 std::size_t cublasSgemv(
-    cublasHandle_t blas, int trans, int m, int n, const float *p_alpha, const float *A, int lda,
-    const float *x, int incx, const float *beta, float *p_y, int incy) {
-    throw runtime_error("not implemented");
+    cublasHandle_t blas, int transA, int M, int N, const float *p_alpha, const float *ADevice, int lda,
+    const float *xDevice, int incx, const float *p_beta, float *yDevice, int incy) {
+
+    CoclBlas *coclBlas = (CoclBlas *)blas;
+
+    Memory *AMemory = findMemory((const char *)ADevice);
+    size_t AOffset = AMemory->getOffset((const char *)ADevice) >> 2;
+
+    Memory *xMemory = findMemory((const char *)xDevice);
+    size_t xOffset = xMemory->getOffset((const char *)xDevice) >> 2;
+
+    Memory *yMemory = findMemory((const char *)yDevice);
+    size_t yOffset = yMemory->getOffset((const char *)yDevice) >> 2;
+
+    Transpose transAcl = trans_cutocl(transA);
+
+    StatusCode status = CLBlastSgemv(kColMajor, transAcl,
+                                     M, N,
+                                     *p_alpha,
+                                     AMemory->clmem, AOffset, lda,
+                                     xMemory->clmem, xOffset, incx,
+                                     *p_beta,
+                                     yMemory->clmem, yOffset, incy,
+                                     &coclBlas->queue->queue, 0);
+    if(status != 0) {
+        cout << "sgemv status code " << status << endl;
+        throw runtime_error("Failed call to blas sgemv");
+    }
+    return 0;
+}
+
+std::size_t cublasSaxpy(
+        cublasHandle_t blas, int n, const float *p_alpha, const float *xDevice, int incx, float *yDevice, int incy) {
+    CoclBlas *coclBlas = (CoclBlas *)blas;
+
+    Memory *xMemory = findMemory((const char *)xDevice);
+    size_t xOffset = xMemory->getOffset((const char *)xDevice) >> 2;
+
+    Memory *yMemory = findMemory((const char *)yDevice);
+    size_t yOffset = yMemory->getOffset((const char *)yDevice) >> 2;
+
+    StatusCode status = CLBlastSaxpy(n, *p_alpha,
+                                      xMemory->clmem, xOffset, incx,
+                                      yMemory->clmem, yOffset, incy,
+                                      &coclBlas->queue->queue, 0);
+    if(status != 0) {
+        cout << "saxpy status code " << status << endl;
+        throw runtime_error("Failed call to blas saxpy");
+    }
+    return 0;
+}
+
+std::size_t cublasSscal(cublasHandle_t blas, int n, const float *p_alpha, float *xDevice, int incx) {
+    CoclBlas *coclBlas = (CoclBlas *)blas;
+
+    Memory *xMemory = findMemory((const char *)xDevice);
+    size_t xOffset = xMemory->getOffset((const char *)xDevice) >> 2;
+
+    StatusCode status = CLBlastSscal(n, *p_alpha, xMemory->clmem, xOffset, incx,
+                                     &coclBlas->queue->queue, 0);
+    if(status != 0) {
+        cout << "sscal status code " << status << endl;
+        throw runtime_error("Failed call to blas sscal");
+    }
+    return 0;
 }
