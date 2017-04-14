@@ -448,33 +448,15 @@ void conv_backward_bias_cpu(
 
     for(int outc = 0; outc < outC; outc++) {
         float thisBiasChange = 0;
-        for(int inc = 0; inc < inC; inc++) {
-            for(int kh = 0; kh < kH; kh++) {
-                for(int kw = 0; kw < kW; kw++) {
-                    int weightIndex = ((outc
-                        * inC + inc)
-                        * kH + kh)
-                        * kW + kw;
-                    for(int outh = 0; outh < outH; outh++) {
-                        int inh = outh * dH + kh - padH;
-                        if(inh < 0 || inh >= inH) {
-                            continue;
-                        }
-                        for(int outw = 0; outw < outW; outw++) {
-                            int inw = outw * dW + kw - padW;
-                            if(inw < 0 || inw >= inW) {
-                                continue;
-                            }
-                            for(int n = 0; n < N; n++) {
-                                int outputIndex = ((n
-                                    * outC + outc)
-                                    * outH + outh)
-                                    * outW + outw;
-                                float gradOutputValue = gradOutput[outputIndex];
-                                thisBiasChange += gradOutputValue; // fairly sure this is right.  Fairly :-P
-                            }
-                        }
-                    }
+        for(int n = 0; n < N; n++) {
+            for(int outh = 0; outh < outH; outh++) {
+                for(int outw = 0; outw < outW; outw++) {
+                    int outputIndex = ((n
+                        * outC + outc)
+                        * outH + outh)
+                        * outW + outw;
+                    float gradOutputValue = gradOutput[outputIndex];
+                    thisBiasChange += gradOutputValue;
                 }
             }
         }
@@ -1270,7 +1252,7 @@ TEST(test_dnn, simple_gpu_conv_backward_filters) {
     }
     for(int outc = 0; outc < outC; outc++) {
         cout << "gradBias[" << outc << "] cpu=" << gradBias[outc] << " gpus=" << gpuGradBiasHostside[outc] <<  endl;
-        if(abs(gradBias[outc] - gpuGradBiasHostside[outc]) > 1e-4) {
+        if(abs(gradBias[outc] - gpuGradBiasHostside[outc]) > 1e-4 * outH * outW) {
             allOk = false;
             cout << "    MISMATCH" << endl;
         }

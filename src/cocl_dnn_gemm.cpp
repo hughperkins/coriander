@@ -26,6 +26,7 @@ namespace gemm_im2col {
 
 static string get_im2col_sourcecode();
 static string get_col2im_sourcecode();
+static string get_slowstupidreduce_sourcecode();
 
 CoclDnnGeometryType getColumnsNumElements(
         cudnnHandle_t handle,
@@ -558,7 +559,58 @@ size_t cudnnConvolutionBackwardBias(
     float *p_beta,
     cudnnTensorDescriptor_t gradBiasDesc, float *gradBiasData
 ) {
-    throw runtime_error("cudnnConvolutionBackwardBias not implemented");
+    // this is actually challenging, since we seem to have no workspace???
+    // some ideas:
+    // - just do some stupid slow kernel for now
+    // - use some third-party library (but it needs alloc presumably?)
+    // - create our own workspace... (but... threading? etc ...)
+    // - maybe there is some way of getting some workspace?
+    // I might just go with some slow stupid kernel for now...
+
+    ThreadVars *v = getThreadVars();
+
+    Memory *gradOutputMemory = findMemory((const char *)gradOutputData);
+    Memory *gradBiasMemory = findMemory((const char *)gradBiasData);
+
+    size_t gradOutputOffset = gradOutputMemory->getOffset((const char *)gradOutputData);
+    size_t gradBiasOffset = gradBiasMemory->getOffset((const char *)gradBiasData);
+
+    CoclDnnGeometryType batchSize = gradOutputDesc->N;
+    CoclDnnGeometryType outC = gradOutputDesc->C;
+    CoclDnnGeometryType outH = gradOutputDesc->H;
+    CoclDnnGeometryType outW = gradOutputDesc->W;
+
+    size_t output3dSize = outC * outH * outW;
+
+    cl_int err;
+
+    int biasSize = outC;
+    cl_float value = 0.0f;
+    err = clEnqueueFillBuffer(
+        v->currentContext->default_stream.get()->clqueue->queue,
+        gradBiasMemory->clmem,
+        &value, sizeof(float),
+        gradBiasOffset, biasSize * sizeof(float),
+        0, 0, 0);
+    easycl::EasyCL::checkError(err);
+
+    easycl::CLKernel *kernel = getKernelForNameCl("slowstupidreduce", get_slowstupidreduce_sourcecode());
+    for(int elt=0; elt < batchSize; elt++) {
+        int gradOutputCubeOffset = gradOutputOffset + elt * output3dSize * sizeof(float);
+
+        kernel->inout(&gradOutputMemory->clmem);
+        kernel->in((int32_t)(gradOutputCubeOffset / sizeof(float)));
+
+        // kernel->in((int32_t)elt);
+        kernel->in((int32_t)outC);
+        kernel->in((int32_t)(outH * outW));
+        kernel->inout(&gradBiasMemory->clmem);
+        kernel->in((int32_t)(gradBiasOffset / sizeof(float)));
+
+        int workgroupSize = getNumThreads();
+        int globalSize = GET_BLOCKS(outC) * workgroupSize;
+        kernel->run_1d(&v->currentContext->default_stream.get()->clqueue->queue, globalSize, workgroupSize);
+    }
 }
 
 // Kernel for fast unfold+copy
@@ -647,6 +699,45 @@ kernel void col2im_kernel(const int n, global const float* col_data, int col_off
       }
     }
     data_im[index] = val;
+  }
+}
+)";
+}
+
+string get_slowstupidreduce_sourcecode() {
+    // assumes NCHW layout
+    // and we'll do one image at a time, since that cant be any slower than the actual convolve bit
+    // (can it?)
+    // so, inputs:
+    // - one single cube of gradOutput, ie for specific n
+    // - outC
+    // - outH * outW
+    // bias zerod appropriately, and we just add to it
+
+    return R"(
+// CL: grid stride looping
+#define CL_KERNEL_LOOP(i, n)                        \
+  for (int i = get_group_id(0) * get_local_size(0) + get_local_id(0); \
+      i < (n);                                       \
+      i += get_local_size(0) * get_num_groups(0))
+
+kernel void slowstupidreduce(
+        const global float *gradOutput_data, const int gradOutput_offset,
+        const int outC, const int outHW,
+        global float *gradBias_data, int gradBias_offset) {
+    const global float *gradOutput = gradOutput_data + gradOutput_offset;
+    global float *gradBias = gradBias_data + gradBias_offset;
+  CL_KERNEL_LOOP(outc, outC) {
+    if(outc < outC) {
+        float oldBias = gradBias[outc];
+        float bias = 0.0f;
+        int imageOffset = outc * outHW;
+        global const float *image = gradOutput + imageOffset;
+        for(int outhw = 0; outhw < outHW; outhw++) {
+            bias += image[outhw];
+        }
+        gradBias[outc] = oldBias + bias;
+    }
   }
 }
 )";
