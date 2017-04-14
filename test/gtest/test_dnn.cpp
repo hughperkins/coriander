@@ -196,7 +196,8 @@ TEST(test_dnn, simple_gpu_im2col) {
     cocl::dnn::gemm_im2col::im2col(
         gpuMemory->clmem, imagesOffsetBytes,
         C, inH, inW, kH, kW, padH, padW, dH, dW,
-        gpuMemory->clmem, colOffsetBytes
+        gpuMemory->clmem, colOffsetBytes,
+        &v->currentContext->default_stream.get()->clqueue->queue
     );
 
     float *gpuColHostside = new float[colSizeFloats];
@@ -238,7 +239,8 @@ TEST(test_dnn, simple_gpu_im2col) {
     cocl::dnn::gemm_im2col::col2im(
         gpuMemory2->clmem, colOffsetBytes,
         C, inH, inW, kH, kW, padH, padW, dH, dW,
-        gpuMemory2->clmem, imagesOffsetBytes
+        gpuMemory2->clmem, imagesOffsetBytes,
+        &v->currentContext->default_stream.get()->clqueue->queue
     );
 
     float *gpuImHostside = new float[imagesSizeFloats];
@@ -745,12 +747,12 @@ TEST(test_dnn, simple_gpu_conv) {
         &beta,
         outputDesc, gpuDeviceOutput
     );
-    cl->finish();
 
     float *gpuOutHostside = new float[outLinearSize];
     err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, outputOffsetBytes,
                                      (outLinearSize) * sizeof(float), gpuOutHostside, 0, NULL, NULL);
     EasyCL::checkError(err);
+    cl->finish();
 
     const int numSamples = 20;
     int *sampleIndices = new int[numSamples];
@@ -911,8 +913,8 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
     float *gpuDeviceInput = (float *)(((char *)gpuMemory->fakePos + inputOffsetBytes));
     float *gpuDeviceFilter = (float *)(((char *)gpuMemory->fakePos + filterOffsetBytes));
     float *gpuDeviceOutput = (float *)(((char *)gpuMemory->fakePos + outputOffsetBytes));
-    float *gpuDeviceWorkspace = (float *)(((char *)gpuMemory->fakePos + workspaceOffsetBytes));
     float *gpuDeviceGradInput = (float *)(((char *)gpuMemory->fakePos + gradInputOffsetBytes));
+    float *gpuDeviceWorkspace = (float *)(((char *)gpuMemory->fakePos + workspaceOffsetBytes));
 
     cl_int err;
 
@@ -935,7 +937,7 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
         &beta,
         outputDesc, gpuDeviceOutput
     );
-    cl->finish();
+    // cl->finish();
 
     cocl::dnn::gemm_im2col::cudnnConvolutionBackwardData(
         dnn_handle,
@@ -949,19 +951,21 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
     );
     cl->finish();
 
-    float *gpuOutHostside = new float[outLinearSize];
-    err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, outputOffsetBytes,
-                                     (outLinearSize) * sizeof(float), gpuOutHostside, 0, NULL, NULL);
-    EasyCL::checkError(err);
+    // float *gpuOutHostside = new float[outLinearSize];
+    // err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, outputOffsetBytes,
+    //                                  (outLinearSize) * sizeof(float), gpuOutHostside, 0, NULL, NULL);
+    // EasyCL::checkError(err);
 
     float *gpuGradInputHostside = new float[inLinearSize];
     err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, gradInputOffsetBytes,
                                      (inLinearSize) * sizeof(float), gpuGradInputHostside, 0, NULL, NULL);
     EasyCL::checkError(err);
+    cl->finish();
 
     const int numSamples = 20;
     int *sampleIndices = new int[numSamples];
     fillRandomInt(random, sampleIndices, numSamples, 0, outLinearSize);
+    bool allOk = true;
     for(int i = 0; i < numSamples; i++) {
         int linearPos = sampleIndices[i];
         int n = linearPos / outC / outH / outW;
@@ -970,12 +974,16 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
         rem = rem - c * outH * outW;
         int outh = rem / outW;
         int outw = rem % outW;
-        cout << "n=" << n << " c=" << c << " outh=" << outh << " outw=" << outw << " outImages[" << linearPos << "]="
+        cout << "n=" << n << " c=" << c << " outh=" << outh << " outw=" << outw << " gradInImages[" << linearPos << "]="
             << gradInImages[linearPos] << " " << gpuGradInputHostside[linearPos] << endl;
         if(abs(gradInImages[linearPos] - gpuGradInputHostside[linearPos]) > 1e-4) {
-            throw runtime_error(string("test_dnn, output of conv backward data, mismatch for ") +
-                "n=" + toString(n) + " c=" + toString(c) + " outh=" + toString(outh) + " outw=" + toString(outw));
+            allOk = false;
+            cout << string("test_dnn, output of conv backward data, mismatch for ") +
+                "n=" + toString(n) + " c=" + toString(c) + " outh=" + toString(outh) + " outw=" + toString(outw) << endl;
         }
+    }
+    if(!allOk) {
+        throw runtime_error("FAILED");
     }
 
     cudnnDestroyFilterDescriptor(filterDesc);
@@ -986,7 +994,7 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
     cudnnDestroy(dnn_handle);
 
     delete gpuMemory;
-    delete[] gpuOutHostside;
+    // delete[] gpuOutHostside;
     delete[] gpuGradInputHostside;
 
     delete[] outImages;

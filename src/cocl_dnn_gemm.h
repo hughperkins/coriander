@@ -27,7 +27,8 @@ void im2col(
     const CoclDnnGeometryType pad_w,
     const CoclDnnGeometryType stride_h,
     const CoclDnnGeometryType stride_w,
-    cl_mem col_buf, size_t col_offset
+    cl_mem col_buf, size_t col_offset,
+    cl_command_queue *queue
 );
 
 void col2im(
@@ -41,7 +42,8 @@ void col2im(
     const CoclDnnGeometryType pad_w,
     const CoclDnnGeometryType stride_h,
     const CoclDnnGeometryType stride_w,
-    cl_mem im_buf, size_t im_offset_bytes
+    cl_mem im_buf, size_t im_offset_bytes,
+    cl_command_queue *queue
 );
 
 CoclDnnGeometryType getColumnsNumElements(

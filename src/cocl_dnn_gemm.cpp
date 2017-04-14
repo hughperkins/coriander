@@ -72,7 +72,8 @@ void im2col(cl_mem im_buf, size_t im_offset_bytes, const CoclDnnGeometryType cha
         const CoclDnnGeometryType pad_w,
         const CoclDnnGeometryType stride_h,
         const CoclDnnGeometryType stride_w,
-        cl_mem col_buf, size_t col_offset_bytes
+        cl_mem col_buf, size_t col_offset_bytes,
+        cl_command_queue *queue
         ) {
     // We are going to launch channels * height_col * width_col kernels, each
     // kernel responsible for copying a single-channel grid.
@@ -100,12 +101,13 @@ void im2col(cl_mem im_buf, size_t im_offset_bytes, const CoclDnnGeometryType cha
 
     int workgroupSize = getNumThreads();
     int globalSize = GET_BLOCKS(num_kernels) * workgroupSize;
-    kernel->run_1d(globalSize, workgroupSize);
+    kernel->run_1d(queue, globalSize, workgroupSize);
 }
 
 void col2im(cl_mem col_buf, size_t col_offset_bytes, const int channels,
         const int height, const int width, const int patch_h, const int patch_w, const int pad_h,
-        const int pad_w, const int stride_h, const int stride_w,  cl_mem im_buf, size_t im_offset_bytes) {
+        const int pad_w, const int stride_h, const int stride_w,  cl_mem im_buf, size_t im_offset_bytes,
+        cl_command_queue *queue) {
     int height_col = (height + 2 * pad_h - patch_h) / stride_h + 1;
     int width_col = (width + 2 * pad_w - patch_w) / stride_w + 1;
     int num_kernels = channels * height * width;
@@ -135,7 +137,7 @@ void col2im(cl_mem col_buf, size_t col_offset_bytes, const int channels,
 
     int workgroupSize = getNumThreads();
     int globalSize = GET_BLOCKS(num_kernels) * workgroupSize;
-    kernel->run_1d(globalSize, workgroupSize);
+    kernel->run_1d(queue, globalSize, workgroupSize);
 }
 
 size_t cudnnGetConvolutionForwardWorkspaceSize(
@@ -211,7 +213,8 @@ size_t cudnnConvolutionForward(
         im2col(
             inputMemory->clmem, input3dOffsetBytes,
             nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
-            workspaceMemory->clmem, columnsOffset
+            workspaceMemory->clmem, columnsOffset,
+            &v->currentContext->default_stream.get()->clqueue->queue
         );
 
         CoclDnnGeometryType nOutputPlane = outputDesc->C;
@@ -291,20 +294,19 @@ size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
     cudnnTensorDescriptor_t gradInputDesc,
     CoclDnnSizeType *p_size_bytes
 ) {
-    // from torch:
-    // Resize temporary columns
-    // THClTensor_resize2d(state, gradColumns, nOutputPlane*kW*kH, inputHeight*inputWidth);
+    // from torch cunn SpatialConvolutionMM.cu:
+    // THCudaTensor_resize2d(state, gradColumns, nInputPlane*kW*kH, outputHeight*outputWidth);
 
-    CoclDnnGeometryType outC = gradOutputDesc->C;
+    CoclDnnGeometryType inC = gradInputDesc->C;
 
-    CoclDnnGeometryType inH = gradInputDesc->H;
-    CoclDnnGeometryType inW = gradInputDesc->W;
+    CoclDnnGeometryType outH = gradOutputDesc->H;
+    CoclDnnGeometryType outW = gradOutputDesc->W;
 
     CoclDnnGeometryType kH = filterDesc->kH;
     CoclDnnGeometryType kW = filterDesc->kW;
 
-    CoclDnnGeometryType rows = outC * kW * kH;
-    CoclDnnGeometryType cols = inH * inW;
+    CoclDnnGeometryType rows = inC * kW * kH;
+    CoclDnnGeometryType cols = outH * outW;
 
     *p_size_bytes = rows * cols * sizeof(float);
     return 0;
@@ -356,13 +358,12 @@ size_t cudnnConvolutionBackwardData(
     CoclDnnGeometryType dH = convDesc->dH;
     CoclDnnGeometryType dW = convDesc->dW;
 
-
-    CoclDnnGeometryType columnsNumElements = getColumnsNumElements(
-        handle, gradInputDesc, filterDesc, convDesc, gradOutputDesc);
-    size_t columnsOffset = workspaceOffset;
-
     // from torch cunn SpatialConvolutionMM.cu:
     // THCudaTensor_resize2d(state, gradColumns, nInputPlane*kW*kH, outputHeight*outputWidth);
+    CoclDnnGeometryType columnsRows = inC * kW * kH;
+    CoclDnnGeometryType columnsCols = outH * outW;
+    CoclDnnGeometryType columnsNumElements = columnsRows * columnsCols;
+    size_t columnsOffset = workspaceOffset;
 
     size_t input3dSize = inC * inH * inW;
     size_t output3dSize = outC * outH * outW;
@@ -418,9 +419,11 @@ size_t cudnnConvolutionBackwardData(
         col2im(
             workspaceMemory->clmem, columnsOffset,
             inC, inH, inW, kH, kW, padH, padW, dH, dW,
-            gradInputMemory->clmem, gradInput3dOffsetBytes
+            gradInputMemory->clmem, gradInput3dOffsetBytes,
+            &v->currentContext->default_stream.get()->clqueue->queue
         );
     }
+    // v->getContext()->getCl()->finish();
     return 0;
 }
 size_t cudnnConvolutionBackwardFilter(
@@ -505,7 +508,8 @@ size_t cudnnConvolutionBackwardFilter(
         im2col(
             inputMemory->clmem, input3dOffsetBytes,
             inC, inH, inW, kH, kW, padH, padW, dH, dW,
-            workspaceMemory->clmem, columnsOffset
+            workspaceMemory->clmem, columnsOffset,
+            &v->currentContext->default_stream.get()->clqueue->queue
         );
 
         // from torch cunn SpatialConvolutionMM.cu:
