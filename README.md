@@ -262,7 +262,7 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 ## News
 
 - April 14:
-  - added backwards implementation for convolution, both data and filters (still needs bias backprop I think though)
+  - added backwards implementation for convolution, including data, filters, and bias
 - April 13:
   - added CLBlast wrappers for: segmv, sscal, saxpy
 - April 4:
