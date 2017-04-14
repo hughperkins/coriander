@@ -342,6 +342,7 @@ void conv_backward_data_cpu(
 
     int outH = (inH + 2 * padH - kH) / dH + 1;
     int outW = (inW + 2 * padW - kW) / dW + 1;
+    cout << "outH=" << outH << " outW=" << outW << endl;
 
     for(int n = 0; n < N; n++) {
         for(int inc = 0; inc < inC; inc++) {
@@ -354,18 +355,19 @@ void conv_backward_data_cpu(
                             for(int kw = 0; kw < kW; kw++) {
                                 int outh = (inh -kh + padH) / dH;
                                 int outw = (inw -kw + padW) / dW;
-
-                                int resultIndex = ((n
-                                    * outC + outc)
-                                    * outH + outh)
-                                    * outW + outw;
-                                float thisGradOutput = gradOutput[resultIndex];
-                                int thisWeightIndex = ((outc
-                                    * inC + inc)
-                                    * kH + kh)
-                                    * kW + kw;
-                                float thisWeight = filters[thisWeightIndex];
-                                sumWeightTimesGradOutput += thisWeight * thisGradOutput;
+                                if(outh >= 0 && outh < outH && outw >= 0 && outw < outW) {
+                                    int resultIndex = ((n
+                                        * outC + outc)
+                                        * outH + outh)
+                                        * outW + outw;
+                                    float thisGradOutput = gradOutput[resultIndex];
+                                    int thisWeightIndex = ((outc
+                                        * inC + inc)
+                                        * kH + kh)
+                                        * kW + kw;
+                                    float thisWeight = filters[thisWeightIndex];
+                                    sumWeightTimesGradOutput += thisWeight * thisGradOutput;
+                                }
                             }
                         }
                     }
@@ -487,6 +489,7 @@ TEST(test_dnn, simple_cpu_back_data) {
     int outC = 5;
     int inH = 5;
     int inW = 6;
+
     int kH = 3;
     int kW = 3;
     int padH = 1;
@@ -494,11 +497,11 @@ TEST(test_dnn, simple_cpu_back_data) {
     int dH = 1;
     int dW = 1;
 
-    // N = 1;
-    // inC = 1;
-    // outC = 1;
-    // inH = 3;
-    // inW = 3;
+    N = 1;
+    inC = 1;
+    outC = 1;
+    inH = 3;
+    inW = 3;
 
     int outH = (inH + 2 * padH - kH) / dH + 1;
     int outW = (inW + 2 * padW - kW) / dW + 1;
@@ -519,29 +522,29 @@ TEST(test_dnn, simple_cpu_back_data) {
     conv_forward_cpu(inImages, filters, N, inC, outC, inH, inW, kH, kW, padH, padW, dH, dW, outImages);
     conv_backward_data_cpu(outImages, filters, N, inC, outC, inH, inW, kH, kW, padH, padW, dH, dW, gradInImages);
 
-    // cout << "'gradOutput[0][0]':" << endl;
-    // for(int outh=0; outh < outH; outh++) {
-    //     for(int outw=0; outw < outW; outw++) {
-    //         cout << outImages[outh * outW + outw] << " ";
-    //     }
-    //     cout << endl;
-    // }
+    cout << "'gradOutput[0][0]':" << endl;
+    for(int outh=0; outh < outH; outh++) {
+        for(int outw=0; outw < outW; outw++) {
+            cout << outImages[outh * outW + outw] << " ";
+        }
+        cout << endl;
+    }
 
-    // cout << "'filters[0][0]':" << endl;
-    // for(int kh=0; kh < kH; kh++) {
-    //     for(int kw=0; kw < kW; kw++) {
-    //         cout << filters[kh * kW + kw] << " ";
-    //     }
-    //     cout << endl;
-    // }
+    cout << "'filters[0][0]':" << endl;
+    for(int kh=0; kh < kH; kh++) {
+        for(int kw=0; kw < kW; kw++) {
+            cout << filters[kh * kW + kw] << " ";
+        }
+        cout << endl;
+    }
 
-    // cout << "'gradInput[0][0]':" << endl;
-    // for(int inh=0; inh < inH; inh++) {
-    //     for(int inw=0; inw < inW; inw++) {
-    //         cout << inImages[inh * inW + inw] << " ";
-    //     }
-    //     cout << endl;
-    // }
+    cout << "'gradInput[0][0]':" << endl;
+    for(int inh=0; inh < inH; inh++) {
+        for(int inw=0; inw < inW; inw++) {
+            cout << gradInImages[inh * inW + inw] << " ";
+        }
+        cout << endl;
+    }
 
     const int numSamples = 20;
     int *sampleIndices = new int[numSamples];
