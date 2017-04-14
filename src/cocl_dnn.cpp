@@ -283,9 +283,6 @@ size_t cudnnAddTensor(
     float *p_beta,
     cudnnTensorDescriptor_t yDesc, float * yData
 ) {
-    // if(*p_alpha != 1) {
-    //     throw runtime_error("cudnnAddTensor only implemented for alpha == 1");
-    // }
     if(*p_beta != 1) {
         throw runtime_error("cudnnAddTensor only implemented for beta == 1");
     }
@@ -447,13 +444,18 @@ size_t cudnnActivationBackward(
 size_t cudnnConvolutionBackwardBias(
     cudnnHandle_t handle,
     float *p_alpha,
-    cudnnTensorDescriptor_t tensor1Desc,
-    float *tensor1,
+    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutputData,
     float *p_beta,
-    cudnnTensorDescriptor_t tensor2Desc,
-    float *tensor2
+    cudnnTensorDescriptor_t gradBiasDesc, float *gradBiasData
 ) {
-    throw runtime_error("not implemented");
+    cocl::dnn::gemm_im2col::cudnnConvolutionBackwardBias(
+        handle,
+        p_alpha,
+        gradOutputDesc, gradOutputData,
+        p_beta,
+        gradBiasDesc, gradBiasData
+    );
+    return 0;
 }
 
 size_t cudnnGetConvolutionForwardAlgorithm(

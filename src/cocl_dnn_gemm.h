@@ -109,6 +109,13 @@ size_t cudnnConvolutionBackwardFilter(
     float *p_beta,
     cudnnFilterDescriptor_t filterDesc, float *gradInput_data
 );
+size_t cudnnConvolutionBackwardBias(
+    cudnnHandle_t handle,
+    float *p_alpha,
+    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutputData,
+    float *p_beta,
+    cudnnTensorDescriptor_t gradBiasDesc, float *gradBiasData
+);
 
 } // namespace gemm_im2col
 } // namespace dnn

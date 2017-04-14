@@ -551,6 +551,15 @@ size_t cudnnConvolutionBackwardFilter(
     }
     return 0;
 }
+size_t cudnnConvolutionBackwardBias(
+    cudnnHandle_t handle,
+    float *p_alpha,
+    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutputData,
+    float *p_beta,
+    cudnnTensorDescriptor_t gradBiasDesc, float *gradBiasData
+) {
+    throw runtime_error("cudnnConvolutionBackwardBias not implemented");
+}
 
 // Kernel for fast unfold+copy
 // (borrowed from Caffe: https://github.com/BVLC/caffe/blob/master/src/caffe/layers/conv_layer.cu)
