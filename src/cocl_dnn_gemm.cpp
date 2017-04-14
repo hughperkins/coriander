@@ -518,13 +518,14 @@ size_t cudnnConvolutionBackwardFilter(
         CoclDnnGeometryType n = inC * kW * kH;   // nInputPlane*kW*kH;
         CoclDnnGeometryType k = outH * outW;   // columns->size[1] = outputHeight*outputWidth
 
-        StatusCode status = CLBlastSgemm(kColMajor, kYes, kNo,
+        StatusCode status = CLBlastSgemm(kColMajor,
+                                       kYes, kNo,
                                        n, m, k,
                                        1.0f,
                                        workspaceMemory->clmem, columnsOffset / sizeof(float), k,
                                        gradOutputMemory->clmem, gradOutput3dOffsetBytes / sizeof(float), k,
-                                       1.0f,
-                                       gradFilterMemory->clmem, 0 / sizeof(float), n,
+                                       0.0f,
+                                       gradFilterMemory->clmem, gradFilterOffset / sizeof(float), n,
                                        &v->currentContext->default_stream.get()->clqueue->queue, 0);
         if(status != 0) {
             cout << "sgemm status code " << status << endl;
