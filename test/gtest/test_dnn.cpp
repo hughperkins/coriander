@@ -1008,7 +1008,7 @@ TEST(test_dnn, simple_gpu_conv_backward_filters) {
     int dH = 1;
     int dW = 1;
 
-    N = 3;
+    // N = 1;
     // inC = 1;
     // outC = 1;
     // inH = 3;
@@ -1186,7 +1186,7 @@ TEST(test_dnn, simple_gpu_conv_backward_filters) {
         int dw = rem % kW;
         cout << "inc=" << inc << " outc=" << outc << " dh=" << dh << " dw=" << dw << " gradFilters[" << linearPos << "]="
             << gradFilters[linearPos] << " " << gpuGradFilterHostside[linearPos] << endl;
-        if(abs(gradFilters[linearPos] - gpuGradFilterHostside[linearPos]) > 1e-4) {
+        if(abs(gradFilters[linearPos] - gpuGradFilterHostside[linearPos]) > 1e-4 * N) {
             allOk = false;
             cout << string("test_dnn, output of conv backward filter, mismatch for ") +
                 "inc=" + toString(inc) + " outc=" + toString(outc) + " dh=" + toString(dh) + " dw=" + toString(dw) << endl;

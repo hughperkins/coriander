@@ -481,10 +481,7 @@ size_t cudnnConvolutionBackwardFilter(
     CoclDnnGeometryType batchSize = gradOutputDesc->N;
 
     int filterSize = outC * inC * kH * kW;
-    // filterSize = 1;
-
     cl_float value = 0.0f;
-    // cl_int value = 5;
     err = clEnqueueFillBuffer(
         v->currentContext->default_stream.get()->clqueue->queue,
         gradFilterMemory->clmem,
@@ -492,7 +489,6 @@ size_t cudnnConvolutionBackwardFilter(
         gradFilterOffset, filterSize * sizeof(float),
         0, 0, 0);
     easycl::EasyCL::checkError(err);
-    // v->getContext()->getCl()->finish();
 
     for(CoclDnnGeometryType elt = 0; elt < batchSize; elt++) {
         size_t input3dOffsetBytes = inputOffset + elt * input3dSize * sizeof(float);
