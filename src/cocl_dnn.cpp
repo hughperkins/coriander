@@ -372,7 +372,7 @@ size_t cudnnConvolutionBackwardData(
     cudnnConvolutionDescriptor_t convDesc,
     cudnnConvolutionBwdDataAlgo_t algo,
     void *workspace,
-    CoclDnnSizeType workspaceSize,
+    CoclDnnGeometryType workspaceSize,
     float *p_beta,
     cudnnTensorDescriptor_t gradInputDesc, float *gradInput_data
 ) {
