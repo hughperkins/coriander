@@ -1008,7 +1008,7 @@ TEST(test_dnn, simple_gpu_conv_backward_filters) {
     int dH = 1;
     int dW = 1;
 
-    N = 1;
+    N = 3;
     // inC = 1;
     // outC = 1;
     // inH = 3;
@@ -1113,8 +1113,8 @@ TEST(test_dnn, simple_gpu_conv_backward_filters) {
     size_t inputOffsetBytes = 0;
     size_t filterOffsetBytes = inputOffsetBytes + inLinearSize * sizeof(float);
     size_t outputOffsetBytes = filterOffsetBytes + filterLinearSize * sizeof(float);
-    size_t gradFilterOffsetBytes = outputOffsetBytes + filterLinearSize * sizeof(float);
-    size_t workspaceOffsetBytes = gradFilterOffsetBytes + inLinearSize * sizeof(float);
+    size_t gradFilterOffsetBytes = outputOffsetBytes + outLinearSize * sizeof(float);
+    size_t workspaceOffsetBytes = gradFilterOffsetBytes + filterLinearSize * sizeof(float);
 
     // size_t gpuMemoryAllocSize = (inLinearSize + filterLinearSize + outLinearSize) * sizeof(float) + workspaceSizeBytes;
     size_t gpuMemoryAllocSize = workspaceOffsetBytes + workspaceSizeBytes;
@@ -1175,6 +1175,7 @@ TEST(test_dnn, simple_gpu_conv_backward_filters) {
     const int numSamples = 20;
     int *sampleIndices = new int[numSamples];
     fillRandomInt(random, sampleIndices, numSamples, 0, filterLinearSize);
+    bool allOk = true;
     for(int i = 0; i < numSamples; i++) {
         int linearPos = sampleIndices[i];
         int inc = linearPos / outC / kH / kW;
@@ -1186,9 +1187,13 @@ TEST(test_dnn, simple_gpu_conv_backward_filters) {
         cout << "inc=" << inc << " outc=" << outc << " dh=" << dh << " dw=" << dw << " gradFilters[" << linearPos << "]="
             << gradFilters[linearPos] << " " << gpuGradFilterHostside[linearPos] << endl;
         if(abs(gradFilters[linearPos] - gpuGradFilterHostside[linearPos]) > 1e-4) {
-            throw runtime_error(string("test_dnn, output of conv backward filter, mismatch for ") +
-                "inc=" + toString(inc) + " outc=" + toString(outc) + " dh=" + toString(dh) + " dw=" + toString(dw));
+            allOk = false;
+            cout << string("test_dnn, output of conv backward filter, mismatch for ") +
+                "inc=" + toString(inc) + " outc=" + toString(outc) + " dh=" + toString(dh) + " dw=" + toString(dw) << endl;
         }
+    }
+    if(!allOk) {
+        throw runtime_error(string("FAILED"));
     }
 
     cudnnDestroyFilterDescriptor(filterDesc);

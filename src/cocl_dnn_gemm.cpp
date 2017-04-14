@@ -18,6 +18,8 @@
 #include <iostream>
 using namespace std;
 
+#include "EasyCL/EasyCL.h"
+
 namespace cocl {
 namespace dnn {
 namespace gemm_im2col {
@@ -477,6 +479,21 @@ size_t cudnnConvolutionBackwardFilter(
     size_t input3dSize = inC * inH * inW;
     size_t output3dSize = outC * outH * outW;
     CoclDnnGeometryType batchSize = gradOutputDesc->N;
+
+    int filterSize = outC * inC * kH * kW;
+    // filterSize = 1;
+
+    cl_float value = 0.0f;
+    // cl_int value = 5;
+    err = clEnqueueFillBuffer(
+        v->currentContext->default_stream.get()->clqueue->queue,
+        gradFilterMemory->clmem,
+        &value, sizeof(float),
+        gradFilterOffset, filterSize * sizeof(float),
+        0, 0, 0);
+    easycl::EasyCL::checkError(err);
+    // v->getContext()->getCl()->finish();
+
     for(CoclDnnGeometryType elt = 0; elt < batchSize; elt++) {
         size_t input3dOffsetBytes = inputOffset + elt * input3dSize * sizeof(float);
         size_t gradOutput3dOffsetBytes = gradOutputOffset + elt * output3dSize * sizeof(float);
@@ -524,7 +541,7 @@ size_t cudnnConvolutionBackwardFilter(
                                        1.0f,
                                        workspaceMemory->clmem, columnsOffset / sizeof(float), k,
                                        gradOutputMemory->clmem, gradOutput3dOffsetBytes / sizeof(float), k,
-                                       0.0f,
+                                       1.0f,
                                        gradFilterMemory->clmem, gradFilterOffset / sizeof(float), n,
                                        &v->currentContext->default_stream.get()->clqueue->queue, 0);
         if(status != 0) {
