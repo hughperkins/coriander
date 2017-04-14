@@ -1,7 +1,12 @@
 #include "cocl/cocl_dnn.h"
 
 #include "cocl_dnn_gemm.h"
+#include "cocl/cocl_memory.h"
+#include "cocl/hostside_opencl_funcs.h"
+#include "cocl/cocl.h"
 #include "EasyCL/util/easycl_stringhelper.h"
+
+#include <clblast_c.h>
 
 #include <iostream>
 #include <string>
@@ -274,13 +279,39 @@ size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
 size_t cudnnAddTensor(
     cudnnHandle_t handle,
     float *p_alpha,
-    cudnnTensorDescriptor_t tensorDesc1,
-    float *tensor,
+    cudnnTensorDescriptor_t xDesc, float *xData,
     float *p_beta,
-    cudnnTensorDescriptor_t tensorDesc2,
-    float * tensor2
+    cudnnTensorDescriptor_t yDesc, float * yData
 ) {
-    throw runtime_error("not implemented");
+    // if(*p_alpha != 1) {
+    //     throw runtime_error("cudnnAddTensor only implemented for alpha == 1");
+    // }
+    if(*p_beta != 1) {
+        throw runtime_error("cudnnAddTensor only implemented for beta == 1");
+    }
+
+    cl_int err;
+    ThreadVars *v = getThreadVars();
+
+    Memory *xMemory = findMemory((const char *)xData);
+    Memory *yMemory = findMemory((const char *)yData);
+
+    size_t xOffset = xMemory->getOffset((const char *)xData);
+    size_t yOffset = yMemory->getOffset((const char *)yData);
+
+    int N = xDesc->N;
+    int C = xDesc->C;
+    int H = xDesc->H;
+    int W = xDesc->W;
+    int n = N * C * H * W;
+    StatusCode status = CLBlastSaxpy(n, *p_alpha,
+                                     xMemory->clmem, xOffset, 1,
+                                     yMemory->clmem, yOffset, 1,
+                                     &v->currentContext->default_stream.get()->clqueue->queue, 0);
+    if(status != 0) {
+        cout << "saxpy status code " << status << endl;
+        throw runtime_error("Failed call to blas saxpy");
+    }
 }
 size_t cudnnPoolingForward(
     cudnnHandle_t handle,
