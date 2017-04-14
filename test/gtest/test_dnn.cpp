@@ -499,11 +499,11 @@ TEST(test_dnn, simple_cpu_back_data) {
     int dH = 1;
     int dW = 1;
 
-    N = 1;
-    inC = 1;
-    outC = 1;
-    inH = 3;
-    inW = 3;
+    // N = 1;
+    // inC = 1;
+    // outC = 1;
+    // inH = 3;
+    // inW = 3;
 
     int outH = (inH + 2 * padH - kH) / dH + 1;
     int outW = (inW + 2 * padW - kW) / dW + 1;
@@ -964,7 +964,7 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
 
     const int numSamples = 20;
     int *sampleIndices = new int[numSamples];
-    fillRandomInt(random, sampleIndices, numSamples, 0, outLinearSize);
+    fillRandomInt(random, sampleIndices, numSamples, 0, inLinearSize);
     bool allOk = true;
     for(int i = 0; i < numSamples; i++) {
         int linearPos = sampleIndices[i];
