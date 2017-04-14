@@ -261,6 +261,10 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 ## News
 
+- April 14:
+  - added backwards implementation for convolution, for data/input derivatives (still need the filter backwards)
+- April 13:
+  - added CLBlast wrappers for: segmv, sscal, saxpy
 - April 4:
   - merged in current `dnn` branch, which provides forward convolutional implementation for cudnn API, using `im2col` over Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast)
   - CUDA-on-CL got accepted for a technical presentation at this year's [IWOCL](https://iwocl.org) conference :-)  Conference sessions here: [IWOCL 2017 Conference program](www.iwocl.org/iwocl-2017/conference-program/)
