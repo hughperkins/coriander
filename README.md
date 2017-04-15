@@ -262,7 +262,7 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 ## News
 
 - April 15:
-  - added forward max pooling
+  - added max pooling, forwards and backwards
 - April 14:
   - added backwards implementation for convolution, including data, filters, and bias
 - April 13:
