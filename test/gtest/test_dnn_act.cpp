@@ -68,6 +68,15 @@ public:
         return output * (1 - output);
     }
 };
+class Tanh : public Act {
+public:
+    float forward(float input) {
+        return tanh(input);
+    }
+    float backward(float output, float gradOutput, float input) {
+        return 1 - output * output;
+    }
+};
 
 void forward_relu_cpu(
     float *input, int N, int C, int H, int W,
@@ -462,6 +471,15 @@ TEST(test_dnn_act, gpu_forward_sigmoid) {
 TEST(test_dnn_act, gpu_backward_sigmoid) {
     Sigmoid act;
     run_backward_gpu(&act, CUDNN_ACTIVATION_SIGMOID);
+}
+
+TEST(test_dnn_act, gpu_forward_tanh) {
+    Tanh act;
+    run_forward_gpu(&act, CUDNN_ACTIVATION_TANH);
+}
+TEST(test_dnn_act, gpu_backward_tanh) {
+    Tanh act;
+    run_backward_gpu(&act, CUDNN_ACTIVATION_TANH);
 }
 
 } // namespace

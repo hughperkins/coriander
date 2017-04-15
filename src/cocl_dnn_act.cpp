@@ -85,6 +85,9 @@ size_t cudnnActivationForward(
         case CUDNN_ACTIVATION_SIGMOID:
             actName = "SIGMOID";
             break;
+        case CUDNN_ACTIVATION_TANH:
+            actName = "TANH";
+            break;
         default:
             throw runtime_error("Activations type not implemented");
     }
@@ -146,6 +149,9 @@ size_t cudnnActivationBackward(
             break;
         case CUDNN_ACTIVATION_SIGMOID:
             actName = "SIGMOID";
+            break;
+        case CUDNN_ACTIVATION_TANH:
+            actName = "TANH";
             break;
         default:
             throw runtime_error("Activations type not implemented");
@@ -210,6 +216,10 @@ kernel void {ACTIVATION_TYPE}Forward(
         #ifdef SIGMOID
         output[index] = 1.0f / (1.0f + exp(- inval) );
         #endif
+
+        #ifdef TANH
+        output[index] = tanh(inval);
+        #endif
     }
   }
 }
@@ -251,6 +261,11 @@ kernel void {ACTIVATION_TYPE}Backward(
         #ifdef SIGMOID
         float outputval = output[index];
         gradInput[index] = outputval * (1 - outputval);
+        #endif
+
+        #ifdef TANH
+        float outputval = output[index];
+        gradInput[index] = 1 - outputval * outputval;
         #endif
     }
   }
