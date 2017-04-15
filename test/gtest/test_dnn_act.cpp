@@ -50,7 +50,6 @@ public:
     virtual float forward(float input) = 0;
     virtual float backward(float output, float gradOutput, float input) = 0;
 };
-
 class Relu : public Act {
 public:
     float forward(float input) {
@@ -58,6 +57,15 @@ public:
     }
     float backward(float output, float gradOutput, float input) {
         return input > 0 ? gradOutput : 0.0f;
+    }
+};
+class Sigmoid : public Act {
+public:
+    float forward(float input) {
+        return 1.0f / (1.0f + exp(-input));
+    }
+    float backward(float output, float gradOutput, float input) {
+        return output * (1 - output);
     }
 };
 
@@ -445,6 +453,15 @@ TEST(test_dnn_act, gpu_forward_relu) {
 TEST(test_dnn_act, gpu_backward_relu) {
     Relu relu;
     run_backward_gpu(&relu, CUDNN_ACTIVATION_RELU);
+}
+
+TEST(test_dnn_act, gpu_forward_sigmoid) {
+    Sigmoid act;
+    run_forward_gpu(&act, CUDNN_ACTIVATION_SIGMOID);
+}
+TEST(test_dnn_act, gpu_backward_sigmoid) {
+    Sigmoid act;
+    run_backward_gpu(&act, CUDNN_ACTIVATION_SIGMOID);
 }
 
 } // namespace

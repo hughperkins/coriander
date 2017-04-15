@@ -82,11 +82,14 @@ size_t cudnnActivationForward(
         case CUDNN_ACTIVATION_RELU:
             actName = "RELU";
             break;
+        case CUDNN_ACTIVATION_SIGMOID:
+            actName = "SIGMOID";
+            break;
         default:
             throw runtime_error("Activations type not implemented");
     }
-    sourceCode = easycl::replace(sourceCode, "{ACTIVATION_TYPE}", actName);
-    easycl::CLKernel *kernel = getKernelForNameCl("ReluForward", sourceCode);
+    sourceCode = easycl::replaceGlobal(sourceCode, "{ACTIVATION_TYPE}", actName);
+    easycl::CLKernel *kernel = getKernelForNameCl(actName + "Forward", sourceCode);
 
     int linearSize = N * C * H * W;
 
@@ -120,14 +123,14 @@ size_t cudnnActivationBackward(
     ThreadVars *v = getThreadVars();
     cl_int err;
 
+    Memory *outputMemory = findMemory((const char *)outputData);
     Memory *gradOutputMemory = findMemory((const char *)gradOutputData);
     Memory *inputMemory = findMemory((const char *)inputData);
-
     Memory *gradInputMemory = findMemory((const char *)gradInputData);
 
+    size_t outputOffset = outputMemory->getOffset((const char *)outputData);
     size_t gradOutputOffset = gradOutputMemory->getOffset((const char *)gradOutputData);
     size_t inputOffset = inputMemory->getOffset((const char *)inputData);
-
     size_t gradInputOffset = gradInputMemory->getOffset((const char *)gradInputData);
 
     CoclDnnGeometryType N = inputDesc->N;
@@ -141,15 +144,21 @@ size_t cudnnActivationBackward(
         case CUDNN_ACTIVATION_RELU:
             actName = "RELU";
             break;
+        case CUDNN_ACTIVATION_SIGMOID:
+            actName = "SIGMOID";
+            break;
         default:
             throw runtime_error("Activations type not implemented");
     }
-    sourceCode = easycl::replace(sourceCode, "{ACTIVATION_TYPE}", actName);
-    easycl::CLKernel *kernel = getKernelForNameCl("ReluBackward", sourceCode);
+    sourceCode = easycl::replaceGlobal(sourceCode, "{ACTIVATION_TYPE}", actName);
+    easycl::CLKernel *kernel = getKernelForNameCl(actName + "Backward", sourceCode);
 
     int linearSize = N * C * H * W;
 
     kernel->in((int)linearSize);
+
+    kernel->inout(&outputMemory->clmem);
+    kernel->in((int32_t)(outputOffset / sizeof(float)));
 
     kernel->inout(&gradOutputMemory->clmem);
     kernel->in((int32_t)(gradOutputOffset / sizeof(float)));
@@ -181,7 +190,7 @@ string get_ReluForward_sourcecode() {
 #define Dtype float
 #define {ACTIVATION_TYPE}
 
-kernel void ReluForward(
+kernel void {ACTIVATION_TYPE}Forward(
     const int nthreads,
     global const Dtype* input_data, int input_offset,
     global Dtype* output_data, int output_offset
@@ -193,15 +202,19 @@ kernel void ReluForward(
   CL_KERNEL_LOOP(index, nthreads) {
     if(index < nthreads) {
         float inval = input[index];
+
         #ifdef RELU
         output[index] = inval > 0 ? inval : 0.0f;
+        #endif
+
+        #ifdef SIGMOID
+        output[index] = 1.0f / (1.0f + exp(- inval) );
         #endif
     }
   }
 }
 )";
 }
-
 
 string get_ReluBackward_sourcecode() {
     return R"(
@@ -214,13 +227,15 @@ string get_ReluBackward_sourcecode() {
 #define Dtype float
 #define {ACTIVATION_TYPE}
 
-kernel void ReluBackward(
+kernel void {ACTIVATION_TYPE}Backward(
     const int nthreads,
+    global const Dtype* output_data, int output_offset,
     global const Dtype* gradOutput_data, int gradOutput_offset,
     global const Dtype* input_data, int input_offset,
     global Dtype* gradInput_data, int gradInput_offset
   ) {
 
+  global const Dtype *output = output_data + output_offset;
   global const Dtype *gradOutput = gradOutput_data + gradOutput_offset;
   global const Dtype *input = input_data + input_offset;
   global Dtype *gradInput = gradInput_data + gradInput_offset;
@@ -228,8 +243,14 @@ kernel void ReluBackward(
   CL_KERNEL_LOOP(index, nthreads) {
     if(index < nthreads) {
         float inval = input[index];
+
         #ifdef RELU
         gradInput[index] = inval > 0 ? gradOutput[index] : 0.0f;
+        #endif
+
+        #ifdef SIGMOID
+        float outputval = output[index];
+        gradInput[index] = outputval * (1 - outputval);
         #endif
     }
   }
