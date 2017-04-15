@@ -261,7 +261,7 @@ if(BUILD_TESTS)
         test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
         test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
         test/gtest/test_kernel_dumper.cpp test/gtest/test_global_constants.cpp
-        test/gtest/test_dnn_conv.cpp
+        test/gtest/test_dnn_conv.cpp test/gtest/test_dnn_pooling.cpp
         test/gtest/test_hostside_opencl_funcs.cpp
     )
     target_include_directories(cocl_unittests PRIVATE src)

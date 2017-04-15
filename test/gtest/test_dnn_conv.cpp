@@ -1,4 +1,4 @@
-// Copyright Hugh Perkins 2016
+// Copyright Hugh Perkins 2016, 2017
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,10 +29,21 @@ using namespace std;
 using namespace cocl;
 using namespace easycl;
 
-namespace {
-
 typedef std::mt19937 MT19937;
 
+void fillRandomUniform(MT19937 &random, float *target, int size, float minVal, float maxVal) {
+    for(int i = 0; i < size; i++) {
+        target[i] = random() / (float)random.max();
+    }
+}
+
+void fillRandomInt(MT19937 &random, int *target, int size, int minValInclusive, int maxValExclusive) {
+    for(int i = 0; i < size; i++) {
+        target[i] = random() % (maxValExclusive - 1 - minValInclusive) + minValInclusive;
+    }
+}
+
+namespace {
 void im2col_cpu(float *imageStack, int C, int inH, int inW, int kH, int kW, int padH, int padW, int dH, int dW, float *col) {
     int outH = (inH + 2 * padH - kH) / dH + 1;
     int outW = (inW + 2 * padW - kW) / dW + 1;
@@ -59,18 +70,6 @@ void im2col_cpu(float *imageStack, int C, int inH, int inW, int kH, int kW, int 
                 }
             }
         }
-    }
-}
-
-void fillRandomUniform(MT19937 &random, float *target, int size, float minVal, float maxVal) {
-    for(int i = 0; i < size; i++) {
-        target[i] = random() / (float)random.max();
-    }
-}
-
-void fillRandomInt(MT19937 &random, int *target, int size, int minValInclusive, int maxValExclusive) {
-    for(int i = 0; i < size; i++) {
-        target[i] = random() % (maxValExclusive - 1 - minValInclusive) + minValInclusive;
     }
 }
 
