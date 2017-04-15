@@ -53,7 +53,7 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
     src/struct_clone.cpp src/basicblockdumper.cpp src/ExpressionsHelper.cpp src/readIR.cpp
     src/function_names_map.cpp src/function_dumper.cpp src/kernel_dumper.cpp src/mutations.cpp
     third_party/argparsecpp/argparsecpp.cpp src/cocl_dnn.cpp src/cocl_dnn_gemm.cpp src/cocl_dnn_pooling.cpp
-    src/cocl_dnn_conv.cpp
+    src/cocl_dnn_conv.cpp src/cocl_dnn_act.cpp
     src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cpp src/cocl_device.cpp src/cocl_error.cpp
     src/cocl_memory.cpp src/cocl_properties.cpp src/cocl_streams.cpp src/cocl_clsources.cpp src/cocl_context.cpp
     src/ir-to-opencl.cpp src/shims.cpp src/LocalValueInfo.cpp src/ClWriter.cpp
@@ -261,7 +261,7 @@ if(BUILD_TESTS)
         test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
         test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
         test/gtest/test_kernel_dumper.cpp test/gtest/test_global_constants.cpp
-        test/gtest/test_dnn_conv.cpp test/gtest/test_dnn_pooling.cpp
+        test/gtest/test_dnn_conv.cpp test/gtest/test_dnn_pooling.cpp test/gtest/test_dnn_act.cpp
         test/gtest/test_hostside_opencl_funcs.cpp
     )
     target_include_directories(cocl_unittests PRIVATE src)

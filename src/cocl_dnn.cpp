@@ -13,7 +13,7 @@
 #include <stdexcept>
 using namespace std;
 
-static string col2ImKernelSource;
+// static string col2ImKernelSource;
 
 namespace cocl {
 namespace dnn {
@@ -41,10 +41,6 @@ size_t cudnnCreateTensorDescriptor(cudnnTensorDescriptor_t *p_tensor) {
     *p_tensor = new TensorDescriptor();
     return 0;
 }
-size_t cudnnCreateActivationDescriptor(cudnnActivationDescriptor_t *p_desc) {
-    *p_desc = new ActivationDescriptor();
-    return 0;
-}
 size_t cudnnCreateFilterDescriptor(cudnnFilterDescriptor_t *p_desc) {
     *p_desc = new FilterDescriptor();
     return 0;
@@ -54,15 +50,7 @@ size_t cudnnDestroyTensorDescriptor(cudnnTensorDescriptor_t desc) {
     delete desc;
     return 0;
 }
-size_t cudnnDestroyActivationDescriptor(cudnnActivationDescriptor_t desc) {
-    delete desc;
-    return 0;
-}
 size_t cudnnDestroyFilterDescriptor(cudnnFilterDescriptor_t desc) {
-    delete desc;
-    return 0;
-}
-size_t cudnnDestroyConvolutionDescriptor(cudnnConvolutionDescriptor_t desc) {
     delete desc;
     return 0;
 }
@@ -78,14 +66,6 @@ size_t cudnnSetTensor4dDescriptor(
     tensor->C = C;
     tensor->H = H;
     tensor->W = W;
-    return 0;
-}
-size_t cudnnSetActivationDescriptor(
-    cudnnActivationDescriptor_t act, CoclDnnLayout activationType, CoclDnnLayout propagate,
-        float probability) {
-    act->activationType = activationType;
-    act->propagate = propagate;
-    act->probability = probability;
     return 0;
 }
 size_t cudnnSetFilter4dDescriptor(
@@ -137,18 +117,6 @@ size_t cudnnAddTensor(
         throw runtime_error("Failed call to blas saxpy");
     }
 }
-size_t cudnnActivationForward(
-    cudnnHandle_t handle,
-    cudnnActivationDescriptor_t activationDesc,
-    float *p_alpha,
-    cudnnTensorDescriptor_t tensor1Desc,
-    float *tensor1,
-    float *p_beta,
-    cudnnTensorDescriptor_t tensor2Desc,
-    float *tensor2
-) {
-    throw runtime_error("not implemented");
-}
 size_t cudnnSoftmaxForward(
     cudnnHandle_t handle,
     CoclDnnLayout softmaxMode,
@@ -162,21 +130,3 @@ size_t cudnnSoftmaxForward(
 ) {
     throw runtime_error("not implemented");
 }
-
-size_t cudnnActivationBackward(
-    cudnnHandle_t handle,
-    cudnnActivationDescriptor_t activationDesc,
-    float *p_alpha,
-    cudnnTensorDescriptor_t tensor1Desc,
-    float *tensor1,
-    cudnnTensorDescriptor_t tensor2Desc,
-    float *tensor2,
-    cudnnTensorDescriptor_t tensor3Desc,
-    float *tensor3,
-    float *p_beta,
-    cudnnTensorDescriptor_t tensor4Desc,
-    float *tensor4
-) {
-    throw runtime_error("not implemented");
-}
-

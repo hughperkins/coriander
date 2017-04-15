@@ -33,7 +33,7 @@ typedef std::mt19937 MT19937;
 
 void fillRandomUniform(MT19937 &random, float *target, int size, float minVal, float maxVal) {
     for(int i = 0; i < size; i++) {
-        target[i] = random() / (float)random.max();
+        target[i] = random() / (float)random.max() * (maxVal - minVal) + minVal;
     }
 }
 

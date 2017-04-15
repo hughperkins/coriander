@@ -45,6 +45,10 @@ size_t cudnnSetConvolution2dDescriptor(
     }
     return 0;
 }
+size_t cudnnDestroyConvolutionDescriptor(cudnnConvolutionDescriptor_t desc) {
+    delete desc;
+    return 0;
+}
 size_t cudnnGetConvolution2dForwardOutputDim(
     cudnnConvolutionDescriptor_t convDesc,
     cudnnTensorDescriptor_t inTensorDesc,
