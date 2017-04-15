@@ -269,7 +269,7 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
   - added max pooling
   - added ReLU, sigmoid and tanh activations
   - added softmax forward
-  - I think it's now possible by and large to simply download and compile Tal Ben-Nun's [cudnn-training](https://github.com/tbennun/cudnn-training) (though I confess I've only tested with my mild fork at https://github.com/hughperkins/cudnn-training , [differences here](https://github.com/tbennun/cudnn-training/compare/master...hughperkins:opencl), mostly formatting,  )
+  - now possible by and large to compile Tal Ben-Nun's [cudnn-training](https://github.com/tbennun/cudnn-training).  It needs some additions to the CMakeLists.txt, see my fork at https://github.com/hughperkins/cudnn-training , [differences here](https://github.com/tbennun/cudnn-training/compare/master...hughperkins:opencl)
 - April 14:
   - added backwards implementation for convolution, including data, filters, and bias
 - April 13:
