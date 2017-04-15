@@ -45,31 +45,39 @@ int NCHW_to_index(
     return index;
 }
 
+class Act {
+public:
+    virtual float forward(float input) = 0;
+    virtual float backward(float output, float gradOutput, float input) = 0;
+};
+
+class Relu : public Act {
+public:
+    float forward(float input) {
+        return input > 0 ? input : 0.0f;
+    }
+    float backward(float output, float gradOutput, float input) {
+        return input > 0 ? gradOutput : 0.0f;
+    }
+};
+
 void forward_relu_cpu(
     float *input, int N, int C, int H, int W,
-    float *output) {
+    float *output, Act *act) {
 
     int linearSize = N * C * H * W;
     for(int n = 0; n < linearSize; n++) {
-        if(input[n] > 0) {
-            output[n] = input[n];
-        } else {
-            output[n] = 0.0f;
-        }
+        output[n] = act->forward(input[n]);
     }
 }
 
 void backward_relu_cpu(
     float *output, float *gradOutput, float *input, int N, int C, int H, int W,
-    float *gradInput) {
+    float *gradInput, Act *act) {
 
     int linearSize = N * C * H * W;
     for(int n = 0; n < linearSize; n++) {
-        if(input[n] > 0) {
-            gradInput[n] = gradOutput[n];
-        } else {
-            gradInput[n] = 0.0f;
-        }
+        gradInput[n] = act->backward(output[n], gradOutput[n], input[n]);
     }
 }
 
@@ -89,7 +97,8 @@ TEST(test_dnn_act, forward_cpu) {
 
     fillRandomUniform(random, input, N * C * H * W, -1.0f, 1.0f);
 
-    forward_relu_cpu(input, N, C, H, W, output);
+    Relu act;
+    forward_relu_cpu(input, N, C, H, W, output, &act);
 
     const int numSamples = 20;
     int *sampleIndices = new int[numSamples];
@@ -126,8 +135,9 @@ TEST(test_dnn_act, backward_cpu) {
 
     fillRandomUniform(random, input, N * C * H * W, -1.0f, 1.0f);
 
-    forward_relu_cpu(input, N, C, H, W, output);
-    backward_relu_cpu(output, output, input, N, C, H, W, gradInput);
+    Relu act;
+    forward_relu_cpu(input, N, C, H, W, output, &act);
+    backward_relu_cpu(output, output, input, N, C, H, W, gradInput, &act);
 
     const int numSamples = 20;
     int *sampleIndices = new int[numSamples];
@@ -169,7 +179,8 @@ TEST(test_dnn_act, gpu_forward_relu) {
 
     fillRandomUniform(random, input, N * C * H * W, -1.0f, 1.0f);
 
-    forward_relu_cpu(input, N, C, H, W, output);
+    Relu act;
+    forward_relu_cpu(input, N, C, H, W, output, &act);
 
     cout << "input[0][0]:" << endl;
     for(int h=0; h < H; h++) {
@@ -304,8 +315,9 @@ TEST(test_dnn_act, gpu_backward_relu) {
 
     fillRandomUniform(random, input, N * C * H * W, -1.0f, 1.0f);
 
-    forward_relu_cpu(input, N, C, H, W, output);
-    backward_relu_cpu(output, output, output, N, C, H, W, gradInput);
+    Relu act;
+    forward_relu_cpu(input, N, C, H, W, output, &act);
+    backward_relu_cpu(output, output, output, N, C, H, W, gradInput, &act);
 
     cout << "input[0][0]:" << endl;
     for(int h=0; h < H; h++) {

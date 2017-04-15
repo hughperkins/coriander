@@ -46,12 +46,11 @@ size_t cudnnDestroyActivationDescriptor(cudnnActivationDescriptor_t desc) {
 size_t cudnnSetActivationDescriptor(
     cudnnActivationDescriptor_t act, CoclDnnLayout activationType, CoclDnnLayout propagate,
         float probability) {
-    if(activationType != CUDNN_ACTIVATION_RELU) {
-        throw runtime_error("Activations only implemented for ReLU");
-    }
     if(propagate != CUDNN_PROPAGATE_NAN) {
         throw runtime_error("Activations only implemented with propagate nan enabled");
     }
+    act->activationType = activationType;
+    act->propagate = propagate;
     act->probability = probability;
     return 0;
 }
@@ -77,7 +76,17 @@ size_t cudnnActivationForward(
     CoclDnnGeometryType H = inputDesc->H;
     CoclDnnGeometryType W = inputDesc->W;
 
-    easycl::CLKernel *kernel = getKernelForNameCl("ReluForward", get_ReluForward_sourcecode());
+    string sourceCode = get_ReluForward_sourcecode();
+    string actName = "";
+    switch(activationDesc->activationType) {
+        case CUDNN_ACTIVATION_RELU:
+            actName = "RELU";
+            break;
+        default:
+            throw runtime_error("Activations type not implemented");
+    }
+    sourceCode = easycl::replace(sourceCode, "{ACTIVATION_TYPE}", actName);
+    easycl::CLKernel *kernel = getKernelForNameCl("ReluForward", sourceCode);
 
     int linearSize = N * C * H * W;
 
@@ -126,7 +135,17 @@ size_t cudnnActivationBackward(
     CoclDnnGeometryType H = inputDesc->H;
     CoclDnnGeometryType W = inputDesc->W;
 
-    easycl::CLKernel *kernel = getKernelForNameCl("ReluBackward", get_ReluBackward_sourcecode());
+    string sourceCode = get_ReluBackward_sourcecode();
+    string actName = "";
+    switch(activationDesc->activationType) {
+        case CUDNN_ACTIVATION_RELU:
+            actName = "RELU";
+            break;
+        default:
+            throw runtime_error("Activations type not implemented");
+    }
+    sourceCode = easycl::replace(sourceCode, "{ACTIVATION_TYPE}", actName);
+    easycl::CLKernel *kernel = getKernelForNameCl("ReluBackward", sourceCode);
 
     int linearSize = N * C * H * W;
 
@@ -160,6 +179,7 @@ string get_ReluForward_sourcecode() {
       i += get_local_size(0) * get_num_groups(0))
 
 #define Dtype float
+#define {ACTIVATION_TYPE}
 
 kernel void ReluForward(
     const int nthreads,
@@ -173,7 +193,9 @@ kernel void ReluForward(
   CL_KERNEL_LOOP(index, nthreads) {
     if(index < nthreads) {
         float inval = input[index];
+        #ifdef RELU
         output[index] = inval > 0 ? inval : 0.0f;
+        #endif
     }
   }
 }
@@ -190,6 +212,7 @@ string get_ReluBackward_sourcecode() {
       i += get_local_size(0) * get_num_groups(0))
 
 #define Dtype float
+#define {ACTIVATION_TYPE}
 
 kernel void ReluBackward(
     const int nthreads,
@@ -205,7 +228,9 @@ kernel void ReluBackward(
   CL_KERNEL_LOOP(index, nthreads) {
     if(index < nthreads) {
         float inval = input[index];
+        #ifdef RELU
         gradInput[index] = inval > 0 ? gradOutput[index] : 0.0f;
+        #endif
     }
   }
 }
