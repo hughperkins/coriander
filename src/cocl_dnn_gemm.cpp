@@ -6,7 +6,7 @@
 // other convolutional implementatinos can be added in the future, but GEMM/im2col gives a solid works-everywhere base
 // to start from
 
-#include "cocl_dnn_gemm.h"
+#include "cocl/cocl_dnn_gemm.h"
 
 #include "cocl/cocl.h"
 #include "cocl/cocl_dnn.h"

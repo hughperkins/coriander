@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include "cocl/cocl_dnn.h"
-#include "cocl_dnn_gemm.h"
+#include "cocl/cocl_dnn_gemm.h"
 
 #include "cocl/cocl.h"
 #include "EasyCL/EasyCL.h"

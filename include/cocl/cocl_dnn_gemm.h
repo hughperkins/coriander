@@ -9,7 +9,7 @@
 // to start from
 
 #include "cocl/cocl_dnn.h"
-
+#include "cocl/cocl_dnn_conv.h"
 #include "EasyCL/EasyCL.h"
 
 namespace cocl {
