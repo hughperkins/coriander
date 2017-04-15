@@ -103,6 +103,7 @@ New!
   - convolution (using `im2col` algorithim, over Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast))
   - pooling
   - activations: ReLU, tanh, sigmoid
+  - softmax forward
 
 ## How to build
 
@@ -267,6 +268,7 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 - April 15:
   - added max pooling
   - added ReLU, sigmoid and tanh activations
+  - added softmax forward
 - April 14:
   - added backwards implementation for convolution, including data, filters, and bias
 - April 13:
