@@ -191,6 +191,7 @@ size_t cudnnSoftmaxForward(
     //     cout << "status" << status << endl;
     //     throw runtime_error("Pooling returned non-zero status");
     // }
+    return 0;
 }
 
 string get_SoftmaxForward_sourcecode() {

@@ -112,6 +112,7 @@ size_t cudnnActivationForward(
     //     cout << "status" << status << endl;
     //     throw runtime_error("Pooling returned non-zero status");
     // }
+    return 0;
 }
 size_t cudnnActivationBackward(
     cudnnHandle_t handle,
@@ -183,6 +184,7 @@ size_t cudnnActivationBackward(
     //     cout << "status" << status << endl;
     //     throw runtime_error("Pooling returned non-zero status");
     // }
+    return 0;
 }
 
 string get_ReluForward_sourcecode() {
