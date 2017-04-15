@@ -158,11 +158,10 @@ TEST(test_dnn_pooling, gpu_forward) {
     int dH = 1;
     int dW = 1;
 
-    // N = 1;
-    // inC = 1;
-    // outC = 1;
-    // inH = 3;
-    // inW = 3;
+    N = 1;
+    C = 1;
+    inH = 3;
+    inW = 3;
 
     int outH = (inH + 2 * padH - kH) / dH + 1;
     int outW = (inW + 2 * padW - kW) / dW + 1;
@@ -180,6 +179,22 @@ TEST(test_dnn_pooling, gpu_forward) {
     fillRandomUniform(random, input, N * C * inH * inW, 0.0f, 1.0f);
 
     pool_forward_cpu(input, N, C, inH, inW, kH, kW, padH, padW, dH, dW, output);
+
+    cout << "input[0][0]:" << endl;
+    for(int h=0; h < inH; h++) {
+        for(int w=0; w < inW; w++) {
+            cout << input[h * inW + w] << " ";
+        }
+        cout << endl;
+    }
+
+    cout << "output[0][0]:" << endl;
+    for(int h=0; h < outH; h++) {
+        for(int w=0; w < outW; w++) {
+            cout << output[h * outW + w] << " ";
+        }
+        cout << endl;
+    }
 
     cudnnHandle_t dnn_handle;
     cudnnTensorDescriptor_t inputDesc;
@@ -204,9 +219,9 @@ TEST(test_dnn_pooling, gpu_forward) {
     cudnnSetPooling2dDescriptor(poolDesc,
                                 CUDNN_POOLING_MAX,
                                 CUDNN_PROPAGATE_NAN,
-                                3, 3,
-                                0, 0,
-                                1, 1);
+                                kH, kW,
+                                padH, padW,
+                                dH, dW);
 
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getContext()->getCl();
@@ -241,6 +256,14 @@ TEST(test_dnn_pooling, gpu_forward) {
                                      (outLinearSize) * sizeof(float), gpuOutHostside, 0, NULL, NULL);
     EasyCL::checkError(err);
     cl->finish();
+
+    cout << "gpuOutput[0][0]:" << endl;
+    for(int h=0; h < outH; h++) {
+        for(int w=0; w < outW; w++) {
+            cout << gpuOutHostside[h * outW + w] << " ";
+        }
+        cout << endl;
+    }
 
     const int numSamples = 20;
     int *sampleIndices = new int[numSamples];
