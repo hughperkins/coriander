@@ -74,7 +74,7 @@ void fillRandomInt(MT19937 &random, int *target, int size, int minValInclusive, 
     }
 }
 
-TEST(test_dnn, simple_cpu_im2col) {
+TEST(test_dnn_conv, simple_cpu_im2col) {
     int C = 3;
     int inH = 5;
     int inW = 5;
@@ -128,7 +128,7 @@ TEST(test_dnn, simple_cpu_im2col) {
     delete[] inImageStack;
 }
 
-TEST(test_dnn, simple_gpu_im2col) {
+TEST(test_dnn_conv, simple_gpu_im2col) {
     int C = 3;
     int inH = 5;
     int inW = 5;
@@ -464,7 +464,7 @@ void conv_backward_bias_cpu(
     }
 }
 
-TEST(test_dnn, simple_cpu_conv) {
+TEST(test_dnn_conv, simple_cpu_conv) {
     int N = 4;
     int inC = 3;
     int outC = 5;
@@ -512,7 +512,7 @@ TEST(test_dnn, simple_cpu_conv) {
     delete[] inImages;
 }
 
-TEST(test_dnn, simple_cpu_back_data) {
+TEST(test_dnn_conv, simple_cpu_back_data) {
     int N = 4;
     int inC = 3;
     int outC = 5;
@@ -595,7 +595,7 @@ TEST(test_dnn, simple_cpu_back_data) {
     delete[] inImages;
 }
 
-TEST(test_dnn, simple_cpu_back_filters) {
+TEST(test_dnn_conv, simple_cpu_back_filters) {
     int N = 4;
     int inC = 3;
     int outC = 5;
@@ -655,7 +655,7 @@ TEST(test_dnn, simple_cpu_back_filters) {
     delete[] inImages;
 }
 
-TEST(test_dnn, simple_gpu_conv) {
+TEST(test_dnn_conv, simple_gpu_conv) {
     int N = 4;
     int inC = 3;
     int outC = 5;
@@ -820,7 +820,7 @@ TEST(test_dnn, simple_gpu_conv) {
     delete[] inImages;
 }
 
-TEST(test_dnn, simple_gpu_conv_backward_data) {
+TEST(test_dnn_conv, simple_gpu_conv_backward_data) {
     int N = 4;
     int inC = 3;
     int outC = 5;
@@ -1031,7 +1031,7 @@ TEST(test_dnn, simple_gpu_conv_backward_data) {
     delete[] gradInImages;
 }
 
-TEST(test_dnn, simple_gpu_conv_backward_filters) {
+TEST(test_dnn_conv, simple_gpu_conv_backward_filters) {
     int N = 4;
     int inC = 3;
     int outC = 5;
