@@ -122,11 +122,21 @@ size_t cudnnSoftmaxForward(
     CoclDnnLayout softmaxMode,
     CoclDnnLayout softmaxChannel,
     float *p_alpha,
-    cudnnTensorDescriptor_t tensor1Desc,
-    float *tensor1_data,
+    cudnnTensorDescriptor_t inputDesc, float *inputData,
     float *p_beta,
-    cudnnTensorDescriptor_t tensor2Desc,
-    float *out_data
+    cudnnTensorDescriptor_t outputDesc, float *outputData
 ) {
+    if(softmaxMode != CUDNN_SOFTMAX_ACCURATE) {
+        throw runtime_error("Only softmax mode accurate implemented");
+    }
+    if(softmaxChannel != CUDNN_SOFTMAX_MODE_CHANNEL) {
+        throw runtime_error("Only softmax mode channel implemented");
+    }
+    if(inputDesc->H != 1) {
+        throw runtime_error("input height for softmaxforward only implemented for 1");
+    }
+    if(inputDesc->W != 1) {
+        throw runtime_error("input width for softmaxforward only implemented for 1");
+    }
     throw runtime_error("not implemented");
 }
