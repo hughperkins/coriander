@@ -158,7 +158,7 @@ TEST(test_dnn_act, backward_cpu) {
     delete[] gradInput;
 }
 
-TEST(test_dnn_act, gpu_forward_relu) {
+void run_forward_gpu(Act *act, CoclDnnLayout type) {
     int N = 4;
     int C = 3;
     int H = 5;
@@ -179,8 +179,8 @@ TEST(test_dnn_act, gpu_forward_relu) {
 
     fillRandomUniform(random, input, N * C * H * W, -1.0f, 1.0f);
 
-    Relu act;
-    forward_relu_cpu(input, N, C, H, W, output, &act);
+    // Relu act;
+    forward_relu_cpu(input, N, C, H, W, output, act);
 
     cout << "input[0][0]:" << endl;
     for(int h=0; h < H; h++) {
@@ -219,7 +219,7 @@ TEST(test_dnn_act, gpu_forward_relu) {
         CUDNN_DATA_FLOAT,
         N, C, H, W);
     cudnnSetActivationDescriptor(actDesc,
-                                 CUDNN_ACTIVATION_RELU,
+                                 type,
                                  CUDNN_PROPAGATE_NAN, 0.0);
 
     ThreadVars *v = getThreadVars();
@@ -293,7 +293,7 @@ TEST(test_dnn_act, gpu_forward_relu) {
     delete[] input;
 }
 
-TEST(test_dnn_act, gpu_backward_relu) {
+void run_backward_gpu(Act *act, CoclDnnLayout type) {
     int N = 4;
     int C = 3;
     int H = 5;
@@ -315,9 +315,9 @@ TEST(test_dnn_act, gpu_backward_relu) {
 
     fillRandomUniform(random, input, N * C * H * W, -1.0f, 1.0f);
 
-    Relu act;
-    forward_relu_cpu(input, N, C, H, W, output, &act);
-    backward_relu_cpu(output, output, output, N, C, H, W, gradInput, &act);
+    // Relu act;
+    forward_relu_cpu(input, N, C, H, W, output, act);
+    backward_relu_cpu(output, output, output, N, C, H, W, gradInput, act);
 
     cout << "input[0][0]:" << endl;
     for(int h=0; h < H; h++) {
@@ -356,7 +356,7 @@ TEST(test_dnn_act, gpu_backward_relu) {
         CUDNN_DATA_FLOAT,
         N, C, H, W);
     cudnnSetActivationDescriptor(actDesc,
-                                 CUDNN_ACTIVATION_RELU,
+                                 type,
                                  CUDNN_PROPAGATE_NAN, 0.0);
 
     ThreadVars *v = getThreadVars();
@@ -436,6 +436,15 @@ TEST(test_dnn_act, gpu_backward_relu) {
 
     delete[] output;
     delete[] input;
+}
+
+TEST(test_dnn_act, gpu_forward_relu) {
+    Relu relu;
+    run_forward_gpu(&relu, CUDNN_ACTIVATION_RELU);
+}
+TEST(test_dnn_act, gpu_backward_relu) {
+    Relu relu;
+    run_backward_gpu(&relu, CUDNN_ACTIVATION_RELU);
 }
 
 } // namespace
