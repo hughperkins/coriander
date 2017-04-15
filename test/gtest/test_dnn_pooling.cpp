@@ -158,10 +158,10 @@ TEST(test_dnn_pooling, gpu_forward) {
     int dH = 1;
     int dW = 1;
 
-    N = 1;
-    C = 1;
-    inH = 3;
-    inW = 3;
+    // N = 1;
+    // C = 1;
+    // inH = 3;
+    // inW = 3;
 
     int outH = (inH + 2 * padH - kH) / dH + 1;
     int outW = (inW + 2 * padW - kW) / dW + 1;
