@@ -17,6 +17,7 @@ using namespace cocl;
 using namespace cocl::dnn;
 
 static string get_ReluForward_sourcecode();
+static string get_ReluBackward_sourcecode();
 
 inline int getNumThreads() {
   // int blockSize = 1024;
@@ -107,7 +108,47 @@ size_t cudnnActivationBackward(
     float *p_beta,
     cudnnTensorDescriptor_t gradInputDesc, float *gradInputData
 ) {
-    throw runtime_error("not implemented");
+    ThreadVars *v = getThreadVars();
+    cl_int err;
+
+    Memory *gradOutputMemory = findMemory((const char *)gradOutputData);
+    Memory *inputMemory = findMemory((const char *)inputData);
+
+    Memory *gradInputMemory = findMemory((const char *)gradInputData);
+
+    size_t gradOutputOffset = gradOutputMemory->getOffset((const char *)gradOutputData);
+    size_t inputOffset = inputMemory->getOffset((const char *)inputData);
+
+    size_t gradInputOffset = gradInputMemory->getOffset((const char *)gradInputData);
+
+    CoclDnnGeometryType N = inputDesc->N;
+    CoclDnnGeometryType C = inputDesc->C;
+    CoclDnnGeometryType H = inputDesc->H;
+    CoclDnnGeometryType W = inputDesc->W;
+
+    easycl::CLKernel *kernel = getKernelForNameCl("ReluBackward", get_ReluBackward_sourcecode());
+
+    int linearSize = N * C * H * W;
+
+    kernel->in((int)linearSize);
+
+    kernel->inout(&gradOutputMemory->clmem);
+    kernel->in((int32_t)(gradOutputOffset / sizeof(float)));
+
+    kernel->inout(&inputMemory->clmem);
+    kernel->in((int32_t)(inputOffset / sizeof(float)));
+
+    kernel->inout(&gradInputMemory->clmem);
+    kernel->in((int32_t)(gradInputOffset / sizeof(float)));
+
+    int workgroupSize = getNumThreads();
+    int globalSize = GET_BLOCKS(linearSize) * workgroupSize;
+    kernel->run_1d(&v->currentContext->default_stream.get()->clqueue->queue, globalSize, workgroupSize);
+    // int status = clFinish(v->currentContext->default_stream.get()->clqueue->queue);
+    // if(status != 0) {
+    //     cout << "status" << status << endl;
+    //     throw runtime_error("Pooling returned non-zero status");
+    // }
 }
 
 string get_ReluForward_sourcecode() {
@@ -133,6 +174,38 @@ kernel void ReluForward(
     if(index < nthreads) {
         float inval = input[index];
         output[index] = inval > 0 ? inval : 0.0f;
+    }
+  }
+}
+)";
+}
+
+
+string get_ReluBackward_sourcecode() {
+    return R"(
+// CL: grid stride looping
+#define CL_KERNEL_LOOP(i, n)                        \
+  for (int i = get_group_id(0) * get_local_size(0) + get_local_id(0); \
+      i < (n);                                       \
+      i += get_local_size(0) * get_num_groups(0))
+
+#define Dtype float
+
+kernel void ReluBackward(
+    const int nthreads,
+    global const Dtype* gradOutput_data, int gradOutput_offset,
+    global const Dtype* input_data, int input_offset,
+    global Dtype* gradInput_data, int gradInput_offset
+  ) {
+
+  global const Dtype *gradOutput = gradOutput_data + gradOutput_offset;
+  global const Dtype *input = input_data + input_offset;
+  global Dtype *gradInput = gradInput_data + gradInput_offset;
+
+  CL_KERNEL_LOOP(index, nthreads) {
+    if(index < nthreads) {
+        float inval = input[index];
+        gradInput[index] = inval > 0 ? gradOutput[index] : 0.0f;
     }
   }
 }
