@@ -45,8 +45,12 @@ size_t cudnnDestroyActivationDescriptor(cudnnActivationDescriptor_t desc) {
 size_t cudnnSetActivationDescriptor(
     cudnnActivationDescriptor_t act, CoclDnnLayout activationType, CoclDnnLayout propagate,
         float probability) {
-    act->activationType = activationType;
-    act->propagate = propagate;
+    if(activationType != CUDNN_ACTIVATION_RELU) {
+        throw runtime_error("Activations only implemented for ReLU");
+    }
+    if(propagate != CUDNN_PROPAGATE_NAN) {
+        throw runtime_error("Activations only implemented with propagate nan enabled");
+    }
     act->probability = probability;
     return 0;
 }
