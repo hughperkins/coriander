@@ -206,14 +206,12 @@ TEST(test_dnn_loss, forward_softmax_gpu) {
     }
 
     for(int n=0; n < N; n++) {
-        cout << "n=" << n << ": ";
         for(int c=0; c < C; c++) {
             if(abs(gpuOutHostside[n * C + c] - output[n * C + c]) > 1e-4) {
                 cout << "mismatch for n=" << n << " c=" << c << endl;
                 throw runtime_error("mismatch");
             }
         }
-        cout << endl;
     }
 
     cudnnDestroyTensorDescriptor(inputDesc);

@@ -24,6 +24,24 @@ namespace dnn {
 using namespace cocl;
 using namespace cocl::dnn;
 
+static string get_SoftmaxForward_sourcecode();
+
+inline int getNumThreads() {
+  // int blockSize = 1024;
+  // int maxWorkgroupSize = ((easycl::DeviceInfo *)state->deviceInfoByDevice[state->currentDevice])->maxWorkGroupSize;
+  // if( blockSize > maxWorkgroupSize ) {
+  //   blockSize = maxWorkgroupSize;
+  // }
+  // return blockSize;
+    return 256; // just hardcode to 256 for now, which covers amd, intel, nvidia, just not always most efficiently, but
+                // kind of ok
+}
+
+// CL: number of blocks for threads.
+inline int GET_BLOCKS(const int N) {
+  return (N + getNumThreads() - 1) / getNumThreads();
+}
+
 const char *cudnnGetErrorString(std::size_t error) {
     throw runtime_error("not impelmented cudnnGetErrorString");
 }
@@ -138,5 +156,88 @@ size_t cudnnSoftmaxForward(
     if(inputDesc->W != 1) {
         throw runtime_error("input width for softmaxforward only implemented for 1");
     }
-    throw runtime_error("not implemented");
+
+    ThreadVars *v = getThreadVars();
+    cl_int err;
+
+    Memory *inputMemory = findMemory((const char *)inputData);
+    Memory *outputMemory = findMemory((const char *)outputData);
+
+    size_t inputOffset = inputMemory->getOffset((const char *)inputData);
+    size_t outputOffset = outputMemory->getOffset((const char *)outputData);
+
+    CoclDnnGeometryType N = inputDesc->N;
+    CoclDnnGeometryType C = inputDesc->C;
+
+    easycl::CLKernel *kernel = getKernelForNameCl("SoftmaxForward", get_SoftmaxForward_sourcecode());
+
+    int linearSize = N * C;
+
+    kernel->in((int)N);
+
+    kernel->inout(&inputMemory->clmem);
+    kernel->in((int32_t)(inputOffset / sizeof(float)));
+
+    kernel->in((int)C);
+
+    kernel->inout(&outputMemory->clmem);
+    kernel->in((int32_t)(outputOffset / sizeof(float)));
+
+    int workgroupSize = getNumThreads();
+    int globalSize = GET_BLOCKS(N) * workgroupSize;
+    kernel->run_1d(&v->currentContext->default_stream.get()->clqueue->queue, globalSize, workgroupSize);
+    // int status = clFinish(v->currentContext->default_stream.get()->clqueue->queue);
+    // if(status != 0) {
+    //     cout << "status" << status << endl;
+    //     throw runtime_error("Pooling returned non-zero status");
+    // }
+}
+
+string get_SoftmaxForward_sourcecode() {
+    return R"(
+// CL: grid stride looping
+#define CL_KERNEL_LOOP(i, n)                        \
+  for (int i = get_group_id(0) * get_local_size(0) + get_local_id(0); \
+      i < (n);                                       \
+      i += get_local_size(0) * get_num_groups(0))
+
+#define Dtype float
+
+// each thread will be one example (provide result over all c values for that example)
+kernel void SoftmaxForward(
+    const int N,
+    global const Dtype* input_data, int input_offset,
+    const int C,
+    global Dtype* output_data, int output_offset
+  ) {
+
+  global const Dtype *input = input_data + input_offset;
+  global Dtype *output = output_data + output_offset;
+
+  CL_KERNEL_LOOP(n, N) {
+    if(n < N) {
+        // float inval = input[index];
+        // output[index] = inval > 0 ? inval : 0.0f;
+
+        const global float *inputCube = &input[n * C];
+        global float *outputCube = &output[n * C];
+
+        // first get the max
+        float maxValue = inputCube[0];
+        for(int c = 1; c < C; c++) {
+            maxValue = max(maxValue, inputCube[c]);
+        }
+        // calculate sum, under this max
+        float denominator = 0;
+        for(int c = 0; c < C; c++) {
+            denominator += exp(inputCube[c] - maxValue);
+        }
+        // now calc the softmaxes:
+        for(int c = 0; c < C; c++) {
+            outputCube[c] = exp(inputCube[c] - maxValue) / denominator;
+        }
+    }
+  }
+}
+)";
 }
