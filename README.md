@@ -265,7 +265,7 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 - April 15:
   - added max pooling
-  - added ReLU activation
+  - added ReLU, sigmoid and tanh activations
 - April 14:
   - added backwards implementation for convolution, including data, filters, and bias
 - April 13:
