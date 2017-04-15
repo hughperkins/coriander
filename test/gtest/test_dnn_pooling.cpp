@@ -67,8 +67,30 @@ void pool_forward_cpu(
     int inH, int inW, int kH, int kW, int padH, int padW, int dH, int dW,
     float *output) {
 
-    int outH = (inH + 2 * padH - kH) / dH + 1;
-    int outW = (inW + 2 * padW - kW) / dW + 1;
+    // int outH = (inH + 2 * padH - kH) / dH + 1;
+    // int outW = (inW + 2 * padW - kW) / dW + 1;
+
+    int outH = 0;
+    int outW = 0;
+    // adapted from torch
+    bool ceil_mode = false;
+    if(ceil_mode) {
+        outW = ceil(float(inW - kW + 2*padW) / float(dW)) + 1;
+        outH = ceil(float(inH - kH + 2*padH) / float(dH)) + 1;
+    } else {
+        outW = floor(float(inW - kW + 2*padW) / float(dW)) + 1;
+        outH = floor(float(inH - kH + 2*padH) / float(dH)) + 1;
+    }
+
+    if(padW || padH) {
+        // ensure that the last pooling starts inside the image
+        if((outW - 1)*dH >= inH + padH) {
+            outH--;
+        }
+        if((outW  - 1)*dW >= inW  + padW) {
+            outW--;
+        }
+    }
 
     // adapted from caffe, via torch
     for(int n=0; n < N; n++) {
@@ -95,6 +117,86 @@ void pool_forward_cpu(
                         }
                         int outIndex = NCHW_to_index(N, C, outH, outW, n, c, outh, outw);
                         output[outIndex] = maxval;
+                    // }
+                }
+            }
+        }
+    }
+}
+
+void pool_backward_cpu(
+    float *output, float *gradOutput, float *input, int N, int C,
+    int inH, int inW, int kH, int kW, int padH, int padW, int dH, int dW,
+    float *gradInput) {
+
+    // int outH = (inH + 2 * padH - kH) / dH + 1;
+    // int outW = (inW + 2 * padW - kW) / dW + 1;
+
+    int outH = 0;
+    int outW = 0;
+    // adapted from torch
+    bool ceil_mode = false;
+    if(ceil_mode) {
+        outW = ceil(float(inW - kW + 2*padW) / float(dW)) + 1;
+        outH = ceil(float(inH - kH + 2*padH) / float(dH)) + 1;
+    } else {
+        outW = floor(float(inW - kW + 2*padW) / float(dW)) + 1;
+        outH = floor(float(inH - kH + 2*padH) / float(dH)) + 1;
+    }
+
+    if(padW || padH) {
+        // ensure that the last pooling starts inside the image
+        if((outW - 1)*dH >= inH + padH) {
+            outH--;
+        }
+        if((outW  - 1)*dW >= inW  + padW) {
+            outW--;
+        }
+    }
+    cout << "inH=" << inH << " inW=" << inW << " outH=" << outH << " outW=" << outW << endl;
+
+    // zero everything first...
+    for(int n=0; n < N; n++) {
+        for(int c=0; c < C; c++) {
+            for(int inh=0; inh < inH; inh++) {
+                for(int inw=0; inw < inW; inw++) {
+                    int inIndex = NCHW_to_index(N, C, inH, inW, n, c, inh, inw);
+                    gradInput[inIndex] = 0.0f;
+                }
+            }
+        }
+    }
+
+    // adapted from caffe, via torch
+    for(int n=0; n < N; n++) {
+        for(int c=0; c < C; c++) {
+            for(int outh=0; outh < outH; outh++) {
+                for(int outw=0; outw < outW; outw++) {
+                    // int inh = outh * dH + kh - padH;
+                    // int inw = outw * dW + kw - padW;
+                    // if(inh >= 0 && inw >= 0 && inh < inH && inw < inW) {
+                        int hstart = outh * dH - padH;
+                        int wstart = outw * dW - padW;
+                        int hend = min(hstart + kH, inH);
+                        int wend = min(wstart + kW, inW);
+                        hstart = max(hstart, 0);
+                        wstart = max(wstart, 0);
+                        float maxval = -1e14;
+                        // float maxval = input[NCHW_to_index(N, C, inH, inW, n, c, hstart, wstart)];
+                        int maxidx = -1;
+                        for (int inh = hstart; inh < hend; ++inh) {
+                            for (int inw = wstart; inw < wend; ++inw) {
+                                int inIndex = NCHW_to_index(N, C, inH, inW, n, c, inh, inw);
+                                if (input[inIndex] > maxval) {
+                                    maxval = input[inIndex];
+                                    maxidx = inh * inW + inw;
+                                }
+                            }
+                        }
+                        int outIndex = NCHW_to_index(N, C, outH, outW, n, c, outh, outw);
+                        int inIndex = NCHW_to_index(N, C, inH, inW, n, c, 0, 0) + maxidx;
+                        gradInput[inIndex] = gradOutput[outIndex];
+                        // output[outIndex] = maxval;
                     // }
                 }
             }
@@ -133,15 +235,64 @@ TEST(test_dnn_pooling, forward_cpu) {
     fillRandomInt(random, sampleIndices, numSamples, 0, outLinearSize);
     for(int i = 0; i < numSamples; i++) {
         int linearPos = sampleIndices[i];
+        int n = linearPos / C / outH / outW;
+        int rem = linearPos - n * C * outH * outW;
+        int c = rem / outH / outW;
+        rem = rem - c * outH * outW;
+        int outh = rem / outW;
+        int outw = rem % outW;
+        cout << "n=" << n << " c=" << c << " inh=" << outh << " inw=" << outw << " output[" << linearPos << "]=" << output[linearPos] << endl;
+    }
+
+    delete[] output;
+    delete[] input;
+}
+
+TEST(test_dnn_pooling, backward_cpu) {
+    int N = 4;
+    int C = 3;
+    int inH = 5;
+    int inW = 6;
+    int kH = 3;
+    int kW = 3;
+    int padH = 1;
+    int padW = 1;
+    int dH = 1;
+    int dW = 1;
+
+    int outH = (inH + 2 * padH - kH) / dH + 1;
+    int outW = (inW + 2 * padW - kW) / dW + 1;
+
+    int inLinearSize = N * C * inH * inW;
+    int outLinearSize = N * C * outH * outW;
+
+    float *input = new float[inLinearSize];
+    float *output = new float[outLinearSize];
+    float *gradInput = new float[inLinearSize];
+
+    MT19937 random;
+    random.seed(123ul);
+
+    fillRandomUniform(random, input, N * C * inH * inW, 0.0f, 1.0f);
+
+    pool_forward_cpu(input, N, C, inH, inW, kH, kW, padH, padW, dH, dW, output);
+    pool_backward_cpu(output, output, input, N, C, inH, inW, kH, kW, padH, padW, dH, dW, gradInput);
+
+    const int numSamples = 20;
+    int *sampleIndices = new int[numSamples];
+    fillRandomInt(random, sampleIndices, numSamples, 0, inLinearSize);
+    for(int i = 0; i < numSamples; i++) {
+        int linearPos = sampleIndices[i];
         int n = linearPos / C / inH / inW;
         int rem = linearPos - n * C * inH * inW;
         int c = rem / inH / inW;
         rem = rem - c * inH * inW;
         int inh = rem / inW;
         int inw = rem % inW;
-        cout << "n=" << n << " c=" << c << " inh=" << inh << " inw=" << inw << " output[" << linearPos << "]=" << output[linearPos] << endl;
+        cout << "n=" << n << " c=" << c << " inh=" << inh << " inw=" << inw << " gradInput[" << linearPos << "]=" << gradInput[linearPos] << endl;
     }
 
+    delete[] gradInput;
     delete[] output;
     delete[] input;
 }

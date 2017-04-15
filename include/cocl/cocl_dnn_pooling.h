@@ -46,16 +46,11 @@ extern "C" {
     );
     size_t cudnnPoolingBackward(
         cudnnHandle_t handle,
-        cudnnPoolingDescriptor_t poolDesc,
-        float *p_alpha,
-        cudnnTensorDescriptor_t tensor1Desc,
-        float *tensor1,
-        cudnnTensorDescriptor_t tensor2Desc,
-        float *tensor2,
-        cudnnTensorDescriptor_t tensor3Desc,
-        float *tensor3,
+        cudnnPoolingDescriptor_t poolDesc, float *p_alpha,
+        cudnnTensorDescriptor_t outputDesc, float *outputData,
+        cudnnTensorDescriptor_t gradOutputDesc, float *gradOutputData,
+        cudnnTensorDescriptor_t inputDesc, float *inputData,
         float *p_beta,
-        cudnnTensorDescriptor_t tensor4Desc,
-        float *tensor4
+        cudnnTensorDescriptor_t gradInputDesc, float *gradInputData
     );
 }
