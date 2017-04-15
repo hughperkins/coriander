@@ -16,8 +16,8 @@ public:
     CoclDnnGeometryType kW;
     CoclDnnGeometryType padH;
     CoclDnnGeometryType padW;
-    CoclDnnGeometryType strideH;
-    CoclDnnGeometryType strideW;
+    CoclDnnGeometryType dH;
+    CoclDnnGeometryType dW;
 };
 
 } // namespace dnn
@@ -34,7 +34,7 @@ extern "C" {
         CoclDnnLayout propagate,
         CoclDnnGeometryType kH, CoclDnnGeometryType kW,
         CoclDnnGeometryType padH, CoclDnnGeometryType padW,
-        CoclDnnGeometryType strideH, CoclDnnGeometryType strideW
+        CoclDnnGeometryType dH, CoclDnnGeometryType dW
     );
     size_t cudnnPoolingForward(
         cudnnHandle_t handle,
