@@ -102,6 +102,7 @@ New!
 - cudnn API implementations for:
   - convolution (using `im2col` algorithim, over Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast))
   - pooling
+  - activations: ReLU, tanh, sigmoid
 
 ## How to build
 
