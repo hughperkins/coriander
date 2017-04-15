@@ -111,8 +111,9 @@ size_t cudnnPoolingForward(
     easycl::CLKernel *kernel = getKernelForNameCl("MaxPoolForward", get_MaxPoolForward_sourcecode());
 
     int inputLinearSize = N * C * inH * inW;
+    int outputLinearSize = N * C * outH * outW;
 
-    kernel->in((int)inputLinearSize);
+    kernel->in((int)outputLinearSize);
 
     kernel->inout(&inputMemory->clmem);
     kernel->in((int32_t)(inputOffset / sizeof(float)));
@@ -136,6 +137,11 @@ size_t cudnnPoolingForward(
     int workgroupSize = getNumThreads();
     int globalSize = GET_BLOCKS(inputLinearSize) * workgroupSize;
     kernel->run_1d(&v->currentContext->default_stream.get()->clqueue->queue, globalSize, workgroupSize);
+    // int status = clFinish(v->currentContext->default_stream.get()->clqueue->queue);
+    // if(status != 0) {
+    //     cout << "status" << status << endl;
+    //     throw runtime_error("Pooling returned non-zero status");
+    // }
 }
 size_t cudnnPoolingBackward(
     cudnnHandle_t handle,
@@ -197,6 +203,7 @@ kernel void MaxPoolForward(
   global Dtype *top_data = top_data_data + top_data_offset;
 
   CL_KERNEL_LOOP(index, nthreads) {
+    if(index < nthreads) {
     int pw = index % pooled_width;
     int ph = (index / pooled_width) % pooled_height;
     int c = (index / pooled_width / pooled_height) % channels;
@@ -208,16 +215,18 @@ kernel void MaxPoolForward(
     hstart = max(hstart, 0);
     wstart = max(wstart, 0);
     Dtype maxval = -FLT_MAX;
-    bottom_data += (n * channels + c) * height * width;
+    global float *bottom_data_img = bottom_data + (n * channels + c) * height * width;
     for (int h = hstart; h < hend; ++h) {
       for (int w = wstart; w < wend; ++w) {
-        if (bottom_data[h * width + w] > maxval) {
-          int maxidx = h * width + w;
-          maxval = bottom_data[maxidx];
+        float val = bottom_data_img[h * width + w];
+        if (val > maxval) {
+          // int maxidx = h * width + w;
+          maxval = val;
         }
       }
     }
     top_data[index] = maxval;
+  }
   }
 }
 )";
