@@ -264,7 +264,8 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 ## News
 
 - April 15:
-  - added max pooling, forwards and backwards
+  - added max pooling
+  - added ReLU activation
 - April 14:
   - added backwards implementation for convolution, including data, filters, and bias
 - April 13:
