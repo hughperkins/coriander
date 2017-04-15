@@ -26,7 +26,7 @@ namespace gemm_im2col {
 
 static string get_im2col_sourcecode();
 static string get_col2im_sourcecode();
-static string get_slowstupidreduce_sourcecode();
+static string get_convbackbias_sourcecode();
 
 CoclDnnGeometryType getColumnsNumElements(
         cudnnHandle_t handle,
@@ -594,7 +594,7 @@ size_t cudnnConvolutionBackwardBias(
         0, 0, 0);
     easycl::EasyCL::checkError(err);
 
-    easycl::CLKernel *kernel = getKernelForNameCl("slowstupidreduce", get_slowstupidreduce_sourcecode());
+    easycl::CLKernel *kernel = getKernelForNameCl("convbackbias", get_convbackbias_sourcecode());
     for(int elt=0; elt < batchSize; elt++) {
         int gradOutputCubeOffset = gradOutputOffset + elt * output3dSize * sizeof(float);
 
@@ -704,7 +704,7 @@ kernel void col2im_kernel(const int n, global const float* col_data, int col_off
 )";
 }
 
-string get_slowstupidreduce_sourcecode() {
+string get_convbackbias_sourcecode() {
     // assumes NCHW layout
     // and we'll do one image at a time, since that cant be any slower than the actual convolve bit
     // (can it?)
@@ -721,7 +721,7 @@ string get_slowstupidreduce_sourcecode() {
       i < (n);                                       \
       i += get_local_size(0) * get_num_groups(0))
 
-kernel void slowstupidreduce(
+kernel void convbackbias(
         const global float *gradOutput_data, const int gradOutput_offset,
         const int outC, const int outHW,
         global float *gradBias_data, int gradBias_offset) {
