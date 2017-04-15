@@ -146,4 +146,131 @@ TEST(test_dnn_pooling, forward_cpu) {
     delete[] input;
 }
 
+TEST(test_dnn_pooling, gpu_forward) {
+    int N = 4;
+    int C = 3;
+    int inH = 5;
+    int inW = 6;
+    int kH = 3;
+    int kW = 3;
+    int padH = 1;
+    int padW = 1;
+    int dH = 1;
+    int dW = 1;
+
+    // N = 1;
+    // inC = 1;
+    // outC = 1;
+    // inH = 3;
+    // inW = 3;
+
+    int outH = (inH + 2 * padH - kH) / dH + 1;
+    int outW = (inW + 2 * padW - kW) / dW + 1;
+    cout << "outH=" << outH << " outW=" << outW << endl;
+
+    int inLinearSize = N * C * inH * inW;
+    int outLinearSize = N * C * outH * outW;
+
+    float *input = new float[inLinearSize];
+    float *output = new float[outLinearSize];
+
+    MT19937 random;
+    random.seed(123ul);
+
+    fillRandomUniform(random, input, N * C * inH * inW, 0.0f, 1.0f);
+
+    pool_forward_cpu(input, N, C, inH, inW, kH, kW, padH, padW, dH, dW, output);
+
+    cudnnHandle_t dnn_handle;
+    cudnnTensorDescriptor_t inputDesc;
+    cudnnTensorDescriptor_t outputDesc;
+    cudnnPoolingDescriptor_t poolDesc;
+
+    cudnnCreate(&dnn_handle);
+    cudnnCreateTensorDescriptor(&inputDesc);
+    cudnnCreateTensorDescriptor(&outputDesc);
+    cudnnCreatePoolingDescriptor(&poolDesc);
+
+    cudnnSetTensor4dDescriptor(
+        inputDesc,
+        CUDNN_TENSOR_NCHW,
+        CUDNN_DATA_FLOAT,
+        N, C, inH, inW);
+    cudnnSetTensor4dDescriptor(
+        outputDesc,
+        CUDNN_TENSOR_NCHW,
+        CUDNN_DATA_FLOAT,
+        N, C, outH, outW);
+    cudnnSetPooling2dDescriptor(poolDesc,
+                                CUDNN_POOLING_MAX,
+                                CUDNN_PROPAGATE_NAN,
+                                3, 3,
+                                0, 0,
+                                1, 1);
+
+    ThreadVars *v = getThreadVars();
+    EasyCL *cl = v->getContext()->getCl();
+
+    size_t inputOffsetBytes = 0;
+    size_t outputOffsetBytes = inputOffsetBytes + inLinearSize * sizeof(float);
+    size_t gpuMemoryAllocSize = outputOffsetBytes + outLinearSize * sizeof(float);
+
+    cout << "gpuMemoryAllocSize=" << gpuMemoryAllocSize << endl;
+    Memory *gpuMemory = Memory::newDeviceAlloc(gpuMemoryAllocSize);
+
+    float *gpuDeviceInput = (float *)(((char *)gpuMemory->fakePos + inputOffsetBytes));
+    float *gpuDeviceOutput = (float *)(((char *)gpuMemory->fakePos + outputOffsetBytes));
+
+    cl_int err;
+
+    err = clEnqueueWriteBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, inputOffsetBytes,
+                                     (inLinearSize) * sizeof(float), input, 0, NULL, NULL);
+    EasyCL::checkError(err);
+
+    float alpha = 1.0f;
+    float beta = 0.0f;
+    cudnnPoolingForward(dnn_handle,
+                        poolDesc,
+                        &alpha,
+                        inputDesc, gpuDeviceInput,  // input to this layer
+                        &beta,
+                        outputDesc, gpuDeviceOutput);  // output
+
+    float *gpuOutHostside = new float[outLinearSize];
+    err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, outputOffsetBytes,
+                                     (outLinearSize) * sizeof(float), gpuOutHostside, 0, NULL, NULL);
+    EasyCL::checkError(err);
+    cl->finish();
+
+    const int numSamples = 20;
+    int *sampleIndices = new int[numSamples];
+    fillRandomInt(random, sampleIndices, numSamples, 0, outLinearSize);
+    for(int i = 0; i < numSamples; i++) {
+        int linearPos = sampleIndices[i];
+        int n = linearPos / C / outH / outW;
+        int rem = linearPos - n * C * outH * outW;
+        int c = rem / outH / outW;
+        rem = rem - c * outH * outW;
+        int outh = rem / outW;
+        int outw = rem % outW;
+        cout << "n=" << n << " c=" << c << " outh=" << outh << " outw=" << outw << " output[" << linearPos << "]="
+            << output[linearPos] << " " << gpuOutHostside[linearPos] << endl;
+        if(abs(output[linearPos] - gpuOutHostside[linearPos]) > 1e-4) {
+            throw runtime_error(string("test_dnn, output of conv forward ,mismatch for ") +
+                "n=" + toString(n) + " c=" + toString(c) + " outh=" + toString(outh) + " outw=" + toString(outw));
+        }
+    }
+
+    cudnnDestroyPoolingDescriptor(poolDesc);
+    cudnnDestroyTensorDescriptor(inputDesc);
+    cudnnDestroyTensorDescriptor(outputDesc);
+    cudnnDestroy(dnn_handle);
+
+    delete gpuMemory;
+    delete[] gpuOutHostside;
+
+    delete[] output;
+    delete[] input;
+}
+
 } // namespace
