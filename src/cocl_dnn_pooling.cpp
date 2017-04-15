@@ -58,6 +58,13 @@ size_t cudnnSetPooling2dDescriptor(
     CoclDnnGeometryType padH, CoclDnnGeometryType padW,
     CoclDnnGeometryType dH, CoclDnnGeometryType dW
 ) {
+    if(type != CUDNN_POOLING_MAX) {
+        throw runtime_error("Only pooling type CUDNN_POOLING_MAX implemented, for now");
+    }
+    if(propagate != CUDNN_PROPAGATE_NAN) {
+        throw runtime_error("Only pooling propagate CUDNN_PROPAGATE_NAN implemented, for now");
+    }
+
     pool->type = type;
     pool->propagate = propagate;
     pool->kH = kH;
