@@ -99,7 +99,9 @@ New!
 - compiler for host-side code, including memory allocation, copy, streams, kernel launches
 - compiler for device-side code, handling templated C++ code, converting it into bog-standard OpenCL 1.2 code
 - cuBLAS API implementations for GEMM, GEMV, SCAL, SAXPY (using Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast))
-- cudnn API implementations for convolution (using `im2col` algorithim, over Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast))
+- cudnn API implementations for:
+  - convolution (using `im2col` algorithim, over Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast))
+  - pooling
 
 ## How to build
 
