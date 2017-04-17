@@ -400,7 +400,7 @@ size_t cuMemAlloc(CUdeviceptr*_pMemory, size_t bytes) {
 
 size_t cudaMalloc(float **pMemory, size_t N) {
     size_t res = ::cudaMalloc((void **)pMemory, N);
-    cout << "cudaMalloc float* pMemory= " << (void*)*pMemory << endl;
+    // cout << "cudaMalloc float* pMemory= " << (void*)*pMemory << endl;
     return res;
 }
 
