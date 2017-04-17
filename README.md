@@ -98,7 +98,12 @@ New!
 
 - compiler for host-side code, including memory allocation, copy, streams, kernel launches
 - compiler for device-side code, handling templated C++ code, converting it into bog-standard OpenCL 1.2 code
-- BLAS (using Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast))
+- cuBLAS API implementations for GEMM, GEMV, SCAL, SAXPY (using Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast))
+- cudnn API implementations for:
+  - convolution (using `im2col` algorithim, over Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast))
+  - pooling
+  - activations: ReLU, tanh, sigmoid
+  - softmax forward
 
 ## How to build
 
@@ -168,6 +173,9 @@ There are the following tests:
 - mid-level tests, using `py.test`
 - end-to-end tests
 - Eigen tests, in Eigen repo, https://bitbucket.org/hughperkins/eigen/src/eigen-cl/unsupported/test/cuda-on-cl/?at=eigen-cl
+- cudnn:
+  - I'm using a branch of Tal Ben-Nun's [cudnn-training](https://github.com/tbennun/cudnn-training), at https://github.com/hughperkins/cudnn-training , to add/test cudnn implementation
+  - there are tests within CUDA-on-CL, in the `gtest` tests, eg run `./cocl_unittests tests=*dnn*`
 
 ### gtest tests
 
@@ -249,6 +257,7 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 - Eigen-CL: Minimally-tweaked fork of Eigen, which can be compiled/run using cuda-on-cl, on an OpenCL device, https://bitbucket.org/hughperkins/eigen/commits/branch/eigen-cl
 - Tensorflow-CL: Fork of Tensorflow, that can be built and run on an OpenCL-1.2 enabled GPU, using cuda-on-cl, https://github.com/hughperkins/tensorflow-cl
+- CLBlast: Cedric Nugteren's excellent BLAS implementation for OpenCL  [CLBlast](https://github.com/cnugteren/CLBlast)
 
 ## License
 
@@ -256,6 +265,18 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 ## News
 
+- April 15:
+  - added max pooling
+  - added ReLU, sigmoid and tanh activations
+  - added softmax forward
+  - now possible by and large to compile Tal Ben-Nun's [cudnn-training](https://github.com/tbennun/cudnn-training).  It needs some additions to the CMakeLists.txt, see my fork at https://github.com/hughperkins/cudnn-training , [differences here](https://github.com/tbennun/cudnn-training/compare/master...hughperkins:opencl)
+- April 14:
+  - added backwards implementation for convolution, including data, filters, and bias
+- April 13:
+  - added CLBlast wrappers for: sgemv, sscal, saxpy
+- April 4:
+  - merged in current `dnn` branch, which provides forward convolutional implementation for cudnn API, using `im2col` over Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast)
+  - CUDA-on-CL got accepted for a technical presentation at this year's [IWOCL](https://iwocl.org) conference :-)  Conference sessions here: [IWOCL 2017 Conference program](www.iwocl.org/iwocl-2017/conference-program/)
 - Nov 25:
   - created release 4.0.4:
     - all current Eigen tests, https://bitbucket.org/hughperkins/eigen/src/eigen-cl/unsupported/test/cuda-on-cl/?at=eigen-cl , pass for me currently, using this release, on both beignet 1.2.1, on hd5500, and on NVIDIA 940M, using driver 367.57

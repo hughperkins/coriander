@@ -81,7 +81,7 @@ size_t cudaGetDevice(CUdevice *device) {
 
 size_t cudaGetDeviceCount (int *count) {
     COCL_PRINT(cout << "cudaGetDeviceCount" << endl);
-    *count = easycl::DevicesInfo::getNumGpus();
+    *count = getNumGpus();
     // *count = 1;  // we need a bunch of work to iplement more thna 1 device...
     return 0;
 }
@@ -92,9 +92,9 @@ size_t cudaSetDevice (CUdevice device) {
     if(device < 0) {
         throw runtime_error("Cannot set device less than 0");
     }
-    if(device >= easycl::DevicesInfo::getNumGpus()) {
+    if(device >= getNumGpus()) {
     //if(device > 0) {
-        throw runtime_error("Cannot set device to outside of range 0 to " + toString(easycl::DevicesInfo::getNumGpus() - 1));
+        throw runtime_error("Cannot set device to outside of range 0 to " + toString(getNumGpus() - 1));
         //throw runtime_error("Not yet implemented: switching to non-zero device");
     }
     v->currentDevice = device;

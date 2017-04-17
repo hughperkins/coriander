@@ -9,7 +9,7 @@
 // to start from
 
 #include "cocl/cocl_dnn.h"
-
+#include "cocl/cocl_dnn_conv.h"
 #include "EasyCL/EasyCL.h"
 
 namespace cocl {
@@ -27,7 +27,8 @@ void im2col(
     const CoclDnnGeometryType pad_w,
     const CoclDnnGeometryType stride_h,
     const CoclDnnGeometryType stride_w,
-    cl_mem col_buf, size_t col_offset
+    cl_mem col_buf, size_t col_offset,
+    cl_command_queue *queue
 );
 
 void col2im(
@@ -41,7 +42,8 @@ void col2im(
     const CoclDnnGeometryType pad_w,
     const CoclDnnGeometryType stride_h,
     const CoclDnnGeometryType stride_w,
-    cl_mem im_buf, size_t im_offset_bytes
+    cl_mem im_buf, size_t im_offset_bytes,
+    cl_command_queue *queue
 );
 
 CoclDnnGeometryType getColumnsNumElements(
@@ -59,6 +61,22 @@ std::size_t cudnnGetConvolutionForwardWorkspaceSize(
     cudnnTensorDescriptor_t dstTensor,
     CoclDnnSizeType *p_size_bytes
 );
+size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
+    cudnnHandle_t handle,
+    cudnnFilterDescriptor_t filterDesc,
+    cudnnTensorDescriptor_t gradOutputDesc,
+    cudnnConvolutionDescriptor_t convDesc,
+    cudnnTensorDescriptor_t gradInputDesc,
+    CoclDnnSizeType *p_size_bytes
+);
+size_t cudnnGetConvolutionBackwardFilterWorkspaceSize(
+    cudnnHandle_t handle,
+    cudnnTensorDescriptor_t inputDesc,
+    cudnnTensorDescriptor_t outputDesc,
+    cudnnConvolutionDescriptor_t convDesc,
+    cudnnFilterDescriptor_t filterDesc,
+    CoclDnnSizeType *p_size
+);
 
 size_t cudnnConvolutionForward(
     cudnnHandle_t handle,
@@ -69,6 +87,34 @@ size_t cudnnConvolutionForward(
     void *workspaceData, CoclDnnSizeType workspaceSize,
     float *p_beta,
     cudnnTensorDescriptor_t outputTensorDesc, float *outputData
+);
+size_t cudnnConvolutionBackwardData(
+    cudnnHandle_t handle,
+    float *p_alpha,
+    cudnnFilterDescriptor_t filtersDesc, float *filters_data,
+    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutput_data,
+    cudnnConvolutionDescriptor_t convDesc,
+    void *workspace,
+    CoclDnnGeometryType workspaceSize,
+    float *p_beta,
+    cudnnTensorDescriptor_t gradInputDesc, float *gradInput
+);
+size_t cudnnConvolutionBackwardFilter(
+    cudnnHandle_t handle,
+    float *p_alpha,
+    cudnnTensorDescriptor_t inputDesc, float *input_data,
+    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutput_data,
+    cudnnConvolutionDescriptor_t convDesc,
+    void *workspace_data, CoclDnnGeometryType workspaceSize,
+    float *p_beta,
+    cudnnFilterDescriptor_t filterDesc, float *gradInput_data
+);
+size_t cudnnConvolutionBackwardBias(
+    cudnnHandle_t handle,
+    float *p_alpha,
+    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutputData,
+    float *p_beta,
+    cudnnTensorDescriptor_t gradBiasDesc, float *gradBiasData
 );
 
 } // namespace gemm_im2col

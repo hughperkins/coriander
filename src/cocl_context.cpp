@@ -33,6 +33,8 @@ using namespace cocl;
 using namespace easycl;
 
 namespace cocl {
+    int globalNumGpus = -1;
+
     static pthread_key_t key;
     static pthread_once_t key_once = PTHREAD_ONCE_INIT;
 
@@ -41,7 +43,15 @@ namespace cocl {
     static void make_key() {
         (void) pthread_key_create(&key, NULL);
     }
-
+    int getNumGpus() {
+        if(globalNumGpus >= 0) {
+            return globalNumGpus;
+        }
+        pthread_mutex_lock(&clcontextcreation_mutex);
+        globalNumGpus = easycl::DevicesInfo::getNumGpus();
+        pthread_mutex_unlock(&clcontextcreation_mutex);
+        return globalNumGpus;
+    }
     Context::Context(int device) : device(device) {
         COCL_PRINT(cout << "Context() " << this << endl);
         pthread_mutex_lock(&clcontextcreation_mutex);

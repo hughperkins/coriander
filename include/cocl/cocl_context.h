@@ -30,6 +30,8 @@ namespace easycl {
 }
 
 namespace cocl {
+    int getNumGpus();
+
     class Memory;
     class CoclStream;
 

@@ -6,7 +6,7 @@
 // other convolutional implementatinos can be added in the future, but GEMM/im2col gives a solid works-everywhere base
 // to start from
 
-#include "cocl_dnn_gemm.h"
+#include "cocl/cocl_dnn_gemm.h"
 
 #include "cocl/cocl.h"
 #include "cocl/cocl_dnn.h"
@@ -18,12 +18,15 @@
 #include <iostream>
 using namespace std;
 
+#include "EasyCL/EasyCL.h"
+
 namespace cocl {
 namespace dnn {
 namespace gemm_im2col {
 
 static string get_im2col_sourcecode();
 static string get_col2im_sourcecode();
+static string get_convbackbias_sourcecode();
 
 CoclDnnGeometryType getColumnsNumElements(
         cudnnHandle_t handle,
@@ -70,7 +73,8 @@ void im2col(cl_mem im_buf, size_t im_offset_bytes, const CoclDnnGeometryType cha
         const CoclDnnGeometryType pad_w,
         const CoclDnnGeometryType stride_h,
         const CoclDnnGeometryType stride_w,
-        cl_mem col_buf, size_t col_offset_bytes
+        cl_mem col_buf, size_t col_offset_bytes,
+        cl_command_queue *queue
         ) {
     // We are going to launch channels * height_col * width_col kernels, each
     // kernel responsible for copying a single-channel grid.
@@ -98,12 +102,13 @@ void im2col(cl_mem im_buf, size_t im_offset_bytes, const CoclDnnGeometryType cha
 
     int workgroupSize = getNumThreads();
     int globalSize = GET_BLOCKS(num_kernels) * workgroupSize;
-    kernel->run_1d(globalSize, workgroupSize);
+    kernel->run_1d(queue, globalSize, workgroupSize);
 }
 
 void col2im(cl_mem col_buf, size_t col_offset_bytes, const int channels,
         const int height, const int width, const int patch_h, const int patch_w, const int pad_h,
-        const int pad_w, const int stride_h, const int stride_w,  cl_mem im_buf, size_t im_offset_bytes) {
+        const int pad_w, const int stride_h, const int stride_w,  cl_mem im_buf, size_t im_offset_bytes,
+        cl_command_queue *queue) {
     int height_col = (height + 2 * pad_h - patch_h) / stride_h + 1;
     int width_col = (width + 2 * pad_w - patch_w) / stride_w + 1;
     int num_kernels = channels * height * width;
@@ -133,7 +138,7 @@ void col2im(cl_mem col_buf, size_t col_offset_bytes, const int channels,
 
     int workgroupSize = getNumThreads();
     int globalSize = GET_BLOCKS(num_kernels) * workgroupSize;
-    kernel->run_1d(globalSize, workgroupSize);
+    kernel->run_1d(queue, globalSize, workgroupSize);
 }
 
 size_t cudnnGetConvolutionForwardWorkspaceSize(
@@ -147,16 +152,15 @@ size_t cudnnGetConvolutionForwardWorkspaceSize(
     *p_size_bytes = getColumnsNumElements(handle, srcTensor, filter, conv, dstTensor) * sizeof(float);
     return 0;
 }
-
 size_t cudnnConvolutionForward(
     cudnnHandle_t handle,
     float *p_alpha,
-    cudnnTensorDescriptor_t inputTensorDesc, float *inputData,
+    cudnnTensorDescriptor_t inputDesc, float *inputData,
     cudnnFilterDescriptor_t filterDesc, float *filterData,
     cudnnConvolutionDescriptor_t convDesc,
     void *workspaceData, CoclDnnSizeType workspaceSize,
     float *p_beta,
-    cudnnTensorDescriptor_t outputTensorDesc, float *outputData
+    cudnnTensorDescriptor_t outputDesc, float *outputData
 ) {
     if(*p_alpha != 1) {
         throw runtime_error("cudnnConvolutionForward only implemented for alpha == 1");
@@ -179,34 +183,63 @@ size_t cudnnConvolutionForward(
     cl_int err;
 
     CoclDnnGeometryType columnsNumElements = getColumnsNumElements(
-        handle, inputTensorDesc, filterDesc, convDesc, outputTensorDesc);
+        handle, inputDesc, filterDesc, convDesc, outputDesc);
     size_t columnsOffset = workspaceOffset;
 
-    size_t input3dSize = inputTensorDesc->C * inputTensorDesc->H * inputTensorDesc->W;
-    size_t output3dSize = outputTensorDesc->C * outputTensorDesc->H * outputTensorDesc->W;
-    CoclDnnGeometryType batchSize = inputTensorDesc->N;
+    size_t input3dSize = inputDesc->C * inputDesc->H * inputDesc->W;
+    size_t output3dSize = outputDesc->C * outputDesc->H * outputDesc->W;
+    CoclDnnGeometryType batchSize = inputDesc->N;
     for(CoclDnnGeometryType elt = 0; elt < batchSize; elt++) {
         size_t input3dOffsetBytes = inputOffset + elt * input3dSize * sizeof(float);
         size_t output3dOffsetBytes = outputOffset + elt * output3dSize * sizeof(float);
 
-        CoclDnnGeometryType nInputPlane = inputTensorDesc->C;
-        CoclDnnGeometryType inputHeight = inputTensorDesc->H;
-        CoclDnnGeometryType inputWidth = inputTensorDesc->W;
+        CoclDnnGeometryType nInputPlane = inputDesc->C;
+        CoclDnnGeometryType inputHeight = inputDesc->H;
+        CoclDnnGeometryType inputWidth = inputDesc->W;
         CoclDnnGeometryType kH = filterDesc->kH;
         CoclDnnGeometryType kW = filterDesc->kW;
         CoclDnnGeometryType padH = convDesc->padH;
         CoclDnnGeometryType padW = convDesc->padW;
         CoclDnnGeometryType dH = convDesc->dH;
         CoclDnnGeometryType dW = convDesc->dW;
+
+        // from torch SpatialConvolutionMM.cu:
+        // // Extract columns:
+        // im2col(
+        //   THCState_getCurrentStream(state),
+        //   THCudaTensor_data(state, input_n),
+        //   nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
+        //   1, 1, THCudaTensor_data(state, columns)
+        // );
         im2col(
             inputMemory->clmem, input3dOffsetBytes,
             nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
-            workspaceMemory->clmem, columnsOffset
+            workspaceMemory->clmem, columnsOffset,
+            &v->currentContext->default_stream.get()->clqueue->queue
         );
 
-        CoclDnnGeometryType nOutputPlane = outputTensorDesc->C;
-        CoclDnnGeometryType outputHeight = outputTensorDesc->H;
-        CoclDnnGeometryType outputWidth = outputTensorDesc->W;
+        CoclDnnGeometryType nOutputPlane = outputDesc->C;
+        CoclDnnGeometryType outputHeight = outputDesc->H;
+        CoclDnnGeometryType outputWidth = outputDesc->W;
+
+        // from torch SpatialConvolutionMM.cu:
+        // // M,N,K are dims of matrix A and B
+        // // (see http://docs.nvidia.com/cuda/cublas/#cublas-lt-t-gt-gemm)
+        // long m = nOutputPlane;
+        // long n = columns->size[1];
+        // long k = nInputPlane*kH*kW;
+
+        // // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
+        // THCudaBlas_Sgemm(
+        //     state,
+        //     'n', 'n',
+        //     n, m, k,
+        //     1,
+        //     THCudaTensor_data(state, columns), n,
+        //     THCudaTensor_data(state, weight), k,
+        //     1,
+        //     THCudaTensor_data(state, output_n), n
+        // );
 
         CoclDnnGeometryType m = nOutputPlane; // weight->size[0]; //nOutputPlane
         CoclDnnGeometryType n = outputHeight * outputWidth; // columns->size[1];
@@ -228,6 +261,356 @@ size_t cudnnConvolutionForward(
     }
 
     return 0;
+}
+size_t cudnnGetConvolutionBackwardFilterWorkspaceSize(
+    cudnnHandle_t handle,
+    cudnnTensorDescriptor_t inputDesc,
+    cudnnTensorDescriptor_t outputDesc,
+    cudnnConvolutionDescriptor_t convDesc,
+    cudnnFilterDescriptor_t filterDesc,
+    CoclDnnSizeType *p_size_bytes
+) {
+    // from torch:
+    // // Resize temporary columns
+    // THClTensor_resize2d(state, columns, nOutputPlane*kW*kH, inputHeight*inputWidth);
+
+    CoclDnnGeometryType outC = outputDesc->C;
+
+    CoclDnnGeometryType kH = filterDesc->kH;
+    CoclDnnGeometryType kW = filterDesc->kW;
+
+    CoclDnnGeometryType inH = inputDesc->H;
+    CoclDnnGeometryType inW = inputDesc->W;
+
+    int rows = outC * kW * kH;
+    int cols = inH * inW;
+    *p_size_bytes = rows * cols * sizeof(float);
+    return 0;
+}
+size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
+    cudnnHandle_t handle,
+    cudnnFilterDescriptor_t filterDesc,
+    cudnnTensorDescriptor_t gradOutputDesc,
+    cudnnConvolutionDescriptor_t convDesc,
+    cudnnTensorDescriptor_t gradInputDesc,
+    CoclDnnSizeType *p_size_bytes
+) {
+    // from torch cunn SpatialConvolutionMM.cu:
+    // THCudaTensor_resize2d(state, gradColumns, nInputPlane*kW*kH, outputHeight*outputWidth);
+
+    CoclDnnGeometryType inC = gradInputDesc->C;
+
+    CoclDnnGeometryType outH = gradOutputDesc->H;
+    CoclDnnGeometryType outW = gradOutputDesc->W;
+
+    CoclDnnGeometryType kH = filterDesc->kH;
+    CoclDnnGeometryType kW = filterDesc->kW;
+
+    CoclDnnGeometryType rows = inC * kW * kH;
+    CoclDnnGeometryType cols = outH * outW;
+
+    *p_size_bytes = rows * cols * sizeof(float);
+    return 0;
+}
+size_t cudnnConvolutionBackwardData(
+    cudnnHandle_t handle,
+    float *p_alpha,
+    cudnnFilterDescriptor_t filterDesc, float *filterData,
+    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutputData,
+    cudnnConvolutionDescriptor_t convDesc,
+    void *workspaceData, CoclDnnGeometryType workspaceSize,
+    float *p_beta,
+    cudnnTensorDescriptor_t gradInputDesc, float *gradInputData
+) {
+    if(*p_alpha != 1) {
+        throw runtime_error("cudnnConvolutionBackwardData only implemented for alpha == 1");
+    }
+    if(*p_beta != 0) {
+        throw runtime_error("cudnnConvolutionBackwardData only implemented for beta == 0");
+    }
+    ThreadVars *v = getThreadVars();
+
+    Memory *gradOutputMemory = findMemory((const char *)gradOutputData);
+    Memory *filterMemory = findMemory((const char *)filterData);
+    Memory *gradInputMemory = findMemory((const char *)gradInputData);
+    Memory *workspaceMemory = findMemory((const char *)workspaceData);
+
+    size_t gradOutputOffset = gradOutputMemory->getOffset((const char *)gradOutputData);
+    size_t filterOffset = filterMemory->getOffset((const char *)filterData);
+    size_t gradInputOffset = gradInputMemory->getOffset((const char *)gradInputData);
+    size_t workspaceOffset = workspaceMemory->getOffset((const char *)workspaceData);
+
+    cl_int err;
+
+    CoclDnnGeometryType inC = gradInputDesc->C;
+    CoclDnnGeometryType inH = gradInputDesc->H;
+    CoclDnnGeometryType inW = gradInputDesc->W;
+
+    CoclDnnGeometryType outC = gradOutputDesc->C;
+    CoclDnnGeometryType outH = gradOutputDesc->H;
+    CoclDnnGeometryType outW = gradOutputDesc->W;
+
+    CoclDnnGeometryType kH = filterDesc->kH;
+    CoclDnnGeometryType kW = filterDesc->kW;
+
+    CoclDnnGeometryType padH = convDesc->padH;
+    CoclDnnGeometryType padW = convDesc->padW;
+
+    CoclDnnGeometryType dH = convDesc->dH;
+    CoclDnnGeometryType dW = convDesc->dW;
+
+    // from torch cunn SpatialConvolutionMM.cu:
+    // THCudaTensor_resize2d(state, gradColumns, nInputPlane*kW*kH, outputHeight*outputWidth);
+    CoclDnnGeometryType columnsRows = inC * kW * kH;
+    CoclDnnGeometryType columnsCols = outH * outW;
+    CoclDnnGeometryType columnsNumElements = columnsRows * columnsCols;
+    size_t columnsOffset = workspaceOffset;
+
+    size_t input3dSize = inC * inH * inW;
+    size_t output3dSize = outC * outH * outW;
+    CoclDnnGeometryType batchSize = gradOutputDesc->N;
+    for(CoclDnnGeometryType elt = 0; elt < batchSize; elt++) {
+        size_t gradInput3dOffsetBytes = gradInputOffset + elt * input3dSize * sizeof(float);
+        size_t gradOutput3dOffsetBytes = gradOutputOffset + elt * output3dSize * sizeof(float);
+
+        // from torch cunn SpatialConvolutionMM.cu:
+        // // M,N,K are dims of matrix A and B
+        // // (see http://docs.nvidia.com/cuda/cublas/#cublas-lt-t-gt-gemm)
+        // long m = nInputPlane*kW*kH;
+        // long n = gradColumns->size[1];
+        // long k = nOutputPlane;
+
+        // // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
+        // THCudaBlas_Sgemm(
+        //     state,
+        //     'n', 't',
+        //     n, m, k,
+        //     1,
+        //     THCudaTensor_data(state, gradOutput_n), n,
+        //     THCudaTensor_data(state, weight), m,
+        //     0,
+        //     THCudaTensor_data(state, gradColumns), n
+        // );
+
+        CoclDnnGeometryType m = inC * kH * kW; // nInputPlane*kW*kH;
+        CoclDnnGeometryType n = outH * outW; // columns->size[1] = outputHeight*outputWidth;
+        CoclDnnGeometryType k = outC; // nOutputPlane;
+
+        StatusCode status = CLBlastSgemm(kColMajor, kNo, kYes,
+                                       n, m, k,
+                                       1.0f,
+                                       gradOutputMemory->clmem, gradOutput3dOffsetBytes / sizeof(float), n,
+                                       filterMemory->clmem, filterOffset / sizeof(float), m,
+                                       0.0f,
+                                       workspaceMemory->clmem, columnsOffset / sizeof(float), n,
+                                       &v->currentContext->default_stream.get()->clqueue->queue, 0);
+        if(status != 0) {
+            cout << "sgemm status code " << status << endl;
+            throw runtime_error("Failed call to blas sgem");
+        }
+
+        // from torch cunn SpatialConvolutionMM.cu:
+        // // Unpack columns back into input:
+        // col2im(
+        //   THCState_getCurrentStream(state),
+        //   THCudaTensor_data(state, gradColumns),
+        //   nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
+        //   1, 1, THCudaTensor_data(state, gradInput_n)
+        // );
+        col2im(
+            workspaceMemory->clmem, columnsOffset,
+            inC, inH, inW, kH, kW, padH, padW, dH, dW,
+            gradInputMemory->clmem, gradInput3dOffsetBytes,
+            &v->currentContext->default_stream.get()->clqueue->queue
+        );
+    }
+    // v->getContext()->getCl()->finish();
+    return 0;
+}
+size_t cudnnConvolutionBackwardFilter(
+    cudnnHandle_t handle,
+    float *p_alpha,
+    cudnnTensorDescriptor_t inputDesc, float *inputData,
+    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutputData,
+    cudnnConvolutionDescriptor_t convDesc,
+    void *workspaceData, CoclDnnGeometryType workspaceSize,
+    float *p_beta,
+    cudnnFilterDescriptor_t filterDesc, float *gradFilterData
+) {
+    if(*p_alpha != 1) {
+        throw runtime_error("cudnnConvolutionBackwardData only implemented for alpha == 1");
+    }
+    if(*p_beta != 0) {
+        throw runtime_error("cudnnConvolutionBackwardData only implemented for beta == 0");
+    }
+    ThreadVars *v = getThreadVars();
+
+    Memory *inputMemory = findMemory((const char *)inputData);
+    Memory *gradOutputMemory = findMemory((const char *)gradOutputData);
+    Memory *gradFilterMemory = findMemory((const char *)gradFilterData);
+    Memory *workspaceMemory = findMemory((const char *)workspaceData);
+
+    size_t inputOffset = inputMemory->getOffset((const char *)inputData);
+    size_t gradOutputOffset = gradOutputMemory->getOffset((const char *)gradOutputData);
+    size_t gradFilterOffset = gradFilterMemory->getOffset((const char *)gradFilterData);
+    size_t workspaceOffset = workspaceMemory->getOffset((const char *)workspaceData);
+
+    cl_int err;
+
+    CoclDnnGeometryType inC = inputDesc->C;
+    CoclDnnGeometryType inH = inputDesc->H;
+    CoclDnnGeometryType inW = inputDesc->W;
+
+    CoclDnnGeometryType outC = gradOutputDesc->C;
+    CoclDnnGeometryType outH = gradOutputDesc->H;
+    CoclDnnGeometryType outW = gradOutputDesc->W;
+
+    CoclDnnGeometryType kH = filterDesc->kH;
+    CoclDnnGeometryType kW = filterDesc->kW;
+
+    CoclDnnGeometryType padH = convDesc->padH;
+    CoclDnnGeometryType padW = convDesc->padW;
+    CoclDnnGeometryType dH = convDesc->dH;
+    CoclDnnGeometryType dW = convDesc->dW;
+
+    CoclDnnGeometryType columnsNumElements = getColumnsNumElements(
+        handle, inputDesc, filterDesc, convDesc, gradOutputDesc);
+    size_t columnsOffset = workspaceOffset;
+
+    // from torch cunn SpatialConvolutionMM.cu:
+    // THCudaTensor_resize2d(state, columns, nInputPlane*kW*kH, outputHeight*outputWidth);
+
+    size_t input3dSize = inC * inH * inW;
+    size_t output3dSize = outC * outH * outW;
+    CoclDnnGeometryType batchSize = gradOutputDesc->N;
+
+    int filterSize = outC * inC * kH * kW;
+    cl_float value = 0.0f;
+    err = clEnqueueFillBuffer(
+        v->currentContext->default_stream.get()->clqueue->queue,
+        gradFilterMemory->clmem,
+        &value, sizeof(float),
+        gradFilterOffset, filterSize * sizeof(float),
+        0, 0, 0);
+    easycl::EasyCL::checkError(err);
+
+    for(CoclDnnGeometryType elt = 0; elt < batchSize; elt++) {
+        size_t input3dOffsetBytes = inputOffset + elt * input3dSize * sizeof(float);
+        size_t gradOutput3dOffsetBytes = gradOutputOffset + elt * output3dSize * sizeof(float);
+
+        // from torch cunn SpatialConvolutionMM.cu:
+        // // Extract columns:
+        // im2col(
+        //   THCState_getCurrentStream(state),
+        //   THCudaTensor_data(state, input_n),
+        //   nInputPlane, inputHeight, inputWidth, kH, kW, padH, padW, dH, dW,
+        //   1, 1, THCudaTensor_data(state, columns)
+        // );
+        im2col(
+            inputMemory->clmem, input3dOffsetBytes,
+            inC, inH, inW, kH, kW, padH, padW, dH, dW,
+            workspaceMemory->clmem, columnsOffset,
+            &v->currentContext->default_stream.get()->clqueue->queue
+        );
+
+        // from torch cunn SpatialConvolutionMM.cu:
+        // // M,N,K are dims of matrix A and B
+        // // (see http://docs.nvidia.com/cuda/cublas/#cublas-lt-t-gt-gemm)
+        // long m = nOutputPlane;
+        // long n = nInputPlane*kW*kH;
+        // long k = columns->size[1];
+
+        // // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
+        // THCudaBlas_Sgemm(
+        //     state,
+        //     't', 'n',
+        //     n, m, k,
+        //     scale,
+        //     THCudaTensor_data(state, columns), k,
+        //     THCudaTensor_data(state, gradOutput_n), k,
+        //     1,
+        //     THCudaTensor_data(state, gradWeight), n
+        // );
+
+        CoclDnnGeometryType m = outC;   // nOutputPlane;
+        CoclDnnGeometryType n = inC * kW * kH;   // nInputPlane*kW*kH;
+        CoclDnnGeometryType k = outH * outW;   // columns->size[1] = outputHeight*outputWidth
+
+        StatusCode status = CLBlastSgemm(kColMajor,
+                                       kYes, kNo,
+                                       n, m, k,
+                                       1.0f,
+                                       workspaceMemory->clmem, columnsOffset / sizeof(float), k,
+                                       gradOutputMemory->clmem, gradOutput3dOffsetBytes / sizeof(float), k,
+                                       1.0f,
+                                       gradFilterMemory->clmem, gradFilterOffset / sizeof(float), n,
+                                       &v->currentContext->default_stream.get()->clqueue->queue, 0);
+        if(status != 0) {
+            cout << "sgemm status code " << status << endl;
+            throw runtime_error("Failed call to blas sgem");
+        }
+    }
+    return 0;
+}
+size_t cudnnConvolutionBackwardBias(
+    cudnnHandle_t handle,
+    float *p_alpha,
+    cudnnTensorDescriptor_t gradOutputDesc, float *gradOutputData,
+    float *p_beta,
+    cudnnTensorDescriptor_t gradBiasDesc, float *gradBiasData
+) {
+    // this is actually challenging, since we seem to have no workspace???
+    // some ideas:
+    // - just do some stupid slow kernel for now
+    // - use some third-party library (but it needs alloc presumably?)
+    // - create our own workspace... (but... threading? etc ...)
+    // - maybe there is some way of getting some workspace?
+    // I might just go with some slow stupid kernel for now...
+
+    ThreadVars *v = getThreadVars();
+
+    Memory *gradOutputMemory = findMemory((const char *)gradOutputData);
+    Memory *gradBiasMemory = findMemory((const char *)gradBiasData);
+
+    size_t gradOutputOffset = gradOutputMemory->getOffset((const char *)gradOutputData);
+    size_t gradBiasOffset = gradBiasMemory->getOffset((const char *)gradBiasData);
+
+    CoclDnnGeometryType batchSize = gradOutputDesc->N;
+    CoclDnnGeometryType outC = gradOutputDesc->C;
+    CoclDnnGeometryType outH = gradOutputDesc->H;
+    CoclDnnGeometryType outW = gradOutputDesc->W;
+
+    size_t output3dSize = outC * outH * outW;
+
+    cl_int err;
+
+    int biasSize = outC;
+    cl_float value = 0.0f;
+    err = clEnqueueFillBuffer(
+        v->currentContext->default_stream.get()->clqueue->queue,
+        gradBiasMemory->clmem,
+        &value, sizeof(float),
+        gradBiasOffset, biasSize * sizeof(float),
+        0, 0, 0);
+    easycl::EasyCL::checkError(err);
+
+    easycl::CLKernel *kernel = getKernelForNameCl("convbackbias", get_convbackbias_sourcecode());
+    for(int elt=0; elt < batchSize; elt++) {
+        int gradOutputCubeOffset = gradOutputOffset + elt * output3dSize * sizeof(float);
+
+        kernel->inout(&gradOutputMemory->clmem);
+        kernel->in((int32_t)(gradOutputCubeOffset / sizeof(float)));
+
+        // kernel->in((int32_t)elt);
+        kernel->in((int32_t)outC);
+        kernel->in((int32_t)(outH * outW));
+        kernel->inout(&gradBiasMemory->clmem);
+        kernel->in((int32_t)(gradBiasOffset / sizeof(float)));
+
+        int workgroupSize = getNumThreads();
+        int globalSize = GET_BLOCKS(outC) * workgroupSize;
+        kernel->run_1d(&v->currentContext->default_stream.get()->clqueue->queue, globalSize, workgroupSize);
+    }
 }
 
 // Kernel for fast unfold+copy
@@ -316,6 +699,45 @@ kernel void col2im_kernel(const int n, global const float* col_data, int col_off
       }
     }
     data_im[index] = val;
+  }
+}
+)";
+}
+
+string get_convbackbias_sourcecode() {
+    // assumes NCHW layout
+    // and we'll do one image at a time, since that cant be any slower than the actual convolve bit
+    // (can it?)
+    // so, inputs:
+    // - one single cube of gradOutput, ie for specific n
+    // - outC
+    // - outH * outW
+    // bias zerod appropriately, and we just add to it
+
+    return R"(
+// CL: grid stride looping
+#define CL_KERNEL_LOOP(i, n)                        \
+  for (int i = get_group_id(0) * get_local_size(0) + get_local_id(0); \
+      i < (n);                                       \
+      i += get_local_size(0) * get_num_groups(0))
+
+kernel void convbackbias(
+        const global float *gradOutput_data, const int gradOutput_offset,
+        const int outC, const int outHW,
+        global float *gradBias_data, int gradBias_offset) {
+    const global float *gradOutput = gradOutput_data + gradOutput_offset;
+    global float *gradBias = gradBias_data + gradBias_offset;
+  CL_KERNEL_LOOP(outc, outC) {
+    if(outc < outC) {
+        float oldBias = gradBias[outc];
+        float bias = 0.0f;
+        int imageOffset = outc * outHW;
+        global const float *image = gradOutput + imageOffset;
+        for(int outhw = 0; outhw < outHW; outhw++) {
+            bias += image[outhw];
+        }
+        gradBias[outc] = oldBias + bias;
+    }
   }
 }
 )";
