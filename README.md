@@ -265,6 +265,8 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 ## News
 
+- April 29:
+  - Updated to latest EasyCL. This lets you use environment variable `CL_GPUOFFSET` to choose different gpus, eg set to `1` to use second gpu, to `2` to use third gpu, etc
 - April 15:
   - added max pooling
   - added ReLU, sigmoid and tanh activations
