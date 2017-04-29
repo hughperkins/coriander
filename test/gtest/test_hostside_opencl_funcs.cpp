@@ -45,12 +45,13 @@ kernel void myKernel(global float *data) {
     const int N = 1024;
     Memory *memory = Memory::newDeviceAlloc(N * sizeof(float));
     kernel1->inout(&memory->clmem);
-    kernel1->run_1d(32, 32);
+    kernel1->run_1d(&v->currentContext->default_stream.get()->clqueue->queue, 32, 32);
     float *hostdata = new float[N];
     cl_int err;
     err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, memory->clmem, CL_TRUE, 0,
                                      N * sizeof(float), hostdata, 0, NULL, NULL);
     EasyCL::checkError(err);
+    cl->finish();
     cout << "hostdata[0] " << hostdata[0] << endl;
     EXPECT_EQ(123.0f, hostdata[0]);
     delete [] hostdata;
