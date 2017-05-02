@@ -267,6 +267,7 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 - May 1:
   - dnn tests pass on Radeon Pro 450, on Mac Sierra now
+  - fix crash bugs in pooling forward/backward, on Mac Sierra
 - April 29:
   - Updated to latest EasyCL. This lets you use environment variable `CL_GPUOFFSET` to choose different gpus, eg set to `1` to use second gpu, to `2` to use third gpu, etc
 - April 15:
