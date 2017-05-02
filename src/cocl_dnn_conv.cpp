@@ -84,7 +84,6 @@ size_t cudnnGetConvolutionForwardWorkspaceSize(
     cudnnConvolutionFwdAlgo_t algo,
     CoclDnnSizeType *p_size_bytes
 ) {
-    cout << "cudnnGetConvolutionForwardWorkspaceSize()" << endl;
     switch(algo) {
         case cudnnConvolutionFwdAlgo_GEMM:
             cocl::dnn::gemm_im2col::cudnnGetConvolutionForwardWorkspaceSize(
@@ -106,7 +105,6 @@ size_t cudnnConvolutionForward(
     float *p_beta,
     cudnnTensorDescriptor_t outputTensorDesc, float *outputData
 ) {
-    // cout << "cudnnConvolutionForward()" << endl;
     switch(algo) {
         case cudnnConvolutionFwdAlgo_GEMM:
             cocl::dnn::gemm_im2col::cudnnConvolutionForward(
@@ -154,7 +152,6 @@ size_t cudnnGetConvolutionBackwardDataWorkspaceSize(
     cudnnConvolutionBwdDataAlgo_t algo,
     CoclDnnSizeType *p_size_bytes
 ) {
-    // cout << "cudnnGetConvolutionBackwardDataWorkspaceSize()" << endl;
     switch(algo) {
         case cudnnConvolutionBwdDataAlgo_GEMM:
             cocl::dnn::gemm_im2col::cudnnGetConvolutionBackwardDataWorkspaceSize(
@@ -223,7 +220,6 @@ size_t cudnnConvolutionBackwardData(
     float *p_beta,
     cudnnTensorDescriptor_t gradInputDesc, float *gradInput_data
 ) {
-    // cout << "cudnnConvolutionBackwardData()" << endl;
     switch(algo) {
         case cudnnConvolutionBwdDataAlgo_GEMM:
             cocl::dnn::gemm_im2col::cudnnConvolutionBackwardData(
