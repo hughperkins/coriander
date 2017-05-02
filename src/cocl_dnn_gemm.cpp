@@ -27,6 +27,7 @@ namespace gemm_im2col {
 static string get_im2col_sourcecode();
 static string get_col2im_sourcecode();
 static string get_convbackbias_sourcecode();
+static string get_enqueueFillBuffer_sourcecode();
 
 CoclDnnGeometryType getColumnsNumElements(
         cudnnHandle_t handle,
@@ -62,6 +63,25 @@ inline int getNumThreads() {
 // CL: number of blocks for threads.
 inline int GET_BLOCKS(const int N) {
   return (N + getNumThreads() - 1) / getNumThreads();
+}
+
+int myEnqueueFillBuffer(
+    cl_command_queue queue,
+    cl_mem clmem,
+    float value,
+    int offsetElements, int countElements) {
+
+    easycl::CLKernel *kernel = getKernelForNameCl("enqueueFillBuffer", get_enqueueFillBuffer_sourcecode());
+
+    kernel->inout(&clmem);
+    kernel->in((int32_t)offsetElements);
+
+    kernel->in((int32_t)countElements);
+    kernel->in(value);
+
+    int workgroupSize = getNumThreads();
+    int globalSize = GET_BLOCKS(countElements) * workgroupSize;
+    kernel->run_1d(&queue, globalSize, workgroupSize);
 }
 
 void im2col(cl_mem im_buf, size_t im_offset_bytes, const CoclDnnGeometryType channels,
@@ -244,7 +264,8 @@ size_t cudnnConvolutionForward(
         CoclDnnGeometryType m = nOutputPlane; // weight->size[0]; //nOutputPlane
         CoclDnnGeometryType n = outputHeight * outputWidth; // columns->size[1];
         CoclDnnGeometryType k = nInputPlane * kH * kW; // weight->size[1];
-
+// v->getContext()->getCl()->finish();
+// v->currentContext->getCl()->finish();
         // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
         StatusCode status = CLBlastSgemm(kColMajor, kNo, kNo,
                                        n, m, k,
@@ -485,15 +506,17 @@ size_t cudnnConvolutionBackwardFilter(
     CoclDnnGeometryType batchSize = gradOutputDesc->N;
 
     int filterSize = outC * inC * kH * kW;
-    cl_float value = 0.0f;
-    err = clEnqueueFillBuffer(
-        v->currentContext->default_stream.get()->clqueue->queue,
-        gradFilterMemory->clmem,
-        &value, sizeof(float),
-        gradFilterOffset, filterSize * sizeof(float),
-        0, 0, 0);
-    easycl::EasyCL::checkError(err);
-
+    // cl_float value = 0.0f;
+    // err = clEnqueueFillBuffer(
+    //     v->currentContext->default_stream.get()->clqueue->queue,
+    //     gradFilterMemory->clmem,
+    //     &value, sizeof(float),
+    //     gradFilterOffset, filterSize * sizeof(float),
+    //     0, 0, 0);
+    myEnqueueFillBuffer(v->currentContext->default_stream.get()->clqueue->queue, gradFilterMemory->clmem, 0.0f, gradFilterOffset / sizeof(float), filterSize);
+    // easycl::EasyCL::checkError(err);
+    // easycl::EasyCL::checkError(clFinish(v->currentContext->default_stream.get()->clqueue->queue));
+    // v->getContext()->getCl()->finish();
     for(CoclDnnGeometryType elt = 0; elt < batchSize; elt++) {
         size_t input3dOffsetBytes = inputOffset + elt * input3dSize * sizeof(float);
         size_t gradOutput3dOffsetBytes = gradOutputOffset + elt * output3dSize * sizeof(float);
@@ -512,6 +535,7 @@ size_t cudnnConvolutionBackwardFilter(
             workspaceMemory->clmem, columnsOffset,
             &v->currentContext->default_stream.get()->clqueue->queue
         );
+        // v->getContext()->getCl()->finish();
 
         // from torch cunn SpatialConvolutionMM.cu:
         // // M,N,K are dims of matrix A and B
@@ -535,7 +559,7 @@ size_t cudnnConvolutionBackwardFilter(
         CoclDnnGeometryType m = outC;   // nOutputPlane;
         CoclDnnGeometryType n = inC * kW * kH;   // nInputPlane*kW*kH;
         CoclDnnGeometryType k = outH * outW;   // columns->size[1] = outputHeight*outputWidth
-
+        // v->getContext()->getCl()->finish();
         StatusCode status = CLBlastSgemm(kColMajor,
                                        kYes, kNo,
                                        n, m, k,
@@ -549,6 +573,7 @@ size_t cudnnConvolutionBackwardFilter(
             cout << "sgemm status code " << status << endl;
             throw runtime_error("Failed call to blas sgem");
         }
+        // v->getContext()->getCl()->finish();
     }
     return 0;
 }
@@ -585,14 +610,17 @@ size_t cudnnConvolutionBackwardBias(
     cl_int err;
 
     int biasSize = outC;
-    cl_float value = 0.0f;
-    err = clEnqueueFillBuffer(
-        v->currentContext->default_stream.get()->clqueue->queue,
-        gradBiasMemory->clmem,
-        &value, sizeof(float),
-        gradBiasOffset, biasSize * sizeof(float),
-        0, 0, 0);
-    easycl::EasyCL::checkError(err);
+    // cl_float value = 0.0f;
+    // err = clEnqueueFillBuffer(
+    //     v->currentContext->default_stream.get()->clqueue->queue,
+    //     gradBiasMemory->clmem,
+    //     &value, sizeof(float),
+    //     gradBiasOffset, biasSize * sizeof(float),
+    //     0, 0, 0);
+    myEnqueueFillBuffer(v->currentContext->default_stream.get()->clqueue->queue, gradBiasMemory->clmem, 0.0f, gradBiasOffset / sizeof(float), biasSize);
+
+    // easycl::EasyCL::checkError(err);
+    // easycl::EasyCL::checkError(clFinish(v->currentContext->default_stream.get()->clqueue->queue));
 
     easycl::CLKernel *kernel = getKernelForNameCl("convbackbias", get_convbackbias_sourcecode());
     for(int elt=0; elt < batchSize; elt++) {
@@ -611,6 +639,7 @@ size_t cudnnConvolutionBackwardBias(
         int globalSize = GET_BLOCKS(outC) * workgroupSize;
         kernel->run_1d(&v->currentContext->default_stream.get()->clqueue->queue, globalSize, workgroupSize);
     }
+    return 0;
 }
 
 // Kernel for fast unfold+copy
@@ -737,6 +766,31 @@ kernel void convbackbias(
             bias += image[outhw];
         }
         gradBias[outc] = oldBias + bias;
+    }
+  }
+}
+)";
+}
+
+// this shouldnt be necessary, since clEnqueueFillBuffer should do this, but
+// clEnqueueFillBuffer fails for me on Radeon Pro 450, eg see
+// http://stackoverflow.com/questions/38556710/clenqueuefillbuffer-fills-a-buffer-correctly-only-at-random/43727913#43727913
+string get_enqueueFillBuffer_sourcecode() {
+    return R"(
+// CL: grid stride looping
+#define CL_KERNEL_LOOP(i, n)                        \
+  for (int i = get_group_id(0) * get_local_size(0) + get_local_id(0); \
+      i < (n);                                       \
+      i += get_local_size(0) * get_num_groups(0))
+
+kernel void enqueueFillBuffer(
+        global float *target_data, const int target_offset,
+        const int N,
+        float value) {
+    global float *target = target_data + target_offset;
+  CL_KERNEL_LOOP(n, N) {
+    if(n < N) {
+        target[n] = value;
     }
   }
 }

@@ -784,7 +784,7 @@ TEST(test_dnn_conv, simple_gpu_conv) {
     err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, outputOffsetBytes,
                                      (outLinearSize) * sizeof(float), gpuOutHostside, 0, NULL, NULL);
     EasyCL::checkError(err);
-    cl->finish();
+    EasyCL::checkError(clFinish(v->currentContext->default_stream.get()->clqueue->queue));
 
     const int numSamples = 20;
     int *sampleIndices = new int[numSamples];
@@ -969,7 +969,6 @@ TEST(test_dnn_conv, simple_gpu_conv_backward_data) {
         &beta,
         outputDesc, gpuDeviceOutput
     );
-    // cl->finish();
 
     cocl::dnn::gemm_im2col::cudnnConvolutionBackwardData(
         dnn_handle,
@@ -981,13 +980,12 @@ TEST(test_dnn_conv, simple_gpu_conv_backward_data) {
         &beta,
         gradInputDesc, gpuDeviceGradInput
     );
-    cl->finish();
 
     float *gpuGradInputHostside = new float[inLinearSize];
     err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, gradInputOffsetBytes,
                                      (inLinearSize) * sizeof(float), gpuGradInputHostside, 0, NULL, NULL);
     EasyCL::checkError(err);
-    cl->finish();
+    EasyCL::checkError(clFinish(v->currentContext->default_stream.get()->clqueue->queue));
 
     const int numSamples = 20;
     int *sampleIndices = new int[numSamples];
@@ -1196,7 +1194,6 @@ TEST(test_dnn_conv, simple_gpu_conv_backward_filters) {
         &beta,
         outputDesc, gpuDeviceOutput
     );
-    cl->finish();
 
     cocl::dnn::gemm_im2col::cudnnConvolutionBackwardFilter(
         dnn_handle,
@@ -1208,7 +1205,6 @@ TEST(test_dnn_conv, simple_gpu_conv_backward_filters) {
         &beta,
         gradFilterDesc, gpuDeviceGradFilter
     );
-    cl->finish();
 
     cocl::dnn::gemm_im2col::cudnnConvolutionBackwardBias(
         dnn_handle,
@@ -1217,7 +1213,6 @@ TEST(test_dnn_conv, simple_gpu_conv_backward_filters) {
         &beta,
         gradBiasDesc, gpuDeviceGradBias
     );
-    cl->finish();
 
     float *gpuGradFilterHostside = new float[filterLinearSize];
     err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, gradFilterOffsetBytes,
@@ -1228,6 +1223,7 @@ TEST(test_dnn_conv, simple_gpu_conv_backward_filters) {
     err = clEnqueueReadBuffer(v->currentContext->default_stream.get()->clqueue->queue, gpuMemory->clmem, CL_TRUE, gradBiasOffsetBytes,
                                      (biasLinearSize) * sizeof(float), gpuGradBiasHostside, 0, NULL, NULL);
     EasyCL::checkError(err);
+    EasyCL::checkError(clFinish(v->currentContext->default_stream.get()->clqueue->queue));
 
     const int numSamples = 20;
     int *sampleIndices = new int[numSamples];
@@ -1251,7 +1247,7 @@ TEST(test_dnn_conv, simple_gpu_conv_backward_filters) {
     }
     for(int outc = 0; outc < outC; outc++) {
         cout << "gradBias[" << outc << "] cpu=" << gradBias[outc] << " gpus=" << gpuGradBiasHostside[outc] <<  endl;
-        if(abs(gradBias[outc] - gpuGradBiasHostside[outc]) > 1e-4 * outH * outW) {
+        if(abs(gradBias[outc] - gpuGradBiasHostside[outc]) > 1e-4 * outH * outW * inC) {
             allOk = false;
             cout << "    MISMATCH" << endl;
         }
