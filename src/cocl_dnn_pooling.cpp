@@ -85,7 +85,6 @@ size_t cudnnPoolingForward(
     cudnnTensorDescriptor_t outputDesc, float *outputData
 ) {
     ThreadVars *v = getThreadVars();
-    cl_int err;
 
     Memory *inputMemory = findMemory((const char *)inputData);
     Memory *outputMemory = findMemory((const char *)outputData);
@@ -138,11 +137,7 @@ size_t cudnnPoolingForward(
     int workgroupSize = getNumThreads();
     int globalSize = GET_BLOCKS(inputLinearSize) * workgroupSize;
     kernel->run_1d(&v->currentContext->default_stream.get()->clqueue->queue, globalSize, workgroupSize);
-    // int status = clFinish(v->currentContext->default_stream.get()->clqueue->queue);
-    // if(status != 0) {
-    //     cout << "status" << status << endl;
-    //     throw runtime_error("Pooling returned non-zero status");
-    // }
+    return 0;
 }
 size_t cudnnPoolingBackward(
     cudnnHandle_t handle,
@@ -229,7 +224,7 @@ size_t cudnnPoolingBackward(
     int workgroupSize = getNumThreads();
     int globalSize = GET_BLOCKS(inputLinearSize) * workgroupSize;
     kernel->run_1d(&v->currentContext->default_stream.get()->clqueue->queue, globalSize, workgroupSize);
-
+    return 0;
 }
 
 // adapted from caffe, via torch
