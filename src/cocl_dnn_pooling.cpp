@@ -287,7 +287,7 @@ kernel void MaxPoolForward(
     hstart = max(hstart, 0);
     wstart = max(wstart, 0);
     Dtype maxval = -FLT_MAX;
-    global float *bottom_data_img = bottom_data + (n * channels + c) * height * width;
+    global const float *bottom_data_img = bottom_data + (n * channels + c) * height * width;
     for (int h = hstart; h < hend; ++h) {
       for (int w = wstart; w < wend; ++w) {
         float val = bottom_data_img[h * width + w];
