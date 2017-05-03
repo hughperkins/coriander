@@ -11,7 +11,11 @@ option(OFFSET_32BIT "type to use for offsets. off lets you use more memory.  on 
 option(EXPLAIN_CL "Add IR code into OpenCL.  For maintainers mostly" OFF)
 option(TESTS_DUMP_CL "Writes OpenCL for tests to stdout.  For maintainers mostly" OFF)
 option(COCL_SPAM "Lots of scrolly debug text.  Mostly for maintainer usage" OFF)
+if(APPLE)
+set(CLANG_HOME "/usr/local/opt/llvm-3.8" CACHE STRING "eg the downloaded clang-3.8.0 folder, containing lib, bin etc")
+else()
 set(CLANG_HOME "/usr/lib/llvm-3.8" CACHE STRING "eg the downloaded clang-3.8.0 folder, containing lib, bin etc")
+endif()
 
 if(TESTS_CL_BRANCHES_AS_SWITCH)
     unset(TESTS_CL_RUN_TRANSFORMS CACHE)
@@ -19,16 +23,16 @@ endif()
 
 set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS})
 if(TESTS_DEVICELL_INLINE)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};-devicell-opt;inline)
+set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--devicell-opt;inline)
 endif()
 if(TESTS_DEVICELL_MEM2REG)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};-devicell-opt;mem2reg)
+set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--devicell-opt;mem2reg)
 endif()
 if(TESTS_DEVICELL_INSTCOMBINE)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};-devicell-opt;instcombine)
+set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--devicell-opt;instcombine)
 endif()
 if(TESTS_DEVICELL_OPT)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};-devicell-opt;-O${TESTS_DEVICELL_OPT})
+set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--devicell-opt;${TESTS_DEVICELL_OPT})
 endif()
 if(EXPLAIN_CL)
 set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--add_ir_to_cl)
@@ -238,6 +242,8 @@ if(BUILD_TESTS)
     foreach(TEST ${TESTS})
         add_cocl_executable(${TEST} test/cocl/${TEST}.cu)
         add_custom_target(run-${TEST}
+            COMMAND echo
+            COMMAND echo make run-${TEST}
             COMMAND ${COCL_DUMP_CL_STR} ${CMAKE_CURRENT_BINARY_DIR}/${TEST}
             DEPENDS ${TEST}
         )

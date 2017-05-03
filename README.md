@@ -61,7 +61,7 @@ hostFloats[2] 444
 | -I   | provide an include directory, eg `-I /usr/local/eigen` |
 | -o   | output filepath, eg `-o foo.o` |
 | -c   | compile to .o file; dont link |
-| -devicell-opt [option] | pass [option] through to device ll optimization phase.  Affects success and quality of OpenCL generation. |
+| --devicell-opt [option] | pass [option] through to device ll optimization phase.  Affects success and quality of OpenCL generation. |
 | -fPIC | passed to clang object-code compiler |
 
 The options provided to `-devicell-opt` are passed through to `opt-3.8`, http://llvm.org/docs/Passes.html
@@ -72,7 +72,7 @@ The options provided to `-devicell-opt` are passed through to `opt-3.8`, http://
 - `ir-to-opencl` writes the IR as OpenCL
 
 Recommended generation options:
-- `-devicell-opt inline -devicell-opt mem2reg -devicell-opt instcombine --devicell-opt O2`
+- `--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine --devicell-opt O2`
 
 You can open the `-device.cl` file to look at the OpenCL generated, and compare the effects of different options.
 
@@ -126,9 +126,11 @@ New!
 cd ~
 wget http://llvm.org/releases/3.8.0/clang+llvm-3.8.0-x86_64-apple-darwin.tar.xz
 tar -xf clang+llvm-3.8.0-x86_64-apple-darwin.tar.xz
+mv clang+llvm-3.8.0-x86_64-apple-darwin /usr/local/opt
+ln -s /usr/local/opt/clang+llvm-3.8.0-x86_64-apple-darwin /usr/local/opt/llvm-3.8
 ```
 
-set `CLANG_HOME` to the root of this directory, ie `export CLANG_HOME=$HOME/clang+llvm-3.8.0-x86_64-apple-darwin`
+set `CLANG_HOME` to the root of this directory, ie `export CLANG_HOME=/usr/local/opt/llvm-3.8`
 
 #### Ubuntu 16.04
 ```
