@@ -267,6 +267,11 @@ See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
 
 ## News
 
+- May 5:
+  - Eigen unit tests at https://bitbucket.org/hughperkins/eigen/src/75842846799e15f1c26ef6885565d64c3d0a67b2/unsupported/test/cuda-on-cl/?at=eigen-cl pass on Mac Pro 4th Generation with both:
+    - Intel HD Graphics 530, and
+    - Radeon Pro 450 (using env var `CL_GPUOFFSET=1` to select)
+  - I suspect this may have broken some other stuff, since one of the unit tests fails now, but I think it's a gentle step forward
 - May 1:
   - dnn tests pass on Radeon Pro 450, on Mac Sierra now
   - fix crash bugs in pooling forward/backward, on Mac Sierra
