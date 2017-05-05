@@ -64,7 +64,7 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
 )
 
 set(CMAKE_CC_FLAGS "-fPIC")
-set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC")
+set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC -g")
 add_definitions(-DUSE_CLEW)  # turns off direct linking with libOpenCL.so, all goes via clew dynamic loader (no need to link with libOpenCL at build time)
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 

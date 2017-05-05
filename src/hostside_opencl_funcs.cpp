@@ -227,10 +227,11 @@ namespace cocl {
 
         CLKernel *kernel = 0;
         try {
-            if(kernelName.size() > 32) {
-                kernelName = kernelName.substr(0, 31);
+            string shortKernelName = "" + kernelName;
+            if(shortKernelName.size() > 32) {
+                shortKernelName = shortKernelName.substr(0, 31);
             }
-            kernel = cl->buildKernelFromString(clSourcecode, kernelName, "", "__internal__");
+            kernel = cl->buildKernelFromString(clSourcecode, shortKernelName, "", "__internal__");
         } catch(runtime_error &e) {
             cout << "failed to compile opencl sourcecode" << endl;
             cout << "kernel name " << kernelName << endl;

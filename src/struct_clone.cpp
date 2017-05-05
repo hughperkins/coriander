@@ -275,6 +275,9 @@ void StructCloner::walkType(Module *M, StructInfo *structInfo, int level, int of
     } else if(PointerType *pointerType = dyn_cast<PointerType>(type)) {
         Type *elementType = pointerType->getPointerElementType();
         // outs() << getIndent(level) << "pointer type " << dumpType(elementType) << " addressspace " << addressspace << " offset=" << offset << "\n";
+        outs() << level << " pointer type     offset=" << offset << "\n";
+        pointerType->dump();
+        outs() << '\n';
         // how to find out if this is gpu allocated or not?
         // let's just heuristically assume that all primitive*s are gpu allocated for now?
         // ~~and lets assume that structs are just sent one at a time now, and any contained structs are one at a time~~
@@ -282,10 +285,10 @@ void StructCloner::walkType(Module *M, StructInfo *structInfo, int level, int of
         // new plan: anything htats a pointer, we assume is going to be global, therefore we should remove
         // pointer to pointer is not allowed, so we should remove
         // actually, anything except float *s, we're just going to leave as-is (or set to zero), for now
-        // if(elementType->getPrimitiveSizeInBits() != 0) {
-            // outs() << "primitive type " << dumpType(pointerType) << "\n";
+        if(elementType->getPrimitiveSizeInBits() != 0) {
+            outs() << "primitive type size " << elementType->getPrimitiveSizeInBits() << "\n";
             structInfo->pointerInfos.push_back(unique_ptr<PointerInfo>(new PointerInfo(offset, pointerType, indices, path)));
-        // }
+        }
     } else if(isa<ArrayType>(type)) {
         // outs() << getIndent(level) << dumpType(elemType) << "[" << count << "] offset=" << offset << "\n";
     } else if(isa<IntegerType>(type)) {
