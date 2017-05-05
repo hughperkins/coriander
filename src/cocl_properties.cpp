@@ -29,7 +29,7 @@
 
 using namespace std;
 using namespace cocl;
-using namespace easycl;
+// using namespace easycl;
 
 size_t cuDeviceGetAttribute(
        int *value, int attribute, CUdevice device) {
@@ -49,15 +49,15 @@ size_t cuDeviceGetAttribute(
     } else if(CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR == attribute) {
         *value = 65536;
     } else if(CU_DEVICE_ATTRIBUTE_SHARED_MEMORY_PER_BLOCK == attribute) {
-        *value = getDeviceInfoInt64(deviceid, CL_DEVICE_LOCAL_MEM_SIZE);
+        *value = easycl::getDeviceInfoInt64(deviceid, CL_DEVICE_LOCAL_MEM_SIZE);
     } else if(CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT == attribute) {
-        *value = getDeviceInfoInt(deviceid, CL_DEVICE_MAX_COMPUTE_UNITS);
+        *value = easycl::getDeviceInfoInt(deviceid, CL_DEVICE_MAX_COMPUTE_UNITS);
     } else if(CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK == attribute) {
         *value = 64;
     } else if(CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR == attribute) {
         *value = 128;
     } else if(CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_BLOCK == attribute) {
-        *value = getDeviceInfoInt64(deviceid, CL_DEVICE_LOCAL_MEM_SIZE);
+        *value = easycl::getDeviceInfoInt64(deviceid, CL_DEVICE_LOCAL_MEM_SIZE);
     } else if(CU_DEVICE_ATTRIBUTE_WARP_SIZE == attribute) {
         *value = 32;  // should do like: if amd then 64, else 32
     } else {
@@ -76,7 +76,7 @@ size_t cuDeviceGetName(char *buf, int bufsize, CUdevice device) {
     // ThreadVars *v = getThreadVars();
     cl_device_id deviceid = getDeviceByIdx(v->currentDevice);
     // EasyCL *cl = v->getCl();
-    string name = getDeviceInfoString(deviceid, CL_DEVICE_NAME);
+    string name = easycl::getDeviceInfoString(deviceid, CL_DEVICE_NAME);
     sprintf(buf, "%s", name.c_str());
     // sprintf(buf, "an opencl device");
     return 0;
@@ -103,18 +103,18 @@ size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, CUdevice device) 
 
 size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
     COCL_PRINT(cout << "cudaGetDeviceProperties stub device=" << device << endl);
-    // prop->totalGlobalMem = deviceinfo_helper->getDeviceInfoInt64(cl->device, CL_DEVICE_MAX_MEM_ALLOC_SIZE);
+    // prop->totalGlobalMem = deviceinfo_helper->easycl::getDeviceInfoInt64(cl->device, CL_DEVICE_MAX_MEM_ALLOC_SIZE);
     ThreadVars *v = getThreadVars();
     // cout << "initing clew..." << endl;
     clewInit();
     cl_device_id deviceid = getDeviceByIdx(v->currentDevice);
     // EasyCL *cl = v->getCl();
-    prop->totalGlobalMem = getDeviceInfoInt64(deviceid, CL_DEVICE_GLOBAL_MEM_SIZE);
-    prop->sharedMemPerBlock = getDeviceInfoInt64(deviceid, CL_DEVICE_LOCAL_MEM_SIZE);
+    prop->totalGlobalMem = easycl::getDeviceInfoInt64(deviceid, CL_DEVICE_GLOBAL_MEM_SIZE);
+    prop->sharedMemPerBlock = easycl::getDeviceInfoInt64(deviceid, CL_DEVICE_LOCAL_MEM_SIZE);
     prop->regsPerBlock = 64;
     prop->warpSize = 32;
     // prop->memPitch = 4; // whats this?
-    // prop->maxThreadsPerBlock = getDeviceInfoInt(deviceid, CL_DEVICE_MAX_WORK_GROUP_SIZE);
+    // prop->maxThreadsPerBlock = easycl::getDeviceInfoInt(deviceid, CL_DEVICE_MAX_WORK_GROUP_SIZE);
     prop->maxThreadsPerBlock = 256;
     prop->maxThreadsDim[0] = 1024;
     prop->maxThreadsDim[1] = 1024;
@@ -122,15 +122,15 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
     prop->totalConstMem = 16 * 1024;
     prop->major = 3;
     prop->minor = 0;
-    prop->clockRate = getDeviceInfoInt(deviceid, CL_DEVICE_MAX_CLOCK_FREQUENCY) * 1000 * 1000;
+    prop->clockRate = easycl::getDeviceInfoInt(deviceid, CL_DEVICE_MAX_CLOCK_FREQUENCY) * 1000 * 1000;
     // prop->textureAlignment = 128;  // whats this?
     // prop->deviceOverlap = 0; // whats this?
-    prop->multiProcessorCount = getDeviceInfoInt(deviceid, CL_DEVICE_MAX_COMPUTE_UNITS);
+    prop->multiProcessorCount = easycl::getDeviceInfoInt(deviceid, CL_DEVICE_MAX_COMPUTE_UNITS);
     prop->kernelExecTimeoutEnabled = true;
     prop->integrated = false;
     prop->canMapHostMemory = false;  // I dont want this changing across devices for now, neough bugs for now...
-    // prop->integrated = !getDeviceInfoBool(deviceid, CL_DEVICE_HOST_UNIFIED_MEMORY);
-    // prop->canMapHostMemory = getDeviceInfoBool(deviceid, CL_DEVICE_HOST_UNIFIED_MEMORY);
+    // prop->integrated = !easycl::getDeviceInfoBool(deviceid, CL_DEVICE_HOST_UNIFIED_MEMORY);
+    // prop->canMapHostMemory = easycl::getDeviceInfoBool(deviceid, CL_DEVICE_HOST_UNIFIED_MEMORY);
     // prop->computeMode = 0;  //whats this?
     // prop->concurrentKernels = 1;
     // prop->ECCEnabled = false;
