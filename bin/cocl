@@ -38,8 +38,8 @@ if [ -f ${COCL_HOME}/bin/ir-to-opencl ]; then {
     export COCL_BIN=${COCL_HOME}/bin
     export COCL_LIB=${COCL_HOME}/lib
 } else {
-    export COCL_BIN=${COCL_HOME}/build
-    export COCL_LIB=${COCL_HOME}/build
+    export COCL_BIN=${PWD}
+    export COCL_LIB=${PWD}
 } fi
 
 # Using this weird bash, compared to other possibilities because:
