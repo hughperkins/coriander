@@ -82,6 +82,7 @@ int myEnqueueFillBuffer(
     int workgroupSize = getNumThreads();
     int globalSize = GET_BLOCKS(countElements) * workgroupSize;
     kernel->run_1d(&queue, globalSize, workgroupSize);
+    return 0;
 }
 
 void im2col(cl_mem im_buf, size_t im_offset_bytes, const CoclDnnGeometryType channels,
@@ -200,10 +201,10 @@ size_t cudnnConvolutionForward(
     size_t filterOffset = filterMemory->getOffset((const char *)filterData);
     size_t outputOffset = outputMemory->getOffset((const char *)outputData);
 
-    cl_int err;
+    // cl_int err;
 
-    CoclDnnGeometryType columnsNumElements = getColumnsNumElements(
-        handle, inputDesc, filterDesc, convDesc, outputDesc);
+    // CoclDnnGeometryType columnsNumElements = getColumnsNumElements(
+    //     handle, inputDesc, filterDesc, convDesc, outputDesc);
     size_t columnsOffset = workspaceOffset;
 
     size_t input3dSize = inputDesc->C * inputDesc->H * inputDesc->W;
@@ -361,7 +362,7 @@ size_t cudnnConvolutionBackwardData(
     size_t gradInputOffset = gradInputMemory->getOffset((const char *)gradInputData);
     size_t workspaceOffset = workspaceMemory->getOffset((const char *)workspaceData);
 
-    cl_int err;
+    // cl_int err;
 
     CoclDnnGeometryType inC = gradInputDesc->C;
     CoclDnnGeometryType inH = gradInputDesc->H;
@@ -382,9 +383,9 @@ size_t cudnnConvolutionBackwardData(
 
     // from torch cunn SpatialConvolutionMM.cu:
     // THCudaTensor_resize2d(state, gradColumns, nInputPlane*kW*kH, outputHeight*outputWidth);
-    CoclDnnGeometryType columnsRows = inC * kW * kH;
-    CoclDnnGeometryType columnsCols = outH * outW;
-    CoclDnnGeometryType columnsNumElements = columnsRows * columnsCols;
+    // CoclDnnGeometryType columnsRows = inC * kW * kH;
+    // CoclDnnGeometryType columnsCols = outH * outW;
+    // CoclDnnGeometryType columnsNumElements = columnsRows * columnsCols;
     size_t columnsOffset = workspaceOffset;
 
     size_t input3dSize = inC * inH * inW;
@@ -476,7 +477,7 @@ size_t cudnnConvolutionBackwardFilter(
     size_t gradFilterOffset = gradFilterMemory->getOffset((const char *)gradFilterData);
     size_t workspaceOffset = workspaceMemory->getOffset((const char *)workspaceData);
 
-    cl_int err;
+    // cl_int err;
 
     CoclDnnGeometryType inC = inputDesc->C;
     CoclDnnGeometryType inH = inputDesc->H;
@@ -494,8 +495,8 @@ size_t cudnnConvolutionBackwardFilter(
     CoclDnnGeometryType dH = convDesc->dH;
     CoclDnnGeometryType dW = convDesc->dW;
 
-    CoclDnnGeometryType columnsNumElements = getColumnsNumElements(
-        handle, inputDesc, filterDesc, convDesc, gradOutputDesc);
+    // CoclDnnGeometryType columnsNumElements = getColumnsNumElements(
+    //     handle, inputDesc, filterDesc, convDesc, gradOutputDesc);
     size_t columnsOffset = workspaceOffset;
 
     // from torch cunn SpatialConvolutionMM.cu:
@@ -607,7 +608,7 @@ size_t cudnnConvolutionBackwardBias(
 
     size_t output3dSize = outC * outH * outW;
 
-    cl_int err;
+    // cl_int err;
 
     int biasSize = outC;
     // cl_float value = 0.0f;

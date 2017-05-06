@@ -257,7 +257,7 @@ namespace cocl {
     CLKernel *getKernelForNameLl(string kernelName, string devicellsourcecode) {
         // KernelByNameMutex mutex;
         ThreadVars *v = getThreadVars();
-        EasyCL *cl = v->getContext()->getCl();
+        // EasyCL *cl = v->getContext()->getCl();
         ofstream f;
         if(v->getContext()->kernelByName.find(kernelName) != v->getContext()->kernelByName.end()) {
             v->getContext()->numKernelCalls++;

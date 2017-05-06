@@ -63,7 +63,7 @@ size_t cudnnActivationForward(
     cudnnTensorDescriptor_t outputDesc, float *outputData
 ) {
     ThreadVars *v = getThreadVars();
-    cl_int err;
+    // cl_int err;
 
     Memory *inputMemory = findMemory((const char *)inputData);
     Memory *outputMemory = findMemory((const char *)outputData);
@@ -125,7 +125,7 @@ size_t cudnnActivationBackward(
     cudnnTensorDescriptor_t gradInputDesc, float *gradInputData
 ) {
     ThreadVars *v = getThreadVars();
-    cl_int err;
+    // cl_int err;
 
     Memory *outputMemory = findMemory((const char *)outputData);
     Memory *gradOutputMemory = findMemory((const char *)gradOutputData);

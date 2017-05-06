@@ -268,7 +268,7 @@ TEST(test_dnn_conv, simple_gpu_im2col) {
         for(int inh=0; inh < inH; inh++) {
             for(int inw=0; inw < inW; inw++) {
                 int linearPos = c * inH * inW + inh * inW + inw;
-                if(abs(inImageStack[linearPos] - gpuImHostside[linearPos] > 1e-4)) {
+                if(abs(inImageStack[linearPos] - gpuImHostside[linearPos]) > 1e-4) {
                     cout << "image val " << inImageStack[linearPos] << " after col2im " << gpuImHostside[linearPos] << endl;
                     throw runtime_error("disparity after col2im, c=" + toString(c) + " inh=" + toString(inh) + " inw=" + toString(inw));
                 }
@@ -401,7 +401,7 @@ void conv_backward_filters_cpu(
                         * kH + kh)
                         * kW + kw;
                     float thiswchange = 0;
-                    float thisBiasChange = 0;
+                    // float thisBiasChange = 0;
                     // gradWeights:     [outc][inc][kh][kw]
                     //       aggregate over:  [outh][outw][n]
                     for(int outh = 0; outh < outH; outh++) {
@@ -742,7 +742,7 @@ TEST(test_dnn_conv, simple_gpu_conv) {
     cout << "workspaceSizeBytes=" << workspaceSizeBytes << endl;
 
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getContext()->getCl();
+    // EasyCL *cl = v->getContext()->getCl();
 
     size_t inputOffsetBytes = 0;
     size_t filterOffsetBytes = inputOffsetBytes + inLinearSize * sizeof(float);
@@ -929,7 +929,7 @@ TEST(test_dnn_conv, simple_gpu_conv_backward_data) {
     cout << "workspaceSizeBytes=" << workspaceSizeBytes << endl;
 
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getContext()->getCl();
+    // EasyCL *cl = v->getContext()->getCl();
 
     size_t inputOffsetBytes = 0;
     size_t filterOffsetBytes = inputOffsetBytes + inLinearSize * sizeof(float);
@@ -1152,7 +1152,7 @@ TEST(test_dnn_conv, simple_gpu_conv_backward_filters) {
     cout << "workspaceSizeBytes=" << workspaceSizeBytes << endl;
 
     ThreadVars *v = getThreadVars();
-    EasyCL *cl = v->getContext()->getCl();
+    // EasyCL *cl = v->getContext()->getCl();
 
     size_t inputOffsetBytes = 0;
     size_t filterOffsetBytes = inputOffsetBytes + inLinearSize * sizeof(float);

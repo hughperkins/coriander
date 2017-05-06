@@ -35,18 +35,19 @@ void fillRandomInt(MT19937 &random, int *target, int size, int minValInclusive, 
 
 namespace {
 
-int NCHW_to_index(
-        int N, int C, int H, int W,
-        int n, int c, int h, int w) {
-    int index = n;
-    index = index * C + c;
-    index = index * H + h;
-    index = index * W + w;
-    return index;
-}
+// int NCHW_to_index(
+//         int N, int C, int H, int W,
+//         int n, int c, int h, int w) {
+//     int index = n;
+//     index = index * C + c;
+//     index = index * H + h;
+//     index = index * W + w;
+//     return index;
+// }
 
 class Act {
 public:
+    virtual ~Act(){}
     virtual float forward(float input) = 0;
     virtual float backward(float output, float gradOutput, float input) = 0;
 };
