@@ -83,3 +83,4 @@ generated/
 
 include/cocl/local_config.h
 cmbuild/
+mac/

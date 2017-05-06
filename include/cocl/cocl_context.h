@@ -10,6 +10,7 @@
 extern "C" {
     size_t cuCtxSynchronize(void);
     size_t cuCtxCreate_v2(char **pcontext, unsigned int flags, long long device);
+    size_t cuCtxCreate(char **pcontext, unsigned int flags, long long device);
     size_t cuCtxGetCurrent(char **pcontext);
     size_t cuCtxSetCurrent(char *context);
     size_t cuCtxGetDevice(CUdevice *pdevice);
@@ -30,7 +31,7 @@ namespace easycl {
 }
 
 namespace cocl {
-    int getNumGpus();
+    // int getNumGpus();
 
     class Memory;
     class CoclStream;
@@ -46,7 +47,7 @@ namespace cocl {
         long long nextAllocPos = 1;
         std::map< long long, cocl::Memory *>memoryByAllocPos;
         int numKernelCalls = 0;
-        const int device;
+        const int gpuOrdinal;
         pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
         easycl::EasyCL *getCl() {
             return cl.get();
@@ -65,8 +66,10 @@ namespace cocl {
         ThreadVars();
         ~ThreadVars();
         Context *getContext();
-        int currentDevice = 0;
+        // int currentDevice = 0;
+        // cocl::CoclDevice *currentDevice = 0;
         cocl::Context *currentContext = 0;
+        int currentGpuOrdinal = 0;
         // std::map<int, easycl::EasyCL*> clByDeviceIdx;
     };
 

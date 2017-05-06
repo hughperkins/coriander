@@ -140,9 +140,11 @@ size_t cuMemFreeHost(void *hostPointer) {
 size_t cuMemGetInfo(size_t *free, size_t *total) {
     COCL_PRINT(cout << "cuMemGetInfo redirected" << endl);
     ThreadVars *v = getThreadVars();
-    cl_device_id deviceid = getDeviceByIdx(v->currentDevice);
-    *free = getDeviceInfoInt64(deviceid, CL_DEVICE_MAX_MEM_ALLOC_SIZE);
-    *total = getDeviceInfoInt64(deviceid, CL_DEVICE_GLOBAL_MEM_SIZE);
+    // cl_device_id deviceid = getDeviceByIdx(v->currentDevice);
+    cocl::CoclDevice *coclDevice = cocl::getCoclDeviceByGpuOrdinal(v->currentGpuOrdinal);
+    cl_device_id clDeviceId = coclDevice->deviceId;
+    *free = getDeviceInfoInt64(clDeviceId, CL_DEVICE_MAX_MEM_ALLOC_SIZE);
+    *total = getDeviceInfoInt64(clDeviceId, CL_DEVICE_GLOBAL_MEM_SIZE);
     return 0;
 }
 
@@ -253,8 +255,10 @@ size_t cuMemsetD32(CUdeviceptr location, unsigned int value, uint32_t count) {
 size_t cuDeviceTotalMem(size_t *value, CUdeviceptr device) {
     // COCL_PRINT(cout << "cuDeviceTotalMem redirected" << endl);
     ThreadVars *v = getThreadVars();
-    cl_device_id deviceid = getDeviceByIdx(v->currentDevice);
-    *value = getDeviceInfoInt64(deviceid, CL_DEVICE_GLOBAL_MEM_SIZE);
+    cocl::CoclDevice *coclDevice = cocl::getCoclDeviceByGpuOrdinal(v->currentGpuOrdinal);
+    cl_device_id clDeviceId = coclDevice->deviceId;
+    // cl_device_id deviceid = getDeviceByIdx(v->currentDevice);
+    *value = getDeviceInfoInt64(clDeviceId, CL_DEVICE_GLOBAL_MEM_SIZE);
     return 0;
 }
 

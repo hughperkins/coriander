@@ -33,7 +33,7 @@ using namespace cocl;
 using namespace easycl;
 
 namespace cocl {
-    int globalNumGpus = -1;
+    // int globalNumGpus = -1;
 
     static pthread_key_t key;
     static pthread_once_t key_once = PTHREAD_ONCE_INIT;
@@ -43,31 +43,33 @@ namespace cocl {
     static void make_key() {
         (void) pthread_key_create(&key, NULL);
     }
-    int getNumGpus() {
-        if(globalNumGpus >= 0) {
-            return globalNumGpus;
-        }
-        pthread_mutex_lock(&clcontextcreation_mutex);
-        globalNumGpus = easycl::DevicesInfo::getNumGpus();
-        pthread_mutex_unlock(&clcontextcreation_mutex);
-        return globalNumGpus;
-    }
-    Context::Context(int device) : device(device) {
+    // int getNumGpus() {
+    //     if(globalNumGpus >= 0) {
+    //         return globalNumGpus;
+    //     }
+    //     pthread_mutex_lock(&clcontextcreation_mutex);
+    //     globalNumGpus = easycl::DevicesInfo::getNumGpus();
+    //     pthread_mutex_unlock(&clcontextcreation_mutex);
+    //     return globalNumGpus;
+    // }
+    Context::Context(int gpuOrdinal) : gpuOrdinal(gpuOrdinal) {
         COCL_PRINT(cout << "Context() " << this << endl);
         pthread_mutex_lock(&clcontextcreation_mutex);
         // int deviceId = getThreadVars()->currentDevice;
-        bool coclDevicesAll = false;
-        if(getenv("COCL_DEVICES_ALL")) {
-            if(string(getenv("COCL_DEVICES_ALL")) == "1") {
-                cout << "COCL_DEVICES_ALL=1 activated.  WARNING!  this is a maintainer option, and will likely not do anything useful for you ,and probably cause lots of errors."  << endl;
-                coclDevicesAll = true;
-            }
-        }
-        if(coclDevicesAll) {
-            cl.reset(EasyCL::createForIndexedDevice(device));
-        } else {
-            cl.reset(EasyCL::createForIndexedGpu(device));
-        }
+        // bool coclDevicesAll = false;
+        // if(getenv("COCL_DEVICES_ALL")) {
+        //     if(string(getenv("COCL_DEVICES_ALL")) == "1") {
+        //         cout << "COCL_DEVICES_ALL=1 activated.  WARNING!  this is a maintainer option, and will likely not do anything useful for you ,and probably cause lots of errors."  << endl;
+        //         coclDevicesAll = true;
+        //     }
+        // }
+        // if(coclDevicesAll) {
+        //     cl.reset(EasyCL::createForIndexedDevice(device));
+        // } else {
+        cocl::CoclDevice *coclDevice = cocl::getCoclDeviceByGpuOrdinal(gpuOrdinal);
+        cl.reset(EasyCL::createForPlatformDeviceIds(coclDevice->platformId, coclDevice->deviceId));
+            // cl.reset(EasyCL::createForIndexedGpu(deviceOrdinal));
+        // }
         pthread_mutex_unlock(&clcontextcreation_mutex);
         default_stream.reset(new CoclStream(cl.get()));
     }
@@ -94,7 +96,7 @@ namespace cocl {
     Context *ThreadVars::getContext() {
         if(currentContext == 0) {
             COCL_PRINT(cout << "creating default context" << endl);
-            currentContext = new Context(currentDevice);
+            currentContext = new Context(currentGpuOrdinal);
         }
         return currentContext;
     }
@@ -102,6 +104,7 @@ namespace cocl {
     // ThreadVars::currentContext = 0;
 
     ThreadVars *getThreadVars() {
+        // cout << "getThreadVars()" << endl;
         pthread_once(&key_once, make_key);
         ThreadVars *threadVars = (ThreadVars *)pthread_getspecific(key);
         if(threadVars == 0) {
@@ -143,14 +146,14 @@ size_t cuCtxGetCurrent(char **_ppContext) {
 }
 
 size_t cuCtxSetCurrent(char *_pContext) {
-    COCL_PRINT(cout << "cuCtxSetCurrent redirected context=" << (void *)_pContext << endl);
+    // COCL_PRINT(cout << "cuCtxSetCurrent redirected context=" << (void *)_pContext << endl);
     Context *context = (Context *)_pContext;
     ThreadVars *threadVars = getThreadVars();
     threadVars->currentContext = context;
     return 0;
 }
 
-size_t cuCtxCreate_v2 (char **_ppContext, unsigned int flags, long long device) {
+size_t cuCtxCreate (char **_ppContext, unsigned int flags, long long device) {
     COCL_PRINT(cout << "cuCtxCreate_v2 redirected device=" << device << " flags=" << flags << endl);
     Context **ppContext = (Context **)_ppContext;
     Context *newContext = new Context(device);
@@ -159,4 +162,8 @@ size_t cuCtxCreate_v2 (char **_ppContext, unsigned int flags, long long device) 
     COCL_PRINT(cout << "cuCtxCreate_v2 new context=" << (void *)newContext << endl);
     *ppContext = newContext;
     return 0;
+}
+
+size_t cuCtxCreate_v2 (char **_ppContext, unsigned int flags, long long device) {
+    return cuCtxCreate(_ppContext, flags, device);
 }

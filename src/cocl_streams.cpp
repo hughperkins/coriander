@@ -68,7 +68,7 @@ size_t cuStreamWaitEvent(char *_queue, Event *event, unsigned int flags) {
     // StreamLock streamlock(stream);
     CLQueue *queue = stream->clqueue;
     // CLQueue *queue = (CLQueue*)_queue;
-    COCL_PRINT(cout << "cuStreamWaitEvent redirected queue=" << queue << " event=" << event << " flags=" << flags << endl);
+    // COCL_PRINT(cout << "cuStreamWaitEvent redirected queue=" << queue << " event=" << event << " flags=" << flags << endl);
     if(queue == 0) {
         cout << "cuStreamWaitEvent stream==0 not implemented" << std::endl;
         throw runtime_error("cuStreamWaitEvent stream==0 not implemented");
@@ -134,15 +134,15 @@ size_t cuStreamSynchronize(char *_queue) {
 }
 
 size_t cuStreamCreate(char **_pstream, unsigned int flags) {
-    COCL_PRINT(cout << "cuStreamCreate redirected" << endl);
+    // COCL_PRINT(cout << "cuStreamCreate redirected" << endl);
     CoclStream **pstream = (CoclStream**)_pstream;
     ThreadVars *v = getThreadVars();
-    COCL_PRINT(cout << "cuStreamCreate current context=" << (void *)v->currentContext << endl);
+    // COCL_PRINT(cout << "cuStreamCreate current context=" << (void *)v->currentContext << endl);
     EasyCL *cl = v->getContext()->getCl();
     // hostside_opencl_funcs_assure_initialized();
     // CLQueue *clqueue = cl->newQueue();
     CoclStream *coclStream = new CoclStream(cl);
-    COCL_PRINT(cout << "cuStreamCreate redirected new stream " << (void *)coclStream << endl);
+    // COCL_PRINT(cout << "cuStreamCreate redirected new stream " << (void *)coclStream << endl);
     // coclStream->clqueue = clqueue;
     *pstream = coclStream;
     // cout << "done assign" << endl;
@@ -152,7 +152,7 @@ size_t cuStreamCreate(char **_pstream, unsigned int flags) {
 size_t cuStreamDestroy_v2(char *_queue) {
     CoclStream *stream = (CoclStream *)_queue;
     // StreamLock streamlock(stream);
-    COCL_PRINT(cout << "cuStreamDestroy_v2 redirected stream=" << (void *)stream << endl);
+    // COCL_PRINT(cout << "cuStreamDestroy_v2 redirected stream=" << (void *)stream << endl);
     delete stream;
     return 0;
 }

@@ -112,7 +112,7 @@ size_t cudnnAddTensor(
         throw runtime_error("cudnnAddTensor only implemented for beta == 1");
     }
 
-    cl_int err;
+    // cl_int err;
     ThreadVars *v = getThreadVars();
 
     Memory *xMemory = findMemory((const char *)xData);
@@ -134,6 +134,7 @@ size_t cudnnAddTensor(
         cout << "saxpy status code " << status << endl;
         throw runtime_error("Failed call to blas saxpy");
     }
+    return 0;
 }
 size_t cudnnSoftmaxForward(
     cudnnHandle_t handle,
@@ -158,7 +159,7 @@ size_t cudnnSoftmaxForward(
     }
 
     ThreadVars *v = getThreadVars();
-    cl_int err;
+    // cl_int err;
 
     Memory *inputMemory = findMemory((const char *)inputData);
     Memory *outputMemory = findMemory((const char *)outputData);
@@ -171,7 +172,7 @@ size_t cudnnSoftmaxForward(
 
     easycl::CLKernel *kernel = getKernelForNameCl("SoftmaxForward", get_SoftmaxForward_sourcecode());
 
-    int linearSize = N * C;
+    // int linearSize = N * C;
 
     kernel->in((int)N);
 

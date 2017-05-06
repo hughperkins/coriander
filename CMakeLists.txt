@@ -233,7 +233,7 @@ if(BUILD_TESTS)
         offsetkernelargs properties test_bitcast test_callbacks testcumemcpy testevents2
         testevents testfloat4 test_kernelcachedok testmath testmemcpydevicetodevice test_memhostalloc
         testneg testnullpointer testpartialcopy testshfl teststream test_types
-        singlebuffer
+        singlebuffer test_devices
     )
 
     if(TESTS_DUMP_CL)
@@ -270,6 +270,7 @@ if(BUILD_TESTS)
         test/gtest/test_dnn_conv.cpp test/gtest/test_dnn_pooling.cpp test/gtest/test_dnn_act.cpp
         test/gtest/test_dnn_loss.cpp
         test/gtest/test_hostside_opencl_funcs.cpp
+        # test/gtest/test_cocl_simple.cu
     )
     target_include_directories(cocl_unittests PRIVATE src)
     target_include_directories(cocl_unittests PRIVATE include)
