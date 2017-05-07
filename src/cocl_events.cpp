@@ -79,7 +79,10 @@ size_t cuEventRecord(Event *event, char *_queue) {
         throw runtime_error("cuEventRecord redirected not implemented for stream 0");
     }
     cl_event clevent;
-    clEnqueueMarkerWithWaitList(queue->queue, 0, 0, &clevent);
+    cl_int err = clEnqueueMarkerWithWaitList(queue->queue, 0, 0, &clevent);
+    EasyCL::checkError(err);
+    err = clFlush(queue->queue);
+    EasyCL::checkError(err);
     event->event = clevent;
     return 0;
 }
