@@ -107,14 +107,11 @@ New!
 
 ## How to build
 
-[![Build Status](https://travis-ci.org/hughperkins/cuda-on-cl.svg?branch=master)](https://travis-ci.org/hughperkins/cuda-on-cl)
-
 ### Pre-requisites
 
 - Operating system:
-  - Tested/developed on Ubuntu 16.04
+  - Tested/developed on Ubuntu 16.04, and on Macbook Pro 4th Generation, with Radeon Pro 450
   - Ubuntu 14.04 does seem to work ok too (not tested very much though...)
-  - Mac OS X, see https://travis-ci.org/hughperkins/cuda-on-cl
   - Other operating systems, and clang/llvm versions, might work too, but untested.  Your mileage may vary :-)
 - OpenCL-enabled GPU, and appropriate OpenCL drivers installed for the GPU
 
