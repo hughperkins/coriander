@@ -107,15 +107,17 @@ New!
 
 ## How to build
 
+### Systems tested
+
+- Ubuntu 16.04, with:
+  - NVIDIA GPU
+- Mac Sierra, with:
+  - Intel HD Graphics 530
+  - Radeon Pro 450
+
 ### Pre-requisites
 
-- Operating system:
-  - Tested/developed on Ubuntu 16.04, and on Macbook Pro 4th Generation, with Radeon Pro 450
-  - Ubuntu 14.04 does seem to work ok too (not tested very much though...)
-  - Other operating systems, and clang/llvm versions, might work too, but untested.  Your mileage may vary :-)
 - OpenCL-enabled GPU, and appropriate OpenCL drivers installed for the GPU
-
-### Install clang/llvm-3.8
 
 #### Mac OS X
 
@@ -127,31 +129,17 @@ mv clang+llvm-3.8.0-x86_64-apple-darwin /usr/local/opt
 ln -s /usr/local/opt/clang+llvm-3.8.0-x86_64-apple-darwin /usr/local/opt/llvm-3.8
 ```
 
-set `CLANG_HOME` to the root of this directory, ie `export CLANG_HOME=/usr/local/opt/llvm-3.8`
+set `CLANG_HOME` as `export CLANG_HOME=/usr/local/opt/llvm-3.8`
 
 #### Ubuntu 16.04
 ```
 sudo apt-get install llvm-3.8 llvm-3.8-dev clang-3.8
+sudo apt-get install git cmake cmake-curses-gui libc6-dev-i386 make gcc g++ zlib1g-dev
 ```
 
 set `CLANG_HOME` to `/usr/lib/llvm-3.8`
 
-#### Other systems
-
-- download from http://llvm.org/releases/download.html , and decompress
-- set `CLANG_HOME` to point to the resulting directory, the one that contains `bin`, and `lib`
-
-### Other libraries
-
-On Ubuntu 16.04:
-```
-sudo apt-get install git cmake cmake-curses-gui libc6-dev-i386 make gcc g++
-```
-
-On other systems:
-- somehow install similar things as for Ubuntu 16.04 section
-
-### Procedure
+### Build/installation
 
 ```
 git clone --recursive https://github.com/hughperkins/cuda-on-cl
@@ -159,8 +147,12 @@ cd cuda-on-cl
 mkdir build
 cd build
 cmake ..
+# Note: I usually set build/release type to `Debug`, so this is what is tested
 make -j 4
+# on Ubuntu:
 sudo make install
+# or on Mac, if you have homebrew, you dont need sudo:
+make install
 ```
 
 Note that you'll need to continue to export `CLANG_HOME` environment variable when using `cocl`.
