@@ -24,6 +24,15 @@ namespace cocl {
     Memory *findMemory(const char *passedInPointer);
 }
 
+#define CU_MEMHOSTALLOC_PORTABLE 123
+enum MemoryTypeEnum {
+    CU_MEMORYTYPE_DEVICE = 60000,
+    CU_MEMORYTYPE_HOST
+};
+#define cudaMemcpyDeviceToHost 111
+#define cudaMemcpyHostToDevice 222
+#define cudaMemcpyDeviceToDevice 333
+
 typedef long long CUdeviceptr;
 
 extern "C" {
@@ -33,7 +42,7 @@ extern "C" {
     size_t cuMemAlloc(CUdeviceptr *pMemory, size_t bytes);
     size_t cuMemFree(CUdeviceptr memory);
 
-    size_t cuMemHostAlloc(void **pHostPointer, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE);
+    size_t cuMemHostAlloc(void **pHostPointer, unsigned int bytes, int type=CU_MEMHOSTALLOC_PORTABLE);
     size_t cuMemFreeHost(void *hostPointer);
 
     size_t cudaMemsetAsync(void *devPtr, int value, size_t count, char *queue);
@@ -54,7 +63,7 @@ extern "C" {
     size_t cuDeviceTotalMem(size_t *value, CUdeviceptr device);
 }
 
-size_t cudaMalloc(float **pMemory, size_t N);
+// size_t cudaMalloc(float **pMemory, size_t N);
 
 #define cuMemcpyHtoDAsync_v2 cuMemcpyHtoDAsync
 #define cuMemcpyDtoHAsync_v2 cuMemcpyDtoHAsync
@@ -67,12 +76,3 @@ size_t cudaMalloc(float **pMemory, size_t N);
 
 #define cuDeviceTotalMem_v2 cuDeviceTotalMem
 #define cuMemGetInfo_v2 cuMemGetInfo
-
-#define cudaMemcpyDeviceToHost 111
-#define cudaMemcpyHostToDevice 222
-#define cudaMemcpyDeviceToDevice 333
-
-enum MemoryTypeEnum {
-    CU_MEMORYTYPE_DEVICE = 60000,
-    CU_MEMORYTYPE_HOST
-};

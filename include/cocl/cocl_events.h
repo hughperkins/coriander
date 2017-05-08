@@ -33,5 +33,7 @@ enum EventEnum {
 
     cudaEventDisableTiming
 };
+#define CU_EVENT_DISABLE_TIMING 1
 
 typedef cocl::Event *cudaEvent_t;
+typedef cocl::Event *CUevent;

@@ -125,7 +125,7 @@ namespace cocl {
     }
 }
 
-size_t cuMemHostAlloc(void **pHostPointer, unsigned int bytes, int CU_MEMHOSTALLOC_PORTABLE) {
+size_t cuMemHostAlloc(void **pHostPointer, unsigned int bytes, int type) {
     // COCL_PRINT(cout << "cuMemHostAlloc redirected bytes=" << bytes << endl);
     *pHostPointer = malloc(bytes);
     return 0;

@@ -4,6 +4,11 @@
 #include "cocl_events.h"
 #include "pthread.h"
 
+namespace easycl {
+    class EasyCL;
+    class CLQueue;
+}
+
 extern "C" {
     size_t cuStreamCreate(char **pqueue, unsigned int flags);
     size_t cudaStreamSynchronize(char *pqueue);
@@ -18,14 +23,15 @@ extern "C" {
     typedef void (*cudacallbacktype)(char *stream, size_t status, void*userdata);
     size_t cudaStreamAddCallback(char *stream, cudacallbacktype callback, void *userdata, int flags);
 }
+#define cuStreamDestroy cuStreamDestroy_v2
+#define cuEventDestroy cuEventDestroy_v2
 
 typedef char * cudaStream_t;
+typedef char *CUstream;
+// typedef char *cudaStream_t;
 typedef void (*cudacallbacktype)(char *stream, size_t status, void*userdata);
 
-namespace easycl {
-    class EasyCL;
-    class CLQueue;
-}
+#define cudaStreamDefault 0
 
 namespace cocl {
     class CoclCallbackInfo {

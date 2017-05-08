@@ -75,3 +75,5 @@ namespace cocl {
 
     ThreadVars *getThreadVars();
 }
+
+typedef char *CUcontext;

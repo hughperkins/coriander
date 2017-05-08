@@ -41,12 +41,9 @@ inline int __clz(int value);
 #define normcdff normcdf
 #define erfcxf erfcx
 
-typedef char *CUstream;
-typedef cocl::Event *CUevent;
-// typedef char *cudaStream_t;
 typedef size_t cudaError_t;
 typedef size_t CUresult;
-typedef char *CUcontext;
+#define cudaSuccess 0
 
 // used by stream_executor/cl_driver.h; we just declare them for now...
 typedef void *CUfunction;
@@ -59,14 +56,6 @@ extern CUfunc_cache CU_FUNC_CACHE_PREFER_NONE;
 extern CUfunc_cache CU_FUNC_CACHE_PREFER_SHARED;
 extern CUfunc_cache CU_FUNC_CACHE_PREFER_L1;
 extern CUfunc_cache CU_FUNC_CACHE_PREFER_EQUAL;
-
-#define CU_EVENT_DISABLE_TIMING 1
-#define CU_MEMHOSTALLOC_PORTABLE 123
-#define cudaSuccess 0
-#define cudaStreamDefault 0
-
-#define cuStreamDestroy cuStreamDestroy_v2
-#define cuEventDestroy cuEventDestroy_v2
 
 class  dim3 {
 public:
