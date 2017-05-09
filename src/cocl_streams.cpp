@@ -63,7 +63,7 @@ namespace cocl {
     // }
 }
 
-size_t cuStreamWaitEvent(char *_queue, Event *event, unsigned int flags) {
+size_t cuStreamWaitEvent(char *_queue, CoclEvent *event, unsigned int flags) {
     CoclStream *stream = (CoclStream *)_queue;
     // StreamLock streamlock(stream);
     CLQueue *queue = stream->clqueue;

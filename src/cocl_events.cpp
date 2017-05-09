@@ -29,13 +29,20 @@ using namespace std;
 using namespace cocl;
 using namespace easycl;
 
+#ifdef COCL_SPAM
+#undef COCL_PRINT
+#define COCL_PRINT(x) std::cout << "[COCL] " << x << std::endl;
+#endif
+
 namespace cocl {
-    Event::Event() {
-        // COCL_PRINT(cout << "Event()" << endl);
+    CoclEvent::CoclEvent() {
+        COCL_PRINT("CoclEvent() this=" << this);
+        event = 0;
     }
-    Event::~Event() {
-        // COCL_PRINT(cout << "~Event()" << endl);
+    CoclEvent::~CoclEvent() {
+        COCL_PRINT("~CoclEvent() this=" << this);
         if(event != 0) {
+            COCL_PRINT("~CoclEvent() releasing underlying clevent " << event);
             clReleaseEvent(event);
         }
     }
@@ -49,37 +56,39 @@ namespace cocl {
 // clReleaseEvent
 
 // cuda:
-// cuEventCreate(CUEvent *, flags)
+// cuEventCreate(CUCoclEvent *, flags)
 // cuEventRecord(CUEvent, CUstream);  => puts into the stream
 // cuEventQuery(CUevent)
 // cuEventSynchronize(CUevent)
 // cuEventDestroy
 
-size_t cuEventCreate(Event **pevent, unsigned int flags) {
-    Event *event = new Event();
+size_t cuEventCreate(CoclEvent **pevent, unsigned int flags) {
+    CoclEvent *event = new CoclEvent();
     *pevent = event;
-    // COCL_PRINT(cout << "cuEventCreate redirected flags=" << flags << " new event=" << event << endl);
+    COCL_PRINT("cuEventCreate flags=" << flags << " new CoclEvent=" << event);
+    // throw runtime_error("fake stop");
     return 0;
 }
 
-size_t cuEventSynchronize(Event *event) {
-    // COCL_PRINT(cout << "cuEventSynchronize redirected event=" << event << endl);
+size_t cuEventSynchronize(CoclEvent *event) {
+    COCL_PRINT("cuEventSynchronize CoclEvent=" << event);
     cl_int err = clWaitForEvents(1, &event->event);
     EasyCL::checkError(err);
     return 0;
 }
 
-size_t cuEventRecord(Event *event, char *_queue) {
+size_t cuEventRecord(CoclEvent *event, char *_queue) {
     CoclStream *coclStream = (CoclStream *)_queue;
     CLQueue *queue = coclStream->clqueue;
     // CLQueue *queue = (CLQueue *)_queue;
-    // COCL_PRINT(cout << "cuEventRecord redirected event=" << event << " queue=" << queue << endl);
+    COCL_PRINT("cuEventRecord CoclEvent=" << event << " queue=" << queue);
     if(queue == 0) {
-        cout << "cuEventRecord redirected not implemented for stream 0" << endl;
-        throw runtime_error("cuEventRecord redirected not implemented for stream 0");
+        cout << "cuEventRecord not implemented for stream 0" << endl;
+        throw runtime_error("cuEventRecord not implemented for stream 0");
     }
     cl_event clevent;
     cl_int err = clEnqueueMarkerWithWaitList(queue->queue, 0, 0, &clevent);
+    COCL_PRINT("cuEventRecord CoclEvent=" << event << " created clevent=" << clevent);
     EasyCL::checkError(err);
     err = clFlush(queue->queue);
     EasyCL::checkError(err);
@@ -87,8 +96,8 @@ size_t cuEventRecord(Event *event, char *_queue) {
     return 0;
 }
 
-size_t cuEventQuery(Event *event) {
-    // COCL_PRINT(cout << "cuEventQuery redirected event=" << event << endl);
+size_t cuEventQuery(CoclEvent *event) {
+    COCL_PRINT("cuEventQuery CoclEvent=" << event << " clevent=" << event->event);
     cl_int res;
     cl_int err = clGetEventInfo (
         event->event,
@@ -96,19 +105,22 @@ size_t cuEventQuery(Event *event) {
         sizeof(cl_int),
         &res,
         0);
-    // COCL_PRINT(cout << "clGetEventInfo: " << res << endl);
+    COCL_PRINT("clGetEventInfo: " << res);
     EasyCL::checkError(err);
     if(res == CL_COMPLETE) { // success
+        COCL_PRINT("cuEventQuery, event completed");
         return 0;
     } else if(res > 0) { // not finished yet
+        COCL_PRINT("cuEventQuery, event not finished yet");
         return cudaErrorNotReady;
     } else { // error
+        COCL_PRINT("cuEventQuery, event error");
         return 1;
     }
 }
 
-size_t cuEventDestroy_v2(Event *event) {
-    // COCL_PRINT(cout << "cuEventDestroy redirected event=" << event << endl);
+size_t cuEventDestroy_v2(CoclEvent *event) {
+    COCL_PRINT("cuEventDestroy CoclEvent=" << event);
     delete event;
     return 0;
 }

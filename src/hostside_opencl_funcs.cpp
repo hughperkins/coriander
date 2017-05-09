@@ -113,7 +113,7 @@ size_t cuInit(unsigned int flags) {
 int cudaConfigureCall(
         dim3 grid,
         dim3 block, long long sharedMem, char *queue_as_voidstar) {
-    // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "... locked launch mutex " << (void *)getThreadVars() << endl);
     CoclStream *coclStream = (CoclStream *)queue_as_voidstar;
@@ -337,7 +337,7 @@ void configureKernel(const char *kernelName, const char *devicellsourcecode) {
 }
 
 void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
-    // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "...lcoked launch mutex " << (void *)getThreadVars() << endl);
     ThreadVars *v = getThreadVars();
@@ -370,7 +370,7 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
 }
 
 void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
-    // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "setKernelArgCharStar " << (void *)memory_as_charstar << endl);
@@ -399,7 +399,7 @@ void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
 }
 
 void setKernelArgInt64(int64_t value) {
-    // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "...loocked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "setKernelArgInt64 " << value << endl);
@@ -409,7 +409,7 @@ void setKernelArgInt64(int64_t value) {
 }
 
 void setKernelArgInt32(int value) {
-    // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "setKernelArgInt32 " << value << endl);
@@ -419,7 +419,7 @@ void setKernelArgInt32(int value) {
 }
 
 void setKernelArgFloat(float value) {
-    // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "... locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "setKernelArgFloat " << value << endl);
@@ -429,7 +429,7 @@ void setKernelArgFloat(float value) {
 }
 
 void kernelGo() {
-    // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "kernelGo queue=" << (void *)launchConfiguration.queue << endl);

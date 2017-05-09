@@ -32,6 +32,8 @@ using namespace std;
 using namespace cocl;
 using namespace easycl;
 
+#define COCL_PRINT(x)
+
 namespace cocl {
     // int globalNumGpus = -1;
 
@@ -141,12 +143,12 @@ size_t cuCtxGetCurrent(char **_ppContext) {
     // cout << "cuCtxGetCurrent redirected" << endl;
     ThreadVars *threadVars = getThreadVars();
     *ppContext = threadVars->currentContext;
-    // COCL_PRINT(cout << "cuCtxGetCurrent context=" << (void *)threadVars->currentContext << endl);
+    COCL_PRINT(cout << "cuCtxGetCurrent context=" << (void *)threadVars->currentContext << endl);
     return 0;
 }
 
 size_t cuCtxSetCurrent(char *_pContext) {
-    // COCL_PRINT(cout << "cuCtxSetCurrent redirected context=" << (void *)_pContext << endl);
+    COCL_PRINT(cout << "cuCtxSetCurrent redirected context=" << (void *)_pContext << endl);
     Context *context = (Context *)_pContext;
     ThreadVars *threadVars = getThreadVars();
     threadVars->currentContext = context;
