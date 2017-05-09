@@ -86,15 +86,17 @@ size_t cuEventRecord(CoclEvent *event, char *_queue) {
         cout << "cuEventRecord not implemented for stream 0" << endl;
         throw runtime_error("cuEventRecord not implemented for stream 0");
     }
+    cl_int err;
     if(event->event != 0) {
         COCL_PRINT("  cuEventRecord releasing existing clevent " << event->event);
-        clReleaseEvent(event->event);
+        err = clReleaseEvent(event->event);
+        EasyCL::checkError(err);
         event->event = 0;
         // cout << "cuEventRecrd event is already assigned => error" << endl;
         // throw runtime_error("cuEventRecord: event is already assigned => error");
     }
     cl_event clevent;
-    cl_int err = clEnqueueMarkerWithWaitList(queue->queue, 0, 0, &clevent);
+    err = clEnqueueMarkerWithWaitList(queue->queue, 0, 0, &clevent);
     COCL_PRINT("cuEventRecord CoclEvent=" << event << " created clevent=" << clevent);
     EasyCL::checkError(err);
     err = clFlush(queue->queue);
