@@ -286,7 +286,7 @@ void StructCloner::walkType(Module *M, StructInfo *structInfo, int level, int of
         // pointer to pointer is not allowed, so we should remove
         // actually, anything except float *s, we're just going to leave as-is (or set to zero), for now
         if(elementType->getPrimitiveSizeInBits() != 0) {
-            outs() << "primitive type size " << elementType->getPrimitiveSizeInBits() << "\n";
+            // outs() << "primitive type size " << elementType->getPrimitiveSizeInBits() << "\n";
             structInfo->pointerInfos.push_back(unique_ptr<PointerInfo>(new PointerInfo(offset, pointerType, indices, path)));
         }
     } else if(isa<ArrayType>(type)) {
