@@ -30,15 +30,21 @@ int main(int argc, char *argv[]) {
 
     cout << "created event" << endl;
 
-    cuEventRecord(event, stream);
-    cout << "recoreded event" << endl;
+    for(int i = 0; i < 100; i++) {
+        cout << "i " << i << endl;
+        longKernel<<<dim3(102400 / 32, 1, 1), dim3(32, 1, 1)>>>(gpufloats, N, 3.0f);
+        cout << "queued kernel x" << endl;
 
-    cout << "event finished? " << (cuEventQuery(event) == 0) << endl;
+        cuEventRecord(event, stream);
+        cout << "recoreded event" << endl;
 
-    cuEventSynchronize(event);
-    cout << "synchronized event" << endl;
+        cout << "event finished? " << (cuEventQuery(event) == 0) << endl;
 
-    cout << "event finished? " << (cuEventQuery(event) == 0) << endl;
+        cuEventSynchronize(event);
+        cout << "synchronized event" << endl;
+
+        cout << "event finished? " << (cuEventQuery(event) == 0) << endl;
+    }
 
     cuStreamDestroy(stream);
     cuEventDestroy(event);
