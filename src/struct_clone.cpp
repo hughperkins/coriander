@@ -275,9 +275,9 @@ void StructCloner::walkType(Module *M, StructInfo *structInfo, int level, int of
     } else if(PointerType *pointerType = dyn_cast<PointerType>(type)) {
         Type *elementType = pointerType->getPointerElementType();
         // outs() << getIndent(level) << "pointer type " << dumpType(elementType) << " addressspace " << addressspace << " offset=" << offset << "\n";
-        outs() << level << " pointer type     offset=" << offset << "\n";
-        pointerType->dump();
-        outs() << '\n';
+        // outs() << level << " pointer type     offset=" << offset << "\n";
+        // pointerType->dump();
+        // outs() << '\n';
         // how to find out if this is gpu allocated or not?
         // let's just heuristically assume that all primitive*s are gpu allocated for now?
         // ~~and lets assume that structs are just sent one at a time now, and any contained structs are one at a time~~
