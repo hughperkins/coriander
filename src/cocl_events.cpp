@@ -54,6 +54,48 @@ namespace cocl {
             EasyCL::checkError(err);
         }
     }
+    // bool CoclEvent::has_event() {
+    //     bool res = event != 0;
+    //     return res;
+    // }
+}
+
+size_t cuStreamWaitEvent(char *_queue, CoclEvent *event, unsigned int flags) {
+    pthread_mutex_lock(&cocl_events_mutex);
+    CoclStream *stream = (CoclStream *)_queue;
+    // StreamLock streamlock(stream);
+    CLQueue *queue = stream->clqueue;
+    // CLQueue *queue = (CLQueue*)_queue;
+    // COCL_PRINT(cout << "cuStreamWaitEvent redirected queue=" << queue << " event=" << event << " flags=" << flags << endl);
+    if(queue == 0) {
+        cout << "cuStreamWaitEvent stream==0 not implemented" << std::endl;
+        throw runtime_error("cuStreamWaitEvent stream==0 not implemented");
+    }
+
+    // I think what cuStreamWaitEvent does is:
+    // - add something to the queue, some marker/barrier
+    // - anything added to the queue after this will NOT start executing
+    // - until the event given to cuStreamWaitEvent is marked as finished
+    //
+    // I think that with clWaitForEvents, we can give a list of cl events to wait on,
+    // but its the *host* thread that waits, ie the call is blocking
+    // I think that cuStreamWaitEvent is not actually a blocking call, for the host, its more like
+    // some kind of barrier
+
+    // I think waht we plausibly need is clEnqueueBarrierWithWaitList
+    // so lets try that...
+
+    if(event->event == 0) {
+        cerr << "cuStreamWaitEvent redirected: Warning: you havent Recorded on the event you passed in" << endl;
+    } else {
+        // cl_event clevent;
+        clEnqueueBarrierWithWaitList(queue->queue,
+            1,
+            &event->event,
+            0);
+    }
+    pthread_mutex_unlock(&cocl_events_mutex);
+    return 0;
 }
 
 // opencl:

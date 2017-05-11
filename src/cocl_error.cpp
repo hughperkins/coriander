@@ -19,6 +19,8 @@
 #include <iostream>
 using namespace std;
 
+#define COCL_PRINT(x)
+
 size_t cudaGetLastError() {
     COCL_PRINT(cout << "cudaGetLastError" << endl);
     return 0;

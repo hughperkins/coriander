@@ -125,13 +125,13 @@ namespace cocl {
 // }
 
 size_t cuCtxGetDevice(CUdevice *pdevice) {
-    COCL_PRINT(cout << "cuCtxGetDevice redirected" << endl);
+    COCL_PRINT(cout << "cuCtxGetDevice" << endl);
     throw runtime_error("cuctxgetdevice not implemented");
     return 0;
 }
 
 size_t cuCtxSynchronize(void) {
-    COCL_PRINT(cout << "cuCtxSynchronize redirected" << endl);
+    COCL_PRINT(cout << "cuCtxSynchronize" << endl);
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getContext()->getCl();
     cl->finish();
@@ -148,7 +148,7 @@ size_t cuCtxGetCurrent(char **_ppContext) {
 }
 
 size_t cuCtxSetCurrent(char *_pContext) {
-    COCL_PRINT(cout << "cuCtxSetCurrent redirected context=" << (void *)_pContext << endl);
+    COCL_PRINT(cout << "cuCtxSetCurrent context=" << (void *)_pContext << endl);
     Context *context = (Context *)_pContext;
     ThreadVars *threadVars = getThreadVars();
     threadVars->currentContext = context;
@@ -156,7 +156,7 @@ size_t cuCtxSetCurrent(char *_pContext) {
 }
 
 size_t cuCtxCreate (char **_ppContext, unsigned int flags, long long device) {
-    COCL_PRINT(cout << "cuCtxCreate_v2 redirected device=" << device << " flags=" << flags << endl);
+    COCL_PRINT(cout << "cuCtxCreate_v2 device=" << device << " flags=" << flags << endl);
     Context **ppContext = (Context **)_ppContext;
     Context *newContext = new Context(device);
     ThreadVars *threadVars = getThreadVars();

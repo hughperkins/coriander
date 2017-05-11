@@ -44,6 +44,8 @@ extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
 }
 
+#define COCL_PRINT(x)
+
 // #undef COCL_PRINT
 // #define COCL_PRINT(stuff) \
 //    stuff

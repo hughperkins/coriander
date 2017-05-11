@@ -12,9 +12,7 @@ namespace cocl {
     public:
         CoclEvent();
         ~CoclEvent();
-        bool has_event() {
-            return event != 0;
-        }
+        // bool has_event();
         cl_event event = 0;
     };
 }
@@ -25,6 +23,7 @@ extern "C" {
     size_t cuEventRecord(cocl::CoclEvent *event, char *queue);
     size_t cuEventQuery(cocl::CoclEvent *event);
     size_t cuEventDestroy_v2(cocl::CoclEvent *event);
+    size_t cuStreamWaitEvent(char *queue, cocl::CoclEvent *event, unsigned int flags);
 }
 
 enum EventEnum {
