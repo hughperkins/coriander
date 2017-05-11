@@ -22,6 +22,8 @@
 
 #include "EasyCL/EasyCL.h"
 
+#include "pthread.h"
+
 #include <iostream>
 #include <memory>
 
@@ -34,6 +36,11 @@ using namespace easycl;
 #define COCL_PRINT(x) std::cout << "[COCL] " << x << std::endl;
 #endif
 
+// I guess that events should only be called from a single thread, so there might 
+// be a bug elesewhere, but in the meantime, the events are being called in parallel, from
+// mutliple threads, which crasehs stuff. lets try using a mutex to "fix" this for now
+static pthread_mutex_t cocl_events_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 namespace cocl {
     CoclEvent::CoclEvent() {
         COCL_PRINT("CoclEvent() this=" << this);
@@ -43,7 +50,8 @@ namespace cocl {
         COCL_PRINT("~CoclEvent() this=" << this);
         if(event != 0) {
             COCL_PRINT("~CoclEvent() releasing underlying clevent " << event);
-            clReleaseEvent(event);
+            cl_int err = clReleaseEvent(event);
+            EasyCL::checkError(err);
         }
     }
 }
@@ -63,21 +71,26 @@ namespace cocl {
 // cuEventDestroy
 
 size_t cuEventCreate(CoclEvent **pevent, unsigned int flags) {
+    pthread_mutex_lock(&cocl_events_mutex);
     CoclEvent *event = new CoclEvent();
     *pevent = event;
     COCL_PRINT("cuEventCreate flags=" << flags << " new CoclEvent=" << event);
     // throw runtime_error("fake stop");
+    pthread_mutex_unlock(&cocl_events_mutex);
     return 0;
 }
 
 size_t cuEventSynchronize(CoclEvent *event) {
+    pthread_mutex_lock(&cocl_events_mutex);
     COCL_PRINT("cuEventSynchronize CoclEvent=" << event);
-    cl_int err = clWaitForEvents(1, &event->event);
+    cl_int err = clWaitForEvents(1, &event->event);  // 1 is number of events, 2nd parameter is list of events
     EasyCL::checkError(err);
+    pthread_mutex_unlock(&cocl_events_mutex);
     return 0;
 }
 
 size_t cuEventRecord(CoclEvent *event, char *_queue) {
+    pthread_mutex_lock(&cocl_events_mutex);
     CoclStream *coclStream = (CoclStream *)_queue;
     CLQueue *queue = coclStream->clqueue;
     // CLQueue *queue = (CLQueue *)_queue;
@@ -87,6 +100,8 @@ size_t cuEventRecord(CoclEvent *event, char *_queue) {
         throw runtime_error("cuEventRecord not implemented for stream 0");
     }
     cl_int err;
+    err = clFlush(queue->queue);
+    EasyCL::checkError(err);
     if(event->event != 0) {
         COCL_PRINT("  cuEventRecord releasing existing clevent " << event->event);
         err = clReleaseEvent(event->event);
@@ -102,10 +117,12 @@ size_t cuEventRecord(CoclEvent *event, char *_queue) {
     err = clFlush(queue->queue);
     EasyCL::checkError(err);
     event->event = clevent;
+    pthread_mutex_unlock(&cocl_events_mutex);
     return 0;
 }
 
 size_t cuEventQuery(CoclEvent *event) {
+    pthread_mutex_lock(&cocl_events_mutex);
     COCL_PRINT("cuEventQuery CoclEvent=" << event << " clevent=" << event->event);
     cl_int res;
     cl_int err = clGetEventInfo (
@@ -116,6 +133,7 @@ size_t cuEventQuery(CoclEvent *event) {
         0);
     COCL_PRINT("clGetEventInfo: " << res);
     EasyCL::checkError(err);
+    pthread_mutex_unlock(&cocl_events_mutex);
     if(res == CL_COMPLETE) { // success
         COCL_PRINT("cuEventQuery, event completed");
         return 0;
@@ -129,7 +147,14 @@ size_t cuEventQuery(CoclEvent *event) {
 }
 
 size_t cuEventDestroy_v2(CoclEvent *event) {
+    pthread_mutex_lock(&cocl_events_mutex);
     COCL_PRINT("cuEventDestroy CoclEvent=" << event);
+    // if(event->event != 0) {
+    //     COCL_PRINT("cuEventDestory_v2: releasing event " << event->event);
+    //     cu_int err = clReleaseEvent(event->event);
+    //     EasyCL::checkError(err);
+    // }
     delete event;
+    pthread_mutex_unlock(&cocl_events_mutex);
     return 0;
 }
