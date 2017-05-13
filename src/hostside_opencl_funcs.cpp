@@ -44,7 +44,7 @@ extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
 }
 
-#define COCL_PRINT(x)
+// #define COCL_PRINT(x)
 
 // #undef COCL_PRINT
 // #define COCL_PRINT(stuff) \
@@ -62,17 +62,86 @@ namespace cocl {
     #else
     pthread_mutex_t launchMutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
     #endif
+
+    class Arg {
+    public:
+        virtual ~Arg() {}
+        virtual void inject(CLKernel *kernel) = 0;
+    };
+    class Int32Arg : public Arg {
+    public:
+        Int32Arg(int v) : v(v) {}
+        void inject(CLKernel *kernel) {
+            kernel->in(v);
+        }
+        int v;
+    };
+    class UInt32Arg : public Arg {
+    public:
+        UInt32Arg(uint32_t v) : v(v) {}
+        void inject(CLKernel *kernel) {
+            kernel->in_uint32(v);
+        }
+        uint32_t v;
+    };
+    class Int64Arg : public Arg {
+    public:
+        Int64Arg(int64_t v) : v(v) {}
+        void inject(CLKernel *kernel) {
+            kernel->in(v);
+        }
+        int64_t v;
+    };
+    class FloatArg : public Arg {
+    public:
+        FloatArg(float v) : v(v) {}
+        void inject(CLKernel *kernel) {
+            kernel->in(v);
+        }
+        float v;
+    };
+    class NullPtrArg : public Arg {
+    public:
+        NullPtrArg() {}
+        void inject(CLKernel *kernel) {
+            kernel->in_nullptr();
+        }
+    };
+    class ClmemArg : public Arg {
+    public:
+        ClmemArg(cl_mem v) : v(v) {}
+        void inject(CLKernel *kernel) {
+            kernel->inout(&v);
+        }
+        cl_mem v;
+    };
+    class StructArg : public Arg {
+    public:
+        StructArg(char *pCpuStruct, int structAllocateSize) :
+            pCpuStruct(pCpuStruct), structAllocateSize(structAllocateSize)
+        {}
+        char *pCpuStruct;
+        int structAllocateSize;
+    };
+
     class LaunchConfiguration {
     public:
         size_t grid[3];
         size_t block[3];
-        CLKernel *kernel;
+        // CLKernel *kernel;
         CLQueue *queue = 0;  // NOT owned by us
         CoclStream *coclStream = 0; // NOT owned
 
+        std::vector<std::unique_ptr<Arg> > args;
+
+        // map<cl_mem *, int> clmemIndexByClmem;
+        map<cl_mem *, int> clmemIndexByClmem;
+        vector<cl_mem *> clmems;
+        vector<int> clmemIndexByClmemArg;
+
         vector<cl_mem> kernelArgsToBeReleased;
         std::string kernelName = "";
-        // std::string kernelSource = "";
+        std::string devicellsourcecode = "";
     };
     LaunchConfiguration launchConfiguration;
 
@@ -303,9 +372,10 @@ void configureKernel(const char *kernelName, const char *devicellsourcecode) {
     }
     // hostside_opencl_funcs_assure_initialized();
     launchConfiguration.kernelName = kernelName;
+    launchConfiguration.devicellsourcecode = devicellsourcecode;
     // launchConfiguration.kernelSource = devicellsourcecode;
     // try {
-        launchConfiguration.kernel = getKernelForNameLl(kernelName, devicellsourcecode);
+        // launchConfiguration.kernel = getKernelForNameLl(kernelName, devicellsourcecode);
     // } catch(runtime_error &e) {
     //     cout << "kernel failed to build" << endl;
     //     cout << "kernel name: [" << launchConfiguration.kernelName << "]" << endl;
@@ -366,7 +436,10 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
                                       structAllocateSize, pCpuStruct, 0, NULL, NULL);
     EasyCL::checkError(err);
     launchConfiguration.kernelArgsToBeReleased.push_back(gpu_struct);
-    launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
+
+    launchConfiguration.args.push_back(std::unique_ptr<Arg>(new ClmemArg(launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1])));
+
+    // launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
     // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);
 }
@@ -374,26 +447,34 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
 void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
     COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
+
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "setKernelArgCharStar " << (void *)memory_as_charstar << endl);
     Memory *memory = findMemory(memory_as_charstar);
     if(memory == 0) {
-        launchConfiguration.kernel->in_nullptr();
+        launchConfiguration.args.push_back(std::unique_ptr<Arg>(new NullPtrArg()));
+        // launchConfiguration.kernel->in_nullptr();
         #ifdef OFFSET_32BIT
-        launchConfiguration.kernel->in_uint32(0);
+        launchConfiguration.args.push_back(std::unique_ptr<Arg>(new UInt32Arg(0)));
+        // launchConfiguration.kernel->in_uint32(0);
         #else
-        launchConfiguration.kernel->in_int64(0);
+        launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int64Arg(0)));
+        // launchConfiguration.kernel->in_int64(0);
         #endif
     } else {
         size_t offset = memory->getOffset(memory_as_charstar);
         cl_mem clmem = memory->clmem;
-        launchConfiguration.kernel->inout(&clmem);
+        launchConfiguration.args.push_back(std::unique_ptr<Arg>(new ClmemArg(clmem)));
+
+        // launchConfiguration.kernel->inout(&clmem);
         size_t offsetElements = offset / elementSize;
         // COCL_PRINT(cout << "offset elements " << offsetElements << endl);
         #ifdef OFFSET_32BIT
-        launchConfiguration.kernel->in_uint32((uint32_t)offsetElements); // kernel expects a `long` which is 64-bit signed int
+        launchConfiguration.args.push_back(std::unique_ptr<Arg>(new UInt32Arg((uint32_t)offsetElements)));
+        // launchConfiguration.kernel->in_uint32((uint32_t)offsetElements); // kernel expects a `long` which is 64-bit signed int
         #else
-        launchConfiguration.kernel->in_int64((int64_t)offsetElements); // kernel expects a `long` which is 64-bit signed int
+        launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int64Arg((int64_t)offsetElements)));
+        // launchConfiguration.kernel->in_int64((int64_t)offsetElements); // kernel expects a `long` which is 64-bit signed int
         #endif
     }
     // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
@@ -403,9 +484,10 @@ void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
 void setKernelArgInt64(int64_t value) {
     COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
+    launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int64Arg(value)));
+
     // COCL_PRINT(cout << "...loocked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "setKernelArgInt64 " << value << endl);
-    launchConfiguration.kernel->in(value);
     // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);
 }
@@ -413,9 +495,10 @@ void setKernelArgInt64(int64_t value) {
 void setKernelArgInt32(int value) {
     COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
+    launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int32Arg(value)));
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "setKernelArgInt32 " << value << endl);
-    launchConfiguration.kernel->in(value);
+    // launchConfiguration.kernel->in(value);
     // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);
 }
@@ -423,9 +506,10 @@ void setKernelArgInt32(int value) {
 void setKernelArgFloat(float value) {
     COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
+    launchConfiguration.args.push_back(std::unique_ptr<Arg>(new FloatArg(value)));
     // COCL_PRINT(cout << "... locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "setKernelArgFloat " << value << endl);
-    launchConfiguration.kernel->in(value);
+    // launchConfiguration.kernel->in(value);
     // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);
 }
@@ -435,6 +519,13 @@ void kernelGo() {
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "kernelGo queue=" << (void *)launchConfiguration.queue << endl);
+
+    CLKernel *kernel = getKernelForNameLl(launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
+    for(int i = 0; i < launchConfiguration.args.size(); i++) {
+        // cout << "i=" << i << endl;
+        launchConfiguration.args[i]->inject(kernel);
+    }
+
     size_t global[3];
      COCL_PRINT(cout << "<<< global=dim3(");
     for(int i = 0; i < 3; i++) {
@@ -449,10 +540,10 @@ void kernelGo() {
     // cout << "launching kernel, using OpenCL..." << endl;
     int workgroupSize = launchConfiguration.block[0] * launchConfiguration.block[1] * launchConfiguration.block[2];
     COCL_PRINT(cout << "workgroupSize=" << workgroupSize << endl);
-    launchConfiguration.kernel->localInts(workgroupSize);
+    kernel->localInts(workgroupSize);
 
     try {
-        launchConfiguration.kernel->run(launchConfiguration.queue, 3, global, launchConfiguration.block);
+        kernel->run(launchConfiguration.queue, 3, global, launchConfiguration.block);
     } catch(runtime_error &e) {
         cout << "kernel failed to run" << endl;
         cout << "kernel name: [" << launchConfiguration.kernelName << "]" << endl;
@@ -482,6 +573,7 @@ void kernelGo() {
         EasyCL::checkError(err);
     }
     launchConfiguration.kernelArgsToBeReleased.clear();
+    launchConfiguration.args.clear();
     err = clFinish(launchConfiguration.queue->queue);
     EasyCL::checkError(err);
     // cout << "released args done" << endl;

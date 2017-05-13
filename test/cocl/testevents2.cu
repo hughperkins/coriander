@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 
     cout << "created event" << endl;
 
-    for(int i = 0; i < 100; i++) {
+    for(int i = 0; i < 5; i++) {
         if(i % 10 == 0) {
             cout << "i " << i << endl;
         }
