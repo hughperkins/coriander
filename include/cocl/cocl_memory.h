@@ -63,7 +63,7 @@ extern "C" {
     size_t cuDeviceTotalMem(size_t *value, CUdeviceptr device);
 }
 
-// size_t cudaMalloc(float **pMemory, size_t N);
+size_t cudaMalloc(float **pMemory, size_t N);
 
 #define cuMemcpyHtoDAsync_v2 cuMemcpyHtoDAsync
 #define cuMemcpyDtoHAsync_v2 cuMemcpyDtoHAsync
