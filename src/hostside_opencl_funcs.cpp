@@ -247,9 +247,9 @@ namespace cocl {
         return getThreadVars()->getContext()->numKernelCalls;
     }
 
-    string  convertLlToCl(string devicellsourcecode, string kernelName) {
+    string  convertLlToCl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, string devicellsourcecode, string kernelName) {
         // cout << "llsourcecode [" << devicellsourcecode << "]" << endl;  
-        string clcode = convertLlStringToCl(devicellsourcecode, kernelName);
+        string clcode = convertLlStringToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, kernelName);
         // string clcode = convertLlStringToCl(devicellsourcecode, "");
         // cout << "clcode " << clcode << endl;
         return clcode;
@@ -325,7 +325,7 @@ namespace cocl {
         return kernel;
     }
 
-    CLKernel *getKernelForNameLl(string kernelName, string devicellsourcecode) {
+    CLKernel *getKernelForNameLl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, string kernelName, string devicellsourcecode) {
         // KernelByNameMutex mutex;
         ThreadVars *v = getThreadVars();
         // EasyCL *cl = v->getContext()->getCl();
@@ -342,7 +342,7 @@ namespace cocl {
         // convert to opencl first... based on the kernel name required
         string clSourcecode = "";
         try {
-           clSourcecode = convertLlToCl(devicellsourcecode, kernelName);
+           clSourcecode = convertLlToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, kernelName);
         } catch(runtime_error &e) {
             cout << "failed to generate opencl sourcecode" << endl;
             cout << "kernel name " << kernelName << endl;
@@ -534,7 +534,13 @@ void kernelGo() {
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "kernelGo queue=" << (void *)launchConfiguration.queue << endl);
 
-    CLKernel *kernel = getKernelForNameLl(launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
+    // launchConfiguration.kernelName += "_";
+    for(int i = 0; i < launchConfiguration.clmemIndexByClmemArgIndex.size(); i++) {
+        int clmemIndex = launchConfiguration.clmemIndexByClmemArgIndex[i];
+        launchConfiguration.kernelName += "_" + EasyCL::toString(clmemIndex);
+    }
+    cout << "kernel name " << launchConfiguration.kernelName << endl;
+    CLKernel *kernel = getKernelForNameLl(launchConfiguration.clmems.size(), launchConfiguration.clmemIndexByClmemArgIndex, launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
     for(int i = 0; i < launchConfiguration.args.size(); i++) {
         // cout << "i=" << i << endl;
         launchConfiguration.args[i]->inject(kernel);

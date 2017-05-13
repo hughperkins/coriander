@@ -330,7 +330,7 @@ string convertModuleToCl(Module *M, string specificFunction) {
     return cl;
 }
 
-string convertLlStringToCl(string llString, string specificFunction) {
+string convertLlStringToCl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, string llString, string specificFunction) {
     StringRef llStringRef(llString);
     // cout << "got llstringref" << endl;
     unique_ptr<MemoryBuffer> llMemoryBuffer = MemoryBuffer::getMemBuffer(llStringRef);
@@ -345,23 +345,23 @@ string convertLlStringToCl(string llString, string specificFunction) {
         // return "";
         throw runtime_error("failed to parse IR");
     }
-    string gencode = convertModuleToCl(M.get(), specificFunction);
+    string gencode = convertModuleToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, M.get(), specificFunction);
     // cout << "gencode " << gencode << endl;;
     return gencode;
 }
 
-void convertLlFileToClFile(string llFilename, string ClFilename, string specificFunction) {
-    llvm::LLVMContext context;
-    SMDiagnostic smDiagnostic;
-    std::unique_ptr<llvm::Module> M = parseIRFile(llFilename, smDiagnostic, context);
-    if(!M) {
-        smDiagnostic.print("irtoopencl", errs());
-        // return 1;
-        throw runtime_error("failed to parse IR");
-    }
-    string gencode = convertModuleToCl(M.get(), specificFunction);
-    ofstream of;
-    of.open(ClFilename, ios_base::out);
-    of << gencode;
-    of.close();
-}
+// void convertLlFileToClFile(string llFilename, string ClFilename, string specificFunction) {
+//     llvm::LLVMContext context;
+//     SMDiagnostic smDiagnostic;
+//     std::unique_ptr<llvm::Module> M = parseIRFile(llFilename, smDiagnostic, context);
+//     if(!M) {
+//         smDiagnostic.print("irtoopencl", errs());
+//         // return 1;
+//         throw runtime_error("failed to parse IR");
+//     }
+//     string gencode = convertModuleToCl(M.get(), specificFunction);
+//     ofstream of;
+//     of.open(ClFilename, ios_base::out);
+//     of << gencode;
+//     of.close();
+// }

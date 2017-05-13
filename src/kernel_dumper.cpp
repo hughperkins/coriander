@@ -118,7 +118,7 @@ void KernelDumper::declareGlobals(ostream &os) {
     // }
 }
 
-std::string KernelDumper::toCl() {
+std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, ) {
     Function *F = M->getFunction(kernelName);
     if(F == 0) {
         throw runtime_error("Couldnt find kernel " + kernelName);
