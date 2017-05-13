@@ -135,9 +135,9 @@ namespace cocl {
         std::vector<std::unique_ptr<Arg> > args;
 
         // map<cl_mem *, int> clmemIndexByClmem;
-        map<cl_mem *, int> clmemIndexByClmem;
-        vector<cl_mem *> clmems;
-        vector<int> clmemIndexByClmemArg;
+        map<cl_mem, int> clmemIndexByClmem;
+        vector<cl_mem> clmems;
+        vector<int> clmemIndexByClmemArgIndex;
 
         vector<cl_mem> kernelArgsToBeReleased;
         std::string kernelName = "";
@@ -408,6 +408,18 @@ void configureKernel(const char *kernelName, const char *devicellsourcecode) {
     pthread_mutex_unlock(&launchMutex);
 }
 
+void indexClmemArg(cl_mem clmem) {
+    int clmemIndex = 0;
+    if(launchConfiguration.clmemIndexByClmem.find(clmem) == launchConfiguration.clmemIndexByClmem.end()) {
+        clmemIndex = launchConfiguration.clmems.size();
+        launchConfiguration.clmems.push_back(clmem);
+        launchConfiguration.clmemIndexByClmem[clmem] = clmemIndex;
+    } else {
+        clmemIndex = launchConfiguration.clmemIndexByClmem.find(clmem)->second;
+    }
+    launchConfiguration.clmemIndexByClmemArgIndex.push_back(clmemIndex);
+}
+
 void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
@@ -438,6 +450,7 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     launchConfiguration.kernelArgsToBeReleased.push_back(gpu_struct);
 
     launchConfiguration.args.push_back(std::unique_ptr<Arg>(new ClmemArg(launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1])));
+    indexClmemArg(gpu_struct);
 
     // launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
     // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
@@ -465,6 +478,7 @@ void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
         size_t offset = memory->getOffset(memory_as_charstar);
         cl_mem clmem = memory->clmem;
         launchConfiguration.args.push_back(std::unique_ptr<Arg>(new ClmemArg(clmem)));
+        indexClmemArg(clmem);
 
         // launchConfiguration.kernel->inout(&clmem);
         size_t offsetElements = offset / elementSize;
@@ -574,6 +588,11 @@ void kernelGo() {
     }
     launchConfiguration.kernelArgsToBeReleased.clear();
     launchConfiguration.args.clear();
+
+    launchConfiguration.clmemIndexByClmem.clear();
+    launchConfiguration.clmems.clear();
+    launchConfiguration.clmemIndexByClmemArgIndex.clear();
+
     err = clFinish(launchConfiguration.queue->queue);
     EasyCL::checkError(err);
     // cout << "released args done" << endl;
