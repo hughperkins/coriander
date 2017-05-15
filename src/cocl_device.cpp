@@ -92,7 +92,7 @@ namespace cocl {
             cl_device_id deviceId;
             easycl::DevicesInfo::getIdForIndexedGpu(gpu, &platformId, &deviceId);
             deviceByOrdinal.push_back(unique_ptr<CoclDevice>(new CoclDevice(gpu, platformId, deviceId)));
-            cout << " found gpu platform=" << platformId << " device=" << deviceId << endl;
+            // cout << " found gpu platform=" << platformId << " device=" << deviceId << endl;
         }
 
         // this should only be set once everything really has been initialized:
