@@ -84,11 +84,11 @@ TEST(test_kernel_dumper, basic) {
 float someFunc_gg(global float* d1, global float* v11, local int *scratch);
 float someFunc_gp(global float* d1, float* v11, local int *scratch);
 float someFunc_pg(float* d1, global float* v11, local int *scratch);
-kernel void someKernel(global float* d1, uint d1_offset, global float* d2, uint d2_offset, local int *scratch);
+kernel void someKernel(global float *clmem0, global float *clmem1, uint d1_offset, uint d2_offset, local int *scratch);
 
-kernel void someKernel(global float* d1, uint d1_offset, global float* d2, uint d2_offset, local int *scratch) {
-    d2 += d2_offset;
-    d1 += d1_offset;
+kernel void someKernel(global float *clmem0, global float *clmem1, uint d1_offset, uint d2_offset, local int *scratch) {
+    global float *d2 = clmem1 + d2_offset;
+    global float *d1 = clmem0 + d1_offset;
 
     float v4;
     float v5;
@@ -150,11 +150,11 @@ TEST(test_kernel_dumper, redundant_clmems1) {
 float someFunc_gg(global float* d1, global float* v11, local int *scratch);
 float someFunc_gp(global float* d1, float* v11, local int *scratch);
 float someFunc_pg(float* d1, global float* v11, local int *scratch);
-kernel void someKernel(global float* d1, uint d1_offset, global float* d2, uint d2_offset, local int *scratch);
+kernel void someKernel(global float *clmem0, uint d1_offset, uint d2_offset, local int *scratch);
 
-kernel void someKernel(global float* d1, uint d1_offset, uint d2_offset, local int *scratch) {
-    d2 += d2_offset;
-    d1 += d1_offset;
+kernel void someKernel(global float *clmem0, uint d1_offset, uint d2_offset, local int *scratch) {
+    global float *d2 = clmem0 + d2_offset;
+    global float *d1 = clmem0 + d1_offset;
 
     float v4;
     float v5;
@@ -211,10 +211,10 @@ TEST(test_kernel_dumper, testBranches_phifromfuture) {
     string cl = runKernelDumper(kernelDumper, 1);
     cout << "kernel cl: [" << cl << "]" << endl;
     EXPECT_EQ(R"(
-kernel void testBranches_phifromfuture(global float* d1, uint d1_offset, local int *scratch);
+kernel void testBranches_phifromfuture(global float *clmem0, uint d1_offset, local int *scratch);
 
-kernel void testBranches_phifromfuture(global float* d1, uint d1_offset, local int *scratch) {
-    d1 += d1_offset;
+kernel void testBranches_phifromfuture(global float *clmem0, uint d1_offset, local int *scratch) {
+    global float *d1 = clmem0 + d1_offset;
 
     float v12;
     float v4;
@@ -253,7 +253,7 @@ TEST(test_kernel_dumper, usesPointerFunction) {
     EXPECT_EQ(R"(
 float* returnsPointer(float* in, local int *scratch);
 global float* returnsPointer_g(global float* in, local int *scratch);
-kernel void usesPointerFunction(global float* in, uint in_offset, local int *scratch);
+kernel void usesPointerFunction(global float *clmem0, uint in_offset, local int *scratch);
 
 global float* returnsPointer_g(global float* in, local int *scratch) {
 
@@ -265,8 +265,8 @@ float* returnsPointer(float* in, local int *scratch) {
 v1:;
     return in;
 }
-kernel void usesPointerFunction(global float* in, uint in_offset, local int *scratch) {
-    in += in_offset;
+kernel void usesPointerFunction(global float *clmem0, uint in_offset, local int *scratch) {
+    global float *in = clmem0 + in_offset;
 
     float v3[1];
     float* v4;
@@ -292,11 +292,11 @@ TEST(test_kernel_dumper, usesFunctionReturningVoid) {
     string cl = runKernelDumper(kernelDumper, 1);
     cout << "kernel cl: [" << cl << "]" << endl;
     EXPECT_EQ(R"(
-kernel void usesFunctionReturningVoid(global float* in, uint in_offset, local int *scratch);
+kernel void usesFunctionReturningVoid(global float *clmem0, uint in_offset, local int *scratch);
 void returnsVoid_g(global float* in, local int *scratch);
 
-kernel void usesFunctionReturningVoid(global float* in, uint in_offset, local int *scratch) {
-    in += in_offset;
+kernel void usesFunctionReturningVoid(global float *clmem0, uint in_offset, local int *scratch) {
+    global float *in = clmem0 + in_offset;
 
 
 v1:;
@@ -330,12 +330,12 @@ TEST(test_kernel_dumper, test_long_conflicting_names) {
         EXPECT_LE(line.size(), 128u);
     }
     EXPECT_EQ(R"(
-kernel void mysuperlongfunctionnamemysuperl(global float* d, uint d_offset, local int *scratch);
+kernel void mysuperlongfunctionnamemysuperl(global float *clmem0, uint d_offset, local int *scratch);
 void mysuperlongfunctionnamemysup0_g(global float* d, local int *scratch);
 void mysuperlongfunctionnamemysup1_g(global float* d, local int *scratch);
 
-kernel void mysuperlongfunctionnamemysuperl(global float* d, uint d_offset, local int *scratch) {
-    d += d_offset;
+kernel void mysuperlongfunctionnamemysuperl(global float *clmem0, uint d_offset, local int *scratch) {
+    global float *d = clmem0 + d_offset;
 
 
 v1:;
