@@ -247,9 +247,10 @@ namespace cocl {
         return getThreadVars()->getContext()->numKernelCalls;
     }
 
-    string  convertLlToCl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, string devicellsourcecode, string kernelName) {
+    string  convertLlToCl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, string devicellsourcecode,
+            string origKernelName, std::string generatedKernelName) {
         // cout << "llsourcecode [" << devicellsourcecode << "]" << endl;  
-        string clcode = convertLlStringToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, kernelName);
+        string clcode = convertLlStringToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, origKernelName);
         // string clcode = convertLlStringToCl(devicellsourcecode, "");
         // cout << "clcode " << clcode << endl;
         return clcode;
@@ -325,14 +326,20 @@ namespace cocl {
         return kernel;
     }
 
-    CLKernel *getKernelForNameLl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, string kernelName, string devicellsourcecode) {
+    CLKernel *getKernelForNameLl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, string origKernelName, string devicellsourcecode) {
         // KernelByNameMutex mutex;
         ThreadVars *v = getThreadVars();
         // EasyCL *cl = v->getContext()->getCl();
         ofstream f;
-        if(v->getContext()->kernelByName.find(kernelName) != v->getContext()->kernelByName.end()) {
+        std::ostringstream kernelNameAfterGenerate_ss;
+        kernelNameAfterGenerate_ss << origKernelName;
+        for(int i = 0; i < clmemIndexByClmemArgIndex.size(); i++) {
+            kernelNameAfterGenerate_ss << "_" << clmemIndexByClmemArgIndex[i];
+        }
+        std::string kernelNameAfterGenerate = kernelNameAfterGenerate_ss.str();
+        if(v->getContext()->kernelByName.find(kernelNameAfterGenerate) != v->getContext()->kernelByName.end()) {
             v->getContext()->numKernelCalls++;
-            return v->getContext()->kernelByName[kernelName];
+            return v->getContext()->kernelByName[kernelNameAfterGenerate];
         }
         // compile the kernel.  we are still locking the mutex, but I cnat think of a better
         // way right now...
@@ -342,17 +349,17 @@ namespace cocl {
         // convert to opencl first... based on the kernel name required
         string clSourcecode = "";
         try {
-           clSourcecode = convertLlToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, kernelName);
+           clSourcecode = convertLlToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, origKernelName, kernelNameAfterGenerate);
         } catch(runtime_error &e) {
             cout << "failed to generate opencl sourcecode" << endl;
-            cout << "kernel name " << kernelName << endl;
+            cout << "kernel name " << origKernelName << " " << kernelNameAfterGenerate << endl;
             cout << "writing ll to /tmp/failed-kernel.ll" << endl;
             f.open("/tmp/failed-kernel.ll", ios_base::out);
             f << devicellsourcecode << endl;
             f.close();
             throw e;
         }
-        return getKernelForNameCl(kernelName, clSourcecode);
+        return getKernelForNameCl(kernelNameAfterGenerate, clSourcecode);
     }
 }
 
@@ -529,16 +536,17 @@ void setKernelArgFloat(float value) {
 }
 
 void kernelGo() {
+    try {
     COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "kernelGo queue=" << (void *)launchConfiguration.queue << endl);
 
     // launchConfiguration.kernelName += "_";
-    for(int i = 0; i < launchConfiguration.clmemIndexByClmemArgIndex.size(); i++) {
-        int clmemIndex = launchConfiguration.clmemIndexByClmemArgIndex[i];
-        launchConfiguration.kernelName += "_" + EasyCL::toString(clmemIndex);
-    }
+    // for(int i = 0; i < launchConfiguration.clmemIndexByClmemArgIndex.size(); i++) {
+    //     int clmemIndex = launchConfiguration.clmemIndexByClmemArgIndex[i];
+    //     launchConfiguration.kernelName += "_" + EasyCL::toString(clmemIndex);
+    // }
     cout << "kernel name " << launchConfiguration.kernelName << endl;
     CLKernel *kernel = getKernelForNameLl(launchConfiguration.clmems.size(), launchConfiguration.clmemIndexByClmemArgIndex, launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
     for(int i = 0; i < launchConfiguration.args.size(); i++) {
@@ -607,6 +615,10 @@ void kernelGo() {
     // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);
     // cout << "unlocked both mutexes" << endl;
+    } catch(runtime_error &e) {
+        std::cout << "caught runtime error " << e.what() << std::endl;
+        throw e;
+    }
 }
 
 float4 make_float4(float x, float y, float z, float w) {

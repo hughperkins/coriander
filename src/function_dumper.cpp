@@ -311,10 +311,16 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
     // cout << "dump function dclaratoin [" << fname << "]" << endl;
     // declaration += typeDumper->dumpType(retType) + " " + fname + "(";
     // declaration += fname + "(";
-    declaration << fname << "(";
+    declaration << fname;
+    if(isKernel) {
+        for(int clmemIdx = 0; clmemIdx < kernelClmemIndexByArgIndex.size(); clmemIdx++) {
+            declaration << "_" << kernelClmemIndexByArgIndex[clmemIdx];
+        }
+    }
+    declaration << "(";
     int i = 0;
     if(isKernel) {
-        for(int clmemIdx = 0; clmemIdx < kernelNumUniqueClmems; clmemIdx++) {
+        for(int clmemIdx = 0; clmemIdx < kernelClmemIndexByArgIndex.size(); clmemIdx++) {
             if(clmemIdx > 0) {
                 // declaration += ", ";
                 declaration << ", ";
