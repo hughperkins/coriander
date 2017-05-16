@@ -37,9 +37,10 @@ string FunctionDumper::createOffsetDeclaration(string argName) {
     #endif
 }
 
-string FunctionDumper::createOffsetShim(Type *argType, string argName) {
-    string shim = "    " + argName + " += " + argName + "_offset;\n";
-    return shim;
+std::string FunctionDumper::createOffsetShim(Type *argType, std::string argName, int clmemIndex) {
+    std::ostringstream oss;
+    oss << "    global float *" << argName << " = clmem" << clmemIndex << " + " << argName + "_offset;\n";
+    return oss.str();
 }
 
 std::string FunctionDumper::dumpPhi(std::string indent, llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock) {
@@ -301,16 +302,30 @@ std::string FunctionDumper::dumpSharedDefinitions(std::string indent) {
 }
 
 std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function *F) {
-    string declaration = "";
+    // string declaration = "";
+    std::ostringstream declaration;
     shimCode = "";
     // Type *retType = F->getReturnType();
     // std::string retTypeString = typeDumper->dumpType(retType);
     string fname = F->getName().str();
     // cout << "dump function dclaratoin [" << fname << "]" << endl;
     // declaration += typeDumper->dumpType(retType) + " " + fname + "(";
-    declaration += fname + "(";
+    // declaration += fname + "(";
+    declaration << fname << "(";
     int i = 0;
+    if(isKernel) {
+        for(int clmemIdx = 0; clmemIdx < kernelNumUniqueClmems; clmemIdx++) {
+            if(clmemIdx > 0) {
+                // declaration += ", ";
+                declaration << ", ";
+            }
+            // declaration += 'global float *clmem' + easycl::toString(clmemIdx);
+            declaration << "global float *clmem" << clmemIdx;
+            i++;
+        }
+    }
     // structpointershimcode = "";
+    int clmemArgIndex = 0;
     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
         Argument *arg = &*it;
         string argName = localNames.getOrCreateName(arg, arg->getName().str());
@@ -358,16 +373,20 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
                 }
             }
         }
-        if(!is_struct_needs_cloning) {
+        if(!is_struct_needs_cloning && !(isKernel && ispointer)) {
             argdeclaration = typeDumper->dumpType(arg->getType()) + " " + argName;
             // if(ispointer) {
                 // argdeclaration += "_";
             // }
         }
-        if(i > 0) {
-            declaration += ", ";
+        if(!(isKernel && ispointer)) {
+            if(i > 0) {
+                // declaration += ", ";
+                declaration << ", ";
+            }
         }
-        declaration += argdeclaration;
+        // declaration += argdeclaration;
+        declaration << argdeclaration;
         // if this is a kernel method, check for any structs containing pointers,
         // and add those pointers t othe argument list, with some appropriate shimcode
         // to copy those pointers into the struct, at the start of the kernel
@@ -388,10 +407,12 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
                 }
                 pointerInfo->type = PointerType::get(pointerInfo->type->getPointerElementType(), 1);
                 string pointerArgName = argName + "_ptr" + easycl::toString(j);
-                declaration += ", " + typeDumper->dumpType(pointerInfo->type) + " " + pointerArgName;
-                declaration += createOffsetDeclaration(pointerArgName);
+                declaration << ", " << typeDumper->dumpType(pointerInfo->type) << " " << pointerArgName;
+                declaration << createOffsetDeclaration(pointerArgName);
+                int clmemIndex = kernelClmemIndexByArgIndex[clmemArgIndex];
+                clmemArgIndex++;
                 shimCode = 
-                    createOffsetShim(pointerInfo->type, pointerArgName) +
+                    createOffsetShim(pointerInfo->type, pointerArgName, clmemIndex) +
                     shimCode +
                     argName + "[0]" + pointerInfo->path + " = " + pointerArgName + ";\n";
                 j++;
@@ -399,19 +420,21 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
         }
         if(isKernel && ispointer && !is_struct_needs_cloning) {
             // add offset
-            declaration += createOffsetDeclaration(argName);
+            int clmemIndex = kernelClmemIndexByArgIndex[clmemArgIndex];
+            clmemArgIndex++;
+            declaration << createOffsetDeclaration(argName);
             shimCode = 
-                createOffsetShim(arg->getType(), argName) +
+                createOffsetShim(arg->getType(), argName, clmemIndex) +
                 shimCode;
         }
         i++;
     }
     if(i > 0) {
-        declaration += ", ";
+        declaration << ", ";
     }
-    declaration += "local int *scratch";
-    declaration += ")";
-    return declaration;
+    declaration << "local int *scratch";
+    declaration << ")";
+    return declaration.str();
 }
 
 std::string FunctionDumper::dumpTerminator(Type **pReturnType, Instruction *terminator) {

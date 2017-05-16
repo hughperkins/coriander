@@ -183,7 +183,7 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
             // }
             // cout << "dumping function " << functionName << endl;
             bool _isKernel = isKernel.find(childF) != isKernel.end();
-            FunctionDumper childFunctionDumper(childF, _isKernel, &globalNames, typeDumper.get(), &functionNamesMap);
+            FunctionDumper childFunctionDumper(childF, _isKernel, uniqueClmemCount, clmemIndexByClmemArgIndex, &globalNames, typeDumper.get(), &functionNamesMap);
             if(_addIRToCl) {
                 childFunctionDumper.addIRToCl();
             }

@@ -83,15 +83,15 @@ public:
 
 class LocalWrapper {
 public:
-    LocalWrapper(GlobalWrapper &G, string functionName) :
+    LocalWrapper(GlobalWrapper &G, string functionName, int numClmems, vector<int> &clmemIndexes) :
         G(G),
         F(G.getFunction(functionName)),
-        functionDumper(F, true, &G.globalNames, &G.typeDumper, &G.functionNamesMap) {
+        functionDumper(F, true, numClmems, clmemIndexes, &G.globalNames, &G.typeDumper, &G.functionNamesMap) {
     }
-    LocalWrapper(GlobalWrapper &G, Function *F) :
+    LocalWrapper(GlobalWrapper &G, Function *F, int numClmems, vector<int> &clmemIndexes) :
         G(G),
         F(F),
-        functionDumper(F, true, &G.globalNames, &G.typeDumper, &G.functionNamesMap) {
+        functionDumper(F, true, numClmems, clmemIndexes, &G.globalNames, &G.typeDumper, &G.functionNamesMap) {
     }
     virtual ~LocalWrapper() {
     }
@@ -109,7 +109,10 @@ public:
 
 TEST(test_function_dumper, basic1) {
     GlobalWrapper G;
-    LocalWrapper wrapper(G, "someKernel");
+    vector<int> c;
+    c.push_back(0);
+    c.push_back(1);
+    LocalWrapper wrapper(G, "someKernel", 2, c);
     Function *F = wrapper.F;
     FunctionDumper *functionDumper = &wrapper.functionDumper;
     F->dump();
@@ -122,9 +125,49 @@ TEST(test_function_dumper, basic1) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl: [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void someKernel(global float* d1, uint d1_offset, global float* d2, uint d2_offset, local int *scratch) {
-    d2 += d2_offset;
-    d1 += d1_offset;
+    EXPECT_EQ(R"(kernel void someKernel(global float *clmem0, global float *clmem1, uint d1_offset, uint d2_offset, local int *scratch) {
+    global float *d2 = clmem1 + d2_offset;
+    global float *d1 = clmem0 + d1_offset;
+
+    float v4;
+    float* v2[1];
+    float* v3;
+
+v1:;
+    v3 = v2[0];
+    v4 = someFunc_gp(d1, v3, scratch);
+    return;
+}
+)", os.str());
+
+    for(auto it=functionDumper->neededFunctions.begin(); it != functionDumper->neededFunctions.end(); it++) {
+        Function *childF = *it;
+        cout << "needed function call: " << childF->getName().str() << endl;
+    }
+    ASSERT_EQ(1u, functionDumper->neededFunctions.size());
+    ASSERT_EQ("someFunc_gp", (*functionDumper->neededFunctions.begin())->getName().str());
+}
+TEST(test_function_dumper, redundantclmems) {
+    GlobalWrapper G;
+    vector<int> c;
+    c.push_back(0);
+    c.push_back(0);
+    LocalWrapper wrapper(G, "someKernel", 1, c);
+    Function *F = wrapper.F;
+    FunctionDumper *functionDumper = &wrapper.functionDumper;
+    F->dump();
+
+    bool res = wrapper.runGeneration();
+    EXPECT_TRUE(res);
+
+    ostringstream os;
+
+    os.str("");
+    functionDumper->toCl(os);
+    cout << "cl: [" << os.str() << "]" << endl;
+    EXPECT_EQ(R"(kernel void someKernel(global float *clmem0, uint d1_offset, uint d2_offset, local int *scratch) {
+    global float *d2 = clmem0 + d2_offset;
+    global float *d1 = clmem0 + d1_offset;
 
     float v4;
     float* v2[1];
@@ -146,7 +189,9 @@ v1:;
 }
 TEST(test_function_dumper, usesShared1) {
     GlobalWrapper G;
-    LocalWrapper wrapper(G, "usesShared");
+    vector<int> c;
+    c.push_back(0);
+    LocalWrapper wrapper(G, "usesShared", 1, c);
     Function *F = wrapper.F;
     FunctionDumper *functionDumper = &wrapper.functionDumper;
     F->dump();
@@ -159,8 +204,8 @@ TEST(test_function_dumper, usesShared1) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl: [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void usesShared(global float* d1, uint d1_offset, local int *scratch) {
-    d1 += d1_offset;
+    EXPECT_EQ(R"(kernel void usesShared(global float *clmem0, uint d1_offset, local int *scratch) {
+    global float *d1 = clmem0 + d1_offset;
 
     float v7[1];
     float v8;
@@ -178,7 +223,9 @@ v1:;
 
 TEST(test_function_dumper, usesShared2) {
     GlobalWrapper G;
-    LocalWrapper wrapper(G, "usesShared2");
+    vector<int> c;
+    c.push_back(0);
+    LocalWrapper wrapper(G, "usesShared2", 1, c);
     Function *F = wrapper.F;
     FunctionDumper *functionDumper = &wrapper.functionDumper;
     F->dump();
@@ -191,8 +238,8 @@ TEST(test_function_dumper, usesShared2) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void usesShared2(global float* d1, uint d1_offset, local int *scratch) {
-    d1 += d1_offset;
+    EXPECT_EQ(R"(kernel void usesShared2(global float *clmem0, uint d1_offset, local int *scratch) {
+    global float *d1 = clmem0 + d1_offset;
 
     float v11[1];
     float v13;
@@ -218,7 +265,9 @@ v1:;
 TEST(test_function_dumper, usesPointerFunction) {
     GlobalWrapper G;
 
-    LocalWrapper wrapper(G, "usesPointerFunction");
+    vector<int> c;
+    c.push_back(0);
+    LocalWrapper wrapper(G, "usesPointerFunction", 1, c);
     Function *F = wrapper.F;
     FunctionDumper *functionDumper = &wrapper.functionDumper;
     F->dump();
@@ -239,7 +288,7 @@ TEST(test_function_dumper, usesPointerFunction) {
     EXPECT_EQ("returnsPointer_g", neededFunction->getName().str());
     neededFunction->dump();
 
-    LocalWrapper wrapper2(G, neededFunction);
+    LocalWrapper wrapper2(G, neededFunction, 1, c);
     Function *F2 = neededFunction;
     FunctionDumper *functionDumper2 = &wrapper2.functionDumper;
     F2->dump();
@@ -251,8 +300,8 @@ TEST(test_function_dumper, usesPointerFunction) {
     os.str("");
     functionDumper2->toCl(os);
     cout << "cl, F2: [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel global float* returnsPointer_g(global float* in, uint in_offset, local int *scratch) {
-    in += in_offset;
+    EXPECT_EQ(R"(kernel global float* returnsPointer_g(global float *clmem0, uint in_offset, local int *scratch) {
+    global float *in = clmem0 + in_offset;
 
 
 v1:;
@@ -272,8 +321,8 @@ v1:;
     os.str("");
     functionDumper->toCl(os);
     cout << "cl, F: [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void usesPointerFunction(global float* in, uint in_offset, local int *scratch) {
-    in += in_offset;
+    EXPECT_EQ(R"(kernel void usesPointerFunction(global float *clmem0, uint in_offset, local int *scratch) {
+    global float *in = clmem0 + in_offset;
 
     global float* v2;
 
@@ -286,7 +335,9 @@ v1:;
 
 TEST(test_function_dumper, returnsFloatConstant) {
     GlobalWrapper G;
-    LocalWrapper wrapper(G, "returnsFloatConstant");
+    vector<int> c;
+    c.push_back(0);
+    LocalWrapper wrapper(G, "returnsFloatConstant", 1, c);
     Function *F = wrapper.F;
     FunctionDumper *functionDumper = &wrapper.functionDumper;
     F->dump();
@@ -299,8 +350,8 @@ TEST(test_function_dumper, returnsFloatConstant) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel float returnsFloatConstant(global float* in, uint in_offset, local int *scratch) {
-    in += in_offset;
+    EXPECT_EQ(R"(kernel float returnsFloatConstant(global float *clmem0, uint in_offset, local int *scratch) {
+    global float *in = clmem0 + in_offset;
 
 
 v1:;
@@ -311,7 +362,9 @@ v1:;
 
 TEST(test_function_dumper, testBranches_nophi) {
     GlobalWrapper G;
-    LocalWrapper wrapper(G, "testBranches_nophi");
+    vector<int> c;
+    c.push_back(0);
+    LocalWrapper wrapper(G, "testBranches_nophi", 1, c);
     Function *F = wrapper.F;
     FunctionDumper *functionDumper = &wrapper.functionDumper;
     F->dump();
@@ -324,8 +377,8 @@ TEST(test_function_dumper, testBranches_nophi) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void testBranches_nophi(global float* d1, uint d1_offset, local int *scratch) {
-    d1 += d1_offset;
+    EXPECT_EQ(R"(kernel void testBranches_nophi(global float *clmem0, uint d1_offset, local int *scratch) {
+    global float *d1 = clmem0 + d1_offset;
 
     float v3;
     float v6[1];
@@ -346,7 +399,9 @@ v2:;
 
 TEST(test_function_dumper, testBranches_onephi) {
     GlobalWrapper G;
-    LocalWrapper wrapper(G, "testBranches_onephi");
+    vector<int> c;
+    c.push_back(0);
+    LocalWrapper wrapper(G, "testBranches_onephi", 1, c);
     Function *F = wrapper.F;
     FunctionDumper *functionDumper = &wrapper.functionDumper;
     F->dump();
@@ -359,8 +414,8 @@ TEST(test_function_dumper, testBranches_onephi) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void testBranches_onephi(global float* d1, uint d1_offset, local int *scratch) {
-    d1 += d1_offset;
+    EXPECT_EQ(R"(kernel void testBranches_onephi(global float *clmem0, uint d1_offset, local int *scratch) {
+    global float *d1 = clmem0 + d1_offset;
 
     float v3;
     float v6;
@@ -384,7 +439,9 @@ v2:;
 
 TEST(test_function_dumper, testBranches_phifromfuture) {
     GlobalWrapper G;
-    LocalWrapper wrapper(G, "testBranches_phifromfuture");
+    vector<int> c;
+    c.push_back(0);
+    LocalWrapper wrapper(G, "testBranches_phifromfuture", 1, c);
     Function *F = wrapper.F;
     FunctionDumper *functionDumper = &wrapper.functionDumper;
     F->dump();
@@ -397,8 +454,8 @@ TEST(test_function_dumper, testBranches_phifromfuture) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void testBranches_phifromfuture(global float* d1, uint d1_offset, local int *scratch) {
-    d1 += d1_offset;
+    EXPECT_EQ(R"(kernel void testBranches_phifromfuture(global float *clmem0, uint d1_offset, local int *scratch) {
+    global float *d1 = clmem0 + d1_offset;
 
     float v12;
     float v4;
@@ -427,7 +484,9 @@ v3:;
 
 TEST(test_function_dumper, testBranches_phifromfloat) {
     GlobalWrapper G;
-    LocalWrapper wrapper(G, "testBranches_phifromfloat");
+    vector<int> c;
+    c.push_back(0);
+    LocalWrapper wrapper(G, "testBranches_phifromfloat", 1, c);
     Function *F = wrapper.F;
     FunctionDumper *functionDumper = &wrapper.functionDumper;
     F->dump();
@@ -440,8 +499,8 @@ TEST(test_function_dumper, testBranches_phifromfloat) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void testBranches_phifromfloat(global float* d1, uint d1_offset, local int *scratch) {
-    d1 += d1_offset;
+    EXPECT_EQ(R"(kernel void testBranches_phifromfloat(global float *clmem0, uint d1_offset, local int *scratch) {
+    global float *d1 = clmem0 + d1_offset;
 
     float v13;
     float v8;
@@ -468,7 +527,9 @@ v3:;
 
 TEST(test_function_dumper, multigpu_Z8getValuePf) {
     GlobalWrapper G;
-    LocalWrapper wrapper(G, "multigpu_Z8getValuePf");
+    vector<int> c;
+    c.push_back(0);
+    LocalWrapper wrapper(G, "multigpu_Z8getValuePf", 1, c);
     Function *F = wrapper.F;
     FunctionDumper *functionDumper = &wrapper.functionDumper;
     F->dump();
@@ -481,8 +542,8 @@ TEST(test_function_dumper, multigpu_Z8getValuePf) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void multigpu_Z8getValuePf(global float* outdata, uint outdata_offset, local int *scratch) {
-    outdata += outdata_offset;
+    EXPECT_EQ(R"(kernel void multigpu_Z8getValuePf(global float *clmem0, uint outdata_offset, local int *scratch) {
+    global float *outdata = clmem0 + outdata_offset;
 
     float v10;
     float v15;

@@ -136,6 +136,72 @@ v1:;
 )", cl);
 }
 
+TEST(test_kernel_dumper, redundant_clmems1) {
+    GlobalWrapper G("someKernel");
+    KernelDumper *kernelDumper = G.kernelDumper.get();
+
+    // string cl = runKernelDumper(kernelDumper, 2);
+    vector<int> argIndexes;
+    argIndexes.push_back(0);
+    argIndexes.push_back(0);
+    string cl = kernelDumper->toCl(1, argIndexes);
+    cout << "kernel cl: [" << cl << "]" << endl;
+    EXPECT_EQ(R"(
+float someFunc_gg(global float* d1, global float* v11, local int *scratch);
+float someFunc_gp(global float* d1, float* v11, local int *scratch);
+float someFunc_pg(float* d1, global float* v11, local int *scratch);
+kernel void someKernel(global float* d1, uint d1_offset, global float* d2, uint d2_offset, local int *scratch);
+
+kernel void someKernel(global float* d1, uint d1_offset, uint d2_offset, local int *scratch) {
+    d2 += d2_offset;
+    d1 += d1_offset;
+
+    float v4;
+    float v5;
+    float v6;
+    float* v2[1];
+    float* v3;
+
+v1:;
+    v3 = v2[0];
+    v4 = someFunc_gp(d1, v3, scratch);
+    v5 = someFunc_pg(v3, d1, scratch);
+    v6 = someFunc_gg(d1, d1, scratch);
+    return;
+}
+float someFunc_gg(global float* d1, global float* v11, local int *scratch) {
+    float v5;
+    global float* v6;
+
+v1:;
+    v5 = d1[0];
+    v6 = (&(d1[3]));
+    v6[0] = v5;
+    return 4.5f;
+}
+float someFunc_gp(global float* d1, float* v11, local int *scratch) {
+    float v5;
+    global float* v6;
+
+v1:;
+    v5 = d1[0];
+    v6 = (&(d1[3]));
+    v6[0] = v5;
+    return 4.5f;
+}
+float someFunc_pg(float* d1, global float* v11, local int *scratch) {
+    float v5;
+    float* v6;
+
+v1:;
+    v5 = d1[0];
+    v6 = (&(d1[3]));
+    v6[0] = v5;
+    return 4.5f;
+}
+)", cl);
+}
+
 TEST(test_kernel_dumper, testBranches_phifromfuture) {
     GlobalWrapper G("testBranches_phifromfuture");
     KernelDumper *kernelDumper = G.kernelDumper.get();

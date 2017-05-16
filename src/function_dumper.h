@@ -36,10 +36,12 @@ namespace cocl {
 
 class FunctionDumper {
 public:
-    FunctionDumper(llvm::Function *F, bool isKernel, GlobalNames *globalNames, TypeDumper *typeDumper,
+    FunctionDumper(llvm::Function *F, bool isKernel, int kernelNumUniqueClmems, std::vector<int> &kernelClmemIndexByArgIndex, GlobalNames *globalNames, TypeDumper *typeDumper,
         FunctionNamesMap *functionNamesMap) :
             F(F),
             isKernel(isKernel),
+            kernelNumUniqueClmems(kernelNumUniqueClmems),
+            kernelClmemIndexByArgIndex(kernelClmemIndexByArgIndex),
             globalNames(globalNames),
             typeDumper(typeDumper),
             structCloner(typeDumper, globalNames),
@@ -67,7 +69,7 @@ public:
     bool generationDone();
 
     std::string createOffsetDeclaration(std::string argName);
-    std::string createOffsetShim(llvm::Type *argType, std::string argName);
+    std::string createOffsetShim(llvm::Type *argType, std::string argName, int clmemIndex);
     std::string dumpFunctionDeclarationWithoutReturn(llvm::Function *F);
     void generateBlockIndex();
 
@@ -109,6 +111,8 @@ protected:
 
     llvm::Function *F;
     bool isKernel = false;
+    int kernelNumUniqueClmems;
+    std::vector<int> &kernelClmemIndexByArgIndex;
     bool _addIRToCl = false;
     std::map<llvm::BasicBlock *, int> functionBlockIndex;
 
