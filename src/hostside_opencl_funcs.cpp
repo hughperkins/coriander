@@ -67,6 +67,7 @@ namespace cocl {
     public:
         virtual ~Arg() {}
         virtual void inject(CLKernel *kernel) = 0;
+        virtual std::string str() = 0;
     };
     class Int32Arg : public Arg {
     public:
@@ -74,6 +75,7 @@ namespace cocl {
         void inject(CLKernel *kernel) {
             kernel->in(v);
         }
+        virtual std::string str() { return "Int32Arg"; }
         int v;
     };
     class UInt32Arg : public Arg {
@@ -82,6 +84,7 @@ namespace cocl {
         void inject(CLKernel *kernel) {
             kernel->in_uint32(v);
         }
+        virtual std::string str() { return "UInt32Arg"; }
         uint32_t v;
     };
     class Int64Arg : public Arg {
@@ -90,6 +93,7 @@ namespace cocl {
         void inject(CLKernel *kernel) {
             kernel->in(v);
         }
+        virtual std::string str() { return "Int64Arg"; }
         int64_t v;
     };
     class FloatArg : public Arg {
@@ -98,6 +102,7 @@ namespace cocl {
         void inject(CLKernel *kernel) {
             kernel->in(v);
         }
+        virtual std::string str() { return "FloatArg"; }
         float v;
     };
     class NullPtrArg : public Arg {
@@ -106,6 +111,7 @@ namespace cocl {
         void inject(CLKernel *kernel) {
             kernel->in_nullptr();
         }
+        virtual std::string str() { return "NullPtrArg"; }
     };
     class ClmemArg : public Arg {
     public:
@@ -113,6 +119,7 @@ namespace cocl {
         void inject(CLKernel *kernel) {
             kernel->inout(&v);
         }
+        virtual std::string str() { return "ClmemArg"; }
         cl_mem v;
     };
     class StructArg : public Arg {
@@ -120,6 +127,7 @@ namespace cocl {
         StructArg(char *pCpuStruct, int structAllocateSize) :
             pCpuStruct(pCpuStruct), structAllocateSize(structAllocateSize)
         {}
+        virtual std::string str() { return "StructArg"; }
         char *pCpuStruct;
         int structAllocateSize;
     };
@@ -331,6 +339,7 @@ namespace cocl {
         ThreadVars *v = getThreadVars();
         // EasyCL *cl = v->getContext()->getCl();
         ofstream f;
+        std::cout << "getKErnelForNameLl uniqueClmemCount=" << uniqueClmemCount << std::endl;
         std::ostringstream kernelNameAfterGenerate_ss;
         kernelNameAfterGenerate_ss << origKernelName;
         for(int i = 0; i < clmemIndexByClmemArgIndex.size(); i++) {
@@ -415,13 +424,15 @@ void configureKernel(const char *kernelName, const char *devicellsourcecode) {
     pthread_mutex_unlock(&launchMutex);
 }
 
-void indexClmemArg(cl_mem clmem) {
+void addClmemArg(cl_mem clmem) {
     int clmemIndex = 0;
     if(launchConfiguration.clmemIndexByClmem.find(clmem) == launchConfiguration.clmemIndexByClmem.end()) {
+        cout << "new clmem" << endl;
         clmemIndex = launchConfiguration.clmems.size();
         launchConfiguration.clmems.push_back(clmem);
         launchConfiguration.clmemIndexByClmem[clmem] = clmemIndex;
     } else {
+        cout << "existing clmem" << endl;
         clmemIndex = launchConfiguration.clmemIndexByClmem.find(clmem)->second;
     }
     launchConfiguration.clmemIndexByClmemArgIndex.push_back(clmemIndex);
@@ -456,8 +467,8 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     EasyCL::checkError(err);
     launchConfiguration.kernelArgsToBeReleased.push_back(gpu_struct);
 
-    launchConfiguration.args.push_back(std::unique_ptr<Arg>(new ClmemArg(launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1])));
-    indexClmemArg(gpu_struct);
+    // launchConfiguration.args.push_back(std::unique_ptr<Arg>(new ClmemArg(launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1])));
+    addClmemArg(gpu_struct);
 
     // launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
     // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
@@ -472,7 +483,8 @@ void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
     COCL_PRINT(cout << "setKernelArgCharStar " << (void *)memory_as_charstar << endl);
     Memory *memory = findMemory(memory_as_charstar);
     if(memory == 0) {
-        launchConfiguration.args.push_back(std::unique_ptr<Arg>(new NullPtrArg()));
+        // launchConfiguration.args.push_back(std::unique_ptr<Arg>(new NullPtrArg()));
+        addClmemArg(0);
         // launchConfiguration.kernel->in_nullptr();
         #ifdef OFFSET_32BIT
         launchConfiguration.args.push_back(std::unique_ptr<Arg>(new UInt32Arg(0)));
@@ -484,8 +496,8 @@ void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
     } else {
         size_t offset = memory->getOffset(memory_as_charstar);
         cl_mem clmem = memory->clmem;
-        launchConfiguration.args.push_back(std::unique_ptr<Arg>(new ClmemArg(clmem)));
-        indexClmemArg(clmem);
+        // launchConfiguration.args.push_back(std::unique_ptr<Arg>(new ClmemArg(clmem)));
+        addClmemArg(clmem);
 
         // launchConfiguration.kernel->inout(&clmem);
         size_t offsetElements = offset / elementSize;
@@ -547,10 +559,14 @@ void kernelGo() {
     //     int clmemIndex = launchConfiguration.clmemIndexByClmemArgIndex[i];
     //     launchConfiguration.kernelName += "_" + EasyCL::toString(clmemIndex);
     // }
-    cout << "kernel name " << launchConfiguration.kernelName << endl;
+    cout << "kernel name " << launchConfiguration.kernelName << " unique clmems=" << launchConfiguration.clmems.size() << endl;
     CLKernel *kernel = getKernelForNameLl(launchConfiguration.clmems.size(), launchConfiguration.clmemIndexByClmemArgIndex, launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
+    for(int i = 0; i < launchConfiguration.clmems.size(); i++) {
+        cout << "clmem" << i << endl;
+        kernel->inout(&launchConfiguration.clmems[i]);
+    }
     for(int i = 0; i < launchConfiguration.args.size(); i++) {
-        // cout << "i=" << i << endl;
+        cout << "i=" << i << " " << launchConfiguration.args[i]->str() << endl;
         launchConfiguration.args[i]->inject(kernel);
     }
 

@@ -320,7 +320,7 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
     declaration << "(";
     int i = 0;
     if(isKernel) {
-        for(int clmemIdx = 0; clmemIdx < kernelClmemIndexByArgIndex.size(); clmemIdx++) {
+        for(int clmemIdx = 0; clmemIdx < kernelNumUniqueClmems; clmemIdx++) {
             if(clmemIdx > 0) {
                 // declaration += ", ";
                 declaration << ", ";
