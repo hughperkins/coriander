@@ -34,7 +34,7 @@ public:
         typeDumper.reset(new cocl::TypeDumper(&globalNames));
     }
     virtual ~KernelDumper() {}
-    std::string toCl();
+    std::string toCl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex);
     void declareGlobals(std::ostream &os);
     void declareGlobal(std::ostream &os, llvm::GlobalValue *var);
 

@@ -323,10 +323,10 @@ bool add_ir_to_cl = false;
 //     }
 // }
 
-string convertModuleToCl(Module *M, string specificFunction) {
+string convertModuleToCl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, Module *M, string specificFunction) {
     KernelDumper kernelDumper(M, specificFunction);
     kernelDumper.addIRToCl();
-    string cl = kernelDumper.toCl();
+    string cl = kernelDumper.toCl(uniqueClmemCount, clmemIndexByClmemArgIndex);
     return cl;
 }
 

@@ -38,6 +38,16 @@ namespace {
 
 string ll_path = "../test/gtest/test_kernel_dumper.ll";  // this is a bit hacky, but fine-ish for now
 
+std::string runKernelDumper(KernelDumper *kernelDumper, int numClmemArgs) {
+    // assumes all args unique
+    vector<int> clmemIndexByClmemArgIndex;
+    for(int i = 0; i < numClmemArgs; i++) {
+        clmemIndexByClmemArgIndex.push_back(i);
+    }
+    std::string cl = kernelDumper->toCl(numClmemArgs, clmemIndexByClmemArgIndex);
+    return cl;
+}
+
 class GlobalWrapper {
 public:
     GlobalWrapper(string kernelName) {
@@ -67,7 +77,8 @@ TEST(test_kernel_dumper, basic) {
     GlobalWrapper G("someKernel");
     KernelDumper *kernelDumper = G.kernelDumper.get();
 
-    string cl = kernelDumper->toCl();
+    // string cl = kernelDumper->toCl();
+    string cl = runKernelDumper(kernelDumper, 2);
     cout << "kernel cl: [" << cl << "]" << endl;
     EXPECT_EQ(R"(
 float someFunc_gg(global float* d1, global float* v11, local int *scratch);
@@ -130,7 +141,8 @@ TEST(test_kernel_dumper, testBranches_phifromfuture) {
     KernelDumper *kernelDumper = G.kernelDumper.get();
     // Module *M = getM();
 
-    string cl = kernelDumper->toCl();
+    // string cl = kernelDumper->toCl();
+    string cl = runKernelDumper(kernelDumper, 1);
     cout << "kernel cl: [" << cl << "]" << endl;
     EXPECT_EQ(R"(
 kernel void testBranches_phifromfuture(global float* d1, uint d1_offset, local int *scratch);
@@ -169,7 +181,8 @@ TEST(test_kernel_dumper, usesPointerFunction) {
     KernelDumper *kernelDumper = G.kernelDumper.get();
     // Module *M = getM();
 
-    string cl = kernelDumper->toCl();
+    // string cl = kernelDumper->toCl();
+    string cl = runKernelDumper(kernelDumper, 1);
     cout << "kernel cl: [" << cl << "]" << endl;
     EXPECT_EQ(R"(
 float* returnsPointer(float* in, local int *scratch);
@@ -209,7 +222,8 @@ TEST(test_kernel_dumper, usesFunctionReturningVoid) {
     KernelDumper *kernelDumper = G.kernelDumper.get();
     // Module *M = getM();
 
-    string cl = kernelDumper->toCl();
+    // string cl = kernelDumper->toCl();
+    string cl = runKernelDumper(kernelDumper, 1);
     cout << "kernel cl: [" << cl << "]" << endl;
     EXPECT_EQ(R"(
 kernel void usesFunctionReturningVoid(global float* in, uint in_offset, local int *scratch);
@@ -239,7 +253,8 @@ TEST(test_kernel_dumper, test_long_conflicting_names) {
     KernelDumper *kernelDumper = G.kernelDumper.get();
     // Module *M = getM();
 
-    string cl = kernelDumper->toCl();
+    string cl = runKernelDumper(kernelDumper, 1);
+    // string cl = kernelDumper->toCl();
     cout << "kernel cl: [" << cl << "]" << endl;
     EXPECT_TRUE(cl.find(" void mysuperlongfunctionnamemysuperl(") != string::npos);  // kernel name should be exactly 32 characters, simply truncated
     vector<string>splitLine = easycl::split(cl, "\n");
