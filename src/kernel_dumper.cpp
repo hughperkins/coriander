@@ -129,7 +129,7 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
         kernelName = kernelName.substr(0, 31);
         F->setName(kernelName);
     }
-    cout << "F name " << F->getName().str() << endl;
+    // cout << "F name " << F->getName().str() << endl;
 
     int i = 0;
     for(auto it = M->begin(); it != M->end(); it++) {
@@ -187,7 +187,7 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
             if(_addIRToCl) {
                 childFunctionDumper.addIRToCl();
             }
-            cout << " running generation on " << childF->getName().str() << endl;
+            // cout << " running generation on " << childF->getName().str() << endl;
             if(!childFunctionDumper.runGeneration(returnTypeByFunction)) {
                 // cout << "couldnt run generation to completion yet for " << childF->getName().str() << endl;
                 neededFunctions.insert(childFunctionDumper.neededFunctions.begin(), childFunctionDumper.neededFunctions.end());

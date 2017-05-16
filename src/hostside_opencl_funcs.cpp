@@ -319,7 +319,7 @@ namespace cocl {
 
             throw e;
         }
-        cout << " ... built" << endl;
+        // cout << " ... built" << endl;
         v->getContext()->kernelByName[kernelName ] = kernel;
         cl->storeKernel(kernelName, kernel, true);  // this will cause the kernel to be deleted with cl.  Not clean yet, but a start
         return kernel;
@@ -336,7 +336,7 @@ namespace cocl {
         }
         // compile the kernel.  we are still locking the mutex, but I cnat think of a better
         // way right now...
-        cout << "building kernel " << kernelName << endl;
+        // cout << "building kernel " << kernelName << endl;
         // cout << "source [" << sourcecode << "]" << endl;
 
         // convert to opencl first... based on the kernel name required
