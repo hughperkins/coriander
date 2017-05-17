@@ -233,7 +233,7 @@ if(BUILD_TESTS)
         offsetkernelargs properties test_bitcast test_callbacks testcumemcpy testevents2
         testevents testfloat4 test_kernelcachedok testmath testmemcpydevicetodevice test_memhostalloc
         testneg testnullpointer testpartialcopy testshfl teststream test_types
-        singlebuffer test_devices
+        singlebuffer test_devices test_buffers longname
     )
 
     if(TESTS_DUMP_CL)

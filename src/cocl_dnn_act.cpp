@@ -92,7 +92,7 @@ size_t cudnnActivationForward(
             throw runtime_error("Activations type not implemented");
     }
     sourceCode = easycl::replaceGlobal(sourceCode, "{ACTIVATION_TYPE}", actName);
-    easycl::CLKernel *kernel = getKernelForNameCl(actName + "Forward", sourceCode);
+    easycl::CLKernel *kernel = compileOpenCLKernel(actName + "Forward", actName + "Forward", sourceCode);
 
     int linearSize = N * C * H * W;
 
@@ -158,7 +158,7 @@ size_t cudnnActivationBackward(
             throw runtime_error("Activations type not implemented");
     }
     sourceCode = easycl::replaceGlobal(sourceCode, "{ACTIVATION_TYPE}", actName);
-    easycl::CLKernel *kernel = getKernelForNameCl(actName + "Backward", sourceCode);
+    easycl::CLKernel *kernel = compileOpenCLKernel(actName + "Backward", actName + "Backward", sourceCode);
 
     int linearSize = N * C * H * W;
 

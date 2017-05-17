@@ -34,7 +34,7 @@ esac
 SCRIPT_DIR=$( cd "$( dirname "$0" )" && pwd )
 export COCL_HOME=$(dirname ${SCRIPT_DIR})
 
-if [ -f ${COCL_HOME}/bin/ir-to-opencl ]; then {
+if [ -f ${COCL_HOME}/bin/patch-hostside ]; then {
     export COCL_BIN=${COCL_HOME}/bin
     export COCL_LIB=${COCL_HOME}/lib
 } else {

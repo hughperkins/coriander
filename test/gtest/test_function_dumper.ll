@@ -9,6 +9,17 @@ define void @someKernel(float * %d1, float * %d2) {
     ret void
 }
 
+define i32 @someFuncInts(i32 * %d1, i32 * %v1) {
+    ret i32 3
+}
+
+define void @someKernelInts(i32 * %d1, i32 * %d2) {
+    %1 = alloca i32 *, i32 1
+    %2 = load i32 *, i32 **%1
+    %3 = call i32 @someFuncInts(i32 *%d1, i32 *%2)
+    ret void
+}
+
 @mysharedmem = internal addrspace(3) global [8 x float] zeroinitializer, align 4
 @anothershared = internal addrspace(3) global [12 x i32] zeroinitializer, align 4
 

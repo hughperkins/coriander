@@ -37,9 +37,18 @@ namespace cocl {
 
     int32_t getNumCachedKernels(); // this should be per-context or something, though right now, it is not yet
     int32_t getNumKernelCalls();
-    std::string  convertLlToCl(std::string devicellsourcecode, std::string kernelName);
-    easycl::CLKernel *getKernelForNameCl(std::string kernelName, std::string clSourcecode);
-    easycl::CLKernel *getKernelForNameLl(std::string kernelName, std::string devicellsourcecode);
+    // std::string  convertLlToCl(std::string devicellsourcecode, std::string kernelName);
+    // easycl::CLKernel *getKernelForNameCl(std::string kernelName, std::string clSourcecode);
+
+    struct GenerateOpenCLResult {
+        std::string clSourcecode;
+        std::string originalKernelName;
+        std::string shortKernelName;
+        std::string uniqueKernelName;
+    };
+    GenerateOpenCLResult generateOpenCL(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, std::string origKernelName, std::string devicellsourcecode);
+    easycl::CLKernel *compileOpenCLKernel(std::string uniqueKernelName, std::string shortKernelName, std::string clSourcecode);
+    // easycl::CLKernel *getKernelForNameLl(std::string kernelName, std::string devicellsourcecode);
 }
 
 extern "C" {

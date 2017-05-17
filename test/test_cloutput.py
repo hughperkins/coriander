@@ -108,6 +108,7 @@ __global__ void somekernel(float *data) {
 """
     mangledname = test_common.mangle('somekernel', ['float *'])
     cl_code = test_common.cu_to_cl(sourcecode, mangledname)
+    print('cl_code', cl_code)
     kernel = test_common.build_kernel(context, cl_code, mangledname)
 
 

@@ -125,21 +125,39 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
     }
     // kernel name will simply be truncated to 32 characters
     // other names will fit around it
-    if(kernelName.size() > 32) {
-        kernelName = kernelName.substr(0, 31);
-        F->setName(kernelName);
-    }
+
+    F->setName(generatedName);
+    std::cout << "kernel_dumper toCl generatedName=" << generatedName << std::endl;
+    // if(kernelName.size() > 32) {
+    //     kernelName = kernelName.substr(0, 31);
+    //     F->setName(kernelName);
+    // }
     // cout << "F name " << F->getName().str() << endl;
 
-    int i = 0;
+    std::set<std::string> usedNames;
+    usedNames.insert(generatedName);
     for(auto it = M->begin(); it != M->end(); it++) {
-        Function *F = &*it;
-        string name = F->getName().str();
-        if(name.size() > 32) {
-            name = name.substr(0, 28) + easycl::toString(i);
-            i++;
-            F->setName(name);
+        Function *thisF = &*it;
+        if(thisF == F) {
+            std::cout << "skipping " << F->getName().str() << std::endl;
+            continue;
         }
+        string name = thisF->getName().str();
+        // if(name == )
+        std::cout << "kernel_dumper toCl func orig name = " << name << std::endl;
+        // if(name.size() > 32) {
+            name = name.substr(0, 27);
+        // }
+        if(name.find("llvm.") == std::string::npos) {
+            name = easycl::replaceGlobal(name, ".", "_");
+        }
+        int i = 0;
+        while(usedNames.find(name) != usedNames.end()) {
+            name = name.substr(0, 27) + easycl::toString(i);
+            i++;
+        }
+        thisF->setName(name);
+        std::cout << "   generatedname=" << name << std::endl;
     }
 
     // GlobalNames globalNames;

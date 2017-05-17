@@ -71,7 +71,7 @@ int myEnqueueFillBuffer(
     float value,
     int offsetElements, int countElements) {
 
-    easycl::CLKernel *kernel = getKernelForNameCl("enqueueFillBuffer", get_enqueueFillBuffer_sourcecode());
+    easycl::CLKernel *kernel = compileOpenCLKernel("enqueueFillBuffer", "enqueueFillBuffer", get_enqueueFillBuffer_sourcecode());
 
     kernel->inout(&clmem);
     kernel->in((int32_t)offsetElements);
@@ -103,7 +103,7 @@ void im2col(cl_mem im_buf, size_t im_offset_bytes, const CoclDnnGeometryType cha
     int width_col = (width + 2 * pad_w - ksize_w) / stride_w + 1;
     int num_kernels = channels * height_col * width_col;
 
-    easycl::CLKernel *kernel = getKernelForNameCl("im2col_kernel", get_im2col_sourcecode());
+    easycl::CLKernel *kernel = compileOpenCLKernel("im2col_kernel", "im2col_kernel", get_im2col_sourcecode());
 
     kernel->in((int32_t)num_kernels);
     kernel->inout(&im_buf);
@@ -136,7 +136,7 @@ void col2im(cl_mem col_buf, size_t col_offset_bytes, const int channels,
     // To avoid involving atomic operations, we will launch one kernel per
     // bottom dimension, and then in the kernel add up the top dimensions.
 
-    easycl::CLKernel *kernel = getKernelForNameCl("col2im_kernel", get_col2im_sourcecode());
+    easycl::CLKernel *kernel = compileOpenCLKernel("col2im_kernel", "col2im_kernel", get_col2im_sourcecode());
 
     kernel->in((int32_t)num_kernels);
     kernel->inout(&col_buf);
@@ -623,7 +623,7 @@ size_t cudnnConvolutionBackwardBias(
     // easycl::EasyCL::checkError(err);
     // easycl::EasyCL::checkError(clFinish(v->currentContext->default_stream.get()->clqueue->queue));
 
-    easycl::CLKernel *kernel = getKernelForNameCl("convbackbias", get_convbackbias_sourcecode());
+    easycl::CLKernel *kernel = compileOpenCLKernel("convbackbias", "convbackbias", get_convbackbias_sourcecode());
     for(int elt=0; elt < batchSize; elt++) {
         int gradOutputCubeOffset = gradOutputOffset + elt * output3dSize * sizeof(float);
 

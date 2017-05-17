@@ -170,7 +170,7 @@ size_t cudnnSoftmaxForward(
     CoclDnnGeometryType N = inputDesc->N;
     CoclDnnGeometryType C = inputDesc->C;
 
-    easycl::CLKernel *kernel = getKernelForNameCl("SoftmaxForward", get_SoftmaxForward_sourcecode());
+    easycl::CLKernel *kernel = compileOpenCLKernel("SoftmaxForward", "SoftmaxForward", get_SoftmaxForward_sourcecode());
 
     // int linearSize = N * C;
 

@@ -42,7 +42,8 @@ namespace cocl {
         ~Context();
         std::unique_ptr<easycl::EasyCL> cl;
         std::unique_ptr<cocl::CoclStream> default_stream;
-        std::map<std::string, easycl::CLKernel *> kernelByName;
+        std::map<std::string, easycl::CLKernel *> kernelCache;
+        std::map<std::string, std::string > clSourceCodeCache;
         std::set<cocl::Memory *>memories;
         long long nextAllocPos = 1;
         std::map< long long, cocl::Memory *>memoryByAllocPos;

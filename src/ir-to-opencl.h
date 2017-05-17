@@ -36,6 +36,8 @@
 // std::string dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock);
 // std::string convertLlStringToCl(std::string llString, std::string specificFunction);
 
-std::string convertModuleToCl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, llvm::Module *M, std::string specificFunction);
-std::string convertLlStringToCl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, std::string llString, std::string specificFunction);
+std::string convertModuleToCl(
+    int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, llvm::Module *M, std::string specificFunction, std::string generatedName);
+std::string convertLlStringToCl(
+    int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, std::string llString, std::string specificFunction, std::string generatedName);
 void convertLlFileToClFile(std::string llFilename, std::string ClFilename, std::string specificFunction);

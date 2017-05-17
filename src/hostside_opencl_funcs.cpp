@@ -247,7 +247,7 @@ namespace cocl {
 
     int getNumCachedKernels() {
         // KernelByNameMutex mutex;
-        return getThreadVars()->getContext()->kernelByName.size();
+        return getThreadVars()->getContext()->kernelCache.size();
     }
 
     int getNumKernelCalls() {
@@ -255,30 +255,35 @@ namespace cocl {
         return getThreadVars()->getContext()->numKernelCalls;
     }
 
-    string  convertLlToCl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, string devicellsourcecode,
-            string origKernelName, std::string generatedKernelName) {
-        // cout << "llsourcecode [" << devicellsourcecode << "]" << endl;  
-        string clcode = convertLlStringToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, origKernelName);
-        // string clcode = convertLlStringToCl(devicellsourcecode, "");
-        // cout << "clcode " << clcode << endl;
-        return clcode;
-    }
+    // string  convertLlToCl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, string devicellsourcecode,
+    //         string origKernelName, std::string generatedKernelName) {
+    //     // cout << "llsourcecode [" << devicellsourcecode << "]" << endl;  
+    //     string clcode = convertLlStringToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, origKernelName, generatedKernelName);
+    //     // string clcode = convertLlStringToCl(devicellsourcecode, "");
+    //     // cout << "clcode " << clcode << endl;
+    //     return clcode;
+    // }
 
-    CLKernel *getKernelForNameCl(string kernelName, string clSourcecode) {
+    CLKernel *compileOpenCLKernel(string uniqueKernelName, string shortKernelName, string clSourcecode) {
+        // returns already-built kernel if available, based on the name
+        // otherwise builds passed-in clsourcecode, caches that, and returns resulting kernel
+        // (opencl generation has already happened prior to this function)
+
         // KernelByNameMutex mutex;
         ThreadVars *v = getThreadVars();
         EasyCL *cl = v->getContext()->getCl();
         ofstream f;
         v->getContext()->numKernelCalls++;
-        if(v->getContext()->kernelByName.find(kernelName) != v->getContext()->kernelByName.end()) {
-            return v->getContext()->kernelByName[kernelName];
+        if(v->getContext()->kernelCache.find(uniqueKernelName) != v->getContext()->kernelCache.end()) {
+            return v->getContext()->kernelCache[uniqueKernelName];
         }
         // compile the kernel.  we are still locking the mutex, but I cnat think of a better
         // way right now...
-        cout << "building kernel " << kernelName << endl;
-        // cout << "source [" << sourcecode << "]" << endl;
+        cout << "compileOpenCLKernel building kernel unique name: " << uniqueKernelName << endl;
+        cout << "shortname: " << shortKernelName << endl;
+        // cout << "source [" << clSourcecode << "]" << endl;
 
-        string filename = "/tmp/out.cl";
+        string filename = "/tmp/" + uniqueKernelName + ".cl";
         if(getenv("COCL_LOAD_KERNEL") != 0) {
             cout << "loading kernel from " << filename << endl;
             ifstream f;
@@ -307,14 +312,17 @@ namespace cocl {
 
         CLKernel *kernel = 0;
         try {
-            string shortKernelName = "" + kernelName;
-            if(shortKernelName.size() > 32) {
-                shortKernelName = shortKernelName.substr(0, 31);
-            }
+            // string shortKernelName = "" + kernelName;
+            // if(shortKernelName.size() > 32) {
+            //     shortKernelName = shortKernelName.substr(0, 31);
+            // }
+            cout << "building kernel " << shortKernelName << endl;
+            cout << "clSourcecode [" << clSourcecode << "]" << endl;
             kernel = cl->buildKernelFromString(clSourcecode, shortKernelName, "", "__internal__");
         } catch(runtime_error &e) {
-            cout << "failed to compile opencl sourcecode" << endl;
-            cout << "kernel name " << kernelName << endl;
+            cout << "compileOpenCLKernel failed to compile opencl sourcecode" << endl;
+            cout << "unique kernel name " << uniqueKernelName << endl;
+            cout << "short kernel name " << shortKernelName << endl;
             cout << "writing ll to /tmp/failed-kernel.ll" << endl;
 
             // f.open("/tmp/failed-kernel.ll", ios_base::out);
@@ -329,26 +337,37 @@ namespace cocl {
             throw e;
         }
         // cout << " ... built" << endl;
-        v->getContext()->kernelByName[kernelName ] = kernel;
-        cl->storeKernel(kernelName, kernel, true);  // this will cause the kernel to be deleted with cl.  Not clean yet, but a start
+        v->getContext()->kernelCache[uniqueKernelName] = kernel;
+        cl->storeKernel(uniqueKernelName, kernel, true);  // this will cause the kernel to be deleted with cl.  Not clean yet, but a start
         return kernel;
     }
 
-    CLKernel *getKernelForNameLl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, string origKernelName, string devicellsourcecode) {
+    GenerateOpenCLResult generateOpenCL(
+            int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, string origKernelName, string devicellsourcecode) {
+        // generates OpenCL source-code, based on passed-in bytecode
+        // returns cached source-code if available
+
         // KernelByNameMutex mutex;
         ThreadVars *v = getThreadVars();
+
         // EasyCL *cl = v->getContext()->getCl();
         ofstream f;
-        std::cout << "getKErnelForNameLl uniqueClmemCount=" << uniqueClmemCount << std::endl;
-        std::ostringstream kernelNameAfterGenerate_ss;
-        kernelNameAfterGenerate_ss << origKernelName;
+        // std::cout << "generateOpenCL uniqueClmemCount=" << uniqueClmemCount << std::endl;
+        // std::ostringstream shortKernelName_ss;
+        std::string shortKernelName = origKernelName.substr(0, 20);
+
+        std::ostringstream uniqueKernelName_ss;
+        uniqueKernelName_ss << origKernelName;
         for(int i = 0; i < clmemIndexByClmemArgIndex.size(); i++) {
-            kernelNameAfterGenerate_ss << "_" << clmemIndexByClmemArgIndex[i];
+            uniqueKernelName_ss << "_" << clmemIndexByClmemArgIndex[i];
         }
-        std::string kernelNameAfterGenerate = kernelNameAfterGenerate_ss.str();
-        if(v->getContext()->kernelByName.find(kernelNameAfterGenerate) != v->getContext()->kernelByName.end()) {
-            v->getContext()->numKernelCalls++;
-            return v->getContext()->kernelByName[kernelNameAfterGenerate];
+        std::string uniqueKernelName = uniqueKernelName_ss.str();
+        // cout << "generateOpenCL() kernelNameAfterGenerate " << kernelNameAfterGenerate << endl;
+        if(v->getContext()->clSourceCodeCache.find(uniqueKernelName) != v->getContext()->clSourceCodeCache.end()) {
+            std::string clSourcecode = v->getContext()->clSourceCodeCache[uniqueKernelName];
+            return GenerateOpenCLResult { clSourcecode, origKernelName, shortKernelName, uniqueKernelName };
+            // v->getContext()->numKernelCalls++;
+            // return v->getContext()->clSourceCodeByGeneratedName[kernelNameAfterGenerate];
         }
         // compile the kernel.  we are still locking the mutex, but I cnat think of a better
         // way right now...
@@ -356,19 +375,33 @@ namespace cocl {
         // cout << "source [" << sourcecode << "]" << endl;
 
         // convert to opencl first... based on the kernel name required
-        string clSourcecode = "";
         try {
-           clSourcecode = convertLlToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, origKernelName, kernelNameAfterGenerate);
+            string filename = "/tmp/" + uniqueKernelName;
+            if(getenv("COCL_DUMP_BYTECODE") != 0) {
+                cout << "saving bytecode to " << filename << endl;
+                ofstream f;
+                f.open(filename, ios_base::out);
+                // f << launchConfiguration.kernelName << endl;
+                f << devicellsourcecode << endl;
+                f.close();
+            }
+            string clSourcecode = convertLlStringToCl(
+                uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, origKernelName, shortKernelName);
+            // std::string clSourcecode = convertLlToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, origKernelName, kernelNameAfterGenerate);
+            v->getContext()->clSourceCodeCache[uniqueKernelName] = clSourcecode;
+            return GenerateOpenCLResult { clSourcecode, origKernelName, shortKernelName, uniqueKernelName };
         } catch(runtime_error &e) {
-            cout << "failed to generate opencl sourcecode" << endl;
-            cout << "kernel name " << origKernelName << " " << kernelNameAfterGenerate << endl;
+            cout << "generateOpenCL failed to generate opencl sourcecode" << endl;
+            cout << "kernel name orig=" << origKernelName << endl;
+            cout << "kernel name short=" << shortKernelName << endl;
+            cout << "kernel name unique=" << uniqueKernelName << endl;
             cout << "writing ll to /tmp/failed-kernel.ll" << endl;
             f.open("/tmp/failed-kernel.ll", ios_base::out);
             f << devicellsourcecode << endl;
             f.close();
             throw e;
         }
-        return getKernelForNameCl(kernelNameAfterGenerate, clSourcecode);
+        // return compileOpenCLKernel(kernelNameAfterGenerate, clSourcecode);
     }
 }
 
@@ -377,7 +410,7 @@ void configureKernel(const char *kernelName, const char *devicellsourcecode) {
     // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "... locked launch mutex " << (void *)getThreadVars() << endl);
-    COCL_PRINT(cout << "configureKernel name=" << kernelName << endl);
+    // COCL_PRINT(cout << "configureKernel name=" << kernelName << endl);
     // send in scratch buffer, local ints
     // make it have one int per core
 
@@ -427,12 +460,12 @@ void configureKernel(const char *kernelName, const char *devicellsourcecode) {
 void addClmemArg(cl_mem clmem) {
     int clmemIndex = 0;
     if(launchConfiguration.clmemIndexByClmem.find(clmem) == launchConfiguration.clmemIndexByClmem.end()) {
-        cout << "new clmem" << endl;
+        // cout << "new clmem" << endl;
         clmemIndex = launchConfiguration.clmems.size();
         launchConfiguration.clmems.push_back(clmem);
         launchConfiguration.clmemIndexByClmem[clmem] = clmemIndex;
     } else {
-        cout << "existing clmem" << endl;
+        // cout << "existing clmem" << endl;
         clmemIndex = launchConfiguration.clmemIndexByClmem.find(clmem)->second;
     }
     launchConfiguration.clmemIndexByClmemArgIndex.push_back(clmemIndex);
@@ -467,8 +500,8 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     EasyCL::checkError(err);
     launchConfiguration.kernelArgsToBeReleased.push_back(gpu_struct);
 
-    // launchConfiguration.args.push_back(std::unique_ptr<Arg>(new ClmemArg(launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1])));
-    addClmemArg(gpu_struct);
+    launchConfiguration.args.push_back(std::unique_ptr<Arg>(new ClmemArg(launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1])));
+    // addClmemArg(gpu_struct);
 
     // launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
     // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
@@ -559,14 +592,20 @@ void kernelGo() {
     //     int clmemIndex = launchConfiguration.clmemIndexByClmemArgIndex[i];
     //     launchConfiguration.kernelName += "_" + EasyCL::toString(clmemIndex);
     // }
-    cout << "kernel name " << launchConfiguration.kernelName << " unique clmems=" << launchConfiguration.clmems.size() << endl;
-    CLKernel *kernel = getKernelForNameLl(launchConfiguration.clmems.size(), launchConfiguration.clmemIndexByClmemArgIndex, launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
+    // cout << "kernelGo() kernel name " << launchConfiguration.kernelName << " unique clmems=" << launchConfiguration.clmems.size() << endl;
+
+    GenerateOpenCLResult res = generateOpenCL(
+        launchConfiguration.clmems.size(), launchConfiguration.clmemIndexByClmemArgIndex, launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
+    // cout << "kernelGo() generatedKernelName=" << res.generatedKernelName << endl;
+    cout << "kernelGo() OpenCL sourcecode:\n" << res.clSourcecode << endl;
+    CLKernel *kernel = compileOpenCLKernel(res.uniqueKernelName, res.shortKernelName, res.clSourcecode);
+
     for(int i = 0; i < launchConfiguration.clmems.size(); i++) {
-        cout << "clmem" << i << endl;
+        // cout << "clmem" << i << endl;
         kernel->inout(&launchConfiguration.clmems[i]);
     }
     for(int i = 0; i < launchConfiguration.args.size(); i++) {
-        cout << "i=" << i << " " << launchConfiguration.args[i]->str() << endl;
+        // cout << "i=" << i << " " << launchConfiguration.args[i]->str() << endl;
         launchConfiguration.args[i]->inject(kernel);
     }
 

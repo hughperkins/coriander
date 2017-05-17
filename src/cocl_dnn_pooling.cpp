@@ -108,7 +108,7 @@ size_t cudnnPoolingForward(
     CoclDnnGeometryType dH = poolDesc->dH;
     CoclDnnGeometryType dW = poolDesc->dW;
 
-    easycl::CLKernel *kernel = getKernelForNameCl("MaxPoolForward", get_MaxPoolForward_sourcecode());
+    easycl::CLKernel *kernel = compileOpenCLKernel("MaxPoolForward", "MaxPoolForward", get_MaxPoolForward_sourcecode());
 
     int inputLinearSize = N * C * inH * inW;
     int outputLinearSize = N * C * outH * outW;
@@ -179,7 +179,7 @@ size_t cudnnPoolingBackward(
     CoclDnnGeometryType dH = poolDesc->dH;
     CoclDnnGeometryType dW = poolDesc->dW;
 
-    easycl::CLKernel *kernel = getKernelForNameCl("MaxPoolBackward", get_MaxPoolBackward_sourcecode());
+    easycl::CLKernel *kernel = compileOpenCLKernel("MaxPoolBackward", "MaxPoolBackward", get_MaxPoolBackward_sourcecode());
 
     int inputLinearSize = N * C * inH * inW;
     int outputLinearSize = N * C * outH * outW;
