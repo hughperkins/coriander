@@ -127,7 +127,7 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
     // other names will fit around it
 
     F->setName(generatedName);
-    std::cout << "kernel_dumper toCl generatedName=" << generatedName << std::endl;
+    // std::cout << "kernel_dumper toCl generatedName=" << generatedName << std::endl;
     // if(kernelName.size() > 32) {
     //     kernelName = kernelName.substr(0, 31);
     //     F->setName(kernelName);
@@ -139,7 +139,7 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
     for(auto it = M->begin(); it != M->end(); it++) {
         Function *thisF = &*it;
         if(thisF == F) {
-            std::cout << "skipping " << F->getName().str() << std::endl;
+            // std::cout << "skipping " << F->getName().str() << std::endl;
             continue;
         }
         string name = thisF->getName().str();
@@ -158,7 +158,7 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
         }
         thisF->setName(name);
         usedNames.insert(name);
-        std::cout << "   generatedname=" << name << std::endl;
+        // std::cout << "   generatedname=" << name << std::endl;
     }
 
     // GlobalNames globalNames;
