@@ -280,8 +280,8 @@ namespace cocl {
         }
         // compile the kernel.  we are still locking the mutex, but I cnat think of a better
         // way right now...
-        cout << "compileOpenCLKernel building kernel unique name: " << uniqueKernelName << endl;
-        cout << "shortname: " << shortKernelName << endl;
+        // cout << "compileOpenCLKernel building kernel unique name: " << uniqueKernelName << endl;
+        // cout << "shortname: " << shortKernelName << endl;
         // cout << "source [" << clSourcecode << "]" << endl;
 
         // string filename = "/tmp/" + uniqueKernelName + ".cl";
@@ -318,9 +318,10 @@ namespace cocl {
             // if(shortKernelName.size() > 32) {
             //     shortKernelName = shortKernelName.substr(0, 31);
             // }
-            cout << "building kernel " << shortKernelName << endl;
             // cout << "clSourcecode [" << clSourcecode << "]" << endl;
             kernel = cl->buildKernelFromString(clSourcecode, shortKernelName, "", "__internal__");
+            cout << "built kernel " << uniqueKernelName << endl;
+            // std::cout << " ... built" << std::endl;
         } catch(runtime_error &e) {
             cout << "compileOpenCLKernel failed to compile opencl sourcecode" << endl;
             cout << "unique kernel name " << uniqueKernelName << endl;

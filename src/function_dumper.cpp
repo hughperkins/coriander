@@ -308,7 +308,7 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
     // Type *retType = F->getReturnType();
     // std::string retTypeString = typeDumper->dumpType(retType);
     string fname = F->getName().str();
-    cout << "function_dumper dumpFunctionDeclarationWithoutReturn fname=[" << fname << "]" << endl;
+    // cout << "function_dumper dumpFunctionDeclarationWithoutReturn fname=[" << fname << "]" << endl;
     // declaration += typeDumper->dumpType(retType) + " " + fname + "(";
     // declaration += fname + "(";
     declaration << fname;
