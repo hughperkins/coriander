@@ -144,7 +144,7 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
         }
         string name = thisF->getName().str();
         // if(name == )
-        std::cout << "kernel_dumper toCl func orig name = " << name << std::endl;
+        // std::cout << "kernel_dumper toCl func orig name = " << name << std::endl;
         // if(name.size() > 32) {
             name = name.substr(0, 27);
         // }
@@ -157,6 +157,7 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
             i++;
         }
         thisF->setName(name);
+        usedNames.insert(name);
         std::cout << "   generatedname=" << name << std::endl;
     }
 

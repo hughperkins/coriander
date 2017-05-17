@@ -28,6 +28,7 @@
 #include "pthread.h"
 
 #include "EasyCL/EasyCL.h"
+#include "EasyCL/util/easycl_stringhelper.h"
 
 // #include "CL/cl.h"
 #include "cocl/cocl.h"
@@ -283,7 +284,8 @@ namespace cocl {
         cout << "shortname: " << shortKernelName << endl;
         // cout << "source [" << clSourcecode << "]" << endl;
 
-        string filename = "/tmp/" + uniqueKernelName + ".cl";
+        // string filename = "/tmp/" + uniqueKernelName + ".cl";
+        string filename = "/tmp/" + easycl::toString(v->getContext()->kernelCache.size()) + ".cl";
         if(getenv("COCL_LOAD_KERNEL") != 0) {
             cout << "loading kernel from " << filename << endl;
             ifstream f;
@@ -307,7 +309,7 @@ namespace cocl {
         }
         if(getenv("COCL_DUMP_CL") != 0 && string(getenv("COCL_DUMP_CL")) == "1") {
             cout << "cocl dump cl set" << endl;
-            cout << "cl: [" << clSourcecode << "]" << endl;
+            // cout << "cl: [" << clSourcecode << "]" << endl;
         }
 
         CLKernel *kernel = 0;
@@ -317,7 +319,7 @@ namespace cocl {
             //     shortKernelName = shortKernelName.substr(0, 31);
             // }
             cout << "building kernel " << shortKernelName << endl;
-            cout << "clSourcecode [" << clSourcecode << "]" << endl;
+            // cout << "clSourcecode [" << clSourcecode << "]" << endl;
             kernel = cl->buildKernelFromString(clSourcecode, shortKernelName, "", "__internal__");
         } catch(runtime_error &e) {
             cout << "compileOpenCLKernel failed to compile opencl sourcecode" << endl;
@@ -376,7 +378,8 @@ namespace cocl {
 
         // convert to opencl first... based on the kernel name required
         try {
-            string filename = "/tmp/" + uniqueKernelName;
+            // string filename = "/tmp/" + uniqueKernelName;
+            string filename = "/tmp/" + easycl::toString(v->getContext()->clSourceCodeCache.size()) + ".ll";
             if(getenv("COCL_DUMP_BYTECODE") != 0) {
                 cout << "saving bytecode to " << filename << endl;
                 ofstream f;
@@ -597,7 +600,7 @@ void kernelGo() {
     GenerateOpenCLResult res = generateOpenCL(
         launchConfiguration.clmems.size(), launchConfiguration.clmemIndexByClmemArgIndex, launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
     // cout << "kernelGo() generatedKernelName=" << res.generatedKernelName << endl;
-    cout << "kernelGo() OpenCL sourcecode:\n" << res.clSourcecode << endl;
+    // cout << "kernelGo() OpenCL sourcecode:\n" << res.clSourcecode << endl;
     CLKernel *kernel = compileOpenCLKernel(res.uniqueKernelName, res.shortKernelName, res.clSourcecode);
 
     for(int i = 0; i < launchConfiguration.clmems.size(); i++) {
