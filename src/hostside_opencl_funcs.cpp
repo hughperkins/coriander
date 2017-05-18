@@ -70,6 +70,15 @@ namespace cocl {
         virtual void inject(CLKernel *kernel) = 0;
         virtual std::string str() = 0;
     };
+    class Int8Arg : public Arg {
+    public:
+        Int8Arg(char v) : v(v) {}
+        void inject(CLKernel *kernel) {
+            kernel->in(v);
+        }
+        virtual std::string str() { return "Int8Arg"; }
+        char v;
+    };
     class Int32Arg : public Arg {
     public:
         Int32Arg(int v) : v(v) {}
@@ -568,6 +577,17 @@ void setKernelArgInt32(int value) {
     launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int32Arg(value)));
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
     COCL_PRINT(cout << "setKernelArgInt32 " << value << endl);
+    // launchConfiguration.kernel->in(value);
+    // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
+    pthread_mutex_unlock(&launchMutex);
+}
+
+void setKernelArgInt8(char value) {
+    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    pthread_mutex_lock(&launchMutex);
+    launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int8Arg(value)));
+    // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
+    COCL_PRINT(cout << "setKernelArgInt8 " << value << endl);
     // launchConfiguration.kernel->in(value);
     // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_unlock(&launchMutex);

@@ -236,7 +236,12 @@ void getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info) {
         throw runtime_error("getlaunchvalue, first operatnd of inst is not an instruction...");
     }
     Instruction *bitcast = cast<Instruction>(inst->getOperand(0));
-    Value *alloca = bitcast->getOperand(0);
+    Value *alloca = bitcast;
+    if(isa<BitCastInst>(bitcast)) {
+        alloca = bitcast->getOperand(0);
+    } else {
+        alloca = bitcast;
+    }
     Instruction *load = new LoadInst(alloca, "loadCudaArg");
     load->insertBefore(inst->getInst());
     info->callValuesByValue.push_back(load);
