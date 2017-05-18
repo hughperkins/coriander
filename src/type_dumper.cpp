@@ -257,17 +257,24 @@ std::string TypeDumper::dumpStructDefinitions() {
             if(dumped.find(structType) != dumped.end()) {
                 continue;
             }
-            // cout << "checking " << structType->getName().str() << endl;
+            // cout << structType->getName().str() << endl;
             // check if we already defined its members
             bool dumpable = true;
-            // cout << "dumping elements of " << structType->getName().str() << endl;
-            // cout << "num elements " << structType->getNumElements() << endl;
+            // cout << "    dumping elements of " << structType->getName().str() << endl;
+            // cout << "    num elements " << structType->getNumElements() << endl;
             for(auto it2=structType->element_begin(); it2 != structType->element_end(); it2++) {
                 // Type *structElementType = *it2;
-                if(StructType *elementStructType = dyn_cast<StructType>(*it2)) {
+                // (*it2)->dump();
+                // outs << "\n";
+                Type *subType = (*it2);
+                // cout << "array type? " << dyn_cast<ArrayType>(*it2) << endl;
+                if(ArrayType *elementArrayType = dyn_cast<ArrayType>(subType)) {
+                    subType = elementArrayType->getElementType();
+                }
+                if(StructType *elementStructType = dyn_cast<StructType>(subType)) {
                     if(dumped.find(elementStructType) == dumped.end()) {
-                        // cout << "      ... depends on " << elementStructType->getName().str() << endl;
-                        // cout << "adding to structs to define" << endl;
+                        // cout << "    needs: " << elementStructType->getName().str() << endl;
+                        // cout << "    adding to structs to define" << endl;
                         // elementStructType->dump();
                         // if(elementStructType->getName().str() == "") {
                         //     throw runtime_error("anonymous struct");
@@ -275,15 +282,18 @@ std::string TypeDumper::dumpStructDefinitions() {
                         structsToDefine.insert(elementStructType);
                         dumpable = false;
                         break;
+                    } else {
+                        // cout << "    ok: " << elementStructType->getName().str() << endl;
                     }
                 }
             }
             if(!dumpable) {
+                // cout << "    skip" << std::endl;
                 continue;
             }
             dumped.insert(structType);
             addStructToGlobalNames(structType);
-            // cout << "dumping struct " << structType->getName().str() << endl;
+            // cout << "    dump" << endl;
             gencode += dumpStructDefinition(structType, globalNames->getName(structType));
         }
     }

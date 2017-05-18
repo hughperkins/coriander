@@ -885,6 +885,10 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("barrier(CLK_GLOBAL_MEM_FENCE)");
         return;
+    } else if(functionName == "_Z8__umulhiii") {
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("0");
+        return;
     } else if(functionName == "llvm.dbg.value") {
         // ignore
         localValueInfo->skip();

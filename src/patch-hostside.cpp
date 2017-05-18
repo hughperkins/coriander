@@ -266,7 +266,11 @@ Instruction *addSetKernelArgInst_int(Instruction *lastInst, Value *value, Intege
     if(bitLength == 32) {
         mangledName = "_Z17setKernelArgInt32i";
     } else if(bitLength == 64) {
+        #ifdef __APPLE__
+        mangledName = "_Z17setKernelArgInt64x";
+        #else
         mangledName = "_Z17setKernelArgInt64l";
+        #endif
     } else if(bitLength == 8) {
         mangledName = "_Z16setKernelArgInt8c";
     } else {
