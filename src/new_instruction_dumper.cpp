@@ -33,8 +33,8 @@ NewInstructionDumper::NewInstructionDumper(
         std::set<llvm::Function *> *neededFunctions,
 
         std::map<llvm::Value *, std::string> *globalExpressionByValue,
-        std::map<llvm::Value *, unique_ptr<LocalValueInfo > > *localValueInfos,
-        std::map<std::string, std::string> *shortFnNameByOrigName
+        std::map<llvm::Value *, unique_ptr<LocalValueInfo > > *localValueInfos
+        // std::map<std::string, std::string> *shortFnNameByOrigName
         // std::vector<AllocaInfo> *allocaDeclarations
         ) :
     M(M),
@@ -47,8 +47,8 @@ NewInstructionDumper::NewInstructionDumper(
     neededFunctions(neededFunctions),
 
     globalExpressionByValue(globalExpressionByValue),
-    localValueInfos(localValueInfos),
-    shortFnNameByOrigName(shortFnNameByOrigName)
+    localValueInfos(localValueInfos)
+    // shortFnNameByOrigName(shortFnNameByOrigName)
     // allocaDeclarations(allocaDeclarations)
         {
     if(M == 0) {
@@ -1051,12 +1051,12 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         localValueInfo->needDependencies = false;
         gencode += "scratch";
         // Module *M = instr->getModule();
-        std::string shortFunctionName = functionName;
-        if(shortFnNameByOrigName->find(functionName) != shortFnNameByOrigName->end()) {
-            // string origFunctionName = functionName;
-            shortFunctionName = shortFnNameByOrigName->operator[](functionName);
-            cout << "new_instruction_dumper dumpCall() functionName=" << functionName << " => " << shortFunctionName << endl;
-        }
+        // std::string shortFunctionName = functionName;
+        // if(shortFnNameByOrigName->find(functionName) != shortFnNameByOrigName->end()) {
+        //     // string origFunctionName = functionName;
+        //     shortFunctionName = shortFnNameByOrigName->operator[](functionName);
+        //     cout << "new_instruction_dumper dumpCall() functionName=" << functionName << " => " << shortFunctionName << endl;
+        // }
         // cout << "M " << M << endl;
         // Function *F = M->getFunction(StringRef(functionName));
         Function *F = M->getFunction(functionName);

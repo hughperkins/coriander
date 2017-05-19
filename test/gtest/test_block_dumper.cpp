@@ -92,7 +92,7 @@ public:
         blockDumper.reset(new BasicBlockDumper(
             G.M.get(),
             block, &G.globalNames, &localNames, G.typeDumper.get(), &G.functionNamesMap,
-            &G.globalExpressionByValue, &localValueInfos, &emptyStringMap
+            &G.globalExpressionByValue, &localValueInfos
         ));
         for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
             Argument *arg = &*it;
@@ -116,7 +116,7 @@ public:
     BasicBlock *block = 0;
     LocalNames localNames;
     std::map<llvm::Value *, std::unique_ptr<cocl::LocalValueInfo> > localValueInfos;
-    std::map<std::string, std::string> emptyStringMap;
+    // std::map<std::string, std::string> emptyStringMap;
 
     unique_ptr<BasicBlockDumper> blockDumper;
 };
@@ -741,14 +741,20 @@ TEST(test_block_dumper, test_randomintarray) {
     blockDumper->toCl(oss);
     string cl = oss.str();
     cout << "cl: [" << cl << "]" << endl;
-    EXPECT_EQ(R"(
+    EXPECT_EQ(R"(    v2 = v1[0];
+    v3 = v2.f0;
+    v8 = (v3[0] + v3[1]) + v3[2];
+    data[0] = v8;
 )", oss.str());
 
     oss.str("");
     blockDumper->writeDeclarations("    ", oss);
     // cout << oss.str() << endl;
     cout << "declarations: [" << oss.str() << "]" << endl;
-    EXPECT_EQ(R"(
+    EXPECT_EQ(R"(    int v8;
+    int* v3;
+    struct class_tensorflow__random__Array v1[1];
+    struct class_tensorflow__random__Array v2;
 )", oss.str());
 }
 

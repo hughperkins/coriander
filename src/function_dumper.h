@@ -41,8 +41,8 @@ public:
                 llvm::Module *M,
                 llvm::Function *F, std::string shortName, bool isKernel, int kernelNumUniqueClmems, std::vector<int> &kernelClmemIndexByArgIndex,
                 GlobalNames *globalNames, TypeDumper *typeDumper,
-                FunctionNamesMap *functionNamesMap,
-                std::map<std::string, std::string> *shortFnNameByOrigName) :
+                FunctionNamesMap *functionNamesMap) :
+                // std::map<std::string, std::string> *shortFnNameByOrigName) :
             M(M),
             F(F),
             shortName(shortName),
@@ -52,9 +52,10 @@ public:
             globalNames(globalNames),
             typeDumper(typeDumper),
             structCloner(typeDumper, globalNames),
-            functionNamesMap(functionNamesMap),
-            shortFnNameByOrigName(shortFnNameByOrigName) {
+            functionNamesMap(functionNamesMap) {
+            // shortFnNameByOrigName(shortFnNameByOrigName) {
         // block_it = F->begin();
+        // std::cout << "functiondumper, numuniqueclmems " << this->kernelNumUniqueClmems << std::endl;
         instructionDumper.reset(new NewInstructionDumper(
             M,
             globalNames,
@@ -66,8 +67,8 @@ public:
             &neededFunctions,
 
             &globalExpressionByValue,
-            &localValueInfos,
-            shortFnNameByOrigName
+            &localValueInfos
+            // shortFnNameByOrigName
         ));
         // if(F->getParent() == 0) {
         //     std::cout << "FunctionDumper constr() F->getParent is 0 func " << shortName << std::endl;
@@ -84,6 +85,8 @@ public:
 
     std::string createOffsetDeclaration(std::string argName);
     std::string createOffsetShim(llvm::Type *argType, std::string argName, int clmemIndex);
+    std::string dumpKernelFunctionDeclarationWithoutReturn(llvm::Function *F);
+    std::string dumpInternalFunctionDeclarationWithoutReturn(llvm::Function *F);
     std::string dumpFunctionDeclarationWithoutReturn(llvm::Function *F);
     void generateBlockIndex();
 
@@ -137,7 +140,7 @@ protected:
     TypeDumper *typeDumper;
     StructCloner structCloner;
     const FunctionNamesMap *functionNamesMap;
-    std::map<std::string, std::string> *shortFnNameByOrigName;
+    // std::map<std::string, std::string> *shortFnNameByOrigName;
 
     std::unique_ptr<NewInstructionDumper> instructionDumper;
 };

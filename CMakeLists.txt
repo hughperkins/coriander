@@ -233,7 +233,7 @@ if(BUILD_TESTS)
         offsetkernelargs properties test_bitcast test_callbacks testcumemcpy testevents2
         testevents testfloat4 test_kernelcachedok testmath testmemcpydevicetodevice test_memhostalloc
         testneg testnullpointer testpartialcopy testshfl teststream test_types
-        singlebuffer test_devices test_buffers longname test_char
+        singlebuffer test_devices test_buffers longname test_char test_structs
     )
 
     if(TESTS_DUMP_CL)
@@ -246,6 +246,8 @@ if(BUILD_TESTS)
             COMMAND echo make run-${TEST}
             COMMAND ${COCL_DUMP_CL_STR} ${CMAKE_CURRENT_BINARY_DIR}/${TEST}
             DEPENDS ${TEST}
+            DEPENDS cocl
+            DEPENDS patch-hostside
         )
         set(TEST_TARGETS ${TEST_TARGETS} run-${TEST})
     endforeach()

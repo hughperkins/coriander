@@ -322,7 +322,27 @@ TEST(test_kernel_dumper, test_randomintarray) {
     // string cl = kernelDumper->toCl();
     string cl = runKernelDumper(kernelDumper, 1);
     cout << "kernel cl: [" << cl << "]" << endl;
-    EXPECT_EQ(R"(
+    EXPECT_EQ(R"(struct class_tensorflow__random__Array {
+    int f0[4];
+};
+
+kernel void test_randomintarray(global char* clmem0, uint data_offset, local int *scratch);
+
+kernel void test_randomintarray(global char* clmem0, uint data_offset, local int *scratch) {
+    global int* data = (global int*)clmem0 + data_offset;
+
+    int v9;
+    int* v4;
+    struct class_tensorflow__random__Array v2[1];
+    struct class_tensorflow__random__Array v3;
+
+v1:;
+    v3 = v2[0];
+    v4 = v3.f0;
+    v9 = (v4[0] + v4[1]) + v4[2];
+    data[0] = v9;
+    return;
+}
 )", cl);
 
     EXPECT_FALSE(cl.find(" = returnsVoid") != string::npos);

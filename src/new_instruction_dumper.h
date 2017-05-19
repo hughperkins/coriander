@@ -79,8 +79,8 @@ public:
         std::set<llvm::Function *> *neededFunctions,
 
         std::map<llvm::Value *, std::string> *globalExpressionByValue,
-        std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos,
-        std::map<std::string, std::string> *shortFnNameByOrigName
+        std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos
+        // std::map<std::string, std::string> *shortFnNameByOrigName
     );
 
     void dumpIcmp(LocalValueInfo *localValueInfo);
@@ -124,7 +124,7 @@ public:
 
     std::set<std::string> *shimFunctionsNeeded = 0; // for __shfldown_3 etc, that we provide as opencl directly
     std::set<llvm::Function *> *neededFunctions = 0;
-    std::map<std::string, std::string> *shortFnNameByOrigName = 0;
+    // std::map<std::string, std::string> *shortFnNameByOrigName = 0;
     // std::set<std::unique_ptr<Dependency> > neededDependencies; // this will probably replace neededFunctions soon, but for now is only for needed values
 
     std::map<llvm::Value *, std::string> *globalExpressionByValue = 0;

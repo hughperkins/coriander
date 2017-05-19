@@ -45,8 +45,8 @@ public:
             const FunctionNamesMap *functionNamesMap,
 
             std::map<llvm::Value *, std::string> *globalExpressionByValue,
-            std::map<llvm::Value *, std::unique_ptr<cocl::LocalValueInfo> > *localValueInfos,
-            std::map<std::string, std::string> *shortFnNameByOrigName
+            std::map<llvm::Value *, std::unique_ptr<cocl::LocalValueInfo> > *localValueInfos
+            // std::map<std::string, std::string> *shortFnNameByOrigName
             ) :
         M(M),
         block(block),
@@ -63,8 +63,8 @@ public:
                 M,
                 globalNames, localNames, typeDumper, functionNamesMap,
                 &shimFunctionsNeeded, &neededFunctions,
-                globalExpressionByValue, localValueInfos,
-                shortFnNameByOrigName
+                globalExpressionByValue, localValueInfos
+                // shortFnNameByOrigName
                 ));
         instruction_it = block->begin();
     }

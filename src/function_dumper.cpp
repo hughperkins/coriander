@@ -301,7 +301,7 @@ std::string FunctionDumper::dumpSharedDefinitions(std::string indent) {
     return oss.str();
 }
 
-std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function *F) {
+std::string FunctionDumper::dumpKernelFunctionDeclarationWithoutReturn(llvm::Function *F) {
     // string declaration = "";
     std::ostringstream declaration;
     shimCode = "";
@@ -311,6 +311,7 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
     // cout << "function_dumper dumpFunctionDeclarationWithoutReturn fname=[" << fname << "]" << endl;
     // declaration += typeDumper->dumpType(retType) + " " + fname + "(";
     // declaration += fname + "(";
+    // cout << "shortName=[" << shortName << "]" << endl;
     declaration << shortName;
     // if(isKernel) {
     //     for(int clmemIdx = 0; clmemIdx < kernelClmemIndexByArgIndex.size(); clmemIdx++) {
@@ -319,16 +320,15 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
     // }
     declaration << "(";
     int i = 0;
-    if(isKernel) {
-        for(int clmemIdx = 0; clmemIdx < kernelNumUniqueClmems; clmemIdx++) {
-            if(clmemIdx > 0) {
-                // declaration += ", ";
-                declaration << ", ";
-            }
-            // declaration += 'global float *clmem' + easycl::toString(clmemIdx);
-            declaration << "global char* clmem" << clmemIdx;
-            i++;
+    // cout << "dumpKernelFunctionDeclarationWithoutReturn kernelNumUniqueClmems=" << kernelNumUniqueClmems << endl;
+    for(int clmemIdx = 0; clmemIdx < this->kernelNumUniqueClmems; clmemIdx++) {
+        if(clmemIdx > 0) {
+            // declaration += ", ";
+            declaration << ", ";
         }
+        // declaration += 'global float *clmem' + easycl::toString(clmemIdx);
+        declaration << "global char* clmem" << clmemIdx;
+        i++;
     }
     // structpointershimcode = "";
     int clmemArgIndex = 0;
@@ -340,52 +340,50 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
         string argdeclaration = "";
         bool is_struct_needs_cloning = false;
         bool ispointer = isa<PointerType>(argType);
-        if(isKernel) {
-            if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
-                Type *elemType = ptrType->getPointerElementType();
-                if(StructType *structType = dyn_cast<StructType>(elemType)) {
-                    if(structType->getName().str() != "struct.float4") {
-                        unique_ptr<StructInfo> structInfo(new StructInfo());
-                        StructCloner::walkStructType(F->getParent(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
-                        if(structInfo->pointerInfos.size() > 0) { // struct has pointers...
-                            // mutate any pointers to be globals
-                            map<StructType *, StructType *>oldnew;
-                            // StructType *globalizedStruct = structCloner.createGlobalizedPointerStruct(oldnew, structType);
-                            // cout << "globalizedstruct:" << endl;
-                            // globalizedStruct->dump();
-                            // structType->dump();
-                            // if(structType->getName().str() == "") {
-                            //     throw runtime_error("anonymous struct");
-                            // }
-                            // globalNames->getOrCreateName(structType, structType->getName().str());
-                            StructType *noptrType = structCloner.cloneNoPointers(structType);
-                            noptrType->setName(structType->getName().str() + "_nopointers");
-                            // argType = PointerType::get(globalizedStruct, 0);
-                            // arg->mutateType(argType);
-                            // structsToDefine.insert(globalizedStruct);
-                            // noptrType->dump();
-                            structsToDefine.insert(noptrType);
-                            is_struct_needs_cloning = true;
-                            argdeclaration = "global " + typeDumper->dumpType(noptrType) + "* " + argName + "_nopointers";
-                        }
+        if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
+            Type *elemType = ptrType->getPointerElementType();
+            if(StructType *structType = dyn_cast<StructType>(elemType)) {
+                if(structType->getName().str() != "struct.float4") {
+                    unique_ptr<StructInfo> structInfo(new StructInfo());
+                    StructCloner::walkStructType(F->getParent(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
+                    if(structInfo->pointerInfos.size() > 0) { // struct has pointers...
+                        // mutate any pointers to be globals
+                        map<StructType *, StructType *>oldnew;
+                        // StructType *globalizedStruct = structCloner.createGlobalizedPointerStruct(oldnew, structType);
+                        // cout << "globalizedstruct:" << endl;
+                        // globalizedStruct->dump();
+                        // structType->dump();
+                        // if(structType->getName().str() == "") {
+                        //     throw runtime_error("anonymous struct");
+                        // }
+                        // globalNames->getOrCreateName(structType, structType->getName().str());
+                        StructType *noptrType = structCloner.cloneNoPointers(structType);
+                        noptrType->setName(structType->getName().str() + "_nopointers");
+                        // argType = PointerType::get(globalizedStruct, 0);
+                        // arg->mutateType(argType);
+                        // structsToDefine.insert(globalizedStruct);
+                        // noptrType->dump();
+                        structsToDefine.insert(noptrType);
+                        is_struct_needs_cloning = true;
+                        argdeclaration = "global " + typeDumper->dumpType(noptrType) + "* " + argName + "_nopointers";
                     }
                 }
             }
-            if(!is_struct_needs_cloning) {
-                if(argType->getTypeID() == Type::PointerTyID) {
-                    Type *elementType = argType->getPointerElementType();
-                    Type *newtype = PointerType::get(elementType, 1);
-                    arg->mutateType(newtype);
-                }
+        }
+        if(!is_struct_needs_cloning) {
+            if(argType->getTypeID() == Type::PointerTyID) {
+                Type *elementType = argType->getPointerElementType();
+                Type *newtype = PointerType::get(elementType, 1);
+                arg->mutateType(newtype);
             }
         }
-        if(!is_struct_needs_cloning && !(isKernel && ispointer)) {
+        if(!is_struct_needs_cloning && !ispointer) {
             argdeclaration = typeDumper->dumpType(arg->getType()) + " " + argName;
             // if(ispointer) {
                 // argdeclaration += "_";
             // }
         }
-        if(is_struct_needs_cloning || !(isKernel && ispointer)) {
+        if(is_struct_needs_cloning || !ispointer) {
             if(i > 0) {
                 // declaration += ", ";
                 declaration << ", ";
@@ -424,7 +422,7 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
                 j++;
             }
         }
-        if(isKernel && ispointer && !is_struct_needs_cloning) {
+        if(ispointer && !is_struct_needs_cloning) {
             // add offset
             int clmemIndex = kernelClmemIndexByArgIndex[clmemArgIndex];
             clmemArgIndex++;
@@ -441,6 +439,38 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
     declaration << "local int *scratch";
     declaration << ")";
     return declaration.str();
+}
+
+std::string FunctionDumper::dumpInternalFunctionDeclarationWithoutReturn(llvm::Function *F) {
+    std::ostringstream declaration;
+    shimCode = "";
+    declaration << shortName;
+    declaration << "(";
+    int i = 0;
+    for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+        Argument *arg = &*it;
+        string argName = localNames.getOrCreateName(arg, arg->getName().str());
+        Type *argType = arg->getType();
+        string argdeclaration = "";
+        bool ispointer = isa<PointerType>(argType);
+        argdeclaration = typeDumper->dumpType(arg->getType()) + " " + argName;
+        declaration << argdeclaration;
+        i++;
+    }
+    if(i > 0) {
+        declaration << ", ";
+    }
+    declaration << "local int *scratch";
+    declaration << ")";
+    return declaration.str();
+}
+
+std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function *F) {
+    if(isKernel) {
+        return dumpKernelFunctionDeclarationWithoutReturn(F);
+    } else {
+        return dumpInternalFunctionDeclarationWithoutReturn(F);
+    }
 }
 
 std::string FunctionDumper::dumpTerminator(Type **pReturnType, Instruction *terminator) {
@@ -537,7 +567,8 @@ bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *
 
             BasicBlockDumper basicBlockDumper(
                 M, basicBlock, globalNames, &localNames, typeDumper, functionNamesMap,
-                &globalExpressionByValue, &localValueInfos, shortFnNameByOrigName);
+                &globalExpressionByValue, &localValueInfos);
+            // shortFnNameByOrigName);
             if(_addIRToCl) {
                 basicBlockDumper.addIRToCl();
             }
