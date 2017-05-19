@@ -31,23 +31,32 @@
 #include <set>
 #include <map>
 #include <sstream>
+#include <iostream>
 
 namespace cocl {
 
 class FunctionDumper {
 public:
-    FunctionDumper(llvm::Function *F, bool isKernel, int kernelNumUniqueClmems, std::vector<int> &kernelClmemIndexByArgIndex, GlobalNames *globalNames, TypeDumper *typeDumper,
-        FunctionNamesMap *functionNamesMap) :
+    FunctionDumper(
+                llvm::Module *M,
+                llvm::Function *F, std::string shortName, bool isKernel, int kernelNumUniqueClmems, std::vector<int> &kernelClmemIndexByArgIndex,
+                GlobalNames *globalNames, TypeDumper *typeDumper,
+                FunctionNamesMap *functionNamesMap,
+                std::map<std::string, std::string> *shortFnNameByOrigName) :
+            M(M),
             F(F),
+            shortName(shortName),
             isKernel(isKernel),
             kernelNumUniqueClmems(kernelNumUniqueClmems),
             kernelClmemIndexByArgIndex(kernelClmemIndexByArgIndex),
             globalNames(globalNames),
             typeDumper(typeDumper),
             structCloner(typeDumper, globalNames),
-            functionNamesMap(functionNamesMap) {
+            functionNamesMap(functionNamesMap),
+            shortFnNameByOrigName(shortFnNameByOrigName) {
         // block_it = F->begin();
         instructionDumper.reset(new NewInstructionDumper(
+            M,
             globalNames,
             &localNames,
             typeDumper,
@@ -57,8 +66,13 @@ public:
             &neededFunctions,
 
             &globalExpressionByValue,
-            &localValueInfos
+            &localValueInfos,
+            shortFnNameByOrigName
         ));
+        // if(F->getParent() == 0) {
+        //     std::cout << "FunctionDumper constr() F->getParent is 0 func " << shortName << std::endl;
+        //     throw std::runtime_error("FunctionDumper constr() F->getParent is 0 " + shortName);
+        // }
     }
     virtual ~FunctionDumper() {
         instructionDumper.release();
@@ -109,7 +123,9 @@ protected:
     std::ostringstream ouros;
     std::string declaration;
 
+    llvm::Module *M;
     llvm::Function *F;
+    std::string shortName;
     bool isKernel = false;
     int kernelNumUniqueClmems;
     std::vector<int> &kernelClmemIndexByArgIndex;
@@ -121,6 +137,7 @@ protected:
     TypeDumper *typeDumper;
     StructCloner structCloner;
     const FunctionNamesMap *functionNamesMap;
+    std::map<std::string, std::string> *shortFnNameByOrigName;
 
     std::unique_ptr<NewInstructionDumper> instructionDumper;
 };

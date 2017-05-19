@@ -307,11 +307,11 @@ std::string FunctionDumper::dumpFunctionDeclarationWithoutReturn(llvm::Function 
     shimCode = "";
     // Type *retType = F->getReturnType();
     // std::string retTypeString = typeDumper->dumpType(retType);
-    string fname = F->getName().str();
+    // string fname = F->getName().str();
     // cout << "function_dumper dumpFunctionDeclarationWithoutReturn fname=[" << fname << "]" << endl;
     // declaration += typeDumper->dumpType(retType) + " " + fname + "(";
     // declaration += fname + "(";
-    declaration << fname;
+    declaration << shortName;
     // if(isKernel) {
     //     for(int clmemIdx = 0; clmemIdx < kernelClmemIndexByArgIndex.size(); clmemIdx++) {
     //         declaration << "_" << kernelClmemIndexByArgIndex[clmemIdx];
@@ -536,8 +536,8 @@ bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *
             // cout << "all phis ok => continuing to dump block" << endl;
 
             BasicBlockDumper basicBlockDumper(
-                basicBlock, globalNames, &localNames, typeDumper, functionNamesMap,
-                &globalExpressionByValue, &localValueInfos);
+                M, basicBlock, globalNames, &localNames, typeDumper, functionNamesMap,
+                &globalExpressionByValue, &localValueInfos, shortFnNameByOrigName);
             if(_addIRToCl) {
                 basicBlockDumper.addIRToCl();
             }

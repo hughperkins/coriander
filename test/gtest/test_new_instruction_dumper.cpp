@@ -68,10 +68,13 @@ class InstructionDumperWrapper {
 public:
     InstructionDumperWrapper(StandaloneBlock &myblock) :myblock(myblock) {
         typeDumper.reset(new TypeDumper(&globalNames));
-        instructionDumper.reset(new NewInstructionDumper(&globalNames, &localNames, typeDumper.get(), &functionNamesMap,
-            &shimFunctionsNeeded,
-            &neededFunctions,
-            &globalExpressionByValue, &localValueInfos));
+        instructionDumper.reset(
+            new NewInstructionDumper(
+                myblock.M.get(), &globalNames, &localNames, typeDumper.get(), &functionNamesMap,
+                &shimFunctionsNeeded,
+                &neededFunctions,
+                &globalExpressionByValue, &localValueInfos,
+                &emptyStringMap));
     }
     virtual ~InstructionDumperWrapper() {
 
@@ -101,6 +104,7 @@ public:
 
     std::map<llvm::Value *, std::string> globalExpressionByValue;
     map<Value *, unique_ptr<LocalValueInfo> > localValueInfos;
+    std::map<std::string, std::string> emptyStringMap;
     // std::vector<AllocaInfo> allocaDeclarations;
 
     unique_ptr<NewInstructionDumper> instructionDumper;

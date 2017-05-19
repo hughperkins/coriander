@@ -340,7 +340,7 @@ bool BasicBlockDumper::runGeneration(const std::map<llvm::Function *, llvm::Type
         try {
             LocalValueInfo *instrInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, inst);
             // cout << "basicblockdumper rungeneration on inst:" << endl;
-            // inst->dump();
+            inst->dump();
             // cout << endl;
             instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
             if(instrInfo->needDependencies) {

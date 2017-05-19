@@ -314,6 +314,20 @@ v1:;
     EXPECT_FALSE(cl.find(" = returnsVoid") != string::npos);
 }
 
+TEST(test_kernel_dumper, test_randomintarray) {
+    GlobalWrapper G("test_randomintarray");
+    KernelDumper *kernelDumper = G.kernelDumper.get();
+    // Module *M = getM();
+
+    // string cl = kernelDumper->toCl();
+    string cl = runKernelDumper(kernelDumper, 1);
+    cout << "kernel cl: [" << cl << "]" << endl;
+    EXPECT_EQ(R"(
+)", cl);
+
+    EXPECT_FALSE(cl.find(" = returnsVoid") != string::npos);
+}
+
 // TEST(test_kernel_dumper, test_long_conflicting_names) {
 //     GlobalWrapper G("mysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamec");
 //     KernelDumper *kernelDumper = G.kernelDumper.get();

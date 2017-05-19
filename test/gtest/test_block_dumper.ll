@@ -140,3 +140,21 @@ define void @test_ieee_doubles(double *%data) {
   store double 0xFFEFFFFFFFFFFFFF, double* %4   ; -INFINITY
   ret void
 }
+
+%"class.tensorflow::random::Array" = type {
+  [4 x i32],
+  [4 x float]
+}
+
+define void @test_randomintarray(i32 *%data) {
+  %1 = alloca %"class.tensorflow::random::Array", i32 1
+  %2 = load %"class.tensorflow::random::Array", %"class.tensorflow::random::Array"* %1
+  %3 = extractvalue %"class.tensorflow::random::Array" %2, 0
+  %4 = extractvalue [4 x i32] %3, 0
+  %5 = extractvalue [4 x i32] %3, 1
+  %6 = extractvalue [4 x i32] %3, 2
+  %7 = add i32 %4, %5
+  %8 = add i32 %7, %6
+  store i32 %8, i32* %data
+  ret void
+}

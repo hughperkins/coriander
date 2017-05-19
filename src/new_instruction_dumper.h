@@ -69,6 +69,7 @@ public:
 class NewInstructionDumper {
 public:
     NewInstructionDumper(
+        llvm::Module *M,
         GlobalNames *globalNames,
         LocalNames *localNames,
         TypeDumper *typeDumper,
@@ -78,7 +79,8 @@ public:
         std::set<llvm::Function *> *neededFunctions,
 
         std::map<llvm::Value *, std::string> *globalExpressionByValue,
-        std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos
+        std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos,
+        std::map<std::string, std::string> *shortFnNameByOrigName
     );
 
     void dumpIcmp(LocalValueInfo *localValueInfo);
@@ -112,6 +114,8 @@ public:
         return this;
     }
 
+    llvm::Module *M = 0;
+
     cocl::GlobalNames *globalNames = 0;
     cocl::LocalNames *localNames = 0;   // these are names for instructions etc, doesnt say anything about whether they've been declared
                                         // they're always some single idnetifier, eg "v3", never compound, ie never "v1 + v3"
@@ -120,6 +124,7 @@ public:
 
     std::set<std::string> *shimFunctionsNeeded = 0; // for __shfldown_3 etc, that we provide as opencl directly
     std::set<llvm::Function *> *neededFunctions = 0;
+    std::map<std::string, std::string> *shortFnNameByOrigName = 0;
     // std::set<std::unique_ptr<Dependency> > neededDependencies; // this will probably replace neededFunctions soon, but for now is only for needed values
 
     std::map<llvm::Value *, std::string> *globalExpressionByValue = 0;

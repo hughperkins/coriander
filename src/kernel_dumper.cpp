@@ -118,6 +118,29 @@ void KernelDumper::declareGlobals(ostream &os) {
     // }
 }
 
+static std::string createShortKernelName(string origName, std::set<std::string> &usedShortNames,
+        std::map<std::string, std::string> &shortNameByOrigName) {
+    // string origName = name;
+    std::string name = origName;
+    // if(name == )
+    // std::cout << "kernel_dumper toCl func orig name = " << name << std::endl;
+    // if(name.size() > 32) {
+    name = name.substr(0, 27);
+    // }
+    // if(name.find("llvm.") == std::string::npos) {
+    //     name = easycl::replaceGlobal(name, ".", "_");
+    // }
+    int i = 0;
+    while(usedShortNames.find(name) != usedShortNames.end()) {
+        name = name.substr(0, 27) + easycl::toString(i);
+        i++;
+    }
+    // thisF->setName(name);
+    usedShortNames.insert(name);
+    shortNameByOrigName[origName] = name;    
+    return name;
+}
+
 std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex) {
     Function *F = M->getFunction(kernelName);
     if(F == 0) {
@@ -126,39 +149,37 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
     // kernel name will simply be truncated to 32 characters
     // other names will fit around it
 
-    F->setName(generatedName);
-    // std::cout << "kernel_dumper toCl generatedName=" << generatedName << std::endl;
+    // F->setName(generatedName);
+    std::cout << "kernel_dumper toCl generatedName=" << generatedName << std::endl;
     // if(kernelName.size() > 32) {
     //     kernelName = kernelName.substr(0, 31);
     //     F->setName(kernelName);
     // }
     // cout << "F name " << F->getName().str() << endl;
 
-    std::set<std::string> usedNames;
-    usedNames.insert(generatedName);
+    std::set<std::string> usedShortNames;
+    usedShortNames.insert(generatedName);
+    std::map<std::string, std::string> shortNameByOrigName;
+    shortNameByOrigName[kernelName] = generatedName;
     for(auto it = M->begin(); it != M->end(); it++) {
         Function *thisF = &*it;
         if(thisF == F) {
             // std::cout << "skipping " << F->getName().str() << std::endl;
             continue;
         }
-        string name = thisF->getName().str();
-        // if(name == )
-        // std::cout << "kernel_dumper toCl func orig name = " << name << std::endl;
-        // if(name.size() > 32) {
-            name = name.substr(0, 27);
-        // }
-        if(name.find("llvm.") == std::string::npos) {
-            name = easycl::replaceGlobal(name, ".", "_");
+        string origName = thisF->getName().str();
+        std::string shortName = createShortKernelName(origName, usedShortNames,
+            shortNameByOrigName);
+        if(M->getFunction(origName) == 0) {
+            cout << "ERROR: couldnt find kernel " << origName << endl;
+            throw runtime_error("ERROR: couldnt find kernel " + origName);
         }
-        int i = 0;
-        while(usedNames.find(name) != usedNames.end()) {
-            name = name.substr(0, 27) + easycl::toString(i);
-            i++;
+        if(thisF->getParent() == 0) {
+            cout << "ERROR: couldnt find parent module " << origName << endl;
+            throw runtime_error("ERROR: couldnt find parent module " + origName);
         }
-        thisF->setName(name);
-        usedNames.insert(name);
         // std::cout << "   generatedname=" << name << std::endl;
+        std::cout << "kernel_dumper toCl() " << origName << " => " << shortName << std::endl;
     }
 
     // GlobalNames globalNames;
@@ -188,6 +209,7 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
                 continue;
             }
             string functionName = childF->getName().str();
+            cout << "  neededFuncion=" << functionName << endl;
             neededFunctionNames.push_back(functionName);
             neededFunctionByName[functionName] = childF;
         }
@@ -200,9 +222,16 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
             // if(returnTypeByFunction.find(childF) != returnTypeByFunction.end()) {
             //     continue;
             // }
-            // cout << "dumping function " << functionName << endl;
+            cout << "dumping function " << functionName << endl;
             bool _isKernel = isKernel.find(childF) != isKernel.end();
-            FunctionDumper childFunctionDumper(childF, _isKernel, uniqueClmemCount, clmemIndexByClmemArgIndex, &globalNames, typeDumper.get(), &functionNamesMap);
+            std::string origName = childF->getName().str();
+            if(shortNameByOrigName.find(origName) == shortNameByOrigName.end()) {
+                createShortKernelName(origName, usedShortNames, shortNameByOrigName);
+            }
+            std::string shortName = shortNameByOrigName[functionName];
+            FunctionDumper childFunctionDumper(
+                M, childF, shortName, _isKernel, uniqueClmemCount, clmemIndexByClmemArgIndex, &globalNames, typeDumper.get(), &functionNamesMap,
+                &shortNameByOrigName);
             if(_addIRToCl) {
                 childFunctionDumper.addIRToCl();
             }

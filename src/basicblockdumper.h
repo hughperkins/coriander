@@ -37,6 +37,7 @@ public:
     // - ignores returns
     // - ignores phis
     BasicBlockDumper(
+            llvm::Module *M,
             llvm::BasicBlock *block,
             GlobalNames *globalNames,
             LocalNames *localNames,
@@ -44,8 +45,10 @@ public:
             const FunctionNamesMap *functionNamesMap,
 
             std::map<llvm::Value *, std::string> *globalExpressionByValue,
-            std::map<llvm::Value *, std::unique_ptr<cocl::LocalValueInfo> > *localValueInfos
+            std::map<llvm::Value *, std::unique_ptr<cocl::LocalValueInfo> > *localValueInfos,
+            std::map<std::string, std::string> *shortFnNameByOrigName
             ) :
+        M(M),
         block(block),
         globalNames(globalNames),
         localNames(localNames),
@@ -57,9 +60,12 @@ public:
              {
         instructionDumper.reset(
             new NewInstructionDumper(
+                M,
                 globalNames, localNames, typeDumper, functionNamesMap,
                 &shimFunctionsNeeded, &neededFunctions,
-                globalExpressionByValue, localValueInfos));
+                globalExpressionByValue, localValueInfos,
+                shortFnNameByOrigName
+                ));
         instruction_it = block->begin();
     }
     bool runGeneration(const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
@@ -91,6 +97,7 @@ public:
     llvm::BasicBlock::iterator instruction_it;
 
 protected:
+    llvm::Module *M;
     llvm::BasicBlock *block;
     // bool _addIRToCl = false;
     bool forceSingle = true;

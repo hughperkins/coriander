@@ -90,8 +90,9 @@ public:
         F = G.getFunction(functionName);
         block = &*F->begin();
         blockDumper.reset(new BasicBlockDumper(
+            G.M.get(),
             block, &G.globalNames, &localNames, G.typeDumper.get(), &G.functionNamesMap,
-            &G.globalExpressionByValue, &localValueInfos
+            &G.globalExpressionByValue, &localValueInfos, &emptyStringMap
         ));
         for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
             Argument *arg = &*it;
@@ -115,6 +116,7 @@ public:
     BasicBlock *block = 0;
     LocalNames localNames;
     std::map<llvm::Value *, std::unique_ptr<cocl::LocalValueInfo> > localValueInfos;
+    std::map<std::string, std::string> emptyStringMap;
 
     unique_ptr<BasicBlockDumper> blockDumper;
 };
@@ -724,6 +726,29 @@ TEST(test_block_dumper, test_ieee_doubles) {
     float* v15;
     float* v3;
     float* v7;
+)", oss.str());
+}
+
+TEST(test_block_dumper, test_randomintarray) {
+    GlobalWrapper G;
+    LocalWrapper wrapper(G, "test_randomintarray");
+    BasicBlockDumper *blockDumper = wrapper.blockDumper.get();
+
+    wrapper.runGeneration();
+    ostringstream oss;
+
+    oss.str("");
+    blockDumper->toCl(oss);
+    string cl = oss.str();
+    cout << "cl: [" << cl << "]" << endl;
+    EXPECT_EQ(R"(
+)", oss.str());
+
+    oss.str("");
+    blockDumper->writeDeclarations("    ", oss);
+    // cout << oss.str() << endl;
+    cout << "declarations: [" << oss.str() << "]" << endl;
+    EXPECT_EQ(R"(
 )", oss.str());
 }
 

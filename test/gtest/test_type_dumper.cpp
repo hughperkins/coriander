@@ -243,4 +243,26 @@ TEST(test_type_dumper, mystruct2) {
     ASSERT_NE(structDefinitions.find("float* f3;"), string::npos);
 }
 
+
+TEST(test_type_dumper, random_array) {
+    Module *M = getM();
+    StructType *myStructType = M->getTypeByName(StringRef("class.tensorflow::random::Array"));
+    ASSERT_TRUE(myStructType != nullptr);
+    GlobalNames globalNames;
+    TypeDumper typeDumper(&globalNames);
+    string structCl = typeDumper.dumpType(myStructType);
+
+    cout << "structCl: " << structCl << endl;
+    ASSERT_EQ(structCl, "struct class_tensorflow__random__Array");
+
+    string structDefinitions = typeDumper.dumpStructDefinitions();
+    cout << "structDefinitions: " << structDefinitions << endl;
+
+    ASSERT_EQ(structDefinitions, R"(struct class_tensorflow__random__Array {
+    int f0[4];
+    float f1[6];
+};
+)");
+}
+
 } // namespace test_type_dumper

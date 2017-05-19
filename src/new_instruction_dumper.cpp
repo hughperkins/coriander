@@ -26,15 +26,18 @@ using namespace llvm;
 namespace cocl {
 
 NewInstructionDumper::NewInstructionDumper(
+        llvm::Module *M,
         GlobalNames *globalNames, LocalNames *localNames, TypeDumper *typeDumper, const FunctionNamesMap *functionNamesMap,
 
         std::set<std::string> *shimFunctionsNeeded,
         std::set<llvm::Function *> *neededFunctions,
 
         std::map<llvm::Value *, std::string> *globalExpressionByValue,
-        std::map<llvm::Value *, unique_ptr<LocalValueInfo > > *localValueInfos
+        std::map<llvm::Value *, unique_ptr<LocalValueInfo > > *localValueInfos,
+        std::map<std::string, std::string> *shortFnNameByOrigName
         // std::vector<AllocaInfo> *allocaDeclarations
         ) :
+    M(M),
     globalNames(globalNames),
     localNames(localNames),
     typeDumper(typeDumper),
@@ -44,9 +47,14 @@ NewInstructionDumper::NewInstructionDumper(
     neededFunctions(neededFunctions),
 
     globalExpressionByValue(globalExpressionByValue),
-    localValueInfos(localValueInfos)
+    localValueInfos(localValueInfos),
+    shortFnNameByOrigName(shortFnNameByOrigName)
     // allocaDeclarations(allocaDeclarations)
         {
+    if(M == 0) {
+        cout << "NewInstructionDumper constr() M is 0" << endl;
+        throw runtime_error("NewInstructionDumper constr() M is 0");
+    }
 }
 
 LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
@@ -615,53 +623,92 @@ void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo
     copyAddressSpace(instr, aggInfo->value);
 
     // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
-    string gencode = "";
-    string lhs = "";
+    ostringstream gencode;
+    // string lhs = "";
+    ostringstream rhs;
+
     // string incomingOperand = dumpOperand(instr->getAggregateOperand());
     // LocalValueInfo *incomingOperandInfo = this->getOperand(instr->getAggregateOperand());
     // string incomingOperand = incomingOperandInfo->getExpr();
     string incomingOperand = aggInfo->getExpr();
+    cout << "incomingOperand " << incomingOperand << endl;
     // if rhs is empty, that means its 'undef', so we better declare it, I guess...
     Type *currentType = instr->getAggregateOperand()->getType();
-    lhs += incomingOperand;
+    rhs << incomingOperand;
     ArrayRef<unsigned> indices = instr->getIndices();
     int numIndices = instr->getNumIndices();
+    cout << "  numIndices=" << numIndices << endl;
     for(int d=0; d < numIndices; d++) {
         int idx = indices[d];
         Type *newType = 0;
-        if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
+        if(currentType->isPointerTy()) {
+            // cout << "pointer or array" << endl;
+            // cout << "ispointerty? " << currentType->isPointerTy() << endl;
+            // cout << "isa<ArrayType>? " << isa<ArrayType>(currentType) << endl;
             if(d == 0) {
                 if(isa<ArrayType>(currentType->getPointerElementType())) {
-                    lhs = "(&" + lhs + ")";
+                    cout << "element type is arraytype" << endl;
+                    string oldRhs = rhs.str();
+                    rhs.str("");
+                    rhs << "(&" << oldRhs << ")";
                 }
             }
+            // if(numIndices > 0) {
+            // cout << "d + 1" << (d + 1) << endl;
+            // Value *operand = instr->getOperand(d + 1);
+            // cout << "got operand " << d << endl;
             LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
-            lhs += string("[") + thisInfo->getExpr() + "]";
+            rhs << "[" << thisInfo->getExpr() << "]";
+            newType = currentType->getPointerElementType();
+        } else if(isa<ArrayType>(currentType)) {
+            // cout << "pointer or array" << endl;
+            // cout << "ispointerty? " << currentType->isPointerTy() << endl;
+            cout << "  isa<ArrayType>? " << isa<ArrayType>(currentType) << endl;
+            cout << "  d=" << d << endl;
+            // if(d == 0) {
+            //     if(isa<ArrayType>(currentType->getPointerElementType())) {
+            //         cout << "element type is arraytype" << endl;
+            //         lhs = "(&" + lhs + ")";
+            //     }
+            // }
+            // if(numIndices > 0) {
+            // cout << "d + 1" << (d + 1) << endl;
+            Value *operand = instr->getOperand(d);
+            // int index = indices[d];
+            cout << "  idx=" << idx << endl;
+            // LocalValueInfo *thisInfo = getOperand(instr->getOperand(d));
+            rhs << "[" << idx << "]";
+            cout << "  rhs [" << rhs.str() << "]" << endl;
             newType = currentType->getPointerElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
+            cout << "struct" << endl;
             string structName = getName(structtype);
             if(structName == "struct.float4") {
                 Type *elementType = structtype->getElementType(idx);
                 Type *castType = PointerType::get(elementType, 0);
                 newType = elementType;
-                lhs = "((" + typeDumper->dumpType(castType) + ")&" + lhs + ")";
-                lhs += string("[") + easycl::toString(idx) + "]";
+                string oldRhs = rhs.str();
+                rhs.str("");
+                rhs << "((" << typeDumper->dumpType(castType) << ")&" << oldRhs << ")";
+                rhs << "[" << idx << "]";
             } else {
                 // generic struct
                 Type *elementType = structtype->getElementType(idx);
-                lhs += string(".f") + easycl::toString(idx);
+                rhs << ".f" << idx;
                 newType = elementType;
             }
         } else {
+            cout << "NewInstructionDumper::dumpExtractValue unimplemented type" << endl;
             currentType->dump();
             throw runtime_error("type not implemented in extractvalue");
         }
         currentType = newType;
     }
-    gencode += lhs;
+    // gencode << rhs.str();
     // return gencode;
+    cout << "  dumpExtractValue, rhs=[" << rhs.str() << "]" << endl;
     // cout << "gencode " << gencode << endl;
-    localValueInfo->setExpression(gencode);
+    localValueInfo->setExpression(rhs.str());
 }
 
 void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo) {
@@ -1003,8 +1050,16 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         }
         localValueInfo->needDependencies = false;
         gencode += "scratch";
-        Module *M = instr->getModule();
-        Function *F = M->getFunction(StringRef(functionName));
+        // Module *M = instr->getModule();
+        std::string shortFunctionName = functionName;
+        if(shortFnNameByOrigName->find(functionName) != shortFnNameByOrigName->end()) {
+            // string origFunctionName = functionName;
+            shortFunctionName = shortFnNameByOrigName->operator[](functionName);
+            cout << "new_instruction_dumper dumpCall() functionName=" << functionName << " => " << shortFunctionName << endl;
+        }
+        // cout << "M " << M << endl;
+        // Function *F = M->getFunction(StringRef(functionName));
+        Function *F = M->getFunction(functionName);
         if(F != 0) {
             // check arguments...
             bool addressSpacesMatch = true;
@@ -1126,6 +1181,11 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
             }
         } else {
             cout << "couldnt find function " + functionName << endl;
+            // cout << "here are available functions:" << endl;
+            // for(auto it = M->begin(); it != M->end(); it++) {
+            //     Function *thisF = &*it;
+            //     cout << "    " << thisF->getName().str() << endl;
+            // }
             throw runtime_error("couldnt find function " + functionName);
         }
     }

@@ -43,3 +43,5 @@ define void @mystruct() {
 }
 
 %"struct.mystruct" = type { i32, float, float*, float* }
+
+%"class.tensorflow::random::Array" = type { [4 x i32], [6 x float] }

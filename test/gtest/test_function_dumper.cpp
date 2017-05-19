@@ -86,12 +86,16 @@ public:
     LocalWrapper(GlobalWrapper &G, string functionName, int numClmems, vector<int> &clmemIndexes) :
         G(G),
         F(G.getFunction(functionName)),
-        functionDumper(F, true, numClmems, clmemIndexes, &G.globalNames, &G.typeDumper, &G.functionNamesMap) {
+        functionDumper(
+            G.M.get(), F, functionName, true, numClmems, clmemIndexes, &G.globalNames, &G.typeDumper, &G.functionNamesMap,
+            &emptyStringMap) {
     }
     LocalWrapper(GlobalWrapper &G, Function *F, int numClmems, vector<int> &clmemIndexes) :
         G(G),
         F(F),
-        functionDumper(F, true, numClmems, clmemIndexes, &G.globalNames, &G.typeDumper, &G.functionNamesMap) {
+        functionDumper(
+            G.M.get(), F, F->getName().str(), true, numClmems, clmemIndexes, &G.globalNames, &G.typeDumper, &G.functionNamesMap,
+            &emptyStringMap) {
     }
     virtual ~LocalWrapper() {
     }
@@ -105,6 +109,7 @@ public:
 
     LocalNames localNames;
     FunctionDumper functionDumper;
+    std::map<std::string, std::string> emptyStringMap;
 };
 
 TEST(test_function_dumper, basic1) {
