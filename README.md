@@ -182,6 +182,8 @@ No dependencies on graphics card etc.  It simply takes some hand-crafted IR, and
 
 ### Tests from python
 
+The python tests TEMPORARILY DONT RUN, so just ignore these for now please :-)
+
 #### Pre-requisites
 
 ```
