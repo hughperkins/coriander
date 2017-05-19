@@ -448,6 +448,9 @@ std::string FunctionDumper::dumpInternalFunctionDeclarationWithoutReturn(llvm::F
     declaration << "(";
     int i = 0;
     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
+        if(i > 0) {
+            declaration << ", ";
+        }
         Argument *arg = &*it;
         string argName = localNames.getOrCreateName(arg, arg->getName().str());
         Type *argType = arg->getType();
