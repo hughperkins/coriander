@@ -2,7 +2,9 @@
 
 To use CUDA-on-CL, please build from source:
 
-## Mac OS X pre-requisites
+## Install pre-requisites
+
+### Mac OS X
 
 Download/install llvm-3.8:
 ```
@@ -15,7 +17,7 @@ ln -s /usr/local/opt/clang+llvm-3.8.0-x86_64-apple-darwin /usr/local/opt/llvm-3.
 
 Whenever you use CUDA-on-CL, please set `CLANG_HOME`, using `export CLANG_HOME=/usr/local/opt/llvm-3.8`
 
-## Ubuntu 16.04 pre-requisites
+### Ubuntu 16.04
 
 ```
 sudo apt-get install llvm-3.8 llvm-3.8-dev clang-3.8
@@ -24,7 +26,7 @@ sudo apt-get install git cmake cmake-curses-gui libc6-dev-i386 make gcc g++ zlib
 
 Whenever you use CUDA-on-CL, please set `CLANG_HOME` to `/usr/lib/llvm-3.8`
 
-### Build/installation
+## Build/installation
 
 ```
 mkdir -p ~/git
