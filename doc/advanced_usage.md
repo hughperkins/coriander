@@ -37,3 +37,9 @@ The options provided to `-devicell-opt` are passed through to `opt-3.8`, http://
 
 Recommended generation options:
 - `--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine --devicell-opt O2`
+
+## Runtime options
+
+At runtime, you can use the environment variable `CL_GPUOFFSET` to choose gpu, eg:
+- `CL_GPUOFFSET=1`: use the second gpu (index `1`)
+- `CL_GPUOFFSET=2`: use the third gpu (index `2`)
