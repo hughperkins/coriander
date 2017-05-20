@@ -24,7 +24,7 @@
 ## Tensorflow
 
 What's done:
-- [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc) can now be written out as compileable OpenCL [https://github.com/hughperkins/cuda-on-cl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl](https://github.com/hughperkins/cuda-on-cl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl)
+- [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc) can now be written out as compileable OpenCL [https://github.com/hughperkins/Coriander/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl](https://github.com/hughperkins/Coriander/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl)
 - https://bitbucket.org/eigen/eigen/src/97c1ebe6ccc21dc858c1f0ae2ce2e9186f6bac83/unsupported/test/cxx11_tensor_cuda.cu?at=default&fileviewer=file-view-default#cxx11_tensor_cuda.cu-68:114 builds/runs in OpenCL now
 
 What's next:

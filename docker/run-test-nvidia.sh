@@ -6,7 +6,7 @@
 
 # assumptions:
 # - nvidia-docker in PATH, and the nvidia-docker-plugin started
-# - run this script from this directory, ie fro mth e`docker` directoyr of the cuda-on-cl cloned repo
+# - run this script from this directory, ie fro mth e`docker` directoyr of the Coriander cloned repo
 #
 # note that it will build/run the current git branch you are sitting in
 
@@ -15,4 +15,4 @@ set -x
 
 GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 docker build -t coclnvidia --no-cache ./ --file Dockerfile-nvidia --build-arg GIT_BRANCH=${GIT_BRANCH}
-nvidia-docker run -t coclnvidia bash /cuda-on-cl/docker/docker-unittest.sh
+nvidia-docker run -t coclnvidia bash /Coriander/docker/docker-unittest.sh

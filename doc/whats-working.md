@@ -49,5 +49,5 @@ On the host-side, there is code to:
 ## Host/device interface
 
 - single-source compilation works ok: clang handles this for us: splitting the sourcecode into two parts for us
-- structs passed by-value in CUDA correctly passed by-value in the OpenCL (via an implicit allocate, behind the scenes, handled by cuda-on-cl automatically)
-- gpu-allocated float arrays inside a struct are passed correctly from the host to the device, via an additional, hidden, kernel argument, added automatically by cuda-on-cl, behind the scenes
+- structs passed by-value in CUDA correctly passed by-value in the OpenCL (via an implicit allocate, behind the scenes, handled by Coriander automatically)
+- gpu-allocated float arrays inside a struct are passed correctly from the host to the device, via an additional, hidden, kernel argument, added automatically by Coriander, behind the scenes

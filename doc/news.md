@@ -11,10 +11,10 @@
   - added CLBlast wrappers for: sgemv, sscal, saxpy
 - April 4:
   - merged in current `dnn` branch, which provides forward convolutional implementation for cudnn API, using `im2col` over Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast)
-  - CUDA-on-CL got accepted for a technical presentation at this year's [IWOCL](https://iwocl.org) conference :-)  Conference sessions here: [IWOCL 2017 Conference program](www.iwocl.org/iwocl-2017/conference-program/)
+  - Coriander got accepted for a technical presentation at this year's [IWOCL](https://iwocl.org) conference :-)  Conference sessions here: [IWOCL 2017 Conference program](www.iwocl.org/iwocl-2017/conference-program/)
 - Nov 25:
   - created release 4.0.4:
-    - all current Eigen tests, https://bitbucket.org/hughperkins/eigen/src/eigen-cl/unsupported/test/cuda-on-cl/?at=eigen-cl , pass for me currently, using this release, on both beignet 1.2.1, on hd5500, and on NVIDIA 940M, using driver 367.57
+    - all current Eigen tests, https://bitbucket.org/hughperkins/eigen/src/eigen-cl/unsupported/test/Coriander/?at=eigen-cl , pass for me currently, using this release, on both beignet 1.2.1, on hd5500, and on NVIDIA 940M, using driver 367.57
     - fixes some issues with walk-dependency order during cl walk/generation
     - fixed an issue with un-initialized pointers, in structs passed as kernel parameters, into GPU kernels
 - Nov 24:
@@ -23,13 +23,13 @@
     - can handle determining the address-space of functions returning pointers
     - opencl generation is at runtime now => facilitates determining address-space; and counter-intuitively is actually faster, because less OpenCL to compile by the GPU driver
 - Nov 18:
-  - Mac build working :-)  https://travis-ci.org/hughperkins/cuda-on-cl/builds/176997220#L1356
+  - Mac build working :-)  https://travis-ci.org/hughperkins/Coriander/builds/176997220#L1356
 - Nov 17:
   - merged `runtime-compile` branch into `master` branch.  This brings a few changes:
     - opencl generation is now at runtime, rather than at compile time
       - this lets us build only the one specific kernel we need
       - means more information is available at generation time, facilitating the generation process
-    - build on Mac OS X is more or less working, eg https://travis-ci.org/hughperkins/cuda-on-cl/builds/176580716
+    - build on Mac OS X is more or less working, eg https://travis-ci.org/hughperkins/Coriander/builds/176580716
     - code radically refactorized underneath
     - remove `--run_branch_transforms`, `--branches_as_switch`, for now
 - Nov 8:
@@ -38,7 +38,7 @@
   - created dockerfiles for Beignet and NVIDIA [docker](docker)
 - Nov 5:
   - switched from `Makefile` to `CMakeLists.txt` => build/install instructions have changed, see above
-  - added a `cmake` file, so you can easily add `cocl` to your cmakelists file, eg see https://bitbucket.org/hughperkins/eigen/src/d84b9f44f924e36a8527e66a46a189395f046d21/unsupported/test/cuda-on-cl/CMakeLists.txt?at=eigen-cl&fileviewer=file-view-default for an example
+  - added a `cmake` file, so you can easily add `cocl` to your cmakelists file, eg see https://bitbucket.org/hughperkins/eigen/src/d84b9f44f924e36a8527e66a46a189395f046d21/unsupported/test/Coriander/CMakeLists.txt?at=eigen-cl&fileviewer=file-view-default for an example
 - Nov 4:
   - merged in changes that remove `label`s and gotos, and replace them with `if`s, `while`s, `for`s.  This is a bit flaky/beta/duct-tape, but the unit tests do all pass...
 - Nov 1:
@@ -83,9 +83,9 @@
   - ~~added pinned memory handling~~
   - added a bunch of api call implementations for getting information about the driver (mostly stubbed out for now...)
 - Oct 10:
-  - [test/eigen/test_cuda_elementwise_small.cu](https://github.com/hughperkins/cuda-on-cl/blob/a8f6aa55eb678e534cc7d17a3db26c6b8762d683/test/eigen/test_cuda_elementwise_small.cu) builds and runs ok now
+  - [test/eigen/test_cuda_elementwise_small.cu](https://github.com/hughperkins/Coriander/blob/a8f6aa55eb678e534cc7d17a3db26c6b8762d683/test/eigen/test_cuda_elementwise_small.cu) builds and runs ok now
 - Oct 8:
-  - [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc) compiles completely into compileable OpenCL now [https://github.com/hughperkins/cuda-on-cl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl](https://github.com/hughperkins/cuda-on-cl/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl)
+  - [https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc](https://github.com/tensorflow/tensorflow/blob/r0.10/tensorflow/core/kernels/cwise_op_gpu_add.cu.cc) compiles completely into compileable OpenCL now [https://github.com/hughperkins/Coriander/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl](https://github.com/hughperkins/Coriander/blob/d491aca1b5123781ac59486d38b09fbecd049f45/tensorflow/generated/cwise_op_gpu_add-deviceside.cl)
   - implemented `cudaMalloc`, `cudaMemcpy`, `cudaFree` (using opencl)
   - hostside object now contains generated OpenCL sourcecode
 - Oct 5

@@ -18,15 +18,15 @@ Note that the nvidia dockerfile uses Ubuntu 14.04 for now.
 
 #### Procedure:
 ```
-git clone --recursive https://github.com/hughperkins/cuda-on-cl
-cd cuda-on-cl/docker
+git clone --recursive https://github.com/hughperkins/Coriander
+cd Coriander/docker
 docker build ./ --file Dockerfile-beignet -t coclbeignet
 sudo docker run --device /dev/dri:/dev/dri -it coclbeignet
 ```
 
 (Based on https://github.com/chihchun/opencl-docker, following heads-up from bhack)
 
-<img src="https://github.com/hughperkins/cuda-on-cl/raw/master/doc/img/dockerfile_beignet_cudasample.png?raw=true" width="600" />
+<img src="https://github.com/hughperkins/Coriander/raw/master/doc/img/dockerfile_beignet_cudasample.png?raw=true" width="600" />
 
 ### NVIDIA platforms
 
@@ -41,8 +41,8 @@ nvidia-docker run -t nvidia/cuda:8.0-cudnn5-devel nvidia-smi
 
 Build:
 ```
-git clone --recursive https://github.com/hughperkins/cuda-on-cl
-cd cuda-on-cl/docker
+git clone --recursive https://github.com/hughperkins/Coriander
+cd Coriander/docker
 docker build ./ -t coclnvidia --file Dockerfile-1404-nvidia
 ```
 Run:
@@ -54,7 +54,7 @@ Test a `cocl` compilation:
 cd /tmp
 mkdir foo
 cd foo
-cp /cuda-on-cl/test/cuda_sample.cu .
+cp /Coriander/test/cuda_sample.cu .
 cocl cuda_sample.cu
 ./cuda_sample
 ```
