@@ -47,12 +47,9 @@ make install
 ```
 
 You're good.  If you want you can run some tests:
-- `ccmake`
-- change `BUILD_TESTS` to `ON`
-- run:
-```
-make run-tests
-```
+- `ccmake ..`
+- change `BUILD_TESTS` to `ON`, then press `c` and `g`
+- `make run-tests`
 
 Note that you'll need to continue to export `CLANG_HOME` environment variable when using `cocl`.
 
