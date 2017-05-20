@@ -365,7 +365,15 @@ std::string FunctionDumper::dumpKernelFunctionDeclarationWithoutReturn(llvm::Fun
                         // noptrType->dump();
                         structsToDefine.insert(noptrType);
                         is_struct_needs_cloning = true;
-                        argdeclaration = "global " + typeDumper->dumpType(noptrType) + "* " + argName + "_nopointers";
+                        // argdeclaration = "global " + typeDumper->dumpType(noptrType) + "* " + argName + "_nopointers";
+                        argdeclaration = "int " + argName + "_nopointers_offset";
+
+                        PointerType *noptrTypePointer = PointerType::get(noptrType, 1);
+                        int clmemIndex = kernelClmemIndexByArgIndex[clmemArgIndex];
+                        clmemArgIndex++;
+                        shimCode = 
+                            createOffsetShim(noptrTypePointer, argName + "_nopointers", clmemIndex) +
+                            shimCode;
                     }
                 }
             }
@@ -394,6 +402,16 @@ std::string FunctionDumper::dumpKernelFunctionDeclarationWithoutReturn(llvm::Fun
         // if this is a kernel method, check for any structs containing pointers,
         // and add those pointers t othe argument list, with some appropriate shimcode
         // to copy those pointers into the struct, at the start of the kernel
+        // if(ispointer && !is_struct_needs_cloning) {
+        if(ispointer && !is_struct_needs_cloning) {
+            // add offset
+            int clmemIndex = kernelClmemIndexByArgIndex[clmemArgIndex];
+            clmemArgIndex++;
+            declaration << createOffsetDeclaration(argName);
+            shimCode = 
+                createOffsetShim(arg->getType(), argName, clmemIndex) +
+                shimCode;
+        }
         int j = 0;
         if(is_struct_needs_cloning) {
             StructType *structType = cast<StructType>(cast<PointerType>(argType)->getPointerElementType());
@@ -421,15 +439,6 @@ std::string FunctionDumper::dumpKernelFunctionDeclarationWithoutReturn(llvm::Fun
                     argName + "[0]" + pointerInfo->path + " = " + pointerArgName + ";\n";
                 j++;
             }
-        }
-        if(ispointer && !is_struct_needs_cloning) {
-            // add offset
-            int clmemIndex = kernelClmemIndexByArgIndex[clmemArgIndex];
-            clmemArgIndex++;
-            declaration << createOffsetDeclaration(argName);
-            shimCode = 
-                createOffsetShim(arg->getType(), argName, clmemIndex) +
-                shimCode;
         }
         i++;
     }

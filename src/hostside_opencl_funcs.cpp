@@ -202,7 +202,7 @@ size_t cuInit(unsigned int flags) {
 int cudaConfigureCall(
         dim3 grid,
         dim3 block, long long sharedMem, char *queue_as_voidstar) {
-    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "... locked launch mutex " << (void *)getThreadVars() << endl);
     CoclStream *coclStream = (CoclStream *)queue_as_voidstar;
@@ -211,10 +211,10 @@ int cudaConfigureCall(
         coclStream = v->currentContext->default_stream.get();
         // coclStream = defaultCoclStream;
         // throw runtime_error("not implemented: default stream");
-        COCL_PRINT(cout << "cudaConfigureCall using default_queue" << endl);
+        // COCL_PRINT(cout << "cudaConfigureCall using default_queue" << endl);
     }
     CLQueue *clqueue = coclStream->clqueue;
-    COCL_PRINT(cout << "cudaConfigureCall queue=" << (void *)clqueue << endl);
+    // COCL_PRINT(cout << "cudaConfigureCall queue=" << (void *)clqueue << endl);
     if(sharedMem != 0) {
         COCL_PRINT(cout << "cudaConfigureCall: Not implemented: non-zero shared memory" << endl);
         throw runtime_error("cudaConfigureCall: Not implemented: non-zero shared memory");
@@ -225,8 +225,8 @@ int cudaConfigureCall(
     int block_x = block.x;
     int block_y = block.y;
     int block_z = block.z;
-    COCL_PRINT(cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl);
-    COCL_PRINT(cout << "block(" << block_x << ", " << block_y << ", " << block_z << ")" << endl);
+    // COCL_PRINT(cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl);
+    // COCL_PRINT(cout << "block(" << block_x << ", " << block_y << ", " << block_z << ")" << endl);
     launchConfiguration.queue = clqueue;
     launchConfiguration.coclStream = coclStream;
     launchConfiguration.grid[0] = grid_x;
@@ -473,19 +473,20 @@ void configureKernel(const char *kernelName, const char *devicellsourcecode) {
 void addClmemArg(cl_mem clmem) {
     int clmemIndex = 0;
     if(launchConfiguration.clmemIndexByClmem.find(clmem) == launchConfiguration.clmemIndexByClmem.end()) {
-        // cout << "new clmem" << endl;
         clmemIndex = launchConfiguration.clmems.size();
         launchConfiguration.clmems.push_back(clmem);
         launchConfiguration.clmemIndexByClmem[clmem] = clmemIndex;
+        cout << "   new clmem" << clmemIndex << endl;
     } else {
-        // cout << "existing clmem" << endl;
         clmemIndex = launchConfiguration.clmemIndexByClmem.find(clmem)->second;
+        cout << "   existing clmem" << clmemIndex << endl;
     }
     launchConfiguration.clmemIndexByClmemArgIndex.push_back(clmemIndex);
+    // cout << ""
 }
 
 void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
-    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "...lcoked launch mutex " << (void *)getThreadVars() << endl);
     ThreadVars *v = getThreadVars();
@@ -513,8 +514,17 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
     EasyCL::checkError(err);
     launchConfiguration.kernelArgsToBeReleased.push_back(gpu_struct);
 
-    launchConfiguration.args.push_back(std::unique_ptr<Arg>(new ClmemArg(launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1])));
-    // addClmemArg(gpu_struct);
+    // launchConfiguration.args.push_back(std::unique_ptr<Arg>(new ClmemArg(launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1])));
+    addClmemArg(gpu_struct);
+
+    int offsetElements = 0;
+    #ifdef OFFSET_32BIT
+    launchConfiguration.args.push_back(std::unique_ptr<Arg>(new UInt32Arg((uint32_t)offsetElements)));
+    // launchConfiguration.kernel->in_uint32((uint32_t)offsetElements); // kernel expects a `long` which is 64-bit signed int
+    #else
+    launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int64Arg((int64_t)offsetElements)));
+    // launchConfiguration.kernel->in_int64((int64_t)offsetElements); // kernel expects a `long` which is 64-bit signed int
+    #endif
 
     // launchConfiguration.kernel->inout(&launchConfiguration.kernelArgsToBeReleased[launchConfiguration.kernelArgsToBeReleased.size() - 1]);
     // COCL_PRINT(cout << " --- unlocking launch mutex " << (void *)getThreadVars() << endl);
@@ -522,13 +532,13 @@ void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
 }
 
 void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
-    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
 
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
-    COCL_PRINT(cout << "setKernelArgCharStar " << (void *)memory_as_charstar << endl);
     Memory *memory = findMemory(memory_as_charstar);
     if(memory == 0) {
+        COCL_PRINT(cout << "setKernelArgCharStar nullptr" << endl);
         // launchConfiguration.args.push_back(std::unique_ptr<Arg>(new NullPtrArg()));
         addClmemArg(0);
         // launchConfiguration.kernel->in_nullptr();
@@ -543,10 +553,14 @@ void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
         size_t offset = memory->getOffset(memory_as_charstar);
         cl_mem clmem = memory->clmem;
         // launchConfiguration.args.push_back(std::unique_ptr<Arg>(new ClmemArg(clmem)));
-        addClmemArg(clmem);
 
         // launchConfiguration.kernel->inout(&clmem);
         size_t offsetElements = offset / elementSize;
+
+        COCL_PRINT(cout << "setKernelArgCharStar offset=" << offsetElements << " elementSize=" << elementSize << endl);
+
+        addClmemArg(clmem);
+
         // COCL_PRINT(cout << "offset elements " << offsetElements << endl);
         #ifdef OFFSET_32BIT
         launchConfiguration.args.push_back(std::unique_ptr<Arg>(new UInt32Arg((uint32_t)offsetElements)));
@@ -561,7 +575,7 @@ void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
 }
 
 void setKernelArgInt64(int64_t value) {
-    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int64Arg(value)));
 
@@ -572,7 +586,7 @@ void setKernelArgInt64(int64_t value) {
 }
 
 void setKernelArgInt32(int value) {
-    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int32Arg(value)));
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
@@ -583,7 +597,7 @@ void setKernelArgInt32(int value) {
 }
 
 void setKernelArgInt8(char value) {
-    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int8Arg(value)));
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
@@ -594,7 +608,7 @@ void setKernelArgInt8(char value) {
 }
 
 void setKernelArgFloat(float value) {
-    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     launchConfiguration.args.push_back(std::unique_ptr<Arg>(new FloatArg(value)));
     // COCL_PRINT(cout << "... locked launch mutex " << (void *)getThreadVars() << endl);
@@ -606,17 +620,24 @@ void setKernelArgFloat(float value) {
 
 void kernelGo() {
     try {
-    COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
+    // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
-    COCL_PRINT(cout << "kernelGo queue=" << (void *)launchConfiguration.queue << endl);
+    // COCL_PRINT(cout << "kernelGo queue=" << (void *)launchConfiguration.queue << endl);
 
     // launchConfiguration.kernelName += "_";
     // for(int i = 0; i < launchConfiguration.clmemIndexByClmemArgIndex.size(); i++) {
     //     int clmemIndex = launchConfiguration.clmemIndexByClmemArgIndex[i];
     //     launchConfiguration.kernelName += "_" + EasyCL::toString(clmemIndex);
     // }
-    // cout << "kernelGo() kernel name " << launchConfiguration.kernelName << " unique clmems=" << launchConfiguration.clmems.size() << endl;
+    cout << "kernelGo() kernel name " << launchConfiguration.kernelName << " unique clmems=" << launchConfiguration.clmems.size() << endl;
+    cout << "kernelGo() clmems.size() " << launchConfiguration.clmems.size() << endl;
+    for(auto it = launchConfiguration.clmemIndexByClmemArgIndex.begin(); it != launchConfiguration.clmemIndexByClmemArgIndex.end(); it++) {
+        cout << " clmem index " << *it << endl;
+    }
+    for(int i = 0; i < launchConfiguration.args.size(); i++) {
+        cout << "  arg i=" << i << " " << launchConfiguration.args[i]->str() << endl;
+    }
 
     GenerateOpenCLResult res = generateOpenCL(
         launchConfiguration.clmems.size(), launchConfiguration.clmemIndexByClmemArgIndex, launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
@@ -625,28 +646,28 @@ void kernelGo() {
     CLKernel *kernel = compileOpenCLKernel(res.uniqueKernelName, res.shortKernelName, res.clSourcecode);
 
     for(int i = 0; i < launchConfiguration.clmems.size(); i++) {
-        // cout << "clmem" << i << endl;
+        cout << "clmem" << i << endl;
         kernel->inout(&launchConfiguration.clmems[i]);
     }
     for(int i = 0; i < launchConfiguration.args.size(); i++) {
-        // cout << "i=" << i << " " << launchConfiguration.args[i]->str() << endl;
+        cout << "i=" << i << " " << launchConfiguration.args[i]->str() << endl;
         launchConfiguration.args[i]->inject(kernel);
     }
 
     size_t global[3];
-     COCL_PRINT(cout << "<<< global=dim3(");
+     // COCL_PRINT(cout << "<<< global=dim3(");
     for(int i = 0; i < 3; i++) {
         global[i] = launchConfiguration.grid[i] * launchConfiguration.block[i];
-        COCL_PRINT(cout << global[i] << ",");
+        // COCL_PRINT(cout << global[i] << ",");
     }
-    COCL_PRINT(cout << "), workgroupsize=dim3(");
-    for(int i = 0; i < 3; i++) {
-        COCL_PRINT(cout << launchConfiguration.block[i] << ",");
-    }
-    COCL_PRINT(cout << ")>>>" << endl);
+    // COCL_PRINT(cout << "), workgroupsize=dim3(");
+    // for(int i = 0; i < 3; i++) {
+    //     COCL_PRINT(cout << launchConfiguration.block[i] << ",");
+    // }
+    // COCL_PRINT(cout << ")>>>" << endl);
     // cout << "launching kernel, using OpenCL..." << endl;
     int workgroupSize = launchConfiguration.block[0] * launchConfiguration.block[1] * launchConfiguration.block[2];
-    COCL_PRINT(cout << "workgroupSize=" << workgroupSize << endl);
+    // COCL_PRINT(cout << "workgroupSize=" << workgroupSize << endl);
     kernel->localInts(workgroupSize);
 
     try {
