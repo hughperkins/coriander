@@ -341,9 +341,14 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
 
     outs() << "got a byvalue struct" << "\n";
 
-    Type *valueType = cast<PointerType>(valueAsPointerInstr->getType())->getPointerElementType();
+    StructType *valueType = cast<StructType>(cast<PointerType>(valueAsPointerInstr->getType())->getPointerElementType());
     outs() << "valuetype:\n";
     valueType->dump();
+    string typeName = valueType->getName().str();
+    cout << "typeName [" << typeName << "]" << endl;
+    if(typeName == "struct.float4") {
+        return addSetKernelArgInst_pointer(lastInst, valueAsPointerInstr);
+    }
 
     unique_ptr<StructInfo> structInfo(new StructInfo());
     StructCloner::walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", cast<StructType>(valueType));
