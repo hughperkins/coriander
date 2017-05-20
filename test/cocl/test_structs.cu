@@ -188,41 +188,42 @@ void testtwostructs() {
     cuStreamDestroy(stream);
 }
 
-// __global__ void kernel_structbyval_noptrs(struct Struct_1float mystruct1, float *out) {
-//     if(threadIdx.x == 0) {
-//         out[0] = mystruct1.p1;
-//         out[1] = 5;
-//     }
-// }
+__global__ void kernel_structbyval_noptrs(struct Struct_1float mystruct1, float *out) {
+    if(threadIdx.x == 0) {
+        out[0] = mystruct1.f1;
+        out[1] = 5;
+    }
+}
 
-// void teststructbyvalNoPtr() {
-//     int N = 1024;
+void teststructbyvalNoPtr() {
+    int N = 1024;
 
-//     CUstream stream;
-//     cuStreamCreate(&stream, 0);
+    CUstream stream;
+    cuStreamCreate(&stream, 0);
 
-//     float *hostFloats1 = new float[N];
+    float *hostFloats1 = new float[N];
 
-//     float *gpuFloats1;
-//     cudaMalloc((void**)(&gpuFloats1), N * sizeof(float));
+    float *gpuFloats1;
+    cudaMalloc((void**)(&gpuFloats1), N * sizeof(float));
 
-//     struct Struct_1float mystruct1 = {8.0f};
+    struct Struct_1float mystruct1 = {8.0f};
 
-//     kernel_structbyval_noptrs<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(mystruct1, (float *)gpuFloats1);
+    kernel_structbyval_noptrs<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(mystruct1, (float *)gpuFloats1);
 
-//     cudaMemcpy(hostFloats1, gpuFloats1, 4 * sizeof(float), cudaMemcpyDeviceToHost);
-//     cuStreamSynchronize(stream);
+    cudaMemcpy(hostFloats1, gpuFloats1, 4 * sizeof(float), cudaMemcpyDeviceToHost);
+    cuStreamSynchronize(stream);
 
-//     cout << hostFloats1[0] << endl;
-//     cout << hostFloats1[1] << endl;
+    cout << hostFloats1[0] << endl;
+    cout << hostFloats1[1] << endl;
 
-//     assert(hostFloats1[0] == 8);
+    assert(hostFloats1[0] == 8);
+    assert(hostFloats1[1] == 5);
 
-//     delete[] hostFloats1;
-//     cudaFree(gpuFloats1);
+    delete[] hostFloats1;
+    cudaFree(gpuFloats1);
 
-//     cuStreamDestroy(stream);
-// }
+    cuStreamDestroy(stream);
+}
 
 // __global__ void kernel_struct2byval_noptrs(struct Struct_fpNoPtr mystruct1, float *out) {
 //     if(threadIdx.x == 0) {
@@ -331,8 +332,8 @@ int main(int argc, char *argv[]) {
     // cout << "\teststruct2byvalNoPtr" << endl;
     // teststruct2byvalNoPtr();
 
-    // cout << "\teststructbyvalNoPtr" << endl;
-    // teststructbyvalNoPtr();
+    cout << "\teststructbyvalNoPtr" << endl;
+    teststructbyvalNoPtr();
 
     cout << "\ntest_twostructs_byptr_NoPtr" << endl;
     test_twostructs_byptr_NoPtr();
