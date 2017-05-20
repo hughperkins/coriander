@@ -246,14 +246,14 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction 
     cout << "allocsize " << allocSize << endl;
     int32_t elementSize = allocSize;
 
-    Function *setKernelArgFloatStar = cast<Function>(M->getOrInsertFunction(
-        "setKernelArgCharStar",
+    Function *setKernelArgGpuBuffer = cast<Function>(M->getOrInsertFunction(
+        "setKernelArgGpuBuffer",
         Type::getVoidTy(context),
         PointerType::get(IntegerType::get(context, 8), 0),
         IntegerType::get(context, 32),
         NULL));
     Value *args[] = {bitcast, createInt32Constant(&context, elementSize)};
-    CallInst *call = CallInst::Create(setKernelArgFloatStar, ArrayRef<Value *>(args));
+    CallInst *call = CallInst::Create(setKernelArgGpuBuffer, ArrayRef<Value *>(args));
     call->insertAfter(lastInst);
     lastInst = call;
     return lastInst;
@@ -287,8 +287,8 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
     // outs() << "original typeallocsize " << dataLayout->getTypeAllocSize(value->getType()) << "\n";
     // outs() << "pointerfree typeallocsize " << allocSize << "\n";
 
-    Function *setKernelArgStruct = cast<Function>(M->getOrInsertFunction(
-        "setKernelArgByValueStruct",
+    Function *setKernelArgHostsideBuffer = cast<Function>(M->getOrInsertFunction(
+        "setKernelArgHostsideBuffer",
         Type::getVoidTy(context),
         PointerType::get(IntegerType::get(context, 8), 0),
         IntegerType::get(context, 32),
@@ -316,8 +316,8 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
     args[0] = bitcast;
     args[1] = createInt32Constant(&context, allocSize);
 
-    cout << "adding setKernelArgStruct" << endl;
-    CallInst *call = CallInst::Create(setKernelArgStruct, ArrayRef<Value *>(args));
+    cout << "adding setKernelArgHostsideBuffer call" << endl;
+    CallInst *call = CallInst::Create(setKernelArgHostsideBuffer, ArrayRef<Value *>(args));
     call->insertAfter(lastInst);
     call->dump();
     lastInst = call;

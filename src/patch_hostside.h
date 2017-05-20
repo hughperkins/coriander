@@ -152,7 +152,7 @@ public:
     // - an offset integer parameter will be added
     //
     // the corresponding hostside_opencl_funcs method is:
-    //    setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize)
+    //    setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize)
     //
     // The hostside_opencl_funcs method needs no information other than the (virtual) pointer really
     // currently we are providing the elementsize too, to mitigate against a crash on beignet, but I might
@@ -161,17 +161,18 @@ public:
 
     // this will add bytecode to pass a pointer to the cpu-side struct object to hostside_opencl_funcs, at runtime
     // the entry point into hostside_opencl_funcs will be:
-    //     setKernelArgStruct(char *pCpuStruct, int structAllocateSize)
+    //     setKernelArgHostsideBuffer(char *pCpuStruct, int structAllocateSize)
     //
-    // this expects to receive a host-side allocated struct
-    //
-    // what this method will do is:
+    // The hostside_opencl_funcs method setKernelArgHostsideBuffer expects to receive a host-side allocated struct/buffer
+    // setKernelArgHostsideBuffer will:
     // - allocate a gpu buffer
     // - queue an opencl command, to copy the host-side struct into the gpu buffer
     // - add the clmem, and a zero-offset, to the list of kernel parameters
     //
-    // Note that the method needs no information on the structure of the struct, that will be handled later on, during
-    // opencl generation, not using any struct information from this call (which we arent providing anyway)
+    // Note that the setKernelArgHostsideBuffer method needs no information on the structure of the struct
+    //
+    // this patch_hostside addSetKernelArgInst_byvaluestruct function is going to handle walking the struct, and sending
+    // the other pointers through using additional method calls, likely to setKernelArgGpuBuffer
     static llvm::Instruction *addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *valueAsPointerInstr);
 
     // all setKernelArgs pass through addSetKernelArgInst, which dispatches to other functions

@@ -487,7 +487,7 @@ void addClmemArg(cl_mem clmem) {
     // cout << ""
 }
 
-void setKernelArgByValueStruct(char *pCpuStruct, int structAllocateSize) {
+void setKernelArgHostsideBuffer(char *pCpuStruct, int structAllocateSize) {
     // this receives a hostside struct. it will
     // - allocate a gpu buffer, to hold the struct
     // - queue an OpenCL command, to copy the hostside buffer to the gpu buffer
@@ -498,6 +498,7 @@ void setKernelArgByValueStruct(char *pCpuStruct, int structAllocateSize) {
     //
     // Things this doesnt do:
     // - parse/walk the struct (thats handled during opencl generation, later on, not here)
+    // - (well, and also in patch_hostside, which sends the other pointers through, separately)
     //
     // Things this does definitely need:
     // - struct allocate size, so we know how big to make the gpu buffer, and how much
@@ -519,7 +520,7 @@ void setKernelArgByValueStruct(char *pCpuStruct, int structAllocateSize) {
     // we should also:
     // deallocate the cl_mem after calling the kernel
     // (we assume hte struct is passed by-value, so we dont have to actually copy it back afterwards)
-    COCL_PRINT(cout << "setKernelArgStruct structsize=" << structAllocateSize << endl);
+    COCL_PRINT(cout << "setKernelArgHostsideBuffer size=" << structAllocateSize << endl);
     // int idx = 
     if(structAllocateSize < 4) {
         structAllocateSize = 4;
@@ -550,14 +551,24 @@ void setKernelArgByValueStruct(char *pCpuStruct, int structAllocateSize) {
     pthread_mutex_unlock(&launchMutex);
 }
 
-void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
+void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
+    // This adds a gpu buffer to the kernel args, adding it to the list of unique clmems,
+    // if not already present, and adding the offset, as a kernel parameter
+    //
+    // The size of the buffer is not needed (though the virtual memory system knows it :-) )
+    // The elementSize is used uniquely in the offset boilerplate, where we do something like:
+    //     global float *somefloats = (global float *)somefloats_data + somefloats_offset;
+    //
+    // we did it like this, because adding the offset before the cast was crashing on beignet (I think),
+    // but I might change it back to a byte offset, so we can handle pointers to structs ok
+
     // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
 
     // COCL_PRINT(cout << "...locked launch mutex " << (void *)getThreadVars() << endl);
     Memory *memory = findMemory(memory_as_charstar);
     if(memory == 0) {
-        COCL_PRINT(cout << "setKernelArgCharStar nullptr" << endl);
+        COCL_PRINT(cout << "setKernelArgGpuBuffer nullptr" << endl);
         // launchConfiguration.args.push_back(std::unique_ptr<Arg>(new NullPtrArg()));
         addClmemArg(0);
         // launchConfiguration.kernel->in_nullptr();
@@ -576,7 +587,7 @@ void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize) {
         // launchConfiguration.kernel->inout(&clmem);
         size_t offsetElements = offset / elementSize;
 
-        COCL_PRINT(cout << "setKernelArgCharStar offset=" << offsetElements << " elementSize=" << elementSize << endl);
+        COCL_PRINT(cout << "setKernelArgGpuBuffer offset=" << offsetElements << " elementSize=" << elementSize << endl);
 
         addClmemArg(clmem);
 
