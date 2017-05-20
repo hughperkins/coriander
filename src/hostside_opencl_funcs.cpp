@@ -385,10 +385,10 @@ void addClmemArg(cl_mem clmem) {
         clmemIndex = launchConfiguration.clmems.size();
         launchConfiguration.clmems.push_back(clmem);
         launchConfiguration.clmemIndexByClmem[clmem] = clmemIndex;
-        cout << "   new clmem" << clmemIndex << endl;
+        // cout << "   new clmem" << clmemIndex << endl;
     } else {
         clmemIndex = launchConfiguration.clmemIndexByClmem.find(clmem)->second;
-        cout << "   existing clmem" << clmemIndex << endl;
+        // cout << "   existing clmem" << clmemIndex << endl;
     }
     launchConfiguration.clmemIndexByClmemArgIndex.push_back(clmemIndex);
 }
@@ -530,14 +530,14 @@ void kernelGo() {
     //     int clmemIndex = launchConfiguration.clmemIndexByClmemArgIndex[i];
     //     launchConfiguration.kernelName += "_" + EasyCL::toString(clmemIndex);
     // }
-    cout << "kernelGo() kernel name " << launchConfiguration.kernelName << " unique clmems=" << launchConfiguration.clmems.size() << endl;
-    cout << "kernelGo() clmems.size() " << launchConfiguration.clmems.size() << endl;
-    for(auto it = launchConfiguration.clmemIndexByClmemArgIndex.begin(); it != launchConfiguration.clmemIndexByClmemArgIndex.end(); it++) {
-        cout << " clmem index " << *it << endl;
-    }
-    for(int i = 0; i < launchConfiguration.args.size(); i++) {
-        cout << "  arg i=" << i << " " << launchConfiguration.args[i]->str() << endl;
-    }
+    // cout << "kernelGo() kernel name " << launchConfiguration.kernelName << " unique clmems=" << launchConfiguration.clmems.size() << endl;
+    // cout << "kernelGo() clmems.size() " << launchConfiguration.clmems.size() << endl;
+    // for(auto it = launchConfiguration.clmemIndexByClmemArgIndex.begin(); it != launchConfiguration.clmemIndexByClmemArgIndex.end(); it++) {
+    //     cout << " clmem index " << *it << endl;
+    // }
+    // for(int i = 0; i < launchConfiguration.args.size(); i++) {
+    //     cout << "  arg i=" << i << " " << launchConfiguration.args[i]->str() << endl;
+    // }
 
     GenerateOpenCLResult res = generateOpenCL(
         launchConfiguration.clmems.size(), launchConfiguration.clmemIndexByClmemArgIndex, launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
@@ -546,11 +546,11 @@ void kernelGo() {
     CLKernel *kernel = compileOpenCLKernel(res.uniqueKernelName, res.shortKernelName, res.clSourcecode);
 
     for(int i = 0; i < launchConfiguration.clmems.size(); i++) {
-        cout << "clmem" << i << endl;
+        // cout << "clmem" << i << endl;
         kernel->inout(&launchConfiguration.clmems[i]);
     }
     for(int i = 0; i < launchConfiguration.args.size(); i++) {
-        cout << "i=" << i << " " << launchConfiguration.args[i]->str() << endl;
+        // cout << "i=" << i << " " << launchConfiguration.args[i]->str() << endl;
         launchConfiguration.args[i]->inject(kernel);
     }
 

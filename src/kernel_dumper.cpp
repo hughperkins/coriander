@@ -150,7 +150,7 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
     // other names will fit around it
 
     F->setName(generatedName);
-    std::cout << "kernel_dumper toCl generatedName=" << generatedName << std::endl;
+    // std::cout << "kernel_dumper toCl generatedName=" << generatedName << std::endl;
     // if(kernelName.size() > 32) {
     //     kernelName = kernelName.substr(0, 31);
     //     F->setName(kernelName);
