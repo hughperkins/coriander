@@ -259,26 +259,41 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction 
     return lastInst;
 }
 
-llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *valueAsPointerInstr) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst_pointerstruct(llvm::Instruction *lastInst, llvm::Value *structPointer) {
+    // what this will need to do is:
+    // - create a call to pass the gpu buffer, that contains the struct, to hostside_opencl_funcs, at runtime
+    // - if the struct contains pointers, then add appropriate calls to pass those at runtime too
+
+    // lets deal with the gpuside buffer first, that should be fairly easy-ish:
+    lastInst = addSetKernelArgInst_pointer(lastInst, structPointer);
+}
+
+llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *structPointer) {
+    //
+    // what this is going to do is:
+    // - create a call to pass the hostside buffer to hostside_opencl_funcs, at runtime
+    // - if the struct contains pointers, then add appropriate calls to pass those at runtime too
+    //
+
     Module *M = lastInst->getModule();
 
     outs() << "got a byvalue struct" << "\n";
 
-    StructType *valueType = cast<StructType>(cast<PointerType>(valueAsPointerInstr->getType())->getPointerElementType());
-    outs() << "valuetype:\n";
-    valueType->dump();
-    string typeName = valueType->getName().str();
+    StructType *structType = cast<StructType>(cast<PointerType>(structPointer->getType())->getPointerElementType());
+    outs() << "structType:\n";
+    structType->dump();
+    string typeName = structType->getName().str();
     cout << "typeName [" << typeName << "]" << endl;
     if(typeName == "struct.float4") {
-        return PatchHostside::addSetKernelArgInst_pointer(lastInst, valueAsPointerInstr);
+        return PatchHostside::addSetKernelArgInst_pointer(lastInst, structPointer);
     }
 
     unique_ptr<StructInfo> structInfo(new StructInfo());
-    StructCloner::walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", cast<StructType>(valueType));
+    StructCloner::walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", structType);
 
     bool structHasPointers = structInfo->pointerInfos.size() > 0;
 
-    StructType *structType = cast<StructType>(valueType);
+    // StructType *structType = cast<StructType>(valueType);
     string name = globalNames.getOrCreateName(structType);
     Type *newType = structCloner.cloneNoPointers(structType);
 
@@ -301,11 +316,11 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
         lastInst = alloca;
 
         cout << "struct has pointers, so cloning" << endl;
-        lastInst = structCloner.createHostsideIrCopyPtrfullToNoptr(lastInst, structType, valueAsPointerInstr, alloca);
+        lastInst = structCloner.createHostsideIrCopyPtrfullToNoptr(lastInst, structType, structPointer, alloca);
         sourceStruct = alloca;
     } else {
         cout << "struct does not have pointers, no need to clone" << endl;
-        sourceStruct = valueAsPointerInstr;
+        sourceStruct = structPointer;
     }
 
     BitCastInst *bitcast = new BitCastInst(sourceStruct, PointerType::get(IntegerType::get(context, 8), 0));
@@ -333,7 +348,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
             // outs() << "idx " << idx << "\n";
             indices.push_back(createInt32Constant(&context, idx));
         }
-        GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(valueType, valueAsPointerInstr, ArrayRef<Value *>(&indices[0], &indices[indices.size()]), "getfloatstaraddr");
+        GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(structType, structPointer, ArrayRef<Value *>(&indices[0], &indices[indices.size()]), "getfloatstaraddr");
         gep->insertAfter(lastInst);
         lastInst = gep;
 
@@ -359,10 +374,10 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
         // cout << "pointer" << endl;
         Type *elementType = dyn_cast<PointerType>(value->getType())->getPointerElementType();
         if(isa<StructType>(elementType)) {
-            lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, value);
+            // lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, value);
             // cout << "pointer to struct" << endl;
             // lastInst = addSetKernelArgInst_byvaluestruct(lastInst, value);
-            // lastInst = addSetKernelArgInst_pointerstruct(lastInst, value);
+            lastInst = addSetKernelArgInst_pointerstruct(lastInst, value);
         } else {
             // cout << "pointer to non-struct" << endl;
             lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, value);

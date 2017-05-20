@@ -175,6 +175,12 @@ public:
     // the other pointers through using additional method calls, likely to setKernelArgGpuBuffer
     static llvm::Instruction *addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *valueAsPointerInstr);
 
+    // this needs to do the same as addSetKernelArgInst_byvaluestruct , but it passes the struct pointer into the
+    // setKernelArgGpuBuffer function, rather than the setKernelArgHostsideBuffer
+    // but it still needs to walk the struct, at patching time, compile time, and add calls to pass any pointers
+    // in the struct through too
+    static llvm::Instruction *addSetKernelArgInst_pointerstruct(llvm::Instruction *lastInst, llvm::Value *structPointer);
+
     // all setKernelArgs pass through addSetKernelArgInst, which dispatches to other functions
     static llvm::Instruction *addSetKernelArgInst(llvm::Instruction *lastInst, llvm::Value *value, llvm::Value *valueAsPointerInstr);
 
