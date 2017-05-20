@@ -76,24 +76,6 @@ Recommended generation options:
 
 You can open the `-device.cl` file to look at the OpenCL generated, and compare the effects of different options.
 
-## How it works
-
-Behind the scenes, there are a few parts:
-- Device-side, `cocl` converts the CUDA kernels into OpenCL kernels
-- Host-side, `cocl`:
-  - converts the cuda kernel launch code into opencl kernel launch code, and
-  - bakes in the OpenCL code
-
-<img src="doc/img/cudairtoopenclarchitecture6.png?raw=true" width="900" height="400" />
-
-[More detail](doc/how-it-works.md)
-
-New!
-- the device-IR to OpenCL step happens at runtime now
-  - surprisingly, this actually is faster than doing it offline
-  - thats because the GPU driver only needs to compile the small amount of OpenCL needed for a specific kernel, rather than an entire IR file
-- in addition, address-space deduction is significantly facilitated
-
 ## What it provides
 
 - compiler for host-side code, including memory allocation, copy, streams, kernel launches
@@ -104,6 +86,10 @@ New!
   - pooling
   - activations: ReLU, tanh, sigmoid
   - softmax forward
+
+## How it works
+
+Slides on the IWOCL website, [here](http://www.iwocl.org/wp-content/uploads/iwocl2017-hugh-perkins-cuda-cl.pdf)
 
 ## How to build
 
