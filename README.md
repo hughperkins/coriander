@@ -242,9 +242,16 @@ You can see the section `Options` above for more details.
 
 ## Docker
 
-See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)
+See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)  (or used to. not tested very recently...)
 
 <img src="https://github.com/hughperkins/cuda-on-cl/raw/master/doc/img/dockerfile_beignet_cudasample.png?raw=true" width="600" />
+
+## Simplifications made by cuda-on-cl
+
+cuda-on-cl makes the following relaxations/simplifications:
+- ints are generally assumed to be no longer than 32-bit, and truncated to 32-bit mostly
+- floats are assumed to be singles. doubles in the original kernels are converted to floats in the OpenCL code
+- buffer offsets are generally taken to be int32s for now.  This might change in the future
 
 ## Related projects
 
