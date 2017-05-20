@@ -336,116 +336,21 @@ Instruction *addSetKernelArgInst_pointer(Instruction *lastInst, Value *value) {
     return lastInst;
 }
 
-Instruction *addSetKernelArgInst_pointerstruct(Instruction *lastInst, Value *value) {
-    Module *M = lastInst->getModule();
-
-    outs() << "addSetKernelArgInst_pointerstruct()\n";
-    // outs() << "value\n";
-    // value->dump();
-    Type *valueType = value->getType();
-    // outs() << "valueType\n";
-    // valueType->dump();
-    StructType *structType = cast<StructType>(valueType->getPointerElementType());
-
-    // outs() << "got a byvalue struct" << "\n";
-    unique_ptr<StructInfo> structInfo(new StructInfo());
-    StructCloner::walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", cast<StructType>(structType));
-
-    bool structHasPointers = structInfo->pointerInfos.size() > 0;
-    // outs() << "struct has pointers? " << structHasPointers << "\n";
-
-    // if it doesnt contain pointers, we can just send it as a char *, after creating a pointer
-    // to it
-    // actually, we have a pointer already, ie valueAsPointerInstr
-    if(!structHasPointers) {
-        return addSetKernelArgInst_pointer(lastInst, value);
-    }
-
-    // StructType *structType = cast<StructType>(value->getType());
-    string name = globalNames.getOrCreateName(structType);
-    Type *newType = structCloner.cloneNoPointers(structType);
-
-    const DataLayout *dataLayout = &M->getDataLayout();
-    int allocSize = dataLayout->getTypeAllocSize(newType);
-    // outs() << "original typeallocsize " << dataLayout->getTypeAllocSize(value->getType()) << "\n";
-    // outs() << "pointerfree typeallocsize " << allocSize << "\n";
-
-    Function *setKernelArgStruct = cast<Function>(M->getOrInsertFunction(
-        "_Z18setKernelArgStructPci",
-        Type::getVoidTy(context),
-        PointerType::get(IntegerType::get(context, 8), 0),
-        IntegerType::get(context, 32),
-        NULL));
-
-    AllocaInst *alloca = new AllocaInst(newType, "newalloca");
-    alloca->insertAfter(lastInst);
-    lastInst = alloca;
-
-    lastInst = structCloner.createHostsideIrCopyPtrfullToNoptr(lastInst, structType, value, alloca);
-
-    BitCastInst *bitcast = new BitCastInst(alloca, PointerType::get(IntegerType::get(context, 8), 0));
-    bitcast->insertAfter(lastInst);
-    lastInst = bitcast;
-
-    Value *args[2];
-    args[0] = bitcast;
-    args[1] = createInt32Constant(&context, allocSize);
-
-    CallInst *call = CallInst::Create(setKernelArgStruct, ArrayRef<Value *>(args));
-    call->insertAfter(lastInst);
-    lastInst = call;
-
-    // outs() << "pointers in struct:" << "\n";
-    for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
-        PointerInfo *pointerInfo = pointerit->get();
-        vector<Value *> indices;
-        indices.push_back(createInt32Constant(&context, 0));
-        for(auto idxit = pointerInfo->indices.begin(); idxit != pointerInfo->indices.end(); idxit++) {
-            int idx = *idxit;
-            // outs() << "idx " << idx << "\n";
-            indices.push_back(createInt32Constant(&context, idx));
-        }
-        GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(structType, value, ArrayRef<Value *>(&indices[0], &indices[indices.size()]), "getfloatstaraddr");
-        gep->insertAfter(lastInst);
-        lastInst = gep;
-
-        LoadInst *loadgep = new LoadInst(gep, "loadgep");
-        loadgep->insertAfter(lastInst);
-        lastInst = loadgep;
-
-        lastInst = addSetKernelArgInst_pointer(lastInst, loadgep);
-    }
-
-    return lastInst;
-}
-
-Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *value, Value *valueAsPointerInstr) {
+Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *valueAsPointerInstr) {
     Module *M = lastInst->getModule();
 
     outs() << "got a byvalue struct" << "\n";
+
+    Type *valueType = cast<PointerType>(valueAsPointerInstr->getType())->getPointerElementType();
+    outs() << "valuetype:\n";
+    valueType->dump();
+
     unique_ptr<StructInfo> structInfo(new StructInfo());
-    StructCloner::walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", cast<StructType>(value->getType()));
+    StructCloner::walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", cast<StructType>(valueType));
 
     bool structHasPointers = structInfo->pointerInfos.size() > 0;
-    // outs() << "struct has pointers? " << structHasPointers << "\n";
 
-    // if it doesnt contain pointers, we can just send it as a char *, after creating a pointer
-    // to it
-    // actually, we have a pointer already, ie valueAsPointerInstr
-    // if(!structHasPointers) {
-    //     Function *setKernelArgStruct = cast<Function>(M->getOrInsertFunction(
-    //         "_Z18setKernelArgStructPci",
-    //         Type::getVoidTy(context),
-    //         PointerType::get(IntegerType::get(context, 8), 0),
-    //         IntegerType::get(context, 32),
-    //         NULL));
-    //     CallInst *call = CallInst::Create(setKernelArgStruct, ArrayRef<Value *>(args));
-    //     call->insertAfter(lastInst);
-    //     lastInst = call;
-    //     return lastInst;
-    // }
-
-    StructType *structType = cast<StructType>(value->getType());
+    StructType *structType = cast<StructType>(valueType);
     string name = globalNames.getOrCreateName(structType);
     Type *newType = structCloner.cloneNoPointers(structType);
 
@@ -500,7 +405,7 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
             // outs() << "idx " << idx << "\n";
             indices.push_back(createInt32Constant(&context, idx));
         }
-        GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(value->getType(), valueAsPointerInstr, ArrayRef<Value *>(&indices[0], &indices[indices.size()]), "getfloatstaraddr");
+        GetElementPtrInst *gep = GetElementPtrInst::CreateInBounds(valueType, valueAsPointerInstr, ArrayRef<Value *>(&indices[0], &indices[indices.size()]), "getfloatstaraddr");
         gep->insertAfter(lastInst);
         lastInst = gep;
 
@@ -523,14 +428,15 @@ Instruction *addSetKernelArgInst(Instruction *lastInst, Value *value, Value *val
         Type *elementType = dyn_cast<PointerType>(value->getType())->getPointerElementType();
         if(isa<StructType>(elementType)) {
             // cout << "pointer to struct" << endl;
-            lastInst = addSetKernelArgInst_pointerstruct(lastInst, value);
+            lastInst = addSetKernelArgInst_byvaluestruct(lastInst, value);
+            // lastInst = addSetKernelArgInst_pointerstruct(lastInst, value);
         } else {
             // cout << "pointer to non-struct" << endl;
             lastInst = addSetKernelArgInst_pointer(lastInst, value);
         }
     } else if(isa<StructType>(value->getType())) {
         // cout << "structtype" << endl;
-        lastInst = addSetKernelArgInst_byvaluestruct(lastInst, value, valueAsPointerInstr);
+        lastInst = addSetKernelArgInst_byvaluestruct(lastInst, valueAsPointerInstr);
     } else {
         value->dump();
         outs() << "\n";
@@ -547,6 +453,7 @@ void patchCudaLaunch(Function *F, GenericCallInst *inst, vector<Instruction *> &
 
     getLaunchTypes(inst, launchCallInfo.get());
     to_replace_with_zero.push_back(inst->getInst());
+    outs() << "\n";
     outs() << "patching launch in " << string(F->getName()) << "\n";
 
     string kernelName = launchCallInfo->kernelName;
