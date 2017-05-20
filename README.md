@@ -51,9 +51,9 @@ hostFloats[2] 444
 
 <img src="doc/img/howitworks_kernelcompilation.png?raw=true" width="600" />
 
-<img src="doc/img/howitworks_compiletime.png?raw=true" />
+<img src="doc/img/howitworks_compiletime.png?raw=true" width="600" />
 
-<img src="doc/img/howitworks_runtime.png?raw=true" />
+<img src="doc/img/howitworks_runtime.png?raw=true" width="600" />
 
 Slides on the IWOCL website, [here](http://www.iwocl.org/wp-content/uploads/iwocl2017-hugh-perkins-cuda-cl.pdf)
 
