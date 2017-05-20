@@ -1,4 +1,4 @@
-// Copyright Hugh Perkins 2016
+// Copyright Hugh Perkins 2016, 2017
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// For doc, please see the corresponding include file, patch-hostside.h
 
-// This is going to patch the cuda launch instrutions, in the hostside ir. hopefully
+#include "patch-hostside.h"
 
 #include "mutations.h"
 #include "struct_clone.h"
@@ -75,91 +76,17 @@ static StructCloner structCloner(&typeDumper, &globalNames);
 
 // bool single_precision = true;
 
-class LaunchCallInfo {
-public:
-    LaunchCallInfo() {
-        grid_xy_value = 0;
-        grid_z_value = 0;
-        block_xy_value = 0;
-        block_z_value = 0;
-    }
-    std::string kernelName = "";
-    vector<Type *> callTypes;
-    vector<Value *> callValuesByValue;
-    vector<Value *> callValuesAsPointers;
-    Value *stream;
-    Value *grid_xy_value;
-    Value *grid_z_value;
-    Value *block_xy_value;
-    Value *block_z_value;
-};
+// this should probably be more of an instance variable probably?
+static std::unique_ptr<LaunchCallInfo> launchCallInfo(new LaunchCallInfo);
 
-static unique_ptr<LaunchCallInfo> launchCallInfo(new LaunchCallInfo);
-
-class GenericCallInst {
-    // its children can hold a CallInst or an InvokeInst
-public:
-    // GenericCallInst() {}
-    virtual ~GenericCallInst() {}
-    static unique_ptr<GenericCallInst> create(InvokeInst *inst);
-    static unique_ptr<GenericCallInst> create(CallInst *inst);
-    virtual Value *getArgOperand(int idx) = 0;
-    virtual Value *getOperand(int idx) = 0;
-    virtual Module *getModule() = 0;
-    virtual Instruction *getInst() = 0;
-    virtual void dump() = 0;
-};
-
-class GenericCallInst_Call : public GenericCallInst {
-public:
-    GenericCallInst_Call(CallInst *inst) : inst(inst) {}
-    CallInst *inst;
-    virtual Value *getArgOperand(int idx) override {
-        return inst->getArgOperand(idx);
-    }
-    virtual Value *getOperand(int idx) override {
-        return inst->getArgOperand(idx);
-    }
-    virtual Module *getModule() {
-        return inst->getModule();
-    }
-    virtual Instruction *getInst() {
-        return inst;
-    }
-    virtual void dump() {
-        inst->dump();
-    }
-};
-
-class GenericCallInst_Invoke : public GenericCallInst {
-public:
-    GenericCallInst_Invoke(InvokeInst *inst) : inst(inst) {}
-    InvokeInst *inst;
-    virtual Value *getArgOperand(int idx) override {
-        return inst->getArgOperand(idx);
-    }
-    virtual Value *getOperand(int idx) override {
-        return inst->getArgOperand(idx);
-    }
-    virtual Module *getModule() {
-        return inst->getModule();
-    }
-    virtual Instruction *getInst() {
-        return inst;
-    }
-    virtual void dump() {
-        inst->dump();
-    }
-};
-
-unique_ptr<GenericCallInst> GenericCallInst::create(InvokeInst *inst) {
+std::unique_ptr<GenericCallInst> GenericCallInst::create(llvm::InvokeInst *inst) {
     return unique_ptr<GenericCallInst>(new GenericCallInst_Invoke(inst));
 }
-unique_ptr<GenericCallInst> GenericCallInst::create(CallInst *inst) {
+std::unique_ptr<GenericCallInst> GenericCallInst::create(llvm::CallInst *inst) {
     return unique_ptr<GenericCallInst>(new GenericCallInst_Call(inst));
 }
 
-ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
+std::ostream &operator<<(std::ostream &os, const LaunchCallInfo &info) {
     raw_os_ostream my_raw_os_ostream(os);
     my_raw_os_ostream << "LaunchCallInfo " << info.kernelName;
     my_raw_os_ostream << "<<<";
@@ -189,7 +116,7 @@ ostream &operator<<(ostream &os, const LaunchCallInfo &info) {
     return os;
 }
 
-void getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info) {
+void PatchHostside::getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info) {
     // input to this is a cudaLaunch instruction
     // sideeffect is to populate in info:
     // - name of the kernel
@@ -210,11 +137,11 @@ void getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info) {
         info->kernelName = instr->getOperand(0)->getName();
         // outs() << "got kernel name " << info->kernelName << "\n";
     } else {
-        throw runtime_error("getlaunchtypes, didnt get ConstantExpr");
+        throw std::runtime_error("getlaunchtypes, didnt get ConstantExpr");
     }
 }
 
-void getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info) {
+void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info) {
     // input to this is:
     // - inst is cudaSetupArgument instruction, with:
     //   - first operand is a value pointing to the value we want to send to the kernel
@@ -248,7 +175,7 @@ void getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info) {
     info->callValuesAsPointers.push_back(alloca);
 }
 
-ostream &operator<<(ostream &os, const PointerInfo &pointerInfo) {
+std::ostream &operator<<(std::ostream &os, const PointerInfo &pointerInfo) {
     os << "PointerInfo(offset=" << pointerInfo.offset << ", type=" << typeDumper.dumpType(pointerInfo.type);
     os << " indices=";
     int i = 0;
@@ -263,7 +190,7 @@ ostream &operator<<(ostream &os, const PointerInfo &pointerInfo) {
     return os;
 }
 
-Instruction *addSetKernelArgInst_int(Instruction *lastInst, Value *value, IntegerType *intType) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst_int(llvm::Instruction *lastInst, llvm::Value *value, llvm::IntegerType *intType) {
     Module *M = lastInst->getModule();
 
     int bitLength = intType->getBitWidth();
@@ -279,7 +206,7 @@ Instruction *addSetKernelArgInst_int(Instruction *lastInst, Value *value, Intege
     } else if(bitLength == 8) {
         mangledName = "_Z16setKernelArgInt8c";
     } else {
-        throw runtime_error("bitlength " + easycl::toString(bitLength) + " not implemented");
+        throw std::runtime_error("bitlength " + easycl::toString(bitLength) + " not implemented");
     }
     Function *setKernelArgInt = cast<Function>(M->getOrInsertFunction(
         mangledName,
@@ -292,7 +219,7 @@ Instruction *addSetKernelArgInst_int(Instruction *lastInst, Value *value, Intege
     return lastInst;
 }
 
-Instruction *addSetKernelArgInst_float(Instruction *lastInst, Value *value) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst_float(llvm::Instruction *lastInst, llvm::Value *value) {
     Module *M = lastInst->getModule();
 
     Function *setKernelArgFloat = cast<Function>(M->getOrInsertFunction(
@@ -305,7 +232,7 @@ Instruction *addSetKernelArgInst_float(Instruction *lastInst, Value *value) {
     return call;
 }
 
-Instruction *addSetKernelArgInst_pointer(Instruction *lastInst, Value *value) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction *lastInst, llvm::Value *value) {
     Module *M = lastInst->getModule();
 
     Type *elementType = value->getType()->getPointerElementType();
@@ -336,7 +263,7 @@ Instruction *addSetKernelArgInst_pointer(Instruction *lastInst, Value *value) {
     return lastInst;
 }
 
-Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *valueAsPointerInstr) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *valueAsPointerInstr) {
     Module *M = lastInst->getModule();
 
     outs() << "got a byvalue struct" << "\n";
@@ -347,7 +274,7 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
     string typeName = valueType->getName().str();
     cout << "typeName [" << typeName << "]" << endl;
     if(typeName == "struct.float4") {
-        return addSetKernelArgInst_pointer(lastInst, valueAsPointerInstr);
+        return PatchHostside::addSetKernelArgInst_pointer(lastInst, valueAsPointerInstr);
     }
 
     unique_ptr<StructInfo> structInfo(new StructInfo());
@@ -418,45 +345,50 @@ Instruction *addSetKernelArgInst_byvaluestruct(Instruction *lastInst, Value *val
         loadgep->insertAfter(lastInst);
         lastInst = loadgep;
 
-        lastInst = addSetKernelArgInst_pointer(lastInst, loadgep);
+        lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, loadgep);
     }
     return lastInst;
 }
 
-Instruction *addSetKernelArgInst(Instruction *lastInst, Value *value, Value *valueAsPointerInstr) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastInst, llvm::Value *value, llvm::Value *valueAsPointerInstr) {
+    /*
+    This figures out the type of the argument, and dispatches appropriately. All arguments pass through this function,
+    including primitives, pointers, structs, ...
+    */
     if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
-        lastInst = addSetKernelArgInst_int(lastInst, value, intType);
+        lastInst = PatchHostside::addSetKernelArgInst_int(lastInst, value, intType);
     } else if(value->getType()->isFloatingPointTy()) {
-        lastInst = addSetKernelArgInst_float(lastInst, value);
+        lastInst = PatchHostside::addSetKernelArgInst_float(lastInst, value);
     } else if(value->getType()->isPointerTy()) {
         // cout << "pointer" << endl;
         Type *elementType = dyn_cast<PointerType>(value->getType())->getPointerElementType();
         if(isa<StructType>(elementType)) {
+            lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, value);
             // cout << "pointer to struct" << endl;
-            lastInst = addSetKernelArgInst_byvaluestruct(lastInst, value);
+            // lastInst = addSetKernelArgInst_byvaluestruct(lastInst, value);
             // lastInst = addSetKernelArgInst_pointerstruct(lastInst, value);
         } else {
             // cout << "pointer to non-struct" << endl;
-            lastInst = addSetKernelArgInst_pointer(lastInst, value);
+            lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, value);
         }
     } else if(isa<StructType>(value->getType())) {
         // cout << "structtype" << endl;
-        lastInst = addSetKernelArgInst_byvaluestruct(lastInst, valueAsPointerInstr);
+        lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, valueAsPointerInstr);
     } else {
         value->dump();
         outs() << "\n";
-        throw runtime_error("kernel arg type type not implemented " + typeDumper.dumpType(value->getType()));
+        throw std::runtime_error("kernel arg type type not implemented " + typeDumper.dumpType(value->getType()));
     }
     return lastInst;
 }
 
-void patchCudaLaunch(Function *F, GenericCallInst *inst, vector<Instruction *> &to_replace_with_zero) {
+void PatchHostside::patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, std::vector<llvm::Instruction *> &to_replace_with_zero) {
     // outs() << "============\n";
     // outs() << "cudaLaunch\n";
 
     Module *M = inst->getModule();
 
-    getLaunchTypes(inst, launchCallInfo.get());
+    PatchHostside::getLaunchTypes(inst, launchCallInfo.get());
     to_replace_with_zero.push_back(inst->getInst());
     outs() << "\n";
     outs() << "patching launch in " << string(F->getName()) << "\n";
@@ -489,7 +421,7 @@ void patchCudaLaunch(Function *F, GenericCallInst *inst, vector<Instruction *> &
     for(auto argit=launchCallInfo->callValuesByValue.begin(); argit != launchCallInfo->callValuesByValue.end(); argit++) {
         Value *value = *argit;
         Value *valueAsPointerInstr = launchCallInfo->callValuesAsPointers[i];
-        lastInst = addSetKernelArgInst(lastInst, value, valueAsPointerInstr);
+        lastInst = PatchHostside::addSetKernelArgInst(lastInst, value, valueAsPointerInstr);
         i++;
     }
     // trigger the kernel...
@@ -506,7 +438,7 @@ void patchCudaLaunch(Function *F, GenericCallInst *inst, vector<Instruction *> &
     // launchCallInfo.reset(new LaunchCallInfo);
 }
 
-void patchFunction(Function *F) {
+void PatchHostside::patchFunction(llvm::Function *F) {
     bool is_main = (string(F->getName().str()) == "main");
     if(is_main) cout << "patching " << F->getName().str() << endl;    
     vector<Instruction *> to_replace_with_zero;
@@ -537,9 +469,9 @@ void patchFunction(Function *F) {
             string calledFunctionName = called->getName();
             // if(is_main && calledFunctionName.find("cuda") != string::npos) cout << "calledfunctionname " << calledFunctionName << endl;
             if(calledFunctionName == "cudaLaunch") {
-                patchCudaLaunch(F, genCallInst.get(), to_replace_with_zero);
+                PatchHostside::patchCudaLaunch(F, genCallInst.get(), to_replace_with_zero);
             } else if(calledFunctionName == "cudaSetupArgument") {
-                getLaunchArgValue(genCallInst.get(), launchCallInfo.get());
+                PatchHostside::getLaunchArgValue(genCallInst.get(), launchCallInfo.get());
                 to_replace_with_zero.push_back(inst);
             }
         }
@@ -565,7 +497,7 @@ void patchFunction(Function *F) {
     }
 }
 
-string getBasename(string path) {
+std::string PatchHostside::getBasename(std::string path) {
     // grab anything after final / ,or whole string
     size_t slash_pos = path.rfind('/');
     if(slash_pos == string::npos) {
@@ -574,11 +506,9 @@ string getBasename(string path) {
     return path.substr(slash_pos + 1);
 }
 
-void patchModule(Module *M) {
-    // ifstream f_incl(::deviceclfilename);
-    // string cl_sourcecode(
-    //     (std::istreambuf_iterator<char>(f_incl)),
-    //     (std::istreambuf_iterator<char>()));
+void PatchHostside::patchModule(Module *M) {
+    // entry point: given Module M, traverse all functions, rewriting the launch instructison to call
+    // into CUDA-on-CL runtime
 
     ifstream f_inll(::devicellfilename);
     string devicell_sourcecode(
@@ -595,7 +525,7 @@ void patchModule(Module *M) {
     for(auto it = M->begin(); it != M->end(); it++) {
         Function *F = &*it;
         string name = F->getName();
-            patchFunction(F);
+            PatchHostside::patchFunction(F);
             verifyFunction(*F);
     }
 }
@@ -625,7 +555,7 @@ int main(int argc, char *argv[]) {
     }
 
     try {
-        patchModule(module.get());
+        PatchHostside::patchModule(module.get());
     } catch(const runtime_error &e) {
         outs() << "exception whilst doing:\n";
         outs() << "reading rawhost ll file " << rawhostfilename << "\n";
