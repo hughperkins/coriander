@@ -137,6 +137,8 @@ cuda-on-cl makes the following relaxations/simplifications:
 
 ## News
 
+- May 18:
+  - Presented CUDA-on-CL at this year's [IWOCL](http://iwocl.org) :-)  Full IWOCL program [here](http://www.iwocl.org/iwocl-2017/conference-program/), and there is a link to my own slides
 - May 5:
   - Eigen unit tests at https://bitbucket.org/hughperkins/eigen/src/75842846799e15f1c26ef6885565d64c3d0a67b2/unsupported/test/cuda-on-cl/?at=eigen-cl pass on Mac Pro 4th Generation with both:
     - Intel HD Graphics 530, and
@@ -148,43 +150,4 @@ cuda-on-cl makes the following relaxations/simplifications:
   - thanks to my employer [ASAPP](http://www.asapp.com/) giving me use of a nice Mac Book Pro 4th Generation, with Radeon Pro 450, unit tests now pass on said hardware :-)
 - April 29:
   - Updated to latest EasyCL. This lets you use environment variable `CL_GPUOFFSET` to choose different gpus, eg set to `1` to use second gpu, to `2` to use third gpu, etc
-- April 15:
-  - added max pooling
-  - added ReLU, sigmoid and tanh activations
-  - added softmax forward
-  - now possible by and large to compile Tal Ben-Nun's [cudnn-training](https://github.com/tbennun/cudnn-training).  It needs some additions to the CMakeLists.txt, see my fork at https://github.com/hughperkins/cudnn-training , [differences here](https://github.com/tbennun/cudnn-training/compare/master...hughperkins:opencl)
-- April 14:
-  - added backwards implementation for convolution, including data, filters, and bias
-- April 13:
-  - added CLBlast wrappers for: sgemv, sscal, saxpy
-- April 4:
-  - merged in current `dnn` branch, which provides forward convolutional implementation for cudnn API, using `im2col` over Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast)
-  - CUDA-on-CL got accepted for a technical presentation at this year's [IWOCL](https://iwocl.org) conference :-)  Conference sessions here: [IWOCL 2017 Conference program](www.iwocl.org/iwocl-2017/conference-program/)
-- Nov 25:
-  - created release 4.0.4:
-    - all current Eigen tests, https://bitbucket.org/hughperkins/eigen/src/eigen-cl/unsupported/test/cuda-on-cl/?at=eigen-cl , pass for me currently, using this release, on both beignet 1.2.1, on hd5500, and on NVIDIA 940M, using driver 367.57
-    - fixes some issues with walk-dependency order during cl walk/generation
-    - fixed an issue with un-initialized pointers, in structs passed as kernel parameters, into GPU kernels
-- Nov 24:
-  - merge from branch clwriter:
-    - lots of refactorization under-the-hood
-    - can handle determining the address-space of functions returning pointers
-    - opencl generation is at runtime now => facilitates determining address-space; and counter-intuitively is actually faster, because less OpenCL to compile by the GPU driver
-- Nov 18:
-  - Mac build working :-)  https://travis-ci.org/hughperkins/cuda-on-cl/builds/176997220#L1356
-- Nov 17:
-  - merged `runtime-compile` branch into `master` branch.  This brings a few changes:
-    - opencl generation is now at runtime, rather than at compile time
-      - this lets us build only the one specific kernel we need
-      - means more information is available at generation time, facilitating the generation process
-    - build on Mac OS X is more or less working, eg https://travis-ci.org/hughperkins/cuda-on-cl/builds/176580716
-    - code radically refactorized underneath
-    - remove `--run_branch_transforms`, `--branches_as_switch`, for now
-- Nov 8:
-  - ~~exposed generation options as `cocl` options, eg `--run_branching_transforms`, `--branches_as_switch`, and the `--devicell-opt [opt]` options~~
-- Nov 6:
-  - created dockerfiles for Beignet and NVIDIA [docker](docker)
-- Nov 5:
-  - switched from `Makefile` to `CMakeLists.txt` => build/install instructions have changed, see above
-  - added a `cmake` file, so you can easily add `cocl` to your cmakelists file, eg see https://bitbucket.org/hughperkins/eigen/src/d84b9f44f924e36a8527e66a46a189395f046d21/unsupported/test/cuda-on-cl/CMakeLists.txt?at=eigen-cl&fileviewer=file-view-default for an example
 - [Older news](doc/news.md)
