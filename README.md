@@ -49,7 +49,7 @@ hostFloats[2] 444
 
 ## How CUDA-on-CL works
 
-<img src="doc/img/howitworks_kernelcompilation.png?raw=true" />
+<img src="doc/img/howitworks_kernelcompilation.png?raw=true" width="600" />
 
 <img src="doc/img/howitworks_compiletime.png?raw=true" />
 
