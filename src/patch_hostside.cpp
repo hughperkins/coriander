@@ -196,15 +196,11 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_int(llvm::Instruction *las
     int bitLength = intType->getBitWidth();
     string mangledName = "";
     if(bitLength == 32) {
-        mangledName = "_Z17setKernelArgInt32i";
+        mangledName = "setKernelArgInt32";
     } else if(bitLength == 64) {
-        #ifdef __APPLE__
-        mangledName = "_Z17setKernelArgInt64x";
-        #else
-        mangledName = "_Z17setKernelArgInt64l";
-        #endif
+        mangledName = "setKernelArgInt64";
     } else if(bitLength == 8) {
-        mangledName = "_Z16setKernelArgInt8c";
+        mangledName = "setKernelArgInt8";
     } else {
         throw std::runtime_error("bitlength " + easycl::toString(bitLength) + " not implemented");
     }
@@ -223,7 +219,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_float(llvm::Instruction *l
     Module *M = lastInst->getModule();
 
     Function *setKernelArgFloat = cast<Function>(M->getOrInsertFunction(
-        "_Z17setKernelArgFloatf",
+        "setKernelArgFloat",
         Type::getVoidTy(context),
         Type::getFloatTy(context),
         NULL));
@@ -251,7 +247,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction 
     int32_t elementSize = allocSize;
 
     Function *setKernelArgFloatStar = cast<Function>(M->getOrInsertFunction(
-        "_Z20setKernelArgCharStarPci",
+        "setKernelArgCharStar",
         Type::getVoidTy(context),
         PointerType::get(IntegerType::get(context, 8), 0),
         IntegerType::get(context, 32),
@@ -292,7 +288,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
     // outs() << "pointerfree typeallocsize " << allocSize << "\n";
 
     Function *setKernelArgStruct = cast<Function>(M->getOrInsertFunction(
-        "_Z18setKernelArgStructPci",
+        "setKernelArgStruct",
         Type::getVoidTy(context),
         PointerType::get(IntegerType::get(context, 8), 0),
         IntegerType::get(context, 32),
@@ -426,7 +422,7 @@ void PatchHostside::patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, st
     }
     // trigger the kernel...
     Function *kernelGo = cast<Function>(F->getParent()->getOrInsertFunction(
-        "_Z8kernelGov",
+        "kernelGo",
         Type::getVoidTy(context),
         NULL));
     CallInst *kernelGoInst = CallInst::Create(kernelGo);
