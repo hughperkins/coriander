@@ -7,11 +7,11 @@ Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 - leave applications in NVIDIA® CUDA™
 - compile into OpenCL 1.2
 
-## How to use, example
+## How to use
 
-- write an NVIDIA® CUDA™ sourcecode file, or find an existing one
+- Write an NVIDIA® CUDA™ sourcecode file, or find an existing one
 - Let's use [cuda_sample.cu](https://github.com/hughperkins/cuda-on-cl/blob/76a849d9510276bc67167c9a7676d64ff04c3e4a/test/cuda_sample.cu)
-- Compile, using new `cocl` command:
+- Compile, using `cocl`:
 ```
 $ cocl cuda_sample.cu
    ...
@@ -46,7 +46,7 @@ hostFloats[2] 444
   - activations: ReLU, tanh, sigmoid
   - softmax forward
 
-## How it works
+## How CUDA-on-CL works
 
 <img src="doc/img/howitworks_kernelcompilation.png?raw=true" />
 
