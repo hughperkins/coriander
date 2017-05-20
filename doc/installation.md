@@ -1,6 +1,6 @@
 # Installation
 
-To use CUDA-on-CL, you need to build from source:
+To use CUDA-on-CL, please build from source:
 
 ## Mac OS X pre-requisites
 
