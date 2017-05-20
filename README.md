@@ -6,6 +6,7 @@ Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 
 - leave applications in NVIDIA® CUDA™
 - compile into OpenCL 1.2
+- run on any OpenCL 1.2 GPU
 
 ## How to use
 
