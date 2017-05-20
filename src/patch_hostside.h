@@ -179,6 +179,9 @@ public:
     // setKernelArgGpuBuffer function, rather than the setKernelArgHostsideBuffer
     // but it still needs to walk the struct, at patching time, compile time, and add calls to pass any pointers
     // in the struct through too
+    // hmmmm. actually. I think we'll forbid pointers in gpuside structs for now. unless we have to
+    // why? because, how are we going to get those pointers, if they're stored on the gpu :-P
+    // like, how are we going to clone it, first issue.  Possible to to do, but a bunch of work, unless we have to
     static llvm::Instruction *addSetKernelArgInst_pointerstruct(llvm::Instruction *lastInst, llvm::Value *structPointer);
 
     // all setKernelArgs pass through addSetKernelArgInst, which dispatches to other functions

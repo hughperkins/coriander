@@ -229,13 +229,27 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_float(llvm::Instruction *l
 }
 
 llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction *lastInst, llvm::Value *value) {
-    Module *M = lastInst->getModule();
+    cout << "lastInst:" << endl;
+    lastInst->dump();
+    cout << endl;
+    cout << "lastInst M " << lastInst->getModule() << endl;
+    // cout << "value M " << value->getType()->getModule() << endl;
 
-    Type *elementType = value->getType()->getPointerElementType();
-    cout << "addSetKernelArgInst_pointer elementType:" << endl;
-    elementType->dump();
+    cout << "getting M" << endl;
+    Module *M = lastInst->getModule();
+    cout << "M=" << M << endl;
+
+    value->dump();
+    cout << endl;
+
+    Type *elementType = cast<PointerType>(value->getType())->getPointerElementType();
+    // cout << "addSetKernelArgInst_pointer elementType:" << endl;
+    // elementType->dump();
     // we can probably generalize these to all just send as a pointer to char
     // we'll need to cast them somehow first
+    cout << "got elementtype" << endl;
+    elementType->dump();
+    cout << endl;
 
     BitCastInst *bitcast = new BitCastInst(value, PointerType::get(IntegerType::get(context, 8), 0));
     bitcast->insertAfter(lastInst);
@@ -262,10 +276,27 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction 
 llvm::Instruction *PatchHostside::addSetKernelArgInst_pointerstruct(llvm::Instruction *lastInst, llvm::Value *structPointer) {
     // what this will need to do is:
     // - create a call to pass the gpu buffer, that contains the struct, to hostside_opencl_funcs, at runtime
-    // - if the struct contains pointers, then add appropriate calls to pass those at runtime too
+    // ~~- if the struct contains pointers, then add appropriate calls to pass those at runtime too~~
+    // update: we're going to forbid gpuside buffers containing pointers, for now
 
     // lets deal with the gpuside buffer first, that should be fairly easy-ish:
     lastInst = addSetKernelArgInst_pointer(lastInst, structPointer);
+
+    // we'd better at least assert or something, if there are pointers in the struct
+    Module *M = lastInst->getModule();
+    StructType *structType = cast<StructType>(cast<PointerType>(structPointer->getType())->getPointerElementType());
+    unique_ptr<StructInfo> structInfo(new StructInfo());
+    StructCloner::walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", structType);
+    bool structHasPointers = structInfo->pointerInfos.size() > 0;
+    if(structHasPointers) {
+        cout << "ERROR: CUDA-on-CL currently forbids pointers inside gpu-side structs, passed into kernels" << endl;
+        cout << "If you need this, please create an issue at https://github.com/hughperkins/cuda-on-cl/issues" << endl;
+        cout << "Note that it's pretty hard to do though" << endl;
+        structPointer->dump();
+        cout << endl;
+        throw std::runtime_error("ERROR: CUDA-on-CL currently forbids pointers inside gpu-side structs, passed into kernels");
+    }
+    return lastInst;
 }
 
 llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *structPointer) {
@@ -290,7 +321,6 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
 
     unique_ptr<StructInfo> structInfo(new StructInfo());
     StructCloner::walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", structType);
-
     bool structHasPointers = structInfo->pointerInfos.size() > 0;
 
     // StructType *structType = cast<StructType>(valueType);
@@ -337,6 +367,8 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
     call->dump();
     lastInst = call;
 
+    // now we have to handle any pointers, send those through too
+
     // outs() << "pointers in struct:" << "\n";
     for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
         cout << "   passing a pointer, from the struct" << endl;
@@ -377,7 +409,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
             // lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, value);
             // cout << "pointer to struct" << endl;
             // lastInst = addSetKernelArgInst_byvaluestruct(lastInst, value);
-            lastInst = addSetKernelArgInst_pointerstruct(lastInst, value);
+            lastInst = PatchHostside::addSetKernelArgInst_pointerstruct(lastInst, value);
         } else {
             // cout << "pointer to non-struct" << endl;
             lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, value);
@@ -398,6 +430,7 @@ void PatchHostside::patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, st
     // outs() << "cudaLaunch\n";
 
     Module *M = inst->getModule();
+    cout << "M " << M << endl;
 
     PatchHostside::getLaunchTypes(inst, launchCallInfo.get());
     to_replace_with_zero.push_back(inst->getInst());
