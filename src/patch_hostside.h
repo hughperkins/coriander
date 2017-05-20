@@ -184,6 +184,8 @@ public:
     // like, how are we going to clone it, first issue.  Possible to to do, but a bunch of work, unless we have to
     static llvm::Instruction *addSetKernelArgInst_pointerstruct(llvm::Instruction *lastInst, llvm::Value *structPointer);
 
+    static llvm::Instruction *addSetKernelArgInst_byvaluevector(llvm::Instruction *lastInst, llvm::Value *structPointer);
+
     // all setKernelArgs pass through addSetKernelArgInst, which dispatches to other functions
     static llvm::Instruction *addSetKernelArgInst(llvm::Instruction *lastInst, llvm::Value *value, llvm::Value *valueAsPointerInstr);
 

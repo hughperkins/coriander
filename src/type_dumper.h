@@ -39,6 +39,7 @@ public:
     std::string dumpStructType(llvm::StructType *type);
     std::string dumpAddressSpace(llvm::Type *type);
     std::string dumpArrayType(llvm::ArrayType *type, bool decayArraysToPointer = false);
+    std::string dumpVectorType(llvm::VectorType *type, bool decayArraysToPointer = false);
 
     std::string dumpStructDefinitions();
     std::string dumpStructDefinition(llvm::StructType *type, std::string name);

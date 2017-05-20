@@ -153,6 +153,28 @@ std::string TypeDumper::dumpArrayType(ArrayType *type, bool decayArraysToPointer
     }
 }
 
+std::string TypeDumper::dumpVectorType(VectorType *vectorType, bool decayArraysToPointer) {
+    int elementCount = vectorType->getNumElements();
+    Type *elementType = vectorType->getElementType();
+    // cout << "TypeDumper::dumpVectorType count=" << elementCount << " type=" << dumpType(elementType) << endl;
+    if(elementType->getPrimitiveSizeInBits() == 0) {
+        cout << endl;
+        vectorType->dump();
+        cout << endl;
+        throw runtime_error("TypeDumper::dumpVectorType: not implemented for non-primitive types");
+    }
+    ostringstream oss;
+    oss << dumpType(elementType);
+    if(decayArraysToPointer) {
+        oss << "*";
+    } else {
+        oss << "[" << elementCount << "]";
+    }
+    cout << oss.str();
+    return oss.str();
+    // return dumpType(elementType);
+}
+
 std::string TypeDumper::dumpFunctionType(FunctionType *fn) {
     // throw runtime_error("not implemented");
     // // outs() << "function" << "\n";
@@ -175,30 +197,47 @@ std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {
     switch(typeID) {
         case Type::VoidTyID:
             return "void";
+
         case Type::FloatTyID:
             return "float";
+
         // case Type::UnionTyID:
         //     throw runtime_error("not implemented: union type");
+
         case Type::StructTyID:
             return dumpStructType(cast<StructType>(type));
+
         case Type::VectorTyID:
-            throw runtime_error("not implemented: vector type");
+            return dumpVectorType(cast<VectorType>(type));
+            // cout << endl;
+            // type->dump();
+            // cout << endl;
+            // throw runtime_error("TypeDumper::dumpType(...): not implemented: vector type");
+
         case Type::ArrayTyID:
             return dumpArrayType(cast<ArrayType>(type), decayArraysToPointer);
+
         case Type::DoubleTyID:
             if(forceSingle) {
                 return "float";
             }
             return "double";
+
         case Type::FunctionTyID:
             return dumpFunctionType(cast<FunctionType>(type));
+
         case Type::PointerTyID:
             return dumpPointerType(cast<PointerType>(type), decayArraysToPointer);
+
         case Type::IntegerTyID:
             return dumpIntegerType(cast<IntegerType>(type));
+
         default:
             outs() << "type id " << typeID << "\n";
-            throw runtime_error("unrecognized type");
+            cout << endl;
+            type->dump();
+            cout << endl;
+            throw runtime_error("TypeDumper::dumpType(...): unrecognized type");
     }
 }
 

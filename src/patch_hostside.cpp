@@ -229,27 +229,27 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_float(llvm::Instruction *l
 }
 
 llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction *lastInst, llvm::Value *value) {
-    cout << "lastInst:" << endl;
-    lastInst->dump();
-    cout << endl;
-    cout << "lastInst M " << lastInst->getModule() << endl;
+    // cout << "lastInst:" << endl;
+    // lastInst->dump();
+    // cout << endl;
+    // cout << "lastInst M " << lastInst->getModule() << endl;
     // cout << "value M " << value->getType()->getModule() << endl;
 
-    cout << "getting M" << endl;
+    // cout << "getting M" << endl;
     Module *M = lastInst->getModule();
-    cout << "M=" << M << endl;
+    // cout << "M=" << M << endl;
 
-    value->dump();
-    cout << endl;
+    // value->dump();
+    // cout << endl;
 
     Type *elementType = cast<PointerType>(value->getType())->getPointerElementType();
     // cout << "addSetKernelArgInst_pointer elementType:" << endl;
     // elementType->dump();
     // we can probably generalize these to all just send as a pointer to char
     // we'll need to cast them somehow first
-    cout << "got elementtype" << endl;
-    elementType->dump();
-    cout << endl;
+    // cout << "got elementtype" << endl;
+    // elementType->dump();
+    // cout << endl;
 
     BitCastInst *bitcast = new BitCastInst(value, PointerType::get(IntegerType::get(context, 8), 0));
     bitcast->insertAfter(lastInst);
@@ -257,7 +257,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction 
 
     const DataLayout *dataLayout = &M->getDataLayout();
     int allocSize = dataLayout->getTypeAllocSize(elementType);
-    cout << "allocsize " << allocSize << endl;
+    // cout << "allocsize " << allocSize << endl;
     int32_t elementSize = allocSize;
 
     Function *setKernelArgGpuBuffer = cast<Function>(M->getOrInsertFunction(
@@ -299,6 +299,62 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointerstruct(llvm::Instru
     return lastInst;
 }
 
+llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluevector(llvm::Instruction *lastInst, llvm::Value *vectorPointer) {
+    // so, lets assume its just a hostside blob, that we need to send deviceside, as a blob
+    // we should thus find out the blob size
+    // we'll need:
+    // - element count
+    // - element size
+
+    VectorType *vectorType = cast<VectorType>(cast<PointerType>(vectorPointer->getType())->getPointerElementType());
+    // outs() << "vectorType:\n";
+    // vectorType->dump();
+
+    // VectorType *vectorType = cast<VectorType>(vectorPointer->getType());
+    // vectorType->dump();
+    // cout << endl;
+    int elementCount = vectorType->getNumElements();
+    Type *elementType = vectorType->getElementType();
+    int elementSizeBytes = elementType->getPrimitiveSizeInBits() / 8;
+    // cout << "PatchHostside::addSetKernelArgInst_byvaluevector count=" << elementCount <<
+    //     " elementsizebytes=" << elementSizeBytes << " type=" <<  endl;
+    // elementType->dump();
+    // cout << endl;
+    if(elementType->getPrimitiveSizeInBits() == 0) {
+        cout << endl;
+        vectorType->dump();
+        cout << endl;
+        throw runtime_error("PatchHostside::addSetKernelArgInst_byvaluevector: not implemented for non-primitive types");
+    }
+
+    int allocSize = elementSizeBytes * elementCount;
+
+    Module *M = lastInst->getModule();
+
+    BitCastInst *bitcast = new BitCastInst(vectorPointer, PointerType::get(IntegerType::get(context, 8), 0));
+    bitcast->insertAfter(lastInst);
+    lastInst = bitcast;
+
+    Value *args[2];
+    args[0] = bitcast;
+    args[1] = createInt32Constant(&context, allocSize);
+
+    Function *setKernelArgHostsideBuffer = cast<Function>(M->getOrInsertFunction(
+        "setKernelArgHostsideBuffer",
+        Type::getVoidTy(context),
+        PointerType::get(IntegerType::get(context, 8), 0),
+        IntegerType::get(context, 32),
+        NULL));
+
+    // cout << "adding setKernelArgHostsideBuffer call" << endl;
+    CallInst *call = CallInst::Create(setKernelArgHostsideBuffer, ArrayRef<Value *>(args));
+    call->insertAfter(lastInst);
+    // call->dump();
+    lastInst = call;
+
+    return lastInst;
+}
+
 llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *structPointer) {
     //
     // what this is going to do is:
@@ -308,13 +364,13 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
 
     Module *M = lastInst->getModule();
 
-    outs() << "got a byvalue struct" << "\n";
+    // outs() << "got a byvalue struct" << "\n";
 
     StructType *structType = cast<StructType>(cast<PointerType>(structPointer->getType())->getPointerElementType());
-    outs() << "structType:\n";
-    structType->dump();
+    // outs() << "structType:\n";
+    // structType->dump();
     string typeName = structType->getName().str();
-    cout << "typeName [" << typeName << "]" << endl;
+    // cout << "typeName [" << typeName << "]" << endl;
     if(typeName == "struct.float4") {
         return PatchHostside::addSetKernelArgInst_pointer(lastInst, structPointer);
     }
@@ -338,11 +394,11 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
         alloca->insertAfter(lastInst);
         lastInst = alloca;
 
-        cout << "struct has pointers, so cloning" << endl;
+        // cout << "struct has pointers, so cloning" << endl;
         lastInst = structCloner.createHostsideIrCopyPtrfullToNoptr(lastInst, structType, structPointer, alloca);
         sourceStruct = alloca;
     } else {
-        cout << "struct does not have pointers, no need to clone" << endl;
+        // cout << "struct does not have pointers, no need to clone" << endl;
         sourceStruct = structPointer;
     }
 
@@ -361,17 +417,17 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
         IntegerType::get(context, 32),
         NULL));
 
-    cout << "adding setKernelArgHostsideBuffer call" << endl;
+    // cout << "adding setKernelArgHostsideBuffer call" << endl;
     CallInst *call = CallInst::Create(setKernelArgHostsideBuffer, ArrayRef<Value *>(args));
     call->insertAfter(lastInst);
-    call->dump();
+    // call->dump();
     lastInst = call;
 
     // now we have to handle any pointers, send those through too
 
     // outs() << "pointers in struct:" << "\n";
     for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
-        cout << "   passing a pointer, from the struct" << endl;
+        // cout << "   passing a pointer, from the struct" << endl;
         PointerInfo *pointerInfo = pointerit->get();
         vector<Value *> indices;
         indices.push_back(createInt32Constant(&context, 0));
@@ -417,6 +473,15 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
     } else if(isa<StructType>(value->getType())) {
         // cout << "structtype" << endl;
         lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, valueAsPointerInstr);
+    } else if(isa<VectorType>(value->getType())) {
+        // cout << "got vector arg type" << endl;
+        // value->dump();
+        // cout << endl;
+        // value->getType()->dump();
+        // cout << endl;
+        // so, this is byval, thus hostside?
+        // so send it as a hostside buffer?
+        lastInst = PatchHostside::addSetKernelArgInst_byvaluevector(lastInst, valueAsPointerInstr);
     } else {
         value->dump();
         outs() << "\n";
@@ -430,12 +495,12 @@ void PatchHostside::patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, st
     // outs() << "cudaLaunch\n";
 
     Module *M = inst->getModule();
-    cout << "M " << M << endl;
+    // cout << "M " << M << endl;
 
     PatchHostside::getLaunchTypes(inst, launchCallInfo.get());
     to_replace_with_zero.push_back(inst->getInst());
-    outs() << "\n";
-    outs() << "patching launch in " << string(F->getName()) << "\n";
+    // outs() << "\n";
+    // outs() << "patching launch in " << string(F->getName()) << "\n";
 
     string kernelName = launchCallInfo->kernelName;
     Instruction *kernelNameValue = addStringInstr(M, "s_" + ::devicellcode_stringname + "_" + kernelName, kernelName);

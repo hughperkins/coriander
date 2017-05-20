@@ -225,44 +225,6 @@ void teststructbyvalNoPtr() {
     cuStreamDestroy(stream);
 }
 
-// __global__ void kernel_struct2byval_noptrs(struct Struct_fpNoPtr mystruct1, float *out) {
-//     if(threadIdx.x == 0) {
-//     out[0] = mystruct1.p1;
-//     out[1] = mystruct1.p2;
-//     }
-// }
-
-// void teststruct2byvalNoPtr() {
-//     int N = 1024;
-
-//     CUstream stream;
-//     cuStreamCreate(&stream, 0);
-
-//     float *hostFloats1;
-//     cuMemHostAlloc((void **)&hostFloats1, N * sizeof(float), CU_MEMHOSTALLOC_PORTABLE);
-
-//     CUdeviceptr gpuFloats1;
-//     cuMemAlloc(&gpuFloats1, N * sizeof(float));
-//     cuMemcpyHtoDAsync((CUdeviceptr)(((float *)gpuFloats1)), hostFloats1, N * sizeof(float), stream);
-
-//     struct Struct_fpNoPtr mystruct1 = {8.0f, 9.0f};
-
-//     kernel_struct2byval_noptrs<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(mystruct1, (float *)gpuFloats1);
-//     cuMemcpyDtoHAsync(hostFloats1, gpuFloats1, N * sizeof(float), stream);
-//     cuStreamSynchronize(stream);
-
-//     cout << hostFloats1[0] << endl;
-//     cout << hostFloats1[1] << endl;
-
-//     assert(hostFloats1[0] == 8);
-//     assert(hostFloats1[1] == 9);
-
-//     cuMemFreeHost(hostFloats1);
-//     cuMemFree(gpuFloats1);
-
-//     cuStreamDestroy(stream);
-// }
-
 __global__ void kernel_twostructs_noptrs(struct Struct_2floats *mystruct, struct Struct_1float *mystruct2, struct Struct_1float mystruct3, float *out) {
     if(threadIdx.x == 0) {
     out[0] = mystruct->f1;
@@ -319,6 +281,42 @@ void test_twostructs_byptr_NoPtr() {
     cuStreamDestroy(stream);
 }
 
+__global__ void kernel_struct2byval_noptrs(struct Struct_2floats mystruct1, float *out) {
+    if(threadIdx.x == 0) {
+    out[0] = mystruct1.f1;
+    out[1] = mystruct1.f2;
+    }
+}
+
+void teststruct2byvalNoPtr() {
+    int N = 1024;
+
+    CUstream stream;
+    cuStreamCreate(&stream, 0);
+
+    float *hostFloats1 = new float[N];
+
+    float *gpuFloats1;
+    cudaMalloc((void**)(&gpuFloats1), N * sizeof(float));
+
+    struct Struct_2floats mystruct1 = {8.0f, 9.0f};
+
+    kernel_struct2byval_noptrs<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(mystruct1, (float *)gpuFloats1);
+    cudaMemcpy(hostFloats1, gpuFloats1, 4 * sizeof(float), cudaMemcpyDeviceToHost);
+    cuStreamSynchronize(stream);
+
+    cout << hostFloats1[0] << endl;
+    cout << hostFloats1[1] << endl;
+
+    assert(hostFloats1[0] == 8);
+    assert(hostFloats1[1] == 9);
+
+    delete[] hostFloats1;
+    cudaFree(gpuFloats1);
+
+    cuStreamDestroy(stream);
+}
+
 int main(int argc, char *argv[]) {
     cout << "\ntestvaluestruct" << endl;
     testbyvaluestruct();
@@ -329,14 +327,14 @@ int main(int argc, char *argv[]) {
     cout << "\ntesttwostructs" << endl;
     testtwostructs();
 
-    // cout << "\teststruct2byvalNoPtr" << endl;
-    // teststruct2byvalNoPtr();
-
     cout << "\teststructbyvalNoPtr" << endl;
     teststructbyvalNoPtr();
 
     cout << "\ntest_twostructs_byptr_NoPtr" << endl;
     test_twostructs_byptr_NoPtr();
+
+    cout << "\teststruct2byvalNoPtr" << endl;
+    teststruct2byvalNoPtr();
 
     return 0;
 }
