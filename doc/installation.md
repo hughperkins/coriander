@@ -1,9 +1,6 @@
 # Installation
 
-To use CUDA-on-CL, you need to build from source please. Dont worry: it is quite quick and easy. There is one dependency really, which is clang/llvm-3.8.
-Other than that, the installation is quite quick, self-contained (seconds/minutes to build). CUDA-on-CL uses [CLBlast](https://github.com/cnugeteren/CLBlast)
-to provide GEMM, GEMV, and to implementat convolutions. However, the source-code for this should be cloned automatically, when you clone CUDA-on-CL,
-and the build is handled automatically by CUDA-on-CL build, so should be fairly painless :-)
+To use CUDA-on-CL, you need to build from source:
 
 ## Mac OS X pre-requisites
 
