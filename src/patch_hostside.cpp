@@ -288,7 +288,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
     // outs() << "pointerfree typeallocsize " << allocSize << "\n";
 
     Function *setKernelArgStruct = cast<Function>(M->getOrInsertFunction(
-        "setKernelArgStruct",
+        "setKernelArgByValueStruct",
         Type::getVoidTy(context),
         PointerType::get(IntegerType::get(context, 8), 0),
         IntegerType::get(context, 32),

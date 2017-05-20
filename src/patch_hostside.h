@@ -153,11 +153,25 @@ public:
     //
     // the corresponding hostside_opencl_funcs method is:
     //    setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize)
+    //
+    // The hostside_opencl_funcs method needs no information other than the (virtual) pointer really
+    // currently we are providing the elementsize too, to mitigate against a crash on beignet, but I might
+    // remove that, whilst I get Mac radeon working :-P (since structs might not have useful element sizes)
     static llvm::Instruction *addSetKernelArgInst_pointer(llvm::Instruction *lastInst, llvm::Value *value);
 
     // this will add bytecode to pass a pointer to the cpu-side struct object to hostside_opencl_funcs, at runtime
     // the entry point into hostside_opencl_funcs will be:
-    // hostside_opencl_funcs
+    //     setKernelArgStruct(char *pCpuStruct, int structAllocateSize)
+    //
+    // this expects to receive a host-side allocated struct
+    //
+    // what this method will do is:
+    // - allocate a gpu buffer
+    // - queue an opencl command, to copy the host-side struct into the gpu buffer
+    // - add the clmem, and a zero-offset, to the list of kernel parameters
+    //
+    // Note that the method needs no information on the structure of the struct, that will be handled later on, during
+    // opencl generation, not using any struct information from this call (which we arent providing anyway)
     static llvm::Instruction *addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *valueAsPointerInstr);
 
     // all setKernelArgs pass through addSetKernelArgInst, which dispatches to other functions

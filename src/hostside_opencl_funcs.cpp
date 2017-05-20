@@ -487,7 +487,24 @@ void addClmemArg(cl_mem clmem) {
     // cout << ""
 }
 
-void setKernelArgStruct(char *pCpuStruct, int structAllocateSize) {
+void setKernelArgByValueStruct(char *pCpuStruct, int structAllocateSize) {
+    // this receives a hostside struct. it will
+    // - allocate a gpu buffer, to hold the struct
+    // - queue an OpenCL command, to copy the hostside buffer to the gpu buffer
+    // - adds the gpu buffer, and its offset, to the kernel parameters:
+    //   - add the gpu buffer to list of unique clmems (if not already there)
+    //   - records the unique clmem index, for use in generation
+    //   - adds an integer arg, with value 0, as the offset arg
+    //
+    // Things this doesnt do:
+    // - parse/walk the struct (thats handled during opencl generation, later on, not here)
+    //
+    // Things this does definitely need:
+    // - struct allocate size, so we know how big to make the gpu buffer, and how much
+    //   data to copy across, from the hostside struct pointer location
+    // - we wont add the clmem to the virtualmem table, so we wont delegate
+    //   anything to the more generic setKernelArgCharStar method
+
     // COCL_PRINT(cout << "locking launch mutex " << (void *)getThreadVars() << endl);
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "...lcoked launch mutex " << (void *)getThreadVars() << endl);
