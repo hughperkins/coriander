@@ -89,6 +89,12 @@ You can open the `-device.cl` file to look at the OpenCL generated, and compare 
 
 ## How it works
 
+<img src="doc/img/howitworks_kernelcompilation.png?raw=true" />
+
+<img src="doc/img/howitworks_compiletime.png?raw=true" />
+
+<img src="doc/img/howitworks_runtime.png?raw=true" />
+
 Slides on the IWOCL website, [here](http://www.iwocl.org/wp-content/uploads/iwocl2017-hugh-perkins-cuda-cl.pdf)
 
 ## How to build
