@@ -51,6 +51,12 @@ You're good.  If you want you can run some tests:
 - change `BUILD_TESTS` to `ON`, press `c`, press `g`
 - `make run-tests`
 
+You can select the GPU using the environment variable `CL_GPUOFFSET`. For example, on a Macbook Pro 4th generation, to run on the Radeon:
+```
+CL_GPUOFFSET=1 make run-tests
+```
+(This is important, since the HD530 isnt quite working, on SGEMM currently. But the Radeon runs just fine :-) )
+
 Note that you'll need to continue to export `CLANG_HOME` environment variable when using `cocl`.
 
 ## Docker
