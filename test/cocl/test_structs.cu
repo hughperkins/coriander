@@ -86,12 +86,12 @@ void testbyvaluestruct() {
     cuStreamDestroy(stream);
 }
 
-struct GpusideStruct {
+struct Struct_2floats {
     float f1;
     float f2;
 };
 
-__global__ void struct_aspointer(struct GpusideStruct *mystruct, float *out) {
+__global__ void struct_aspointer(struct Struct_2floats *mystruct, float *out) {
     out[0] = mystruct->f1;
     out[1] = mystruct->f2;
 }
@@ -107,8 +107,8 @@ void testaspointerstruct() {
     float *gpuOut;
     cudaMalloc((void**)(&gpuOut), N * sizeof(float));
 
-    struct GpusideStruct mystruct = { 5, 7 };
-    struct GpusideStruct *gpu_mystruct;
+    struct Struct_2floats mystruct = { 5, 7 };
+    struct Struct_2floats *gpu_mystruct;
     cudaMalloc((void**)(&gpu_mystruct), sizeof(mystruct));
     cudaMemcpy(gpu_mystruct, &mystruct, sizeof(mystruct), cudaMemcpyHostToDevice);
 
@@ -184,11 +184,11 @@ void testaspointerstruct() {
 //     cuStreamDestroy(stream);
 // }
 
-// struct MyStructNoPtr {
-//     float p1;
-// };
+struct Struct_1float {
+    float f1;
+};
 
-// __global__ void kernel_structbyval_noptrs(struct MyStructNoPtr mystruct1, float *out) {
+// __global__ void kernel_structbyval_noptrs(struct Struct_1float mystruct1, float *out) {
 //     if(threadIdx.x == 0) {
 //         out[0] = mystruct1.p1;
 //         out[1] = 5;
@@ -206,7 +206,7 @@ void testaspointerstruct() {
 //     float *gpuFloats1;
 //     cudaMalloc((void**)(&gpuFloats1), N * sizeof(float));
 
-//     struct MyStructNoPtr mystruct1 = {8.0f};
+//     struct Struct_1float mystruct1 = {8.0f};
 
 //     kernel_structbyval_noptrs<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(mystruct1, (float *)gpuFloats1);
 
@@ -223,11 +223,6 @@ void testaspointerstruct() {
 
 //     cuStreamDestroy(stream);
 // }
-
-// struct MyStruct2NoPtr {
-//     float p1;
-//     float p2;
-// };
 
 // __global__ void kernel_struct2byval_noptrs(struct MyStruct2NoPtr mystruct1, float *out) {
 //     if(threadIdx.x == 0) {
@@ -267,49 +262,61 @@ void testaspointerstruct() {
 //     cuStreamDestroy(stream);
 // }
 
-// __global__ void kernel_twostructs_noptrs(struct MyStruct2NoPtr *mystruct, struct MyStructNoPtr *mystruct2, struct MyStructNoPtr mystruct3, float *out) {
-//     if(threadIdx.x == 0) {
-//     out[0] = mystruct->p1;
-//     out[1] = mystruct->p2;
-//     out[2] = mystruct2->p1;
-//     out[3] = mystruct3.p1;
-//     }
-// }
+__global__ void kernel_twostructs_noptrs(struct Struct_2floats *mystruct, struct Struct_1float *mystruct2, struct Struct_1float mystruct3, float *out) {
+    if(threadIdx.x == 0) {
+    out[0] = mystruct->f1;
+    out[1] = mystruct->f2;
+    out[2] = mystruct2->f1;
+    out[3] = mystruct3.f1;
+    }
+}
 
-// void testtwostructsNoPtr() {
-//     int N = 1024;
+void test_twostructs_byptr_NoPtr() {
+    int N = 1024;
 
-//     CUstream stream;
-//     cuStreamCreate(&stream, 0);
+    CUstream stream;
+    cuStreamCreate(&stream, 0);
 
-//     float *hostFloats1 = new float[N];
+    float *hostFloats1 = new float[N];
 
-//     float *gpuFloats1;
-//     cudaMalloc((void**)(&gpuFloats1), N * sizeof(float));
+    float *gpuFloats1;
+    cudaMalloc((void**)(&gpuFloats1), N * sizeof(float));
 
-//     struct MyStruct2NoPtr mystruct = {5.0f, 6.0f};
-//     struct MyStructNoPtr mystruct2 = {7.0f};
-//     struct MyStructNoPtr mystruct3 = {8.0f};
+    struct Struct_2floats mystruct = {5.0f, 6.0f};
+    struct Struct_1float mystruct2 = {7.0f};
+    struct Struct_1float mystruct3 = {8.0f};
 
-//     kernel_twostructs_noptrs<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(&mystruct, &mystruct2, mystruct3, (float *)gpuFloats1);
-//     cudaMemcpy(hostFloats1, gpuFloats1, 4 * sizeof(float), cudaMemcpyDeviceToHost);
-//     cuStreamSynchronize(stream);
+    struct Struct_2floats *gpu_mystruct;
+    cudaMalloc((void**)(&gpu_mystruct), sizeof(mystruct));
+    cudaMemcpy(gpu_mystruct, &mystruct, sizeof(mystruct), cudaMemcpyHostToDevice);
 
-//     cout << hostFloats1[0] << endl;
-//     cout << hostFloats1[1] << endl;
-//     cout << hostFloats1[2] << endl;
-//     cout << hostFloats1[3] << endl;
+    struct Struct_1float *gpu_mystruct2;
+    cudaMalloc((void**)(&gpu_mystruct2), sizeof(mystruct2));
+    cudaMemcpy(gpu_mystruct2, &mystruct2, sizeof(mystruct2), cudaMemcpyHostToDevice);
 
-//     assert(hostFloats1[0] == 5);
-//     assert(hostFloats1[1] == 6);
-//     assert(hostFloats1[2] == 7);
+    kernel_twostructs_noptrs<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(gpu_mystruct, gpu_mystruct2, mystruct3, (float *)gpuFloats1);
+    cudaMemcpy(hostFloats1, gpuFloats1, 4 * sizeof(float), cudaMemcpyDeviceToHost);
+    cuStreamSynchronize(stream);
 
-//     cudaFree(gpuFloats1);
+    cout << hostFloats1[0] << endl;
+    cout << hostFloats1[1] << endl;
+    cout << hostFloats1[2] << endl;
+    cout << hostFloats1[3] << endl;
 
-//     delete[] hostFloats1;
+    assert(hostFloats1[0] == 5);
+    assert(hostFloats1[1] == 6);
+    assert(hostFloats1[2] == 7);
+    assert(hostFloats1[3] == 8);
 
-//     cuStreamDestroy(stream);
-// }
+    cudaFree(gpuFloats1);
+    cudaFree(gpu_mystruct);
+    cudaFree(gpu_mystruct2);
+    // cudaFree(gpu_mystruct3);
+
+    delete[] hostFloats1;
+
+    cuStreamDestroy(stream);
+}
 
 int main(int argc, char *argv[]) {
     cout << "\ntestvaluestruct" << endl;
@@ -327,8 +334,8 @@ int main(int argc, char *argv[]) {
     // cout << "\teststructbyvalNoPtr" << endl;
     // teststructbyvalNoPtr();
 
-    // cout << "\ntesttwostructsNoPtr" << endl;
-    // testtwostructsNoPtr();
+    cout << "\ntest_twostructs_byptr_NoPtr" << endl;
+    test_twostructs_byptr_NoPtr();
 
     return 0;
 }
