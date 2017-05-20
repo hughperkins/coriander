@@ -1,4 +1,4 @@
-# cuda-on-cl
+# Coriander
 
 Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 
@@ -11,7 +11,7 @@ Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 ## How to use
 
 - Write an NVIDIA® CUDA™ sourcecode file, or find an existing one
-- Let's use [cuda_sample.cu](https://github.com/hughperkins/cuda-on-cl/blob/76a849d9510276bc67167c9a7676d64ff04c3e4a/test/cuda_sample.cu)
+- Let's use [cuda_sample.cu](https://github.com/hughperkins/Coriander/blob/76a849d9510276bc67167c9a7676d64ff04c3e4a/test/cuda_sample.cu)
 - Compile, using `cocl`:
 ```
 $ cocl cuda_sample.cu
@@ -36,7 +36,7 @@ hostFloats[2] 444
 
 [Advanced usage](doc/advanced_usage.md)
 
-## What CUDA-on-CL provides
+## What Coriander provides
 
 - compiler for host-side code, including memory allocation, copy, streams, kernel launches
 - compiler for device-side code, handling templated C++ code, converting it into bog-standard OpenCL 1.2 code
@@ -47,7 +47,7 @@ hostFloats[2] 444
   - activations: ReLU, tanh, sigmoid
   - softmax forward
 
-## How CUDA-on-CL works
+## How Coriander works
 
 <img src="doc/img/howitworks_kernelcompilation.png?raw=true" width="600" />
 
@@ -59,7 +59,7 @@ Slides on the IWOCL website, [here](http://www.iwocl.org/wp-content/uploads/iwoc
 
 ## Installation
 
-CUDA-on-CL development is carried out using the following platforms:
+Coriander development is carried out using the following platforms:
 - Ubuntu 16.04, with:
   - NVIDIA K80 GPU
 - Mac Sierra, with:
@@ -75,17 +75,17 @@ For installation, please see [installation.md](doc/installation.md)
 
 See [testing.md](doc/testing.md)
 
-## Simplifications made by cuda-on-cl
+## Simplifications made by Coriander
 
-cuda-on-cl makes the following relaxations/simplifications:
+Coriander makes the following relaxations/simplifications:
 - ints are generally assumed to be no longer than 32-bit, and truncated to 32-bit mostly
 - floats are assumed to be singles. doubles in the original kernels are converted to floats in the OpenCL code
 - buffer offsets are generally taken to be int32s for now.  This might change in the future
 
 ## Related projects
 
-- Eigen-CL: Minimally-tweaked fork of Eigen, which can be compiled/run using cuda-on-cl, on an OpenCL device, https://bitbucket.org/hughperkins/eigen/commits/branch/eigen-cl
-- Tensorflow-CL: Fork of Tensorflow, that can be built and run on an OpenCL-1.2 enabled GPU, using cuda-on-cl, https://github.com/hughperkins/tensorflow-cl
+- Eigen-CL: Minimally-tweaked fork of Eigen, which can be compiled/run using Coriander, on an OpenCL device, https://bitbucket.org/hughperkins/eigen/commits/branch/eigen-cl
+- Tensorflow-CL: Fork of Tensorflow, that can be built and run on an OpenCL-1.2 enabled GPU, using Coriander, https://github.com/hughperkins/tensorflow-cl
 - CLBlast: Cedric Nugteren's excellent BLAS implementation for OpenCL  [CLBlast](https://github.com/cnugteren/CLBlast)
 
 ## License
@@ -94,10 +94,12 @@ cuda-on-cl makes the following relaxations/simplifications:
 
 ## News
 
+- May 20:
+  - renamed to Coriander
 - May 18:
-  - Presented CUDA-on-CL at this year's [IWOCL](http://iwocl.org) :-)  Full IWOCL program [here](http://www.iwocl.org/iwocl-2017/conference-program/), and there is a link to my own slides
+  - Presented Coriander at this year's [IWOCL](http://iwocl.org) :-)  Full IWOCL program [here](http://www.iwocl.org/iwocl-2017/conference-program/), and there is a link to my own slides
 - May 5:
-  - Eigen unit tests at https://bitbucket.org/hughperkins/eigen/src/75842846799e15f1c26ef6885565d64c3d0a67b2/unsupported/test/cuda-on-cl/?at=eigen-cl pass on Mac Pro 4th Generation with both:
+  - Eigen unit tests at https://bitbucket.org/hughperkins/eigen/src/75842846799e15f1c26ef6885565d64c3d0a67b2/unsupported/test/Coriander/?at=eigen-cl pass on Mac Pro 4th Generation with both:
     - Intel HD Graphics 530, and
     - Radeon Pro 450 (using env var `CL_GPUOFFSET=1` to select)
   - I suspect this may have broken some other stuff, since one of the unit tests fails now, but I think it's a gentle step forward
