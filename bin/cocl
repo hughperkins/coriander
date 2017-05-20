@@ -185,7 +185,8 @@ while [ x$1 != x ]; do {
                 COMPILE=1
                 ;;
             -g)
-                OPT_G=-g
+                # OPT_G=-g
+                # ignore, so we dont get llvm stuff everywehere...
                 ;;
             -o)
                 OUTPATH=$2
