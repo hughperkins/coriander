@@ -289,12 +289,12 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointerstruct(llvm::Instru
     StructCloner::walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", structType);
     bool structHasPointers = structInfo->pointerInfos.size() > 0;
     if(structHasPointers) {
-        cout << "ERROR: CUDA-on-CL currently forbids pointers inside gpu-side structs, passed into kernels" << endl;
-        cout << "If you need this, please create an issue at https://github.com/hughperkins/cuda-on-cl/issues" << endl;
+        cout << "ERROR: Coriander currently forbids pointers inside gpu-side structs, passed into kernels" << endl;
+        cout << "If you need this, please create an issue at https://github.com/hughperkins/Coriander/issues" << endl;
         cout << "Note that it's pretty hard to do though" << endl;
         structPointer->dump();
         cout << endl;
-        throw std::runtime_error("ERROR: CUDA-on-CL currently forbids pointers inside gpu-side structs, passed into kernels");
+        throw std::runtime_error("ERROR: Coriander currently forbids pointers inside gpu-side structs, passed into kernels");
     }
     return lastInst;
 }
@@ -552,7 +552,7 @@ std::string PatchHostside::getBasename(std::string path) {
 
 void PatchHostside::patchModule(Module *M) {
     // entry point: given Module M, traverse all functions, rewriting the launch instructison to call
-    // into CUDA-on-CL runtime
+    // into Coriander runtime
 
     ifstream f_inll(::devicellfilename);
     string devicell_sourcecode(
