@@ -4,19 +4,14 @@ Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 
 ## Concept
 
-- *Compile* using `cocl`
-- *link* using `-lcocl -lOpenCL`
-- at runtime, loads *libOpenCL.so*
-
-Here is a screenshot of running on a Mac:
-
-<img src="doc/img/mac_run_cuda_sample.png?raw=true" />
+- leave applications in NVIDIA® CUDA™
+- compile into OpenCL 1.2
 
 ## How to use, example
 
-- write a CUDA sourcecode file, or find an existing one
-- here's a simple example: [cuda_sample.cu](https://github.com/hughperkins/cuda-on-cl/blob/76a849d9510276bc67167c9a7676d64ff04c3e4a/test/cuda_sample.cu)
-- Use `cocl` to compile `cuda_sample.cu`:
+- write an NVIDIA® CUDA™ sourcecode file, or find an existing one
+- Let's use [cuda_sample.cu](https://github.com/hughperkins/cuda-on-cl/blob/76a849d9510276bc67167c9a7676d64ff04c3e4a/test/cuda_sample.cu)
+- Compile, using new `cocl` command:
 ```
 $ cocl cuda_sample.cu
    ...
@@ -36,9 +31,11 @@ hostFloats[2] 222
 hostFloats[2] 444
 ```
 
+<img src="doc/img/mac_run_cuda_sample.png?raw=true" />
+
 [Advanced usage](doc/advanced_usage.md)
 
-## What it provides
+## What CUDA-on-CL provides
 
 - compiler for host-side code, including memory allocation, copy, streams, kernel launches
 - compiler for device-side code, handling templated C++ code, converting it into bog-standard OpenCL 1.2 code
