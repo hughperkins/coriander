@@ -56,67 +56,23 @@ hostFloats[2] 444
 
 Slides on the IWOCL website, [here](http://www.iwocl.org/wp-content/uploads/iwocl2017-hugh-perkins-cuda-cl.pdf)
 
-## How to build
+## Installation
 
-### Systems tested
-
+CUDA-on-CL development is carried out using the following platforms:
 - Ubuntu 16.04, with:
-  - NVIDIA GPU
+  - NVIDIA K80 GPU
 - Mac Sierra, with:
   - Intel HD Graphics 530
   - Radeon Pro 450
 
-### Pre-requisites
+Other systems should work too, ideally.  You will need at a minimum at least one OpenCL-enabled GPU,
+and appropriate OpenCL drivers installed, for the GPU. Both linux and Mac systems stand a reasonable chance of working ok.
 
-- OpenCL-enabled GPU, and appropriate OpenCL drivers installed for the GPU
-
-#### Mac OS X
-
-```
-cd ~
-wget http://llvm.org/releases/3.8.0/clang+llvm-3.8.0-x86_64-apple-darwin.tar.xz
-tar -xf clang+llvm-3.8.0-x86_64-apple-darwin.tar.xz
-mv clang+llvm-3.8.0-x86_64-apple-darwin /usr/local/opt
-ln -s /usr/local/opt/clang+llvm-3.8.0-x86_64-apple-darwin /usr/local/opt/llvm-3.8
-```
-
-set `CLANG_HOME` as `export CLANG_HOME=/usr/local/opt/llvm-3.8`
-
-#### Ubuntu 16.04
-```
-sudo apt-get install llvm-3.8 llvm-3.8-dev clang-3.8
-sudo apt-get install git cmake cmake-curses-gui libc6-dev-i386 make gcc g++ zlib1g-dev
-```
-
-set `CLANG_HOME` to `/usr/lib/llvm-3.8`
-
-### Build/installation
-
-```
-git clone --recursive https://github.com/hughperkins/cuda-on-cl
-cd cuda-on-cl
-mkdir build
-cd build
-cmake ..
-# Note: I usually set build/release type to `Debug`, so this is what is tested
-make -j 4
-# on Ubuntu:
-sudo make install
-# or on Mac, if you have homebrew, you dont need sudo:
-make install
-```
-
-Note that you'll need to continue to export `CLANG_HOME` environment variable when using `cocl`.
+For installation, please see [installation.md](doc/installation.md)
 
 ## Testing
 
 See [testing.md](doc/testing.md)
-
-## Docker
-
-See [docker](docker).  Docker images run ok on beignet and NVIDIA :-)  (or used to. not tested very recently...)
-
-<img src="https://github.com/hughperkins/cuda-on-cl/raw/master/doc/img/dockerfile_beignet_cudasample.png?raw=true" width="600" />
 
 ## Simplifications made by cuda-on-cl
 
