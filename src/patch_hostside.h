@@ -46,6 +46,8 @@ code slightly differently:
 Note: I've moved this to a class, to force me to declare all the methods here :-)  It's a stateless class though, everything
 is static :-)
 
+Ok, so the doc is mostly below, inside the class declaration, at the bottom of this file. So go there now :-)
+
 */
 
 #pragma once
@@ -128,18 +130,42 @@ public:
 
 class PatchHostside {
 public:
-    static std::string getBasename(std::string path); // this should go into some utiity class really...
+    // returns path without the directory name (I think). this should go into some utiity class really...
+    static std::string getBasename(std::string path); 
 
     static void getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info);
     static void getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info);
+
+    // handle primitive ints and floats (not arrays):
     static llvm::Instruction *addSetKernelArgInst_int(llvm::Instruction *lastInst, llvm::Value *value, llvm::IntegerType *intType);
     static llvm::Instruction *addSetKernelArgInst_float(llvm::Instruction *lastInst, llvm::Value *value);
+
+    // handle generic pointers.  This will arrive in hostside_opencl_funcs at runtime, as a pointer to char,
+    // containing a virtual memory pointer (possibly with an offset added)
+    // the corresponding hostside_opencl_funcs method will:
+    // - look up the virtual mem, to get cl_mem object, and offset
+    // - check if it's already received a cl_mem, and if not add it to the list of cl_mems to send to the kernel
+    // - record the index number of this cl_mem, into the list of distinct/unique cl_mems
+    //
+    // The corresponding kernel parameters for this will be:
+    // - there will be a cl_mem pointer added, if this cl_mem hasnt already been received at least once
+    // - an offset integer parameter will be added
+    //
+    // the corresponding hostside_opencl_funcs method is:
+    //    setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize)
     static llvm::Instruction *addSetKernelArgInst_pointer(llvm::Instruction *lastInst, llvm::Value *value);
+
+    // this will add bytecode to pass a pointer to the cpu-side struct object to hostside_opencl_funcs, at runtime
+    // the entry point into hostside_opencl_funcs will be:
+    // hostside_opencl_funcs
     static llvm::Instruction *addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *valueAsPointerInstr);
+
+    // all setKernelArgs pass through addSetKernelArgInst, which dispatches to other functions
     static llvm::Instruction *addSetKernelArgInst(llvm::Instruction *lastInst, llvm::Value *value, llvm::Value *valueAsPointerInstr);
+
     static void patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, std::vector<llvm::Instruction *> &to_replace_with_zero);
-    static void patchFunction(llvm::Function *F);
-    static void patchModule(llvm::Module *M);
+    static void patchFunction(llvm::Function *F);  // patch all kernel launch commands in function F
+    static void patchModule(llvm::Module *M);  // main entry point. Scan through module M, and rewrite kernel launch commands
 };
 
 } // namespace cocl

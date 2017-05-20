@@ -49,6 +49,7 @@ namespace cocl {
     GenerateOpenCLResult generateOpenCL(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, std::string origKernelName, std::string devicellsourcecode);
     easycl::CLKernel *compileOpenCLKernel(std::string uniqueKernelName, std::string shortKernelName, std::string clSourcecode);
     // easycl::CLKernel *getKernelForNameLl(std::string kernelName, std::string devicellsourcecode);
+
 }
 
 extern "C" {
@@ -58,3 +59,13 @@ extern "C" {
 
     size_t cuInit(unsigned int flags);
 }
+
+void configureKernel(const char *kernelName, const char *devicellsourcecode);
+void addClmemArg(cl_mem clmem);
+void setKernelArgStruct(char *pCpuStruct, int structAllocateSize);
+void setKernelArgCharStar(char *memory_as_charstar, int32_t elementSize);
+void setKernelArgInt64(int64_t value);
+void setKernelArgInt32(int value);
+void setKernelArgInt8(char value);
+void setKernelArgFloat(float value);
+void kernelGo();
