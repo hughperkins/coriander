@@ -39,7 +39,7 @@ print('COCL_HOME', COCL_HOME)
 # print('os.cwd', os.getcwd())
 PWD = os.getcwd()
 print('PWD', PWD)
-if path.isfile('%s/bin/patch-hostside' % COCL_HOME):
+if path.isfile('%s/bin/patch_hostside' % COCL_HOME):
     COCL_BIN = '%s/bin' % COCL_HOME
     COCL_LIB = '%s/lib' % COCL_HOME
 else:

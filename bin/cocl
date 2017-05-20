@@ -34,7 +34,7 @@ esac
 SCRIPT_DIR=$( cd "$( dirname "$0" )" && pwd )
 export COCL_HOME=$(dirname ${SCRIPT_DIR})
 
-if [ -f ${COCL_HOME}/bin/patch-hostside ]; then {
+if [ -f ${COCL_HOME}/bin/patch_hostside ]; then {
     export COCL_BIN=${COCL_HOME}/bin
     export COCL_LIB=${COCL_HOME}/lib
 } else {
@@ -384,7 +384,7 @@ ${CLANG_HOME}/bin/clang++ ${PASSTHRU} \
     -include ${COCL_HOME}/include/cocl/cocl_hostside.h \
     ${INPUTBASEPATH}${INPUTPOSTFIX} -o ${OUTPUTBASEPATH}-hostraw.ll
 
-${COCL_BIN}/patch-hostside \
+${COCL_BIN}/patch_hostside \
     --hostrawfile ${OUTPUTBASEPATH}-hostraw.ll \
     --devicellfile ${OUTPUTBASEPATH}-device.ll \
     --hostpatchedfile ${OUTPUTBASEPATH}-hostpatched.ll

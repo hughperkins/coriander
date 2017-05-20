@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// For doc, please see the corresponding include file, patch-hostside.h
+// For doc, please see the corresponding include file, patch_hostside.h
 
-#include "patch-hostside.h"
+#include "patch_hostside.h"
 
 #include "mutations.h"
 #include "struct_clone.h"

@@ -121,16 +121,16 @@ endforeach()
 # #     target_compile_definitions(ir-to-opencl PRIVATE -DOFFSET_32BIT)
 # # endif()
 
-add_executable(patch-hostside
-    src/patch-hostside.cpp src/struct_clone.cpp src/mutations.cpp src/readIR.cpp
+add_executable(patch_hostside
+    src/patch_hostside.cpp src/struct_clone.cpp src/mutations.cpp src/readIR.cpp
     third_party/argparsecpp/argparsecpp.cpp src/type_dumper.cpp src/GlobalNames.cpp
     src/EasyCL/util/easycl_stringhelper.cpp
 )
-target_include_directories(patch-hostside PRIVATE ${CLANG_HOME}/include)
-target_include_directories(patch-hostside PRIVATE third_party/argparsecpp)
-target_include_directories(patch-hostside PRIVATE src/EasyCL)
-target_compile_options(patch-hostside PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-target_link_libraries(patch-hostside "${LLVM_LIBS}"  ${LLVM_SYSLIBS})
+target_include_directories(patch_hostside PRIVATE ${CLANG_HOME}/include)
+target_include_directories(patch_hostside PRIVATE third_party/argparsecpp)
+target_include_directories(patch_hostside PRIVATE src/EasyCL)
+target_compile_options(patch_hostside PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
+target_link_libraries(patch_hostside "${LLVM_LIBS}"  ${LLVM_SYSLIBS})
 
 add_library(clew SHARED src/EasyCL/thirdparty/clew/src/clew.c)
 target_include_directories(clew PRIVATE src/EasyCL/thirdparty/clew/include)
@@ -219,7 +219,7 @@ else()
 endif()
 
 set(THIS_COCL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl)
-set(COCL_ARTIFACTS patch-hostside cocl)
+set(COCL_ARTIFACTS patch_hostside cocl)
 # set(THIS_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set(THIS_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR})
 CONFIGURE_FILE(
@@ -247,7 +247,7 @@ if(BUILD_TESTS)
             COMMAND ${COCL_DUMP_CL_STR} ${CMAKE_CURRENT_BINARY_DIR}/${TEST}
             DEPENDS ${TEST}
             DEPENDS cocl
-            DEPENDS patch-hostside
+            DEPENDS patch_hostside
         )
         set(TEST_TARGETS ${TEST_TARGETS} run-${TEST})
     endforeach()
@@ -272,6 +272,7 @@ if(BUILD_TESTS)
         test/gtest/test_dnn_conv.cpp test/gtest/test_dnn_pooling.cpp test/gtest/test_dnn_act.cpp
         test/gtest/test_dnn_loss.cpp
         test/gtest/test_hostside_opencl_funcs.cpp
+        # test/gtest/test_simple.cu
         # test/gtest/test_cocl_simple.cu
     )
     target_include_directories(cocl_unittests PRIVATE src)
@@ -315,7 +316,7 @@ INSTALL(FILES ${CLEW_HEADERS} DESTINATION include)
 INSTALL(FILES ${EASYCL_HEADERS_ROOT} DESTINATION include/EasyCL)
 # INSTALL(FILES ${CMAKE_SOURCE_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
 INSTALL(FILES ${CMAKE_BINARY_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
-install(TARGETS easycl clew clblast cocl patch-hostside EXPORT cocl-targets
+install(TARGETS easycl clew clblast cocl patch_hostside EXPORT cocl-targets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
