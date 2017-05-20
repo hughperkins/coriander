@@ -601,11 +601,16 @@ int main(int argc, char *argv[]) {
     try {
         PatchHostside::patchModule(module.get());
     } catch(const runtime_error &e) {
-        outs() << "exception whilst doing:\n";
-        outs() << "reading rawhost ll file " << rawhostfilename << "\n";
+        cout << endl;
+        cout << "Something went wrong, sorry." << endl;
+        cout << endl;
+        cout << "More detail for devs/maintainers:" << endl;
+        cout << "  exception: " << e.what() << endl;
+        cout << "  rawhost ll file: " << rawhostfilename << "\n";
         // outs() << "reading device cl file " << deviceclfilename << "\n";
-        outs() << "outputing to hostpatched file " << patchedhostfilename << "\n";
-        throw e;
+        outs() << "  hostpatched file: " << patchedhostfilename << "\n";
+        cout << endl;
+        return -1;
     }
 
     AssemblyAnnotationWriter assemblyAnnotationWriter;
