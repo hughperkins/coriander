@@ -302,13 +302,6 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
     // outs() << "original typeallocsize " << dataLayout->getTypeAllocSize(value->getType()) << "\n";
     // outs() << "pointerfree typeallocsize " << allocSize << "\n";
 
-    Function *setKernelArgHostsideBuffer = cast<Function>(M->getOrInsertFunction(
-        "setKernelArgHostsideBuffer",
-        Type::getVoidTy(context),
-        PointerType::get(IntegerType::get(context, 8), 0),
-        IntegerType::get(context, 32),
-        NULL));
-
     Value *sourceStruct = 0;
     if(structHasPointers) {
         Instruction *alloca = new AllocaInst(newType, "newalloca");
@@ -330,6 +323,13 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
     Value *args[2];
     args[0] = bitcast;
     args[1] = createInt32Constant(&context, allocSize);
+
+    Function *setKernelArgHostsideBuffer = cast<Function>(M->getOrInsertFunction(
+        "setKernelArgHostsideBuffer",
+        Type::getVoidTy(context),
+        PointerType::get(IntegerType::get(context, 8), 0),
+        IntegerType::get(context, 32),
+        NULL));
 
     cout << "adding setKernelArgHostsideBuffer call" << endl;
     CallInst *call = CallInst::Create(setKernelArgHostsideBuffer, ArrayRef<Value *>(args));
