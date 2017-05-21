@@ -41,11 +41,7 @@ hostFloats[2] 444
 - compiler for host-side code, including memory allocation, copy, streams, kernel launches
 - compiler for device-side code, handling templated C++ code, converting it into bog-standard OpenCL 1.2 code
 - cuBLAS API implementations for GEMM, GEMV, SCAL, SAXPY (using Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast))
-- cudnn API implementations for:
-  - convolution (using `im2col` algorithim, over Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast))
-  - pooling
-  - activations: ReLU, tanh, sigmoid
-  - softmax forward
+- cuDNN API implementations for: convolutions (using `im2col` algorithm over Cedric Nugteren's [CLBlast](https://github.com/cnugteren/CLBlast), pooling, ReLU, tanh, and sigmoid
 
 ## How Coriander works
 
