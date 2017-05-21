@@ -2,19 +2,24 @@ import pytest
 from test import test_common
 
 
-test_definitions = {
-    "test/struct_initializer.cu": ['somekernel', 'somekernel2', 'getFooValue', 'getBarValue'],
-    "test/phiaddressspace.cu": ['mykernel'],
-    "test/test_local.cu": ['testLocal', 'testLocal2'],
-    "test/pointerpointer.cu": ['mykernel', 'myte6kernel']
-}
+test_definitions = [
+    {'file': "test/struct_initializer.cu", 'kernels':
+        {'somekernel': 2, 'somekernel2': 2, 'getFooValue': 2, 'getBarValue': 2}},
+    {'file': "test/phiaddressspace.cu", 'kernels': {'mykernel': 2}},
+    {'file': "test/test_local.cu", 'kernels': {'testLocal': 2, 'testLocal2': 2}},
+    {'file': "test/pointerpointer.cu", 'kernels': {'mykernel': 2, 'myte6kernel': 3}}
+]
 
 
 def get_test_definitions():
     tests = []
-    for filepath, kernelnames in test_definitions.items():
-        for kernelname in kernelnames:
-            test = (filepath, kernelname)
+    # for filepath, kernelnames in test_definitions.items():
+    for defn in test_definitions:
+        filepath = defn['file']
+        clmems_by_kernel = defn['kernels']
+        # for kernelname in kernelnames:
+        for kernelname, num_clmems in clmems_by_kernel.items():
+            test = (filepath, kernelname, num_clmems)
             if 'struct' in filepath:
                 print('marking xfail')
                 test = pytest.mark.xfail(reason='need global constants')(test)
@@ -22,13 +27,13 @@ def get_test_definitions():
     return tests
 
 
-@pytest.mark.parametrize("cu_filepath,kernelname", get_test_definitions())
-def test_compile(context, cu_filepath, kernelname):
+@pytest.mark.parametrize("cu_filepath,kernelname,num_clmems", get_test_definitions())
+def test_compile(context, cu_filepath, kernelname, num_clmems):
     with open(cu_filepath, 'r') as f:
         cu_code = f.read()
 
     try:
-        cl_code = test_common.cu_to_cl(cu_code, '')
+        cl_code = test_common.cu_to_cl(cu_code, '', num_clmems=num_clmems)
     except:
         pass
 
@@ -42,9 +47,9 @@ def test_compile(context, cu_filepath, kernelname):
 
     print('mangledname', mangledname)
 
-    cl_code = test_common.cu_to_cl(cu_code, mangledname)
+    cl_code = test_common.cu_to_cl(cu_code, mangledname, num_clmems=num_clmems)
 
-    test_common.build_kernel(context, cl_code, mangledname[:31])
+    test_common.build_kernel(context, cl_code, mangledname)
 
 
 def test_no_pointer_struct_ointer(context):

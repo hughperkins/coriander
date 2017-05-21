@@ -33,7 +33,7 @@ struct MyStruct {
     }
 """
     kernelName = test_common.mangle('foo', ['float *'])
-    cl_sourcecode = test_common.cu_to_cl(cu_source, kernelName)
+    cl_sourcecode = test_common.cu_to_cl(cu_source, kernelName, num_clmems=1)
     print('cl_sourcecode', cl_sourcecode)
     kernel = test_common.build_kernel(context, cl_sourcecode, kernelName)
     # float_data_orig = np.copy(float_data)
@@ -58,7 +58,7 @@ struct MyStruct {
 """
     # kernelName = test_common.mangle('foo', ['float *'])
     kernelName = '_Z3foo8MyStruct'
-    cl_sourcecode = test_common.cu_to_cl(cu_source, kernelName)
+    cl_sourcecode = test_common.cu_to_cl(cu_source, kernelName, num_clmems=1)
     print('cl_sourcecode', cl_sourcecode)
     kernel = test_common.build_kernel(context, cl_sourcecode, kernelName)
     # float_data_orig = np.copy(float_data)

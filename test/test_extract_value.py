@@ -28,46 +28,17 @@ kernelname = test_common.mangle('test_floats', ['float *'])
 @pytest.fixture(scope='module')
 def extract_value_cl():
     # lets check it's compileable ll first, using llvm
-    # cu_filepath = 'test/extract_value.cu'
-    # ll_filepath = 'test/generated/extract_value.ll'
     ll_filepath = 'test/extract_value.ll'
-    cl_filepath = 'test/generated/extract_value.cl'
 
-    # print(subprocess.check_output([
-    #     clang_path,
-    #     '-I%s/include' % cuda_home,
-    #     '-include', 'include/fake_funcs.h',
-    #     cu_filepath,
-    #     '--cuda-device-only',
-    #     '-emit-llvm', '-S',
-    #     '-o', ll_filepath
-    # ]).decode('utf-8'))
-
-    print(subprocess.check_output([
-        test_common.clang_path,
-        '-c', ll_filepath,
-        '-O3',
-        '-o', '/tmp/~foo'
-    ]).decode('utf-8'))
-
-    if not path.isdir('test/generated'):
-        os.makedirs('test/generated')
-    print(subprocess.check_output([
-        'build/ir-to-opencl',
-        # '--debug',
-        '--inputfile', ll_filepath,
-        '--outputfile', cl_filepath,
-        '--kernelname', kernelname
-    ]).decode('utf-8'))
-    return cl_filepath
+    with open(ll_filepath, 'r') as f:
+        ll_sourcecode = f.read()
+    cl_sourcecode = test_common.ll_to_cl(ll_sourcecode=ll_sourcecode, kernelName=kernelname, num_clmems=1)
+    return cl_sourcecode
 
 
 @pytest.fixture(scope='module')
 def extract_value(context, extract_value_cl):
-    with open(extract_value_cl, 'r') as f:
-        sourcecode = f.read()
-
-    prog = cl.Program(context, sourcecode).build()
+    prog = cl.Program(context, extract_value_cl).build()
     return prog
 
 

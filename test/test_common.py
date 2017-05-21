@@ -201,15 +201,17 @@ def compile_code_v3(cl, context, kernelSource, kernelName, num_clmems):
     return {'kernel': kernel, 'cl_sourcecode': cl_sourcecode}
 
 
-def ll_to_cl(ll_sourcecode, kernelName):
+def ll_to_cl(ll_sourcecode, kernelName, num_clmems):
     with open('/tmp/testprog-device.ll', 'w') as f:
         f.write(ll_sourcecode)
 
+    clmemIndexes = ','.join([str(i) for i in range(num_clmems)])
     run_process([
         'build/ir-to-opencl',
         '--inputfile', '/tmp/testprog-device.ll',
         '--outputfile', '/tmp/testprog-device.cl',
         '--kernelname', kernelName,
+        '--cmem-indexes', clmemIndexes,
         '--add_ir_to_cl'
     ])
 
