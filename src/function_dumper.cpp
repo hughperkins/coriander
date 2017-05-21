@@ -39,7 +39,9 @@ string FunctionDumper::createOffsetDeclaration(string argName) {
 
 std::string FunctionDumper::createOffsetShim(Type *argType, std::string argName, int clmemIndex) {
     std::ostringstream oss;
-    oss << "    " << typeDumper->dumpType(argType) << " " << argName << " = (" << typeDumper->dumpType(argType) << ")clmem" << clmemIndex << " + " << argName + "_offset;\n";
+    // oss << "    " << typeDumper->dumpType(argType) << " " << argName << " = (" << typeDumper->dumpType(argType) << ")clmem" << clmemIndex << " + " << argName + "_offset;\n";
+    oss << "    " << typeDumper->dumpType(argType) << " " << argName << " = ";
+    oss << "(" << typeDumper->dumpType(argType) << ")(clmem" << clmemIndex << " + " << argName + "_offset);\n";
     return oss.str();
 }
 

@@ -631,13 +631,13 @@ void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo
     // LocalValueInfo *incomingOperandInfo = this->getOperand(instr->getAggregateOperand());
     // string incomingOperand = incomingOperandInfo->getExpr();
     string incomingOperand = aggInfo->getExpr();
-    cout << "incomingOperand " << incomingOperand << endl;
+    // cout << "incomingOperand " << incomingOperand << endl;
     // if rhs is empty, that means its 'undef', so we better declare it, I guess...
     Type *currentType = instr->getAggregateOperand()->getType();
     rhs << incomingOperand;
     ArrayRef<unsigned> indices = instr->getIndices();
     int numIndices = instr->getNumIndices();
-    cout << "  numIndices=" << numIndices << endl;
+    // cout << "  numIndices=" << numIndices << endl;
     for(int d=0; d < numIndices; d++) {
         int idx = indices[d];
         Type *newType = 0;
@@ -647,7 +647,7 @@ void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo
             // cout << "isa<ArrayType>? " << isa<ArrayType>(currentType) << endl;
             if(d == 0) {
                 if(isa<ArrayType>(currentType->getPointerElementType())) {
-                    cout << "element type is arraytype" << endl;
+                    // cout << "element type is arraytype" << endl;
                     string oldRhs = rhs.str();
                     rhs.str("");
                     rhs << "(&" << oldRhs << ")";
@@ -663,8 +663,8 @@ void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo
         } else if(isa<ArrayType>(currentType)) {
             // cout << "pointer or array" << endl;
             // cout << "ispointerty? " << currentType->isPointerTy() << endl;
-            cout << "  isa<ArrayType>? " << isa<ArrayType>(currentType) << endl;
-            cout << "  d=" << d << endl;
+            // cout << "  isa<ArrayType>? " << isa<ArrayType>(currentType) << endl;
+            // cout << "  d=" << d << endl;
             // if(d == 0) {
             //     if(isa<ArrayType>(currentType->getPointerElementType())) {
             //         cout << "element type is arraytype" << endl;
@@ -675,13 +675,13 @@ void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo
             // cout << "d + 1" << (d + 1) << endl;
             Value *operand = instr->getOperand(d);
             // int index = indices[d];
-            cout << "  idx=" << idx << endl;
+            // cout << "  idx=" << idx << endl;
             // LocalValueInfo *thisInfo = getOperand(instr->getOperand(d));
             rhs << "[" << idx << "]";
-            cout << "  rhs [" << rhs.str() << "]" << endl;
+            // cout << "  rhs [" << rhs.str() << "]" << endl;
             newType = currentType->getPointerElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
-            cout << "struct" << endl;
+            // cout << "struct" << endl;
             string structName = getName(structtype);
             if(structName == "struct.float4") {
                 Type *elementType = structtype->getElementType(idx);
@@ -706,7 +706,7 @@ void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo
     }
     // gencode << rhs.str();
     // return gencode;
-    cout << "  dumpExtractValue, rhs=[" << rhs.str() << "]" << endl;
+    // cout << "  dumpExtractValue, rhs=[" << rhs.str() << "]" << endl;
     // cout << "gencode " << gencode << endl;
     localValueInfo->setExpression(rhs.str());
 }

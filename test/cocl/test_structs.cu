@@ -317,6 +317,67 @@ void teststruct2byvalNoPtr() {
     cuStreamDestroy(stream);
 }
 
+struct struct_f_c_f_c {
+    float f1;
+    char c1;
+    float f2;
+    char c2;
+};
+
+__global__ void kernel_twostructs_gpuside_singlebuffer(struct struct_f_c_f_c *mystruct1, struct struct_f_c_f_c *mystruct2, float *out) {
+    out[0] = mystruct1->f1;
+    out[1] = mystruct1->f2;
+    out[2] = mystruct2->f1;
+    out[3] = mystruct2->f2;
+}
+
+void test_twostructs_gpuside_singlebuffer() {
+    int N = 1024;
+
+    CUstream stream;
+    cuStreamCreate(&stream, 0);
+
+    float *hostOut = new float[N];
+
+    float *gpuOut;
+    cudaMalloc((void**)(&gpuOut), N * sizeof(float));
+
+    char *gpubuf;
+    cudaMalloc((void **)&gpubuf, 1024);
+
+    int offset1 = 24;
+    int offset2 = 40;
+
+    struct struct_f_c_f_c mystruct1 = { 5, 0, 7, 0 };
+    cudaMemcpy(gpubuf + offset1, &mystruct1, sizeof(mystruct1), cudaMemcpyHostToDevice);
+
+    struct struct_f_c_f_c mystruct2 = { 9, 0, 3, 0 };
+    cudaMemcpy(gpubuf + offset2, &mystruct2, sizeof(mystruct2), cudaMemcpyHostToDevice);
+
+    kernel_twostructs_gpuside_singlebuffer<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(
+        (struct struct_f_c_f_c *)(gpubuf + offset1),
+        (struct struct_f_c_f_c *)(gpubuf + offset2),
+        gpuOut);
+
+    cudaMemcpy(hostOut, gpuOut, 4 * sizeof(float), cudaMemcpyDeviceToHost);
+
+    cuStreamSynchronize(stream);
+
+    cout << hostOut[0] << endl;
+    cout << hostOut[1] << endl;
+    cout << hostOut[2] << endl;
+    cout << hostOut[3] << endl;
+
+    assert(hostOut[0] == 5);
+    assert(hostOut[1] == 7);
+    assert(hostOut[2] == 9);
+    assert(hostOut[3] == 3);
+
+    delete[]hostOut;
+
+    cuStreamDestroy(stream);
+}
+
 int main(int argc, char *argv[]) {
     cout << "\ntestvaluestruct" << endl;
     testbyvaluestruct();
@@ -335,6 +396,9 @@ int main(int argc, char *argv[]) {
 
     cout << "\teststruct2byvalNoPtr" << endl;
     teststruct2byvalNoPtr();
+
+    cout << "\test_twostructs_gpuside_singlebuffer" << endl;
+    test_twostructs_gpuside_singlebuffer();
 
     return 0;
 }
