@@ -18,8 +18,8 @@ from test import test_common
 def try_build(context, filepath, kernelname):
     with open(filepath, 'r') as f:
         cucode = f.read()
-    clcode = test_common.cu_to_cl(cucode, kernelname, num_clmems=2)
-    test_common.build_kernel(context, clcode, kernelname[:31])
+    clcode = test_common.cu_to_cl(cucode, kernelname, num_clmems=4)
+    test_common.build_kernel(context, clcode, kernelname)
 
 
 def test_program_compiles(context):
