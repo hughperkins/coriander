@@ -2,6 +2,7 @@
 
 The following tests are available:
 - low-level tests, using gtest
+- pyopencl tests
 - end-to-end tests
 - Eigen tests, in Eigen repo, https://bitbucket.org/hughperkins/eigen/src/eigen-cl/unsupported/test/Coriander/?at=eigen-cl
 - cudnn:
@@ -19,6 +20,30 @@ make -j 4
 No dependencies on graphics card etc.  It simply takes some hand-crafted IR, and writes it to OpenCL.  It never actually tries to run the OpenCL, so it validates:
 - can Coriander handle the IR without choking/crashing?
 - do the hand-crafted OpenCL expected results match up with the actual cocl outputs?
+
+## pyopencl tests
+
+### Pre-requisites
+
+```
+pip install -r test/requirements.txt
+```
+
+### Procedure
+
+```
+OFFSET_32BIT=1 \
+COCL_OPTIONS='--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine --devicell-opt O2' \
+py.test -v
+```
+
+- python tests are at [test](test)
+
+You can modify the options in `COCL_OPTIONS`.  There are passed to the `cocl` command, see section #Options above.
+
+If you set `OFFSET_32BIT` to off in your cmake options, you should remove the `OFFSET_32BIT=1` optio nwhen running py.test
+
+
 
 ## End-to-end tests
 
