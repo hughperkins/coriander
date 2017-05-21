@@ -24,34 +24,41 @@ from test import test_common
 def dotdotdot_cl():
     # lets check it's compileable ll first, using llvm
     ll_filepath = 'test/dotdotdot.ll'
-    cl_filepath = 'test/generated/dotdotdot.cl'
 
-    print(subprocess.check_output([
-        test_common.clang_path,
-        '-c', ll_filepath,
-        '-O3',
-        '-o', '/tmp/~foo'
-    ]).decode('utf-8'))
+    with open(ll_filepath, 'r') as f:
+        ll_sourcecode = f.read()
 
-    if not path.isdir('test/generated'):
-        os.makedirs('test/generated')
-    print(subprocess.check_output([
-        'build/ir-to-opencl',
-        # '--debug',
-        '--inputfile', ll_filepath,
-        '--outputfile', cl_filepath,
-        '--kernelname', '_Z7test_siPf'
-    ]).decode('utf-8'))
-    return cl_filepath
+    kernelName = test_common.mangle('test_si', ['float *'])
+    cl_sourcecode = test_common.ll_to_cl(ll_sourcecode, kernelName, num_clmems=1)
+    print('cl_sourcecode', cl_sourcecode)
+    return cl_sourcecode
+
+    # cl_filepath = 'test/generated/dotdotdot.cl'
+
+    # print(subprocess.check_output([
+    #     test_common.clang_path,
+    #     '-c', ll_filepath,
+    #     '-O3',
+    #     '-o', '/tmp/~foo'
+    # ]).decode('utf-8'))
+
+    # if not path.isdir('test/generated'):
+    #     os.makedirs('test/generated')
+    # print(subprocess.check_output([
+    #     'build/ir-to-opencl',
+    #     # '--debug',
+    #     '--inputfile', ll_filepath,
+    #     '--outputfile', cl_filepath,
+    #     '--kernelname', '_Z7test_siPf'
+    # ]).decode('utf-8'))
+    # return cl_filepath
 
 
 @pytest.fixture(scope='module')
 def dotdotdot(context, dotdotdot_cl):
-    with open(dotdotdot_cl, 'r') as f:
-        sourcecode = f.read()
-
-    prog = cl.Program(context, sourcecode).build()
-    return prog
+    kernelName = test_common.mangle('test_si', ['float *'])
+    kernel = test_common.build_kernel(context, dotdotdot_cl, kernelName)
+    return kernel
 
 
 def test_program_compiles(dotdotdot):
