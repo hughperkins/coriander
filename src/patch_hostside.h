@@ -134,6 +134,10 @@ public:
     static std::string getBasename(std::string path); 
 
     static void getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info);
+
+    // given a bytecode that calls the cudaSetupArgument method, obtains information
+    // about this, such as the type of the argument being set, and an instruction that represents
+    // its value, stores that, in info, along with the arguments there already
     static void getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info);
 
     // handle primitive ints and floats (not arrays):
