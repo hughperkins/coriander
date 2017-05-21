@@ -458,11 +458,8 @@ void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
     // if not already present, and adding the offset, as a kernel parameter
     //
     // The size of the buffer is not needed (though the virtual memory system knows it :-) )
-    // The elementSize is used uniquely in the offset boilerplate, where we do something like:
-    //     global float *somefloats = (global float *)somefloats_data + somefloats_offset;
-    //
-    // we did it like this, because adding the offset before the cast was crashing on beignet (I think),
-    // but I might change it back to a byte offset, so we can handle pointers to structs ok
+    // The elementSize used to be used, but is no longer used/needed. Should probably be
+    // removed from the method parameters at some point.
 
     pthread_mutex_lock(&launchMutex);
 
