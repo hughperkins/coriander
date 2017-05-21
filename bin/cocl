@@ -101,7 +101,7 @@ display_help () {
 
         --add_ir_to_cl
              Add the original IR code into the generated OpenCL code, as comments
-             Mainly useful to cuda-on-cl maintainers
+             Mainly useful to coriander maintainers
 
       Options passed through to clang compiler:
         -fPIC
