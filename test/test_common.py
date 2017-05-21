@@ -130,7 +130,7 @@ def compile_code(cl, context, kernelSource, kernelName, num_clmems):
     return prog
 
 
-def compile_code_v2(cl, context, kernelSource, kernelName):
+def compile_code_v2(cl, context, kernelSource, kernelName, num_clmems):
     """
     returns dict
     """
@@ -140,17 +140,22 @@ def compile_code_v2(cl, context, kernelSource, kernelName):
     with open('/tmp/testprog.cu', 'w') as f:
         f.write(kernelSource)
 
+    clmemIndexes = ','.join([str(i) for i in range(num_clmems)])
+    env = os.environ
+    env['COCL_BIN'] = 'build'
+    env['COCL_LIB'] = 'build'
     run_process([
         'bin/cocl',
         '-c',
         '/tmp/testprog.cu'
-    ] + cocl_options())
+    ] + cocl_options(), env=env)
 
     run_process([
         'build/ir-to-opencl',
         '--inputfile', '/tmp/testprog-device.ll',
         '--outputfile', '/tmp/testprog-device.cl',
         '--kernelname', kernelName,
+        '--cmem-indexes', clmemIndexes,
         '--add_ir_to_cl'
     ])
 
@@ -185,7 +190,7 @@ def compile_code_v3(cl, context, kernelSource, kernelName, num_clmems):
         '--inputfile', '/tmp/testprog-device.ll',
         '--outputfile', '/tmp/testprog-device.cl',
         '--kernelname', kernelName,
-        '--cmem-indexes', clmemIndexes,        
+        '--cmem-indexes', clmemIndexes,
         '--add_ir_to_cl'
     ])
 
@@ -236,7 +241,7 @@ def cu_to_cl(cu_sourcecode, kernelName, num_clmems):
         '--inputfile', '/tmp/testprog-device.ll',
         '--outputfile', '/tmp/testprog-device.cl',
         '--kernelname', kernelName,
-        '--cmem-indexes', clmemIndexes,        
+        '--cmem-indexes', clmemIndexes,
         '--add_ir_to_cl'
     ])
 

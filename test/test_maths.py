@@ -44,7 +44,7 @@ __global__ void myKernel(float *data) {
     // data[8] = 0xFFEFFFFFFFFFFFFF;
 }
 """
-    kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['float *']))['kernel']
+    kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['float *']), num_clmems=1)['kernel']
     kernel(
         q, (32,), (32,),
         float_data_gpu, offset_type(0), cl.LocalMemory(4))
@@ -84,7 +84,7 @@ __global__ void mykernel(double *data) {
 }
 """
     kernel_name = test_common.mangle('mykernel', ['double*'])
-    cl_code = test_common.cu_to_cl(cu_code, kernel_name)
+    cl_code = test_common.cu_to_cl(cu_code, kernel_name, num_clmems=1)
     kernel = test_common.build_kernel(context, cl_code, kernel_name)
     kernel(
         q, (32,), (32,),
@@ -108,7 +108,7 @@ __global__ void myKernel(float *data) {
     data[5] = pow(data[7], data[8]);
 }
 """
-    kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['float *']))['kernel']
+    kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['float *']), num_clmems=1)['kernel']
     float_data[1] = 1.5
     float_data[2] = 4.6
     float_data[4] = -1.5
@@ -136,7 +136,7 @@ __global__ void myKernel(float *data) {
     data[threadIdx.x] = sqrt(data[threadIdx.x]);
 }
 """
-    kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['float *']))['kernel']
+    kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['float *']), num_clmems=1)['kernel']
     float_data[0] = 1.5
     float_data[1] = 4.6
     float_data[2] = -1.5
@@ -165,15 +165,17 @@ __global__ void myKernel(float *float_data, int *int_data) {
     int_data[0] = (int)float_data[0];
 }
 """
-    kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['float *', 'int *']))['kernel']
+    kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['float *', 'int *']), num_clmems=2)['kernel']
     float_data[0] = 4.7
     float_data[1] = 1.5
     float_data[2] = 4.6
     cl.enqueue_copy(q, float_data_gpu, float_data)
     kernel(
         q, (32,), (32,),
-        float_data_gpu, offset_type(0),
-        int_data_gpu, offset_type(0),
+        float_data_gpu,
+        int_data_gpu,
+        offset_type(0),
+        offset_type(0),
         cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
@@ -191,15 +193,17 @@ __global__ void myKernel(float *float_data, int *int_data) {
     float_data[0] = (float)int_data[0];
 }
 """
-    kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['float *', 'int *']))['kernel']
+    kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['float *', 'int *']), num_clmems=2)['kernel']
     int_data[0] = 5
     int_data[1] = 2
     int_data[2] = 4
     cl.enqueue_copy(q, int_data_gpu, int_data)
     kernel(
         q, (32,), (32,),
-        float_data_gpu, offset_type(0),
-        int_data_gpu, offset_type(0),
+        float_data_gpu,
+        int_data_gpu,
+        offset_type(0),
+        offset_type(0),
         cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
@@ -217,7 +221,7 @@ __global__ void myKernel(int *int_data) {
     int_data[0] = __clz(int_data[1]);
 }
 """
-    kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['int *']))['kernel']
+    kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['int *']), num_clmems=1)['kernel']
     int_data[1] = 15
     cl.enqueue_copy(q, int_data_gpu, int_data)
     kernel(

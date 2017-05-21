@@ -37,7 +37,7 @@ __global__ void mykernel(float *data) {
 """
     kernelName = test_common.mangle('mykernel', ['float *'])
     try:
-        dict = test_common.compile_code_v2(cl, context, code, kernelName)
+        dict = test_common.compile_code_v2(cl, context, code, kernelName, num_clmems=1)
         prog = dict['prog']
         cl_sourcecode = dict['cl_sourcecode']
         print('cl_sourcecode', cl_sourcecode)

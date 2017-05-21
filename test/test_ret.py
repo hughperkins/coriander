@@ -43,7 +43,7 @@ def test_return(context):
     }
 """
     kernelName = test_common.mangle('mykernel', ['float*'])
-    dict = test_common.compile_code_v3(cl, context, source, kernelName)
+    dict = test_common.compile_code_v3(cl, context, source, kernelName, num_clmems=1)
     # prog = dict['prog']
     cl_sourcecode = dict['cl_sourcecode']
     print('cl_sourcecode', cl_sourcecode)

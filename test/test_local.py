@@ -32,7 +32,7 @@ def test_local(context, q, float_data, float_data_gpu):
     }
 """
     kernelName = test_common.mangle('foo', ['float *'])
-    cl_sourcecode = test_common.cu_to_cl(cu_source, kernelName)
+    cl_sourcecode = test_common.cu_to_cl(cu_source, kernelName, num_clmems=1)
     print('cl_sourcecode', cl_sourcecode)
     kernel = test_common.build_kernel(context, cl_sourcecode, kernelName)
     float_data_orig = np.copy(float_data)
