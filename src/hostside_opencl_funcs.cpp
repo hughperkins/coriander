@@ -64,6 +64,12 @@ namespace cocl {
     pthread_mutex_t launchMutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
     #endif
 
+    // These Arg classes store kernel parameter values, which we can use
+    // at kernel creation time, and then pass into the kernel at that point
+    // we dont create the kernel until the actual launch command (which is after
+    // the kernelSetArg commands), so we have all the information available at that
+    // time about what kernel arguments we have
+    // concretely, it means we can dedupe the underlying cl_mem buffers, for example
     class Arg {
     public:
         virtual ~Arg() {}
