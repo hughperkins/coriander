@@ -58,6 +58,7 @@ def test_cwise_sqrt(context, q, float_data, float_data_gpu):
     ] + iropencl_options + [
         '--inputfile', '/tmp/test-opt.ll',
         '--outputfile', '/tmp/test-device.cl',
+        '--cmem-indexes', '0,1,2',
         '--kernelname', '_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_'
     ])
 
@@ -99,11 +100,14 @@ def test_cwise_sqrt(context, q, float_data, float_data_gpu):
     scratch = workgroup_size * 4
 
     print('running kernel...')
-    prog.__getattr__('_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_'[:31])(
+    prog.__getattr__('_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_')(
         q, (global_size,), (workgroup_size,),
         eval_nopointers_gpu,
-        eval_ptr0_gpu, offset_type(eval_ptr0_offset),
-        eval_ptr1_gpu, offset_type(eval_ptr1_offset),
+        eval_ptr0_gpu,
+        eval_ptr1_gpu,
+        offset_type(0),
+        offset_type(eval_ptr0_offset),
+        offset_type(eval_ptr1_offset),
         np.int32(size),
         cl.LocalMemory(scratch)
     )
@@ -155,6 +159,7 @@ def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
         ] + iropencl_options + [
             '--inputfile', '/tmp/test-opt.ll',
             '--outputfile', '/tmp/test-device.cl',
+            '--cmem-indexes', '0,1,2',
             '--kernelname', '_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_'
         ], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         print(' '.join(res.args))
@@ -194,10 +199,10 @@ def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
     eval_nopointers_gpu = cl.Buffer(context, cl.mem_flags.READ_WRITE, size=4096)
 
     eval_ptr0_gpu = huge_buf_gpu
-    eval_ptr0_offset = dst_offset_bytes // 4
+    eval_ptr0_offset = dst_offset_bytes
 
     eval_ptr1_gpu = huge_buf_gpu
-    eval_ptr1_offset = src_offset_bytes // 4
+    eval_ptr1_offset = src_offset_bytes
 
     size = N
 
@@ -209,11 +214,14 @@ def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
     workgroup_size = 256
     scratch = workgroup_size * 4
 
-    prog.__getattr__('_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_'[:31])(
+    prog.__getattr__('_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_')(
         queue, (global_size,), (workgroup_size,),
         eval_nopointers_gpu,
-        eval_ptr0_gpu, offset_type(eval_ptr0_offset),
-        eval_ptr1_gpu, offset_type(eval_ptr1_offset),
+        eval_ptr0_gpu,
+        eval_ptr1_gpu,
+        offset_type(0),
+        offset_type(eval_ptr0_offset),
+        offset_type(eval_ptr1_offset),
         np.int32(size),
         cl.LocalMemory(scratch)
     )

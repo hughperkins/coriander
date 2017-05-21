@@ -220,6 +220,26 @@ def ll_to_cl(ll_sourcecode, kernelName, num_clmems):
     return cl_sourcecode
 
 
+def cu_to_ll(cu_sourcecode):
+    for file in os.listdir('/tmp'):
+        if file.startswith('testprog'):
+            os.unlink('/tmp/%s' % file)
+    with open('/tmp/testprog.cu', 'w') as f:
+        f.write(cu_sourcecode)
+
+    env = os.environ
+    env['COCL_BIN'] = 'build'
+    env['COCL_LIB'] = 'build'
+    run_process([
+        'bin/cocl',
+        '-c',
+        '/tmp/testprog.cu'
+    ] + cocl_options(), env=env)
+    with open('/tmp/testprog-device.ll', 'r') as f:
+        ll_sourcecode = f.read()
+    return ll_sourcecode
+
+
 def cu_to_cl(cu_sourcecode, kernelName, num_clmems):
     for file in os.listdir('/tmp'):
         if file.startswith('testprog'):
@@ -253,6 +273,9 @@ def cu_to_cl(cu_sourcecode, kernelName, num_clmems):
 
 
 def build_kernel(context, cl_sourcecode, kernelName):
+    print('building sourcecode')
+    print('cl_sourcecode', cl_sourcecode)
     prog = cl.Program(context, cl_sourcecode).build()
+    print('built prog')
     kernel = prog.__getattr__(kernelName)
     return kernel
