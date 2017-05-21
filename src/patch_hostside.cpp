@@ -16,6 +16,8 @@
 
 #include "patch_hostside.h"
 
+#include "cocl/cocl_defs.h"
+
 #include "mutations.h"
 #include "struct_clone.h"
 // #include "ir-to-opencl-common.h"
@@ -162,17 +164,35 @@ void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *inf
         outs() << "\n";
         throw runtime_error("getlaunchvalue, first operatnd of inst is not an instruction...");
     }
-    Instruction *bitcast = cast<Instruction>(inst->getOperand(0));
-    Value *alloca = bitcast;
-    if(isa<BitCastInst>(bitcast)) {
-        alloca = bitcast->getOperand(0);
+    Instruction *valuePointer = cast<Instruction>(inst->getOperand(0));
+    COCL_PRINT(cout << "getLaunchArgValue() valuePointer (value pointer):" << endl);
+    COCL_PRINT(valuePointer->dump());
+    // COCL_PRINT(cout << "inst->getType()->dump()" << endl);
+    // COCL_PRINT(inst->getType()->dump());
+    COCL_PRINT(cout << "valuePointer->getType()->dump()" << endl);
+    COCL_PRINT(valuePointer->getType()->dump());
+    COCL_PRINT(cout << endl);
+    Value *alloca = 0;
+    if(isa<BitCastInst>(valuePointer)) {
+        alloca = valuePointer->getOperand(0);
+        COCL_PRINT(cout << "  its a bitcast => grabbing the earlier alloca:" << endl);
+        COCL_PRINT(alloca->dump());
+    } else if(isa<GetElementPtrInst>(valuePointer)) {
+        COCL_PRINT(cout << "got a gep" << endl);
     } else {
-        alloca = bitcast;
+        alloca = valuePointer;
+        // alloca = bitcast;
     }
-    Instruction *load = new LoadInst(alloca, "loadCudaArg");
-    load->insertBefore(inst->getInst());
-    info->callValuesByValue.push_back(load);
-    info->callValuesAsPointers.push_back(alloca);
+    Instruction *value = new LoadInst(alloca, "loadCudaArg");
+    COCL_PRINT(cout << "  load (value)" << endl);
+    COCL_PRINT(value->dump());
+    COCL_PRINT(cout << "load->getType()->dump()" << endl);
+    COCL_PRINT(value->getType()->dump());
+    COCL_PRINT(cout << endl);
+
+    value->insertBefore(inst->getInst());
+    info->callValuesByValue.push_back(value);
+    info->callValuesAsPointers.push_back(valuePointer);
 }
 
 std::ostream &operator<<(std::ostream &os, const PointerInfo &pointerInfo) {
@@ -500,7 +520,7 @@ void PatchHostside::patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, st
     PatchHostside::getLaunchTypes(inst, launchCallInfo.get());
     to_replace_with_zero.push_back(inst->getInst());
     // outs() << "\n";
-    // outs() << "patching launch in " << string(F->getName()) << "\n";
+    COCL_PRINT(outs() << "patching launch in " << string(F->getName()) << "\n");
 
     string kernelName = launchCallInfo->kernelName;
     Instruction *kernelNameValue = addStringInstr(M, "s_" + ::devicellcode_stringname + "_" + kernelName, kernelName);
@@ -530,6 +550,7 @@ void PatchHostside::patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, st
     for(auto argit=launchCallInfo->callValuesByValue.begin(); argit != launchCallInfo->callValuesByValue.end(); argit++) {
         Value *value = *argit;
         Value *valueAsPointerInstr = launchCallInfo->callValuesAsPointers[i];
+        COCL_PRINT(value->dump());
         lastInst = PatchHostside::addSetKernelArgInst(lastInst, value, valueAsPointerInstr);
         i++;
     }
@@ -615,10 +636,7 @@ std::string PatchHostside::getBasename(std::string path) {
     return path.substr(slash_pos + 1);
 }
 
-void PatchHostside::patchModule(Module *M) {
-    // entry point: given Module M, traverse all functions, rewriting the launch instructison to call
-    // into Coriander runtime
-
+void PatchHostside::setupGlobalVars(Module *M) {
     ifstream f_inll(::devicellfilename);
     string devicell_sourcecode(
         (std::istreambuf_iterator<char>(f_inll)),
@@ -629,7 +647,11 @@ void PatchHostside::patchModule(Module *M) {
 
     // addGlobalVariable(M, sourcecode_stringname, cl_sourcecode);
     addGlobalVariable(M, devicellcode_stringname, devicell_sourcecode);
+}
 
+void PatchHostside::patchModule(Module *M) {
+    // entry point: given Module M, traverse all functions, rewriting the launch instructison to call
+    // into Coriander runtime
     vector<Function *> functionsToRemove;
     for(auto it = M->begin(); it != M->end(); it++) {
         Function *F = &*it;
@@ -648,11 +670,13 @@ int main(int argc, char *argv[]) {
     // string devicellfilename;
     string rawhostfilename;
     string patchedhostfilename;
+    string specific_function = "";
 
     parser.add_string_argument("--hostrawfile", &rawhostfilename)->required()->help("input file");
     // parser.add_string_argument("--deviceclfile", &::deviceclfilename)->required()->help("input file");
     parser.add_string_argument("--devicellfile", &::devicellfilename)->required()->help("input file");
     parser.add_string_argument("--hostpatchedfile", &patchedhostfilename)->required()->help("output file");
+    parser.add_string_argument("--specific-function", &specific_function);
     if(!parser.parse_args(argc, argv)) {
         return -1;
     }
@@ -664,7 +688,20 @@ int main(int argc, char *argv[]) {
     }
 
     try {
-        PatchHostside::patchModule(module.get());
+        PatchHostside::setupGlobalVars(module.get());
+        if(specific_function == "") {
+            PatchHostside::patchModule(module.get());
+        } else {
+            cout << "specific function: " << specific_function << endl;
+            Function *F = module->getFunction(specific_function);
+            if(F == 0) {
+                cout << "function not found" << endl;
+                return -1;
+            }
+            // F->dump();
+            // cout << endl;
+            PatchHostside::patchFunction(F);
+        }
     } catch(const runtime_error &e) {
         cout << endl;
         cout << "Something went wrong, sorry." << endl;

@@ -99,6 +99,7 @@ public:
     static std::unique_ptr<GenericCallInst> create(llvm::CallInst *inst);
     virtual llvm::Value *getArgOperand(int idx) = 0;
     virtual llvm::Value *getOperand(int idx) = 0;
+    virtual llvm::Type *getType() = 0;
     virtual llvm::Module *getModule() = 0;
     virtual llvm::Instruction *getInst() = 0;
     virtual void dump() = 0;
@@ -112,6 +113,7 @@ public:
     llvm::CallInst *inst;
     virtual llvm::Value *getArgOperand(int idx) override { return inst->getArgOperand(idx); }
     virtual llvm::Value *getOperand(int idx) override { return inst->getArgOperand(idx); }
+    virtual llvm::Type *getType() override { return inst->getType(); }
     virtual llvm::Module *getModule() override { return inst->getModule(); }
     virtual llvm::Instruction *getInst() override { return inst; }
     virtual void dump() override { inst->dump(); }
@@ -123,6 +125,7 @@ public:
     llvm::InvokeInst *inst;
     virtual llvm::Value *getArgOperand(int idx) override { return inst->getArgOperand(idx); }
     virtual llvm::Value *getOperand(int idx) override { return inst->getArgOperand(idx); }
+    virtual llvm::Type *getType() override { return inst->getType(); }
     virtual llvm::Module *getModule() override { return inst->getModule(); }
     virtual llvm::Instruction *getInst() override { return inst; }
     virtual void dump() override { inst->dump(); }
@@ -195,6 +198,7 @@ public:
 
     static void patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, std::vector<llvm::Instruction *> &to_replace_with_zero);
     static void patchFunction(llvm::Function *F);  // patch all kernel launch commands in function F
+    static void setupGlobalVars(llvm::Module *M);
     static void patchModule(llvm::Module *M);  // main entry point. Scan through module M, and rewrite kernel launch commands
 };
 

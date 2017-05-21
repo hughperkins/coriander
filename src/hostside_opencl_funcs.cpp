@@ -237,6 +237,7 @@ CLKernel *compileOpenCLKernel(string uniqueKernelName, string shortKernelName, s
     ofstream f;
     v->getContext()->numKernelCalls++;
     if(v->getContext()->kernelCache.find(uniqueKernelName) != v->getContext()->kernelCache.end()) {
+        cout << "compileOpenCLKernel(): found kernel in cache for [" << uniqueKernelName << "]" << endl;
         return v->getContext()->kernelCache[uniqueKernelName];
     }
     // compile the kernel.  we are still locking the mutex, but I cnat think of a better
@@ -328,6 +329,7 @@ GenerateOpenCLResult generateOpenCL(
     std::string uniqueKernelName = uniqueKernelName_ss.str();
     // cout << "generateOpenCL() kernelNameAfterGenerate " << kernelNameAfterGenerate << endl;
     if(v->getContext()->clSourceCodeCache.find(uniqueKernelName) != v->getContext()->clSourceCodeCache.end()) {
+        cout << "generateOpenCL(): found cl sourcecode in cache for [" << uniqueKernelName << "]" << endl;
         std::string clSourcecode = v->getContext()->clSourceCodeCache[uniqueKernelName];
         return GenerateOpenCLResult { clSourcecode, origKernelName, shortKernelName, uniqueKernelName };
         // v->getContext()->numKernelCalls++;
@@ -534,17 +536,22 @@ void kernelGo() {
     //     launchConfiguration.kernelName += "_" + EasyCL::toString(clmemIndex);
     // }
     // cout << "kernelGo() kernel name " << launchConfiguration.kernelName << " unique clmems=" << launchConfiguration.clmems.size() << endl;
-    // cout << "kernelGo() clmems.size() " << launchConfiguration.clmems.size() << endl;
-    // for(auto it = launchConfiguration.clmemIndexByClmemArgIndex.begin(); it != launchConfiguration.clmemIndexByClmemArgIndex.end(); it++) {
-    //     cout << " clmem index " << *it << endl;
-    // }
+    cout << "kernelGo() clmems.size() " << launchConfiguration.clmems.size() << endl;
+    for(auto it = launchConfiguration.clmemIndexByClmemArgIndex.begin(); it != launchConfiguration.clmemIndexByClmemArgIndex.end(); it++) {
+        cout << " clmem index " << *it << endl;
+    }
     // for(int i = 0; i < launchConfiguration.args.size(); i++) {
     //     cout << "  arg i=" << i << " " << launchConfiguration.args[i]->str() << endl;
     // }
 
     GenerateOpenCLResult res = generateOpenCL(
-        launchConfiguration.clmems.size(), launchConfiguration.clmemIndexByClmemArgIndex, launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
-    // cout << "kernelGo() generatedKernelName=" << res.generatedKernelName << endl;
+        launchConfiguration.clmems.size(),
+        launchConfiguration.clmemIndexByClmemArgIndex,
+        launchConfiguration.kernelName,
+        launchConfiguration.devicellsourcecode);
+    cout << "kernelGo() kernelName=" << launchConfiguration.kernelName << endl;
+    cout << "  kernelGo() uniqueKernelName=" << res.uniqueKernelName << endl;
+    cout << "  kernelGo() shortKernelName=" << res.shortKernelName << endl;
     // cout << "kernelGo() OpenCL sourcecode:\n" << res.clSourcecode << endl;
     CLKernel *kernel = compileOpenCLKernel(res.uniqueKernelName, res.shortKernelName, res.clSourcecode);
 

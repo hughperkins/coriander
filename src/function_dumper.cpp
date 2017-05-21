@@ -371,6 +371,11 @@ std::string FunctionDumper::dumpKernelFunctionDeclarationWithoutReturn(llvm::Fun
                         argdeclaration = "int " + argName + "_nopointers_offset";
 
                         PointerType *noptrTypePointer = PointerType::get(noptrType, 1);
+                        if(clmemArgIndex >= kernelClmemIndexByArgIndex.size()) {
+                            cout << "function_dumper.cpp dumpKernelFunctionDeclarationWithoutReturn(): didnt receive enough clmem indexes" << endl;
+                            cout << "received " << kernelClmemIndexByArgIndex.size() << " needed more" << endl;
+                            throw runtime_error("function_dumper.cpp dumpKernelFunctionDeclarationWithoutReturn(): didnt receive enough clmem indexes");
+                        }
                         int clmemIndex = kernelClmemIndexByArgIndex[clmemArgIndex];
                         clmemArgIndex++;
                         shimCode = 
@@ -433,6 +438,11 @@ std::string FunctionDumper::dumpKernelFunctionDeclarationWithoutReturn(llvm::Fun
                 string pointerArgName = argName + "_ptr" + easycl::toString(j);
                 // declaration << ", " << typeDumper->dumpType(pointerInfo->type) << " " << pointerArgName;
                 declaration << createOffsetDeclaration(pointerArgName);
+                if(clmemArgIndex >= kernelClmemIndexByArgIndex.size()) {
+                    cout << "function_dumper.cpp dumpKernelFunctionDeclarationWithoutReturn(): didnt receive enough clmem indexes" << endl;
+                    cout << "received " << kernelClmemIndexByArgIndex.size() << " needed more" << endl;
+                    throw runtime_error("function_dumper.cpp dumpKernelFunctionDeclarationWithoutReturn(): didnt receive enough clmem indexes");
+                }
                 int clmemIndex = kernelClmemIndexByArgIndex[clmemArgIndex];
                 clmemArgIndex++;
                 shimCode = 
