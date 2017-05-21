@@ -216,7 +216,25 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_int(llvm::Instruction *las
 }
 
 llvm::Instruction *PatchHostside::addSetKernelArgInst_float(llvm::Instruction *lastInst, llvm::Value *value) {
+    // handle primitive floats, which we pass to `setKernelArgFloat`, by value
+
     Module *M = lastInst->getModule();
+
+    Type *valueType = value->getType();
+    // cout << "addSetKernelArgInst_float, value type:" << endl;
+    // valueType->dump();
+    // cout << endl;
+    if(valueType->isDoubleTy()) {
+        // cout << "is double" << endl;
+        // FPTruncInst *fpTrunc = new FPTruncInst(value, Type::getFloatTy(context), "trunctofloat");
+        // fpTrunc->insertAfter(lastInst);
+        // lastInst = fpTrunc;
+        // value = fpTrunc;
+        cout << "Executing functions with doubles as kernel parameters is not supported" << endl;
+        cout << "Note that this is not set-in-stone, but is really hard to do." << endl;
+        cout << "If you really need this functionality, please post your use-case into https://github.com/hughperkins/coriander/issues/22" << endl;
+        throw runtime_error("Executing functions with doubles as kernel parameters is not supported");
+    }
 
     Function *setKernelArgFloat = cast<Function>(M->getOrInsertFunction(
         "setKernelArgFloat",
@@ -250,6 +268,18 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction 
     // cout << "got elementtype" << endl;
     // elementType->dump();
     // cout << endl;
+
+    if(elementType->isDoubleTy()) {
+        // cout << "is double" << endl;
+        // FPTruncInst *fpTrunc = new FPTruncInst(value, Type::getFloatTy(context), "trunctofloat");
+        // fpTrunc->insertAfter(lastInst);
+        // lastInst = fpTrunc;
+        // value = fpTrunc;
+        cout << "Executing functions with double arrays as kernel parameters is not supported" << endl;
+        cout << "Note that this is not set-in-stone, but is really hard to do." << endl;
+        cout << "If you really need this functionality, please post your use-case into https://github.com/hughperkins/coriander/issues/22" << endl;
+        throw runtime_error("Executing functions with double arrays as kernel parameters is not supported");
+    }
 
     BitCastInst *bitcast = new BitCastInst(value, PointerType::get(IntegerType::get(context, 8), 0));
     bitcast->insertAfter(lastInst);
