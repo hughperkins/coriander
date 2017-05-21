@@ -33,26 +33,6 @@ def dotdotdot_cl():
     print('cl_sourcecode', cl_sourcecode)
     return cl_sourcecode
 
-    # cl_filepath = 'test/generated/dotdotdot.cl'
-
-    # print(subprocess.check_output([
-    #     test_common.clang_path,
-    #     '-c', ll_filepath,
-    #     '-O3',
-    #     '-o', '/tmp/~foo'
-    # ]).decode('utf-8'))
-
-    # if not path.isdir('test/generated'):
-    #     os.makedirs('test/generated')
-    # print(subprocess.check_output([
-    #     'build/ir-to-opencl',
-    #     # '--debug',
-    #     '--inputfile', ll_filepath,
-    #     '--outputfile', cl_filepath,
-    #     '--kernelname', '_Z7test_siPf'
-    # ]).decode('utf-8'))
-    # return cl_filepath
-
 
 @pytest.fixture(scope='module')
 def dotdotdot(context, dotdotdot_cl):

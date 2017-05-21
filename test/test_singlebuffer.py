@@ -140,7 +140,7 @@ __global__ void myKernel(float *data0, float *data1, int N) {
 }
 """
     mangledName = '_Z8myKernelPfS_i'
-    kernel = test_common.compile_code_v3(cl, context, code, mangledName)['kernel']
+    kernel = test_common.compile_code_v3(cl, context, code, mangledName, num_clmems=2)['kernel']
 
     N = 10
 
@@ -160,8 +160,10 @@ __global__ void myKernel(float *data0, float *data1, int N) {
 
     kernel(
         queue, (global_size,), (workgroup_size,),
-        huge_buf_gpu, offset_type(dst_offset // 4),
-        huge_buf_gpu, offset_type(src_offset // 4),
+        huge_buf_gpu,
+        huge_buf_gpu,
+        offset_type(dst_offset),
+        offset_type(src_offset),
         np.int32(N),
         cl.LocalMemory(4)
     )

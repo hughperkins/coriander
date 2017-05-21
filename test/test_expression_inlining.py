@@ -40,28 +40,6 @@ __global__ void myKernel(float *data) {
     print('cl_sourcecode', cl_sourcecode)
     kernel = test_common.build_kernel(context, cl_sourcecode, kernelName)
 
-    # for file in os.listdir('/tmp'):
-    #     if file.startswith(basename):
-    #         os.unlink('/tmp/%s' % file)
-    # with open('/tmp/%s.cu' % basename, 'w') as f:
-    #     f.write(code)
-    # print(subprocess.check_output([
-    #     'bin/cocl',
-    #     '-c',
-    #     '/tmp/%s.cu' % basename
-    # ]).decode('utf-8'))
-
-    # kernelName = test_common.mangle('myKernel', ['float *'])
-    # print(subprocess.check_output([
-    #     'build/ir-to-opencl',
-    #     '--inputfile', '/tmp/%s-device.ll' % basename,
-    #     '--outputfile', '/tmp/%s-device.cl' % basename,
-    #     '--kernelname', kernelName
-    # ]).decode('utf-8'))
-
-    # with open('/tmp/%s-device.cl' % basename, 'r') as f:
-    #     sourcecode = f.read()
-
     for i in range(10):
         float_data[i] = i + 3
     cl.enqueue_copy(q, float_data_gpu, float_data)
