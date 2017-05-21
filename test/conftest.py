@@ -4,7 +4,7 @@ import pytest
 import os
 
 
-gpu_idx = int(os.environ.get('TARGET_GPU', 0))
+gpu_idx = int(os.environ.get('CL_GPUOFFSET', 0))
 
 mf = cl.mem_flags
 

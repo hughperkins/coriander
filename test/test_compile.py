@@ -48,6 +48,7 @@ def test_compile(context, cu_filepath, kernelname, num_clmems):
     print('after build kernel')
 
 
+@pytest.mark.xfail(reason='need to re-implement global variables')
 def test_no_pointer_struct_pointer(context):
     with open("test/pointerpointer.cu", 'r') as f:
         cu_code = f.read()
