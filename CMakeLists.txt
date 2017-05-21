@@ -112,14 +112,14 @@ foreach(LIB ${LLVM_LIBFILES})
    endif()
 endforeach()
 
-# add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp)
-# target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
-# target_include_directories(ir-to-opencl PRIVATE ${CLANG_HOME}/include)
-# target_compile_options(ir-to-opencl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-# target_link_libraries(ir-to-opencl cocl ${LLVM_SYSLIBS})
-# # if(OFFSET_32BIT)
-# #     target_compile_definitions(ir-to-opencl PRIVATE -DOFFSET_32BIT)
-# # endif()
+add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp)
+target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
+target_include_directories(ir-to-opencl PRIVATE ${CLANG_HOME}/include)
+target_compile_options(ir-to-opencl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
+target_link_libraries(ir-to-opencl cocl ${LLVM_SYSLIBS})
+# if(OFFSET_32BIT)
+#     target_compile_definitions(ir-to-opencl PRIVATE -DOFFSET_32BIT)
+# endif()
 
 add_executable(patch_hostside
     src/patch_hostside.cpp src/struct_clone.cpp src/mutations.cpp src/readIR.cpp

@@ -34,12 +34,14 @@ esac
 SCRIPT_DIR=$( cd "$( dirname "$0" )" && pwd )
 export COCL_HOME=$(dirname ${SCRIPT_DIR})
 
-if [ -f ${COCL_HOME}/bin/patch_hostside ]; then {
-    export COCL_BIN=${COCL_HOME}/bin
-    export COCL_LIB=${COCL_HOME}/lib
-} else {
-    export COCL_BIN=${PWD}
-    export COCL_LIB=${PWD}
+if [[ x${COCL_BIN} == x ]]; then {
+    if [ -f ${COCL_HOME}/bin/patch_hostside ]; then {
+        export COCL_BIN=${COCL_HOME}/bin
+        export COCL_LIB=${COCL_HOME}/lib
+    } else {
+        export COCL_BIN=${PWD}
+        export COCL_LIB=${PWD}
+    } fi
 } fi
 
 # Using this weird bash, compared to other possibilities because:

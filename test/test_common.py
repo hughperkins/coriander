@@ -8,10 +8,10 @@ import pyopencl as cl
 clang_path = join(os.environ['CLANG_HOME'], 'bin', 'clang++')
 
 
-def run_process(cmdline_list):
+def run_process(cmdline_list, cwd=None, env=None):
     print('running [%s]' % ' '.join(cmdline_list))
     fout = open('/tmp/pout.txt', 'w')
-    res = subprocess.run(cmdline_list, stdout=fout, stderr=subprocess.STDOUT)
+    res = subprocess.run(cmdline_list, stdout=fout, stderr=subprocess.STDOUT, cwd=cwd, env=env)
     fout.close()
     with open('/tmp/pout.txt', 'r') as f:
         output = f.read()
@@ -94,7 +94,7 @@ def mangle(name, param_types):
     return mangled
 
 
-def compile_code(cl, context, kernelSource, kernelName):
+def compile_code(cl, context, kernelSource, kernelName, num_clmems):
     for file in os.listdir('/tmp'):
         if file.startswith('testprog'):
             os.unlink('/tmp/%s' % file)
@@ -104,17 +104,23 @@ def compile_code(cl, context, kernelSource, kernelName):
     # if not branching_transformations:
     #     args.append('--no_branching_transforms')
 
+    clmemIndexes = ','.join([str(i) for i in range(num_clmems)])
+    env = os.environ
+    env['COCL_BIN'] = 'build'
+    env['COCL_LIB'] = 'build'
     run_process([
         'bin/cocl',
         '-c',
         '/tmp/testprog.cu'
-    ] + cocl_options())
+    ] + cocl_options(),
+        env=env)
 
     run_process([
         'build/ir-to-opencl',
         '--inputfile', '/tmp/testprog-device.ll',
         '--outputfile', '/tmp/testprog-device.cl',
         '--kernelname', kernelName,
+        '--cmem-indexes', clmemIndexes,
         '--add_ir_to_cl'
     ])
 
@@ -154,7 +160,7 @@ def compile_code_v2(cl, context, kernelSource, kernelName):
     return {'prog': prog, 'cl_sourcecode': cl_sourcecode}
 
 
-def compile_code_v3(cl, context, kernelSource, kernelName):
+def compile_code_v3(cl, context, kernelSource, kernelName, num_clmems):
     """
     returns dict
     """
@@ -164,17 +170,22 @@ def compile_code_v3(cl, context, kernelSource, kernelName):
     with open('/tmp/testprog.cu', 'w') as f:
         f.write(kernelSource)
 
+    clmemIndexes = ','.join([str(i) for i in range(num_clmems)])
+    env = os.environ
+    env['COCL_BIN'] = 'build'
+    env['COCL_LIB'] = 'build'
     run_process([
         'bin/cocl',
         '-c',
         '/tmp/testprog.cu'
-    ] + cocl_options())
+    ] + cocl_options(), env=env)
 
     run_process([
         'build/ir-to-opencl',
         '--inputfile', '/tmp/testprog-device.ll',
         '--outputfile', '/tmp/testprog-device.cl',
         '--kernelname', kernelName,
+        '--cmem-indexes', clmemIndexes,        
         '--add_ir_to_cl'
     ])
 
@@ -202,24 +213,30 @@ def ll_to_cl(ll_sourcecode, kernelName):
     return cl_sourcecode
 
 
-def cu_to_cl(cu_sourcecode, kernelName):
+def cu_to_cl(cu_sourcecode, kernelName, num_clmems):
     for file in os.listdir('/tmp'):
         if file.startswith('testprog'):
             os.unlink('/tmp/%s' % file)
     with open('/tmp/testprog.cu', 'w') as f:
         f.write(cu_sourcecode)
 
+    clmemIndexes = ','.join([str(i) for i in range(num_clmems)])
+
+    env = os.environ
+    env['COCL_BIN'] = 'build'
+    env['COCL_LIB'] = 'build'
     run_process([
         'bin/cocl',
         '-c',
         '/tmp/testprog.cu'
-    ] + cocl_options())
+    ] + cocl_options(), env=env)
 
     run_process([
         'build/ir-to-opencl',
         '--inputfile', '/tmp/testprog-device.ll',
         '--outputfile', '/tmp/testprog-device.cl',
         '--kernelname', kernelName,
+        '--cmem-indexes', clmemIndexes,        
         '--add_ir_to_cl'
     ])
 

@@ -107,14 +107,14 @@ __global__ void somekernel(float *data) {
 }
 """
     mangledname = test_common.mangle('somekernel', ['float *'])
-    cl_code = test_common.cu_to_cl(sourcecode, mangledname)
+    cl_code = test_common.cu_to_cl(sourcecode, mangledname, num_clmems=1)
     print('cl_code', cl_code)
     kernel = test_common.build_kernel(context, cl_code, mangledname)
 
 
 def test_foo(context, q, float_data, float_data_gpu, cuSourcecode):
     kernelName = test_common.mangle('foo', ['float *'])
-    testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName)
+    testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName, num_clmems=1)
     testcudakernel1.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -122,8 +122,9 @@ def test_foo(context, q, float_data, float_data_gpu, cuSourcecode):
 
 
 def test_copy_float(cuSourcecode, context, q, float_data, float_data_gpu):
-    kernelName = test_common.mangle('copy_float', ['float *'])
-    testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName)
+    argTypes = ['float *']
+    kernelName = test_common.mangle('copy_float', argTypes)
+    testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName, num_clmems=1)
     testcudakernel1.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -133,7 +134,7 @@ def test_copy_float(cuSourcecode, context, q, float_data, float_data_gpu):
 def test_use_tid2(cuSourcecode, context, q, int_data, int_data_gpu):
     int_data_orig = np.copy(int_data)
     kernelName = test_common.mangle('use_tid2', ['int *'])
-    testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName)
+    testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName, num_clmems=1)
     testcudakernel1.__getattr__(kernelName)(q, (32,), (32,), int_data_gpu, offset_type(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, int_data, int_data_gpu)
     q.finish()
@@ -157,11 +158,11 @@ __global__ void use_template1(float *data, int *intdata) {
 }
 """
     kernelName = test_common.mangle('use_template1', ['float *', 'int *'])
-    prog = compile_code(cl, context, code, kernelName)
+    prog = compile_code(cl, context, code, kernelName, num_clmems=2)
     float_data_orig = np.copy(float_data)
     int_data_orig = np.copy(int_data)
 
-    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), int_data_gpu, offset_type(0), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, int_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     cl.enqueue_copy(q, int_data, int_data_gpu)
     q.finish()
@@ -181,10 +182,10 @@ __global__ void testTernary(float *data) {
 }
 """
     setValueKernelName = test_common.mangle('setValue', ['float *', 'int', 'float'])
-    setValueProg = compile_code(cl, context, kernelSource, setValueKernelName)
+    setValueProg = compile_code(cl, context, kernelSource, setValueKernelName, num_clmems=1)
 
     testTernaryName = test_common.mangle('testTernary', ['float *'])
-    testTernaryProg = compile_code(cl, context, kernelSource, testTernaryName)
+    testTernaryProg = compile_code(cl, context, kernelSource, testTernaryName, num_clmems=1)
 
     float_data_orig = np.copy(float_data)
 
@@ -228,7 +229,10 @@ __global__ void testStructs(MyStruct *structs, float *float_data, int *int_data)
     float_data[1] = structs[1].myfloat;
 }
 """
-    kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('testStructs', ['MyStruct *', 'float *', 'int *']))['kernel']
+    kernel = test_common.compile_code_v3(
+        cl, context, code, test_common.mangle('testStructs', ['MyStruct *', 'float *', 'int *']),
+        num_clmems=3
+    )['kernel']
 
     # my_struct = np.dtype([("myfloat", np.float32), ("myint", np.int32)])  # I dont know why, but seems these are back to front...
     my_struct = np.dtype([("myint", np.int32), ("myfloat", np.float32)])  # seems these are wrong way around on HD5500.  Works ok on 940M
@@ -265,7 +269,7 @@ __global__ void testStructs(MyStruct *structs, float *float_data, int *int_data)
 def test_float4(cuSourcecode, context, ctx, q, float_data, float_data_gpu):
     float_data_orig = np.copy(float_data)
     kernelName = test_common.mangle('testFloat4', ['float4 *'])
-    testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName)
+    testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName, num_clmems=1)
     testcudakernel1.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -279,7 +283,7 @@ def test_float4(cuSourcecode, context, ctx, q, float_data, float_data_gpu):
 def test_float4_test2(cuSourcecode, context, ctx, q, float_data, float_data_gpu):
     float_data_orig = np.copy(float_data)
     kernelName = test_common.mangle('testFloat4_test2', ['float4 *'])
-    testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName)
+    testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName, num_clmems=1)
     testcudakernel1.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -306,8 +310,10 @@ __global__ void mysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctio
     mysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnameb(data);
 }
 """
-    mangled_name = test_common.mangle('mysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamec', ['float *'])
-    cl_source = test_common.cu_to_cl(cu_source, mangled_name)
+    mangled_name = test_common.mangle(
+        'mysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctionnamec',
+        ['float *'])
+    cl_source = test_common.cu_to_cl(cu_source, mangled_name, num_clmems=1)
     print('cl_source', cl_source)
     for line in cl_source.split("\n"):
         if line.strip().startswith('/*'):
@@ -317,8 +323,9 @@ __global__ void mysuperlongfunctionnamemysuperlongfunctionnamemysuperlongfunctio
         name = line.replace('kernel ', '').replace('void ', '').split('(')[0]
         if name != '':
             print('name', name)
-            assert len(name) <= 32
-    test_common.build_kernel(context, cl_source, mangled_name[:31])
+            # assert len(name) <= 32
+    # test_common.build_kernel(context, cl_source, mangled_name[:31])
+    test_common.build_kernel(context, cl_source, mangled_name)
 
 
 def test_short_names(context):
@@ -343,7 +350,7 @@ __global__ void funck(float *data) {
 }
 """
     mangled_name = test_common.mangle('funck', ['float *'])
-    cl_source = test_common.cu_to_cl(cu_source, mangled_name)
+    cl_source = test_common.cu_to_cl(cu_source, mangled_name, num_clmems=1)
     print('cl_source', cl_source)
 
     test_common.build_kernel(context, cl_source, mangled_name[:31])

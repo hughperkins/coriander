@@ -15,6 +15,8 @@
 #include "argparsecpp.h"
 #include "kernel_dumper.h"
 
+#include "EasyCL/util/easycl_stringhelper.h"
+
 #include "llvm/IR/DebugInfoMetadata.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/SourceMgr.h"
@@ -35,6 +37,7 @@ int main(int argc, char *argv[]) {
     string llFilename;
     string ClFilename;
     string kernelname = "";
+    string cmem_indexes = "";
     bool add_ir_to_cl = false;
     // bool dumpCl = false;
     // string rcFile = "";
@@ -43,6 +46,8 @@ int main(int argc, char *argv[]) {
     parser.add_string_argument("--inputfile", &llFilename)->required();
     parser.add_string_argument("--outputfile", &ClFilename)->required();
     parser.add_string_argument("--kernelname", &kernelname)->required();
+    parser.add_string_argument("--cmem-indexes", &cmem_indexes)->required()->help("comma-separated, eg 0,1,2,1");
+
     // parser.add_bool_argument("--debug", &debug);
     // parser.add_string_argument("--rcfile", &rcFile)
     //     ->help("Path to rcfile, containing default options, set to blank to disable")
@@ -57,6 +62,18 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
+    vector<string> split_cmem_indexes = easycl::split(cmem_indexes, ",");
+    int numCmems = 0;
+    vector<int> cmemIndexes;
+    for(int i = 0; i < (int)split_cmem_indexes.size(); i++) {
+        int index = easycl::atoi(split_cmem_indexes[i]);
+        cmemIndexes.push_back(index);
+        if(index + 1 > numCmems) {
+            numCmems = index + 1;
+        }
+    }
+    cout << "numCmems " << numCmems << endl; 
+
     llvm::LLVMContext context;
     SMDiagnostic smDiagnostic;
     std::unique_ptr<llvm::Module> M = parseIRFile(llFilename, smDiagnostic, context);
@@ -66,19 +83,23 @@ int main(int argc, char *argv[]) {
         throw runtime_error("failed to parse IR");
     }
 
-    KernelDumper kernelDumper(M.get(), kernelname);
+    KernelDumper kernelDumper(M.get(), kernelname, kernelname);
     if(add_ir_to_cl) {
         kernelDumper.addIRToCl();
     }
     // if(dumpCl) {
     //     kernelDumper.setDumpCl();
     // }
-    string cl = kernelDumper.toCl();
-
-    ofstream of;
-    of.open(ClFilename, ios_base::out);
-    of << cl;
-    of.close();
+    try {
+        string cl = kernelDumper.toCl(numCmems, cmemIndexes);
+        ofstream of;
+        of.open(ClFilename, ios_base::out);
+        of << cl;
+        of.close();
+    } catch(runtime_error &e) {
+        cout << "got exception: " << e.what() << endl;
+        return -1;
+    }
 
     return 0;
 }
