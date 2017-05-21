@@ -410,7 +410,8 @@ void setKernelArgHostsideBuffer(char *pCpuStruct, int structAllocateSize) {
     // - struct allocate size, so we know how big to make the gpu buffer, and how much
     //   data to copy across, from the hostside struct pointer location
     // - we wont add the clmem to the virtualmem table, so we wont delegate
-    //   anything to the more generic setKernelArgCharStar method
+    //   anything to the setKernelArgGpuBuffer method (which expects an incoming
+    //   pointer to be a virtual pointer, not a cl_mem)
 
     pthread_mutex_lock(&launchMutex);
     ThreadVars *v = getThreadVars();
