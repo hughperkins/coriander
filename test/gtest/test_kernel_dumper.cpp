@@ -87,8 +87,8 @@ float someFunc_pg(float* d1, global float* v11, local int *scratch);
 kernel void someKernel(global char* clmem0, global char* clmem1, uint d1_offset, uint d2_offset, local int *scratch);
 
 kernel void someKernel(global char* clmem0, global char* clmem1, uint d1_offset, uint d2_offset, local int *scratch) {
-    global float* d2 = (global float*)clmem1 + d2_offset;
-    global float* d1 = (global float*)clmem0 + d1_offset;
+    global float* d2 = (global float*)(clmem1 + d2_offset);
+    global float* d1 = (global float*)(clmem0 + d1_offset);
 
     float v4;
     float v5;
@@ -153,8 +153,8 @@ float someFunc_pg(float* d1, global float* v11, local int *scratch);
 kernel void someKernel(global char* clmem0, uint d1_offset, uint d2_offset, local int *scratch);
 
 kernel void someKernel(global char* clmem0, uint d1_offset, uint d2_offset, local int *scratch) {
-    global float* d2 = (global float*)clmem0 + d2_offset;
-    global float* d1 = (global float*)clmem0 + d1_offset;
+    global float* d2 = (global float*)(clmem0 + d2_offset);
+    global float* d1 = (global float*)(clmem0 + d1_offset);
 
     float v4;
     float v5;
@@ -214,7 +214,7 @@ TEST(test_kernel_dumper, testBranches_phifromfuture) {
 kernel void testBranches_phifromfuture(global char* clmem0, uint d1_offset, local int *scratch);
 
 kernel void testBranches_phifromfuture(global char* clmem0, uint d1_offset, local int *scratch) {
-    global float* d1 = (global float*)clmem0 + d1_offset;
+    global float* d1 = (global float*)(clmem0 + d1_offset);
 
     float v12;
     float v4;
@@ -266,7 +266,7 @@ v1:;
     return in;
 }
 kernel void usesPointerFunction(global char* clmem0, uint in_offset, local int *scratch) {
-    global float* in = (global float*)clmem0 + in_offset;
+    global float* in = (global float*)(clmem0 + in_offset);
 
     float v3[1];
     float* v4;
@@ -296,7 +296,7 @@ kernel void usesFunctionReturningVoid(global char* clmem0, uint in_offset, local
 void returnsVoid_g(global float* in, local int *scratch);
 
 kernel void usesFunctionReturningVoid(global char* clmem0, uint in_offset, local int *scratch) {
-    global float* in = (global float*)clmem0 + in_offset;
+    global float* in = (global float*)(clmem0 + in_offset);
 
 
 v1:;
@@ -329,7 +329,7 @@ TEST(test_kernel_dumper, test_randomintarray) {
 kernel void test_randomintarray(global char* clmem0, uint data_offset, local int *scratch);
 
 kernel void test_randomintarray(global char* clmem0, uint data_offset, local int *scratch) {
-    global int* data = (global int*)clmem0 + data_offset;
+    global int* data = (global int*)(clmem0 + data_offset);
 
     int v9;
     int* v4;

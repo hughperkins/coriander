@@ -131,8 +131,8 @@ TEST(test_function_dumper, basic1) {
     functionDumper->toCl(os);
     cout << "cl: [" << os.str() << "]" << endl;
     EXPECT_EQ(R"(kernel void someKernel(global char* clmem0, global char* clmem1, uint d1_offset, uint d2_offset, local int *scratch) {
-    global float* d2 = (global float*)clmem1 + d2_offset;
-    global float* d1 = (global float*)clmem0 + d1_offset;
+    global float* d2 = (global float*)(clmem1 + d2_offset);
+    global float* d1 = (global float*)(clmem0 + d1_offset);
 
     float v4;
     float* v2[1];
@@ -171,8 +171,8 @@ TEST(test_function_dumper, basic1Ints) {
     functionDumper->toCl(os);
     cout << "cl: [" << os.str() << "]" << endl;
     EXPECT_EQ(R"(kernel void someKernelInts(global char* clmem0, global char* clmem1, uint d1_offset, uint d2_offset, local int *scratch) {
-    global int* d2 = (global int*)clmem1 + d2_offset;
-    global int* d1 = (global int*)clmem0 + d1_offset;
+    global int* d2 = (global int*)(clmem1 + d2_offset);
+    global int* d1 = (global int*)(clmem0 + d1_offset);
 
     int v4;
     int* v2[1];
@@ -211,8 +211,8 @@ TEST(test_function_dumper, redundantclmems) {
     functionDumper->toCl(os);
     cout << "cl: [" << os.str() << "]" << endl;
     EXPECT_EQ(R"(kernel void someKernel(global char* clmem0, uint d1_offset, uint d2_offset, local int *scratch) {
-    global float* d2 = (global float*)clmem0 + d2_offset;
-    global float* d1 = (global float*)clmem0 + d1_offset;
+    global float* d2 = (global float*)(clmem0 + d2_offset);
+    global float* d1 = (global float*)(clmem0 + d1_offset);
 
     float v4;
     float* v2[1];
@@ -250,7 +250,7 @@ TEST(test_function_dumper, usesShared1) {
     functionDumper->toCl(os);
     cout << "cl: [" << os.str() << "]" << endl;
     EXPECT_EQ(R"(kernel void usesShared(global char* clmem0, uint d1_offset, local int *scratch) {
-    global float* d1 = (global float*)clmem0 + d1_offset;
+    global float* d1 = (global float*)(clmem0 + d1_offset);
 
     float v7[1];
     float v8;
@@ -284,7 +284,7 @@ TEST(test_function_dumper, usesShared2) {
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
     EXPECT_EQ(R"(kernel void usesShared2(global char* clmem0, uint d1_offset, local int *scratch) {
-    global float* d1 = (global float*)clmem0 + d1_offset;
+    global float* d1 = (global float*)(clmem0 + d1_offset);
 
     float v11[1];
     float v13;
@@ -346,7 +346,7 @@ TEST(test_function_dumper, usesPointerFunction) {
     functionDumper2->toCl(os);
     cout << "cl, F2: [" << os.str() << "]" << endl;
     EXPECT_EQ(R"(kernel global float* returnsPointer_g(global char* clmem0, uint in_offset, local int *scratch) {
-    global float* in = (global float*)clmem0 + in_offset;
+    global float* in = (global float*)(clmem0 + in_offset);
 
 
 v1:;
@@ -367,7 +367,7 @@ v1:;
     functionDumper->toCl(os);
     cout << "cl, F: [" << os.str() << "]" << endl;
     EXPECT_EQ(R"(kernel void usesPointerFunction(global char* clmem0, uint in_offset, local int *scratch) {
-    global float* in = (global float*)clmem0 + in_offset;
+    global float* in = (global float*)(clmem0 + in_offset);
 
     global float* v2;
 
@@ -396,7 +396,7 @@ TEST(test_function_dumper, returnsFloatConstant) {
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
     EXPECT_EQ(R"(kernel float returnsFloatConstant(global char* clmem0, uint in_offset, local int *scratch) {
-    global float* in = (global float*)clmem0 + in_offset;
+    global float* in = (global float*)(clmem0 + in_offset);
 
 
 v1:;
@@ -423,7 +423,7 @@ TEST(test_function_dumper, testBranches_nophi) {
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
     EXPECT_EQ(R"(kernel void testBranches_nophi(global char* clmem0, uint d1_offset, local int *scratch) {
-    global float* d1 = (global float*)clmem0 + d1_offset;
+    global float* d1 = (global float*)(clmem0 + d1_offset);
 
     float v3;
     float v6[1];
@@ -460,7 +460,7 @@ TEST(test_function_dumper, testBranches_onephi) {
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
     EXPECT_EQ(R"(kernel void testBranches_onephi(global char* clmem0, uint d1_offset, local int *scratch) {
-    global float* d1 = (global float*)clmem0 + d1_offset;
+    global float* d1 = (global float*)(clmem0 + d1_offset);
 
     float v3;
     float v6;
@@ -500,7 +500,7 @@ TEST(test_function_dumper, testBranches_phifromfuture) {
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
     EXPECT_EQ(R"(kernel void testBranches_phifromfuture(global char* clmem0, uint d1_offset, local int *scratch) {
-    global float* d1 = (global float*)clmem0 + d1_offset;
+    global float* d1 = (global float*)(clmem0 + d1_offset);
 
     float v12;
     float v4;
@@ -545,7 +545,7 @@ TEST(test_function_dumper, testBranches_phifromfloat) {
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
     EXPECT_EQ(R"(kernel void testBranches_phifromfloat(global char* clmem0, uint d1_offset, local int *scratch) {
-    global float* d1 = (global float*)clmem0 + d1_offset;
+    global float* d1 = (global float*)(clmem0 + d1_offset);
 
     float v13;
     float v8;
@@ -588,7 +588,7 @@ TEST(test_function_dumper, multigpu_Z8getValuePf) {
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
     EXPECT_EQ(R"(kernel void multigpu_Z8getValuePf(global char* clmem0, uint outdata_offset, local int *scratch) {
-    global float* outdata = (global float*)clmem0 + outdata_offset;
+    global float* outdata = (global float*)(clmem0 + outdata_offset);
 
     float v10;
     float v15;
