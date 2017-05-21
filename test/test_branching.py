@@ -60,7 +60,7 @@ __global__ void testIf(float *data, int N) {
 }
 """
     kernelName = test_common.mangle('testIf', ['float *', 'int'])
-    prog = compile_code(cl, context, sourcecode, kernelName)
+    prog = compile_code(cl, context, sourcecode, kernelName, num_clmems=1)
     float_data_orig = np.copy(float_data)
 
     N = 2
@@ -89,7 +89,7 @@ __global__ void testIfElse(float *data, int N) {
 }
 """
     kernelName = test_common.mangle('testIfElse', ['float *', 'int'])
-    prog = compile_code(cl, context, sourcecode, kernelName)
+    prog = compile_code(cl, context, sourcecode, kernelName, num_clmems=1)
     float_data_orig = np.copy(float_data)
 
     N = 2
@@ -120,7 +120,7 @@ __global__ void testIfElse(float *data, int N) {
 }
 """
     kernelName = test_common.mangle('testIfElse', ['float *', 'int'])
-    prog = compile_code(cl, context, sourcecode, kernelName)
+    prog = compile_code(cl, context, sourcecode, kernelName, num_clmems=1)
     float_data_orig = np.copy(float_data)
 
     N = 2
@@ -144,7 +144,7 @@ __global__ void testInline(float *data, int N) {
 }
 """
     kernelName = test_common.mangle('testInline', ['float *', 'int'])
-    prog = compile_code(cl, context, sourcecode, kernelName)
+    prog = compile_code(cl, context, sourcecode, kernelName, num_clmems=1)
     float_data_orig = np.copy(float_data)
 
     N = 4
@@ -169,7 +169,7 @@ __global__ void testFor(float *data, int N) {
 }
 """
     kernelName = test_common.mangle('testFor', ['float *', 'int'])
-    prog = compile_code(cl, context, sourcecode, kernelName)
+    prog = compile_code(cl, context, sourcecode, kernelName, num_clmems=1)
     float_data_orig = np.copy(float_data)
 
     N = 4
@@ -205,7 +205,7 @@ __global__ void testTwoFors(float *data, int N) {
 }
 """
     kernelName = test_common.mangle('testTwoFors', ['float *', 'int'])
-    prog = compile_code(cl, context, sourcecode, kernelName)
+    prog = compile_code(cl, context, sourcecode, kernelName, num_clmems=1)
     float_data_orig = np.copy(float_data)
 
     N = 4
@@ -241,7 +241,7 @@ __global__ void mykernel(float *data, int a, int b) {
 }
 """
     kernelName = test_common.mangle('mykernel', ['float *', 'int', 'int'])
-    kernel = test_common.compile_code_v3(cl, context, source, kernelName)['kernel']
+    kernel = test_common.compile_code_v3(cl, context, source, kernelName, num_clmems=1)['kernel']
     float_data_orig = np.copy(float_data)
 
     a = 2
@@ -275,7 +275,7 @@ __global__ void longKernel(float *data, int N, float value) {
 }
 """
     kernelName = test_common.mangle('longKernel', ['float *', 'int', 'float'])
-    prog = compile_code(cl, context, sourcecode, kernelName)
+    prog = compile_code(cl, context, sourcecode, kernelName, num_clmems=1)
     float_data_orig = np.copy(float_data)
 
     N = 2
@@ -304,7 +304,7 @@ __global__ void testFor(float *data, int N) {
 }
 """
     kernelName = test_common.mangle('testFor', ['float *', 'int'])
-    prog = compile_code(cl, context, sourcecode, kernelName)
+    prog = compile_code(cl, context, sourcecode, kernelName, num_clmems=1)
     float_data_orig = np.copy(float_data)
 
     N = 4
