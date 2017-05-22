@@ -133,6 +133,8 @@ __device__ T atomicInc(T* address, T val);
 template<typename T>
 __device__ T atomicExch(T* address, T val);
 
+// __device__ long long atomicExch(long long* address, long long val);
+
 __device__ void __threadfence();
 template<typename T>
 __device__ T __shfl_down(T val, int offset);
@@ -140,6 +142,8 @@ template<typename T>
 __device__ T __shfl_down(T val, int offset, int warpSize);
 template<typename T>
 __device__ T __shfl_xor(T val, int offset, int warpSize);
+
+__device__ void __assert_rtn(const char *, const char *, int, const char *);
 
 __device__ unsigned int atomicCAS(unsigned int* address, unsigned int compare, unsigned int val);
 

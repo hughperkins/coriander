@@ -97,7 +97,9 @@ __host__ __device__ inline double __longlong_as_double(long long val) {
 //     // return atomic::exchange(p, val)
 // }
 
-__host__ inline unsigned long long atomicExch(volatile unsigned long long *p, unsigned long long val) {
+// __device__ unsigned long long atomicExch(volatile unsigned long long *p, unsigned long long val);
+
+__device__ __host__ inline unsigned long long atomicExch(volatile unsigned long long *p, unsigned long long val) {
     throw std::runtime_error("not implemented: atomicExch on host");
     // std::atomic<T> global;
     // return atomic::exchange(p, val)
