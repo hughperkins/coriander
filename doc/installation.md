@@ -6,25 +6,25 @@ To use Coriander, please build from source:
 
 ### Mac OS X
 
-Download/install llvm-3.8:
+Download/install llvm-4.0:
 ```
 cd ~
-wget http://llvm.org/releases/3.8.0/clang+llvm-3.8.0-x86_64-apple-darwin.tar.xz
-tar -xf clang+llvm-3.8.0-x86_64-apple-darwin.tar.xz
-mv clang+llvm-3.8.0-x86_64-apple-darwin /usr/local/opt
-ln -s /usr/local/opt/clang+llvm-3.8.0-x86_64-apple-darwin /usr/local/opt/llvm-3.8
+wget http://llvm.org/releases/4.0.0/clang+llvm-4.0.0-x86_64-apple-darwin.tar.xz
+tar -xf clang+llvm-4.0.0-x86_64-apple-darwin.tar.xz
+mv clang+llvm-4.0.0-x86_64-apple-darwin /usr/local/opt
+ln -s /usr/local/opt/clang+llvm-4.0.0-x86_64-apple-darwin /usr/local/opt/llvm-4.0
 ```
 
-Whenever you use Coriander, please set `CLANG_HOME`, using `export CLANG_HOME=/usr/local/opt/llvm-3.8`
+Whenever you use Coriander, please set `CLANG_HOME`, using `export CLANG_HOME=/usr/local/opt/llvm-4.0`
 
 ### Ubuntu 16.04
 
 ```
-sudo apt-get install llvm-3.8 llvm-3.8-dev clang-3.8
+sudo apt-get install [to be filled in :-P  Maybe just download from llvm.org, as per Mac above? ]
 sudo apt-get install git cmake cmake-curses-gui libc6-dev-i386 make gcc g++ zlib1g-dev
 ```
 
-Whenever you use Coriander, please set `CLANG_HOME` to `/usr/lib/llvm-3.8`
+Whenever you use Coriander, please set `CLANG_HOME` to `/usr/lib/llvm-4.0`
 
 ## Build/installation
 

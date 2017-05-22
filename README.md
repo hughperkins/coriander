@@ -2,6 +2,11 @@
 
 Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 
+## Branch notes
+
+This branch is for llvm-4.0.  The `make run-tests` end-to-end tests run/pass ok.  I can compile at least one Tensorflow file with it (`xent_op_gpu.cc`),
+but note that I needed to use cutting-edge Eigen for this, ie the one in `default` branch, of the eigen mercurial, https://bitbucket.org/eigen/eigen/commits/branch/default . I tested when the 25th april commit 2b969e5 was tip
+
 ## Concept
 
 - leave applications in NVIDIA® CUDA™
