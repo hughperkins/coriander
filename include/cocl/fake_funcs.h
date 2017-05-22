@@ -5,6 +5,8 @@
 
 // #pragma message "reading fake_funcs.h"
 
+#pragma once
+
 #include <cstdlib>
 
 #define stubout_gen(SCOPE, OP, SUFFIX, TYPE) \
@@ -75,10 +77,10 @@ stubout_scope(cta)
 
 // #define EIGEN_USING_STD_MATH(FUNC) using std::FUNC;
 
-// #include <complex>
-// template<class T> T arg (const std::complex<T>& x) {
-//     return std::arg(x);
-// }
+#include <complex>
+template<class T> __device__ T arg (const std::complex<T>& x) {
+    return std::arg(x);
+}
 // #include <random>
 
 // #define tanh our_pretend_tanh
@@ -113,6 +115,10 @@ int max(int in1, int in2);
 int min(int in1, int in2);
 long long max(long long in1, long long in2);
 long long min(long long in1, long long in2);
+
+__device__ float fmaxf(float in1, float in2);
+__device__ float expf(float in1);
+__device__ float logf(float in1);
 
 __device__ float pow(float in1, float in2);
 // float sqrt(float in1);
