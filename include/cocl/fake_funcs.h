@@ -116,12 +116,29 @@ int min(int in1, int in2);
 long long max(long long in1, long long in2);
 long long min(long long in1, long long in2);
 
+__device__ float fminf(float in1, float in2);
 __device__ float fmaxf(float in1, float in2);
 __device__ float expf(float in1);
 __device__ float logf(float in1);
+__device__ float tanf(float in1);
+__device__ float cosf(float in1);
+__device__ float sinf(float in1);
+__device__ float asinf(float in1);
+__device__ float tanhf(float in1);
+__device__ float acosf(float in1);
+__device__ float atanf(float in1);
+__device__ float fabsf(float in1);
+__device__ float sqrtf(float in1);
+__device__ float rsqrtf(float in1);
+__device__ float ceilf(float in1);
+__device__ float floorf(float in1);
 
 __device__ float pow(float in1, float in2);
-// float sqrt(float in1);
+__device__ float sqrt(float in1);
+
+__device__ bool isnan(float in1);
+__device__ bool isinf(float in1);
+__device__ bool isfinite(float in1);
 
 // #define max cocl::max
 // #define min cocl::min
@@ -153,12 +170,12 @@ __device__ void __assert_rtn(const char *, const char *, int, const char *);
 
 __device__ unsigned int atomicCAS(unsigned int* address, unsigned int compare, unsigned int val);
 
-// inline float __int_as_float(int val) {
-//     return *(float *)&val;
-// }
-// inline int __float_as_int(float val) {
-//     return *(int *)&val;
-// }
+__device__ inline float __int_as_float(int val) {
+    return *(float *)&val;
+}
+__device__ inline int __float_as_int(float val) {
+    return *(int *)&val;
+}
 
 int __clzll(long long x);
 long long __umul64hi(unsigned long long x, unsigned long long y);
