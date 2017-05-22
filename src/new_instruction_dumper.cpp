@@ -909,11 +909,11 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("get_local_id(0)");
         return;
-    } else if(functionName == "llvm.ptx.read.tid.y") {
+    } else if(functionName == "llvm.ptx.read.tid.y" || functionName == "llvm.nvvm.read.ptx.sreg.tid.y") {
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("get_local_id(1)");
         return;
-    } else if(functionName == "llvm.ptx.read.tid.z") {
+    } else if(functionName == "llvm.ptx.read.tid.z" || functionName == "llvm.nvvm.read.ptx.sreg.tid.z") {
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("get_local_id(2)");
         return;
@@ -921,35 +921,35 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("get_group_id(0)");
         return;
-    } else if(functionName == "llvm.ptx.read.ctaid.y") {
+    } else if(functionName == "llvm.ptx.read.ctaid.y" || functionName == "llvm.nvvm.read.ptx.sreg.ctaid.y") {
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("get_group_id(1)");
         return;
-    } else if(functionName == "llvm.ptx.read.ctaid.z") {
+    } else if(functionName == "llvm.ptx.read.ctaid.z" || functionName == "llvm.nvvm.read.ptx.sreg.ctaid.z") {
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("get_group_id(2)");
         return;
-    } else if(functionName == "llvm.ptx.read.nctaid.x") {
+    } else if(functionName == "llvm.ptx.read.nctaid.x" || functionName == "llvm.nvvm.read.ptx.sreg.nctaid.x") {  // second is for llvm 4.0
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("get_num_groups(0)");
         return;
-    } else if(functionName == "llvm.ptx.read.nctaid.y") {
+    } else if(functionName == "llvm.ptx.read.nctaid.y" || functionName == "llvm.nvvm.read.ptx.sreg.nctaid.y") {
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("get_num_groups(1)");
         return;
-    } else if(functionName == "llvm.ptx.read.nctaid.z") {
+    } else if(functionName == "llvm.ptx.read.nctaid.z" || functionName == "llvm.nvvm.read.ptx.sreg.nctaid.z") {
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("get_num_groups(2)");
         return;
-    } else if(functionName == "llvm.ptx.read.ntid.x") {
+    } else if(functionName == "llvm.ptx.read.ntid.x" || functionName == "llvm.nvvm.read.ptx.sreg.ntid.x") {
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("get_local_size(0)");
         return;
-    } else if(functionName == "llvm.ptx.read.ntid.y") {
+    } else if(functionName == "llvm.ptx.read.ntid.y" || functionName == "llvm.nvvm.read.ptx.sreg.ntid.y") {
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("get_local_size(1)");
         return;
-    } else if(functionName == "llvm.ptx.read.ntid.z") {
+    } else if(functionName == "llvm.ptx.read.ntid.z" || functionName == "llvm.nvvm.read.ptx.sreg.ntid.z") {
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("get_local_size(2)");
         return;
