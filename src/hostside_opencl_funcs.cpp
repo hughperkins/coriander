@@ -484,7 +484,7 @@ void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
         size_t offsetElements = offset;
 
         // cout << "setKernelArgGpuBuffer offset=" << offset << " offsetElements=" << offsetElements << " newoffset=" << (offsetElements * elementSize) << endl;
-        COCL_PRINT(cout << "setKernelArgGpuBuffer offset=" << offsetElements << " elementSize=" << elementSize << endl);
+        // COCL_PRINT(cout << "setKernelArgGpuBuffer offset=" << offsetElements << " elementSize=" << elementSize << endl);
 
         addClmemArg(clmem);
 

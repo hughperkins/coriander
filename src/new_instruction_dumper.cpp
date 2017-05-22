@@ -901,6 +901,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
     //     calledName = calledName.substr(0, 31);
     //     calledValue->setName(calledName);
     // }
+
     string functionName = instr->getCalledValue()->getName().str();
     cout << "called function: [" << functionName << "]" << endl;
     bool internalfunc = false;
@@ -916,7 +917,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("get_local_id(2)");
         return;
-    } else if(functionName == "llvm.ptx.read.ctaid.x") {
+    } else if(functionName == "llvm.ptx.read.ctaid.x" || functionName == "llvm.nvvm.read.ptx.sreg.ctaid.x") {  // second is for llvm4.0
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("get_group_id(0)");
         return;

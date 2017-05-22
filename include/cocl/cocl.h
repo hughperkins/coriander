@@ -15,14 +15,14 @@
 #include <cmath>
 #include <random>
 
-#if defined(__CUDACC__) || defined(__CUDA_ARCH__)
-#define __device__ __attribute__((device))
-#define __host__ __attribute__((host))
-#else
-#include <stdexcept>
-#define __host__
-#define __device__
-#endif
+// #if defined(__CUDACC__) || defined(__CUDA_ARCH__)
+// #define __device__ __attribute__((device))
+// #define __host__ __attribute__((host))
+// #else
+// #include <stdexcept>
+// #define __host__
+// #define __device__
+// #endif
 
 // #define __host__ __attribute__((host))
 #define __global__ __attribute__((global))
