@@ -69,8 +69,10 @@ void FunctionNamesMap::populateKnownValues() {
     knownFunctionsMap["_ZSt3powff"] = "pow";
     knownFunctionsMap["_Z3minff"] = "fmin";
     knownFunctionsMap["_Z3maxff"] = "fmax";
+
     knownFunctionsMap["fminf"] = "fmin";
     knownFunctionsMap["fmaxf"] = "fmax";
+
     knownFunctionsMap["tanhf"] = "tanh";
     knownFunctionsMap["expf"] = "exp";
     knownFunctionsMap["fabsf"] = "fabs";
@@ -84,6 +86,7 @@ void FunctionNamesMap::populateKnownValues() {
     knownFunctionsMap["floorf"] = "floor";
     knownFunctionsMap["logf"] = "log";
     knownFunctionsMap["sqrtf"] = "sqrt";
+
     knownFunctionsMap["sqrt"] = "sqrt";
     knownFunctionsMap["pow"] = "pow"; // just so we dont try to pass `scratch` to it :-P
     // knownFunctoinsMap["_Z11syncthreadsv"] = "";
@@ -97,6 +100,26 @@ void FunctionNamesMap::populateKnownValues() {
     // knownFunctionsMap["_Z11__shfl_downIfET_S0_ii"] = "__shfl_down_3";   // float, and see cl_add_definitions, at top
     // knownFunctionsMap["_Z11__shfl_downIfET_S0_i"] = "__shfl_down_2";   // float, and see cl_add_definitions, at top
     knownFunctionsMap["_Z9atomicAddIfET_PS0_S0_"] = "__atomic_add"; // float
+
+    // llvm 4.0:
+    knownFunctionsMap["_Z5fminfff"] = "fmin";
+    knownFunctionsMap["_Z5fmaxfff"] = "fmax";
+
+    knownFunctionsMap["_Z5sqrtff"] = "sqrt";
+    knownFunctionsMap["_Z4logff"] = "log";
+    knownFunctionsMap["_Z5sqrtff"] = "sqrt";
+    knownFunctionsMap["_Z5tanhff"] = "tanh";
+    knownFunctionsMap["_Z4expff"] = "exp";
+    knownFunctionsMap["_Z5fabsff"] = "fabs";
+    knownFunctionsMap["_Z5acosff"] = "acos";
+    knownFunctionsMap["_Z5asinff"] = "asin";
+    knownFunctionsMap["_Z5atanff"] = "atan";
+    knownFunctionsMap["_Z4cosff"] = "cos";
+    knownFunctionsMap["_Z4sinff"] = "sin";
+    knownFunctionsMap["_Z4tanff"] = "tan";
+    knownFunctionsMap["_Z5ceilff"] = "ceil";
+    knownFunctionsMap["_Z6floorff"] = "floor";
+    // end llvm 4.0
 
     ignoredGlobalVariables.insert("blockIdx");
     ignoredGlobalVariables.insert("threadIdx");
