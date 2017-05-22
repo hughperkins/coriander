@@ -107,14 +107,14 @@ float exp10f(float in);
 
 double max(double in1, double in2);
 double min(double in1, double in2);
-float max(float in1, float in2);
-float min(float in1, float in2);
+__host__ __device__ float max(float in1, float in2);
+__host__ __device__ float min(float in1, float in2);
 int max(int in1, int in2);
 int min(int in1, int in2);
 long long max(long long in1, long long in2);
 long long min(long long in1, long long in2);
 
-// float pow(float in1, float in2);
+__device__ float pow(float in1, float in2);
 // float sqrt(float in1);
 
 // #define max cocl::max

@@ -45,12 +45,15 @@ int main(int argc, char *argv[]) {
     cuStreamSynchronize(stream);
 
     // and check the values...
-    cout << hostFloats1[0] << endl;
-    cout << hostFloats1[1] << endl;
-    cout << hostFloats1[2] << endl;
+    for(int i = 0; i < 7; i++) {
+        cout << "hostFloats1[" << i << "]=" << hostFloats1[i] << endl;
+    }
+    // cout << hostFloats1[0] << endl;
+    // cout << hostFloats1[1] << endl;
+    // cout << hostFloats1[2] << endl;
 
-    cout << hostFloats1[4] << endl;
-    cout << hostFloats1[5] << endl;
+    // cout << hostFloats1[4] << endl;
+    // cout << hostFloats1[5] << endl;
 
     float diff = std::abs(hostFloats1[0] - 140.296);
     assert(diff < 0.01);
