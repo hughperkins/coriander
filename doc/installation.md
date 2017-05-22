@@ -20,11 +20,16 @@ Whenever you use Coriander, please set `CLANG_HOME`, using `export CLANG_HOME=/u
 ### Ubuntu 16.04
 
 ```
-sudo apt-get install [to be filled in :-P  Maybe just download from llvm.org, as per Mac above? ]
 sudo apt-get install git cmake cmake-curses-gui libc6-dev-i386 make gcc g++ zlib1g-dev
+cd ~/Downloads
+wget http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz
+sudo mkdir -p /usr/local/opt
+cd /usr/local/opt
+sudo tar -xf ~/Downloads/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz
+sudo mv llvm-4.0
 ```
 
-Whenever you use Coriander, please set `CLANG_HOME` to `/usr/lib/llvm-4.0`
+Whenever you use Coriander, please set `CLANG_HOME` to `/usr/local/opt/llvm-4.0`
 
 ## Build/installation
 
