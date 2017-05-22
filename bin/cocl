@@ -346,7 +346,7 @@ LLVM_LINK_FLAGS=`${CLANG_HOME}/bin/llvm-config --ldflags --system-libs --libs al
 set -x
 ${CLANG_HOME}/bin/clang++ ${PASSTHRU} -DUSE_CLEW \
     -std=c++11 -x cuda \
-    --cuda-gpu-arch=sm_30 --cuda-device-only -emit-llvm -O0 -S \
+    --cuda-gpu-arch=sm_30 -nocudalib -nocudainc --cuda-device-only -emit-llvm -O0 -S \
     ${ADDFLAGS} \
     ${LLVM_COMPILE_FLAGS} \
     -I${COCL_HOME}/include/EasyCL \
@@ -372,7 +372,7 @@ ${CLANG_HOME}/bin/opt ${DEVICELLOPT} -S -o ${OUTPUTBASEPATH}-device.ll ${OUTPUTB
 
 ${CLANG_HOME}/bin/clang++ ${PASSTHRU} \
     ${INCLUDES} -DUSE_CLEW \
-    -std=c++11 -x cuda --cuda-host-only -emit-llvm  -O3 -S \
+    -std=c++11 -x cuda -nocudalib -nocudainc --cuda-host-only -emit-llvm  -O3 -S \
     ${LLVM_COMPILE_FLAGS} \
     -I${COCL_HOME}/include \
     -I${COCL_HOME}/include/EasyCL \

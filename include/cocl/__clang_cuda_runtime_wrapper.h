@@ -81,7 +81,8 @@
 // #define __CUDA_ARCH__ 350
 // #endif
 
-#include "cuda_builtin_vars.h"
+// #include "cuda_builtin_vars.h"
+#include "__clang_cuda_builtin_vars.h"
 
 // No need for device_launch_parameters.h as cuda_builtin_vars.h above
 // has taken care of builtin variables declared in the file.

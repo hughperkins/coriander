@@ -1,5 +1,16 @@
 #pragma once
 
+// #if defined(__CUDACC__) || defined(__CUDA_ARCH__)
+#pragma message("defining device and host")
+#define __device__ __attribute__((device))
+#define __host__ __attribute__((host))
+// #else
+// #pragma message("stubbing device and host")
+// #include <stdexcept>
+// #define __host__
+// #define __device__
+// #endif
+
 #include <stdexcept>
 #include <cmath>
 #include <random>

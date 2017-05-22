@@ -168,6 +168,9 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
             continue;
         }
         string origName = thisF->getName().str();
+        if(origName.find("llvm.") != string::npos) {
+            continue;
+        }
         std::string shortName = createShortKernelName(origName, usedShortNames);
             // shortNameByOrigName);
         if(M->getFunction(origName) == 0) {
@@ -180,7 +183,7 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
         }
         // std::cout << "   generatedname=" << name << std::endl;
         thisF->setName(shortName);
-        // std::cout << "kernel_dumper toCl() " << origName << " => " << shortName << std::endl;
+        std::cout << "kernel_dumper toCl() " << origName << " => " << shortName << std::endl;
     }
 
     // GlobalNames globalNames;

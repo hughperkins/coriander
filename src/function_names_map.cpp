@@ -22,33 +22,33 @@ using namespace std;
 namespace cocl {
 
 void FunctionNamesMap::populateKnownValues() {
-    ignoredFunctionNames.insert("llvm.ptx.read.tid.x");
-    ignoredFunctionNames.insert("llvm.ptx.read.tid.y");
-    ignoredFunctionNames.insert("llvm.ptx.read.tid.z");
-    ignoredFunctionNames.insert("llvm.cuda.syncthreads");
-    ignoredFunctionNames.insert("_Z11syncthreadsv");
-    ignoredFunctionNames.insert("_ZL21__nvvm_reflect_anchorv");
-    ignoredFunctionNames.insert("__nvvm_reflect");
-    ignoredFunctionNames.insert("llvm.ptx.read.ctaid.x");
-    ignoredFunctionNames.insert("llvm.ptx.read.ctaid.y");
-    ignoredFunctionNames.insert("llvm.ptx.read.ctaid.z");
-    ignoredFunctionNames.insert("llvm.ptx.read.nctaid.x");
-    ignoredFunctionNames.insert("llvm.ptx.read.nctaid.y");
-    ignoredFunctionNames.insert("llvm.ptx.read.nctaid.z");
-    ignoredFunctionNames.insert("llvm.ptx.read.ntid.x");
-    ignoredFunctionNames.insert("llvm.ptx.read.ntid.y");
-    ignoredFunctionNames.insert("llvm.ptx.read.ntid.z");
-    ignoredFunctionNames.insert("llvm.memcpy.p0i8.p0i8.i64");
-    ignoredFunctionNames.insert("llvm.memcpy.p0i8.p0i8.i32");
-    ignoredFunctionNames.insert("llvm.lifetime.start");
-    ignoredFunctionNames.insert("llvm.lifetime.end");
-    ignoredFunctionNames.insert("pow");
-    ignoredFunctionNames.insert("_Z11make_float4ffff");
-    ignoredFunctionNames.insert("_GLOBAL__sub_I_struct_initializer.cu");
-    ignoredFunctionNames.insert("_Z13__threadfencev");
-    ignoredFunctionNames.insert("_Z11__shfl_downIfET_S0_ii"); // 3 args, int
-    ignoredFunctionNames.insert("_Z11__shfl_downIfET_S0_i");  // 2 args, int
-    ignoredFunctionNames.insert("llvm.dbg.value");
+    // ignoredFunctionNames.insert("llvm.ptx.read.tid.x");
+    // ignoredFunctionNames.insert("llvm.ptx.read.tid.y");
+    // ignoredFunctionNames.insert("llvm.ptx.read.tid.z");
+    // ignoredFunctionNames.insert("llvm.cuda.syncthreads");
+    // ignoredFunctionNames.insert("_Z11syncthreadsv");
+    // ignoredFunctionNames.insert("_ZL21__nvvm_reflect_anchorv");
+    // ignoredFunctionNames.insert("__nvvm_reflect");
+    // ignoredFunctionNames.insert("llvm.ptx.read.ctaid.x");
+    // ignoredFunctionNames.insert("llvm.ptx.read.ctaid.y");
+    // ignoredFunctionNames.insert("llvm.ptx.read.ctaid.z");
+    // ignoredFunctionNames.insert("llvm.ptx.read.nctaid.x");
+    // ignoredFunctionNames.insert("llvm.ptx.read.nctaid.y");
+    // ignoredFunctionNames.insert("llvm.ptx.read.nctaid.z");
+    // ignoredFunctionNames.insert("llvm.ptx.read.ntid.x");
+    // ignoredFunctionNames.insert("llvm.ptx.read.ntid.y");
+    // ignoredFunctionNames.insert("llvm.ptx.read.ntid.z");
+    // ignoredFunctionNames.insert("llvm.memcpy.p0i8.p0i8.i64");
+    // ignoredFunctionNames.insert("llvm.memcpy.p0i8.p0i8.i32");
+    // ignoredFunctionNames.insert("llvm.lifetime.start");
+    // ignoredFunctionNames.insert("llvm.lifetime.end");
+    // ignoredFunctionNames.insert("pow");
+    // ignoredFunctionNames.insert("_Z11make_float4ffff");
+    // ignoredFunctionNames.insert("_GLOBAL__sub_I_struct_initializer.cu");
+    // ignoredFunctionNames.insert("_Z13__threadfencev");
+    // ignoredFunctionNames.insert("_Z11__shfl_downIfET_S0_ii"); // 3 args, int
+    // ignoredFunctionNames.insert("_Z11__shfl_downIfET_S0_i");  // 2 args, int
+    // ignoredFunctionNames.insert("llvm.dbg.value");
 
     knownFunctionsMap["_ZSt4sqrtf"] = "sqrt";
     knownFunctionsMap["llvm.nvvm.sqrt.rn.d"] = "sqrt";
@@ -104,9 +104,9 @@ void FunctionNamesMap::populateKnownValues() {
     ignoredGlobalVariables.insert("blockDim");
 }
 
-bool FunctionNamesMap::isIgnoredFunction(std::string name) const {
-    return ignoredFunctionNames.find(name) != ignoredFunctionNames.end();
-}
+// bool FunctionNamesMap::isIgnoredFunction(std::string name) const {
+//     return ignoredFunctionNames.find(name) != ignoredFunctionNames.end();
+// }
 
 bool FunctionNamesMap::isMappedFunction(std::string name) const {
     return knownFunctionsMap.find(name) != knownFunctionsMap.end();

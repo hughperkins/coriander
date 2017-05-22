@@ -31,7 +31,7 @@ public:
     std::string getFunctionMappedName(std::string name) const;
 protected:
     void populateKnownValues();
-    std::set<std::string> ignoredFunctionNames;
+    // std::set<std::string> ignoredFunctionNames;
     std::set<std::string> ignoredGlobalVariables;
     std::map<std::string, std::string> knownFunctionsMap; // from cuda to opencl, eg tid.x => get_global_id
 };

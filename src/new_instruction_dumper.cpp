@@ -513,9 +513,9 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     }
     for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
-        if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
+        if(SequentialType *seqType = dyn_cast<SequentialType>(currentType)) {
             if(d == 0) {
-                if(isa<ArrayType>(currentType->getPointerElementType())) {
+                if(isa<ArrayType>(seqType->getElementType())) {
                     rhs = "(&" + rhs + ")";
                 }
             }
@@ -524,7 +524,24 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             string idxstring = thisInfo->getExpr();
             idxstring = stripOuterParams(idxstring);
             rhs += string("[") + idxstring + "]";
-            newType = currentType->getPointerElementType();
+            currentType->dump();
+            cout << endl;
+            newType = seqType->getElementType();
+        } else if(PointerType *pointerType = dyn_cast<PointerType>(currentType)) {
+            // PointerType *pointerType = cast<PointerType>(currentType);
+            // if(d == 0) {
+            //     if(isa<ArrayType>(cast<SequentialType>(currentType)->getElementType())) {
+            //         rhs = "(&" + rhs + ")";
+            //     }
+            // }
+            // LocalValueInfo *thisInfo = localValueInfos->at(instr->getOperand(d + 1)).get();
+            LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
+            string idxstring = thisInfo->getExpr();
+            idxstring = stripOuterParams(idxstring);
+            rhs += string("[") + idxstring + "]";
+            currentType->dump();
+            cout << endl;
+            newType = pointerType->getElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
             string structName = getName(structtype);
             if(structName == "struct.float4") {
@@ -548,8 +565,15 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                 }
             }
         } else {
+            cout << "type unimplemeneted in gep:" << endl;
             currentType->dump();
-            throw runtime_error("type not implemented in gpe");
+            cout << endl;
+            cout << "isa pointer " << isa<PointerType>(currentType) << endl;
+            cout << "isa struct " << isa<StructType>(currentType) << endl;
+            cout << "isa composite " << isa<CompositeType>(currentType) << endl;
+            cout << "isa sequential " << isa<SequentialType>(currentType) << endl;
+            cout << "isa type " << isa<Type>(currentType) << endl;
+            throw runtime_error("type not implemented in gep");
         }
         // if new type is a pointer, and old type was a struct, then we assume its a global pointer, and therefore
         // update the addressspace to be global, ie 1.  This is a bit hacky I know
@@ -878,9 +902,9 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
     //     calledValue->setName(calledName);
     // }
     string functionName = instr->getCalledValue()->getName().str();
-    // cout << "called function: [" << functionName << "]" << endl;
+    cout << "called function: [" << functionName << "]" << endl;
     bool internalfunc = false;
-    if(functionName == "llvm.ptx.read.tid.x") {
+    if(functionName == "llvm.ptx.read.tid.x" || functionName == "llvm.nvvm.read.ptx.sreg.tid.x") { // second on is llvm 4.0, first is 3.8
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("get_local_id(0)");
         return;
@@ -1111,9 +1135,15 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
                 if(!alreadyExists) {
                     // cout << "cloning new funciton " << newName << endl;
                     ValueToValueMapTy valueMap;
+                    #if(LLVM_VERSION_MAJOR == 4)
+                    #pragma message("clang 4 detected")
+                    newFunc = CloneFunction(F,
+                                   valueMap);
+                    #else
                     newFunc = CloneFunction(F,
                                    valueMap,
                                    false);
+                    #endif
                     newFunc->setName(newName);
                     i = 0;
                     for(auto it=newFunc->arg_begin(); it != newFunc->arg_end(); it++) {

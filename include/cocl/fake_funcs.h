@@ -75,10 +75,10 @@ stubout_scope(cta)
 
 // #define EIGEN_USING_STD_MATH(FUNC) using std::FUNC;
 
-#include <complex>
-template<class T> T arg (const std::complex<T>& x) {
-    return std::arg(x);
-}
+// #include <complex>
+// template<class T> T arg (const std::complex<T>& x) {
+//     return std::arg(x);
+// }
 // #include <random>
 
 // #define tanh our_pretend_tanh
@@ -143,12 +143,12 @@ __device__ T __shfl_xor(T val, int offset, int warpSize);
 
 __device__ unsigned int atomicCAS(unsigned int* address, unsigned int compare, unsigned int val);
 
-inline float __int_as_float(int val) {
-    return *(float *)&val;
-}
-inline int __float_as_int(float val) {
-    return *(int *)&val;
-}
+// inline float __int_as_float(int val) {
+//     return *(float *)&val;
+// }
+// inline int __float_as_int(float val) {
+//     return *(int *)&val;
+// }
 
 int __clzll(long long x);
 long long __umul64hi(unsigned long long x, unsigned long long y);

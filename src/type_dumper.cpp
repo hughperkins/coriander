@@ -263,7 +263,7 @@ std::string TypeDumper::dumpStructDefinition(StructType *type, string name) {
         }
         std::string memberName = "f" + easycl::toString(i);
         if(ArrayType *arraytype = dyn_cast<ArrayType>(elementType)) {
-            Type *arrayelementtype = arraytype->getPointerElementType();
+            Type *arrayelementtype = arraytype->getElementType();
             // outs() << "arrayelementtype " << dumpType(arrayelementtype) << "\n";
             int numElements = arraytype->getNumElements();
             // outs() << "numelements " << numElements << "\n";
