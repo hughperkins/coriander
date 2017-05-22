@@ -179,6 +179,7 @@ void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *inf
         COCL_PRINT(alloca->dump());
     } else if(isa<GetElementPtrInst>(valuePointer)) {
         COCL_PRINT(cout << "got a gep" << endl);
+        alloca = valuePointer;
     } else {
         alloca = valuePointer;
         // alloca = bitcast;
