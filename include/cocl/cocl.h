@@ -30,7 +30,9 @@
 #define __shared__ __attribute__((shared))
 #define __align__(x) __attribute__((aligned(x)))
 
-#define __launch_bounds__(x) __attribute__((launch_bounds(x)))
+// #define __launch_bounds__(x) __attribute__((launch_bounds(x)))
+#define __launch_bounds__(x)
+#define __launch_bounds__(x, y)
 
 #include "cocl/cocl_memory.h"
 #include "cocl/cocl_streams.h"
@@ -156,7 +158,13 @@ enum cujitenum {
 // for now
 // __device___ bool __isGlobal(void *ptr);
 
-bool __isGlobal(const void *ptr);
+// following added for thrust:
+__device__ __host__ bool __isGlobal(const void *ptr);
+namespace std {
+__device__ void *malloc(size_t count);
+__device__ void free(void *ptr);
+} // namespace std
+
 
 // bool __isGlobal(const void *ptr) {
 //     return true;
