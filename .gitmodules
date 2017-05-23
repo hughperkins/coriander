@@ -4,3 +4,6 @@
 [submodule "src/EasyCL"]
     path = src/EasyCL
     url = https://github.com/hughperkins/EasyCL
+[submodule "third_party/thrust"]
+	path = third_party/thrust
+	url = https://github.com/hughperkins/thrust
