@@ -135,10 +135,13 @@ __device__ float floorf(float in1);
 
 __device__ float pow(float in1, float in2);
 __device__ float sqrt(float in1);
+__device__ float log(float in1);
 
 __device__ bool isnan(float in1);
 __device__ bool isinf(float in1);
 __device__ bool isfinite(float in1);
+
+__device__ void memcpy(void *dst, const void *src, size_t count);
 
 // #define max cocl::max
 // #define min cocl::min
