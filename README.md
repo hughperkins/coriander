@@ -87,6 +87,29 @@ Coriander makes the following relaxations/simplifications:
 - Tensorflow-CL: Fork of Tensorflow, that can be built and run on an OpenCL-1.2 enabled GPU, using Coriander, https://github.com/hughperkins/tensorflow-cl
 - CLBlast: Cedric Nugteren's excellent BLAS implementation for OpenCL  [CLBlast](https://github.com/cnugteren/CLBlast)
 
+## How to Cite
+
+```
+@inproceedings{Perkins:2017:CCR:3078155.3078156,
+ author = {Perkins, Hugh},
+ title = {CUDA-on-CL: A Compiler and Runtime for Running NVIDIA\&Reg; CUDA\&Trade; C++11 Applications on OpenCL\&Trade; 1.2 Devices},
+ booktitle = {Proceedings of the 5th International Workshop on OpenCL},
+ series = {IWOCL 2017},
+ year = {2017},
+ isbn = {978-1-4503-5214-7},
+ location = {Toronto, Canada},
+ pages = {6:1--6:4},
+ articleno = {6},
+ numpages = {4},
+ url = {http://doi.acm.org/10.1145/3078155.3078156},
+ doi = {10.1145/3078155.3078156},
+ acmid = {3078156},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {CUDA, Compilers, GPGPU, LLVM, Machine Learning, OpenCL},
+} 
+```
+
 ## License
 
 [Apache 2.0](LICENSE)
