@@ -71,5 +71,4 @@ extern "C" {
 
     // used by thrust:
     // void cudaSetupArgument(void *fn, int);
-    // void cudaLaunch();
 }

@@ -112,6 +112,12 @@ typedef void (*fun_ptr_type)();
 size_t cudaFuncGetAttributes(cudaFuncAttributes *p_attributes, fun_ptr_type fn);
 size_t cudaFuncGetAttributes(cudaFuncAttributes *p_attributes, void *pfn);
 
+
+template<typename T>
+size_t cudaSetupArgument(T arg, int flags);
+template<typename T>
+size_t cudaLaunch(T fn);
+
 // struct CUfunc_cache {
 // };
 typedef void *CUmodule;
