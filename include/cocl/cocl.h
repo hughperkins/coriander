@@ -108,7 +108,9 @@ struct cudaFuncAttributes {
     int ptxVersion;
     size_t sharedSizeBytes;
 };
-size_t cudaFuncGetAttributes(cudaFuncAttributes *p_attributes, CUfunction);
+typedef void (*fun_ptr_type)();
+size_t cudaFuncGetAttributes(cudaFuncAttributes *p_attributes, fun_ptr_type fn);
+size_t cudaFuncGetAttributes(cudaFuncAttributes *p_attributes, void *pfn);
 
 // struct CUfunc_cache {
 // };
