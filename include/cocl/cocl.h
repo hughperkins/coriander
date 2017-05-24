@@ -1,11 +1,11 @@
 #pragma once
 
 #ifdef __CUDA_ARCH__
-#pragma message("cuda arch")
+// #pragma message("cuda arch")
 #endif
 
 #ifdef __CUDACC__
-#pragma message("cudacc")
+// #pragma message("cudacc")
 #endif
 
 // #if defined(__CUDACC__) || defined(__CUDA_ARCH__)
@@ -31,6 +31,7 @@
 #endif
 
 #ifndef __CUDACC__  // normal cpp file
+// remove these defs: these functions will be hostside by default, in a normal cpp file
 #undef __devicehost__
 #define __devicehost__ 
 #undef __host__
@@ -70,7 +71,10 @@
 
 // #define __launch_bounds__(x) __attribute__((launch_bounds(x)))
 // #define __launch_bounds__(x)
-#define __launch_bounds__(x, y)
+// #define __launch_bounds__(x, y)
+
+// found this at https://gist.github.com/eliben/b014ac17cbe5a452803f
+#define __launch_bounds__(...) __attribute__((launch_bounds(__VA_ARGS__)))
 
 #include "cocl/cocl_memory.h"
 #include "cocl/cocl_streams.h"
@@ -91,10 +95,6 @@ inline int __clz(int value);
 #define sinpif sinpi
 #define normcdff normcdf
 #define erfcxf erfcx
-
-typedef size_t cudaError_t;
-typedef size_t CUresult;
-#define cudaSuccess 0
 
 // used by stream_executor/cl_driver.h; we just declare them for now...
 typedef void *CUfunction;
@@ -217,6 +217,9 @@ __device__ void *malloc(size_t count);
 __device__ void free(void *ptr);
 } // namespace std
 
+// ==========================
+// needed for thrust:
+
 // used by util_ptx.cuh, warpAny etc
 __device__ int __all(int bits);
 __device__ int __any(int bits);
@@ -225,7 +228,24 @@ __device__ void __threadfence_block();
 // https://en.wikipedia.org/wiki/Find_first_set
 __device__ int __clz(int val);
 __device__ int __brev(int val);
+__device__ int __popc(int val);
 #endif // __CUDA_ARCH__ deviceside
+
+typedef int64_t cudaTextureObject_t;
+typedef int64_t TextureWord;
+struct cudaChannelFormatDesc {
+};
+struct cudaTextureDesc {
+};
+// typedef int64_t cudaCreateChannelDesc;
+struct cudaResourceDesc {
+};
+typedef int64_t cudaResourceTypeLinear;
+
+template<typename T> cudaChannelFormatDesc cudaCreateChannelDesc();
+template<typename T> TextureWord tex1Dfetch();
+// end of thrust stuff ===============================
+
 
 // end of thrust bits
 // =====================

@@ -46,6 +46,7 @@ typedef cudaSharedMemConfig CUsharedconfig;
 // extern struct cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
 cudaSharedMemConfig cudaSharedMemBankSizeFourByte = 123;
 cudaSharedMemConfig cudaSharedMemBankSizeEightByte = 423;
+cudaSharedMemConfig cudaSharedMemBankSizeDefault = 314;
 
 // struct cudaSharedMemBankSizeEightByte {
 // };
