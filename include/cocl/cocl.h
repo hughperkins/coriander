@@ -109,14 +109,25 @@ struct cudaFuncAttributes {
     size_t sharedSizeBytes;
 };
 typedef void (*fun_ptr_type)();
-size_t cudaFuncGetAttributes(cudaFuncAttributes *p_attributes, fun_ptr_type fn);
-size_t cudaFuncGetAttributes(cudaFuncAttributes *p_attributes, void *pfn);
-
+inline size_t cudaFuncGetAttributes(cudaFuncAttributes *p_attributes, fun_ptr_type fn) {
+    std::cout << "cocl.h cudaFuncGetAttributes()" << std::endl;
+    return 0;
+}
+inline size_t cudaFuncGetAttributes(cudaFuncAttributes *p_attributes, void *pfn) {
+    std::cout << "cocl.h cudaFuncGetAttributes()" << std::endl;
+    return 0;
+}
 
 template<typename T>
-size_t cudaSetupArgument(T arg, int flags);
+size_t cudaSetupArgument(T arg, int flags) {
+    std::cout << "cudaSetupArgument from cocl.h" << std::endl;
+    return 0;
+}
 template<typename T>
-size_t cudaLaunch(T fn);
+size_t cudaLaunch(T fn) {
+    std::cout << "cudaLaunch from cocl.h" << std::endl;
+    return 0;
+}
 
 // struct CUfunc_cache {
 // };

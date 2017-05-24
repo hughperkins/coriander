@@ -114,12 +114,20 @@ size_t cuStreamCreate(char **_pstream, unsigned int flags) {
     return 0;
 }
 
+size_t cudaStreamCreate(char **_pstream) {
+    return cuStreamCreate(_pstream, 0);
+}
+
 size_t cuStreamDestroy_v2(char *_queue) {
     CoclStream *stream = (CoclStream *)_queue;
     // StreamLock streamlock(stream);
     // COCL_PRINT(cout << "cuStreamDestroy_v2 redirected stream=" << (void *)stream << endl);
     delete stream;
     return 0;
+}
+
+size_t cudaStreamDestroy(char *_queue) {
+    return cuStreamDestroy_v2(_queue);
 }
 
 size_t cudaStreamQuery(char *_queue) {

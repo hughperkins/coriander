@@ -112,6 +112,10 @@ size_t cuStreamWaitEvent(char *_queue, CoclEvent *event, unsigned int flags) {
 // cuEventSynchronize(CUevent)
 // cuEventDestroy
 
+size_t cudaStreamWaitEvent(char *_queue, CoclEvent *event, unsigned int flags) {
+    return cuStreamWaitEvent(_queue, event, flags);
+}
+
 size_t cuEventCreate(CoclEvent **pevent, unsigned int flags) {
     pthread_mutex_lock(&cocl_events_mutex);
     CoclEvent *event = new CoclEvent();
@@ -120,6 +124,10 @@ size_t cuEventCreate(CoclEvent **pevent, unsigned int flags) {
     // throw runtime_error("fake stop");
     pthread_mutex_unlock(&cocl_events_mutex);
     return 0;
+}
+
+size_t cudaEventCreateWithFlags(CoclEvent **pevent, unsigned int flags) {
+    return cuEventCreate(pevent, flags);
 }
 
 size_t cudaEventCreate(CoclEvent **pevent) {
@@ -220,4 +228,8 @@ size_t cuEventDestroy_v2(CoclEvent *event) {
     delete event;
     pthread_mutex_unlock(&cocl_events_mutex);
     return 0;
+}
+
+size_t cudaEventDestroy(CoclEvent *event) {
+    return cuEventDestroy(event);
 }

@@ -73,6 +73,11 @@ size_t cuDeviceGetAttribute(
     return 0;
 }
 
+size_t cudaDeviceGetAttribute(
+       int *value, int attribute, CUdevice device) {
+    return cuDeviceGetAttribute(value, attribute, device);
+}
+
 // cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
 
 size_t cuDeviceGetName(char *buf, int bufsize, CUdevice device) {

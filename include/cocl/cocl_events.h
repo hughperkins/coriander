@@ -27,7 +27,7 @@ extern "C" {
 
     size_t cudaEventElapsedTime(float *p_elapsedTime, cocl::CoclEvent *start, cocl::CoclEvent *stop);
     size_t cudaEventCreate(cocl::CoclEvent **pevent);
-    size_t cudaEventCreateWithFlags(cocl::CoclEvent **pevent, int flags);
+    size_t cudaEventCreateWithFlags(cocl::CoclEvent **pevent, unsigned int flags);
     size_t cudaEventQuery(cocl::CoclEvent *event);
     size_t cudaEventRecord(cocl::CoclEvent *event, char *queue=0);
     size_t cudaEventSynchronize(cocl::CoclEvent *event);
