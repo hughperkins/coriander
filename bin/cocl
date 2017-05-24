@@ -348,6 +348,7 @@ ${CLANG_HOME}/bin/clang++ ${PASSTHRU} -DUSE_CLEW \
     -std=c++11 -x cuda \
     --cuda-gpu-arch=sm_30 -nocudalib -nocudainc --cuda-device-only -emit-llvm -O0 -S \
     ${ADDFLAGS} \
+    -D__CUDACC__ \
     ${LLVM_COMPILE_FLAGS} \
     -I${COCL_HOME}/include/EasyCL \
     -I${COCL_HOME}/include/cocl \
@@ -372,7 +373,8 @@ ${CLANG_HOME}/bin/opt ${DEVICELLOPT} -S -o ${OUTPUTBASEPATH}-device.ll ${OUTPUTB
 
 ${CLANG_HOME}/bin/clang++ ${PASSTHRU} \
     ${INCLUDES} -DUSE_CLEW \
-    -std=c++11 -x cuda -nocudalib -nocudainc --cuda-host-only -emit-llvm  -O3 -S \
+    -std=c++11 -x cuda -nocudainc --cuda-host-only -emit-llvm  -O3 -S \
+    -D__CUDACC__ \
     ${LLVM_COMPILE_FLAGS} \
     -I${COCL_HOME}/include \
     -I${COCL_HOME}/include/EasyCL \

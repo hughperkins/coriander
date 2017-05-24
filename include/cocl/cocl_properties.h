@@ -40,11 +40,12 @@ typedef cudaDeviceProp CUdevprop;
 // struct cudaSharedMemConfig {
 //   // nothing here :-P
 // };
-typedef std::string cudaSharedMemConfig;
+typedef const int cudaSharedMemConfig;  // thrust black_radix_rank.cuh means cannot be a string
 typedef cudaSharedMemConfig CUsharedconfig;
 
 // extern struct cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
-extern cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
+cudaSharedMemConfig cudaSharedMemBankSizeFourByte = 123;
+cudaSharedMemConfig cudaSharedMemBankSizeEightByte = 423;
 
 // struct cudaSharedMemBankSizeEightByte {
 // };

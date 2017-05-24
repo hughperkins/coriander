@@ -267,11 +267,11 @@ size_t cuDeviceTotalMem(size_t *value, CUdeviceptr device) {
     return 0;
 }
 
-size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKind) {
+size_t cudaMemcpy(void *dst, const void *src, size_t bytes, cudaMemcpyKind kind) {
     COCL_PRINT("cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << " count=" << bytes);
     cl_int err;
     ThreadVars *v = getThreadVars();
-    if(cudaMemcpyKind == cudaMemcpyDeviceToHost) {
+    if(kind == cudaMemcpyDeviceToHost) {
         // device => host
         // COCL_PRINT("cudamemcpy device to host");
         Memory *srcMemory = findMemory((const char *)src);
@@ -280,7 +280,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
                                          bytes, dst, 0, NULL, NULL);
         EasyCL::checkError(err);
         // cl->finish();
-    } else if(cudaMemcpyKind == cudaMemcpyHostToDevice) {
+    } else if(kind == cudaMemcpyHostToDevice) {
         // host => device
         // cout << "cudamemcpy host to device" << endl;
         Memory *dstMemory = findMemory((char *)dst);
@@ -288,7 +288,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
         err = clEnqueueWriteBuffer(v->currentContext->default_stream.get()->clqueue->queue, dstMemory->clmem, CL_TRUE, offset,
                                           bytes, src, 0, NULL, NULL);
         EasyCL::checkError(err);
-    } else if(cudaMemcpyKind == cudaMemcpyDeviceToDevice) {
+    } else if(kind == cudaMemcpyDeviceToDevice) {
         // device => device
         Memory *srcMemory = findMemory((const char *)src);
         size_t src_offset = srcMemory->getOffset((const char *)src);
@@ -306,7 +306,7 @@ size_t cudaMemcpy(void *dst, const void *src, size_t bytes, size_t cudaMemcpyKin
             0);
         EasyCL::checkError(err);
     } else {
-        cout << "cudaMemcpy cudaMemcpyKind using opencl " << cudaMemcpyKind << endl;
+        cout << "cudaMemcpy cudaMemcpyKind using opencl " << kind << endl;
         throw runtime_error("unhandled cudaMemcpyKind");
     }
     return 0;

@@ -225,7 +225,7 @@ llvm::Instruction *StructCloner::createHostsideIrCopyPtrfullToNoptr(
                 load->insertAfter(lastInst);
                 lastInst = load;
 
-                Instruction *store = new StoreInst(load, childDstInst, "storeint");
+                Instruction *store = new StoreInst(load, childDstInst);
                 store->insertAfter(lastInst);
                 lastInst = store;
             } else if(ArrayType *arrayType = dyn_cast<ArrayType>(childType)) {
@@ -247,7 +247,7 @@ llvm::Instruction *StructCloner::createHostsideIrCopyPtrfullToNoptr(
                     load->insertAfter(arraydst);
                     lastInst = load;
 
-                    Instruction *store = new StoreInst(load, arraydst, "storearr");
+                    Instruction *store = new StoreInst(load, arraydst);
                     store->insertAfter(load);
                     lastInst = store;
                 }

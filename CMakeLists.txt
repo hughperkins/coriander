@@ -64,7 +64,7 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
 )
 
 set(CMAKE_CC_FLAGS "-fPIC")
-set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC -g")
+set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC -g -Wno-covered-switch-default -Wno-sign-compare")
 add_definitions(-DUSE_CLEW)  # turns off direct linking with libOpenCL.so, all goes via clew dynamic loader (no need to link with libOpenCL at build time)
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 
@@ -158,7 +158,7 @@ endif()
 if(COCL_DEFINITIONS)
     target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
 endif()
-target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
+target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES} -Wno-sign-compare -Wno-covered-switch-default)
 target_link_libraries(cocl easycl ${LLVM_LIBS} ${LLVM_SYSLIBS})
 
 # ==================================================================================================
@@ -202,6 +202,7 @@ endforeach()
 
 include_directories(src/CLBlast/src)
 add_library(clblast SHARED ${CLBLAST_SOURCES})
+target_compile_options(clblast PRIVATE -Wno-switch)
 target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
 target_include_directories(clblast PRIVATE src/CLBlast/include)
 target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include)

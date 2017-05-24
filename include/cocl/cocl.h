@@ -1,9 +1,47 @@
 #pragma once
 
+#ifdef __CUDA_ARCH__
+#pragma message("cuda arch")
+#endif
+
+#ifdef __CUDACC__
+#pragma message("cudacc")
+#endif
+
 // #if defined(__CUDACC__) || defined(__CUDA_ARCH__)
-#pragma message("defining device and host")
+// #pragma message("defining device and host")
+// #ifdef __CUDACC__ // cu file?
 #define __device__ __attribute__((device))
 #define __host__ __attribute__((host))
+// #else
+// #define __device__
+// #define __host__
+// #endif
+
+// #ifdef __CUDACC__ // cu file?
+#ifdef __CUDA_ARCH__ // means device-side
+// #pragma message("deviceside")
+#define __devicehost__ __attribute__((device))
+#define __DEVICESIDE__
+#else
+// #pragma message("hostside")
+// #define __devicehost__ __attribute__((host))
+#define __HOSTSIDE__
+#define __devicehost__ __attribute__((device)) __attribute__((host))
+#endif
+
+#ifndef __CUDACC__  // normal cpp file
+#undef __devicehost__
+#define __devicehost__ 
+#undef __host__
+#define __host__ 
+#endif
+
+// #else // cpp file, not cu file
+// #define __HOSTSIDE__
+// #define __devicehost__
+// #endif
+
 // #else
 // #pragma message("stubbing device and host")
 // #include <stdexcept>
@@ -31,7 +69,7 @@
 #define __align__(x) __attribute__((aligned(x)))
 
 // #define __launch_bounds__(x) __attribute__((launch_bounds(x)))
-#define __launch_bounds__(x)
+// #define __launch_bounds__(x)
 #define __launch_bounds__(x, y)
 
 #include "cocl/cocl_memory.h"
@@ -81,11 +119,11 @@ unsigned int y;
 unsigned int z;
 };
 
-__host__ __device__ inline long long __double_as_longlong(double val) {
+__devicehost__ inline long long __double_as_longlong(double val) {
     return (long long)val;
 }
 
-__host__ __device__ inline double __longlong_as_double(long long val) {
+__devicehost__ inline double __longlong_as_double(long long val) {
     return (double)val;
 }
 
@@ -101,11 +139,15 @@ __host__ __device__ inline double __longlong_as_double(long long val) {
 
 // __device__ unsigned long long atomicExch(volatile unsigned long long *p, unsigned long long val);
 
-__device__ __host__ inline unsigned long long atomicExch(volatile unsigned long long *p, unsigned long long val) {
+#ifdef __CUDA_ARCH__
+__device__ unsigned long long atomicExch(volatile unsigned long long *p, unsigned long long val);
+#else
+__host__ inline unsigned long long atomicExch(volatile unsigned long long *p, unsigned long long val) {
     throw std::runtime_error("not implemented: atomicExch on host");
     // std::atomic<T> global;
     // return atomic::exchange(p, val)
 }
+#endif
 
 // #define atomicExch atomic_xchg
 
@@ -135,11 +177,15 @@ extern "C" {
 
 void syncthreads();
 
-__device__ __host__ int __shfl_xor(int a, int b); // just declare it for now, to get Eigen compiling. Figure out what to do with it
+#ifdef __CUDA_ARCH__
+__device__ int __shfl_xor(int a, int b); // just declare it for now, to get Eigen compiling. Figure out what to do with it
+// int __shfl_xor(int a, int b); // just declare it for now, to get Eigen compiling. Figure out what to do with it
 // later...
 
 // ditto
-__device__ __host__ int __umulhi(int magic, int n);
+__device__ int __umulhi(int magic, int n);
+// int __umulhi(int magic, int n);
+#endif
 
 typedef unsigned int CUjit_option;
 
@@ -158,13 +204,31 @@ enum cujitenum {
 // for now
 // __device___ bool __isGlobal(void *ptr);
 
+// ==========================================
 // following added for thrust:
-__device__ __host__ bool __isGlobal(const void *ptr);
+#ifdef __CUDA_ARCH__
+__device__ bool __isGlobal(const void *ptr);
+#endif
+// bool __isGlobal(const void *ptr);
+
+#ifdef __CUDA_ARCH__  // deviceside?
 namespace std {
 __device__ void *malloc(size_t count);
 __device__ void free(void *ptr);
 } // namespace std
 
+// used by util_ptx.cuh, warpAny etc
+__device__ int __all(int bits);
+__device__ int __any(int bits);
+__device__ void __threadfence_block();
+
+// https://en.wikipedia.org/wiki/Find_first_set
+__device__ int __clz(int val);
+__device__ int __brev(int val);
+#endif // __CUDA_ARCH__ deviceside
+
+// end of thrust bits
+// =====================
 
 // bool __isGlobal(const void *ptr) {
 //     return true;

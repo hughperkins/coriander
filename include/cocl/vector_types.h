@@ -1,32 +1,89 @@
 #pragma once
 
-struct float4 {
-public:
-    __attribute__((device)) __attribute__((host)) float4() {}
-    __attribute__((device)) __attribute__((host)) float4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
-    float x;
-    float y;
-    float z;
-    float w;
+#include <cstdint>
+
+#include "cocl.h"
+
+// #ifdef __CUDA_ARCH__ // means device-side
+// #define __devicehost__ __attribute__((device))
+// #else
+// // #define __devicehost__ __attribute__((host))
+// #define __devicehost__
+// #endif
+
+#define type1(NAME, TYPE) \
+struct NAME ## 1 { \
+public: \
+    __devicehost__ NAME ## 1() {} \
+    __devicehost__ NAME ## 1(TYPE x) : x(x) {} \
+    TYPE x; \
 };
 
-
-struct float2 {
-public:
-    __attribute__((device)) __attribute__((host)) float2() {}
-    __attribute__((device)) __attribute__((host)) float2(float x, float y) : x(x), y(y) {}
-    float x;
-    float y;
+#define type2(NAME, TYPE) \
+struct NAME ## 2 { \
+public: \
+    __devicehost__ NAME ## 2() {} \
+    __devicehost__ NAME ## 2(TYPE x, TYPE y) : x(x), y(y) {} \
+    TYPE x; \
+    TYPE y; \
 };
 
-struct double2 {
-public:
-    __attribute__((device)) __attribute__((host)) double2() {}
-    __attribute__((device)) __attribute__((host)) double2(double x, double y) : x(x), y(y) {}
-    double x;
-    double y;
+#define type3(NAME, TYPE) \
+struct NAME ## 3 { \
+public: \
+    __devicehost__ NAME ## 3() {} \
+    __devicehost__ NAME ## 3(TYPE x, TYPE y, TYPE z, TYPE w) : x(x), y(y), z(z) {} \
+    TYPE x; \
+    TYPE y; \
+    TYPE z; \
 };
 
-__attribute__((device)) __attribute__((host)) float4 make_float4(float x, float y, float z, float w);
-__attribute__((device)) __attribute__((host)) float2 make_float2(float x, float y);
-__attribute__((device)) __attribute__((host)) double2 make_double2(double x, double y);
+#define type4(NAME, TYPE) \
+struct NAME ## 4 { \
+public: \
+    __devicehost__ NAME ## 4() {} \
+    __devicehost__ NAME ## 4(TYPE x, TYPE y, TYPE z, TYPE w) : x(x), y(y), z(z), w(w) {} \
+    TYPE x; \
+    TYPE y; \
+    TYPE z; \
+    TYPE w; \
+};
+
+#define type_all_lengths(NAME, TYPE) \
+  type1(NAME, TYPE) \
+  type2(NAME, TYPE) \
+  type3(NAME, TYPE) \
+  type4(NAME, TYPE)
+
+
+type_all_lengths(uchar, unsigned char)
+type_all_lengths(char, char)
+type_all_lengths(ushort, unsigned short)
+type_all_lengths(short, short)
+type_all_lengths(uint, unsigned int)
+type_all_lengths(int, int)
+type_all_lengths(ulong, uint32_t)
+type_all_lengths(long, int32_t)
+type_all_lengths(ulonglong, uint64_t)
+type_all_lengths(longlong, int64_t)
+type_all_lengths(float, float)
+type_all_lengths(double, double)
+
+// type4(ushort, unsigned short)
+// type4(int, int)
+// type4(float, float)
+
+// __attribute__((device)) __attribute__((host)) float4 make_float4(float x, float y, float z, float w);
+// __attribute__((device)) __attribute__((host)) float2 make_float2(float x, float y);
+// __attribute__((device)) __attribute__((host)) double2 make_double2(double x, double y);
+
+
+#ifdef __CUDACC__
+__device__ float4 make_float4(float x, float y, float z, float w);
+__device__ float2 make_float2(float x, float y);
+__device__ double2 make_double2(double x, double y);
+#endif
+
+float4 make_float4(float x, float y, float z, float w);
+float2 make_float2(float x, float y);
+double2 make_double2(double x, double y);

@@ -73,7 +73,7 @@ size_t cuDeviceGetAttribute(
     return 0;
 }
 
-cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
+// cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
 
 size_t cuDeviceGetName(char *buf, int bufsize, CUdevice device) {
     COCL_PRINT(cout << "cuDeviceGetName device=" << device << endl);
