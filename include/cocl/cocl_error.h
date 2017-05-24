@@ -5,6 +5,7 @@
 extern "C" {
     const char *cudaGetErrorString (size_t error);
     size_t cudaGetLastError();
+    size_t cudaPeekAtLastError();
 }
 
 // #define cudaErrorNotReady 2222

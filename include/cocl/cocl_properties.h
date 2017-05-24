@@ -52,7 +52,6 @@ cudaSharedMemConfig cudaSharedMemBankSizeDefault = 314;
 // };
 
 extern "C" {
-    size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device);
     size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, CUdevice device);
     size_t cuDriverGetVersion(int *driver_version);
     size_t cuDeviceGetPCIBusId(char *buf, int bufsize, CUdevice device);
@@ -60,7 +59,12 @@ extern "C" {
     size_t cuDeviceGetAttribute(
        int *value, int attribute, CUdevice device);
     size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, int device_ordinal);
+
+    size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device);
     size_t cudaDeviceSetSharedMemConfig(cudaSharedMemConfig config);
+    size_t cudaDeviceGetAttribute(
+       int *value, int attribute, CUdevice device);
+    size_t cudaDeviceGetSharedMemConfig(cudaSharedMemConfig *p_config);
 }
 
 // constants are arbitrary, just as long as we use this header file for compiling the client sourcecode
@@ -77,5 +81,16 @@ enum deviceattributes {
     CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT,
     CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR,
     CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK,
-    CU_DEVICE_ATTRIBUTE_WARP_SIZE
+    CU_DEVICE_ATTRIBUTE_WARP_SIZE,
+    cudaDevAttrComputeCapabilityMajor,
+    cudaDevAttrMaxGridDimX,
+    cudaDevAttrMaxGridDimY,
+    cudaDevAttrMaxGridDimZ,
+    cudaDevAttrMaxThreadsPerBlock,
+    cudaDevAttrMaxThreadsPerMultiProcessor,
+    cudaDevAttrComputeCapabilityMinor,
+    cudaDevAttrMultiProcessorCount,
+    cudaDevAttrMaxRegistersPerBlock,
+    cudaDevAttrMaxSharedMemoryPerBlock,
+    cudaDevAttrWarpSize
 };

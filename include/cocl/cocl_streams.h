@@ -17,7 +17,9 @@ extern "C" {
     size_t cuStreamDestroy_v2(char *queue);
     size_t cuStreamSynchronize(char *queue);
 
+    size_t cudaStreamCreate(char **pqueue);
     size_t cudaStreamQuery(char *stream);
+    size_t cudaStreamDestroy(char *queue);
 
     typedef void (*cudacallbacktype)(char *stream, size_t status, void*userdata);
     size_t cudaStreamAddCallback(char *stream, cudacallbacktype callback, void *userdata, int flags);

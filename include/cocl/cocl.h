@@ -100,6 +100,16 @@ inline int __clz(int value);
 typedef void *CUfunction;
 typedef void *CUfunction_attribute;
 typedef const std::discrete_distribution<int> CUfunc_cache;
+struct cudaFuncAttributes {
+    size_t constSizeBytes;
+    size_t localSizeBytes;
+    int maxThreadsPerBlock;
+    int numRegs;
+    int ptxVersion;
+    size_t sharedSizeBytes;
+};
+size_t cudaFuncGetAttributes(cudaFuncAttributes *p_attributes, CUfunction);
+
 // struct CUfunc_cache {
 // };
 typedef void *CUmodule;
@@ -211,24 +221,24 @@ __device__ bool __isGlobal(const void *ptr);
 #endif
 // bool __isGlobal(const void *ptr);
 
+#ifdef __CUDACC__
+__device__ void __threadfence_block();
+__device__ int __all(int bits);
+__device__ int __any(int bits);
+
+// https://en.wikipedia.org/wiki/Find_first_set
+__device__ int __clz(int val);
+__device__ int __brev(int val);
+__device__ int __popc(int val);
+#endif // __CUDACC__
+
 #ifdef __CUDA_ARCH__  // deviceside?
 namespace std {
 __device__ void *malloc(size_t count);
 __device__ void free(void *ptr);
 } // namespace std
 
-// ==========================
-// needed for thrust:
-
 // used by util_ptx.cuh, warpAny etc
-__device__ int __all(int bits);
-__device__ int __any(int bits);
-__device__ void __threadfence_block();
-
-// https://en.wikipedia.org/wiki/Find_first_set
-__device__ int __clz(int val);
-__device__ int __brev(int val);
-__device__ int __popc(int val);
 #endif // __CUDA_ARCH__ deviceside
 
 typedef int64_t cudaTextureObject_t;

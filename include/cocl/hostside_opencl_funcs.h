@@ -68,4 +68,8 @@ extern "C" {
     void setKernelArgInt8(char value);
     void setKernelArgFloat(float value);
     void kernelGo();
+
+    // used by thrust:
+    // void cudaSetupArgument(void *fn, int);
+    // void cudaLaunch();
 }
