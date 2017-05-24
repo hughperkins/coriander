@@ -122,6 +122,10 @@ size_t cuEventCreate(CoclEvent **pevent, unsigned int flags) {
     return 0;
 }
 
+size_t cudaEventCreate(CoclEvent **pevent) {
+    return cuEventCreate(pevent, 0);
+}
+
 size_t cuEventSynchronize(CoclEvent *event) {
     pthread_mutex_lock(&cocl_events_mutex);
     COCL_PRINT("cuEventSynchronize CoclEvent=" << event);
@@ -129,6 +133,19 @@ size_t cuEventSynchronize(CoclEvent *event) {
     EasyCL::checkError(err);
     pthread_mutex_unlock(&cocl_events_mutex);
     return 0;
+}
+
+size_t cudaProfilerStop() {
+    return 0;
+}
+
+size_t cudaEventElapsedTime(float *p_elapsedTime, cocl::CoclEvent *start, cocl::CoclEvent *stop) {
+    *p_elapsedTime = 0.0f;
+    return 0;
+}
+
+size_t cudaEventSynchronize(cocl::CoclEvent *event) {
+    return cuEventSynchronize(event);
 }
 
 size_t cuEventRecord(CoclEvent *event, char *_queue) {
@@ -161,6 +178,10 @@ size_t cuEventRecord(CoclEvent *event, char *_queue) {
     event->event = clevent;
     pthread_mutex_unlock(&cocl_events_mutex);
     return 0;
+}
+
+size_t cudaEventRecord(cocl::CoclEvent *event, char *queue) {
+    return cuEventRecord(event, queue);
 }
 
 size_t cuEventQuery(CoclEvent *event) {

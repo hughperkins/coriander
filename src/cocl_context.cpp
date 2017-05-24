@@ -32,6 +32,7 @@ using namespace std;
 using namespace cocl;
 using namespace easycl;
 
+#undef COCL_PRINT
 #define COCL_PRINT(x)
 
 namespace cocl {

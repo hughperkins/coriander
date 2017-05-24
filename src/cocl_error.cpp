@@ -19,6 +19,7 @@
 #include <iostream>
 using namespace std;
 
+#undef COCL_PRINT
 #define COCL_PRINT(x)
 
 size_t cudaGetLastError() {

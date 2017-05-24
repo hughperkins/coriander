@@ -240,6 +240,7 @@ if(BUILD_TESTS)
     if(TESTS_DUMP_CL)
         set(COCL_DUMP_CL_STR "COCL_DUMP_CL=1")
     endif()
+    include_directories(include/cocl/proxy_includes)
     foreach(TEST ${TESTS})
         add_cocl_executable(${TEST} test/cocl/${TEST}.cu)
         add_custom_target(run-${TEST}

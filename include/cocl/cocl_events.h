@@ -24,6 +24,14 @@ extern "C" {
     size_t cuEventQuery(cocl::CoclEvent *event);
     size_t cuEventDestroy_v2(cocl::CoclEvent *event);
     size_t cuStreamWaitEvent(char *queue, cocl::CoclEvent *event, unsigned int flags);
+    size_t cudaEventElapsedTime(float *p_elapsedTime, cocl::CoclEvent *start, cocl::CoclEvent *stop);
+
+    size_t cudaEventCreate(cocl::CoclEvent **pevent);
+    size_t cudaEventRecord(cocl::CoclEvent *event, char *queue=0);
+    size_t cudaEventSynchronize(cocl::CoclEvent *event);
+    size_t cudaEventElapsedTime(float *p_elapsedTime, cocl::CoclEvent *start, cocl::CoclEvent *stop);
+
+    size_t cudaProfilerStop();
 }
 
 enum EventEnum {

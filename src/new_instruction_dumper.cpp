@@ -1137,7 +1137,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
                     // cout << "cloning new funciton " << newName << endl;
                     ValueToValueMapTy valueMap;
                     #if(LLVM_VERSION_MAJOR == 4)
-                    #pragma message("clang 4 detected")
+                    // #pragma message("clang 4 detected")
                     newFunc = CloneFunction(F,
                                    valueMap);
                     #else
