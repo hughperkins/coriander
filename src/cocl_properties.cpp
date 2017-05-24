@@ -33,42 +33,81 @@ using namespace cocl;
 
 size_t cuDeviceGetAttribute(
        int *value, int attribute, CUdevice device) {
-    // ThreadVars *v = getThreadVars();
-    // ThreadVars *v = getThreadVars();
-    // cocl::CoclDevice *coclDevice = static_cast<CoclDevice *>(device);
-    // cl_device_id deviceid = getDeviceByIdx(v->currentDevice);
-    // EasyCL *cl = v->getCl();
+
+    // cudaDevAttrComputeCapabilityMajor,
+    // cudaDevAttrComputeCapabilityMinor,
+
     cocl::CoclDevice *coclDevice = getCoclDeviceByGpuOrdinal(device);
     COCL_PRINT(cout << "cuDeviceGetAttribute device ordinal=" << coclDevice->gpuOrdinal << endl);
     cl_device_id clDeviceId = coclDevice->deviceId;
     // COCL_PRINT(cout << "cuDeviceGetAttribute current device=" << v->currentDevice << endl);
     // COCL_PRINT(cout << "cuDeviceGetAttribute device=" << device << endl);
-    if(CU_DEVICE_ATTRIBUTE_ECC_ENABLED == attribute) {
-        *value = 0;
-    } else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X == attribute) {
-        *value = 1024;
-    } else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y == attribute) {
-        *value = 1024;
-    } else if(CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z == attribute) {
-        *value = 1024;
-    } else if(CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR == attribute) {
-        *value = 65536;
-    } else if(CU_DEVICE_ATTRIBUTE_SHARED_MEMORY_PER_BLOCK == attribute) {
-        *value = easycl::getDeviceInfoInt64(clDeviceId, CL_DEVICE_LOCAL_MEM_SIZE);
-    } else if(CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT == attribute) {
-        *value = easycl::getDeviceInfoInt(clDeviceId, CL_DEVICE_MAX_COMPUTE_UNITS);
-    } else if(CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK == attribute) {
-        *value = 64;
-    } else if(CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR == attribute) {
-        *value = 128;
-    } else if(CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_BLOCK == attribute) {
-        *value = easycl::getDeviceInfoInt64(clDeviceId, CL_DEVICE_LOCAL_MEM_SIZE);
-    } else if(CU_DEVICE_ATTRIBUTE_WARP_SIZE == attribute) {
-        *value = 32;  // should do like: if amd then 64, else 32
-    } else {
-        cout << "attribute " << attribute << endl;
-        throw runtime_error("attribute not implemented");
+    switch(attribute) {
+        case cudaDevAttrComputeCapabilityMajor:
+            *value = 3;
+            break;
+
+        case cudaDevAttrComputeCapabilityMinor:
+            *value = 0;
+            break;
+
+        case CU_DEVICE_ATTRIBUTE_ECC_ENABLED:
+            *value = 0;
+            break;
+
+        case CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X:
+        case cudaDevAttrMaxGridDimX:
+            *value = 1024;
+            break;
+
+        case CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y:
+        case cudaDevAttrMaxGridDimY:
+            *value = 1024;
+            break;
+
+        case CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z:
+        case cudaDevAttrMaxGridDimZ:
+            *value = 1024;
+            break;
+
+        case CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR:
+            *value = 65536;
+            break;
+
+        case CU_DEVICE_ATTRIBUTE_SHARED_MEMORY_PER_BLOCK:
+        case cudaDevAttrMaxSharedMemoryPerBlock:
+            *value = easycl::getDeviceInfoInt64(clDeviceId, CL_DEVICE_LOCAL_MEM_SIZE);
+
+        case CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT:
+        case cudaDevAttrMultiProcessorCount:
+            *value = easycl::getDeviceInfoInt(clDeviceId, CL_DEVICE_MAX_COMPUTE_UNITS);
+            break;
+
+        case CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK:
+        case cudaDevAttrMaxRegistersPerBlock:
+            *value = 64;
+            break;
+
+        case CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR:
+        case cudaDevAttrMaxThreadsPerBlock:  // ok, this is probably wrong...
+        case cudaDevAttrMaxThreadsPerMultiProcessor:
+            *value = 128;
+            break;
+
+        case CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_BLOCK:
+            *value = easycl::getDeviceInfoInt64(clDeviceId, CL_DEVICE_LOCAL_MEM_SIZE);
+            break;
+
+        case CU_DEVICE_ATTRIBUTE_WARP_SIZE:
+        case cudaDevAttrWarpSize:
+            *value = 32;  // should do like: if amd then 64, else 32
+            break;
+
+        default:
+            cout << __FILE__ << ":" << __LINE__ << " ERROR: attribute " << attribute << " not implemented" << endl;
+            throw runtime_error("attribute not implemented");
     }
+
     // cout << "cuDeviceGetAttribute redirected att=" << attribute << " value=" << *value << endl;
     return 0;
 }
