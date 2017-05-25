@@ -133,6 +133,7 @@ TEST(test_struct_cloner, test_clone) {
 
     cout << "testIR [" << testIR << "]" << endl;
 string expectedIR = R"(; ModuleID = 'hostsideM'
+source_filename = "hostsideM"
 
 %"struct mystruct" = type { i32, float, float*, i32, float* }
 %"struct mystruct_nopointers" = type { i32, float, i32 }
@@ -144,18 +145,19 @@ entry:
   %2 = getelementptr inbounds %"struct mystruct", %"struct mystruct"* %0, i32 0, i32 0
   %3 = getelementptr inbounds %"struct mystruct_nopointers", %"struct mystruct_nopointers"* %1, i32 0, i32 0
   %loadint = load i32, i32* %2
-  store volatile i32 %loadint, i32* %3
+  store i32 %loadint, i32* %3
   %4 = getelementptr inbounds %"struct mystruct", %"struct mystruct"* %0, i32 0, i32 1
   %5 = getelementptr inbounds %"struct mystruct_nopointers", %"struct mystruct_nopointers"* %1, i32 0, i32 1
   %loadint1 = load float, float* %4
-  store volatile float %loadint1, float* %5
+  store float %loadint1, float* %5
   %6 = getelementptr inbounds %"struct mystruct", %"struct mystruct"* %0, i32 0, i32 3
   %7 = getelementptr inbounds %"struct mystruct_nopointers", %"struct mystruct_nopointers"* %1, i32 0, i32 2
   %loadint2 = load i32, i32* %6
-  store volatile i32 %loadint2, i32* %7
+  store i32 %loadint2, i32* %7
   ret void
 }
 )";
+    cout << "expectedIR: [" << expectedIR << "]" << endl;
     ASSERT_EQ(expectedIR, testIR);
 }
 

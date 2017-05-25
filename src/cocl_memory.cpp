@@ -268,7 +268,7 @@ size_t cuDeviceTotalMem(size_t *value, CUdeviceptr device) {
 }
 
 size_t cudaMemcpy(void *dst, const void *src, size_t bytes, cudaMemcpyKind kind) {
-    COCL_PRINT("cudamempcy using opencl cudaMemcpyKind " << cudaMemcpyKind << " count=" << bytes);
+    COCL_PRINT("cudamempcy using opencl cudaMemcpyKind " << kind << " count=" << bytes);
     cl_int err;
     ThreadVars *v = getThreadVars();
     if(kind == cudaMemcpyDeviceToHost) {

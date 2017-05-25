@@ -684,7 +684,7 @@ void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo
             LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
             rhs << "[" << thisInfo->getExpr() << "]";
             newType = currentType->getPointerElementType();
-        } else if(isa<ArrayType>(currentType)) {
+        } else if(ArrayType *arrayType = dyn_cast<ArrayType>(currentType)) {
             // cout << "pointer or array" << endl;
             // cout << "ispointerty? " << currentType->isPointerTy() << endl;
             // cout << "  isa<ArrayType>? " << isa<ArrayType>(currentType) << endl;
@@ -697,13 +697,13 @@ void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo
             // }
             // if(numIndices > 0) {
             // cout << "d + 1" << (d + 1) << endl;
-            Value *operand = instr->getOperand(d);
+            // Value *operand = instr->getOperand(d);
             // int index = indices[d];
             // cout << "  idx=" << idx << endl;
             // LocalValueInfo *thisInfo = getOperand(instr->getOperand(d));
             rhs << "[" << idx << "]";
             // cout << "  rhs [" << rhs.str() << "]" << endl;
-            newType = currentType->getPointerElementType();
+            newType = arrayType->getElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
             // cout << "struct" << endl;
             string structName = getName(structtype);
