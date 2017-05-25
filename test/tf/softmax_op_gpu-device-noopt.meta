@@ -1,0 +1,2 @@
+kernel: _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorEvalToOpIKNS_17TensorReductionOpINS0_10MaxReducerIfEEKNS_6DSizesIiLi1EEEKNS_9TensorMapINS_6TensorIKfLi2ELi1EiEELi16ENS_11MakePointerEEESE_EESE_EENS_9GpuDeviceEEEiEEvT_T0_
+command: 'make -j 8 libcocl.dylib && make -j 8 patch_hostside && ./patch_hostside --devicellfile ../test/tf/softmax_op_gpu-device-noopt.ll --hostrawfile ../test/tf/softmax_op_gpu-hostraw.ll --hostpatchedfile softmax_op_gpu-hostpatched.ll'
