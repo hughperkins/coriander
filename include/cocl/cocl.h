@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _COCL_H  // since pragma once doesnt work if two files have same name and content, but different location...
+#define _COCL_H
+
 #ifdef __CUDA_ARCH__
 // #pragma message("cuda arch")
 #endif
@@ -195,16 +198,6 @@ extern "C" {
 
 #define clock64() 0
 
-#ifdef __CUDA_ARCH__
-__device__ int __shfl_xor(int a, int b); // just declare it for now, to get Eigen compiling. Figure out what to do with it
-// int __shfl_xor(int a, int b); // just declare it for now, to get Eigen compiling. Figure out what to do with it
-// later...
-
-// ditto
-__device__ int __umulhi(int magic, int n);
-// int __umulhi(int magic, int n);
-#endif
-
 typedef unsigned int CUjit_option;
 
 #define CU_JIT_ERROR_LOG_BUFFER_SIZE_BYTES 65536
@@ -254,3 +247,5 @@ template<typename T> TextureWord tex1Dfetch();
 // bool __isGlobal(const void *ptr) {
 //     return true;
 // }
+
+#endif // _COCL_H

@@ -134,10 +134,12 @@ __device__ bool isinf(float in1);
 __device__ bool isfinite(float in1);
 
 __device__ void memcpy(void *dst, const void *src, size_t count);
+__device__ double rsqrt(double x);
+// __device__ int __clz(int value);
 
-inline double rsqrt(double x) {
-    return sqrt(1.0 / x);
-}
+// inline double rsqrt(double x) {
+//     return sqrt(1.0 / x);
+// }
 inline int __clz(int value);
 #define rsqrtf(x) rsqrt(x)
 #define sinpif sinpi
@@ -185,6 +187,9 @@ template<typename T>
 __device__ T __shfl_down(T val, int offset, int warpSize);
 template<typename T>
 __device__ T __shfl_xor(T val, int offset, int warpSize);
+
+__device__ int __shfl_xor(int a, int b);
+__device__ int __umulhi(int magic, int n);
 
 __device__ void __assert_rtn(const char *, const char *, int, const char *);
 

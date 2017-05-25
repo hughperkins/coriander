@@ -338,6 +338,8 @@ if [ ! "$COMPILE" ]; then {
 
 LLVM_COMPILE_FLAGS=`${CLANG_HOME}/bin/llvm-config --cppflags --cxxflags | sed -e 's/ -fno-exceptions/ -fexceptions/g' -e 's/ -fno-rtti//g' -e 's/ -DNDEBUG//g' -e 's/ -g / /g' -e 's/ -std=c++0x/ -std=c++11/g' -e 's% -isysroot [^ ]*%%g'`
 LLVM_COMPILE_FLAGS=${LLVM_COMPILE_FLAGS//-Wno-maybe-uninitialized/}
+LLVM_LL_COMPILE_FLAGS=${LLVM_COMPILE_FLAGS/-I[^ ]+//}
+LLVM_LL_COMPILE_FLAGS=${LLVM_LL_COMPILE_FLAGS/-I [^ ]+//}
 LLVM_LINK_FLAGS=`${CLANG_HOME}/bin/llvm-config --ldflags --system-libs --libs all`
 
 # echo LLVM_COMPILE_FLAGS ${LLVM_COMPILE_FLAGS}
@@ -346,6 +348,7 @@ LLVM_LINK_FLAGS=`${CLANG_HOME}/bin/llvm-config --ldflags --system-libs --libs al
 set -x
 ${CLANG_HOME}/bin/clang++ ${PASSTHRU} -DUSE_CLEW \
     -std=c++11 -x cuda \
+    -D__CORIANDERCC__ \
     --cuda-gpu-arch=sm_30 -nocudalib -nocudainc --cuda-device-only -emit-llvm -O0 -S \
     ${ADDFLAGS} \
     -D__CUDACC__ \
@@ -377,6 +380,7 @@ ${CLANG_HOME}/bin/clang++ ${PASSTHRU} \
     ${INCLUDES} -DUSE_CLEW \
     -std=c++11 -x cuda -nocudainc --cuda-host-only -emit-llvm  -O3 -S \
     -D__CUDACC__ \
+    -D__CORIANDERCC__ \
     -Wno-gnu-anonymous-struct \
     -Wno-nested-anon-types \
     ${LLVM_COMPILE_FLAGS} \
@@ -398,7 +402,7 @@ ${COCL_BIN}/patch_hostside \
     --devicellfile ${OUTPUTBASEPATH}-device.ll \
     --hostpatchedfile ${OUTPUTBASEPATH}-hostpatched.ll
 
-${CLANG_HOME}/bin/clang++ ${PASSTHRU} ${LLVM_COMPILE_FLAGS} -DUSE_CLEW -c ${OUTPUTBASEPATH}-hostpatched.ll -O3 ${OPT_G} -o ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}
+${CLANG_HOME}/bin/clang++ ${PASSTHRU} ${LLVM_LL_COMPILE_FLAGS} -DUSE_CLEW -c ${OUTPUTBASEPATH}-hostpatched.ll -O3 ${OPT_G} -o ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}
 
 if [ ! "$COMPILE" ]; then {
     ${NATIVE_COMPILER} \
