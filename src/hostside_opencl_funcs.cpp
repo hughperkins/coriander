@@ -199,7 +199,7 @@ int cudaConfigureCall(
         // COCL_PRINT(cout << "cudaConfigureCall using default_queue" << endl);
     }
     CLQueue *clqueue = coclStream->clqueue;
-    // COCL_PRINT(cout << "cudaConfigureCall queue=" << (void *)clqueue << endl);
+    cout << "cudaConfigureCall queue=" << (void *)clqueue;
     if(sharedMem != 0) {
         COCL_PRINT(cout << "cudaConfigureCall: Not implemented: non-zero shared memory" << endl);
         throw runtime_error("cudaConfigureCall: Not implemented: non-zero shared memory");
@@ -210,8 +210,9 @@ int cudaConfigureCall(
     int block_x = block.x;
     int block_y = block.y;
     int block_z = block.z;
-    // COCL_PRINT(cout << "grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")" << endl);
-    // COCL_PRINT(cout << "block(" << block_x << ", " << block_y << ", " << block_z << ")" << endl);
+    cout << " grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")";
+    cout << " block(" << block_x << ", " << block_y << ", " << block_z << ")";
+    cout << endl;
     launchConfiguration.queue = clqueue;
     launchConfiguration.coclStream = coclStream;
     launchConfiguration.grid[0] = grid_x;
@@ -526,7 +527,7 @@ void setKernelArgFloat(float value) {
     pthread_mutex_unlock(&launchMutex);
 }
 
-void kernelGo() {
+void kernelGo_old() {
     try {
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT(cout << "kernelGo queue=" << (void *)launchConfiguration.queue << endl);
@@ -618,6 +619,54 @@ void kernelGo() {
     // cout << "released args done" << endl;
     pthread_mutex_unlock(&launchMutex);
     pthread_mutex_unlock(&launchMutex);
+    } catch(runtime_error &e) {
+        std::cout << "caught runtime error " << e.what() << std::endl;
+        throw e;
+    }
+}
+
+class NewArg {
+public:
+    NewArg(){}
+    NewArg(char *pValue, int valueSizeBytes) : pValue(pValue), valueSizeBytes(valueSizeBytes) {
+    }
+    char *pValue = 0;
+    int valueSizeBytes = 0;
+};
+ostream &operator<<(ostream &os, const NewArg &newarg) {
+    os << "NewArg(pValue=" << newarg.pValue << ", size=" << newarg.valueSizeBytes << ")";
+    return os;
+}
+
+vector<unique_ptr<NewArg> > newArgs;
+
+int cudaSetupArgument(char *pValue, int valueSizeBytes, int a) {
+    pthread_mutex_lock(&launchMutex);
+    cout << "cudaSetupArgument pValue=" << (long long)pValue << " size bytes=" << valueSizeBytes << endl;
+    newArgs.push_back(unique_ptr<NewArg>(new NewArg(pValue, valueSizeBytes)));
+    pthread_mutex_unlock(&launchMutex);
+    return 0;
+}
+
+void kernelGo() {
+    try {
+        pthread_mutex_lock(&launchMutex);
+        cout << "cudaLaunch" << endl;
+        for(int i = 0; i < newArgs.size(); i++) {
+            NewArg *arg = newArgs[i].get();
+            cout << "arg: " << *arg << endl;
+        }
+        cout << launchConfiguration.kernelName << endl;
+
+        // GenerateOpenCLResult res = generateOpenCL(
+        //     launchConfiguration.clmems.size(), launchConfiguration.clmemIndexByClmemArgIndex, launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
+        // // cout << "kernelGo() generatedKernelName=" << res.generatedKernelName << endl;
+        // // cout << "kernelGo() OpenCL sourcecode:\n" << res.clSourcecode << endl;
+        // CLKernel *kernel = compileOpenCLKernel(res.uniqueKernelName, res.shortKernelName, res.clSourcecode);
+
+
+        pthread_mutex_unlock(&launchMutex);
+        pthread_mutex_unlock(&launchMutex);
     } catch(runtime_error &e) {
         std::cout << "caught runtime error " << e.what() << std::endl;
         throw e;

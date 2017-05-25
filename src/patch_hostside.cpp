@@ -610,8 +610,8 @@ void PatchHostside::patchFunction(llvm::Function *F) {
             if(calledFunctionName == "cudaLaunch") {
                 PatchHostside::patchCudaLaunch(F, genCallInst.get(), to_replace_with_zero);
             } else if(calledFunctionName == "cudaSetupArgument") {
-                PatchHostside::getLaunchArgValue(genCallInst.get(), launchCallInfo.get());
-                to_replace_with_zero.push_back(inst);
+                // PatchHostside::getLaunchArgValue(genCallInst.get(), launchCallInfo.get());
+                // to_replace_with_zero.push_back(inst);
             }
         }
     }
