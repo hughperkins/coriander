@@ -94,19 +94,24 @@ std::ostream &operator<<(std::ostream &os, const LaunchCallInfo &info) {
     my_raw_os_ostream << ">>>";
     my_raw_os_ostream << "(";
     int i = 0;
-    for(auto it=info.callTypes.begin(); it != info.callTypes.end(); it++) {
+    // for(auto it=info.callTypes.begin(); it != info.callTypes.end(); it++) {
+    for(auto it=info.params.begin(); it != info.params.end(); it++) {
         if(i > 0){
             my_raw_os_ostream << ", ";
         }
-        Type *type = *it;
-        type->print(my_raw_os_ostream);
+        ParamInfo paramInfo = *it;
+        // Type *type = *it;
+        paramInfo.type->print(my_raw_os_ostream);
         i++;
     }
     my_raw_os_ostream << ");\n";
     my_raw_os_ostream << "value types: ";
     i = 0;
-    for(auto it=info.callValuesByValue.begin(); it != info.callValuesByValue.end(); it++) {
-        Value *value = *it;
+    for(auto it=info.params.begin(); it != info.params.end(); it++) {
+    // for(auto it=info.callValuesByValue.begin(); it != info.callValuesByValue.end(); it++) {
+        ParamInfo paramInfo = *it;
+        Value *value = paramInfo.value;
+        // Value *value = *it;
         if(i > 0) {
             my_raw_os_ostream << ", ";
         }
@@ -121,17 +126,51 @@ void PatchHostside::getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info) 
     // sideeffect is to populate in info:
     // - name of the kernel
     // - type of each of the kernel parameters (without the actual Value's)
-    info->callTypes.clear();
+    // info->callTypes.clear();
+    // info->params.clear();
+    // cout << "getLaunchTypes: clearning params" << endl;
     // outs() << "getLaunchTypes()\n";
     Value *argOperand = inst->getArgOperand(0);
     if(ConstantExpr *expr = dyn_cast<ConstantExpr>(argOperand)) {
         Instruction *instr = expr->getAsInstruction();
+        // cout << "instr:" << endl;
+        // instr->dump();
+        Function *fn = cast<Function>(instr->getOperand(0));
+        // cout << "fn:" << endl;
+        // fn->dump();
+        // cout << endl;
+        // instr->getOperand(0)->dump();
+        // cout << endl;
         Type *op0type = instr->getOperand(0)->getType();
         Type *op0typepointed = op0type->getPointerElementType();
-        if(FunctionType *fn = dyn_cast<FunctionType>(op0typepointed)) {
-            for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
+        int i = 0;
+        for(auto it=fn->arg_begin(); it != fn->arg_end(); it++) {
+            Argument *arg = &*it;
+            // arg->dump()
+            cout << "arg " << i << " byval=" << arg->hasByValAttr() << endl;
+            arg->dump();
+            cout << endl;
+            // ParamInfo paramInfo;
+            launchCallInfo->params[i].isByVal = arg->hasByValAttr();
+            // launchCallInfo->params.push_back(paramInfo);
+            i++;
+        }
+        if(FunctionType *fnType = dyn_cast<FunctionType>(op0typepointed)) {
+            // int i = 0;
+            int i = 0;
+            for(auto it=fnType->param_begin(); it != fnType->param_end(); it++) {
                 Type * paramType = *it;
-                info->callTypes.push_back(paramType);
+                info->params[i].type = paramType;
+                // info->callTypes.push_back(paramType);
+                i++;
+                // cout << "param " << i << ":" << endl;
+                // paramType->dump();
+                // fn->getArgumentList()[i]->dump();
+                // fn->getArgumentList()[i]->dump();
+                // cout << endl;
+                // cout << isa<Argument>(paramType);
+                // cout << 
+                // i++;
             }
         }
         info->kernelName = instr->getOperand(0)->getName();
@@ -141,7 +180,7 @@ void PatchHostside::getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info) 
     }
 }
 
-void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info) {
+void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info, ParamInfo *paramInfo) {
     // input to this is:
     // - inst is cudaSetupArgument instruction, with:
     //   - first operand is a value pointing to the value we want to send to the kernel
@@ -171,8 +210,10 @@ void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *inf
     }
     Instruction *load = new LoadInst(alloca, "loadCudaArg");
     load->insertBefore(inst->getInst());
-    info->callValuesByValue.push_back(load);
-    info->callValuesAsPointers.push_back(alloca);
+    paramInfo->value = load;
+    paramInfo->pointer = alloca;
+    // info->callValuesByValue.push_back(load);
+    // info->callValuesAsPointers.push_back(alloca);
 }
 
 std::ostream &operator<<(std::ostream &os, const PointerInfo &pointerInfo) {
@@ -246,7 +287,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_float(llvm::Instruction *l
     return call;
 }
 
-llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction *lastInst, llvm::Value *value) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction *lastInst, llvm::Type *valueType, llvm::Value *value) {
     // cout << "lastInst:" << endl;
     // lastInst->dump();
     // cout << endl;
@@ -260,7 +301,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction 
     // value->dump();
     // cout << endl;
 
-    Type *elementType = cast<PointerType>(value->getType())->getPointerElementType();
+    Type *elementType = cast<PointerType>(valueType)->getPointerElementType();
     // cout << "addSetKernelArgInst_pointer elementType:" << endl;
     // elementType->dump();
     // we can probably generalize these to all just send as a pointer to char
@@ -303,18 +344,18 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction 
     return lastInst;
 }
 
-llvm::Instruction *PatchHostside::addSetKernelArgInst_pointerstruct(llvm::Instruction *lastInst, llvm::Value *structPointer) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst_pointerstruct(llvm::Instruction *lastInst, llvm::Type *valueType, llvm::Value *structPointer) {
     // what this will need to do is:
     // - create a call to pass the gpu buffer, that contains the struct, to hostside_opencl_funcs, at runtime
     // ~~- if the struct contains pointers, then add appropriate calls to pass those at runtime too~~
     // update: we're going to forbid gpuside buffers containing pointers, for now
 
     // lets deal with the gpuside buffer first, that should be fairly easy-ish:
-    lastInst = addSetKernelArgInst_pointer(lastInst, structPointer);
+    lastInst = addSetKernelArgInst_pointer(lastInst, valueType, structPointer);
 
     // we'd better at least assert or something, if there are pointers in the struct
     Module *M = lastInst->getModule();
-    StructType *structType = cast<StructType>(cast<PointerType>(structPointer->getType())->getPointerElementType());
+    StructType *structType = cast<StructType>(cast<PointerType>(valueType)->getPointerElementType());
     unique_ptr<StructInfo> structInfo(new StructInfo());
     StructCloner::walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", structType);
     bool structHasPointers = structInfo->pointerInfos.size() > 0;
@@ -329,14 +370,14 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointerstruct(llvm::Instru
     return lastInst;
 }
 
-llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluevector(llvm::Instruction *lastInst, llvm::Value *vectorPointer) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluevector(llvm::Instruction *lastInst, llvm::Type *valueType, llvm::Value *vectorPointer) {
     // so, lets assume its just a hostside blob, that we need to send deviceside, as a blob
     // we should thus find out the blob size
     // we'll need:
     // - element count
     // - element size
 
-    VectorType *vectorType = cast<VectorType>(cast<PointerType>(vectorPointer->getType())->getPointerElementType());
+    VectorType *vectorType = cast<VectorType>(valueType);
     // outs() << "vectorType:\n";
     // vectorType->dump();
 
@@ -385,7 +426,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluevector(llvm::Instru
     return lastInst;
 }
 
-llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *structPointer) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Type *valueType, llvm::Value *structPointer) {
     //
     // what this is going to do is:
     // - create a call to pass the hostside buffer to hostside_opencl_funcs, at runtime
@@ -396,13 +437,14 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
 
     // outs() << "got a byvalue struct" << "\n";
 
-    StructType *structType = cast<StructType>(cast<PointerType>(structPointer->getType())->getPointerElementType());
+    // StructType *structType = cast<StructType>(cast<PointerType>(valueType)->getPointerElementType());
+    StructType *structType = cast<StructType>(valueType);
     // outs() << "structType:\n";
     // structType->dump();
     string typeName = structType->getName().str();
     // cout << "typeName [" << typeName << "]" << endl;
     if(typeName == "struct.float4") {
-        return PatchHostside::addSetKernelArgInst_pointer(lastInst, structPointer);
+        return PatchHostside::addSetKernelArgInst_pointer(lastInst, valueType, structPointer);
     }
 
     unique_ptr<StructInfo> structInfo(new StructInfo());
@@ -455,7 +497,8 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
 
     // now we have to handle any pointers, send those through too
 
-    // outs() << "pointers in struct:" << "\n";
+    outs() << "pointers in struct:" << "\n";
+    int i = 0;
     for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
         // cout << "   passing a pointer, from the struct" << endl;
         PointerInfo *pointerInfo = pointerit->get();
@@ -474,36 +517,72 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
         loadgep->insertAfter(lastInst);
         lastInst = loadgep;
 
-        lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, loadgep);
+        cout << "   pointer in struct idx=" << i << endl;
+        lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, loadgep->getType(), loadgep);
+        i++;
     }
     return lastInst;
 }
 
-llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastInst, llvm::Value *value, llvm::Value *valueAsPointerInstr) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastInst, ParamInfo *paramInfo) {
     /*
     This figures out the type of the argument, and dispatches appropriately. All arguments pass through this function,
     including primitives, pointers, structs, ...
     */
-    if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
+    Type *valueType = paramInfo->type;
+    Value *value = paramInfo->value;
+    Value *valueAsPointerInstr = paramInfo->pointer;
+    bool byValue = paramInfo->isByVal;
+    cout << "addSetKernelArgInst byvalue=" << paramInfo->isByVal << " type:" << endl;
+    valueType->dump();
+    value->dump();
+    cout << endl;
+    // cout << "byvalue=" << byValue << endl;
+    // valueType->dump();
+    // value->getType()->dump();
+    if(IntegerType *intType = dyn_cast<IntegerType>(valueType)) {
         lastInst = PatchHostside::addSetKernelArgInst_int(lastInst, value, intType);
-    } else if(value->getType()->isFloatingPointTy()) {
+    } else if(valueType->isFloatingPointTy()) {
         lastInst = PatchHostside::addSetKernelArgInst_float(lastInst, value);
-    } else if(value->getType()->isPointerTy()) {
+    } else if(byValue) {
+        // cout << "by value" << endl;
+        valueType = cast<PointerType>(valueType)->getElementType();
+        valueType->dump();
+        cout << endl;
+        if(isa<StructType>(valueType)) {
+            cout << "structtype" << endl;
+            lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, valueType, valueAsPointerInstr);
+        } else if(isa<VectorType>(valueType)) {
+            cout << "got vector arg type" << endl;
+            // value->dump();
+            // cout << endl;
+            // value->getType()->dump();
+            // cout << endl;
+            // so, this is byval, thus hostside?
+            // so send it as a hostside buffer?
+            lastInst = PatchHostside::addSetKernelArgInst_byvaluevector(lastInst, valueType, valueAsPointerInstr);
+        } else {
+            valueType->dump();
+            value->dump();
+            outs() << "\n";
+            throw std::runtime_error("byval kernel arg type type not implemented " + typeDumper.dumpType(valueType));
+        }
+    } else if(valueType->isPointerTy()) {
         // cout << "pointer" << endl;
-        Type *elementType = dyn_cast<PointerType>(value->getType())->getPointerElementType();
+        Type *elementType = dyn_cast<PointerType>(valueType)->getPointerElementType();
         if(isa<StructType>(elementType)) {
             // lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, value);
             // cout << "pointer to struct" << endl;
             // lastInst = addSetKernelArgInst_byvaluestruct(lastInst, value);
-            lastInst = PatchHostside::addSetKernelArgInst_pointerstruct(lastInst, value);
+            lastInst = PatchHostside::addSetKernelArgInst_pointerstruct(lastInst, valueType, value);
         } else {
             // cout << "pointer to non-struct" << endl;
-            lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, value);
+            lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, valueType, value);
         }
-    } else if(isa<StructType>(value->getType())) {
+    } else if(isa<StructType>(valueType)) {
         // cout << "structtype" << endl;
-        lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, valueAsPointerInstr);
-    } else if(isa<VectorType>(value->getType())) {
+        lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, valueType, valueAsPointerInstr);
+    } else if(isa<VectorType>(valueType)) {
         // cout << "got vector arg type" << endl;
         // value->dump();
         // cout << endl;
@@ -511,11 +590,12 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
         // cout << endl;
         // so, this is byval, thus hostside?
         // so send it as a hostside buffer?
-        lastInst = PatchHostside::addSetKernelArgInst_byvaluevector(lastInst, valueAsPointerInstr);
+        lastInst = PatchHostside::addSetKernelArgInst_byvaluevector(lastInst, valueType, valueAsPointerInstr);
     } else {
+        valueType->dump();
         value->dump();
         outs() << "\n";
-        throw std::runtime_error("kernel arg type type not implemented " + typeDumper.dumpType(value->getType()));
+        throw std::runtime_error("kernel arg type type not implemented " + typeDumper.dumpType(valueType));
     }
     return lastInst;
 }
@@ -557,10 +637,22 @@ void PatchHostside::patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, st
 
     // pass args now
     int i = 0;
-    for(auto argit=launchCallInfo->callValuesByValue.begin(); argit != launchCallInfo->callValuesByValue.end(); argit++) {
-        Value *value = *argit;
-        Value *valueAsPointerInstr = launchCallInfo->callValuesAsPointers[i];
-        lastInst = PatchHostside::addSetKernelArgInst(lastInst, value, valueAsPointerInstr);
+    // for(auto argit=launchCallInfo->callValuesByValue.begin(); argit != launchCallInfo->callValuesByValue.end(); argit++) {
+    for(auto argit=launchCallInfo->params.begin(); argit != launchCallInfo->params.end(); argit++) {
+        ParamInfo *paramInfo = &*argit;
+        // Value *value = paramInfo->value;
+        // Value *valueAsPointerInstr = launchCallInfo->callValuesAsPointers[i];
+        // Value *valueAsPointerInstr = paramInfo->pointer;
+        // Type *argType = paramInfo->type;
+        // Type *argType = launchCallInfo->callTypes[i];
+        cout << "patch cudalaunch, arg " << i << " byval=" << paramInfo->isByVal << " type=" << endl;
+        paramInfo->type->dump();
+        cout << endl;
+        paramInfo->value->dump();
+        cout << endl;
+        // argType->dump();
+        // cout << endl;
+        lastInst = PatchHostside::addSetKernelArgInst(lastInst, paramInfo);
         i++;
     }
     // trigger the kernel...
@@ -572,8 +664,9 @@ void PatchHostside::patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, st
     kernelGoInst->insertAfter(lastInst);
     lastInst = kernelGoInst;
 
-    launchCallInfo->callValuesByValue.clear();
-    launchCallInfo->callValuesAsPointers.clear();
+    launchCallInfo->params.clear();
+    // launchCallInfo->callValuesByValue.clear();
+    // launchCallInfo->callValuesAsPointers.clear();
     // launchCallInfo.reset(new LaunchCallInfo);
 }
 
@@ -583,6 +676,14 @@ void PatchHostside::patchFunction(llvm::Function *F) {
     vector<Instruction *> to_replace_with_zero;
     IntegerType *inttype = IntegerType::get(context, 32);
     ConstantInt *constzero = ConstantInt::getSigned(inttype, 0);
+    launchCallInfo->params.clear();
+    // cout << "clearning params" << endl;
+    // vector<unique_ptr<GenericCallInst> args;
+    // vector<unique_ptr<GenericCallInt> launch;
+    // // first, we'll fetch all the relevant arg calls, and the launch call
+    // // then we will process them
+    // // this means we can determine what method is being called, with what parameters,
+    // // and have this information to hand, when we process the args
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
         for(auto insit=basicBlock->begin(); insit != basicBlock->end(); insit++) {
@@ -607,11 +708,16 @@ void PatchHostside::patchFunction(llvm::Function *F) {
             }
             string calledFunctionName = called->getName();
             // if(is_main && calledFunctionName.find("cuda") != string::npos) cout << "calledfunctionname " << calledFunctionName << endl;
-            if(calledFunctionName == "cudaLaunch") {
-                PatchHostside::patchCudaLaunch(F, genCallInst.get(), to_replace_with_zero);
-            } else if(calledFunctionName == "cudaSetupArgument") {
-                PatchHostside::getLaunchArgValue(genCallInst.get(), launchCallInfo.get());
+            if(calledFunctionName == "cudaSetupArgument") {
+                ParamInfo paramInfo;
+                PatchHostside::getLaunchArgValue(genCallInst.get(), launchCallInfo.get(), &paramInfo);
+                launchCallInfo->params.push_back(paramInfo);
+                cout << "got cudasetupargument" << endl;
+                // args.push_back(genCallInst);
                 to_replace_with_zero.push_back(inst);
+            } else if(calledFunctionName == "cudaLaunch") {
+                // launch = genCallInst;
+                PatchHostside::patchCudaLaunch(F, genCallInst.get(), to_replace_with_zero);
             }
         }
     }

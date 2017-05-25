@@ -67,6 +67,17 @@ Ok, so the doc is mostly below, inside the class declaration, at the bottom of t
 
 namespace cocl {
 
+class ParamInfo {
+public:
+    // ParamInfo(llvm::Type *type, llvm::Value *value, llvm::Value pointer, bool isByVal) :
+    //     type(type), value(value), pointer(pointer), isByVal(isByVal) {
+    // }
+    llvm::Type *type = 0;
+    llvm::Value *value = 0;
+    llvm::Value *pointer = 0;
+    bool isByVal = false;
+};
+
 class LaunchCallInfo {
 public:
     LaunchCallInfo() {
@@ -76,9 +87,10 @@ public:
         block_z_value = 0;
     }
     std::string kernelName = "";
-    std::vector<llvm::Type *> callTypes;
-    std::vector<llvm::Value *> callValuesByValue;
-    std::vector<llvm::Value *> callValuesAsPointers;
+    std::vector<ParamInfo> params;
+    // std::vector<llvm::Type *> callTypes;
+    // std::vector<llvm::Value *> callValuesByValue;
+    // std::vector<llvm::Value *> callValuesAsPointers;
     llvm::Value *stream;
     llvm::Value *grid_xy_value;
     llvm::Value *grid_z_value;
@@ -138,7 +150,7 @@ public:
     // given a bytecode that calls the cudaSetupArgument method, obtains information
     // about this, such as the type of the argument being set, and an instruction that represents
     // its value, stores that, in info, along with the arguments there already
-    static void getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info);
+    static void getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info, ParamInfo *paramInfo);
 
     // handle primitive ints and floats (not arrays):
     static llvm::Instruction *addSetKernelArgInst_int(llvm::Instruction *lastInst, llvm::Value *value, llvm::IntegerType *intType);
@@ -161,7 +173,7 @@ public:
     // The hostside_opencl_funcs method needs no information other than the (virtual) pointer really
     // currently we are providing the elementsize too, to mitigate against a crash on beignet, but I might
     // remove that, whilst I get Mac radeon working :-P (since structs might not have useful element sizes)
-    static llvm::Instruction *addSetKernelArgInst_pointer(llvm::Instruction *lastInst, llvm::Value *value);
+    static llvm::Instruction *addSetKernelArgInst_pointer(llvm::Instruction *lastInst, llvm::Type *valueType, llvm::Value *value);
 
     // this will add bytecode to pass a pointer to the cpu-side struct object to hostside_opencl_funcs, at runtime
     // the entry point into hostside_opencl_funcs will be:
@@ -177,7 +189,7 @@ public:
     //
     // this patch_hostside addSetKernelArgInst_byvaluestruct function is going to handle walking the struct, and sending
     // the other pointers through using additional method calls, likely to setKernelArgGpuBuffer
-    static llvm::Instruction *addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *valueAsPointerInstr);
+    static llvm::Instruction *addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Type *valueType, llvm::Value *valueAsPointerInstr);
 
     // this needs to do the same as addSetKernelArgInst_byvaluestruct , but it passes the struct pointer into the
     // setKernelArgGpuBuffer function, rather than the setKernelArgHostsideBuffer
@@ -186,12 +198,13 @@ public:
     // hmmmm. actually. I think we'll forbid pointers in gpuside structs for now. unless we have to
     // why? because, how are we going to get those pointers, if they're stored on the gpu :-P
     // like, how are we going to clone it, first issue.  Possible to to do, but a bunch of work, unless we have to
-    static llvm::Instruction *addSetKernelArgInst_pointerstruct(llvm::Instruction *lastInst, llvm::Value *structPointer);
+    static llvm::Instruction *addSetKernelArgInst_pointerstruct(llvm::Instruction *lastInst, llvm::Type *valueType, llvm::Value *structPointer);
 
-    static llvm::Instruction *addSetKernelArgInst_byvaluevector(llvm::Instruction *lastInst, llvm::Value *structPointer);
+    static llvm::Instruction *addSetKernelArgInst_byvaluevector(llvm::Instruction *lastInst, llvm::Type *valueType, llvm::Value *structPointer);
 
     // all setKernelArgs pass through addSetKernelArgInst, which dispatches to other functions
-    static llvm::Instruction *addSetKernelArgInst(llvm::Instruction *lastInst, llvm::Value *value, llvm::Value *valueAsPointerInstr);
+    static llvm::Instruction *addSetKernelArgInst(
+        llvm::Instruction *lastInst, ParamInfo *paramInfo);
 
     static void patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, std::vector<llvm::Instruction *> &to_replace_with_zero);
     static void patchFunction(llvm::Function *F);  // patch all kernel launch commands in function F
