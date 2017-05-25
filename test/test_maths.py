@@ -16,6 +16,7 @@ import numpy as np
 import pyopencl as cl
 import os
 import math
+import pytest
 from test import test_common
 from test.test_common import offset_type
 
@@ -70,7 +71,8 @@ __global__ void myKernel(float *data) {
     assert float_data[7] == - np.inf
 
 
-def test_ieeefloats(context, q, float_data, float_data_gpu):
+@pytest.mark.skip
+def test_double_ieeefloats(context, q, float_data, float_data_gpu):
     cu_code = """
 __global__ void mykernel(double *data) {
     double d_neginfinity = -INFINITY;

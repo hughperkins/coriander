@@ -511,11 +511,21 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         // sharedInfo->setAsAssigned();
         // sharedVariablesToDeclare->insert();
     }
+    // cout << "gep" << endl;
+    // cout << "   inst:" << endl;
+    // instr->dump();
+    // cout << endl;
+    // cout << "   currenttype:" << endl;
+    // currentType->dump();
+    // cout << endl;
     for(int d=0; d < numOperands - 1; d++) {
+        // cout << "d=" << d << endl;
         Type *newType = 0;
         if(SequentialType *seqType = dyn_cast<SequentialType>(currentType)) {
+            // cout << "sequentialtype" << endl;
             if(d == 0) {
                 if(isa<ArrayType>(seqType->getElementType())) {
+                    // cout << " d is 0 and is arraytype" << endl;
                     rhs = "(&" + rhs + ")";
                 }
             }
@@ -524,25 +534,27 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             string idxstring = thisInfo->getExpr();
             idxstring = stripOuterParams(idxstring);
             rhs += string("[") + idxstring + "]";
-            currentType->dump();
-            cout << endl;
+            // currentType->dump();
+            // cout << endl;
             newType = seqType->getElementType();
         } else if(PointerType *pointerType = dyn_cast<PointerType>(currentType)) {
+            // cout << "pointertype" << endl;
             // PointerType *pointerType = cast<PointerType>(currentType);
-            // if(d == 0) {
-            //     if(isa<ArrayType>(cast<SequentialType>(currentType)->getElementType())) {
-            //         rhs = "(&" + rhs + ")";
-            //     }
-            // }
+            if(d == 0) {
+                if(isa<ArrayType>(pointerType->getElementType())) {
+                    rhs = "(&" + rhs + ")";
+                }
+            }
             // LocalValueInfo *thisInfo = localValueInfos->at(instr->getOperand(d + 1)).get();
             LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
             string idxstring = thisInfo->getExpr();
             idxstring = stripOuterParams(idxstring);
             rhs += string("[") + idxstring + "]";
-            currentType->dump();
-            cout << endl;
+            // currentType->dump();
+            // cout << endl;
             newType = pointerType->getElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
+            // cout << "structtype" << endl;
             string structName = getName(structtype);
             if(structName == "struct.float4") {
                 int idx = readInt32Constant(instr->getOperand(d + 1));
@@ -661,40 +673,65 @@ void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo
     rhs << incomingOperand;
     ArrayRef<unsigned> indices = instr->getIndices();
     int numIndices = instr->getNumIndices();
+    // cout << "dumpExtractValue()" << endl;
+    // currentType->dump();
+    // cout << endl;
     // cout << "  numIndices=" << numIndices << endl;
     for(int d=0; d < numIndices; d++) {
         int idx = indices[d];
         Type *newType = 0;
-        if(currentType->isPointerTy()) {
+        if(PointerType *pointerType = dyn_cast<PointerType>(currentType)) {
+            // cout << "pointer type" << endl;
+            // pointerType->dump();
+            // cout << endl;
+        // if(currentType->isPointerTy()) {
             // cout << "pointer or array" << endl;
             // cout << "ispointerty? " << currentType->isPointerTy() << endl;
             // cout << "isa<ArrayType>? " << isa<ArrayType>(currentType) << endl;
-            if(d == 0) {
-                if(isa<ArrayType>(currentType->getPointerElementType())) {
-                    // cout << "element type is arraytype" << endl;
-                    string oldRhs = rhs.str();
-                    rhs.str("");
-                    rhs << "(&" << oldRhs << ")";
-                }
-            }
+            // if(d == 0) {
+            //     if(isa<ArrayType>(currentType->getPointerElementType())) {
+            //         // cout << "element type is arraytype" << endl;
+            //         string oldRhs = rhs.str();
+            //         rhs.str("");
+            //         rhs << "(&" << oldRhs << ")";
+            //     }
+            // }
             // if(numIndices > 0) {
             // cout << "d + 1" << (d + 1) << endl;
             // Value *operand = instr->getOperand(d + 1);
             // cout << "got operand " << d << endl;
             LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
             rhs << "[" << thisInfo->getExpr() << "]";
-            newType = currentType->getPointerElementType();
+            newType = pointerType->getElementType();
         } else if(ArrayType *arrayType = dyn_cast<ArrayType>(currentType)) {
+            // cout << "arrayType" << endl;
+            // arrayType->dump();
+            // cout << endl;
+            // if(d == 0) {
+            //     string oldRhs = rhs.str();
+            //     rhs.str("");
+            //     rhs << "(&" << oldRhs << ")";
+            // }
+            // if(numIndices > 0) {
+            // cout << "d + 1" << (d + 1) << endl;
+            // Value *operand = instr->getOperand(d + 1);
+            // cout << "got operand " << d << endl;
+            // LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
+            // rhs << "[" << thisInfo->getExpr() << "]";
+            // newType = arrayType->getElementType();
+
             // cout << "pointer or array" << endl;
             // cout << "ispointerty? " << currentType->isPointerTy() << endl;
             // cout << "  isa<ArrayType>? " << isa<ArrayType>(currentType) << endl;
             // cout << "  d=" << d << endl;
-            // if(d == 0) {
-            //     if(isa<ArrayType>(currentType->getPointerElementType())) {
-            //         cout << "element type is arraytype" << endl;
-            //         lhs = "(&" + lhs + ")";
-            //     }
-            // }
+            if(d == 0) {
+                if(isa<ArrayType>(arrayType->getElementType())) {
+                    // cout << "element type is arraytype" << endl;
+                    string oldRhs = rhs.str();
+                    rhs.str("");
+                    rhs << "(&" << oldRhs << ")";
+                }
+            }
             // if(numIndices > 0) {
             // cout << "d + 1" << (d + 1) << endl;
             // Value *operand = instr->getOperand(d);

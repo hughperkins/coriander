@@ -83,9 +83,6 @@ template<class T> __device__ T arg (const std::complex<T>& x) {
 }
 // #include <random>
 
-// #define tanh our_pretend_tanh
-// #define log our_pretend_log
-// #define exp our_pretend_exp
 namespace cocl {
    // double max(double in1, double in2);
    // double min(double in, double in2);
@@ -94,27 +91,21 @@ namespace cocl {
 // using cocl::min;
 
 extern "C" {
-// double our_pretend_tanh(double in);
-// double our_pretend_log(double in);
-// double our_pretend_exp(double in);
-// double our_pretend_max(double in1, double in2);
-// double our_pretend_min(double in1, double in2);
+    __device__ double tanh(double in);
+    __device__ double log(double in);
+    __device__ double exp(double in);
+    __device__ double exp10(double in);
+    __device__ float exp10f(float in);
+} // extern "C"
 
-double tanh(double in);
-double log(double in);
-double exp(double in);
-double exp10(double in);
-float exp10f(float in);
-}
-
-double max(double in1, double in2);
-double min(double in1, double in2);
+__device__ double max(double in1, double in2);
+__device__ double min(double in1, double in2);
 __host__ __device__ float max(float in1, float in2);
 __host__ __device__ float min(float in1, float in2);
-int max(int in1, int in2);
-int min(int in1, int in2);
-long long max(long long in1, long long in2);
-long long min(long long in1, long long in2);
+__device__ int max(int in1, int in2);
+__device__ int min(int in1, int in2);
+__device__ long long max(long long in1, long long in2);
+__device__ long long min(long long in1, long long in2);
 
 __device__ float fminf(float in1, float in2);
 __device__ float fmaxf(float in1, float in2);
@@ -144,11 +135,27 @@ __device__ bool isfinite(float in1);
 
 __device__ void memcpy(void *dst, const void *src, size_t count);
 
+inline double rsqrt(double x) {
+    return sqrt(1.0 / x);
+}
+inline int __clz(int value);
+#define rsqrtf(x) rsqrt(x)
+#define sinpif sinpi
+#define normcdff normcdf
+#define erfcxf erfcx
+
 // #define max cocl::max
 // #define min cocl::min
 
 // #define atomicCAS atomic_cmpxchg
 
+
+// __device__ long long atomicExch(long long* address, long long val);
+
+// #ifdef __CUDA_ARCH__
+// #endif
+
+#ifdef __CUDACC__  // means: are we building a .cu file (cf building a .cpp file, eg cocl_dnn_conv.cpp)
 template<typename T>
 __device__ T atomicCAS(T* address, T compare, T val);
 template<typename T>
@@ -160,9 +167,18 @@ __device__ T atomicInc(T* address, T val);
 template<typename T>
 __device__ T atomicExch(T* address, T val);
 
-// __device__ long long atomicExch(long long* address, long long val);
-
+__device__ bool __isGlobal(const void *ptr);
+__device__ void __threadfence_block();
+__device__ void syncthreads();
 __device__ void __threadfence();
+__device__ int __all(int bits);
+__device__ int __any(int bits);
+
+// https://en.wikipedia.org/wiki/Find_first_set
+__device__ int __clz(int val);
+__device__ int __brev(int val);
+__device__ int __popc(int val);
+
 template<typename T>
 __device__ T __shfl_down(T val, int offset);
 template<typename T>
@@ -180,6 +196,7 @@ __device__ inline float __int_as_float(int val) {
 __device__ inline int __float_as_int(float val) {
     return *(int *)&val;
 }
+#endif // __CUDACC__
 
 int __clzll(long long x);
 long long __umul64hi(unsigned long long x, unsigned long long y);

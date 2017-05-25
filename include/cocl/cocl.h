@@ -87,15 +87,6 @@
 // #include "cocl/EasyCL/EasyCL.h"
 #include "cocl/vector_types.h"
 
-inline double rsqrt(double x) {
-    return sqrt(1.0 / x);
-}
-inline int __clz(int value);
-#define rsqrtf(x) rsqrt(x)
-#define sinpif sinpi
-#define normcdff normcdf
-#define erfcxf erfcx
-
 // used by stream_executor/cl_driver.h; we just declare them for now...
 typedef void *CUfunction;
 typedef void *CUfunction_attribute;
@@ -204,8 +195,6 @@ extern "C" {
 
 #define clock64() 0
 
-void syncthreads();
-
 #ifdef __CUDA_ARCH__
 __device__ int __shfl_xor(int a, int b); // just declare it for now, to get Eigen compiling. Figure out what to do with it
 // int __shfl_xor(int a, int b); // just declare it for now, to get Eigen compiling. Figure out what to do with it
@@ -234,23 +223,6 @@ enum cujitenum {
 // __device___ bool __isGlobal(void *ptr);
 
 // ==========================================
-// following added for thrust:
-#ifdef __CUDA_ARCH__
-__device__ bool __isGlobal(const void *ptr);
-#endif
-// bool __isGlobal(const void *ptr);
-
-#ifdef __CUDACC__
-__device__ void __threadfence_block();
-__device__ int __all(int bits);
-__device__ int __any(int bits);
-
-// https://en.wikipedia.org/wiki/Find_first_set
-__device__ int __clz(int val);
-__device__ int __brev(int val);
-__device__ int __popc(int val);
-#endif // __CUDACC__
-
 #ifdef __CUDA_ARCH__  // deviceside?
 namespace std {
 __device__ void *malloc(size_t count);
