@@ -378,58 +378,58 @@ void test_twostructs_gpuside_singlebuffer() {
     cuStreamDestroy(stream);
 }
 
-// struct NestL2 {
-//     float floats[10];
-// };
+struct NestL2 {
+    float floats[10];
+};
 
-// struct NestL1 {
-//     struct NestL2 n1;
-//     struct NestL2 n2;
-// };
+struct NestL1 {
+    struct NestL2 n1;
+    struct NestL2 n2;
+};
 
-// struct NestTop {
-//     struct NestL1 n1;
-//     struct NestL1 n2;
-// };
+struct NestTop {
+    struct NestL1 n1;
+    struct NestL1 n2;
+};
 
-// __global__ void kernelUseNestTop(NestTop nest, float *out) {
-//     out[0] = nest.n1.n1.floats[0];
-//     out[1] = nest.n1.n1.floats[1];
-// }
+__global__ void kernelUseNestTop(NestTop nest, float *out) {
+    out[0] = nest.n1.n1.floats[0];
+    out[1] = nest.n1.n1.floats[1];
+}
 
-// void testKernelUsesNestTop() {
-//     int N = 1024;
+void testKernelUsesNestTop() {
+    int N = 1024;
 
-//     CUstream stream;
-//     cuStreamCreate(&stream, 0);
+    CUstream stream;
+    cuStreamCreate(&stream, 0);
 
-//     float *gpuOut;
-//     cudaMalloc((void**)(&gpuOut), N * sizeof(float));
+    float *gpuOut;
+    cudaMalloc((void**)(&gpuOut), N * sizeof(float));
 
-//     float *hostOut = new float[N];
+    float *hostOut = new float[N];
 
-//     struct NestTop nestTop;
-//     nestTop.n1.n1.floats[0] = 5;
-//     nestTop.n1.n1.floats[1] = 7;
+    struct NestTop nestTop;
+    nestTop.n1.n1.floats[0] = 5;
+    nestTop.n1.n1.floats[1] = 7;
 
-//     kernelUseNestTop<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(nestTop, (float *)gpuOut);
+    kernelUseNestTop<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(nestTop, (float *)gpuOut);
 
-//     cudaMemcpy(hostOut, gpuOut, 4 * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(hostOut, gpuOut, 4 * sizeof(float), cudaMemcpyDeviceToHost);
 
-//     cuStreamSynchronize(stream);
+    cuStreamSynchronize(stream);
 
-//     cout << hostOut[0] << endl;
-//     cout << hostOut[1] << endl;
+    cout << hostOut[0] << endl;
+    cout << hostOut[1] << endl;
 
-//     assert(hostOut[0] == 5);
-//     assert(hostOut[1] == 7);
+    assert(hostOut[0] == 5);
+    assert(hostOut[1] == 7);
 
-//     cudaFree(gpuOut);
+    cudaFree(gpuOut);
 
-//     delete[]hostOut;
+    delete[]hostOut;
 
-//     cuStreamDestroy(stream);    
-// }
+    cuStreamDestroy(stream);    
+}
 
 int main(int argc, char *argv[]) {
     cout << "\ntestvaluestruct" << endl;
@@ -453,8 +453,8 @@ int main(int argc, char *argv[]) {
     cout << "\test_twostructs_gpuside_singlebuffer" << endl;
     test_twostructs_gpuside_singlebuffer();
 
-    // cout << "\ntestKernelUsesNestTop" << endl;
-    // testKernelUsesNestTop();
+    cout << "\ntestKernelUsesNestTop" << endl;
+    testKernelUsesNestTop();
 
     return 0;
 }
