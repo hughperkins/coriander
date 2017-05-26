@@ -67,6 +67,18 @@ Ok, so the doc is mostly below, inside the class declaration, at the bottom of t
 
 namespace cocl {
 
+class ParamInfo {
+public:
+    // ParamInfo(llvm::Type *type, llvm::Value *value, llvm::Value pointer, bool isByVal) :
+    //     type(type), value(value), pointer(pointer), isByVal(isByVal) {
+    // }
+    llvm::Type *type = 0;
+    llvm::Value *value = 0;
+    llvm::Value *pointer = 0;
+    // bool isByVal = false;
+    int size = 0;
+};
+
 class LaunchCallInfo {
 public:
     LaunchCallInfo() {
@@ -76,9 +88,8 @@ public:
         block_z_value = 0;
     }
     std::string kernelName = "";
-    std::vector<llvm::Type *> callTypes;
-    std::vector<llvm::Value *> callValuesByValue;
-    std::vector<llvm::Value *> callValuesAsPointers;
+    std::vector<ParamInfo> params;
+
     llvm::Value *stream;
     llvm::Value *grid_xy_value;
     llvm::Value *grid_z_value;
@@ -138,7 +149,7 @@ public:
     // given a bytecode that calls the cudaSetupArgument method, obtains information
     // about this, such as the type of the argument being set, and an instruction that represents
     // its value, stores that, in info, along with the arguments there already
-    static void getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info);
+    static void getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info, ParamInfo *paramInfo);
 
     // handle primitive ints and floats (not arrays):
     static llvm::Instruction *addSetKernelArgInst_int(llvm::Instruction *lastInst, llvm::Value *value, llvm::IntegerType *intType);
@@ -191,7 +202,8 @@ public:
     static llvm::Instruction *addSetKernelArgInst_byvaluevector(llvm::Instruction *lastInst, llvm::Value *structPointer);
 
     // all setKernelArgs pass through addSetKernelArgInst, which dispatches to other functions
-    static llvm::Instruction *addSetKernelArgInst(llvm::Instruction *lastInst, llvm::Value *value, llvm::Value *valueAsPointerInstr);
+    static llvm::Instruction *addSetKernelArgInst(
+        llvm::Instruction *lastInst, ParamInfo *paramInfo);
 
     static void patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, std::vector<llvm::Instruction *> &to_replace_with_zero);
     static void patchFunction(llvm::Function *F);  // patch all kernel launch commands in function F
