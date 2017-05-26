@@ -436,7 +436,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
     // structPointerType->dump();
 
     // indentor << isa<StructType>(structPointer->getType()) << endl;
-    structPointerType->getPointerElementType()->dump();
+    // structPointerType->getPointerElementType()->dump();
     StructType *structType = cast<StructType>(structPointerType->getPointerElementType());
     // outs() << "structType:\n";
     // structType->dump();
@@ -538,7 +538,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
     // bool couldBePointer = paramInfo->size == 4 || paramInfo->size == 8;
     bool clearlyAByValueStruct = paramInfo->size > 8;
     // bool definitelyNotAPointer = false;
-    indentor << "size=" << paramInfo->size << endl;
+    // indentor << "size=" << paramInfo->size << endl;
     if(clearlyAByValueStruct) {
         // indentor << "clearly a by value struct" << endl;
         // value->dump();
@@ -547,7 +547,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
 
         // lets walk up the gep???
         if(GetElementPtrInst *gep = dyn_cast<GetElementPtrInst>(valueAsPointerInstr)) {
-            indentor << "got a gep" << endl;
+            // indentor << "got a gep" << endl;
             // indentor << "valueAsPointer is gep? " << isa<GetElementPtrInst>(valueAsPointerInstr) << endl;
             Value *beforeGep = gep->getOperand(0);
             // beforeGep->dump();
@@ -694,7 +694,7 @@ void PatchHostside::patchFunction(llvm::Function *F) {
                 ParamInfo paramInfo;
                 PatchHostside::getLaunchArgValue(genCallInst.get(), launchCallInfo.get(), &paramInfo);
                 launchCallInfo->params.push_back(paramInfo);
-                indentor << " creating paraminfo params size " << launchCallInfo->params.size() << endl;
+                // indentor << " creating paraminfo params size " << launchCallInfo->params.size() << endl;
                 to_replace_with_zero.push_back(inst);
             } else if(calledFunctionName == "cudaLaunch") {
                 PatchHostside::patchCudaLaunch(F, genCallInst.get(), to_replace_with_zero);
@@ -751,7 +751,7 @@ void PatchHostside::patchModule(Module *M) {
         PatchHostside::patchFunction(F);
         verifyFunction(*F);
     }
-    cout << "after loop" << endl;
+    // cout << "after loop" << endl;
 }
 
 } // namespace cocl
