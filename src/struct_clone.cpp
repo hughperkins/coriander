@@ -14,6 +14,8 @@
 
 #include "struct_clone.h"
 
+#include "cocl_logging.h"
+
 #include "ir-to-opencl-common.h"
 #include "EasyCL/util/easycl_stringhelper.h"
 #include "mutations.h"
@@ -87,6 +89,8 @@ llvm::StructType *StructCloner::createGlobalizedPointerStruct(std::map<llvm::Str
 }
 
 StructType *StructCloner::cloneNoPointers(StructType *inType) {
+    Indentor indentor;
+    // indentor << "StructClone::cloneNoPointers() " << typeDumper->dumpType(inType) << endl;
     LLVMContext &context = inType->getContext();
     if(pointerlessTypeByOriginalType.find(inType) != pointerlessTypeByOriginalType.end()) {
         return pointerlessTypeByOriginalType[inType];
@@ -184,15 +188,22 @@ std::string StructCloner::writeClCopyNoPtrToPtrfull(llvm::StructType *ptrfullTyp
 }
 
 llvm::Instruction *StructCloner::createHostsideIrCopyPtrfullToNoptr(
-        llvm::Instruction *lastInst, StructType *ptrfullType, Value *src, Value *dst) {
+        llvm::Instruction *lastInst, StructType *srcType, Value *srcPointer, Value *dstPointer) {
     // assumes incoming values are pointers to struct
-    LLVMContext &context = src->getContext();
+    LLVMContext &context = srcPointer->getContext();
     int srcidx = 0;
     int dstidx = 0;
-    if(StructType *structType = dyn_cast<StructType>(src->getType()->getPointerElementType())) {
-        for(auto it=structType->element_begin(); it != structType->element_end(); it++) {
-            Type *childType = *it;
-            if(isa<PointerType>(childType)) {
+
+    Indentor indentor;
+    // indentor << "StructClone::createHostsideIrCopyPtrfullToNoptr() srcType=" << typeDumper->dumpType(srcType) << endl;
+    // indentor << "  srcPointer type=" << typeDumper->dumpType(srcPointer->getType()->getPointerElementType()) <<
+    //     " dstPointer type=" << typeDumper->dumpType(dstPointer->getType()->getPointerElementType()) << endl;
+
+    PointerType *srcPointerType = cast<PointerType>(srcPointer->getType());
+    StructType *srcStructType = cast<StructType>(srcPointerType->getElementType());
+        for(auto it=srcStructType->element_begin(); it != srcStructType->element_end(); it++) {
+            Type *srcChildType = *it;
+            if(isa<PointerType>(srcChildType)) {
                 // ignore
                 srcidx++;
                 continue;
@@ -200,21 +211,21 @@ llvm::Instruction *StructCloner::createHostsideIrCopyPtrfullToNoptr(
             Value *srcIndex[2];
             srcIndex[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
             srcIndex[1] = ConstantInt::getSigned(IntegerType::get(context, 32), srcidx);
-            Instruction *childSrcInst = GetElementPtrInst::CreateInBounds(src, ArrayRef<Value *>(&srcIndex[0], &srcIndex[2]));
+            Instruction *childSrcInst = GetElementPtrInst::CreateInBounds(srcPointer, ArrayRef<Value *>(&srcIndex[0], &srcIndex[2]));
             childSrcInst->insertAfter(lastInst);
             lastInst = childSrcInst;
 
             Value *dstIndex[2];
             dstIndex[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
             dstIndex[1] = ConstantInt::getSigned(IntegerType::get(context, 32), dstidx);
-            Instruction *childDstInst = GetElementPtrInst::CreateInBounds(dst, ArrayRef<Value *>(&dstIndex[0], &dstIndex[2]));
+            Instruction *childDstInst = GetElementPtrInst::CreateInBounds(dstPointer, ArrayRef<Value *>(&dstIndex[0], &dstIndex[2]));
             childDstInst->insertAfter(lastInst);
             lastInst = childDstInst;
 
-            if(StructType *childStructType = dyn_cast<StructType>(childType)) {
-                lastInst = createHostsideIrCopyPtrfullToNoptr(lastInst, childStructType, childSrcInst, childDstInst);
+            if(StructType *srcChildStructType = dyn_cast<StructType>(srcChildType)) {
+                lastInst = createHostsideIrCopyPtrfullToNoptr(lastInst, srcChildStructType, childSrcInst, childDstInst);
             // } else if(IntegerType *intType = dyn_cast<IntegerType>(childType)) {
-            } else if(childType->getPrimitiveSizeInBits() > 0 ) {
+            } else if(srcChildType->getPrimitiveSizeInBits() > 0 ) {
                 // do we have to do `load` followed by `store`?
                 // outs() << "copying " << dumpType(childType) << "\n";
                 // Instruction *alloca = new AllocaInst(intType, "allocateint");
@@ -228,7 +239,7 @@ llvm::Instruction *StructCloner::createHostsideIrCopyPtrfullToNoptr(
                 Instruction *store = new StoreInst(load, childDstInst);
                 store->insertAfter(lastInst);
                 lastInst = store;
-            } else if(ArrayType *arrayType = dyn_cast<ArrayType>(childType)) {
+            } else if(ArrayType *arrayType = dyn_cast<ArrayType>(srcChildType)) {
                 int numElements = arrayType->getNumElements();
                 // outs() << "numlemenets " << numElements << "\n";
                 for(int i=0; i < numElements; i++) {
@@ -254,18 +265,18 @@ llvm::Instruction *StructCloner::createHostsideIrCopyPtrfullToNoptr(
                 // throw runtime_error("unhandled type " + dumpType(childType));
             } else {
                 outs() << "unhandled type:\n";
-                childType->dump();
+                srcChildType->dump();
                 outs() << "\n";
                 throw runtime_error("structcloner unhandled type");
             }
             srcidx++;
             dstidx++;
         }
-    } else {
-        outs() << "skipping type:\n";
-        structType->dump();
-        outs() << "\n";
-    }
+    // } else {
+    //     outs() << "skipping type:\n";
+    //     // structType->dump();
+    //     outs() << "\n";
+    // }
     return lastInst;
 }
 

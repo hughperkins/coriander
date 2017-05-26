@@ -64,7 +64,8 @@ public:
     llvm::StructType *createGlobalizedPointerStruct(std::map<llvm::StructType *, llvm::StructType *> &newByOld, llvm::StructType *inType);
     llvm::StructType *cloneNoPointers(llvm::StructType *inStructType);
     std::string writeClCopyNoPtrToPtrfull(llvm::StructType *ptrfullType, std::string srcName, std::string destName);
-    llvm::Instruction *createHostsideIrCopyPtrfullToNoptr(llvm::Instruction *lastInst, llvm::StructType *ptrfullType,
+    llvm::Instruction *createHostsideIrCopyPtrfullToNoptr(
+        llvm::Instruction *lastInst, llvm::StructType *ptrfullType,
         llvm::Value *src, llvm::Value *dest);
     static void walkType(
         llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices,

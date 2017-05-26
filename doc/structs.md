@@ -74,6 +74,23 @@ In other words, at calling time, it's still considered as a struct.
 
 By-value structs can contain pointers. These pointers could represent gpu-side allocated buffers.
 
+## Weird GetElementPtr Usage
+
+In a very few cases, eg SoftMax kernel on Tensorflow, the launch instructions look something like:
+
+```
+  %4 = getelementptr inbounds %"struct.Eigen::TensorEvaluator.74", %"struct.Eigen::TensorEvaluator.74"* %0, i64 0, i32 0, i32 0, i32 0, i64 0
+  %5 = tail call i32 @cudaSetupArgument(i8* %4, i64 136, i64 0)
+```
+
+This seems totally bizarre to me. The `gep` no longer has type struct `TensorEvaluator.74`, but eg `int *`, or something similar. And yet, all indications everywhere else are that this pointer is being treated as a by-value struct.  Look at the second parameter of the `cudaSetupArgument`. 136. It's the size of the struct, in bytes.  And the declared type of the called method shows it as a struct:
+
+```
+  %12 = call i32 @cudaLaunch(i8* bitcast (void (%"struct.Eigen::TensorEvaluator.74"*, i32)* @_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorEvalToOpIKNS_17TensorReductionOpINS0_10SumReducerIfEEKNS_6DSizesIiLi1EEEKNS_18TensorCwiseUnaryOpINS0_13scalar_exp_opIfEEKNS_9TensorMapINS_6TensorIfLi2ELi1EiEELi16ENS_11MakePointerEEEEESG_EESG_EENS_9GpuDeviceEEEiEEvT_T0_ to i8*))
+```
+
+Its the first parameter, the `TensorEvaluator.74` one. Struct. Not an `int *` ...
+
 ## What Coriander does
 
 - for gpu-side structs, they are simply passed in directly, as-is

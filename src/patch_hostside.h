@@ -188,7 +188,7 @@ public:
     //
     // this patch_hostside addSetKernelArgInst_byvaluestruct function is going to handle walking the struct, and sending
     // the other pointers through using additional method calls, likely to setKernelArgGpuBuffer
-    static llvm::Instruction *addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Type *valueType, llvm::Value *valueAsPointerInstr);
+    static llvm::Instruction *addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::StructType *structType, llvm::Value *valueAsPointerInstr);
 
     // this needs to do the same as addSetKernelArgInst_byvaluestruct , but it passes the struct pointer into the
     // setKernelArgGpuBuffer function, rather than the setKernelArgHostsideBuffer
