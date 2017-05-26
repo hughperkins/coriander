@@ -97,6 +97,8 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
 
 ## News
 
+- May 26:
+  - finally hacked around a bug that was causing test_softmax.py to crash in tensorflow
 - May 20:
   - renamed to Coriander
 - May 18:
