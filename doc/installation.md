@@ -26,7 +26,7 @@ wget http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.
 sudo mkdir -p /usr/local/opt
 cd /usr/local/opt
 sudo tar -xf ~/Downloads/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz
-sudo mv llvm-4.0
+sudo mv clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04 llvm-4.0
 ```
 
 Whenever you use Coriander, please set `CLANG_HOME` to `/usr/local/opt/llvm-4.0`
