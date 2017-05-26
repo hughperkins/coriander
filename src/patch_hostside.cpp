@@ -132,18 +132,20 @@ void PatchHostside::getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info) 
     // outs() << "getLaunchTypes()\n";
     Indentor indentor;
     Value *argOperand = inst->getArgOperand(0);
-    int i = 0;
     indentor << "getLaunchTypes" << endl;
     if(ConstantExpr *expr = dyn_cast<ConstantExpr>(argOperand)) {
         Instruction *instr = expr->getAsInstruction();
         Type *op0type = instr->getOperand(0)->getType();
         Type *op0typepointed = op0type->getPointerElementType();
         if(FunctionType *fn = dyn_cast<FunctionType>(op0typepointed)) {
+            int i = 0;
             for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
                 Type * paramType = *it;
-                indentor << "  fn param type " << typeDumper.dumpType(paramType) << endl;
+                indentor << "  fn param type[" << i << "] " << typeDumper.dumpType(paramType) << endl;
                 // info->callTypes.push_back(paramType);
                 info->params[i].type = paramType;
+                paramType->dump();
+                i++;
             }
         }
         info->kernelName = instr->getOperand(0)->getName();
@@ -151,7 +153,6 @@ void PatchHostside::getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info) 
     } else {
         throw std::runtime_error("getlaunchtypes, didnt get ConstantExpr");
     }
-    i++;
 }
 
 void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info, ParamInfo *paramInfo) {
