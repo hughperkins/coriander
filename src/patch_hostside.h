@@ -172,7 +172,7 @@ public:
     // The hostside_opencl_funcs method needs no information other than the (virtual) pointer really
     // currently we are providing the elementsize too, to mitigate against a crash on beignet, but I might
     // remove that, whilst I get Mac radeon working :-P (since structs might not have useful element sizes)
-    static llvm::Instruction *addSetKernelArgInst_pointer(llvm::Instruction *lastInst, llvm::Type *valueType, llvm::Value *value);
+    static llvm::Instruction *addSetKernelArgInst_pointer(llvm::Instruction *lastInst, llvm::Value *value);
 
     // this will add bytecode to pass a pointer to the cpu-side struct object to hostside_opencl_funcs, at runtime
     // the entry point into hostside_opencl_funcs will be:
@@ -188,7 +188,7 @@ public:
     //
     // this patch_hostside addSetKernelArgInst_byvaluestruct function is going to handle walking the struct, and sending
     // the other pointers through using additional method calls, likely to setKernelArgGpuBuffer
-    static llvm::Instruction *addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::StructType *structType, llvm::Value *valueAsPointerInstr);
+    static llvm::Instruction *addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *valueAsPointerInstr);
 
     // this needs to do the same as addSetKernelArgInst_byvaluestruct , but it passes the struct pointer into the
     // setKernelArgGpuBuffer function, rather than the setKernelArgHostsideBuffer
@@ -197,9 +197,9 @@ public:
     // hmmmm. actually. I think we'll forbid pointers in gpuside structs for now. unless we have to
     // why? because, how are we going to get those pointers, if they're stored on the gpu :-P
     // like, how are we going to clone it, first issue.  Possible to to do, but a bunch of work, unless we have to
-    static llvm::Instruction *addSetKernelArgInst_pointerstruct(llvm::Instruction *lastInst, llvm::Type *valueType, llvm::Value *structPointer);
+    static llvm::Instruction *addSetKernelArgInst_pointerstruct(llvm::Instruction *lastInst, llvm::Value *structPointer);
 
-    static llvm::Instruction *addSetKernelArgInst_byvaluevector(llvm::Instruction *lastInst, llvm::Type *valueType, llvm::Value *structPointer);
+    static llvm::Instruction *addSetKernelArgInst_byvaluevector(llvm::Instruction *lastInst, llvm::Value *structPointer);
 
     // all setKernelArgs pass through addSetKernelArgInst, which dispatches to other functions
     static llvm::Instruction *addSetKernelArgInst(

@@ -323,7 +323,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_float(llvm::Instruction *l
     return call;
 }
 
-llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction *lastInst, llvm::Type *valueType, llvm::Value *value) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction *lastInst, llvm::Value *value) {
     // expected: valueType should be the pointer type
     // value should be the value representing the pointer
 
@@ -333,8 +333,10 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction 
     // cout << "lastInst M " << lastInst->getModule() << endl;
     // cout << "value M " << value->getType()->getModule() << endl;
 
+
     Indentor indentor;
-    indentor << "addSetKernelArgInst_pointer valueType=" << typeDumper.dumpType(valueType)
+    Type *valueType = value->getType();
+    indentor << "addSetKernelArgInst_pointer "
       << " value->getType()=" << typeDumper.dumpType(value->getType()) << endl;
 
     // cout << "getting M" << endl;
@@ -387,17 +389,18 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction 
     return lastInst;
 }
 
-llvm::Instruction *PatchHostside::addSetKernelArgInst_pointerstruct(llvm::Instruction *lastInst, llvm::Type *valueType, llvm::Value *structPointer) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst_pointerstruct(llvm::Instruction *lastInst, llvm::Value *structPointer) {
     // what this will need to do is:
     // - create a call to pass the gpu buffer, that contains the struct, to hostside_opencl_funcs, at runtime
     // ~~- if the struct contains pointers, then add appropriate calls to pass those at runtime too~~
     // update: we're going to forbid gpuside buffers containing pointers, for now
 
     // lets deal with the gpuside buffer first, that should be fairly easy-ish:
-    lastInst = addSetKernelArgInst_pointer(lastInst, valueType, structPointer);
+    lastInst = addSetKernelArgInst_pointer(lastInst, structPointer);
 
     // we'd better at least assert or something, if there are pointers in the struct
     Module *M = lastInst->getModule();
+    Type *valueType = structPointer->getType();
     StructType *structType = cast<StructType>(cast<PointerType>(valueType)->getPointerElementType());
     unique_ptr<StructInfo> structInfo(new StructInfo());
     StructCloner::walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", structType);
@@ -413,13 +416,14 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointerstruct(llvm::Instru
     return lastInst;
 }
 
-llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluevector(llvm::Instruction *lastInst, llvm::Type *valueType, llvm::Value *vectorPointer) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluevector(llvm::Instruction *lastInst, llvm::Value *vectorPointer) {
     // so, lets assume its just a hostside blob, that we need to send deviceside, as a blob
     // we should thus find out the blob size
     // we'll need:
     // - element count
     // - element size
 
+    Type *valueType = vectorPointer->getType();
     VectorType *vectorType = cast<VectorType>(valueType);
     // outs() << "vectorType:\n";
     // vectorType->dump();
@@ -475,7 +479,7 @@ void addMetadata(Instruction *value, string tag) {
     value->setMetadata(tag, mdnode);
 }
 
-llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::StructType *structType, llvm::Value *structPointer) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *structPointer) {
     //
     // what this is going to do is:
     // - create a call to pass the hostside buffer to hostside_opencl_funcs, at runtime
@@ -490,33 +494,35 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
     Indentor indentor;
     // outs() << "got a byvalue struct" << "\n";
 
-    // StructType *structType = cast<StructType>(cast<PointerType>(valueType)->getPointerElementType());
-    indentor << "addSetKernelArgInst_byvaluestruct structType=" << typeDumper.dumpType(structType) << " structPointer->getType() "
+    // Type *structType = cast<
+    StructType *structType = cast<StructType>(cast<PointerType>(structPointer->getType())->getPointerElementType());
+    indentor << "addSetKernelArgInst_byvaluestruct structPointer->getType() "
         << typeDumper.dumpType(structPointer->getType()) << endl;
     // StructType *structType = cast<StructType>(valueType);
     // outs() << "structType:\n";
     // indentor << "  addSetKernelArgInst_byvaluestruct structType=" << typeDumper.dumpType(structType) << endl;
 
     // if(structType != valueType->getType()) {
-    if(structType != structPointer->getType()->getPointerElementType()) {
-        indentor << "structPointer type and valueType dont match" << endl;
-        BitCastInst *castSource = new BitCastInst(structPointer, PointerType::get(structType, 0));
-        castSource->insertAfter(lastInst);
-        indentor << "casting " << typeDumper.dumpType(structPointer->getType()) << " into " <<
-            typeDumper.dumpType(castSource->getType()) << endl;
-        lastInst = castSource;
-        structPointer = castSource;
-        castSource->dump();
-    } else {
-        indentor << "structPointer type and valuetype match ok" << endl;
-    }
+    // if(structType != structPointer->getType()->getPointerElementType()) {
+    //     indentor << "structPointer type and valueType dont match" << endl;
+    //     BitCastInst *castSource = new BitCastInst(structPointer, PointerType::get(structType, 0));
+    //     castSource->insertAfter(lastInst);
+    //     indentor << "casting " << typeDumper.dumpType(structPointer->getType()) << " into " <<
+    //         typeDumper.dumpType(castSource->getType()) << endl;
+    //     lastInst = castSource;
+    //     structPointer = castSource;
+    //     castSource->dump();
+    // } else {
+    //     indentor << "structPointer type and valuetype match ok" << endl;
+    // }
     indentor << "structPointer->getType() " << typeDumper.dumpType(structPointer->getType()) << endl;
 
     // structType->dump();
+    // Type *
     string typeName = structType->getName().str();
     // cout << "typeName [" << typeName << "]" << endl;
     if(typeName == "struct.float4") {
-        return PatchHostside::addSetKernelArgInst_pointer(lastInst, structType, structPointer);
+        return PatchHostside::addSetKernelArgInst_pointer(lastInst, structPointer);
     }
 
     unique_ptr<StructInfo> structInfo(new StructInfo());
@@ -612,7 +618,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
 
         indentor << "loadgep type=" << typeDumper.dumpType(loadgep->getType()) << endl;
         // indentor << "adding"
-        lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, loadgep->getType(), loadgep);
+        lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, loadgep);
         i++;
     }
     return lastInst;
@@ -650,7 +656,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
         // cout << endl;
         if(isa<StructType>(valueType)) {
             indentor << "  structtype" << endl;
-            lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, cast<StructType>(valueType), valueAsPointerInstr);
+            lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, valueAsPointerInstr);
         } else if(isa<VectorType>(valueType)) {
             indentor << "  got vector arg type" << endl;
             // value->dump();
@@ -659,7 +665,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
             // cout << endl;
             // so, this is byval, thus hostside?
             // so send it as a hostside buffer?
-            lastInst = PatchHostside::addSetKernelArgInst_byvaluevector(lastInst, valueType, valueAsPointerInstr);
+            lastInst = PatchHostside::addSetKernelArgInst_byvaluevector(lastInst, valueAsPointerInstr);
         } else {
             valueType->dump();
             value->dump();
@@ -673,14 +679,14 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
             // lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, value);
             indentor << "  pointer to struct" << endl;
             // lastInst = addSetKernelArgInst_byvaluestruct(lastInst, value);
-            lastInst = PatchHostside::addSetKernelArgInst_pointerstruct(lastInst, valueType, value);
+            lastInst = PatchHostside::addSetKernelArgInst_pointerstruct(lastInst, value);
         } else {
             indentor << "  pointer to non-struct" << endl;
-            lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, valueType, valueAsPointerInstr);
+            lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, valueAsPointerInstr);
         }
     } else if(isa<StructType>(valueType)) {
         indentor << "  structtype by value (outside byvalue bit)" << endl;
-        lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, cast<StructType>(valueType), valueAsPointerInstr);
+        lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, valueAsPointerInstr);
     } else if(isa<VectorType>(valueType)) {
         indentor << "got vector arg type" << endl;
         // value->dump();
@@ -689,7 +695,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
         // cout << endl;
         // so, this is byval, thus hostside?
         // so send it as a hostside buffer?
-        lastInst = PatchHostside::addSetKernelArgInst_byvaluevector(lastInst, valueType, valueAsPointerInstr);
+        lastInst = PatchHostside::addSetKernelArgInst_byvaluevector(lastInst, valueAsPointerInstr);
     } else {
         valueType->dump();
         value->dump();
