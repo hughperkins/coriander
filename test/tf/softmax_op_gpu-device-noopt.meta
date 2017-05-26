@@ -1,2 +1,13 @@
 kernel: _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorEvalToOpIKNS_17TensorReductionOpINS0_10MaxReducerIfEEKNS_6DSizesIiLi1EEEKNS_9TensorMapINS_6TensorIKfLi2ELi1EiEELi16ENS_11MakePointerEEESE_EESE_EENS_9GpuDeviceEEEiEEvT_T0_
 command: 'make -j 8 libcocl.dylib && make -j 8 patch_hostside && ./patch_hostside --devicellfile ../test/tf/softmax_op_gpu-device-noopt.ll --hostrawfile ../test/tf/softmax_op_gpu-hostraw.ll --hostpatchedfile softmax_op_gpu-hostpatched.ll'
+
+
+line 1420 or so, these lines:
+```
+  %135 = getelementptr inbounds [240 x i8], [240 x i8]* @"s___devicell_sourcecode../test/tf/softmax_op_gpu-device-noopt.ll__ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorEvalToOpIKNS_17TensorReductionOpINS0_10MaxReducerIfEEKNS_6DSizesIiLi1EEEKNS_9TensorMapINS_6TensorIKfLi2ELi1EiEELi16ENS_11MakePointerEEESE_EESE_EENS_9GpuDeviceEEEiEEvT_T0_", i32 0, i32 0
+  %136 = getelementptr inbounds [157265 x i8], [157265 x i8]* @"__devicell_sourcecode../test/tf/softmax_op_gpu-device-noopt.ll", i32 0, i32 0
+  call void @configureKernel(i8* %135, i8* %136)
+  call void @setKernelArgInt8(i8 %loadCudaArg)
+  call void @setKernelArgInt32(i32 %loadCudaArg1)
+```
+The `setKernelArgInt8` should be a by-value struct, ie a `HostBuffer`, not an Int8.

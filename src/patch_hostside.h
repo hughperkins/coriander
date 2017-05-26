@@ -72,11 +72,11 @@ public:
     // ParamInfo(llvm::Type *type, llvm::Value *value, llvm::Value pointer, bool isByVal) :
     //     type(type), value(value), pointer(pointer), isByVal(isByVal) {
     // }
-    llvm::Type *type = 0;
-    llvm::Value *value = 0;
-    llvm::Value *pointer = 0;
+    llvm::Type *type = 0;     // type of the arg in the cudaSetupArgument function call
+    llvm::Value *value = 0;   // from the first arg to the bitcast feeding into cudaSetupArgument
+    llvm::Value *pointer = 0;  // from cudaSetupArgument
     // bool isByVal = false;
-    int size = 0;
+    int size = 0;  // from CudaLaunch function call declaration
 };
 
 class LaunchCallInfo {

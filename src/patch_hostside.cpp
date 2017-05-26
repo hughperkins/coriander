@@ -133,6 +133,7 @@ void PatchHostside::getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info) 
     Indentor indentor;
     Value *argOperand = inst->getArgOperand(0);
     int i = 0;
+    indentor << "getLaunchTypes" << endl;
     if(ConstantExpr *expr = dyn_cast<ConstantExpr>(argOperand)) {
         Instruction *instr = expr->getAsInstruction();
         Type *op0type = instr->getOperand(0)->getType();
@@ -140,6 +141,7 @@ void PatchHostside::getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info) 
         if(FunctionType *fn = dyn_cast<FunctionType>(op0typepointed)) {
             for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
                 Type * paramType = *it;
+                indentor << "  fn param type " << typeDumper.dumpType(paramType) << endl;
                 // info->callTypes.push_back(paramType);
                 info->params[i].type = paramType;
             }
@@ -166,6 +168,8 @@ void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *inf
     // - so if we load from the alloca instruction, we should have the value we want?
     // outs() << "getLaunchArgValue " << "\n";
     Indentor indentor;
+    int size = (int)cast<ConstantInt>(inst->getOperand(1))->getZExtValue();
+    paramInfo->size = size;
     if(!isa<Instruction>(inst->getOperand(0))) {
         outs() << "getlaunchvalue, first operatnd of inst is not an instruction..." << "\n";
         inst->dump();
@@ -183,10 +187,10 @@ void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *inf
     }
     Instruction *load = new LoadInst(alloca, "loadCudaArg");
     load->insertBefore(inst->getInst());
-    // info->callValuesByValue.push_back(load);
-    // info->callValuesAsPointers.push_back(alloca);
     paramInfo->value = load;
     paramInfo->pointer = alloca;
+    // info->callValuesByValue.push_back(load);
+    // info->callValuesAsPointers.push_back(alloca);
 }
 
 std::ostream &operator<<(std::ostream &os, const PointerInfo &pointerInfo) {
@@ -421,7 +425,13 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
 
     // outs() << "got a byvalue struct" << "\n";
 
-    StructType *structType = cast<StructType>(cast<PointerType>(structPointer->getType())->getPointerElementType());
+    Indentor indentor;
+    PointerType *structPointerType = cast<PointerType>(structPointer->getType());
+    // structPointerType->dump();
+
+    // indentor << isa<StructType>(structPointer->getType()) << endl;
+    structPointerType->getPointerElementType()->dump();
+    StructType *structType = cast<StructType>(structPointerType->getPointerElementType());
     // outs() << "structType:\n";
     // structType->dump();
     string typeName = structType->getName().str();
@@ -511,27 +521,57 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
     This figures out the type of the argument, and dispatches appropriately. All arguments pass through this function,
     including primitives, pointers, structs, ...
     */
+    Indentor indentor;
     Type *valueType = paramInfo->type;
     Value *value = paramInfo->value;
     Value *valueAsPointerInstr = paramInfo->pointer;
-    if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
+    int size = paramInfo->size;
+    // bool definitelyNotAPointer = paramInfo->size != 4 && paramInfo->size != 8;
+    // bool couldBePrimitiveInt = paramInfo->size == 4 || paramInfo->size == 8;
+    // bool couldBePrimitiveFloat = paramInfo->size == 4 || paramInfo->size == 8;
+    // bool couldBePointer = paramInfo->size == 4 || paramInfo->size == 8;
+    bool clearlyAByValueStruct = paramInfo->size > 8;
+    // bool definitelyNotAPointer = false;
+    indentor << "size=" << paramInfo->size << endl;
+    if(clearlyAByValueStruct) {
+        indentor << "clearly a by value struct" << endl;
+        value->dump();
+        valueAsPointerInstr->dump();
+        paramInfo->type->dump();
+
+        // lets walk up the gep???
+        if(GetElementPtrInst *gep = dyn_cast<GetElementPtrInst>(valueAsPointerInstr)) {
+            indentor << "got a gep" << endl;
+            // indentor << "valueAsPointer is gep? " << isa<GetElementPtrInst>(valueAsPointerInstr) << endl;
+            Value *beforeGep = gep->getOperand(0);
+            beforeGep->dump();
+            valueAsPointerInstr = beforeGep;
+        }
+
+        // lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, value);
+        lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, valueAsPointerInstr);
+    } else if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
+        indentor << "addSetKernelArgInst: int primitive" << endl;
         lastInst = PatchHostside::addSetKernelArgInst_int(lastInst, value, intType);
     } else if(value->getType()->isFloatingPointTy()) {
+        indentor << "addSetKernelArgInst: float primitive" << endl;
         lastInst = PatchHostside::addSetKernelArgInst_float(lastInst, value);
     } else if(value->getType()->isPointerTy()) {
         // cout << "pointer" << endl;
         Type *elementType = dyn_cast<PointerType>(value->getType())->getPointerElementType();
         if(isa<StructType>(elementType)) {
             // lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, value);
-            // cout << "pointer to struct" << endl;
+            // indentor << "pointer to struct" << endl;
             // lastInst = addSetKernelArgInst_byvaluestruct(lastInst, value);
+            indentor << "addSetKernelArgInst: pointerstruct" << endl;
             lastInst = PatchHostside::addSetKernelArgInst_pointerstruct(lastInst, value);
         } else {
-            // cout << "pointer to non-struct" << endl;
+            indentor << "addSetKernelArgInst: pointer" << endl;
             lastInst = PatchHostside::addSetKernelArgInst_pointer(lastInst, value);
         }
     } else if(isa<StructType>(value->getType())) {
         // cout << "structtype" << endl;
+        indentor << "addSetKernelArgInst: byvalue struct" << endl;
         lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, valueAsPointerInstr);
     } else if(isa<VectorType>(value->getType())) {
         // cout << "got vector arg type" << endl;
@@ -541,6 +581,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
         // cout << endl;
         // so, this is byval, thus hostside?
         // so send it as a hostside buffer?
+        indentor << "addSetKernelArgInst: byvalue vector" << endl;
         lastInst = PatchHostside::addSetKernelArgInst_byvaluevector(lastInst, valueAsPointerInstr);
     } else {
         value->dump();
