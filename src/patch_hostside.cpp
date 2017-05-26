@@ -740,12 +740,17 @@ void PatchHostside::patchModule(Module *M) {
     // addGlobalVariable(M, sourcecode_stringname, cl_sourcecode);
     addGlobalVariable(M, devicellcode_stringname, devicell_sourcecode);
 
-    vector<Function *> functionsToRemove;
+    // vector<Function *> functionsToRemove;
+    vector<Function *> functionsToPatch;  // store them first, so we dont start patching ourselves... :-P
     for(auto it = M->begin(); it != M->end(); it++) {
         Function *F = &*it;
+        functionsToPatch.push_back(F);
+    }
+    for(auto it = functionsToPatch.begin(); it != functionsToPatch.end(); it++) {
+        Function *F = *it;
         string name = F->getName();
-            PatchHostside::patchFunction(F);
-            verifyFunction(*F);
+        PatchHostside::patchFunction(F);
+        verifyFunction(*F);
     }
 }
 
