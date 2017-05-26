@@ -35,6 +35,12 @@ Indentor &Indentor::operator<<(const std::string &message) {
     messageSoFar << message;
     return *this;
 }
+Indentor &Indentor::operator<<(const char *message) {
+    // cout << indent << message << endl;
+    // messageSoFar = message
+    messageSoFar << message;
+    return *this;
+}
 Indentor &Indentor::operator<<(const int value) {
     // cout << indent << message << endl;
     // messageSoFar = message

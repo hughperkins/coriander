@@ -28,6 +28,7 @@ namespace cocl {
         Indentor();
         virtual ~Indentor();
         virtual Indentor &operator<<(const std::string &message);
+        virtual Indentor &operator<<(const char *message);
         virtual Indentor &operator<<(const int value);
         virtual Indentor &operator<<(const endl_fn &fn);
         std::ostringstream messageSoFar;

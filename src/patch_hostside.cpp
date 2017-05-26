@@ -132,7 +132,7 @@ void PatchHostside::getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info) 
     // outs() << "getLaunchTypes()\n";
     Indentor indentor;
     Value *argOperand = inst->getArgOperand(0);
-    indentor << "getLaunchTypes" << endl;
+    // indentor << "getLaunchTypes" << endl;
     if(ConstantExpr *expr = dyn_cast<ConstantExpr>(argOperand)) {
         Instruction *instr = expr->getAsInstruction();
         Type *op0type = instr->getOperand(0)->getType();
@@ -141,10 +141,15 @@ void PatchHostside::getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info) 
             int i = 0;
             for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
                 Type * paramType = *it;
-                indentor << "  fn param type[" << i << "] " << typeDumper.dumpType(paramType) << endl;
+                if(i >= info->params.size()) {
+                    cout << "warning: exceeded number of params" << endl;
+                    break;
+                }
+                // indentor << "  fn param type[" << i << "] " << typeDumper.dumpType(paramType) << endl;
                 // info->callTypes.push_back(paramType);
+                // indentor << info->params.size() << " " << i << endl;
                 info->params[i].type = paramType;
-                paramType->dump();
+                // paramType->dump();
                 i++;
             }
         }
@@ -535,17 +540,17 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
     // bool definitelyNotAPointer = false;
     indentor << "size=" << paramInfo->size << endl;
     if(clearlyAByValueStruct) {
-        indentor << "clearly a by value struct" << endl;
-        value->dump();
-        valueAsPointerInstr->dump();
-        paramInfo->type->dump();
+        // indentor << "clearly a by value struct" << endl;
+        // value->dump();
+        // valueAsPointerInstr->dump();
+        // paramInfo->type->dump();
 
         // lets walk up the gep???
         if(GetElementPtrInst *gep = dyn_cast<GetElementPtrInst>(valueAsPointerInstr)) {
             indentor << "got a gep" << endl;
             // indentor << "valueAsPointer is gep? " << isa<GetElementPtrInst>(valueAsPointerInstr) << endl;
             Value *beforeGep = gep->getOperand(0);
-            beforeGep->dump();
+            // beforeGep->dump();
             valueAsPointerInstr = beforeGep;
         }
 
@@ -598,7 +603,6 @@ void PatchHostside::patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, st
 
     Module *M = inst->getModule();
     // cout << "M " << M << endl;
-
     PatchHostside::getLaunchTypes(inst, launchCallInfo.get());
     to_replace_with_zero.push_back(inst->getInst());
     // outs() << "\n";
@@ -661,6 +665,7 @@ void PatchHostside::patchFunction(llvm::Function *F) {
     IntegerType *inttype = IntegerType::get(context, 32);
     ConstantInt *constzero = ConstantInt::getSigned(inttype, 0);
     launchCallInfo->params.clear();
+    Indentor indentor;
     for(auto it=F->begin(); it != F->end(); it++) {
         BasicBlock *basicBlock = &*it;
         for(auto insit=basicBlock->begin(); insit != basicBlock->end(); insit++) {
@@ -689,6 +694,7 @@ void PatchHostside::patchFunction(llvm::Function *F) {
                 ParamInfo paramInfo;
                 PatchHostside::getLaunchArgValue(genCallInst.get(), launchCallInfo.get(), &paramInfo);
                 launchCallInfo->params.push_back(paramInfo);
+                indentor << " creating paraminfo params size " << launchCallInfo->params.size() << endl;
                 to_replace_with_zero.push_back(inst);
             } else if(calledFunctionName == "cudaLaunch") {
                 PatchHostside::patchCudaLaunch(F, genCallInst.get(), to_replace_with_zero);
@@ -740,18 +746,12 @@ void PatchHostside::patchModule(Module *M) {
     // addGlobalVariable(M, sourcecode_stringname, cl_sourcecode);
     addGlobalVariable(M, devicellcode_stringname, devicell_sourcecode);
 
-    // vector<Function *> functionsToRemove;
-    vector<Function *> functionsToPatch;  // store them first, so we dont start patching ourselves... :-P
     for(auto it = M->begin(); it != M->end(); it++) {
         Function *F = &*it;
-        functionsToPatch.push_back(F);
-    }
-    for(auto it = functionsToPatch.begin(); it != functionsToPatch.end(); it++) {
-        Function *F = *it;
-        string name = F->getName();
         PatchHostside::patchFunction(F);
         verifyFunction(*F);
     }
+    cout << "after loop" << endl;
 }
 
 } // namespace cocl
