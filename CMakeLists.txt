@@ -61,6 +61,7 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
     src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cpp src/cocl_device.cpp src/cocl_error.cpp
     src/cocl_memory.cpp src/cocl_properties.cpp src/cocl_streams.cpp src/cocl_clsources.cpp src/cocl_context.cpp
     src/ir-to-opencl.cpp src/shims.cpp src/LocalValueInfo.cpp src/ClWriter.cpp src/cocl_vector_types.cpp
+    src/cocl_logging.cpp
 )
 
 set(CMAKE_CC_FLAGS "-fPIC")
@@ -124,7 +125,7 @@ target_link_libraries(ir-to-opencl cocl ${LLVM_SYSLIBS})
 add_executable(patch_hostside
     src/patch_hostside.cpp src/struct_clone.cpp src/mutations.cpp src/readIR.cpp
     third_party/argparsecpp/argparsecpp.cpp src/type_dumper.cpp src/GlobalNames.cpp
-    src/EasyCL/util/easycl_stringhelper.cpp
+    src/EasyCL/util/easycl_stringhelper.cpp src/cocl_logging.cpp
 )
 target_include_directories(patch_hostside PRIVATE ${CLANG_HOME}/include)
 target_include_directories(patch_hostside PRIVATE third_party/argparsecpp)
@@ -273,7 +274,7 @@ if(BUILD_TESTS)
         test/gtest/test_kernel_dumper.cpp test/gtest/test_global_constants.cpp
         test/gtest/test_dnn_conv.cpp test/gtest/test_dnn_pooling.cpp test/gtest/test_dnn_act.cpp
         test/gtest/test_dnn_loss.cpp
-        test/gtest/test_hostside_opencl_funcs.cpp
+        test/gtest/test_hostside_opencl_funcs.cpp test/gtest/test_logging.cpp
         # test/gtest/test_simple.cu
         # test/gtest/test_cocl_simple.cu
     )

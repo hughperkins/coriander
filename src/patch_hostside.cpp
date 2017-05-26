@@ -201,7 +201,39 @@ void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *inf
         outs() << "\n";
         throw runtime_error("getlaunchvalue, first operatnd of inst is not an instruction...");
     }
+    cout << "getLaunchArgValue inst:" << endl;
+    inst->dump();
+    cout << endl;
     Instruction *bitcast = cast<Instruction>(inst->getOperand(0));
+    cout << "bitcast:" << endl;
+    bitcast->dump();
+    cout << endl;
+    // cout << "arg size: " << readInt32Constant(inst->getOperand(1)) << endl;
+    // cout << "arg 1: " << endl;
+    // inst->getOperand(1)->dump();
+    // cout << endl;
+    // cout << isa<ConstantInt>(inst->getOperand(1)) << endl;
+    int size = (int)cast<ConstantInt>(inst->getOperand(1))->getZExtValue();
+    cout << "size: " << size << " sizeof(void *)" << sizeof(void *) << endl;
+    bool byValue = size != sizeof(void *);
+    if(size == sizeof(void *)) {
+        cout << "could be a pointer" << endl;
+    } else {
+        cout << "certainly not a pointer" << endl;
+    }
+    // info->callSizes.push_back(size);
+    paramInfo->size = size;
+    if(isa<GetElementPtrInst>(bitcast)) {
+        cout << "its a gep arg0:" << endl;
+        bitcast->getOperand(0)->dump();
+        cout << endl;
+        cout << "arg0 type:" << endl;
+        bitcast->getOperand(0)->getType()->dump();
+        cout << endl;
+        cout << "gep type:" << endl;
+        bitcast->getType()->dump();
+        cout << endl;
+    }
     Value *alloca = bitcast;
     if(isa<BitCastInst>(bitcast)) {
         alloca = bitcast->getOperand(0);
@@ -673,6 +705,7 @@ void PatchHostside::patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, st
 void PatchHostside::patchFunction(llvm::Function *F) {
     bool is_main = (string(F->getName().str()) == "main");
     if(is_main) cout << "patching " << F->getName().str() << endl;    
+    cout << "patching " << F->getName().str() << endl;    
     vector<Instruction *> to_replace_with_zero;
     IntegerType *inttype = IntegerType::get(context, 32);
     ConstantInt *constzero = ConstantInt::getSigned(inttype, 0);

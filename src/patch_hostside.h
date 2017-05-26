@@ -76,6 +76,7 @@ public:
     llvm::Value *value = 0;
     llvm::Value *pointer = 0;
     bool isByVal = false;
+    int size = 0;
 };
 
 class LaunchCallInfo {
@@ -88,9 +89,7 @@ public:
     }
     std::string kernelName = "";
     std::vector<ParamInfo> params;
-    // std::vector<llvm::Type *> callTypes;
-    // std::vector<llvm::Value *> callValuesByValue;
-    // std::vector<llvm::Value *> callValuesAsPointers;
+
     llvm::Value *stream;
     llvm::Value *grid_xy_value;
     llvm::Value *grid_z_value;

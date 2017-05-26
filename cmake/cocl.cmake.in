@@ -1,7 +1,9 @@
 macro(add_cocl_executable OUTPUT SRCFILES)
+    # message("SRCFILES: ${SRCFILES}")
     get_directory_property(CURRENT_INCLUDE INCLUDE_DIRECTORIES)
     STRING(REGEX MATCHALL "[^;]+" CURRENT_INCLUDE "${CURRENT_INCLUDE}")
     foreach(INCDIR ${CURRENT_INCLUDE})
+        # message("INCDIR ${INCDIR}")
         SET(INCLUDE_ARGS ${INCLUDE_ARGS} -I ${INCDIR})
     endforeach()
     get_directory_property(DirDefs DIRECTORY ${CMAKE_SOURCE_DIR} COMPILE_DEFINITIONS)
@@ -14,34 +16,44 @@ macro(add_cocl_executable OUTPUT SRCFILES)
     set(${OUTPUT}_DEPS)
     #set(${TA})
     foreach(SRCFILE ${SRCFILES} ${ARGN})
+        # message("SRCFILE ${SRCFILE}")
         # set(SRCFILE ${CMAKE_CURRENT_SOURCE_DIR}/${SRCFILE})
         get_filename_component(SRCFILE ${SRCFILE} ABSOLUTE)
-        string(REGEX REPLACE "[.].*" "" BASENAME ${SRCFILE})
-        string(REGEX REPLACE ".*/" "" TARGETNAME ${BASENAME})
-        #message("basename ${BASENAME} TARGETNAME ${TARGETNAME}")
-        add_custom_command(
-            OUTPUT ${TARGETNAME}.o
-            COMMENT "CLANG_HOME=@CLANG_HOME@ @THIS_COCL_PATH@ ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}"
-            COMMAND CLANG_HOME=@CLANG_HOME@ @THIS_COCL_PATH@ ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}
-            #DEPENDS @THIS_COCL_PATH@ clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
-            DEPENDS ${SRCFILE} @COCL_ARTIFACTS@
-        )
-        add_custom_target(build_${TARGETNAME}_o
-            DEPENDS ${TARGETNAME}.o
-        )
-        set(${OUTPUT}_OBJS ${${OUTPUT}_OBJS} ${TARGETNAME}.o)
-        set(${OUTPUT}_DEPS ${${OUTPUT}_DEPS} build_${TARGETNAME}_o)
+        get_filename_component(EXT ${SRCFILE} EXT)
+        # message("ext ${EXT}")
+        if(${EXT} STREQUAL ".cu")
+            # message("got CU")
+            set(EXT cu)
+            string(REGEX REPLACE "[.].*" "" BASENAME ${SRCFILE})
+            string(REGEX REPLACE ".*/" "" TARGETNAME ${BASENAME})
+            #message("basename ${BASENAME} TARGETNAME ${TARGETNAME}")
+            add_custom_command(
+                OUTPUT ${TARGETNAME}.clo
+                COMMENT "CLANG_HOME=@CLANG_HOME@ @THIS_COCL_PATH@ ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.clo -c ${_TESTS_COCL_OPTIONS}"
+                COMMAND CLANG_HOME=@CLANG_HOME@ @THIS_COCL_PATH@ ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.clo -c ${_TESTS_COCL_OPTIONS}
+                #DEPENDS @THIS_COCL_PATH@ clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
+                DEPENDS ${SRCFILE} @COCL_ARTIFACTS@
+            )
+            add_custom_target(cocl_compile_${TARGETNAME}_clo
+                DEPENDS ${TARGETNAME}.clo
+            )
+            set(${OUTPUT}_OBJS ${${OUTPUT}_OBJS} ${TARGETNAME}.clo)
+            set(${OUTPUT}_DEPS ${${OUTPUT}_DEPS} cocl_compile_${TARGETNAME}_clo)
+        else()
+            # message("not CU")
+            set(${OUTPUT}_DEPS ${${OUTPUT}_DEPS} ${SRCFILE})
+        endif()
     endforeach()
     add_custom_command(
-        OUTPUT ${OUTPUT}
+        OUTPUT cocl_link_${OUTPUT}
         # COMMENT "CLANG_HOME=@CLANG_HOME@ @THIS_COCL_PATH@ ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}"
         COMMAND g++ -o ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT} ${${OUTPUT}_OBJS} -L@THIS_LIB_DIR@ -lcocl -lclblast -leasycl -lclew -lpthread
         DEPENDS ${${OUTPUT}_OBJS}
         #DEPENDS @THIS_COCL_PATH@ clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
     )
     # add_custom_
-    add_custom_target(build_${OUTPUT} ALL
-        DEPENDS ${OUTPUT}
+    add_custom_target(${OUTPUT} ALL
+        DEPENDS cocl_link_${OUTPUT}
     )
     # target_link_libraries(${OUTPUT} cocl clblast easycl clew)
 endmacro(add_cocl_executable)
