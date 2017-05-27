@@ -1010,10 +1010,6 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("barrier(CLK_GLOBAL_MEM_FENCE)");
         return;
-    } else if(functionName == "_Z8__umulhiii") {
-        localValueInfo->setAddressSpace(0);
-        localValueInfo->setExpression("0");
-        return;
     } else if(functionName == "llvm.dbg.value") {
         // ignore
         localValueInfo->skip();
@@ -1026,6 +1022,26 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         // localValueInfo->setAddressSpace(0);
         // localValueInfo->setExpression("");
         // return "";
+        return;
+    } else if(functionName == "_Z8__umulhiii") {
+        // cout << "nid got an umulhi" << endl;
+        string gencode = "";
+        gencode += "__umulhi(";
+        int i = 0;
+        for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
+            Value *op = &*it->get();
+            if(i > 0) {
+                gencode += ", ";
+            }
+            gencode += ExpressionsHelper::stripOuterParams(getOperand(op)->getExpr());
+            i++;
+        }
+        gencode += ")";
+        // cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
+        shimFunctionsNeeded->insert("__umulhi");
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression(gencode);
+        // cout << "shimming call to [" << gencode << "]" << endl;
         return;
     } else if(functionName == "_Z11__shfl_downIfET_S0_ii") {
         string gencode = "";

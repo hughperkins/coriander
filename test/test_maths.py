@@ -72,8 +72,12 @@ __global__ void myKernel(float *data) {
 
 
 def test_float_constants_from_ll(context, q, float_data, float_data_gpu):
-    with open('test/test_maths.ll', 'r') as f:
-        ll_code = f.read()
+    ll_code = """
+define void @kernel_float_constants(float* nocapture %data) #1 {
+  store float 0x3E7AD7F2A0000000, float* %data
+  ret void
+}
+"""
     cl_code = test_common.ll_to_cl(ll_code, 'kernel_float_constants', 1)
     print('cl_code', cl_code)
     # try compiling it, just to be sure...
@@ -86,6 +90,41 @@ def test_float_constants_from_ll(context, q, float_data, float_data_gpu):
     print(type(from_gpu[0]), type(1e-7))
     assert abs(float(from_gpu[0]) - 1e-7) <= 1e-10
     assert 'data[0] = 1e-07f' in cl_code
+
+
+def test_umulhi(context, q, int_data, int_data_gpu):
+    ll_code = """
+declare i32 @_Z8__umulhiii(i32, i32)
+
+define void @test_umulhi(i32* %data) {
+  %1 = load i32, i32* %data
+
+  %2 = getelementptr i32, i32* %data, i32 1
+  %3 = load i32, i32* %2
+
+  %4 = getelementptr i32, i32* %data, i32 2
+  %5 = load i32, i32* %4
+
+  %6 = call i32 @_Z8__umulhiii(i32 %3, i32 %5)
+  store i32 %6, i32* %data
+  ret void
+}
+"""
+    cl_code = test_common.ll_to_cl(ll_code, 'test_umulhi', 1)
+    print('cl_code', cl_code)
+    int_data[0] = 0
+    int_data[1] = 353534
+    int_data[2] = 2523123
+    cl.enqueue_copy(q, int_data_gpu, int_data)
+    kernel = test_common.build_kernel(context, cl_code, 'test_umulhi')
+    kernel(q, (32,), (32,), int_data_gpu, offset_type(0), cl.LocalMemory(32))
+    from_gpu = np.copy(int_data)
+    cl.enqueue_copy(q, from_gpu, int_data_gpu)
+    q.finish()
+    expected = (int_data[1].item() * int_data[2].item()) >> 32
+    print('expected', expected)
+    print('from_gpu[0]', from_gpu[0])
+    assert expected == from_gpu[0].item()
 
 
 @pytest.mark.skip

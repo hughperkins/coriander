@@ -42,6 +42,14 @@ inline float __shfl_down_2(local int *scratch, float v0, int v1) {
 )";
     _dependenciesByName["__shfl_down_2"].insert("__shfl_down_3");
 
+    _shimClByName["__umulhi"] = R"(
+inline unsigned int __umulhi(unsigned int v0, unsigned int v1) {
+    unsigned long res = (long)v0 * v1;
+    unsigned int res2 = res >> 32;
+    return res2;
+}
+)";
+
     // should we add __atomic_add?  If we are really calling this (not just pasting it into the code 'for fun'),
     // then this will fail anyway...
     // inline float __atomic_add(global volatile float *ptr, float val) { // we need to actually implement this
