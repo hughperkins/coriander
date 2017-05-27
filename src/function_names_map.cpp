@@ -88,10 +88,10 @@ void FunctionNamesMap::populateKnownValues() {
     knownFunctionsMap["sqrtf"] = "sqrt";
 
     knownFunctionsMap["sqrt"] = "sqrt";
-    knownFunctionsMap["pow"] = "pow"; // just so we dont try to pass `scratch` to it :-P
-    // knownFunctoinsMap["_Z11syncthreadsv"] = "";
+    knownFunctionsMap["pow"] = "pow";
     knownFunctionsMap["_Z3powff"] = "pow";
     knownFunctionsMap["_Z4sqrtf"] = "sqrt";
+    knownFunctionsMap["_Z3logf"] = "log";
 
     knownFunctionsMap["_Z9atomicCASIjET_PS0_S0_S0_"] = "atomic_cmpxchg";   // int
     knownFunctionsMap["_Z10atomicExchIjET_PS0_S0_"] = "atomic_xchg";  // ints
