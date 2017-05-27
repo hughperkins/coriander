@@ -99,8 +99,9 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
 
 - May 27:
   - updated to LLVM 4.0. Thank you to @iame6162013 for inspiring me to do this
+  - finally came up with a principled way of detecting byvalued-ness, to replace the May 26 hack
 - May 26:
-  - finally hacked around a bug that was causing test_softmax.py to crash in tensorflow
+  - ~~finally hacked around a bug that was causing test_softmax.py to crash in tensorflow~~
 - May 20:
   - renamed to Coriander
 - May 18:
