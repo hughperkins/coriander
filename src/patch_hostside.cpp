@@ -103,7 +103,7 @@ std::ostream &operator<<(std::ostream &os, const LaunchCallInfo &info) {
         }
         ParamInfo paramInfo = *it;
         // Type *type = *it;
-        paramInfo.type->print(my_raw_os_ostream);
+        paramInfo.typeHostsideFn->print(my_raw_os_ostream);
         i++;
     }
     my_raw_os_ostream << ");\n";
@@ -452,7 +452,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
     including primitives, pointers, structs, ...
     */
     Indentor indentor;
-    Type *valueType = paramInfo->type;
+    Type *typeHostsideFn = paramInfo->typeHostsideFn;
     Value *value = paramInfo->value;
     Value *valueAsPointerInstr = paramInfo->pointer;
     int size = paramInfo->size;
@@ -583,7 +583,7 @@ void PatchHostside::getLaunchTypes(
 
     Function *deviceFn = MDevice->getFunction(info->kernelName);
     if(deviceFn != 0) {
-        cout << "Got device function:" << endl;
+        indentor << "Got device function:" << endl;
         // deviceFn->dump();
     } else {
         cout << "ERROR: failed to find device kernel [" << info->kernelName << "]" << endl;
@@ -592,16 +592,17 @@ void PatchHostside::getLaunchTypes(
 
     int i = 0;
     for(auto it=functionType->param_begin(); it != functionType->param_end(); it++) {
-        Type * paramType = *it;
+        Type * typeHostsideFn = *it;
         if(i >= info->params.size()) {
             cout << "warning: exceeded number of params" << endl;
             break;
         }
-        // indentor << "  fn param type[" << i << "] " << typeDumper.dumpType(paramType) << endl;
-        // info->callTypes.push_back(paramType);
-        // indentor << info->params.size() << " " << i << endl;
-        info->params[i].type = paramType;
-        // paramType->dump();
+        indentor << "params[" << i << "]" << endl;
+        info->params[i].typeHostsideFn = typeHostsideFn;
+        Type *devicesideType = cast<FunctionType>(deviceFn->getType()->getPointerElementType())->getParamType(i);
+        indentor << "  hostside type " << typeDumper.dumpType(typeHostsideFn) << endl;
+        indentor << "  deviceside type " << typeDumper.dumpType(devicesideType) << endl;
+        info->params[i].typeDevicesideFn = devicesideType;
         i++;
     }
 }
