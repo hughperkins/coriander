@@ -407,8 +407,8 @@ void NewInstructionDumper::dumpBinaryOperator(LocalValueInfo *localValueInfo, st
     gencode += op2info->getExpr();
     // gencode += ")";
 
-    cout << "dumpbinaryoperator()" << endl;
-    cout << "gencode [" << gencode << "]" << endl;
+    // cout << "dumpbinaryoperator()" << endl;
+    // cout << "gencode [" << gencode << "]" << endl;
 
     localValueInfo->setExpression("(" + gencode + ")");
     localValueInfo->setAddressSpace(0);
@@ -956,7 +956,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
     // }
 
     string functionName = instr->getCalledValue()->getName().str();
-    cout << "called function: [" << functionName << "]" << endl;
+    // cout << "called function: [" << functionName << "]" << endl;
     bool internalfunc = false;
     if(functionName == "llvm.ptx.read.tid.x" || functionName == "llvm.nvvm.read.ptx.sreg.tid.x") { // second on is llvm 4.0, first is 3.8
         localValueInfo->setAddressSpace(0);
