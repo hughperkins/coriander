@@ -74,17 +74,17 @@ public:
     // ParamInfo(llvm::Type *type, llvm::Value *value, llvm::Value pointer, bool isByVal) :
     //     type(type), value(value), pointer(pointer), isByVal(isByVal) {
     // }
-    llvm::Type *typeHostsideFn = 0;     // type of the arg in the hostside bytecode function declaration
+    // llvm::Type *typeHostsideFn = 0;     // type of the arg in the hostside bytecode function declaration
     llvm::Type *typeDevicesideFn = 0;  // how this param is defined in device bytecode function declaration
 
-    bool hostsideByVal = false;  // in hostside arg, is it byvalue?
+    // bool hostsideByVal = false;  // in hostside arg, is it byvalue?
     bool devicesideByVal = false;  // in deviceside arg, is it byvalue?
 
     // bool devicesideReadNone = false; // in deviceside arg, is it readnone? (ie ignored...)
     llvm::Value *value = 0;   // from the first arg to the bitcast feeding into cudaSetupArgument
     llvm::Value *pointer = 0;  // from cudaSetupArgument
 
-    llvm::Argument *hostsideArg = 0;
+    // llvm::Argument *hostsideArg = 0;
     llvm::Argument *devicesideArg = 0;
 
     int size = 0;  // from CudaLaunch function call declaration

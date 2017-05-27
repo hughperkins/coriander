@@ -160,21 +160,20 @@ define void @_ZN10tensorflow7functor28FillPhiloxRandomKernelLaunchINS_6random18N
 
 - hostraw.ll, declaration:
 ```
-  define linkonce_odr void @_ZN10tensorflow7functor28FillPhiloxRandomKernelLaunchINS_6random18NormalDistributionINS2_12PhiloxRandomEfEEEEvS4_PNT_17ResultElementTypeExS6_(
-    %"class.tensorflow::random::PhiloxRandom"* byval align 8,
-    float*,
-    i64) #0 {
 ```
-^^^ missing the readnone param
 
 - hostraw.ll, launch:
 ```
-  %12 = call i32 @cudaSetupArgument(i8* nonnull %11, i64 8, i64 24)
-  %16 = call i32 @cudaSetupArgument(i8* nonnull %15, i64 8, i64 32)
-  %19 = call i32 @cudaSetupArgument(i8* nonnull %4, i64 1, i64 40)
-  %22 = call i32 @cudaLaunch(i8* bitcast (void (%"class.tensorflow::random::PhiloxRandom"*, float*, i64)* 
+  %56 = call i32 @cudaSetupArgument(i8* nonnull %53, i64 24, i64 0)
+  %59 = call i32 @cudaSetupArgument(i8* nonnull %54, i64 8, i64 24)
+  %62 = call i32 @cudaSetupArgument(i8* nonnull %55, i64 8, i64 32)
+  %65 = call i32 @cudaSetupArgument(i8* nonnull %7, i64 1, i64 40)
+  %68 = call i32 @cudaLaunch(i8* bitcast (void (
+    %"class.tensorflow::random::PhiloxRandom"*,
+    float*,
+    i64)* @_ZN10tensorflow7functor28FillPhiloxRandomKernelLaunchINS_6random18NormalDistributionINS2_12PhiloxRandomEfEEEEvS4_PNT_17ResultElementTypeExS6_ to i8*))
 ```
-^^^ also missing the readnone param
+^^^ weirdly, the setupargumetns call for the readnone, but the declaration of the function does not
 
 ## What Coriander does
 

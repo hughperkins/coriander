@@ -103,7 +103,7 @@ std::ostream &operator<<(std::ostream &os, const LaunchCallInfo &info) {
         }
         const ParamInfo *paramInfo = it->get();
         // Type *type = *it;
-        paramInfo->typeHostsideFn->print(my_raw_os_ostream);
+        paramInfo->typeDevicesideFn->print(my_raw_os_ostream);
         i++;
     }
     my_raw_os_ostream << ");\n";
@@ -631,21 +631,22 @@ void PatchHostside::getLaunchTypes(
 
     int i = 0;
     // vector<Argument *> hostsideArgs(hostFn->arg_begin(), hostFn->arg_end());
-    vector<Argument *> hostsideArgs;
-    for(auto it=hostFn->arg_begin(); it != hostFn->arg_end(); it++) {
-        hostsideArgs.push_back(&*it);
-    }
+    // vector<Argument *> hostsideArgs;
+    // for(auto it=hostFn->arg_begin(); it != hostFn->arg_end(); it++) {
+    //     hostsideArgs.push_back(&*it);
+    // }
     vector<Argument *> devicesideArgs;
     for(auto it=deviceFn->arg_begin(); it != deviceFn->arg_end(); it++) {
         Argument *arg = &*it;
-        bool readNone = arg->hasAttribute(Attribute::ReadNone);
-        cout << "device side arg hasAttr readnone? " << readNone << endl;
-        if(!readNone) {
+        // bool readNone = arg->hasAttribute(Attribute::ReadNone);
+        // cout << "device side arg hasAttr readnone? " << readNone << endl;
+        // if(!readNone) {
             devicesideArgs.push_back(&*it);
-        }
+        // }
     }
-    for(auto it=hostFnType->param_begin(); it != hostFnType->param_end(); it++) {
-        Type * typeHostsideFn = *it;
+    // for(auto it=hostFnType->param_begin(); it != hostFnType->param_end(); it++) {
+    for(auto it=deviceFnType->param_begin(); it != deviceFnType->param_end(); it++) {
+        Type * typeDevicesideFn = *it;
         if(i >= (int)info->params.size()) {
             cout << "warning: exceeded number of params" << endl;
             break;
@@ -657,21 +658,22 @@ void PatchHostside::getLaunchTypes(
 
             paramInfo->paramIndex = i;
 
-            paramInfo->hostsideArg = hostsideArgs[i];
+            // paramInfo->hostsideArg = hostsideArgs[i];
             paramInfo->devicesideArg = devicesideArgs[i];
-            paramInfo->hostsideByVal = paramInfo->hostsideArg->hasByValAttr();
+            // paramInfo->hostsideByVal = paramInfo->hostsideArg->hasByValAttr();
             paramInfo->devicesideByVal = paramInfo->devicesideArg->hasByValAttr();
 
-            indentor << "hostside byval " << paramInfo->hostsideArg->hasByValAttr() << endl;
+            // indentor << "hostside byval " << paramInfo->hostsideArg->hasByValAttr() << endl;
             indentor << "deviceside byval " << paramInfo->devicesideArg->hasByValAttr() << endl;
             // indentor << "hostsidearg" << endl;
             // hostsideArg->dump();
             // indentor << "devicesideArg" << endl;
             // devicesideArg->dump();
 
-            paramInfo->typeHostsideFn = typeHostsideFn;
-            paramInfo->typeDevicesideFn = deviceFnType->getParamType(i);
-            indentor << "hostside type " << typeDumper.dumpType(paramInfo->typeHostsideFn) << endl;
+            // paramInfo->typeHostsideFn = typeHostsideFn;
+            // paramInfo->typeDevicesideFn = deviceFnType->getParamType(i);
+            paramInfo->typeDevicesideFn = typeDevicesideFn;
+            // indentor << "hostside type " << typeDumper.dumpType(paramInfo->typeHostsideFn) << endl;
             indentor << "deviceside type " << typeDumper.dumpType(paramInfo->typeDevicesideFn) << endl;
         }
         i++;

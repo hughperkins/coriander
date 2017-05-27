@@ -337,10 +337,10 @@ std::string FunctionDumper::dumpKernelFunctionDeclarationWithoutReturn(llvm::Fun
     for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
         Argument *arg = &*it;
         // check for `readnone`, which argument we skip
-        if(arg->hasAttribute(Attribute::ReadNone)) {
-            cout << "readnone attribute detected on " << arg->getName().str() << " => skipping" << endl;
-            continue;
-        }
+        // if(arg->hasAttribute(Attribute::ReadNone)) {
+        //     cout << "readnone attribute detected on " << arg->getName().str() << " => skipping" << endl;
+        //     continue;
+        // }
         string argName = localNames.getOrCreateName(arg, arg->getName().str());
         Type *argType = arg->getType();
         // string argName = dumpOperand(arg);
