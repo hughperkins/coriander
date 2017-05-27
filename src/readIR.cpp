@@ -100,7 +100,9 @@ string ReadIR::dumpFloatConstant(bool forceSingle, ConstantFP *constantFP) {
     } else if(valuestr == "-inf") {
         return "-INFINITY";
     }
-    if(valuestr.find('.') == string::npos) {
+
+    // check for scientific notation, and lack of decimal point. if neither, add ".0"
+    if(valuestr.find('.') == string::npos && valuestr.find("e") == string::npos) {
         valuestr += ".0";
     }
     if(!isDouble || forceSingle) {

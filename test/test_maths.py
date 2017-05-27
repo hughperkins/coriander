@@ -71,6 +71,23 @@ __global__ void myKernel(float *data) {
     assert float_data[7] == - np.inf
 
 
+def test_float_constants_from_ll(context, q, float_data, float_data_gpu):
+    with open('test/test_maths.ll', 'r') as f:
+        ll_code = f.read()
+    cl_code = test_common.ll_to_cl(ll_code, 'kernel_float_constants', 1)
+    print('cl_code', cl_code)
+    # try compiling it, just to be sure...
+    kernel = test_common.build_kernel(context, cl_code, 'kernel_float_constants')
+    kernel(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(32))
+    from_gpu = np.copy(float_data)
+    cl.enqueue_copy(q, from_gpu, float_data_gpu)
+    q.finish()
+    print('from_gpu[0]', from_gpu[0])
+    print(type(from_gpu[0]), type(1e-7))
+    assert abs(float(from_gpu[0]) - 1e-7) <= 1e-10
+    assert 'data[0] = 1e-07f' in cl_code
+
+
 @pytest.mark.skip
 def test_double_ieeefloats(context, q, float_data, float_data_gpu):
     cu_code = """
