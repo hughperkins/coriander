@@ -28,16 +28,16 @@
 using namespace std;
 using namespace llvm;
 
-uint64_t readIntConstant_uint64(ConstantInt *constant) {
+uint64_t ReadIR::readIntConstant_uint64(ConstantInt *constant) {
     return constant->getZExtValue();
 }
 
-uint32_t readIntConstant_uint32(ConstantInt *constant) {
+uint32_t ReadIR::readIntConstant_uint32(ConstantInt *constant) {
     assert(constant->getBitWidth() <= 32);
     return (uint32_t)constant->getZExtValue();
 }
 
-std::string getName(StructType *type) {
+std::string ReadIR::getName(StructType *type) {
     if(!type->hasName()) {
         type->dump();
         throw runtime_error("type doesnt have name");
@@ -45,7 +45,7 @@ std::string getName(StructType *type) {
     return type->getName();
 }
 
-std::string getName(Function *type) {
+std::string ReadIR::getName(Function *type) {
     if(!type->hasName()) {
         type->dump();
         throw runtime_error("function doesnt have name");
@@ -53,7 +53,7 @@ std::string getName(Function *type) {
     return type->getName();
 }
 
-std::string getName(Value *value) {
+std::string ReadIR::getName(Value *value) {
     if(!value->hasName()) {
         value->dump();
         throw runtime_error("value doesnt have name");
@@ -61,11 +61,11 @@ std::string getName(Value *value) {
     return value->getName();
 }
 
-int readInt32Constant(Value *value) {
+int ReadIR::readInt32Constant(Value *value) {
     return cast<ConstantInt>(value)->getSExtValue();
 }
 
-string dumpFloatConstant(bool forceSingle, ConstantFP *constantFP) {
+string ReadIR::dumpFloatConstant(bool forceSingle, ConstantFP *constantFP) {
     double doubleValue;
     float floatValue;
     bool isDouble = false;
@@ -109,7 +109,7 @@ string dumpFloatConstant(bool forceSingle, ConstantFP *constantFP) {
     return valuestr;
 }
 
-float readFloatConstant(Value *value) {
+float ReadIR::readFloatConstant(Value *value) {
     // cout << endl;
     // cout << "isa double " << (value->getType()->getTypeID() == Type::DoubleTyID) << endl;
     // cout << "isa float " << (value->getType()->getTypeID() == Type::FloatTyID) << endl;

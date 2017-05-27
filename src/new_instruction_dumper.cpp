@@ -100,7 +100,7 @@ LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
     } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
         constantInfo->clWriter.reset(new ClWriter(constantInfo));
         constantInfo->setAddressSpace(0);
-        constantInfo->setExpression(dumpFloatConstant(forceSingle, constantFP));
+        constantInfo->setExpression(ReadIR::dumpFloatConstant(forceSingle, constantFP));
         return constantInfo;
     } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
         // cout << "dumpconstnat, globalvalue" << endl;
@@ -595,9 +595,9 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             newType = pointerType->getElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
             // cout << "structtype" << endl;
-            string structName = getName(structtype);
+            string structName = ReadIR::getName(structtype);
             if(structName == "struct.float4") {
-                int idx = readInt32Constant(instr->getOperand(d + 1));
+                int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
                 Type *elementType = structtype->getElementType(idx);
                 Type *castType = PointerType::get(elementType, addressspace);
                 newType = elementType;
@@ -605,7 +605,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                 rhs += string("[") + easycl::toString(idx) + "]";
             } else {
                 // generic struct
-                int idx = readInt32Constant(instr->getOperand(d + 1));
+                int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
                 Type *elementType = structtype->getElementType(idx);
                 rhs += string(".f") + easycl::toString(idx);
                 newType = elementType;
@@ -783,7 +783,7 @@ void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo
             newType = arrayType->getElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
             // cout << "struct" << endl;
-            string structName = getName(structtype);
+            string structName = ReadIR::getName(structtype);
             if(structName == "struct.float4") {
                 Type *elementType = structtype->getElementType(idx);
                 Type *castType = PointerType::get(elementType, 0);
@@ -869,7 +869,7 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
             newType = currentType->getPointerElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
             // cout << "insertvalue: struct type" << endl;
-            string structName = getName(structtype);
+            string structName = ReadIR::getName(structtype);
             if(structName == "struct.float4") {
                 // cout << "is struct.float4" << endl;
                 Type *elementType = structtype->getElementType(idx);

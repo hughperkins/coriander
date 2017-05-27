@@ -94,7 +94,7 @@ void AllocaClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
     if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
         Type *ptrElementType = allocatypeptr->getPointerElementType();
         std::string typestring = typeDumper->dumpType(ptrElementType);
-        int count = readInt32Constant(alloca->getOperand(0));
+        int count = ReadIR::readInt32Constant(alloca->getOperand(0));
         // string name = localNames->getOrCreateName(alloca);
         string name = l->name;
         // cout << "alloca var name [" << name << "]" << endl;

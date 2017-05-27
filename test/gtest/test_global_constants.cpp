@@ -35,33 +35,33 @@ using namespace llvm;
 
 namespace {
 
-LLVMContext context;
-unique_ptr<Module>M;
+// LLVMContext context;
+// unique_ptr<Module>M;
 
-string ll_path = "../test/gtest/test_global_constants.ll";  // this is a bit hacky, but fine-ish for now
+// string ll_path = "../test/gtest/test_global_constants.ll";  // this is a bit hacky, but fine-ish for now
 
-Module *getM() {
-    if(M == nullptr) {
-        SMDiagnostic smDiagnostic;
-        M = parseIRFile(StringRef(ll_path), smDiagnostic, context);
-        if(!M) {
-            smDiagnostic.print("irtopencl", errs());
-            // return "";
-            throw runtime_error("failed to parse IR");
-            }
-    }
-    return M.get();
-}
+// Module *getM() {
+//     if(M == nullptr) {
+//         SMDiagnostic smDiagnostic;
+//         M = parseIRFile(StringRef(ll_path), smDiagnostic, context);
+//         if(!M) {
+//             smDiagnostic.print("irtopencl", errs());
+//             // return "";
+//             throw runtime_error("failed to parse IR");
+//             }
+//     }
+//     return M.get();
+// }
 
-Function *getFunction(string name) {
-    // Module *M = getM();
-    getM();
-    Function *F = M->getFunction(StringRef(name));
-    if(F == 0) {
-        throw runtime_error("Function " + name + " not found");
-    }
-    return F;
-}
+// Function *getFunction(string name) {
+//     // Module *M = getM();
+//     getM();
+//     Function *F = M->getFunction(StringRef(name));
+//     if(F == 0) {
+//         throw runtime_error("Function " + name + " not found");
+//     }
+//     return F;
+// }
 
 // TEST(test_global_constant, test_union) {
 //     Function *F = getFunction("test_union");
