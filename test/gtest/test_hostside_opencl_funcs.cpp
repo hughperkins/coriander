@@ -36,9 +36,9 @@ kernel void myKernel(global float *data) {
 )";
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getContext()->getCl();
-    CLKernel *kernel1 = compileOpenCLKernel("myKernel", "myKernel", kernelSource);
-    CLKernel *kernel2 = compileOpenCLKernel("myKernel", "myKernel", kernelSource);
-    CLKernel *kernel3 = compileOpenCLKernel("myKernel", "myKernel", kernelSource);
+    CLKernel *kernel1 = compileOpenCLKernel("myKernel", kernelSource);
+    CLKernel *kernel2 = compileOpenCLKernel("myKernel", kernelSource);
+    CLKernel *kernel3 = compileOpenCLKernel("myKernel", kernelSource);
     EXPECT_EQ(kernel1, kernel2);
     EXPECT_EQ(kernel1, kernel3);
 
