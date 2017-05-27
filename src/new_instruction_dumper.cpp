@@ -377,6 +377,30 @@ void NewInstructionDumper::dumpFcmp(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->setExpression(gencode);
 }
 
+void NewInstructionDumper::dumpBinaryOperator(LocalValueInfo *localValueInfo, std::string opstring) {
+    Instruction *instr = cast<Instruction>(localValueInfo->value);
+    string gencode = "";
+    // copyAddressSpace(instr->getOperand(0), instr);
+    // Value *op1 = instr->getOperand(0);
+    // LocalValueInfo *op1info = localValueInfos->at(op1).get();
+    LocalValueInfo *op1info = getOperand(instr->getOperand(0));
+    // gencode += dumpOperand(op1) + " ";
+    gencode += op1info->getExpr() + " ";
+
+    gencode += opstring + " ";
+
+    // Value *op2 = instr->getOperand(1);
+    // LocalValueInfo *op2info = localValueInfos->at(op2).get();
+    LocalValueInfo *op2info = getOperand(instr->getOperand(1));
+    gencode += op2info->getExpr();
+
+    localValueInfo->setExpression("(" + gencode + ")");
+    localValueInfo->setAddressSpace(0);
+    localValueInfo->clWriter.reset(new BinaryClWriter(localValueInfo));
+    // localValueInfo->setAddressSpace()
+    // return gencode;
+}
+
 void NewInstructionDumper::dumpExt(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     Instruction *instr = cast<Instruction>(localValueInfo->value);
@@ -867,30 +891,6 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
     // (*localExpressionByValue)[instr] = incomingOperand;
     localValueInfo->setExpression(incomingOperand);
     // return "";
-}
-
-void NewInstructionDumper::dumpBinaryOperator(LocalValueInfo *localValueInfo, std::string opstring) {
-    Instruction *instr = cast<Instruction>(localValueInfo->value);
-    string gencode = "";
-    // copyAddressSpace(instr->getOperand(0), instr);
-    // Value *op1 = instr->getOperand(0);
-    // LocalValueInfo *op1info = localValueInfos->at(op1).get();
-    LocalValueInfo *op1info = getOperand(instr->getOperand(0));
-    // gencode += dumpOperand(op1) + " ";
-    gencode += op1info->getExpr() + " ";
-
-    gencode += opstring + " ";
-
-    // Value *op2 = instr->getOperand(1);
-    // LocalValueInfo *op2info = localValueInfos->at(op2).get();
-    LocalValueInfo *op2info = getOperand(instr->getOperand(1));
-    gencode += op2info->getExpr();
-
-    localValueInfo->setExpression("(" + gencode + ")");
-    localValueInfo->setAddressSpace(0);
-    localValueInfo->clWriter.reset(new BinaryClWriter(localValueInfo));
-    // localValueInfo->setAddressSpace()
-    // return gencode;
 }
 
 void NewInstructionDumper::dumpMemcpyCharCharLong(LocalValueInfo *localValueInfo) {
