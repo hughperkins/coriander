@@ -30,6 +30,10 @@ TEST(test_expressions_helper, basic) {
     EXPECT_EQ("(v1 + v2) + (v3 + v4)", cocl::ExpressionsHelper::stripOuterParams("(v1 + v2) + (v3 + v4)"));
     EXPECT_EQ("(v1 + v2) + (v3 + v4)", cocl::ExpressionsHelper::stripOuterParams("((v1 + v2) + (v3 + v4))"));
 
+    EXPECT_EQ("1", cocl::ExpressionsHelper::stripOuterParams("(1)"));
+    EXPECT_EQ("1.0f", cocl::ExpressionsHelper::stripOuterParams("(1.0f)"));
+    EXPECT_EQ("1.0f", cocl::ExpressionsHelper::stripOuterParams("((1.0f))"));
+
     EXPECT_EQ(true, cocl::ExpressionsHelper::isValidExpression("v1"));
     EXPECT_EQ(true, cocl::ExpressionsHelper::isValidExpression("(v1)"));
     EXPECT_EQ(false, cocl::ExpressionsHelper::isValidExpression("v1 + v2) + (v3 + v4"));
@@ -42,8 +46,3 @@ TEST(test_expressions_helper, basic) {
 }
 
 } // namespade
-
-
-// std::string stripOuterParams(std::string instructionCode);
-// bool isValidExpression(std::string instructionCode);
-// bool isSingleExpression(std::string instructionCode);

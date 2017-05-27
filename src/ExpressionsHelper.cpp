@@ -52,6 +52,7 @@ bool ExpressionsHelper::isSingleExpression(string instructionCode) {
         } else if(depth == 0 &&
                 thischar != '[' && thischar != ']' &&
                 thischar != '_' &&
+                thischar != '.' &&
                 (thischar < 'a' || thischar > 'z') &&
                 (thischar < 'A' || thischar > 'Z') &&
                 (thischar < '0' || thischar > '9')) {

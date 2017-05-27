@@ -488,7 +488,7 @@ TEST(test_new_instruction_dumper, test_icmp) {
 
     string expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
-    ASSERT_EQ("v_a < v_b", expr);
+    ASSERT_EQ("(v_a < v_b)", expr);
 
     ostringstream oss;
     instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
@@ -542,7 +542,7 @@ TEST(test_new_instruction_dumper, test_fcmp) {
 
     string expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
-    ASSERT_EQ("v_a < v_b", expr);
+    ASSERT_EQ("(v_a < v_b)", expr);
 
     ostringstream oss;
     instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);

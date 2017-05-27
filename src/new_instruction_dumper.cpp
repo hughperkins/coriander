@@ -309,15 +309,21 @@ void NewInstructionDumper::dumpIcmp(cocl::LocalValueInfo *localValueInfo) {
 
     // handle case like `a & 3 == 0`
     // if(op0.find('&') == string::npos) {
-        op0 = ExpressionsHelper::stripOuterParams(op0);
+    op0 = ExpressionsHelper::stripOuterParams(op0);
     // }
     // if(op1.find('&') == string::npos) {
-        op1 = ExpressionsHelper::stripOuterParams(op1);
+    op1 = ExpressionsHelper::stripOuterParams(op1);
     // }
     // gencode += "(";
-    gencode += "(" + op0 + ")";
-    gencode += " " + predicate_string + " ";
-    gencode += "(" + op1 + ")";
+
+    // == and != bind more strongly than &, but < > etc ok
+    // if(predicatestring.find("=="))
+    bool parenthesizeOps = predicate_string == "==" || predicate_string == "!=";
+    if(parenthesizeOps) {
+        gencode += "(" + op0 + ") " + predicate_string + " (" + op1 + ")";
+    } else {
+        gencode += op0 + " " + predicate_string + " " + op1;
+    }
     // gencode += ")";
     // cout << "dumpIcmp gencode op0[" << op0 << "] op1[" << op1 << "] gencode [" << gencode << "]" << endl;
 
@@ -371,6 +377,8 @@ void NewInstructionDumper::dumpFcmp(cocl::LocalValueInfo *localValueInfo) {
     string op0 = op0info->getExpr();
     string op1 = op1info->getExpr();
 
+    // op0 = "(" + ExpressionsHelper::stripOuterParams(op0) + ")";
+    // op1 = "(" + ExpressionsHelper::stripOuterParams(op1) + ")";
     op0 = ExpressionsHelper::stripOuterParams(op0);
     op1 = ExpressionsHelper::stripOuterParams(op1);
     gencode += op0;
