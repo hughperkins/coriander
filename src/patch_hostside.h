@@ -198,17 +198,18 @@ public:
     static llvm::Instruction *addSetKernelArgInst(
         llvm::Instruction *lastInst, ParamInfo *paramInfo);
 
+    static void getLaunchTypes(llvm::Module *M, const llvm::Module *MDevice, GenericCallInst *inst, LaunchCallInfo *info);
+
     // given a bytecode that calls the cudaSetupArgument method, obtains information
     // about this, such as the type of the argument being set, and an instruction that represents
     // its value, stores that, in info, along with the arguments there already
     static void getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info, ParamInfo *paramInfo);
 
-    // given call to cudaLaunch, gets information about the called kernel, args, etc
-    static void getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info);
-
-    static void patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, std::vector<llvm::Instruction *> &to_replace_with_zero);
-    static void patchFunction(llvm::Function *F);  // patch all kernel launch commands in function F
-    static void patchModule(llvm::Module *M);  // main entry point. Scan through module M, and rewrite kernel launch commands
+    static void patchCudaLaunch(
+        llvm::Module *M, const llvm::Module *MDevice,
+        llvm::Function *F, GenericCallInst *inst, std::vector<llvm::Instruction *> &to_replace_with_zero);
+    static void patchFunction(llvm::Module *M, const llvm::Module *MDevice, llvm::Function *F);  // patch all kernel launch commands in function F
+    static void patchModule(llvm::Module *M, const llvm::Module *MDevice);  // main entry point. Scan through module M, and rewrite kernel launch commands
 };
 
 } // namespace cocl

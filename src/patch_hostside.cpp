@@ -560,53 +560,69 @@ void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *inf
     // info->callValuesAsPointers.push_back(alloca);
 }
 
-void PatchHostside::getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info) {
+void PatchHostside::getLaunchTypes(
+        llvm::Module *M, const llvm::Module *MDevice, GenericCallInst *inst, LaunchCallInfo *info) {
     // input to this is a cudaLaunch instruction
     // sideeffect is to populate in info:
     // - name of the kernel
     // - type of each of the kernel parameters (without the actual Value's)
     // info->callTypes.clear();
     // outs() << "getLaunchTypes()\n";
+
     Indentor indentor;
-    Value *argOperand = inst->getArgOperand(0);
-    // indentor << "getLaunchTypes" << endl;
-    if(ConstantExpr *expr = dyn_cast<ConstantExpr>(argOperand)) {
-        Instruction *instr = expr->getAsInstruction();
-        Type *op0type = instr->getOperand(0)->getType();
-        Type *op0typepointed = op0type->getPointerElementType();
-        if(FunctionType *fn = dyn_cast<FunctionType>(op0typepointed)) {
-            int i = 0;
-            for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
-                Type * paramType = *it;
-                if(i >= info->params.size()) {
-                    cout << "warning: exceeded number of params" << endl;
-                    break;
-                }
-                // indentor << "  fn param type[" << i << "] " << typeDumper.dumpType(paramType) << endl;
-                // info->callTypes.push_back(paramType);
-                // indentor << info->params.size() << " " << i << endl;
-                info->params[i].type = paramType;
-                // paramType->dump();
-                i++;
-            }
-        }
-        info->kernelName = instr->getOperand(0)->getName();
-        // outs() << "got kernel name " << info->kernelName << "\n";
+
+    // the cudaLaunch bitcasts the function to a char *:
+    // so we need to walk back along that to get the original function:
+    BitCastInst *bitcast = cast<BitCastInst>(cast<ConstantExpr>(inst->getArgOperand(0))->getAsInstruction());
+    Function *function = cast<Function>(bitcast->getOperand(0));
+
+    PointerType *pointerFunctionType = cast<PointerType>(function->getType());
+    FunctionType *functionType = cast<FunctionType>(pointerFunctionType->getPointerElementType());
+
+    info->kernelName = function->getName();
+
+    Function *deviceFn = MDevice->getFunction(info->kernelName);
+    if(deviceFn != 0) {
+        cout << "Got device function:" << endl;
+        // deviceFn->dump();
     } else {
-        throw std::runtime_error("getlaunchtypes, didnt get ConstantExpr");
+        cout << "ERROR: failed to find device kernel [" << info->kernelName << "]" << endl;
+        throw runtime_error("ERROR: failed to find device kernel " + info->kernelName);
+    }
+
+    int i = 0;
+    for(auto it=functionType->param_begin(); it != functionType->param_end(); it++) {
+        Type * paramType = *it;
+        if(i >= info->params.size()) {
+            cout << "warning: exceeded number of params" << endl;
+            break;
+        }
+        // indentor << "  fn param type[" << i << "] " << typeDumper.dumpType(paramType) << endl;
+        // info->callTypes.push_back(paramType);
+        // indentor << info->params.size() << " " << i << endl;
+        info->params[i].type = paramType;
+        // paramType->dump();
+        i++;
     }
 }
 
-void PatchHostside::patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, std::vector<llvm::Instruction *> &to_replace_with_zero) {
+void PatchHostside::patchCudaLaunch(
+        llvm::Module *M, const llvm::Module *MDevice, llvm::Function *F,
+        GenericCallInst *inst, std::vector<llvm::Instruction *> &to_replace_with_zero) {
+    // This replaces the call to cudaLaunch with calls to setup the arguments, then
+    // a call to kernelGo
+    // We pass the informatino about the kernel first, then the arguments, then finally
+    // call kernelGo.  This is slightly different than the original NVIDIA sequence, which
+    // doenst pass the kernel function name etc until the call to cudaLaunch
+
+    // MDevice is just so we can see how the device-side kernel declarations look, we dont
+    // modify/patch it in any way here
+
     // outs() << "============\n";
     // outs() << "cudaLaunch\n";
 
-    Module *M = inst->getModule();
-    // cout << "M " << M << endl;
-    PatchHostside::getLaunchTypes(inst, launchCallInfo.get());
+    PatchHostside::getLaunchTypes(M, MDevice, inst, launchCallInfo.get());
     to_replace_with_zero.push_back(inst->getInst());
-    // outs() << "\n";
-    // outs() << "patching launch in " << string(F->getName()) << "\n";
 
     string kernelName = launchCallInfo->kernelName;
     Instruction *kernelNameValue = addStringInstr(M, "s_" + ::devicellcode_stringname + "_" + kernelName, kernelName);
@@ -615,9 +631,6 @@ void PatchHostside::patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, st
     // this isnt actually needed for running, but hopefully useful for debugging
     Instruction *llSourcecodeValue = addStringInstrExistingGlobal(M, devicellcode_stringname);
     llSourcecodeValue->insertBefore(inst->getInst());
-
-    // Instruction *clSourcecodeValue = addStringInstrExistingGlobal(M, sourcecode_stringname);
-    // clSourcecodeValue->insertBefore(inst);
 
     Function *configureKernel = cast<Function>(F->getParent()->getOrInsertFunction(
         "configureKernel",
@@ -633,11 +646,8 @@ void PatchHostside::patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, st
 
     // pass args now
     int i = 0;
-    // for(auto argit=launchCallInfo->callValuesByValue.begin(); argit != launchCallInfo->callValuesByValue.end(); argit++) {
     for(auto argit=launchCallInfo->params.begin(); argit != launchCallInfo->params.end(); argit++) {
-        // Value *value = *argit;
         ParamInfo *paramInfo = &*argit;
-        // Value *valueAsPointerInstr = launchCallInfo->callValuesAsPointers[i];
         lastInst = PatchHostside::addSetKernelArgInst(lastInst, paramInfo);
         i++;
     }
@@ -651,12 +661,18 @@ void PatchHostside::patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, st
     lastInst = kernelGoInst;
 
     launchCallInfo->params.clear();
-    // launchCallInfo->callValuesByValue.clear();
-    // launchCallInfo->callValuesAsPointers.clear();
-    // launchCallInfo.reset(new LaunchCallInfo);
 }
 
-void PatchHostside::patchFunction(llvm::Function *F) {
+void PatchHostside::patchFunction(llvm::Module *M, const llvm::Module *MDevice, llvm::Function *F) {
+    // this will take the calls to cudaSetupArgument(someArg, argSize, ...), and
+    // cudaLaunch(function), and rewrite them to call Coriander instead
+    // we do a bunch of bytecode parsing, to figure out how exactly we are goign to get the arguments
+    // into coriander
+    // For example, if it's a by-value struct, we're going to have to do some hacking
+    // If the by-value struct contains pointers, it'll need a bit (lot :-P) more hacking
+
+    // MDevice is only for information, so we can see the declaration of kernels on the device-side
+
     cout << "=========================" << endl;
     bool is_main = (string(F->getName().str()) == "main");
     if(is_main) cout << "patching " << F->getName().str() << endl;    
@@ -697,7 +713,7 @@ void PatchHostside::patchFunction(llvm::Function *F) {
                 // indentor << " creating paraminfo params size " << launchCallInfo->params.size() << endl;
                 to_replace_with_zero.push_back(inst);
             } else if(calledFunctionName == "cudaLaunch") {
-                PatchHostside::patchCudaLaunch(F, genCallInst.get(), to_replace_with_zero);
+                PatchHostside::patchCudaLaunch(M, MDevice, F, genCallInst.get(), to_replace_with_zero);
             }
         }
     }
@@ -711,13 +727,6 @@ void PatchHostside::patchFunction(llvm::Function *F) {
             BranchInst *branch = BranchInst::Create(oldTarget);
             branch->insertAfter(inst);
         }
-        // AllocaInst *alloca = new AllocaInst(IntegerType::get(context, 32));
-        // alloca->insertBefore(inst);
-        // StoreInst *store = new StoreInst(constzero, alloca);
-        // store->insertBefore(inst);
-        // LoadInst *load = new LoadInst(alloca);
-        // load->insertBefore(inst);
-        // ReplaceInstWithValue(inst->getParent()->getInstList(), ii, load);
         ReplaceInstWithValue(inst->getParent()->getInstList(), ii, constzero);
     }
 }
@@ -731,24 +740,23 @@ std::string PatchHostside::getBasename(std::string path) {
     return path.substr(slash_pos + 1);
 }
 
-void PatchHostside::patchModule(Module *M) {
+void PatchHostside::patchModule(Module *M, const Module *MDevice) {
     // entry point: given Module M, traverse all functions, rewriting the launch instructison to call
     // into Coriander runtime
+
+    // MDevice is only for information, so we can see the declaration of kernels on the device-side
 
     ifstream f_inll(::devicellfilename);
     string devicell_sourcecode(
         (std::istreambuf_iterator<char>(f_inll)),
         (std::istreambuf_iterator<char>()));
 
-    // ::sourcecode_stringname = "__opencl_sourcecode" + ::deviceclfilename;
     ::devicellcode_stringname = "__devicell_sourcecode" + ::devicellfilename;
-
-    // addGlobalVariable(M, sourcecode_stringname, cl_sourcecode);
     addGlobalVariable(M, devicellcode_stringname, devicell_sourcecode);
 
     for(auto it = M->begin(); it != M->end(); it++) {
         Function *F = &*it;
-        PatchHostside::patchFunction(F);
+        PatchHostside::patchFunction(M, MDevice, F);
         verifyFunction(*F);
     }
     // cout << "after loop" << endl;
@@ -760,12 +768,10 @@ int main(int argc, char *argv[]) {
     SMDiagnostic smDiagnostic;
     argparsecpp::ArgumentParser parser;
 
-    // string devicellfilename;
     string rawhostfilename;
     string patchedhostfilename;
 
     parser.add_string_argument("--hostrawfile", &rawhostfilename)->required()->help("input file");
-    // parser.add_string_argument("--deviceclfile", &::deviceclfilename)->required()->help("input file");
     parser.add_string_argument("--devicellfile", &::devicellfilename)->required()->help("input file");
     parser.add_string_argument("--hostpatchedfile", &patchedhostfilename)->required()->help("output file");
     if(!parser.parse_args(argc, argv)) {
@@ -777,9 +783,14 @@ int main(int argc, char *argv[]) {
         smDiagnostic.print(argv[0], errs());
         return 1;
     }
+    std::unique_ptr<llvm::Module> deviceModule = parseIRFile(devicellfilename, smDiagnostic, context);
+    if(!deviceModule) {
+        smDiagnostic.print(argv[0], errs());
+        return 1;
+    }
 
     try {
-        PatchHostside::patchModule(module.get());
+        PatchHostside::patchModule(module.get(), deviceModule.get());
     } catch(const runtime_error &e) {
         cout << endl;
         cout << "Something went wrong, sorry." << endl;
@@ -787,7 +798,6 @@ int main(int argc, char *argv[]) {
         cout << "More detail for devs/maintainers:" << endl;
         cout << "  exception: " << e.what() << endl;
         cout << "  rawhost ll file: " << rawhostfilename << "\n";
-        // outs() << "reading device cl file " << deviceclfilename << "\n";
         outs() << "  hostpatched file: " << patchedhostfilename << "\n";
         cout << endl;
         return -1;
