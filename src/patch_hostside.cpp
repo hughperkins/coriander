@@ -101,9 +101,9 @@ std::ostream &operator<<(std::ostream &os, const LaunchCallInfo &info) {
         if(i > 0){
             my_raw_os_ostream << ", ";
         }
-        ParamInfo paramInfo = *it;
+        const ParamInfo *paramInfo = it->get();
         // Type *type = *it;
-        paramInfo.typeHostsideFn->print(my_raw_os_ostream);
+        paramInfo->typeHostsideFn->print(my_raw_os_ostream);
         i++;
     }
     my_raw_os_ostream << ");\n";
@@ -111,8 +111,8 @@ std::ostream &operator<<(std::ostream &os, const LaunchCallInfo &info) {
     i = 0;
     for(auto it=info.params.begin(); it != info.params.end(); it++) {
     // for(auto it=info.callValuesByValue.begin(); it != info.callValuesByValue.end(); it++) {
-        ParamInfo paramInfo = *it;
-        Value *value = paramInfo.value;
+        const ParamInfo *paramInfo = it->get();
+        Value *value = paramInfo->value;
         // Value *value = *it;
         if(i > 0) {
             my_raw_os_ostream << ", ";
@@ -452,10 +452,10 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
     including primitives, pointers, structs, ...
     */
     Indentor indentor;
-    Type *typeHostsideFn = paramInfo->typeHostsideFn;
+    // Type *typeHostsideFn = paramInfo->typeHostsideFn;
     Value *value = paramInfo->value;
     Value *valueAsPointerInstr = paramInfo->pointer;
-    int size = paramInfo->size;
+    // int size = paramInfo->size;
     // bool definitelyNotAPointer = paramInfo->size != 4 && paramInfo->size != 8;
     // bool couldBePrimitiveInt = paramInfo->size == 4 || paramInfo->size == 8;
     // bool couldBePrimitiveFloat = paramInfo->size == 4 || paramInfo->size == 8;
@@ -574,12 +574,12 @@ void PatchHostside::getLaunchTypes(
     // the cudaLaunch bitcasts the function to a char *:
     // so we need to walk back along that to get the original function:
     BitCastInst *bitcast = cast<BitCastInst>(cast<ConstantExpr>(inst->getArgOperand(0))->getAsInstruction());
-    Function *function = cast<Function>(bitcast->getOperand(0));
+    Function *hostFn = cast<Function>(bitcast->getOperand(0));
 
-    PointerType *pointerFunctionType = cast<PointerType>(function->getType());
-    FunctionType *functionType = cast<FunctionType>(pointerFunctionType->getPointerElementType());
+    PointerType *pointerFunctionType = cast<PointerType>(hostFn->getType());
+    FunctionType *hostFnType = cast<FunctionType>(pointerFunctionType->getPointerElementType());
 
-    info->kernelName = function->getName();
+    info->kernelName = hostFn->getName();
 
     Function *deviceFn = MDevice->getFunction(info->kernelName);
     if(deviceFn != 0) {
@@ -589,20 +589,43 @@ void PatchHostside::getLaunchTypes(
         cout << "ERROR: failed to find device kernel [" << info->kernelName << "]" << endl;
         throw runtime_error("ERROR: failed to find device kernel " + info->kernelName);
     }
+    FunctionType *deviceFnType = cast<FunctionType>(deviceFn->getType()->getPointerElementType());
 
     int i = 0;
-    for(auto it=functionType->param_begin(); it != functionType->param_end(); it++) {
+    // vector<Argument *> hostsideArgs(hostFn->arg_begin(), hostFn->arg_end());
+    vector<Argument *> hostsideArgs;
+    for(auto it=hostFn->arg_begin(); it != hostFn->arg_end(); it++) {
+        hostsideArgs.push_back(&*it);
+    }
+    vector<Argument *> devicesideArgs;
+    for(auto it=deviceFn->arg_begin(); it != deviceFn->arg_end(); it++) {
+        devicesideArgs.push_back(&*it);
+    }
+    for(auto it=hostFnType->param_begin(); it != hostFnType->param_end(); it++) {
         Type * typeHostsideFn = *it;
-        if(i >= info->params.size()) {
+        if(i >= (int)info->params.size()) {
             cout << "warning: exceeded number of params" << endl;
             break;
         }
         indentor << "params[" << i << "]" << endl;
-        info->params[i].typeHostsideFn = typeHostsideFn;
-        Type *devicesideType = cast<FunctionType>(deviceFn->getType()->getPointerElementType())->getParamType(i);
-        indentor << "  hostside type " << typeDumper.dumpType(typeHostsideFn) << endl;
-        indentor << "  deviceside type " << typeDumper.dumpType(devicesideType) << endl;
-        info->params[i].typeDevicesideFn = devicesideType;
+        ParamInfo *paramInfo = info->params[i].get();
+
+        paramInfo->hostsideArg = hostsideArgs[i];
+        paramInfo->devicesideArg = devicesideArgs[i];
+        paramInfo->hostsideByVal = paramInfo->hostsideArg->hasByValAttr();
+        paramInfo->devicesideByVal = paramInfo->devicesideArg->hasByValAttr();
+
+        indentor << "hostside byval " << paramInfo->hostsideArg->hasByValAttr() << endl;
+        indentor << "deviceside byval " << paramInfo->devicesideArg->hasByValAttr() << endl;
+        // indentor << "hostsidearg" << endl;
+        // hostsideArg->dump();
+        // indentor << "devicesideArg" << endl;
+        // devicesideArg->dump();
+
+        paramInfo->typeHostsideFn = typeHostsideFn;
+        paramInfo->typeDevicesideFn = deviceFnType->getParamType(i);
+        indentor << "  hostside type " << typeDumper.dumpType(paramInfo->typeHostsideFn) << endl;
+        indentor << "  deviceside type " << typeDumper.dumpType(paramInfo->typeDevicesideFn) << endl;
         i++;
     }
 }
@@ -648,7 +671,7 @@ void PatchHostside::patchCudaLaunch(
     // pass args now
     int i = 0;
     for(auto argit=launchCallInfo->params.begin(); argit != launchCallInfo->params.end(); argit++) {
-        ParamInfo *paramInfo = &*argit;
+        ParamInfo *paramInfo = argit->get();
         lastInst = PatchHostside::addSetKernelArgInst(lastInst, paramInfo);
         i++;
     }
@@ -708,9 +731,9 @@ void PatchHostside::patchFunction(llvm::Module *M, const llvm::Module *MDevice, 
             string calledFunctionName = called->getName();
             // if(is_main && calledFunctionName.find("cuda") != string::npos) cout << "calledfunctionname " << calledFunctionName << endl;
             if(calledFunctionName == "cudaSetupArgument") {
-                ParamInfo paramInfo;
-                PatchHostside::getLaunchArgValue(genCallInst.get(), launchCallInfo.get(), &paramInfo);
-                launchCallInfo->params.push_back(paramInfo);
+                unique_ptr<ParamInfo> paramInfo(new ParamInfo());
+                PatchHostside::getLaunchArgValue(genCallInst.get(), launchCallInfo.get(), paramInfo.get());
+                launchCallInfo->params.push_back(std::move(paramInfo));
                 // indentor << " creating paraminfo params size " << launchCallInfo->params.size() << endl;
                 to_replace_with_zero.push_back(inst);
             } else if(calledFunctionName == "cudaLaunch") {

@@ -69,16 +69,28 @@ namespace cocl {
 
 class ParamInfo {
 public:
+    // ParamInfo() {}
+    // ParamInfo(const ParamInfo&) = delete;
     // ParamInfo(llvm::Type *type, llvm::Value *value, llvm::Value pointer, bool isByVal) :
     //     type(type), value(value), pointer(pointer), isByVal(isByVal) {
     // }
     llvm::Type *typeHostsideFn = 0;     // type of the arg in the hostside bytecode function declaration
     llvm::Type *typeDevicesideFn = 0;  // how this param is defined in device bytecode function declaration
+
+    bool hostsideByVal = false;  // in hostside arg, is it byvalue?
+    bool devicesideByVal = false;  // in hostside arg, is it byvalue?
+
     llvm::Value *value = 0;   // from the first arg to the bitcast feeding into cudaSetupArgument
     llvm::Value *pointer = 0;  // from cudaSetupArgument
-    // bool isByVal = false;
+
+    llvm::Argument *hostsideArg = 0;
+    llvm::Argument *devicesideArg = 0;
+
     int size = 0;  // from CudaLaunch function call declaration
 };
+
+  // noncopyable(const noncopyable&) =delete;  
+  // noncopyable& operator=(const noncopyable&) =delete; 
 
 class LaunchCallInfo {
 public:
@@ -88,8 +100,11 @@ public:
         block_xy_value = 0;
         block_z_value = 0;
     }
+    LaunchCallInfo(const LaunchCallInfo&) = delete;
+    LaunchCallInfo &operator=(const LaunchCallInfo&) = delete;
+
     std::string kernelName = "";
-    std::vector<ParamInfo> params;
+    std::vector<std::unique_ptr<ParamInfo> > params;
 
     llvm::Value *stream;
     llvm::Value *grid_xy_value;
