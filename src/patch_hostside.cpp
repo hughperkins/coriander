@@ -637,7 +637,12 @@ void PatchHostside::getLaunchTypes(
     }
     vector<Argument *> devicesideArgs;
     for(auto it=deviceFn->arg_begin(); it != deviceFn->arg_end(); it++) {
-        devicesideArgs.push_back(&*it);
+        Argument *arg = &*it;
+        bool readNone = arg->hasAttribute(Attribute::ReadNone);
+        cout << "device side arg hasAttr readnone? " << readNone << endl;
+        if(!readNone) {
+            devicesideArgs.push_back(&*it);
+        }
     }
     for(auto it=hostFnType->param_begin(); it != hostFnType->param_end(); it++) {
         Type * typeHostsideFn = *it;

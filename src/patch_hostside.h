@@ -78,8 +78,9 @@ public:
     llvm::Type *typeDevicesideFn = 0;  // how this param is defined in device bytecode function declaration
 
     bool hostsideByVal = false;  // in hostside arg, is it byvalue?
-    bool devicesideByVal = false;  // in hostside arg, is it byvalue?
+    bool devicesideByVal = false;  // in deviceside arg, is it byvalue?
 
+    // bool devicesideReadNone = false; // in deviceside arg, is it readnone? (ie ignored...)
     llvm::Value *value = 0;   // from the first arg to the bitcast feeding into cudaSetupArgument
     llvm::Value *pointer = 0;  // from cudaSetupArgument
 
@@ -106,6 +107,10 @@ public:
     LaunchCallInfo &operator=(const LaunchCallInfo&) = delete;
 
     std::string kernelName = "";
+
+    // this only contains non-readnone args. readnone (devicesdie) are ignored, not stored in this (since hostside wont call them,
+    // eg see the random_op_gpu.cc kernel, from tensorflow, which has NormalDistribution as readnone, on its 4th arg,
+    // but the hostside only passes 3 args, skips the NOrmalDistribution arg)
     std::vector<std::unique_ptr<ParamInfo> > params;
 
     llvm::Value *stream;
