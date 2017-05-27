@@ -104,7 +104,8 @@ public:
     LocalValueInfo *dumpConstant(llvm::Constant *constant);
     void dumpConstantExpr(LocalValueInfo *localValueInfo);
     // LocalValueInfo *CreateConstantInfo(Consant *constant);
-    void dumpMemcpyCharCharLong(LocalValueInfo *localValueInfo);
+    // void dumpMemcpyCharCharLong(LocalValueInfo *localValueInfo);
+    void dumpMemcpy(LocalValueInfo *localValueInfo, int align);
     void dumpCall(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
 
     void runGeneration(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);

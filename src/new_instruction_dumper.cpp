@@ -909,16 +909,19 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
     // return "";
 }
 
-void NewInstructionDumper::dumpMemcpyCharCharLong(LocalValueInfo *localValueInfo) {
+// this will be slowtastic, but at least it gets things working...
+void NewInstructionDumper::dumpMemcpy(LocalValueInfo *localValueInfo, int align) {
     // std::string gencode = "";
     localValueInfo->clWriter.reset(new NoExpressionClWriter(localValueInfo));
     Instruction *instr = cast<Instruction>(localValueInfo->value);
     int totalLength = cast<ConstantInt>(instr->getOperand(2))->getSExtValue();
-    int align = cast<ConstantInt>(instr->getOperand(3))->getSExtValue();
+    // int align = cast<ConstantInt>(instr->getOperand(3))->getSExtValue();
     string dstAddressSpaceStr = typeDumper->dumpAddressSpace(instr->getOperand(0)->getType());
     string srcAddressSpaceStr = typeDumper->dumpAddressSpace(instr->getOperand(1)->getType());
     string elementTypeString = "";
-    if(align == 4) {
+    if(align == 1) {
+        elementTypeString = "char";
+    } else if(align == 4) {
         elementTypeString = "int";
     } else if(align == 8) {
         elementTypeString = "int2";
@@ -941,6 +944,42 @@ void NewInstructionDumper::dumpMemcpyCharCharLong(LocalValueInfo *localValueInfo
     // return gencode;
     // localValueInfo
 }
+
+// void NewInstructionDumper::dumpMemcpy(LocalValueInfo *localValueInfo, int align) {
+//     // std::string gencode = "";
+//     localValueInfo->clWriter.reset(new NoExpressionClWriter(localValueInfo));
+//     Instruction *instr = cast<Instruction>(localValueInfo->value);
+//     int totalLength = cast<ConstantInt>(instr->getOperand(2))->getSExtValue();
+//     // int align = cast<ConstantInt>(instr->getOperand(3))->getSExtValue();
+//     // int align = 1;
+//     string dstAddressSpaceStr = typeDumper->dumpAddressSpace(instr->getOperand(0)->getType());
+//     string srcAddressSpaceStr = typeDumper->dumpAddressSpace(instr->getOperand(1)->getType());
+//     string elementTypeString = "";
+//     if(align == 1) {
+//         elementTypeString = "char";
+//     } else if(align == 4) {
+//         elementTypeString = "int";
+//     } else if(align == 8) {
+//         elementTypeString = "int2";
+//     } else if(align == 16) {
+//         elementTypeString = "int4";
+//     } else {
+//         throw runtime_error("not implemented dumpmemcpy for align " + easycl::toString(align));
+//     }
+//     int numElements = totalLength / align;
+//     if(numElements >1) {
+//         // localValueInfo->inlineCl.push_back("#pragma unroll");
+//         localValueInfo->inlineCl.push_back("for(int __i=0; __i < " + easycl::toString(numElements) + "; __i++) {");
+//         localValueInfo->inlineCl.push_back("    ((" + dstAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(0))->getExpr() + ")[__i] = " +
+//             "((" + srcAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(1))->getExpr() + ")[__i]");
+//         localValueInfo->inlineCl.push_back("}\n");
+//     } else {
+//         localValueInfo->inlineCl.push_back("((" + dstAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(0))->getExpr() + ")[0] = " +
+//             "((" + srcAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(1))->getExpr() + ")[0]");
+//     }
+//     // return gencode;
+//     // localValueInfo
+// }
 
 void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
     localValueInfo->clWriter.reset(new CallClWriter(localValueInfo));
@@ -1122,7 +1161,11 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         localValueInfo->setAddressSpace(0);
         return;
     } else if(functionName == "llvm.memcpy.p0i8.p0i8.i64") {
-        dumpMemcpyCharCharLong(localValueInfo);  // just ignore for now
+        int align = cast<ConstantInt>(instr->getOperand(3))->getSExtValue();
+        dumpMemcpy(localValueInfo, align);
+        return;
+    } else if(functionName == "_Z6memcpyPvPKvm") {
+        dumpMemcpy(localValueInfo, 1);
         return;
     } else if(functionNamesMap->isMappedFunction(functionName)) {
         functionName = functionNamesMap->getFunctionMappedName(functionName);
