@@ -275,6 +275,7 @@ if(BUILD_TESTS)
         test/gtest/test_dnn_conv.cpp test/gtest/test_dnn_pooling.cpp test/gtest/test_dnn_act.cpp
         test/gtest/test_dnn_loss.cpp
         test/gtest/test_hostside_opencl_funcs.cpp test/gtest/test_logging.cpp
+        test/gtest/test_expressions_helper.cpp
         # test/gtest/test_simple.cu
         # test/gtest/test_cocl_simple.cu
     )

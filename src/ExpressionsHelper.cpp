@@ -14,11 +14,13 @@
 
 #include "ExpressionsHelper.h"
 
+#include <iostream>
+
 using namespace std;
 
 namespace cocl {
 
-std::string stripOuterParams(string instructionCode) {
+std::string ExpressionsHelper::stripOuterParams(string instructionCode) {
     if(instructionCode[0] != '(' || instructionCode[instructionCode.size() - 1] != ')') {
         return instructionCode;
     }
@@ -29,12 +31,13 @@ std::string stripOuterParams(string instructionCode) {
     // COCL_PRINT(cout << "innerString [" << innerString << "]" << endl);
     if(isValidExpression(innerString)) {
         // COCL_PRINT(cout << "stripping braces" << endl);
-        instructionCode = innerString;
+        return stripOuterParams(innerString);
+        // instructionCode = innerString;
     }
     return instructionCode;
 }
 
-bool isSingleExpression(string instructionCode) {
+bool ExpressionsHelper::isSingleExpression(string instructionCode) {
     int depth = 0;
     int len = instructionCode.size();
     for(int pos = 0; pos < len; pos++) {
@@ -58,7 +61,7 @@ bool isSingleExpression(string instructionCode) {
     return true;
 }
 
-bool isValidExpression(string instructionCode) {
+bool ExpressionsHelper::isValidExpression(string instructionCode) {
     int depth = 0;
     int len = instructionCode.size();
     for(int pos = 0; pos < len; pos++) {

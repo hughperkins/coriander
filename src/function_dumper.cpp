@@ -169,7 +169,7 @@ std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr) {
             gencode += "    /* " + originalInstruction + " */\n";
         }
 
-        if(!isSingleExpression(conditionstring) || conditionstring[0] != '(') {
+        if(!ExpressionsHelper::isSingleExpression(conditionstring) || conditionstring[0] != '(') {
             conditionstring = "(" + conditionstring + ")";
         }
         // gencode += "if " + conditionstring + " {\n";

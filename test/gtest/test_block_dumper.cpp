@@ -657,7 +657,7 @@ TEST(test_block_dumper, storefloat) {
     blockDumper->toCl(oss);
     string cl = oss.str();
     cout << "cl: [" << cl << "]" << endl;
-    ASSERT_EQ(R"(    v1 = 5.0f + 3.0f;
+    ASSERT_EQ(R"(    v1 = (5.0f + 3.0f);
     data[0] = v1;
 )", oss.str());
 
@@ -681,7 +681,7 @@ TEST(test_block_dumper, test_bitcast) {
     blockDumper->toCl(oss);
     string cl = oss.str();
     cout << "cl: [" << cl << "]" << endl;
-    EXPECT_EQ(R"(    v1 = 5.0f + 3.0f;
+    EXPECT_EQ(R"(    v1 = (5.0f + 3.0f);
     v4 = *(int *)&(v1);
     data[0] = v4;
 )", oss.str());
@@ -743,7 +743,7 @@ TEST(test_block_dumper, test_randomintarray) {
     cout << "cl: [" << cl << "]" << endl;
     EXPECT_EQ(R"(    v2 = v1[0];
     v3 = v2.f0;
-    v8 = (v3[0] + v3[1]) + v3[2];
+    v8 = ((v3[0] + v3[1]) + v3[2]);
     data[0] = v8;
 )", oss.str());
 

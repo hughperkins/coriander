@@ -308,17 +308,20 @@ void NewInstructionDumper::dumpIcmp(cocl::LocalValueInfo *localValueInfo) {
     string op1 = op1info->getExpr();
 
     // handle case like `a & 3 == 0`
-    if(op0.find('&') == string::npos) {
-        op0 = stripOuterParams(op0);
-    }
-    if(op1.find('&') == string::npos) {
-        op1 = stripOuterParams(op1);
-    }
-    gencode += op0;
+    // if(op0.find('&') == string::npos) {
+        op0 = ExpressionsHelper::stripOuterParams(op0);
+    // }
+    // if(op1.find('&') == string::npos) {
+        op1 = ExpressionsHelper::stripOuterParams(op1);
+    // }
+    // gencode += "(";
+    gencode += "(" + op0 + ")";
     gencode += " " + predicate_string + " ";
-    gencode += op1;
+    gencode += "(" + op1 + ")";
+    // gencode += ")";
+    // cout << "dumpIcmp gencode op0[" << op0 << "] op1[" << op1 << "] gencode [" << gencode << "]" << endl;
 
-    localValueInfo->setExpression(gencode);
+    localValueInfo->setExpression("(" + gencode + ")");
     // return gencode;
 }
 
@@ -368,13 +371,13 @@ void NewInstructionDumper::dumpFcmp(cocl::LocalValueInfo *localValueInfo) {
     string op0 = op0info->getExpr();
     string op1 = op1info->getExpr();
 
-    op0 = stripOuterParams(op0);
-    op1 = stripOuterParams(op1);
+    op0 = ExpressionsHelper::stripOuterParams(op0);
+    op1 = ExpressionsHelper::stripOuterParams(op1);
     gencode += op0;
     gencode += " " + predicate_string + " ";
     gencode += op1;
 
-    localValueInfo->setExpression(gencode);
+    localValueInfo->setExpression("(" + gencode + ")");
 }
 
 void NewInstructionDumper::dumpBinaryOperator(LocalValueInfo *localValueInfo, std::string opstring) {
@@ -385,6 +388,7 @@ void NewInstructionDumper::dumpBinaryOperator(LocalValueInfo *localValueInfo, st
     // LocalValueInfo *op1info = localValueInfos->at(op1).get();
     LocalValueInfo *op1info = getOperand(instr->getOperand(0));
     // gencode += dumpOperand(op1) + " ";
+    // gencode += "(";
     gencode += op1info->getExpr() + " ";
 
     gencode += opstring + " ";
@@ -393,6 +397,10 @@ void NewInstructionDumper::dumpBinaryOperator(LocalValueInfo *localValueInfo, st
     // LocalValueInfo *op2info = localValueInfos->at(op2).get();
     LocalValueInfo *op2info = getOperand(instr->getOperand(1));
     gencode += op2info->getExpr();
+    // gencode += ")";
+
+    cout << "dumpbinaryoperator()" << endl;
+    cout << "gencode [" << gencode << "]" << endl;
 
     localValueInfo->setExpression("(" + gencode + ")");
     localValueInfo->setAddressSpace(0);
@@ -556,7 +564,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             // LocalValueInfo *thisInfo = localValueInfos->at(instr->getOperand(d + 1)).get();
             LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
             string idxstring = thisInfo->getExpr();
-            idxstring = stripOuterParams(idxstring);
+            idxstring = ExpressionsHelper::stripOuterParams(idxstring);
             rhs += string("[") + idxstring + "]";
             // currentType->dump();
             // cout << endl;
@@ -572,7 +580,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             // LocalValueInfo *thisInfo = localValueInfos->at(instr->getOperand(d + 1)).get();
             LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
             string idxstring = thisInfo->getExpr();
-            idxstring = stripOuterParams(idxstring);
+            idxstring = ExpressionsHelper::stripOuterParams(idxstring);
             rhs += string("[") + idxstring + "]";
             // currentType->dump();
             // cout << endl;
@@ -617,7 +625,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     }
     updateAddressSpace(instr, addressspace);
     localValueInfo->setAddressSpace(addressspace);
-    rhs = "(" + stripOuterParams(rhs) + ")";
+    rhs = "(" + ExpressionsHelper::stripOuterParams(rhs) + ")";
     rhs = "(&" + rhs + ")";
     // cout << "gep rhs=" << rhs << endl;
 
@@ -650,7 +658,7 @@ void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
     // LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
 
     string rhs = op0info->getExpr(); // dumpOperand(instr->getOperand(0));
-    rhs = stripOuterParams(rhs);
+    rhs = ExpressionsHelper::stripOuterParams(rhs);
     string inlinecode = op1info->getExpr() + "[0] = " + rhs;
     // cout << "dumpStore, gencode=[" << inlinecode << "]" << endl;
     localValueInfo->inlineCl.push_back(inlinecode);
@@ -1020,7 +1028,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
             if(i > 0) {
                 gencode += ", ";
             }
-            gencode += stripOuterParams(getOperand(op)->getExpr());
+            gencode += ExpressionsHelper::stripOuterParams(getOperand(op)->getExpr());
             i++;
         }
         gencode += ")";
@@ -1037,7 +1045,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
             if(i > 0) {
                 gencode += ", ";
             }
-            gencode += stripOuterParams(getOperand(op)->getExpr());
+            gencode += ExpressionsHelper::stripOuterParams(getOperand(op)->getExpr());
             i++;
         }
         gencode += ")";
@@ -1103,7 +1111,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         if(i > 0) {
             gencode += ", ";
         }
-        gencode += stripOuterParams(getOperand(op)->getExpr());
+        gencode += ExpressionsHelper::stripOuterParams(getOperand(op)->getExpr());
         i++;
     }
     if(!internalfunc) {
@@ -1228,7 +1236,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
                 if(i > 0) {
                     gencode += ", ";
                 }
-                gencode += stripOuterParams(getOperand(op)->getExpr());
+                gencode += ExpressionsHelper::stripOuterParams(getOperand(op)->getExpr());
                 i++;
             }
             if(i > 0) {

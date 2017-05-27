@@ -18,8 +18,22 @@
 
 namespace cocl {
 
-std::string stripOuterParams(std::string instructionCode);
-bool isValidExpression(std::string instructionCode);
-bool isSingleExpression(std::string instructionCode);
+class ExpressionsHelper {
+public:
+    // see test/gtest/test_expresions_helper.cpp for examples, but essentially removes as many outer parantheses as possible,
+    // without changing the meaning of this expression. For example:
+    // (v1 + v2)   =>   v1 + v2   // YES, OK
+    // but:
+    // (v1 + v2) + (v3 + v4)    // NO, CANNOT :-) =>   v1 + v2) + (v3 + v4
+    static std::string stripOuterParams(std::string instructionCode);
+
+    // eg "v1 + v2) + (v3 + v4" contains a balanced number of parentheses, but it's
+    // not actually a legal expression
+    static bool isValidExpression(std::string instructionCode);
+
+    // eg v1 + v2 is two expressions, but
+    // (v1 + v2) is one
+    static bool isSingleExpression(std::string instructionCode);
+};
 
 } // namespace cocl

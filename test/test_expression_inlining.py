@@ -58,3 +58,43 @@ __global__ void myKernel(float *data) {
     d2 = float_data2
     expect = (d[3] * (d[1] + d[2])) / d[4]
     assert abs(d2[0] - expect) < 1e-5
+
+
+def test_int_expressions(context, q, int_data, int_data_gpu):
+
+    cu_source = """
+__global__ void myKernel(int *data) {
+    data[0] = (data[10] | data[11]) == data[12];
+}
+"""
+    kernelName = test_common.mangle('myKernel', ['int *'])
+    cl_sourcecode = test_common.cu_to_cl(cu_source, kernelName, num_clmems=1)
+    print('cl_sourcecode', cl_sourcecode)
+    kernel = test_common.build_kernel(context, cl_sourcecode, kernelName)
+
+    for i in range(50):
+        int_data[i] = 0
+    int_data[10] = 2
+    int_data[11] = 1
+    int_data[12] = 1
+    cl.enqueue_copy(q, int_data_gpu, int_data)
+    q.finish()
+    # prog = cl.Program(context, sourcecode).build()
+    # prog.__getattr__(kernelName)(
+    kernel(
+        q, (32,), (32,),
+        int_data_gpu, offset_type(0), cl.LocalMemory(4))
+    q.finish()
+    gpu_data = np.zeros((1024,), dtype=np.int32)
+    cl.enqueue_copy(q, gpu_data, int_data_gpu)
+    q.finish()
+    data = int_data
+    actual = gpu_data[0]
+    expected = int((data[10] | data[11]) == data[12])
+    print('actual', actual, 'expected', expected)
+    assert actual == expected
+    # print('int_data2[0]', int_data2[0])
+    # d = int_data
+    # d2 = int_data2
+    # expect = (d[3] * (d[1] + d[2])) / d[4]
+    # assert abs(d2[0] - expect) < 1e-5

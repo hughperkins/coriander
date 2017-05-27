@@ -38,6 +38,7 @@ std::string ClWriter::getExpr() {
         cout << "expression not yet assigned for " << localValueInfo->name << endl;
         throw std::runtime_error("expression not yet assigned, name " + localValueInfo->name);
     }
+    cout << "ClWriter::GetExpr expression = [" << localValueInfo->expression << "]" << endl;
     return localValueInfo->expression;
 }
 
@@ -59,10 +60,12 @@ void ClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std:
     // if(localValueInfo->toBeDeclared) {
     //     os << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name;\n";
     // }
+    cout << "ClWriter::writeDeclaration()" << endl;
 }
 
 void ClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes any cl required, eg if we toggled setAsAssigned, we need to do the assignment
                                           // some instructoins will *always* write something, eg stores
+    cout << "ClWriter::writeDeclaration()" << endl;
     if(localValueInfo->_skip) {
         return;
     }
@@ -75,7 +78,7 @@ void ClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes a
             cout << "expression for " << localValueInfo->name + " not defined" << endl;
             throw runtime_error("expression for " + localValueInfo->name + " not defined");
         }
-        string expression = stripOuterParams(localValueInfo->expression);
+        string expression = ExpressionsHelper::stripOuterParams(localValueInfo->expression);
         os << indent << localValueInfo->name << " = " << expression << ";\n";
     }
     // expression = name;
@@ -83,6 +86,7 @@ void ClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes a
 
 void AllocaClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std::ostream &os) {
     // cout << "AllocaClWriter::writeDelcaratoin" << endl;
+    cout << "ClWriter::writeDeclaration()" << endl;
     string gencode = "";
     LocalValueInfo *l = localValueInfo;
     AllocaInst *alloca = cast<AllocaInst>(l->value);
@@ -308,7 +312,7 @@ void CallClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writ
             cout << "expression for " << localValueInfo->name + " not defined" << endl;
             throw runtime_error("expression for " + localValueInfo->name + " not defined");
         }
-        string expression = stripOuterParams(localValueInfo->expression);
+        string expression = ExpressionsHelper::stripOuterParams(localValueInfo->expression);
         os << indent << localValueInfo->name << " = " << expression << ";\n";
     }
     // expression = name;

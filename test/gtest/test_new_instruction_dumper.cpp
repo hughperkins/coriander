@@ -130,18 +130,19 @@ TEST(test_new_instruction_dumper, test_add) {
 
     Instruction *add = cast<Instruction>(builder.CreateAdd(aLoad, bLoad));
     LocalValueInfo *addInfo = wrapper.createInfo(add, "v1");
+    cout << "addInfo->expression [" << addInfo->expression << "]" << endl;
     std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
     instructionDumper->runGeneration(addInfo, returnTypeByFunction);
     // wrapper.runRhsGeneration(add);
     // string expr = wrapper.getExpr(add);
     string expr = addInfo->getExpr();
     cout << "expr " << expr << endl;
-    ASSERT_EQ("(v_a + v_b)", expr);
+    EXPECT_EQ("(v_a + v_b)", expr);
 
     ostringstream oss;
     addInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
     cout << "declaration [" << oss.str() << "]" << endl;
-    ASSERT_EQ("", oss.str());
+    EXPECT_EQ("", oss.str());
 
     oss.str("");
     addInfo->writeInlineCl("    ", oss);
