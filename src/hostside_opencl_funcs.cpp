@@ -233,7 +233,11 @@ int32_t getNumKernelCalls() {
     return getThreadVars()->getContext()->numKernelCalls;
 }
 
-CLKernel *compileOpenCLKernel(string uniqueKernelName, string shortKernelName, string clSourcecode) {
+CLKernel *compileOpenCLKernel(string originalKernelName, string clSourcecode) {
+    return compileOpenCLKernel(originalKernelName, originalKernelName, originalKernelName, clSourcecode);
+}
+
+CLKernel *compileOpenCLKernel(string originalKernelName, string uniqueKernelName, string shortKernelName, string clSourcecode) {
     // returns already-built kernel if available, based on the name
     // otherwise builds passed-in clsourcecode, caches that, and returns resulting kernel
     // (opencl generation has already happened prior to this function)
@@ -253,8 +257,8 @@ CLKernel *compileOpenCLKernel(string uniqueKernelName, string shortKernelName, s
 
     // string filename = "/tmp/" + uniqueKernelName + ".cl";
     string filename = "/tmp/" + easycl::toString(v->getContext()->kernelCache.size()) + ".cl";
-    if(getenv("COCL_LOAD_KERNEL") != 0) {
-        cout << "loading kernel from " << filename << endl;
+    if(getenv("COCL_LOAD_CL") != 0) {
+        cout << "loading cl sourcecode from " << filename << endl;
         ifstream f;
         f.open(filename, ios_base::in);
         // f << launchConfiguration.kernelName << endl;
@@ -266,17 +270,17 @@ CLKernel *compileOpenCLKernel(string uniqueKernelName, string shortKernelName, s
         }
         // cout << sourcecode << endl;
         f.close();
-    } else if(getenv("COCL_DUMP_KERNEL") != 0) {
-        cout << "saving kernel to " << filename << endl;
+    } else if(getenv("COCL_DUMP_CL") != 0) {
+        cout << "saving cl sourcecode to " << filename << endl;
         ofstream f;
         f.open(filename, ios_base::out);
+        f << "// original kernelName: [" << originalKernelName << "]" << endl;
+        f << "// unique kernelName: [" << uniqueKernelName << "]" << endl;
+        f << "// short kernelname: [" << shortKernelName << "]" << endl;
+        f << endl;
         // f << launchConfiguration.kernelName << endl;
         f << clSourcecode << endl;
         f.close();
-    }
-    if(getenv("COCL_DUMP_CL") != 0 && string(getenv("COCL_DUMP_CL")) == "1") {
-        cout << "cocl dump cl set" << endl;
-        // cout << "cl: [" << clSourcecode << "]" << endl;
     }
 
     CLKernel *kernel = 0;
@@ -343,9 +347,9 @@ GenerateOpenCLResult generateOpenCL(
     // convert to opencl first... based on the kernel name required
     try {
         // string filename = "/tmp/" + uniqueKernelName;
-        string filename = "/tmp/" + easycl::toString(v->getContext()->clSourceCodeCache.size()) + ".ll";
+        string filename = "/tmp/" + easycl::toString(v->getContext()->clSourceCodeCache.size()) + "-device.ll";
         if(getenv("COCL_DUMP_BYTECODE") != 0) {
-            cout << "saving bytecode to " << filename << endl;
+            cout << "saving deviceside bytecode to " << filename << endl;
             ofstream f;
             f.open(filename, ios_base::out);
             // f << launchConfiguration.kernelName << endl;
@@ -549,7 +553,7 @@ void kernelGo() {
         launchConfiguration.clmems.size(), launchConfiguration.clmemIndexByClmemArgIndex, launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
     // cout << "kernelGo() generatedKernelName=" << res.generatedKernelName << endl;
     // cout << "kernelGo() OpenCL sourcecode:\n" << res.clSourcecode << endl;
-    CLKernel *kernel = compileOpenCLKernel(res.uniqueKernelName, res.shortKernelName, res.clSourcecode);
+    CLKernel *kernel = compileOpenCLKernel(launchConfiguration.kernelName, res.uniqueKernelName, res.shortKernelName, res.clSourcecode);
 
     for(int i = 0; i < launchConfiguration.clmems.size(); i++) {
         // cout << "clmem" << i << endl;

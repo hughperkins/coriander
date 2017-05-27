@@ -47,7 +47,8 @@ namespace cocl {
         std::string uniqueKernelName;
     };
     GenerateOpenCLResult generateOpenCL(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, std::string origKernelName, std::string devicellsourcecode);
-    easycl::CLKernel *compileOpenCLKernel(std::string uniqueKernelName, std::string shortKernelName, std::string clSourcecode);
+    easycl::CLKernel *compileOpenCLKernel(std::string originalKernelName, std::string uniqueKernelName, std::string shortKernelName, std::string clSourcecode);
+    easycl::CLKernel *compileOpenCLKernel(std::string shortKernelName, std::string clSourcecode);
     // easycl::CLKernel *getKernelForNameLl(std::string kernelName, std::string devicellsourcecode);
 
 }
