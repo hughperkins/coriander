@@ -69,3 +69,12 @@ Note that you'll need to continue to export `CLANG_HOME` environment variable wh
 Docker images run ok on beignet and NVIDIA :-)  (or used to. not tested very recently...)  Please see [docker](docker) for more details.
 
 <img src="https://github.com/hughperkins/Coriander/raw/master/doc/img/dockerfile_beignet_cudasample.png?raw=true" width="600" />
+
+## Gotchas
+
+### `Cannot find source file`
+
+Did you clone with `--recursive`? You might be missing the sub-modules. You can get these by doing:
+```
+git submodule update --init --recursive
+```
