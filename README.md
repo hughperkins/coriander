@@ -99,10 +99,7 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
 
 - May 27:
   - updated to LLVM 4.0. Thank you to @iame6162013 for inspiring me to do this
-  - finally came up with a principled way of detecting byvalued-ness, to replace the May 26 hack
-    - this means that tensorflow `random_op_gpu.cc` is one step closer to running ok
-- May 26:
-  - ~~finally hacked around a bug that was causing test_softmax.py to crash in tensorflow~~
+  - Tensorflow `random_op_gpu.cc` compiles and runs ok now :-). There were a few hoops to jump through, https://github.com/hughperkins/coriander/issues/24
 - May 20:
   - renamed to Coriander
 - May 18:
