@@ -144,13 +144,6 @@ public:
     // returns path without the directory name (I think). this should go into some utiity class really...
     static std::string getBasename(std::string path); 
 
-    static void getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info);
-
-    // given a bytecode that calls the cudaSetupArgument method, obtains information
-    // about this, such as the type of the argument being set, and an instruction that represents
-    // its value, stores that, in info, along with the arguments there already
-    static void getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info, ParamInfo *paramInfo);
-
     // handle primitive ints and floats (not arrays):
     static llvm::Instruction *addSetKernelArgInst_int(llvm::Instruction *lastInst, llvm::Value *value, llvm::IntegerType *intType);
     static llvm::Instruction *addSetKernelArgInst_float(llvm::Instruction *lastInst, llvm::Value *value);
@@ -204,6 +197,14 @@ public:
     // all setKernelArgs pass through addSetKernelArgInst, which dispatches to other functions
     static llvm::Instruction *addSetKernelArgInst(
         llvm::Instruction *lastInst, ParamInfo *paramInfo);
+
+    // given a bytecode that calls the cudaSetupArgument method, obtains information
+    // about this, such as the type of the argument being set, and an instruction that represents
+    // its value, stores that, in info, along with the arguments there already
+    static void getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info, ParamInfo *paramInfo);
+
+    // given call to cudaLaunch, gets information about the called kernel, args, etc
+    static void getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info);
 
     static void patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, std::vector<llvm::Instruction *> &to_replace_with_zero);
     static void patchFunction(llvm::Function *F);  // patch all kernel launch commands in function F

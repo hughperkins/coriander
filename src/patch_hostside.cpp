@@ -123,82 +123,6 @@ std::ostream &operator<<(std::ostream &os, const LaunchCallInfo &info) {
     return os;
 }
 
-void PatchHostside::getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info) {
-    // input to this is a cudaLaunch instruction
-    // sideeffect is to populate in info:
-    // - name of the kernel
-    // - type of each of the kernel parameters (without the actual Value's)
-    // info->callTypes.clear();
-    // outs() << "getLaunchTypes()\n";
-    Indentor indentor;
-    Value *argOperand = inst->getArgOperand(0);
-    // indentor << "getLaunchTypes" << endl;
-    if(ConstantExpr *expr = dyn_cast<ConstantExpr>(argOperand)) {
-        Instruction *instr = expr->getAsInstruction();
-        Type *op0type = instr->getOperand(0)->getType();
-        Type *op0typepointed = op0type->getPointerElementType();
-        if(FunctionType *fn = dyn_cast<FunctionType>(op0typepointed)) {
-            int i = 0;
-            for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
-                Type * paramType = *it;
-                if(i >= info->params.size()) {
-                    cout << "warning: exceeded number of params" << endl;
-                    break;
-                }
-                // indentor << "  fn param type[" << i << "] " << typeDumper.dumpType(paramType) << endl;
-                // info->callTypes.push_back(paramType);
-                // indentor << info->params.size() << " " << i << endl;
-                info->params[i].type = paramType;
-                // paramType->dump();
-                i++;
-            }
-        }
-        info->kernelName = instr->getOperand(0)->getName();
-        // outs() << "got kernel name " << info->kernelName << "\n";
-    } else {
-        throw std::runtime_error("getlaunchtypes, didnt get ConstantExpr");
-    }
-}
-
-void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info, ParamInfo *paramInfo) {
-    // input to this is:
-    // - inst is cudaSetupArgument instruction, with:
-    //   - first operand is a value pointing to the value we want to send to the kernel
-    //
-    // - output of this method is
-    //    populate info with a Value holding the actual concrete value w ewant to send to the kernel
-    //    (note a pointer to it, since we Load the pointer)
-    // Notes:
-    // - the first operand of inst was created as bitcast(i8*)(alloca (type-of-arg))
-    // - the alloca instruction is inst->getOperand(0)->getOperand(0)
-    // - so if we load from the alloca instruction, we should have the value we want?
-    // outs() << "getLaunchArgValue " << "\n";
-    Indentor indentor;
-    int size = (int)cast<ConstantInt>(inst->getOperand(1))->getZExtValue();
-    paramInfo->size = size;
-    if(!isa<Instruction>(inst->getOperand(0))) {
-        outs() << "getlaunchvalue, first operatnd of inst is not an instruction..." << "\n";
-        inst->dump();
-        outs() << "\n";
-        inst->getOperand(0)->dump();
-        outs() << "\n";
-        throw runtime_error("getlaunchvalue, first operatnd of inst is not an instruction...");
-    }
-    Instruction *bitcast = cast<Instruction>(inst->getOperand(0));
-    Value *alloca = bitcast;
-    if(isa<BitCastInst>(bitcast)) {
-        alloca = bitcast->getOperand(0);
-    } else {
-        alloca = bitcast;
-    }
-    Instruction *load = new LoadInst(alloca, "loadCudaArg");
-    load->insertBefore(inst->getInst());
-    paramInfo->value = load;
-    paramInfo->pointer = alloca;
-    // info->callValuesByValue.push_back(load);
-    // info->callValuesAsPointers.push_back(alloca);
-}
-
 std::ostream &operator<<(std::ostream &os, const PointerInfo &pointerInfo) {
     os << "PointerInfo(offset=" << pointerInfo.offset << ", type=" << typeDumper.dumpType(pointerInfo.type);
     os << " indices=";
@@ -595,6 +519,82 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
         throw std::runtime_error("kernel arg type type not implemented " + typeDumper.dumpType(value->getType()));
     }
     return lastInst;
+}
+
+void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info, ParamInfo *paramInfo) {
+    // input to this is:
+    // - inst is cudaSetupArgument instruction, with:
+    //   - first operand is a value pointing to the value we want to send to the kernel
+    //
+    // - output of this method is
+    //    populate info with a Value holding the actual concrete value w ewant to send to the kernel
+    //    (note a pointer to it, since we Load the pointer)
+    // Notes:
+    // - the first operand of inst was created as bitcast(i8*)(alloca (type-of-arg))
+    // - the alloca instruction is inst->getOperand(0)->getOperand(0)
+    // - so if we load from the alloca instruction, we should have the value we want?
+    // outs() << "getLaunchArgValue " << "\n";
+    Indentor indentor;
+    int size = (int)cast<ConstantInt>(inst->getOperand(1))->getZExtValue();
+    paramInfo->size = size;
+    if(!isa<Instruction>(inst->getOperand(0))) {
+        outs() << "getlaunchvalue, first operatnd of inst is not an instruction..." << "\n";
+        inst->dump();
+        outs() << "\n";
+        inst->getOperand(0)->dump();
+        outs() << "\n";
+        throw runtime_error("getlaunchvalue, first operatnd of inst is not an instruction...");
+    }
+    Instruction *bitcast = cast<Instruction>(inst->getOperand(0));
+    Value *alloca = bitcast;
+    if(isa<BitCastInst>(bitcast)) {
+        alloca = bitcast->getOperand(0);
+    } else {
+        alloca = bitcast;
+    }
+    Instruction *load = new LoadInst(alloca, "loadCudaArg");
+    load->insertBefore(inst->getInst());
+    paramInfo->value = load;
+    paramInfo->pointer = alloca;
+    // info->callValuesByValue.push_back(load);
+    // info->callValuesAsPointers.push_back(alloca);
+}
+
+void PatchHostside::getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info) {
+    // input to this is a cudaLaunch instruction
+    // sideeffect is to populate in info:
+    // - name of the kernel
+    // - type of each of the kernel parameters (without the actual Value's)
+    // info->callTypes.clear();
+    // outs() << "getLaunchTypes()\n";
+    Indentor indentor;
+    Value *argOperand = inst->getArgOperand(0);
+    // indentor << "getLaunchTypes" << endl;
+    if(ConstantExpr *expr = dyn_cast<ConstantExpr>(argOperand)) {
+        Instruction *instr = expr->getAsInstruction();
+        Type *op0type = instr->getOperand(0)->getType();
+        Type *op0typepointed = op0type->getPointerElementType();
+        if(FunctionType *fn = dyn_cast<FunctionType>(op0typepointed)) {
+            int i = 0;
+            for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
+                Type * paramType = *it;
+                if(i >= info->params.size()) {
+                    cout << "warning: exceeded number of params" << endl;
+                    break;
+                }
+                // indentor << "  fn param type[" << i << "] " << typeDumper.dumpType(paramType) << endl;
+                // info->callTypes.push_back(paramType);
+                // indentor << info->params.size() << " " << i << endl;
+                info->params[i].type = paramType;
+                // paramType->dump();
+                i++;
+            }
+        }
+        info->kernelName = instr->getOperand(0)->getName();
+        // outs() << "got kernel name " << info->kernelName << "\n";
+    } else {
+        throw std::runtime_error("getlaunchtypes, didnt get ConstantExpr");
+    }
 }
 
 void PatchHostside::patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, std::vector<llvm::Instruction *> &to_replace_with_zero) {
