@@ -21,6 +21,7 @@ Whenever you use Coriander, please set `CLANG_HOME`, using `export CLANG_HOME=/u
 
 ```
 sudo apt-get install git cmake cmake-curses-gui libc6-dev-i386 make gcc g++ zlib1g-dev
+sudo apt-get install libtinfo-dev
 cd ~/Downloads
 wget http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz
 sudo mkdir -p /usr/local/opt
