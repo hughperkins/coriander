@@ -87,6 +87,8 @@ public:
     llvm::Argument *devicesideArg = 0;
 
     int size = 0;  // from CudaLaunch function call declaration
+
+    int paramIndex = 0; // in the original function, nto in our hacked around kernel function
 };
 
   // noncopyable(const noncopyable&) =delete;  
@@ -197,7 +199,8 @@ public:
     //
     // this patch_hostside addSetKernelArgInst_byvaluestruct function is going to handle walking the struct, and sending
     // the other pointers through using additional method calls, likely to setKernelArgGpuBuffer
-    static llvm::Instruction *addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *valueAsPointerInstr);
+    static llvm::Instruction *addSetKernelArgInst_byvaluestruct(
+        llvm::Instruction *lastInst, cocl::ParamInfo *paramInfo, llvm::Value *valueAsPointerInstr);
 
     // this needs to do the same as addSetKernelArgInst_byvaluestruct , but it passes the struct pointer into the
     // setKernelArgGpuBuffer function, rather than the setKernelArgHostsideBuffer

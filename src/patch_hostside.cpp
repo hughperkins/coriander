@@ -344,7 +344,7 @@ void addMetadata(Instruction *value, string tag) {
     value->setMetadata(tag, mdnode);
 }
 
-llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *structPointer) {
+llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, ParamInfo *paramInfo, llvm::Value *structPointer) {
     //
     // what this is going to do is:
     // - create a call to pass the hostside buffer to hostside_opencl_funcs, at runtime
@@ -359,8 +359,35 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
     PointerType *structPointerType = cast<PointerType>(structPointer->getType());
     // structPointerType->dump();
 
-    // indentor << isa<StructType>(structPointer->getType()) << endl;
-    // structPointerType->getPointerElementType()->dump();
+    indentor << "structPointerType is pointer? " << isa<PointerType>(structPointerType) << endl;
+    indentor << "isa struct pointer? " << isa<StructType>(structPointer->getType()) << endl;
+
+    if(!isa<StructType>(structPointerType->getPointerElementType())) {
+        indentor << "doesnt actually point to a struct, currenlty, in hostside bytecode => adding a bitcast" << endl;
+        // paramInfo->typeDevicesideFn
+        // string deviceSideTypeName = paramInfo->typeDevicesideFn->getName().str():
+        // indentor << "deviceSideTypeName: " << deviceSideTypeName << endl;
+        paramInfo->typeDevicesideFn->dump();
+        indentor << "dump type on this: " << typeDumper.dumpType(paramInfo->typeDevicesideFn) << endl;
+        // BitCastInst *bitcast = new BitCastInst(structPointer, paramInfo->typeDevicesideFn, 0);
+        // PointerType *pointerStruct = 
+        BitCastInst *bitcast = new BitCastInst(structPointer, paramInfo->typeDevicesideFn);
+        bitcast->insertAfter(lastInst);
+        bitcast->dump();
+        indentor << "after creating bitcast" << endl;
+        structPointer = bitcast;
+        lastInst = bitcast;
+
+        structPointerType = cast<PointerType>(structPointer->getType());
+        indentor << "structPointerType is pointer? " << isa<PointerType>(structPointerType) << endl;
+        indentor << "isa struct pointer? " << isa<StructType>(structPointer->getType()) << endl;
+    }
+
+    indentor << "addSetKernelArgInst_byvaluestruct structPointerType->dump():" << endl;
+    structPointerType->dump();
+    indentor << "addSetKernelArgInst_byvaluestruct structPointerType->getPointerElementType()->dump():" << endl;
+    structPointerType->getPointerElementType()->dump();
+
     StructType *structType = cast<StructType>(structPointerType->getPointerElementType());
     // outs() << "structType:\n";
     // structType->dump();
@@ -451,19 +478,30 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
     This figures out the type of the argument, and dispatches appropriately. All arguments pass through this function,
     including primitives, pointers, structs, ...
     */
-    Indentor indentor;
     // Type *typeHostsideFn = paramInfo->typeHostsideFn;
     Value *value = paramInfo->value;
     Value *valueAsPointerInstr = paramInfo->pointer;
+
+    Indentor indentor_;
+    indentor_ << "addSetKErnelArgInst arg=" << paramInfo->paramIndex << endl;
+
+    Indentor indentor;
+
     // int size = paramInfo->size;
     // bool definitelyNotAPointer = paramInfo->size != 4 && paramInfo->size != 8;
     // bool couldBePrimitiveInt = paramInfo->size == 4 || paramInfo->size == 8;
     // bool couldBePrimitiveFloat = paramInfo->size == 4 || paramInfo->size == 8;
     // bool couldBePointer = paramInfo->size == 4 || paramInfo->size == 8;
-    bool clearlyAByValueStruct = paramInfo->size > 8;
+    // bool clearlyAByValueStruct = paramInfo->size > 8;
     // bool definitelyNotAPointer = false;
     // indentor << "size=" << paramInfo->size << endl;
-    if(clearlyAByValueStruct) {
+
+    Type *devicesideType = paramInfo->typeDevicesideFn;
+
+    if(paramInfo->devicesideByVal &&
+            isa<PointerType>(devicesideType) &&
+            isa<StructType>(devicesideType->getPointerElementType())) {
+        indentor << "deviceside is by value struct, so we will pass by value, as a struct" << endl;
         // indentor << "clearly a by value struct" << endl;
         // value->dump();
         // valueAsPointerInstr->dump();
@@ -479,7 +517,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
         }
 
         // lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, value);
-        lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, valueAsPointerInstr);
+        lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, paramInfo, valueAsPointerInstr);
     } else if(IntegerType *intType = dyn_cast<IntegerType>(value->getType())) {
         indentor << "addSetKernelArgInst: int primitive" << endl;
         lastInst = PatchHostside::addSetKernelArgInst_int(lastInst, value, intType);
@@ -502,7 +540,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
     } else if(isa<StructType>(value->getType())) {
         // cout << "structtype" << endl;
         indentor << "addSetKernelArgInst: byvalue struct" << endl;
-        lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, valueAsPointerInstr);
+        lastInst = PatchHostside::addSetKernelArgInst_byvaluestruct(lastInst, paramInfo, valueAsPointerInstr);
     } else if(isa<VectorType>(value->getType())) {
         // cout << "got vector arg type" << endl;
         // value->dump();
@@ -608,24 +646,29 @@ void PatchHostside::getLaunchTypes(
             break;
         }
         indentor << "params[" << i << "]" << endl;
-        ParamInfo *paramInfo = info->params[i].get();
+        {
+            Indentor indentor;
+            ParamInfo *paramInfo = info->params[i].get();
 
-        paramInfo->hostsideArg = hostsideArgs[i];
-        paramInfo->devicesideArg = devicesideArgs[i];
-        paramInfo->hostsideByVal = paramInfo->hostsideArg->hasByValAttr();
-        paramInfo->devicesideByVal = paramInfo->devicesideArg->hasByValAttr();
+            paramInfo->paramIndex = i;
 
-        indentor << "hostside byval " << paramInfo->hostsideArg->hasByValAttr() << endl;
-        indentor << "deviceside byval " << paramInfo->devicesideArg->hasByValAttr() << endl;
-        // indentor << "hostsidearg" << endl;
-        // hostsideArg->dump();
-        // indentor << "devicesideArg" << endl;
-        // devicesideArg->dump();
+            paramInfo->hostsideArg = hostsideArgs[i];
+            paramInfo->devicesideArg = devicesideArgs[i];
+            paramInfo->hostsideByVal = paramInfo->hostsideArg->hasByValAttr();
+            paramInfo->devicesideByVal = paramInfo->devicesideArg->hasByValAttr();
 
-        paramInfo->typeHostsideFn = typeHostsideFn;
-        paramInfo->typeDevicesideFn = deviceFnType->getParamType(i);
-        indentor << "  hostside type " << typeDumper.dumpType(paramInfo->typeHostsideFn) << endl;
-        indentor << "  deviceside type " << typeDumper.dumpType(paramInfo->typeDevicesideFn) << endl;
+            indentor << "hostside byval " << paramInfo->hostsideArg->hasByValAttr() << endl;
+            indentor << "deviceside byval " << paramInfo->devicesideArg->hasByValAttr() << endl;
+            // indentor << "hostsidearg" << endl;
+            // hostsideArg->dump();
+            // indentor << "devicesideArg" << endl;
+            // devicesideArg->dump();
+
+            paramInfo->typeHostsideFn = typeHostsideFn;
+            paramInfo->typeDevicesideFn = deviceFnType->getParamType(i);
+            indentor << "hostside type " << typeDumper.dumpType(paramInfo->typeHostsideFn) << endl;
+            indentor << "deviceside type " << typeDumper.dumpType(paramInfo->typeDevicesideFn) << endl;
+        }
         i++;
     }
 }
