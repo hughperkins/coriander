@@ -64,109 +64,6 @@ namespace cocl {
     pthread_mutex_t launchMutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
     #endif
 
-    // These Arg classes store kernel parameter values, which we can use
-    // at kernel creation time, and then pass into the kernel at that point
-    // we dont create the kernel until the actual launch command (which is after
-    // the kernelSetArg commands), so we have all the information available at that
-    // time about what kernel arguments we have
-    // concretely, it means we can dedupe the underlying cl_mem buffers, for example
-    class Arg {
-    public:
-        virtual ~Arg() {}
-        virtual void inject(CLKernel *kernel) = 0;
-        virtual std::string str() = 0;
-    };
-    class Int8Arg : public Arg {
-    public:
-        Int8Arg(char v) : v(v) {}
-        void inject(CLKernel *kernel) {
-            kernel->in(v);
-        }
-        virtual std::string str() { return "Int8Arg"; }
-        char v;
-    };
-    class Int32Arg : public Arg {
-    public:
-        Int32Arg(int v) : v(v) {}
-        void inject(CLKernel *kernel) {
-            kernel->in(v);
-        }
-        virtual std::string str() { return "Int32Arg"; }
-        int v;
-    };
-    class UInt32Arg : public Arg {
-    public:
-        UInt32Arg(uint32_t v) : v(v) {}
-        void inject(CLKernel *kernel) {
-            kernel->in_uint32(v);
-        }
-        virtual std::string str() { return "UInt32Arg"; }
-        uint32_t v;
-    };
-    class Int64Arg : public Arg {
-    public:
-        Int64Arg(int64_t v) : v(v) {}
-        void inject(CLKernel *kernel) {
-            kernel->in(v);
-        }
-        virtual std::string str() { return "Int64Arg"; }
-        int64_t v;
-    };
-    class FloatArg : public Arg {
-    public:
-        FloatArg(float v) : v(v) {}
-        void inject(CLKernel *kernel) {
-            kernel->in(v);
-        }
-        virtual std::string str() { return "FloatArg"; }
-        float v;
-    };
-    class NullPtrArg : public Arg {
-    public:
-        NullPtrArg() {}
-        void inject(CLKernel *kernel) {
-            kernel->in_nullptr();
-        }
-        virtual std::string str() { return "NullPtrArg"; }
-    };
-    class ClmemArg : public Arg {
-    public:
-        ClmemArg(cl_mem v) : v(v) {}
-        void inject(CLKernel *kernel) {
-            kernel->inout(&v);
-        }
-        virtual std::string str() { return "ClmemArg"; }
-        cl_mem v;
-    };
-    class StructArg : public Arg {
-    public:
-        StructArg(char *pCpuStruct, int structAllocateSize) :
-            pCpuStruct(pCpuStruct), structAllocateSize(structAllocateSize)
-        {}
-        virtual std::string str() { return "StructArg"; }
-        char *pCpuStruct;
-        int structAllocateSize;
-    };
-
-    class LaunchConfiguration {
-    public:
-        size_t grid[3];
-        size_t block[3];
-        // CLKernel *kernel;
-        CLQueue *queue = 0;  // NOT owned by us
-        CoclStream *coclStream = 0; // NOT owned
-
-        std::vector<std::unique_ptr<Arg> > args;
-
-        // map<cl_mem *, int> clmemIndexByClmem;
-        map<cl_mem, int> clmemIndexByClmem;
-        vector<cl_mem> clmems;
-        vector<int> clmemIndexByClmemArgIndex;
-
-        vector<cl_mem> kernelArgsToBeReleased;
-        std::string kernelName = "";
-        std::string devicellsourcecode = "";
-    };
     LaunchConfiguration launchConfiguration;
 }
 
@@ -551,16 +448,16 @@ void kernelGo() {
 
     GenerateOpenCLResult res = generateOpenCL(
         launchConfiguration.clmems.size(), launchConfiguration.clmemIndexByClmemArgIndex, launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
-    // cout << "kernelGo() generatedKernelName=" << res.generatedKernelName << endl;
+    COCL_PRINT(cout << "kernelGo() kernel: " << launchConfiguration.kernelName << endl);
     // cout << "kernelGo() OpenCL sourcecode:\n" << res.clSourcecode << endl;
     CLKernel *kernel = compileOpenCLKernel(launchConfiguration.kernelName, res.uniqueKernelName, res.shortKernelName, res.clSourcecode);
 
     for(int i = 0; i < launchConfiguration.clmems.size(); i++) {
-        // cout << "clmem" << i << endl;
+        COCL_PRINT(cout << "clmem" << i << endl);
         kernel->inout(&launchConfiguration.clmems[i]);
     }
     for(int i = 0; i < launchConfiguration.args.size(); i++) {
-        // cout << "i=" << i << " " << launchConfiguration.args[i]->str() << endl;
+        COCL_PRINT(cout << "i=" << i << " " << launchConfiguration.args[i]->str() << endl);
         launchConfiguration.args[i]->inject(kernel);
     }
 
