@@ -183,7 +183,7 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
         }
         // std::cout << "   generatedname=" << name << std::endl;
         thisF->setName(shortName);
-        std::cout << "kernel_dumper toCl() " << origName << " => " << shortName << std::endl;
+        // std::cout << "kernel_dumper toCl() " << origName << " => " << shortName << std::endl;
     }
 
     // GlobalNames globalNames;
