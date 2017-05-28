@@ -214,7 +214,7 @@ __global__ void testTernary(float *data) {
 
 # Note: this test seems to fail on HD5500, but ok on 940M
 # The generated opencl code seems correct, so...
-@pytest.mark.xfail(reason='fails on hd5500, not because of cocl itself, I think')
+# @pytest.mark.xfail(reason='fails on hd5500, not because of cocl itself, I think')
 def test_structs(context, q, float_data, float_data_gpu, int_data, int_data_gpu):
 
     code = """
@@ -241,8 +241,8 @@ __global__ void testStructs(MyStruct *structs, float *float_data, int *int_data)
     my_struct = cl.tools.get_or_register_dtype("MyStruct", my_struct)
     structs = np.empty(2, my_struct)
     structs[0]['myint'] = 123
-    structs[1]['myint'] = 33
     structs[0]['myfloat'] = 567
+    structs[1]['myint'] = 33
     structs[1]['myfloat'] = 44
     structs_gpu = cl.array.to_device(q, structs)
     # p = structs_gpu.map_to_host(q)
@@ -250,7 +250,7 @@ __global__ void testStructs(MyStruct *structs, float *float_data, int *int_data)
     # q.finish()
     kernel(
         q, (32,), (32,),
-        structs_gpu.data, offset_type(0), float_data_gpu, offset_type(0), int_data_gpu, offset_type(0), cl.LocalMemory(4))
+        structs_gpu.data, float_data_gpu, int_data_gpu, offset_type(0), offset_type(0), offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     cl.enqueue_copy(q, int_data, int_data_gpu)
