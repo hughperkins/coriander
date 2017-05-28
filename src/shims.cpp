@@ -55,6 +55,25 @@ inline unsigned int __umulhi(unsigned int v0, unsigned int v1) {
     // inline float __atomic_add(global volatile float *ptr, float val) { // we need to actually implement this
     //     return 555;
     // }
+
+// this code is from http://suhorukov.blogspot.co.uk/2011/12/opencl-11-atomic-operations-on-floating.html
+    _shimClByName["__atomic_add"] = R"(
+inline float __atomic_add(volatile __global float *source, const float operand) {
+    union {
+        unsigned int intVal;
+        float floatVal;
+    } newVal;
+    union {
+        unsigned int intVal;
+        float floatVal;
+    } prevVal;
+    do {
+        prevVal.floatVal = *source;
+        newVal.floatVal = prevVal.floatVal + operand;
+    } while (atomic_cmpxchg((volatile __global unsigned int *)source, prevVal.intVal, newVal.intVal) != prevVal.intVal);
+    return prevVal.floatVal;
+}
+)";
 }
 
 std::string Shims::getClByName(std::string name) {

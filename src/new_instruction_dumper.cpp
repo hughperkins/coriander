@@ -1082,6 +1082,26 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         localValueInfo->setExpression(gencode);
         // cout << "shimming call to [" << gencode << "]" << endl;
         return;
+    } else if(functionName == "_Z9atomicAddIfET_PS0_S0_") {
+        // cout << "nid got an umulhi" << endl;
+        string gencode = "";
+        gencode += "__atomic_add(";
+        int i = 0;
+        for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
+            Value *op = &*it->get();
+            if(i > 0) {
+                gencode += ", ";
+            }
+            gencode += ExpressionsHelper::stripOuterParams(getOperand(op)->getExpr());
+            i++;
+        }
+        gencode += ")";
+        // cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
+        shimFunctionsNeeded->insert("__atomic_add");
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression(gencode);
+        // cout << "shimming call to [" << gencode << "]" << endl;
+        return;
     } else if(functionName == "_Z11__shfl_downIfET_S0_ii") {
         string gencode = "";
         gencode += "__shfl_down_3(scratch, ";
