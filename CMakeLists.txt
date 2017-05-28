@@ -223,7 +223,11 @@ CONFIGURE_FILE(
 
 include("${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl-internal.cmake")
 
+set(TESTS_EXCLUDE EXCLUDE_FROM_ALL)
 if(BUILD_TESTS)
+  set(TESTS_EXCLUDE)
+endif(BUILD_TESTS)
+
     set(TESTS testblas cuda_sample context byvaluestructwithpointer multigpu multithreading
         offsetkernelargs properties test_bitcast test_callbacks testcumemcpy testevents2
         testevents testfloat4 test_kernelcachedok testmath testmemcpydevicetodevice test_memhostalloc
@@ -236,7 +240,7 @@ if(BUILD_TESTS)
     endif()
     include_directories(include/cocl/proxy_includes)
     foreach(TEST ${TESTS})
-        add_cocl_executable(${TEST} test/cocl/${TEST}.cu)
+        add_cocl_executable(${TEST} ${TESTS_EXCLUDE} test/cocl/${TEST}.cu)
         add_custom_target(run-${TEST}
             COMMAND echo
             COMMAND echo make run-${TEST}
@@ -254,13 +258,13 @@ if(BUILD_TESTS)
           run-testnullpointer run-testpartialcopy run-teststream run-singlebuffer)
 
     if(UNIX)
-        add_library(cocl_gtest SHARED third_party/gtest/gtest-all.cc)
+        add_library(cocl_gtest SHARED  ${TESTS_EXCLUDE} third_party/gtest/gtest-all.cc)
         target_link_libraries(cocl_gtest pthread)
     else()
-        add_library(cocl_gtest third_party/gtest/gtest-all.cc)
+        add_library(cocl_gtest  ${TESTS_EXCLUDE} third_party/gtest/gtest-all.cc)
     endif()
 
-    add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
+    add_executable(cocl_unittests ${TESTS_EXCLUDE} test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
         test/gtest/test_block_dumper.cpp test/gtest/test_new_instruction_dumper.cpp
         test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
         test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
@@ -279,7 +283,7 @@ if(BUILD_TESTS)
     target_include_directories(cocl_unittests PRIVATE ${CLANG_HOME}/include)
     target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} ${LLVM_SYSLIBS})
     target_compile_options(cocl_unittests PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-endif(BUILD_TESTS)
+# endif(BUILD_TESTS)
 
 FILE(GLOB_RECURSE COCL_HEADERS
   LIST_DIRECTORIES false

@@ -13,24 +13,29 @@ macro(add_cocl_executable OUTPUT SRCFILES)
     set(${OUTPUT}_OBJS)
     set(${OUTPUT}_DEPS)
     #set(${TA})
+    set(ALLVAR ALL)
     foreach(SRCFILE ${SRCFILES} ${ARGN})
-        # set(SRCFILE ${CMAKE_CURRENT_SOURCE_DIR}/${SRCFILE})
-        get_filename_component(SRCFILE ${SRCFILE} ABSOLUTE)
-        string(REGEX REPLACE "[.].*" "" BASENAME ${SRCFILE})
-        string(REGEX REPLACE ".*/" "" TARGETNAME ${BASENAME})
-        #message("basename ${BASENAME} TARGETNAME ${TARGETNAME}")
-        add_custom_command(
-            OUTPUT ${TARGETNAME}.o
-            COMMENT "CLANG_HOME=@CLANG_HOME@ @THIS_COCL_PATH@ ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}"
-            COMMAND CLANG_HOME=@CLANG_HOME@ @THIS_COCL_PATH@ ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}
-            #DEPENDS @THIS_COCL_PATH@ clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
-            DEPENDS ${SRCFILE} @COCL_ARTIFACTS@
-        )
-        add_custom_target(build_${TARGETNAME}_o
-            DEPENDS ${TARGETNAME}.o
-        )
-        set(${OUTPUT}_OBJS ${${OUTPUT}_OBJS} ${TARGETNAME}.o)
-        set(${OUTPUT}_DEPS ${${OUTPUT}_DEPS} build_${TARGETNAME}_o)
+        if(${SRCFILE} STREQUAL EXCLUDE_FROM_ALL)
+            set(ALLVAR )
+        else()
+            # set(SRCFILE ${CMAKE_CURRENT_SOURCE_DIR}/${SRCFILE})
+            get_filename_component(SRCFILE ${SRCFILE} ABSOLUTE)
+            string(REGEX REPLACE "[.].*" "" BASENAME ${SRCFILE})
+            string(REGEX REPLACE ".*/" "" TARGETNAME ${BASENAME})
+            #message("basename ${BASENAME} TARGETNAME ${TARGETNAME}")
+            add_custom_command(
+                OUTPUT ${TARGETNAME}.o
+                COMMENT "CLANG_HOME=@CLANG_HOME@ @THIS_COCL_PATH@ ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}"
+                COMMAND CLANG_HOME=@CLANG_HOME@ @THIS_COCL_PATH@ ${DEF_CMDLINE} ${INCLUDE_ARGS} ${SRCFILE} -o ${TARGETNAME}.o -c ${_TESTS_COCL_OPTIONS}
+                #DEPENDS @THIS_COCL_PATH@ clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
+                DEPENDS ${SRCFILE} @COCL_ARTIFACTS@
+            )
+            add_custom_target(build_${TARGETNAME}_o
+                DEPENDS ${TARGETNAME}.o
+            )
+            set(${OUTPUT}_OBJS ${${OUTPUT}_OBJS} ${TARGETNAME}.o)
+            set(${OUTPUT}_DEPS ${${OUTPUT}_DEPS} build_${TARGETNAME}_o)
+        endif()
     endforeach()
     add_custom_command(
         OUTPUT ${OUTPUT}
@@ -40,7 +45,7 @@ macro(add_cocl_executable OUTPUT SRCFILES)
         #DEPENDS @THIS_COCL_PATH@ clblast clew easycl @CMAKE_INSTALL_PREFIX@/bin/patch-hostside ${SRCFILE}
     )
     # add_custom_
-    add_custom_target(build_${OUTPUT} ALL
+    add_custom_target(build_${OUTPUT} ${ALLVAR}
         DEPENDS ${OUTPUT}
     )
     # target_link_libraries(${OUTPUT} cocl clblast easycl clew)
