@@ -17,6 +17,11 @@ namespace cocl {
 
 using namespace cocl;
 
+#ifdef COCL_PRINT
+#undef COCL_PRINT
+#define COCL_PRINT(x) 
+#endif
+
 namespace cocl {
     static pthread_mutex_t cldevices_mutex = PTHREAD_MUTEX_INITIALIZER;
 
