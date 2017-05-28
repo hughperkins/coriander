@@ -71,6 +71,7 @@ namespace cocl {
         // cocl::CoclDevice *currentDevice = 0;
         cocl::Context *currentContext = 0;
         int currentGpuOrdinal = 0;
+        bool offsets_32bit = false;
         // std::map<int, easycl::EasyCL*> clByDeviceIdx;
     };
 

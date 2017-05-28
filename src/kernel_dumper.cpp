@@ -234,7 +234,8 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
             // }
             // std::string shortName = shortNameByOrigName[functionName];
             FunctionDumper childFunctionDumper(
-                M, childF, origName, _isKernel, uniqueClmemCount, clmemIndexByClmemArgIndex, &globalNames, typeDumper.get(), &functionNamesMap);
+                M, childF, origName, _isKernel, uniqueClmemCount, clmemIndexByClmemArgIndex,
+                &globalNames, typeDumper.get(), &functionNamesMap, offsets_32bit);
                 // &shortNameByOrigName);
             if(_addIRToCl) {
                 childFunctionDumper.addIRToCl();

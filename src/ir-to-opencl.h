@@ -37,7 +37,7 @@
 // std::string convertLlStringToCl(std::string llString, std::string specificFunction);
 
 std::string convertModuleToCl(
-    int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, llvm::Module *M, std::string specificFunction, std::string generatedName);
+    int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, llvm::Module *M, std::string specificFunction, std::string generatedName, bool offsets_32bit);
 std::string convertLlStringToCl(
-    int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, std::string llString, std::string specificFunction, std::string generatedName);
-void convertLlFileToClFile(std::string llFilename, std::string ClFilename, std::string specificFunction);
+    int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, std::string llString, std::string specificFunction, std::string generatedName, bool offsets_32bit);
+void convertLlFileToClFile(std::string llFilename, std::string ClFilename, std::string specificFunction, bool offsets_32bit);

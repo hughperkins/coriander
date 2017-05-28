@@ -19,7 +19,7 @@ However, we have two possible types for the offset:
 - `uint64_t` is the most general
 - however, on beignet, I found that this gave undefined results, and/or crashes, so I tried `unsigned int`, and that worked ok
 
-At the time of writing, the offset size is set by `#ifdef`s, but I think I shall change it to use an enviornemnt vairable, `32BIT_OFFSET`, means `unsigned int`, if set to `1`, otherwise the offsets will be `uint64_t`.
+At the time of writing, the offset size is set by `#ifdef`s, but I think I shall change it to use an enviornemnt vairable, `OFFSET_32BIT`, means `unsigned int`, if set to `1`, otherwise the offsets will be `uint64_t`.
 
 In terms of the various generation/parse processes:
 - patch_hostside doesnt need to handle the offset: it will simply pass the virtual pointer to the coriander runtime, at runtime
@@ -29,4 +29,4 @@ In terms of the various generation/parse processes:
 
 Therefore, going forward:
 - the `#ifdef`s will be removed
-- `hostside_opencl_funcs` will decide at runtime, according to the presence of `32BIT_OFFSET=1` or not, which offset type to use
+- `hostside_opencl_funcs` will decide at runtime, according to the presence of `OFFSET_32BIT=1` or not, which offset type to use

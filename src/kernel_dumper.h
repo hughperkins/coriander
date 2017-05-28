@@ -29,8 +29,8 @@ namespace cocl {
 
 class KernelDumper {
 public:
-    KernelDumper(llvm::Module *M, std::string kernelName, std::string generatedName) :
-            M(M), kernelName(kernelName), generatedName(generatedName) {
+    KernelDumper(llvm::Module *M, std::string kernelName, std::string generatedName, bool offsets_32bit) :
+            M(M), kernelName(kernelName), generatedName(generatedName), offsets_32bit(offsets_32bit) {
         typeDumper.reset(new cocl::TypeDumper(&globalNames));
     }
     virtual ~KernelDumper() {}
@@ -41,6 +41,8 @@ public:
     llvm::Module *M;
     std::string kernelName;
     std::string generatedName;
+    bool offsets_32bit;
+
     std::set<std::string> functionDeclarations;
     std::set<llvm::StructType *>structsToDefine;
     std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly

@@ -254,7 +254,7 @@ GenerateOpenCLResult generateOpenCL(
             f.close();
         }
         string clSourcecode = convertLlStringToCl(
-            uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, origKernelName, shortKernelName);
+            uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, origKernelName, shortKernelName, v->offsets_32bit);
         // std::string clSourcecode = convertLlToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, origKernelName, kernelNameAfterGenerate);
         v->getContext()->clSourceCodeCache[uniqueKernelName] = clSourcecode;
         return GenerateOpenCLResult { clSourcecode, origKernelName, shortKernelName, uniqueKernelName };
@@ -349,11 +349,11 @@ void setKernelArgHostsideBuffer(char *pCpuStruct, int structAllocateSize) {
     addClmemArg(gpu_struct);
 
     int offsetElements = 0;
-    #ifdef OFFSET_32BIT
-    launchConfiguration.args.push_back(std::unique_ptr<Arg>(new UInt32Arg((uint32_t)offsetElements)));
-    #else
-    launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int64Arg((int64_t)offsetElements)));
-    #endif
+    if(v->offsets_32bit) {
+       launchConfiguration.args.push_back(std::unique_ptr<Arg>(new UInt32Arg((uint32_t)offsetElements)));
+    } else {
+       launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int64Arg((int64_t)offsetElements)));
+    }
 
     pthread_mutex_unlock(&launchMutex);
 }
@@ -367,16 +367,17 @@ void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
     // removed from the method parameters at some point.
 
     pthread_mutex_lock(&launchMutex);
+    ThreadVars *v = getThreadVars();
 
     Memory *memory = findMemory(memory_as_charstar);
     if(memory == 0) {
         COCL_PRINT(cout << "setKernelArgGpuBuffer nullptr" << endl);
         addClmemArg(0);
-        #ifdef OFFSET_32BIT
-        launchConfiguration.args.push_back(std::unique_ptr<Arg>(new UInt32Arg(0)));
-        #else
-        launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int64Arg(0)));
-        #endif
+        if(v->offsets_32bit) {
+            launchConfiguration.args.push_back(std::unique_ptr<Arg>(new UInt32Arg(0)));
+        } else {
+            launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int64Arg(0)));
+        }
     } else {
         size_t offset = memory->getOffset(memory_as_charstar);
         cl_mem clmem = memory->clmem;
@@ -390,11 +391,11 @@ void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
         addClmemArg(clmem);
 
         // COCL_PRINT(cout << "offset elements " << offsetElements << endl);
-        #ifdef OFFSET_32BIT
-        launchConfiguration.args.push_back(std::unique_ptr<Arg>(new UInt32Arg((uint32_t)offsetElements)));
-        #else
-        launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int64Arg((int64_t)offsetElements)));
-        #endif
+        if(v->offsets_32bit) {
+            launchConfiguration.args.push_back(std::unique_ptr<Arg>(new UInt32Arg((uint32_t)offsetElements)));
+        } else {
+            launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int64Arg((int64_t)offsetElements)));
+        }
     }
     pthread_mutex_unlock(&launchMutex);
 }

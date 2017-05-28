@@ -40,6 +40,15 @@ Recommended generation options:
 
 ## Runtime options
 
+### `CL_GPUOFFSET`: choosing GPU
+
 At runtime, you can use the environment variable `CL_GPUOFFSET` to choose gpu, eg:
 - `CL_GPUOFFSET=1`: use the second gpu (index `1`)
 - `CL_GPUOFFSET=2`: use the third gpu (index `2`)
+
+### `COCL_OFFSETS_32BIT`: for beignet
+
+On beignet, you should do `export OFFSETS_32BIT=1`, before running any Coriander-based program. Otherwise, you will get weird results and/or crashes.
+
+Technical details: this changes how memory buffer offsets are sent to the kernels. By default, they are passed as 64-bit integers. With this environment
+variable set, they will be transferred as 32-bit unsigned ints. Obviously this limits the size of memory buffers that can be used, but at least it will run :-)

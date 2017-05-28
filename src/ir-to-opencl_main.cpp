@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
     string kernelname = "";
     string cmem_indexes = "";
     bool add_ir_to_cl = false;
+    bool offsets_32bits = false;
     // bool dumpCl = false;
     // string rcFile = "";
 
@@ -47,6 +48,8 @@ int main(int argc, char *argv[]) {
     parser.add_string_argument("--outputfile", &ClFilename)->required();
     parser.add_string_argument("--kernelname", &kernelname)->required();
     parser.add_string_argument("--cmem-indexes", &cmem_indexes)->required()->help("comma-separated, eg 0,1,2,1");
+    parser.add_bool_argument("--offsets-32bits", &offsets_32bits);
+    parser.add_bool_argument("--offsets-32bits", &offsets_32bits);
 
     // parser.add_bool_argument("--debug", &debug);
     // parser.add_string_argument("--rcfile", &rcFile)
@@ -83,7 +86,7 @@ int main(int argc, char *argv[]) {
         throw runtime_error("failed to parse IR");
     }
 
-    KernelDumper kernelDumper(M.get(), kernelname, kernelname);
+    KernelDumper kernelDumper(M.get(), kernelname, kernelname, offsets_32bits);
     if(add_ir_to_cl) {
         kernelDumper.addIRToCl();
     }

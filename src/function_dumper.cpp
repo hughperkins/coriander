@@ -30,11 +30,11 @@ using namespace llvm;
 namespace cocl {
 
 string FunctionDumper::createOffsetDeclaration(string argName) {
-    #ifdef OFFSET_32BIT
+    if(offsets_32bit) {
        return ", uint " + argName + "_offset";
-    #else
+    } else {
        return ", long " + argName + "_offset";
-    #endif
+   }
 }
 
 std::string FunctionDumper::createOffsetShim(Type *argType, std::string argName, int clmemIndex) {

@@ -35,6 +35,8 @@ using namespace easycl;
 #undef COCL_PRINT
 #define COCL_PRINT(x)
 
+#define OFFSETS_32BIT_ENV_VAR "COCL_OFFSETS_32BIT"
+
 namespace cocl {
     // int globalNumGpus = -1;
 
@@ -91,6 +93,12 @@ namespace cocl {
     }
 
     ThreadVars::ThreadVars() {
+        if(getenv(OFFSETS_32BIT_ENV_VAR) != 0) {
+            if(string(getenv(OFFSETS_32BIT_ENV_VAR)) == "1") {
+                cout << OFFSETS_32BIT_ENV_VAR << " enabled" << endl;
+                this->offsets_32bit = true;
+            }
+        }
         // currentContext = new Context();
     }
     ThreadVars::~ThreadVars() {

@@ -324,15 +324,17 @@ bool add_ir_to_cl = false;
 // }
 
 string convertModuleToCl(
-        int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, Module *M, string specificFunction, std::string generatedName) {
-    KernelDumper kernelDumper(M, specificFunction, generatedName);
+        int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, Module *M, string specificFunction, std::string generatedName,
+        bool offsets_32bit) {
+    KernelDumper kernelDumper(M, specificFunction, generatedName, offsets_32bit);
     kernelDumper.addIRToCl();
     string cl = kernelDumper.toCl(uniqueClmemCount, clmemIndexByClmemArgIndex);
     return cl;
 }
 
 string convertLlStringToCl(
-        int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, string llString, string specificFunction, std::string generatedName) {
+        int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, string llString, string specificFunction, std::string generatedName,
+        bool offsets_32bit) {
     StringRef llStringRef(llString);
     // cout << "got llstringref" << endl;
     unique_ptr<MemoryBuffer> llMemoryBuffer = MemoryBuffer::getMemBuffer(llStringRef);
@@ -347,7 +349,7 @@ string convertLlStringToCl(
         // return "";
         throw runtime_error("failed to parse IR");
     }
-    string gencode = convertModuleToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, M.get(), specificFunction, generatedName);
+    string gencode = convertModuleToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, M.get(), specificFunction, generatedName, offsets_32bit);
     // cout << "gencode " << gencode << endl;;
     return gencode;
 }

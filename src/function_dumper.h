@@ -41,7 +41,8 @@ public:
                 llvm::Module *M,
                 llvm::Function *F, std::string shortName, bool isKernel, int kernelNumUniqueClmems, std::vector<int> &kernelClmemIndexByArgIndex,
                 GlobalNames *globalNames, TypeDumper *typeDumper,
-                FunctionNamesMap *functionNamesMap) :
+                FunctionNamesMap *functionNamesMap,
+                bool offsets_32bit) :
                 // std::map<std::string, std::string> *shortFnNameByOrigName) :
             M(M),
             F(F),
@@ -52,7 +53,8 @@ public:
             globalNames(globalNames),
             typeDumper(typeDumper),
             structCloner(typeDumper, globalNames),
-            functionNamesMap(functionNamesMap) {
+            functionNamesMap(functionNamesMap),
+            offsets_32bit(offsets_32bit) {
             // shortFnNameByOrigName(shortFnNameByOrigName) {
         // block_it = F->begin();
         // std::cout << "functiondumper, numuniqueclmems " << this->kernelNumUniqueClmems << std::endl;
@@ -140,6 +142,7 @@ protected:
     TypeDumper *typeDumper;
     StructCloner structCloner;
     const FunctionNamesMap *functionNamesMap;
+    bool offsets_32bit;
     // std::map<std::string, std::string> *shortFnNameByOrigName;
 
     std::unique_ptr<NewInstructionDumper> instructionDumper;
