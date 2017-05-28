@@ -639,7 +639,7 @@ bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *
             try {
                 blockstream << dumpTerminator(&returnType, basicBlock->getTerminator());
             } catch(NeedValueDependencyException &e) {
-                cout << "need dependent value during dump block terminator" << endl;
+                // cout << "need dependent value during dump block terminator" << endl;
                 // e.value->dump();
                 continue;
             }
