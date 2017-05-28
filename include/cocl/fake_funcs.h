@@ -123,6 +123,7 @@ __device__ float sqrtf(float in1);
 __device__ float rsqrtf(float in1);
 __device__ float ceilf(float in1);
 __device__ float floorf(float in1);
+__device__ void sincosf(float angle, float *sinres, float *cosres);
 
 __device__ float pow(float in1, float in2);
 __device__ float sqrt(float in1);
