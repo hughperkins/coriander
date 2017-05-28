@@ -981,6 +981,28 @@ void NewInstructionDumper::dumpMemcpy(LocalValueInfo *localValueInfo, int align)
 //     // localValueInfo
 // }
 
+void NewInstructionDumper::writeShimCall(LocalValueInfo *localValueInfo, std::string shimName, std::string extraArgs, CallInst *instr) {
+        // cout << "nid got an umulhi" << endl;
+    // string gencode = "";
+    ostringstream gencode_ss;
+    gencode_ss << shimName << "(" << extraArgs;
+    int i = 0;
+    for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
+        Value *op = &*it->get();
+        if(i > 0) {
+            gencode_ss << ", ";
+        }
+        gencode_ss << ExpressionsHelper::stripOuterParams(getOperand(op)->getExpr());
+        i++;
+    }
+    gencode_ss << ")";
+    // cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
+    shimFunctionsNeeded->insert(shimName);
+    localValueInfo->setAddressSpace(0);
+    localValueInfo->setExpression(gencode_ss.str());
+    // cout << "shimming call to [" << gencode << "]" << endl;
+}
+
 void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
     localValueInfo->clWriter.reset(new CallClWriter(localValueInfo));
     // ClWriter *clWriter = cast<ClWriter>(localValueInfo->clWriter.get());
@@ -1063,81 +1085,17 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         // return "";
         return;
     } else if(functionName == "_Z8__umulhiii") {
-        // cout << "nid got an umulhi" << endl;
-        string gencode = "";
-        gencode += "__umulhi(";
-        int i = 0;
-        for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
-            Value *op = &*it->get();
-            if(i > 0) {
-                gencode += ", ";
-            }
-            gencode += ExpressionsHelper::stripOuterParams(getOperand(op)->getExpr());
-            i++;
-        }
-        gencode += ")";
-        // cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
-        shimFunctionsNeeded->insert("__umulhi");
-        localValueInfo->setAddressSpace(0);
-        localValueInfo->setExpression(gencode);
-        // cout << "shimming call to [" << gencode << "]" << endl;
+        writeShimCall(localValueInfo, "__umulhi", "", instr);
         return;
     } else if(functionName == "_Z9atomicAddIfET_PS0_S0_") {
-        // cout << "nid got an umulhi" << endl;
-        string gencode = "";
-        gencode += "__atomic_add(";
-        int i = 0;
-        for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
-            Value *op = &*it->get();
-            if(i > 0) {
-                gencode += ", ";
-            }
-            gencode += ExpressionsHelper::stripOuterParams(getOperand(op)->getExpr());
-            i++;
-        }
-        gencode += ")";
-        // cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
-        shimFunctionsNeeded->insert("__atomic_add");
-        localValueInfo->setAddressSpace(0);
-        localValueInfo->setExpression(gencode);
-        // cout << "shimming call to [" << gencode << "]" << endl;
+        writeShimCall(localValueInfo, "__atomic_add", "", instr);
         return;
     } else if(functionName == "_Z11__shfl_downIfET_S0_ii") {
-        string gencode = "";
-        gencode += "__shfl_down_3(scratch, ";
-        int i = 0;
-        for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
-            Value *op = &*it->get();
-            if(i > 0) {
-                gencode += ", ";
-            }
-            gencode += ExpressionsHelper::stripOuterParams(getOperand(op)->getExpr());
-            i++;
-        }
-        gencode += ")";
-        // cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
-        shimFunctionsNeeded->insert("__shfl_down_3");
-        localValueInfo->setAddressSpace(0);
-        localValueInfo->setExpression(gencode);
+        writeShimCall(localValueInfo, "__shfl_down_3", "scratch, ", instr);
         return;
     } else if(functionName == "_Z11__shfl_downIfET_S0_i") {
-        string gencode = "__shfl_down_2(scratch, ";
-        int i = 0;
-        for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
-            Value *op = &*it->get();
-            if(i > 0) {
-                gencode += ", ";
-            }
-            gencode += ExpressionsHelper::stripOuterParams(getOperand(op)->getExpr());
-            i++;
-        }
-        gencode += ")";
-        // cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
-        shimFunctionsNeeded->insert("__shfl_down_2");
-        localValueInfo->setAddressSpace(0);
-        localValueInfo->setExpression(gencode);
+        writeShimCall(localValueInfo, "__shfl_down_2", "scratch, ", instr);
         return;
-        // return gencode;
     } else if(functionName == "_Z13__threadfencev") {
         // Not sure if this is correct?
         // seems to be correct-ish???
@@ -1185,7 +1143,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         dumpMemcpy(localValueInfo, align);
         return;
     } else if(functionName == "_Z6memcpyPvPKvm") {
-        dumpMemcpy(localValueInfo, 1);
+        dumpMemcpy(localValueInfo, 4);
         return;
     } else if(functionNamesMap->isMappedFunction(functionName)) {
         functionName = functionNamesMap->getFunctionMappedName(functionName);

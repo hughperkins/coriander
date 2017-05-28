@@ -106,6 +106,7 @@ public:
     // LocalValueInfo *CreateConstantInfo(Consant *constant);
     // void dumpMemcpyCharCharLong(LocalValueInfo *localValueInfo);
     void dumpMemcpy(LocalValueInfo *localValueInfo, int align);
+    void writeShimCall(LocalValueInfo *localValueInfo, std::string shimName, std::string extraArgs, llvm::CallInst *instr);
     void dumpCall(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
 
     void runGeneration(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
