@@ -65,7 +65,8 @@ def cocl_options():
 
 
 def offset_type(offset):
-    if 'OFFSET_32BIT' in os.environ:
+    if os.environ.get('COCL_OFFSETS_32BIT', None) == '1':
+        print('using 32bit offsets')
         return np.uint32(offset)
     return np.int64(offset)
 
