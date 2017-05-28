@@ -103,6 +103,7 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
     - when you run an already built app, simply set the environment variable `COCL_OFFSETS_32BIT` to the string `1` to use 32-bit offsets
     - otherwise it will default to 64-bit offsets (means, can access more memory)
     - basically, unless you're using beignet, you can ignore this, and stop having to think about the 32-bit offsets variables any more :-)
+  - if you build with `BUILD_TESTS` set to `OFF`, you can still build the tests, eg by doing `make cocl_unittests`, and you can still run them eg by doing `make run-tests`: just, no longer builds them by default, when you do `make`
 - May 27:
   - updated to LLVM 4.0. Thank you to @iame6162013 for inspiring me to do this
   - Tensorflow `random_op_gpu.cc` compiles and runs ok now :-). There were a few hoops to jump through, https://github.com/hughperkins/coriander/issues/24
