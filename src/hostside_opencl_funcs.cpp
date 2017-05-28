@@ -291,7 +291,7 @@ CLKernel *compileOpenCLKernel(string originalKernelName, string uniqueKernelName
         // }
         // cout << "clSourcecode [" << clSourcecode << "]" << endl;
         kernel = cl->buildKernelFromString(clSourcecode, shortKernelName, "", "__internal__");
-        cout << "built kernel " << uniqueKernelName << endl;
+        // cout << "built kernel " << uniqueKernelName << endl;
         // std::cout << " ... built" << std::endl;
     } catch(runtime_error &e) {
         cout << "compileOpenCLKernel failed to compile opencl sourcecode" << endl;
