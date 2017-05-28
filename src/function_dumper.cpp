@@ -29,12 +29,20 @@ using namespace llvm;
 
 namespace cocl {
 
-string FunctionDumper::createOffsetDeclaration(string argName) {
+
+// the type used for kernel buffer offsets, ie unsigned 32bit (for beignet), or signed 64bit (default)
+std::string FunctionDumper::getOffsetType() {
     if(offsets_32bit) {
-       return ", uint " + argName + "_offset";
+       return "uint";
     } else {
-       return ", long " + argName + "_offset";
+       return "long";
    }
+}
+
+string FunctionDumper::createOffsetDeclaration(string argName) {
+    ostringstream decl_ss;
+    decl_ss << ", " << getOffsetType() << " " << argName << "_offset";
+    return decl_ss.str();
 }
 
 std::string FunctionDumper::createOffsetShim(Type *argType, std::string argName, int clmemIndex) {
@@ -373,7 +381,7 @@ std::string FunctionDumper::dumpKernelFunctionDeclarationWithoutReturn(llvm::Fun
                         structsToDefine.insert(noptrType);
                         is_struct_needs_cloning = true;
                         // argdeclaration = "global " + typeDumper->dumpType(noptrType) + "* " + argName + "_nopointers";
-                        argdeclaration = "int " + argName + "_nopointers_offset";
+                        argdeclaration = getOffsetType() + " " + argName + "_nopointers_offset";
 
                         PointerType *noptrTypePointer = PointerType::get(noptrType, 1);
                         int clmemIndex = kernelClmemIndexByArgIndex[clmemArgIndex];

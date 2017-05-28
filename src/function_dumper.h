@@ -85,6 +85,7 @@ public:
     void toCl(std::ostream &os);
     bool generationDone();
 
+    std::string getOffsetType();
     std::string createOffsetDeclaration(std::string argName);
     std::string createOffsetShim(llvm::Type *argType, std::string argName, int clmemIndex);
     std::string dumpKernelFunctionDeclarationWithoutReturn(llvm::Function *F);
