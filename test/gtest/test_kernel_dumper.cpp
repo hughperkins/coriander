@@ -58,7 +58,7 @@ public:
             smDiagnostic.print("irtopencl", errs());
             throw runtime_error("failed to parse IR");
         }
-        kernelDumper.reset(new KernelDumper(M.get(), kernelName, kernelName));
+        kernelDumper.reset(new KernelDumper(M.get(), kernelName, kernelName, true));
     }
     virtual ~GlobalWrapper() {
         kernelDumper.release();

@@ -87,14 +87,14 @@ public:
         G(G),
         F(G.getFunction(functionName)),
         functionDumper(
-            G.M.get(), F, functionName, true, numClmems, clmemIndexes, &G.globalNames, &G.typeDumper, &G.functionNamesMap) {
+            G.M.get(), F, functionName, true, numClmems, clmemIndexes, &G.globalNames, &G.typeDumper, &G.functionNamesMap, true) {
             // &emptyStringMap) {
     }
     LocalWrapper(GlobalWrapper &G, Function *F, int numClmems, vector<int> &clmemIndexes) :
         G(G),
         F(F),
         functionDumper(
-            G.M.get(), F, F->getName().str(), true, numClmems, clmemIndexes, &G.globalNames, &G.typeDumper, &G.functionNamesMap) {
+            G.M.get(), F, F->getName().str(), true, numClmems, clmemIndexes, &G.globalNames, &G.typeDumper, &G.functionNamesMap, true) {
             // &emptyStringMap) {
     }
     virtual ~LocalWrapper() {
