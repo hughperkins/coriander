@@ -43,7 +43,12 @@ You can modify the options in `COCL_OPTIONS`.  There are passed to the `cocl` co
 
 If you set `OFFSET_32BIT` to off in your cmake options, you should remove the `OFFSET_32BIT=1` optio nwhen running py.test
 
-
+If you get lots of errors, you probably should double-check that you have done `export OFFSET_32BIT=1`.  If you're sure you have, and you're still getting errors, please log an issue with:
+  - `git log -n 5 --oneline`, from the coriander directory (via https://gist.github.com )
+  - which operating system (eg 'ubuntu 16.04', 'mac sierra')
+  - which GPU(s) (eg 'nvidia 940m', 'radeon pro 450', ....)
+  - the output of `clinfo` (via https://gist.github.com )
+  - the full output of the command that produced the error, as well as the command (via https://gist.github.com )
 
 ## End-to-end tests
 
