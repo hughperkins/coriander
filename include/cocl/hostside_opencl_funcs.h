@@ -75,7 +75,7 @@ namespace cocl {
         void inject(easycl::CLKernel *kernel) {
             kernel->in(v);
         }
-        virtual std::string str() { return "Int32Arg"; }
+        virtual std::string str();
         int v;
     };
     class UInt32Arg : public Arg {
@@ -93,7 +93,7 @@ namespace cocl {
         void inject(easycl::CLKernel *kernel) {
             kernel->in(v);
         }
-        virtual std::string str() { return "Int64Arg"; }
+        virtual std::string str();
         int64_t v;
     };
     class FloatArg : public Arg {

@@ -122,6 +122,18 @@ int cudaConfigureCall(
 
 namespace cocl {
 
+std::string Int32Arg::str() {
+    ostringstream oss;
+    oss << "Int32Arg=" << v;
+    return oss.str();
+}
+
+std::string Int64Arg::str() {
+    ostringstream oss;
+    oss << "Int64Arg=" << v;
+    return oss.str();
+}
+
 int32_t getNumCachedKernels() {
     return getThreadVars()->getContext()->kernelCache.size();
 }
