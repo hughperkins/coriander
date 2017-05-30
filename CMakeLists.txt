@@ -40,6 +40,9 @@ endif()
 # set($ENV{COCL_DUMP_CL} "1")
 # endif()
 
+FILE(GLOB YAMLCPP_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/yaml-cpp/src/*.cpp)
+# message("YAMLCPP_SRCS ${YAMLCPP_SRCS}")
+
 set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/platforminfo_helper.cpp src/EasyCL/EasyCL.cpp
     src/EasyCL/deviceinfo_helper.cpp src/EasyCL/util/easycl_stringhelper.cpp src/EasyCL/DevicesInfo.cpp src/EasyCL/DeviceInfo.cpp)
 
@@ -138,7 +141,7 @@ target_include_directories(easycl PRIVATE src/EasyCL/thirdparty/clew/include)
 target_include_directories(easycl PRIVATE src/EasyCL)
 target_link_libraries(easycl clew)
 
-add_library(cocl SHARED ${COCL_SRCS})
+add_library(cocl SHARED ${COCL_SRCS} ${YAMLCPP_SRCS})
 target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
 target_include_directories(cocl PRIVATE src/CLBlast/include)
 target_include_directories(cocl PRIVATE include)

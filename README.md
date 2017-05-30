@@ -81,11 +81,28 @@ Coriander makes the following relaxations/simplifications:
 - floats are assumed to be singles. doubles in the original kernels are converted to floats in the OpenCL code
 - buffer offsets are generally taken to be int32s for now.  This might change in the future
 
+## Standing on the shoulders of giants
+
+Coriander might not even be possible without the following amazing libraries:
+
+- [CLBlast](https://github.com/cnugteren/CLBlast): Cedric Nugteren's excellent BLAS for OpenCL
+- [thrust](https://github.com/thrust/thrust): parallel GPU library, from NVIDIA®
+- [clang/llvm](http://llvm.org/): c/c++ parser/compiler; many contributors
+
+The following libraries are less critical, but nevertheless extremely useful :-) :
+
+- [yaml-cpp](https://github.com/jbeder/yaml-cpp): yaml for c++, by Jesse Beder
+- [gtest](https://github.com/google/googletest): unit tests for c++, from Google
+
+Coriander also uses a couple of my own, not giant, libraries:
+
+- [EasyCL](https://github.com/hughperkins/EasyCL): wrapper for OpenCL 1.2 boilerplate
+- [argparsecpp](https://github.com/hughperkins/argparsecpp): command-line parser for c++
+
 ## Related projects
 
-- Eigen-CL: Minimally-tweaked fork of Eigen, which can be compiled/run using Coriander, on an OpenCL device, https://bitbucket.org/hughperkins/eigen/commits/branch/eigen-cl
-- Tensorflow-CL: Fork of Tensorflow, that can be built and run on an OpenCL-1.2 enabled GPU, using Coriander, https://github.com/hughperkins/tensorflow-cl
-- CLBlast: Cedric Nugteren's excellent BLAS implementation for OpenCL  [CLBlast](https://github.com/cnugteren/CLBlast)
+- [Eigen-CL](https://bitbucket.org/hughperkins/eigen/commits/branch/eigen-cl): Minimally-tweaked fork of Eigen, for OpenCL 1.2
+- [tf-coriander](https://github.com/hughperkins/tf-coriander): Tensorflow for OpenCL-1.2
 
 ## How to Cite
 
