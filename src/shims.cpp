@@ -44,7 +44,7 @@ inline float __shfl_down_2(local int *scratch, float v0, int v1) {
 
     _shimClByName["__umulhi"] = R"(
 inline unsigned int __umulhi(unsigned int v0, unsigned int v1) {
-    unsigned long res = (long)v0 * v1;
+    unsigned long res = (unsigned long)v0 * v1;
     unsigned int res2 = res >> 32;
     return res2;
 }
