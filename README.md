@@ -81,23 +81,17 @@ Coriander makes the following relaxations/simplifications:
 - floats are assumed to be singles. doubles in the original kernels are converted to floats in the OpenCL code
 - buffer offsets are generally taken to be int32s for now.  This might change in the future
 
-## Standing on the shoulders of giants
+## Credits
 
-Coriander might not even be possible without the following amazing libraries:
+Coriander uses the following libraries:
 
+- [clang/llvm](http://llvm.org/): c/c++ parser/compiler; many contributors
 - [CLBlast](https://github.com/cnugteren/CLBlast): Cedric Nugteren's excellent BLAS for OpenCL
 - [thrust](https://github.com/thrust/thrust): parallel GPU library, from NVIDIA®
-- [clang/llvm](http://llvm.org/): c/c++ parser/compiler; many contributors
-
-The following libraries are less critical, but nevertheless extremely useful :-) :
-
 - [yaml-cpp](https://github.com/jbeder/yaml-cpp): yaml for c++, by Jesse Beder
-- [gtest](https://github.com/google/googletest): unit tests for c++, from Google
-
-Coriander also uses a couple of my own, not giant, libraries:
-
 - [EasyCL](https://github.com/hughperkins/EasyCL): wrapper for OpenCL 1.2 boilerplate
 - [argparsecpp](https://github.com/hughperkins/argparsecpp): command-line parser for c++
+- [gtest](https://github.com/google/googletest): unit tests for c++, from Google
 
 ## Related projects
 
