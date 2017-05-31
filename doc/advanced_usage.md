@@ -144,3 +144,5 @@ In addition, to get the unique kernel name, we can use the environment variable 
 // unique kernelName: [_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi0ELi1EiEELi16ENS_11MakePointerEEEKNS_17TensorReductionOpINS0_10SumReducerIfEEKNS_5arrayIiLm1EEEKNS_18TensorCwiseUnaryOpINS0_10bind2nd_opINS0_17scalar_product_opIKfSI_EEEEKNS4_INS5_ISI_Li1ELi1EiEELi16ES7_EEEES7_EEEENS_9GpuDeviceEEEiEEvT_T0__0_1_1_2]
 // short kernelname: [_ZN5Eigen8internal15]
 ```
+
+To find out more about how this works, you can look at `src/hostside_opencl_funcs.cpp`, function `dump()`.
