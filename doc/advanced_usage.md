@@ -122,7 +122,7 @@ W [[ 2.36910748 -0.82746542  0.13526216 -0.55217266]
 mu -0.164785 var 1.29928
 ```
 
-You're best turning on the option `COCL_SPAM`, in `ccmake ..`, and also `COCL_SPAM_KERNEL_LAUNCH`. THis will then tell you about the kernel launch, and the args, during the launch:
+You're best turning on the option `COCL_SPAM`, in `ccmake ..`, and also `COCL_SPAM_KERNELLAUNCH`. THis will then tell you about the kernel launch, and the args, during the launch:
 ```
 [LAUNCH] setKernelArgHostsideBuffer size=36
 [LAUNCH] setKernelArgGpuBuffer nullptr
@@ -138,11 +138,7 @@ You're best turning on the option `COCL_SPAM`, in `ccmake ..`, and also `COCL_SP
 [LAUNCH] i=4 Int32Arg=1
 [LAUNCH] .. kernel queued
 ```
-In addition, to get the unique kernel name, we can use the environment variable `COCL_DUMP_CL=1`, to dump the opencl. We can get the unique kernel name from the first few lines of the dumped opencl. In this case `/tmp/4.cl` looked like:
-```
-// original kernelName: [_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi0ELi1EiEELi16ENS_11MakePointerEEEKNS_17TensorReductionOpINS0_10SumReducerIfEEKNS_5arrayIiLm1EEEKNS_18TensorCwiseUnaryOpINS0_10bind2nd_opINS0_17scalar_product_opIKfSI_EEEEKNS4_INS5_ISI_Li1ELi1EiEELi16ES7_EEEES7_EEEENS_9GpuDeviceEEEiEEvT_T0_]
-// unique kernelName: [_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi0ELi1EiEELi16ENS_11MakePointerEEEKNS_17TensorReductionOpINS0_10SumReducerIfEEKNS_5arrayIiLm1EEEKNS_18TensorCwiseUnaryOpINS0_10bind2nd_opINS0_17scalar_product_opIKfSI_EEEEKNS4_INS5_ISI_Li1ELi1EiEELi16ES7_EEEES7_EEEENS_9GpuDeviceEEEiEEvT_T0__0_1_1_2]
-// short kernelname: [_ZN5Eigen8internal15]
-```
+~~In addition, to get the unique kernel name, we can use the environment variable `COCL_DUMP_CL=1`, to dump the opencl. We can get the unique kernel name from the first few lines of the dumped opencl. In this case `/tmp/4.cl` looked like~~:
+We get the unique kernel name from the output to stdout, usign `COCL_SPAM_KERNELLAUNCH` cmake options.  We can then grep for this kernel name in `/tmp/*.cl`, to find the correspdonding `.cl` file.
 
-To find out more about how this works, you can look at `src/hostside_opencl_funcs.cpp`, function `dump()`.
+To find out more about how this works, you can look at `src/hostside_opencl_funcs.cpp`, function `dump()`. (you really should do this, since this doc is almost certainly already out of date :-P )

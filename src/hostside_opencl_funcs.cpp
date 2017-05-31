@@ -102,6 +102,14 @@ static void dump() {
             int offsetArg = argConfig["offsetarg"].as<int>();
             int count = argConfig["count"].as<int>();
             int clmemIndex = argConfig["clmem"].as<int>();
+            if(clmemIndex >= launchConfiguration.clmems.size() || clmemIndex < 0) {
+                cout << "clmemIndex out of bounds => skipping arg" << endl;
+                continue;
+            }
+            if(offsetArg < 0 || offsetArg >= launchConfiguration.args.size()) {
+                cout << "offsetArg out of bounds => skipping arg" << endl;
+                continue;
+            }
             // cout << "offsetarg: " << offsetArg << endl;
             uint64_t offsetBytes = llvm::cast<Int64Arg>(launchConfiguration.args[offsetArg].get())->v;
             // cout << "offsetBytes " << offsetBytes << endl;
@@ -128,7 +136,7 @@ static void dump() {
                         }
                     }
                     if(buf.tellp() > 0) {
-                        cout << buf.str() << endl;
+                        cout << "    " << buf.str() << endl;
                     }
                 }
             } else {
@@ -374,7 +382,7 @@ GenerateOpenCLResult generateOpenCL(
 
 void configureKernel(const char *kernelName, const char *devicellsourcecode) {
     pthread_mutex_lock(&launchMutex);
-
+    COCL_PRINT("=========================================");
     // cout << "clSources.size() " << getNumClSources() << endl;
     // for(auto it=clSources.begin(); it != clSources.end(); it++) {
     // for(int i = 0; i < getNumClSources(); i++) {
@@ -551,6 +559,7 @@ void kernelGo() {
     COCL_PRINT("kernelGo() kernel: " << launchConfiguration.kernelName);
     // cout << "kernelGo() OpenCL sourcecode:\n" << res.clSourcecode << endl;
     CLKernel *kernel = compileOpenCLKernel(launchConfiguration.kernelName, res.uniqueKernelName, res.shortKernelName, res.clSourcecode);
+    COCL_PRINT("kernelGo() uniqueKernelName: " << launchConfiguration.uniqueKernelName);
 
     for(int i = 0; i < launchConfiguration.clmems.size(); i++) {
         COCL_PRINT("clmem" << i);
