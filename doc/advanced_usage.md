@@ -72,9 +72,13 @@ For hostside bytecode, you'll need to recompile the underlying `.cu` file, and y
 
 This will dump the generated OpenCL files into your `/tmp` directory, with names being contiguous integers, starting from 0, like `/tmp/0.cl`, `/tmp/1.cl`, ... one per generated OpenCL kernel.  The name of the original kernel is given in the first few lines of the OpenCL code, as comments.
 
-## Developer options
+### `COCL_LOAD_CL=1`
 
-Unless you're hacking on Coriander itself, you can probably ignore this section :-)
+This will the OpenCL from files in your `/tmp` directory, with names being contiguous integers, starting from 0, like `/tmp/0.cl`, `/tmp/1.cl`, ... one per generated OpenCL kernel.  You can use this to introspect dumped opencl, ie:
+
+- use `COCL_DUMP_CL=1` to dump the opencl
+- modify the dumped opencl in some way, eg copy some value you want to know about into an output buffer
+- run with `COCL_LOAD_CL=1` to use this modified opencl, and view the value you are interested in
 
 ### `COCL_DUMP_CONFIG`: dump kernel buffers
 
