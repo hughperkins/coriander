@@ -87,26 +87,6 @@ static bool checkedDumpEnabled = false;
 static bool dumpEnabled = false;
 static YAML::Node dumpConfig;
 
-    // class LaunchConfiguration {
-    // public:
-    //     size_t grid[3];
-    //     size_t block[3];
-    //     // CLKernel *kernel;
-    //     easycl::CLQueue *queue = 0;  // NOT owned by us
-    //     cocl::CoclStream *coclStream = 0; // NOT owned
-
-    //     std::vector<std::unique_ptr<Arg> > args;
-
-    //     // map<cl_mem *, int> clmemIndexByClmem;
-    //     std::map<cl_mem, int> clmemIndexByClmem;
-    //     std::vector<cl_mem> clmems;
-    //     std::vector<int> clmemIndexByClmemArgIndex;
-
-    //     std::vector<cl_mem> kernelArgsToBeReleased;
-    //     std::string kernelName = "";
-    //     std::string devicellsourcecode = "";
-    // };
-
 static void dump() {
     // we assume that dump config is enabled, and the dump config has been loaded ,successfully
     YAML::Node kernelConfig = dumpConfig[launchConfiguration.uniqueKernelName];
@@ -158,17 +138,6 @@ static void dump() {
         }
     }
 }
-
-
-    // for(int i = 0; i < launchConfiguration.clmems.size(); i++) {
-    //     COCL_PRINT("clmem" << i);
-    //     kernel->inout(&launchConfiguration.clmems[i]);
-    // }
-    // for(int i = 0; i < launchConfiguration.args.size(); i++) {
-    //     COCL_PRINT("i=" << i << " " << launchConfiguration.args[i]->str());
-    //     launchConfiguration.args[i]->inject(kernel);
-    // }
-
 
 static void maybeDump() {
     // we are going to assume we're already inside a mutex, and therefore

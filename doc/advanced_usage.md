@@ -52,3 +52,95 @@ On beignet, you should do `export OFFSETS_32BIT=1`, before running any Coriander
 
 Technical details: this changes how memory buffer offsets are sent to the kernels. By default, they are passed as 64-bit integers. With this environment
 variable set, they will be transferred as 32-bit unsigned ints. Obviously this limits the size of memory buffers that can be used, but at least it will run :-)
+
+## Developer options
+
+Unless you're hacking on Coriander itself, you can probably ignore this section :-)
+
+### `COCL_DUMP_CONFIG`: dump kernel buffers
+
+This is new, and highly beta, and just for kernel debugging basically
+
+It allows you to view the contents of `cl_mem` buffers after a kernel call.
+
+Concept:
+- create a yaml file, describing which buffers you want to dump, and how
+- use `COCL_DUMP_CONFIG=`, to provide the path to this yaml config file, at runtime
+
+Example:
+
+Let's say we want to dump some of the buffers from a call to:
+```
+kernel void _ZN5Eigen8internal15(
+        global char* clmem0, global char* clmem1, global char* clmem2,
+        long v22_nopointers_offset, long v22_ptr0_offset, long v22_ptr1_offset, long v22_ptr2_offset, int v23, local int *scratch) {
+    global float* v22_ptr2 = (global float*)(clmem2 + v22_ptr2_offset);
+    global float* v22_ptr1 = (global float*)(clmem1 + v22_ptr1_offset);
+    global float* v22_ptr0 = (global float*)(clmem1 + v22_ptr0_offset);
+    global struct Eigen__TensorEvaluator_127_nopointers* v22_nopointers = (global struct Eigen__TensorEvaluator_127_nopointers*)(clmem0 + v22_nopointers_offset);
+```
+(This is one of the kernels from running Tensorflow's `random_op_gpu.cc` operation. There are four kernels executed during `random_op_gpu.cc`, for the `tf.random_normal` operation; and this is the fourth one)
+
+Let's say we want to dump those threee `ptr` buffers, ie `v22_ptr0`, `v22_ptr1`, and `v22_ptr2`. We can create a dump configuration file like:
+
+```
+_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi0ELi1EiEELi16ENS_11MakePointerEEEKNS_17TensorReductionOpINS0_10SumReducerIfEEKNS_5arrayIiLm1EEEKNS_18TensorCwiseUnaryOpINS0_10bind2nd_opINS0_17scalar_product_opIKfSI_EEEEKNS4_INS5_ISI_Li1ELi1EiEELi16ES7_EEEES7_EEEENS_9GpuDeviceEEEiEEvT_T0__0_1_1_2:
+  - type: float
+    clmem: 1
+    offsetarg: 1
+    count: 12
+  - type: float
+    clmem: 1
+    offsetarg: 2
+    count: 12
+  - type: float
+    clmem: 2
+    offsetarg: 3
+    count: 12
+```
+
+What this says is:
+- if you've just executed a kernel, with a `uniqueName` of .. .well... that really long name you see :-P, then dump three buffers.  For the first buffer:
+  - it's a float array buffer (`type: float`)
+  - it is clmem index 1 (`clmem: 1`, we get this by looking at the boilerplate, in the opencl, see above)
+  - dump 12 of these floats (just because...)
+  - and the offset into the clmem buffer is given by the kernel arg index 1 (this is 0-indexed, from the first non-clmem arg, in this case it means, use the offset from `v22_ptr0_offset`)
+
+Example output:
+```
+Dumping for _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi0ELi1EiEELi16ENS_11MakePointerEEEKNS_17TensorReductionOpINS0_10SumReducerIfEEKNS_5arrayIiLm1EEEKNS_18TensorCwiseUnaryOpINS0_10bind2nd_opINS0_17scalar_product_opIKfSI_EEEEKNS4_INS5_ISI_Li1ELi1EiEELi16ES7_EEEES7_EEEENS_9GpuDeviceEEEiEEvT_T0__0_1_1_2 in dump config
+  Dumping buffer 0
+1.29928 0 0 0 0 0 0 0 0 0 0 0 
+  Dumping buffer 1
+    5.61267 0.684699 0.0182959 0.304895 0.267527 0.0837005 1.16425 0.912569 
+1.11638 2.52551 1.34282 1.55801 
+  Dumping buffer 2
+    [Null]
+W [[ 2.36910748 -0.82746542  0.13526216 -0.55217266]
+ [ 0.51722991  0.2893104  -1.07900333 -0.95528477]
+ [-1.05658782  1.58918667 -1.15880132 -1.2482028 ]]
+mu -0.164785 var 1.29928
+```
+
+You're best turning on the option `COCL_SPAM`, in `ccmake ..`, and also `COCL_SPAM_KERNEL_LAUNCH`. THis will then tell you about the kernel launch, and the args, during the launch:
+```
+[LAUNCH] setKernelArgHostsideBuffer size=36
+[LAUNCH] setKernelArgGpuBuffer nullptr
+[LAUNCH] setKernelArgInt32 1
+[LAUNCH] kernelGo() kernel: _ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi0ELi1EiEELi16ENS_11MakePointerEEEKNS_17TensorReductionOpINS0_10SumReducerIfEEKNS_5arrayIiLm1EEEKNS_18TensorCwiseUnaryOpINS0_10bind2nd_opINS0_17scalar_product_opIKfSI_EEEEKNS4_INS5_ISI_Li1ELi1EiEELi16ES7_EEEES7_EEEENS_9GpuDeviceEEEiEEvT_T0_
+[LAUNCH] clmem0
+[LAUNCH] clmem1
+[LAUNCH] clmem2
+[LAUNCH] i=0 Int64Arg=0
+[LAUNCH] i=1 Int64Arg=2816
+[LAUNCH] i=2 Int64Arg=1792
+[LAUNCH] i=3 Int64Arg=0
+[LAUNCH] i=4 Int32Arg=1
+[LAUNCH] .. kernel queued
+```
+In addition, to get the unique kernel name, we can use the environment variable `COCL_DUMP_CL=1`, to dump the opencl. We can get the unique kernel name from the first few lines of the dumped opencl. In this case `/tmp/4.cl` looked like:
+```
+// original kernelName: [_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi0ELi1EiEELi16ENS_11MakePointerEEEKNS_17TensorReductionOpINS0_10SumReducerIfEEKNS_5arrayIiLm1EEEKNS_18TensorCwiseUnaryOpINS0_10bind2nd_opINS0_17scalar_product_opIKfSI_EEEEKNS4_INS5_ISI_Li1ELi1EiEELi16ES7_EEEES7_EEEENS_9GpuDeviceEEEiEEvT_T0_]
+// unique kernelName: [_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi0ELi1EiEELi16ENS_11MakePointerEEEKNS_17TensorReductionOpINS0_10SumReducerIfEEKNS_5arrayIiLm1EEEKNS_18TensorCwiseUnaryOpINS0_10bind2nd_opINS0_17scalar_product_opIKfSI_EEEEKNS4_INS5_ISI_Li1ELi1EiEELi16ES7_EEEES7_EEEENS_9GpuDeviceEEEiEEvT_T0__0_1_1_2]
+// short kernelname: [_ZN5Eigen8internal15]
+```
