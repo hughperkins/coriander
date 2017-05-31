@@ -108,6 +108,8 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
 
 ## News
 
+- May 31:
+  - added a developer debugging option `COCL_DUMP_CONFIG`, to allow easy inspection of buffers returned by kernel calls, see [advanced usage](doc/advanced_usage.md)
 - May 28:
   - revamped how we choose the type of buffer offsets passed into the kernels:
     - it's always done at runtime now, never at compile time
