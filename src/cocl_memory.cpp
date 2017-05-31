@@ -35,9 +35,13 @@ using namespace std;
 using namespace cocl;
 using namespace easycl;
 
-#ifdef COCL_SPAM
+#ifdef COCL_PRINT
 #undef COCL_PRINT
-// #define COCL_PRINT(x) std::cout << "[MEM] " << x << std::endl;
+#endif
+
+#ifdef COCL_SPAM_MEMORY
+#define COCL_PRINT(x) std::cout << "[MEM] " << x << std::endl;
+#else
 #define COCL_PRINT(x) 
 #endif
 
