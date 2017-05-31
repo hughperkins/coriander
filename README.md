@@ -81,7 +81,7 @@ Coriander makes the following relaxations/simplifications:
 - floats are assumed to be singles. doubles in the original kernels are converted to floats in the OpenCL code
 - buffer offsets are generally taken to be int32s for now.  This might change in the future
 
-## Credits
+## Libraries
 
 Coriander uses the following libraries:
 
