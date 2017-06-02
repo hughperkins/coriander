@@ -1231,15 +1231,15 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
                 if(!alreadyExists) {
                     // cout << "cloning new funciton " << newName << endl;
                     ValueToValueMapTy valueMap;
-                    #if(LLVM_VERSION_MAJOR == 4)
+                    // #if(LLVM_VERSION_MAJOR == 4)
                     // #pragma message("clang 4 detected")
                     newFunc = CloneFunction(F,
                                    valueMap);
-                    #else
-                    newFunc = CloneFunction(F,
-                                   valueMap,
-                                   false);
-                    #endif
+                    // #else
+                    // newFunc = CloneFunction(F,
+                    //                valueMap,
+                    //                false);
+                    // #endif
                     newFunc->setName(newName);
                     i = 0;
                     for(auto it=newFunc->arg_begin(); it != newFunc->arg_end(); it++) {
