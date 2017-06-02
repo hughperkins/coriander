@@ -56,9 +56,10 @@ Slides on the [IWOCL](http://iwocl.org) website, [here](http://www.iwocl.org/wp-
 Coriander development is carried out using the following platforms:
 - Ubuntu 16.04, with:
   - NVIDIA K80 GPU
-- Mac Sierra, with:
+- Mac Book Pro 4th generation (thank you [ASAPP](http://asapp.com) :-) ), with:
   - Intel HD Graphics 530
-  - Radeon Pro 450 (thank you [ASAPP](http://asapp.com) :-) )
+  - Radeon Pro 450
+  - Sierra OS
 
 Other systems should work too, ideally.  You will need at a minimum at least one OpenCL-enabled GPU,
 and appropriate OpenCL drivers installed, for the GPU. Both linux and Mac systems stand a reasonable chance of working ok.
