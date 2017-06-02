@@ -55,7 +55,7 @@ Slides on the [IWOCL](http://iwocl.org) website, [here](http://www.iwocl.org/wp-
 
 Coriander development is carried out using the following platforms:
 - Ubuntu 16.04, with:
-  - NVIDIA K80 GPU
+  - NVIDIA K80 GPU and/or NVIDIA K520 GPU (via aws)
 - Mac Book Pro 4th generation (thank you [ASAPP](http://asapp.com) :-) ), with:
   - Intel HD Graphics 530
   - Radeon Pro 450
