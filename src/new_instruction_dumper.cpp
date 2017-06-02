@@ -421,18 +421,18 @@ void NewInstructionDumper::dumpExt(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     Instruction *instr = cast<Instruction>(localValueInfo->value);
 
+    ostringstream gencode;
     LocalValueInfo *op0info = getOperand(instr->getOperand(0));
-    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
-    string op0 = op0info->getExpr();
+    gencode << "(" << typeDumper->dumpType(instr->getType()) << ")" << op0info->getExpr();
 
-    localValueInfo->setExpression(op0);
+    localValueInfo->setExpression("(" + gencode.str() + ")");
+    localValueInfo->setAddressSpace(0);
 }
 
 void NewInstructionDumper::dumpTrunc(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     Instruction *instr = cast<Instruction>(localValueInfo->value);
 
-    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
     LocalValueInfo *op0info = getOperand(instr->getOperand(0));
     string op0 = op0info->getExpr();
 
