@@ -1175,6 +1175,11 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         // cout << "M " << M << endl;
         // Function *F = M->getFunction(StringRef(functionName));
         Function *F = M->getFunction(functionName);
+        if(F->isDeclaration()) { // ie, is it *just* a declaration, no definition?
+            std::cout << functionName << " is called, but not defined" << std::endl;
+            std::cout << "This is probalby a bug in Coriander. Please file an issue at https://github.com/hughperkins/coriander/issues/new" << std::endl;
+            throw std::runtime_error(functionName + " is called, but not defined => cannot continue.  Sorry :-(");
+        }
         if(F != 0) {
             // check arguments...
             bool addressSpacesMatch = true;
