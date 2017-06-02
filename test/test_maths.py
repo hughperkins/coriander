@@ -136,7 +136,7 @@ define void @test_umulhi(i32* %data) {
     cl_code = test_common.ll_to_cl(ll_code, 'test_umulhi', 1)
     print('cl_code', cl_code)
     int_data[0] = 0
-    int_data[1] = 353534
+    int_data[1] = -50
     int_data[2] = 2523123
     cl.enqueue_copy(q, int_data_gpu, int_data)
     kernel = test_common.build_kernel(context, cl_code, 'test_umulhi')
@@ -144,7 +144,7 @@ define void @test_umulhi(i32* %data) {
     from_gpu = np.copy(int_data)
     cl.enqueue_copy(q, from_gpu, int_data_gpu)
     q.finish()
-    expected = (int_data[1].item() * int_data[2].item()) >> 32
+    expected = (np.uint64(np.uint32(2523123)) * np.uint64(np.uint32(-50))) // 2**32
     print('expected', expected)
     print('from_gpu[0]', from_gpu[0])
     assert expected == from_gpu[0].item()
