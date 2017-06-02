@@ -116,7 +116,7 @@ static void dump() {
 
             std::string argTypeName = argConfig["type"].as<std::string>();
             // cout << "argTypeName: [" << argTypeName << "]" << endl;
-            if(argTypeName == "float") {
+            if(argTypeName == "float" || argTypeName == "int32") {
                 float *hostBuffer = new float[count];
                 cl_mem clmem = launchConfiguration.clmems[clmemIndex];
                 // cout << "clmem " << clmem << endl;
@@ -129,7 +129,11 @@ static void dump() {
                     ostringstream buf;
                     // buf << "    ";
                     for(int i = 0; i < count; i++) {
-                        buf << hostBuffer[i] << " ";
+                        if(argTypeName == "float") {
+                            buf << hostBuffer[i] << " ";
+                        } else if(argTypeName == "int32") {
+                            buf << *(int *)&hostBuffer[i] << " ";
+                        }
                         if(buf.tellp() > 70) {
                             cout << "    " << buf.str() << endl;
                             buf.str("");
@@ -141,6 +145,10 @@ static void dump() {
                 }
             } else {
                 cout << "type name [" + argTypeName + "] not recognized" << endl;
+            }
+            if(argConfig["stopafter"] && argConfig["stopafter"].as<bool>()) {
+                cout << "dump config requested stop after this arg, so stopping now" << endl;
+                exit(0);
             }
             argIdx++;
         }
