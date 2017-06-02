@@ -239,6 +239,36 @@ __global__ void myKernel(float *data) {
         # print('float_data[]', i, float_data[i])
 
 
+def test_sincos(context, q, float_data, float_data_gpu):
+
+    cu_code = """
+__global__ void mykernel(float *data) {
+    sincosf(0.1, &data[0], &data[1]);
+    sincosf(data[2], &data[3], &data[4]);
+}
+"""
+    kernel_name = test_common.mangle('mykernel', ['float*'])
+    cl_code = test_common.cu_to_cl(cu_code, kernel_name, num_clmems=1)
+    print('cl_code', cl_code)
+
+    float_data[2] = -0.3
+    float_data_orig = np.copy(float_data)
+    cl.enqueue_copy(q, float_data_gpu, float_data)
+
+    kernel = test_common.build_kernel(context, cl_code, kernel_name)
+    kernel(
+        q, (32,), (32,),
+        float_data_gpu, offset_type(0), cl.LocalMemory(4))
+    q.finish()
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    print(float_data[:5])
+    assert abs(float_data[0] - math.sin(0.1)) < 1e-4
+    assert abs(float_data[1] - math.cos(0.1)) < 1e-4
+    assert abs(float_data[3] - math.sin(float_data_orig[2])) < 1e-4
+    assert abs(float_data[4] - math.cos(float_data_orig[2])) < 1e-4
+
+
 def test_fptosi(context, q, float_data, float_data_gpu, int_data, int_data_gpu):
 
     code = """

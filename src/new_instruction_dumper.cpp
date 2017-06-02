@@ -982,6 +982,10 @@ void NewInstructionDumper::dumpMemcpy(LocalValueInfo *localValueInfo, int align)
 // }
 
 void NewInstructionDumper::writeShimCall(LocalValueInfo *localValueInfo, std::string shimName, std::string extraArgs, CallInst *instr) {
+    // this probalby assumes:
+    // - returns a primitive
+    // - parameters are all primitives (no pointers)
+
         // cout << "nid got an umulhi" << endl;
     // string gencode = "";
     ostringstream gencode_ss;
@@ -1086,6 +1090,14 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         return;
     } else if(functionName == "_Z8__umulhiii") {
         writeShimCall(localValueInfo, "__umulhi", "", instr);
+        return;
+    } else if(functionName == "_Z7sincosffPfS_") {
+        localValueInfo->setAddressSpace(0);
+        std::ostringstream gencode;
+        gencode << "*" << getOperand(instr->getOperand(1))->getExpr() << " = sincos(";
+        gencode << getOperand(instr->getOperand(0))->getExpr() << ", ";
+        gencode << getOperand(instr->getOperand(2))->getExpr() << ");";
+        localValueInfo->setExpression(gencode.str());
         return;
     } else if(functionName == "_Z9atomicAddIfET_PS0_S0_") {
         writeShimCall(localValueInfo, "__atomic_add", "", instr);

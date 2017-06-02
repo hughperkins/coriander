@@ -42,6 +42,8 @@ inline float __shfl_down_2(local int *scratch, float v0, int v1) {
 )";
     _dependenciesByName["__shfl_down_2"].insert("__shfl_down_3");
 
+    // note to self: just realized, umulhi is actually available in opencl 1.2 :-)
+    // so, we should migrate this to use that, probably
     _shimClByName["__umulhi"] = R"(
 inline unsigned int __umulhi(unsigned int v0, unsigned int v1) {
     unsigned long res = (unsigned long)v0 * v1;
@@ -49,12 +51,6 @@ inline unsigned int __umulhi(unsigned int v0, unsigned int v1) {
     return res2;
 }
 )";
-
-    // should we add __atomic_add?  If we are really calling this (not just pasting it into the code 'for fun'),
-    // then this will fail anyway...
-    // inline float __atomic_add(global volatile float *ptr, float val) { // we need to actually implement this
-    //     return 555;
-    // }
 
 // this code is from http://suhorukov.blogspot.co.uk/2011/12/opencl-11-atomic-operations-on-floating.html
     _shimClByName["__atomic_add"] = R"(
