@@ -113,7 +113,7 @@ static void dump() {
                 Memory *memory = findMemory((char *)virtualAddress);
                 offsetBytes = memory->getOffset((char *)virtualAddress);
                 clmem = memory->clmem;
-                cout << "  Dumping buffer " << argIdx << " virtualaddress=" << virtualAddress << " " << argTypeName << "s:" << endl;
+                cout << "  Dumping buffer " << argIdx << " virtualaddress=" << virtualAddress << " " << " offset in buffer " << offsetBytes << " " << argTypeName << "s:" << endl;
             } else {
                 if(argConfig["offsetarg"] && argConfig["offsetbytes"]) {
                     cout << "buffer " << argIdx << ": cannot specify both offsetArg and offsetBytes. Choose one :-)  => skipping arg " << argIdx << endl;
