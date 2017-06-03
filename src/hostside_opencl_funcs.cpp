@@ -99,19 +99,28 @@ static void dump() {
             cout << "  Dumping buffer " << argIdx << endl;
             YAML::Node argConfig = *it;
             // cout << "kernelConfig: " << argConfig << endl;
-            int offsetArg = argConfig["offsetarg"].as<int>();
+            if(argConfig["offsetarg"] && argConfig["offsetbytes"]) {
+                cout << "cannot specify both offsetArg and offsetBytes. Choose one :-)  => skipping arg " << argIdx << endl;
+                continue;
+            }
             int count = argConfig["count"].as<int>();
             int clmemIndex = argConfig["clmem"].as<int>();
             if(clmemIndex >= launchConfiguration.clmems.size() || clmemIndex < 0) {
                 cout << "clmemIndex out of bounds => skipping arg" << endl;
                 continue;
             }
-            if(offsetArg < 0 || offsetArg >= launchConfiguration.args.size()) {
-                cout << "offsetArg out of bounds => skipping arg" << endl;
-                continue;
-            }
             // cout << "offsetarg: " << offsetArg << endl;
-            uint64_t offsetBytes = llvm::cast<Int64Arg>(launchConfiguration.args[offsetArg].get())->v;
+            uint64_t offsetBytes = 0;
+            if(argConfig["offsetarg"]) {
+                int offsetArg = argConfig["offsetarg"].as<int>();
+                if(offsetArg < 0 || offsetArg >= launchConfiguration.args.size()) {
+                    cout << "offsetArg out of bounds => skipping arg" << endl;
+                    continue;
+                }
+                offsetBytes = llvm::cast<Int64Arg>(launchConfiguration.args[offsetArg].get())->v;
+            } else {
+                offsetBytes = argConfig["offsetbytes"].as<int>();
+            }
             // cout << "offsetBytes " << offsetBytes << endl;
 
             std::string argTypeName = argConfig["type"].as<std::string>();
@@ -499,6 +508,8 @@ void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
 
         // size_t offsetElements = offset / elementSize;
         size_t offsetElements = offset;
+
+        COCL_PRINT("setKernelArgGpuBuffer offset=" << offset);
 
         // cout << "setKernelArgGpuBuffer offset=" << offset << " offsetElements=" << offsetElements << " newoffset=" << (offsetElements * elementSize) << endl;
         // COCL_PRINT("setKernelArgGpuBuffer offset=" << offsetElements << " elementSize=" << elementSize);
