@@ -344,25 +344,32 @@ size_t  cuMemcpyDtoHAsync(void *dst, CUdeviceptr src, size_t bytes, char *_queue
     COCL_PRINT("cuMemcpyDtoHAsync queue=" << (void *)queue << " dst=" << dst << " src=" << src << " bytes=" << bytes);
     Memory *srcMemory = findMemory((char *)src);
     size_t offset = srcMemory->getOffset((char *)src);
+
     // adding this because otherwise seems I need to call synchronize, on intel hd beignet, before
     // copying data back (even though the copy should wait, by virtue of being on the same queue, I think)
     // this error shows up only in testblas, for now
+
     cl_int err = clEnqueueBarrierWithWaitList(
         queue->queue, 0, 0, 0
     );
-    COCL_PRINT("   cuMemcpyDtoHAsync ...enqueued barrier with wait list")
     EasyCL::checkError(err);
+
+    COCL_PRINT("   cuMemcpyDtoHAsync ...enqueued barrier with wait list")
+
     err = clFinish(queue->queue);
     EasyCL::checkError(err);
+
     err = clEnqueueReadBuffer(queue->queue, srcMemory->clmem, CL_TRUE, offset,
                                      bytes, dst, 0, NULL, NULL);
+    EasyCL::checkError(err);
+
     COCL_PRINT("   cuMemcpyDtoHAsync ...enqueued read buffer")
     // cout << "queued buffer read device => host" << endl;
     // COCL_PRINT("cuMemcpyDtoHAsync dst[0] " << ((float *)dst)[0]);
     EasyCL::checkError(err);
     err = clFinish(queue->queue);
-    COCL_PRINT("   cuMemcpyDtoHAsync ...finished clfinish")
     EasyCL::checkError(err);
+    COCL_PRINT("   cuMemcpyDtoHAsync ...finished clfinish")
     return 0;
 }
 

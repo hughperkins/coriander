@@ -96,38 +96,53 @@ static void dump() {
         // YAML::Node kernelConfig = 
         int argIdx = 0;
         for(auto it=kernelConfig.begin(); it != kernelConfig.end(); it++) {
-            cout << "  Dumping buffer " << argIdx << endl;
             YAML::Node argConfig = *it;
             // cout << "kernelConfig: " << argConfig << endl;
-            if(argConfig["offsetarg"] && argConfig["offsetbytes"]) {
-                cout << "cannot specify both offsetArg and offsetBytes. Choose one :-)  => skipping arg " << argIdx << endl;
-                continue;
-            }
+
             int count = argConfig["count"].as<int>();
-            int clmemIndex = argConfig["clmem"].as<int>();
-            if(clmemIndex >= launchConfiguration.clmems.size() || clmemIndex < 0) {
-                cout << "clmemIndex out of bounds => skipping arg" << endl;
-                continue;
-            }
-            // cout << "offsetarg: " << offsetArg << endl;
             uint64_t offsetBytes = 0;
-            if(argConfig["offsetarg"]) {
-                int offsetArg = argConfig["offsetarg"].as<int>();
-                if(offsetArg < 0 || offsetArg >= launchConfiguration.args.size()) {
-                    cout << "offsetArg out of bounds => skipping arg" << endl;
+            cl_mem clmem;
+            std::string argTypeName = argConfig["type"].as<std::string>();
+
+            if(argConfig["virtualaddress"]) {
+                if(argConfig["offsetarg"] || argConfig["offsetbytes"] || argConfig["clmem"]) {
+                    std::cout << "buffer " << argIdx << ": cannot specify both virtualaddress, and any of offsetarg or offsetbytes or clmem" << endl;
                     continue;
                 }
-                offsetBytes = llvm::cast<Int64Arg>(launchConfiguration.args[offsetArg].get())->v;
+                unsigned long virtualAddress = argConfig["virtualaddress"].as<int>();
+                Memory *memory = findMemory((char *)virtualAddress);
+                offsetBytes = memory->getOffset((char *)virtualAddress);
+                clmem = memory->clmem;
+                cout << "  Dumping buffer " << argIdx << " virtualaddress=" << virtualAddress << " " << argTypeName << "s:" << endl;
             } else {
-                offsetBytes = argConfig["offsetbytes"].as<int>();
+                if(argConfig["offsetarg"] && argConfig["offsetbytes"]) {
+                    cout << "buffer " << argIdx << ": cannot specify both offsetArg and offsetBytes. Choose one :-)  => skipping arg " << argIdx << endl;
+                    continue;
+                }
+                int clmemIndex = argConfig["clmem"].as<int>();
+                if(clmemIndex >= launchConfiguration.clmems.size() || clmemIndex < 0) {
+                    cout << "buffer " << argIdx << ": clmemIndex out of bounds => skipping arg" << endl;
+                    continue;
+                }
+                clmem = launchConfiguration.clmems[clmemIndex];
+                // cout << "offsetarg: " << offsetArg << endl;
+                if(argConfig["offsetarg"]) {
+                    int offsetArg = argConfig["offsetarg"].as<int>();
+                    if(offsetArg < 0 || offsetArg >= launchConfiguration.args.size()) {
+                        cout << "buffer " << argIdx << ": offsetArg out of bounds => skipping arg" << endl;
+                        continue;
+                    }
+                    offsetBytes = llvm::cast<Int64Arg>(launchConfiguration.args[offsetArg].get())->v;
+                } else {
+                    offsetBytes = argConfig["offsetbytes"].as<int>();
+                }
+                cout << "  Dumping buffer " << argIdx << " clmem" << clmemIndex << " offset=" << offsetBytes << " " << argTypeName << "s:" << endl;
             }
             // cout << "offsetBytes " << offsetBytes << endl;
 
-            std::string argTypeName = argConfig["type"].as<std::string>();
             // cout << "argTypeName: [" << argTypeName << "]" << endl;
             if(argTypeName == "float" || argTypeName == "int32") {
                 float *hostBuffer = new float[count];
-                cl_mem clmem = launchConfiguration.clmems[clmemIndex];
                 // cout << "clmem " << clmem << endl;
                 if(clmem == 0) {
                     cout << "    [Null]" << endl;
