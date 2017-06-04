@@ -150,6 +150,27 @@ define void @test_umulhi(i32* %data) {
     assert expected == from_gpu[0].item()
 
 
+def test_fabs_double(context, q, float_data, float_data_gpu):
+    cu_code = """
+__global__ void mykernel(float *data) {
+    data[0] = fabs(data[0]);
+}
+"""
+    cl_code = test_common.cu_to_cl(cu_code, '_Z8mykernelPf', 1)
+    print('cl_code', cl_code)
+    float_data[0] = -0.123
+    cl.enqueue_copy(q, float_data_gpu, float_data)
+    kernel = test_common.build_kernel(context, cl_code, '_Z8mykernelPf')
+    kernel(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(32))
+    from_gpu = np.copy(float_data)
+    cl.enqueue_copy(q, from_gpu, float_data_gpu)
+    q.finish()
+    expected = 0.123
+    print('expected', expected)
+    print('from_gpu[0]', from_gpu[0])
+    assert abs(expected - from_gpu[0].item()) < 1e-4
+
+
 @pytest.mark.skip
 def test_double_ieeefloats(context, q, float_data, float_data_gpu):
     cu_code = """

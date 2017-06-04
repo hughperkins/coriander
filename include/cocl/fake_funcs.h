@@ -119,6 +119,7 @@ __device__ float tanhf(float in1);
 __device__ float acosf(float in1);
 __device__ float atanf(float in1);
 __device__ float fabsf(float in1);
+__device__ float fabs(float in1);
 __device__ float sqrtf(float in1);
 __device__ float rsqrtf(float in1);
 __device__ float ceilf(float in1);
