@@ -51,7 +51,7 @@ macro(cocl_build_objects target_name target_type)
             add_custom_command(
                 OUTPUT ${target_name}_${filename}.o
                 COMMAND
-                    /usr/local/bin/cocl
+                    ${COCL_PATH}
                     ${DEF_CMDLINE}
                     "$<$<BOOL:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>:-I$<JOIN:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>,;-I>>"
                     ${CMAKE_CURRENT_SOURCE_DIR}/${filename}

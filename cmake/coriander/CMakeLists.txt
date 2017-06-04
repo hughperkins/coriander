@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
+set(COCL_PATH /usr/local/bin/cocl)
 include(cmake/cocl.cmake)
 
 macro(cocl_add_executable target_name)
