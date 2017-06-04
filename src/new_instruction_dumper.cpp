@@ -1075,6 +1075,10 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("barrier(CLK_GLOBAL_MEM_FENCE)");
         return;
+    } else if(functionName == "llvm.nvvm.barrier0") {
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("barrier(CLK_LOCAL_MEM_FENCE)");
+        return;
     } else if(functionName == "_Z13__threadfencev") {
         // Not sure if this is correct?
         // seems to be correct-ish???
