@@ -67,3 +67,11 @@ macro(cocl_build_objects target_name target_type)
         endif()
     endforeach()
 endmacro()
+
+macro(cocl_add_executable target_name)
+    cocl_build_objects(${target_name} EXECUTABLE ${ARGN})
+endmacro(cocl_add_executable)
+
+macro(cocl_add_library target_name)
+    cocl_build_objects(${target_name} LIBRARY ${ARGN})
+endmacro(cocl_add_library)
