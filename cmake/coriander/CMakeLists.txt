@@ -194,6 +194,8 @@ cocl_add_executable(many_cpp many_cpp.cpp many_cc.cc many_cu.cu)
 target_link_libraries(many_cpp cocl clblast clew)
 target_include_directories(many_cpp PRIVATE include)
 
+include_directories(include2)
+
 # cocl_add_library(mylibrary SHARED many_cc.cc many_cu.cu)
 # target_include_directories(mylibrary PRIVATE include)
 # target_link_libraries(mylibrary cocl clblast clew)
