@@ -37,7 +37,7 @@ macro(cocl_build_objects target_name target_type shared)
         message("filename ${filename} EXT ${EXT}")
         if(${EXT} STREQUAL .cu)
             message("its a cu")
-            set(OBJECTS ${OBJECTS} ${filename}.o)
+            set(OBJECTS ${OBJECTS} ${target_name}_${filename}.o)
         else()
             set(OBJECTS ${OBJECTS} ${filename})
         endif()
@@ -63,20 +63,20 @@ macro(cocl_build_objects target_name target_type shared)
             # (finding this bit about whitespace cost me a world of pain...)
                     # CLANG_HOME=${LLVM40_HOME}
             add_custom_command(
-                OUTPUT ${filename}.o
+                OUTPUT ${target_name}_${filename}.o
                 COMMAND
                     /usr/local/bin/cocl
                     ${DEF_CMDLINE}
                     "$<$<BOOL:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>:-I$<JOIN:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>,;-I>>"
                     ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
-                    -o ${filename}.o
+                    -o ${target_name}_${filename}.o
                     -c
                     ${_TESTS_COCL_OPTIONS}
                 DEPENDS ${filename}
                 COMMAND_EXPAND_LISTS
             )
             add_custom_target(build_${target_name}_${filename}_o
-                DEPENDS ${filename}.o
+                DEPENDS ${target}_${filename}.o
             )
         endif()
     endforeach()
@@ -106,21 +106,21 @@ cocl_add_executable(many_cpp many_cpp.cpp many_cc.cc many_cu.cu)
 target_link_libraries(many_cpp cocl clblast clew)
 target_include_directories(many_cpp PRIVATE include)
 
-# include_directories(include2)
-# include_directories(include3)
+include_directories(include2)
+include_directories(include3)
 
 cocl_add_library(mylibrary many_cc.cc many_cu.cu)
 target_include_directories(mylibrary PRIVATE paris include anotherinc)
 target_link_libraries(mylibrary cocl clblast clew)
 
-# cocl_add_library(mylibrary_static many_cc.cc many_cu.cu)
-# target_include_directories(mylibrary_static PRIVATE include)
-# target_link_libraries(mylibrary_static cocl clblast clew)
+cocl_add_library(mylibrary_static many_cc.cc many_cu.cu)
+target_include_directories(mylibrary_static PRIVATE include)
+target_link_libraries(mylibrary_static cocl clblast clew)
 
-# cocl_add_executable(uses_mylibrary many_cpp.cpp)
-# target_link_libraries(uses_mylibrary cocl clblast clew mylibrary)
-# target_include_directories(uses_mylibrary PRIVATE include)
+cocl_add_executable(uses_mylibrary many_cpp.cpp)
+target_link_libraries(uses_mylibrary cocl clblast clew mylibrary)
+target_include_directories(uses_mylibrary PRIVATE include)
 
-# cocl_add_executable(uses_mylibrary_static many_cpp.cpp)
-# target_link_libraries(uses_mylibrary_static cocl clblast clew mylibrary_static)
-# target_include_directories(uses_mylibrary_static PRIVATE include)
+cocl_add_executable(uses_mylibrary_static many_cpp.cpp)
+target_link_libraries(uses_mylibrary_static cocl clblast clew mylibrary_static)
+target_include_directories(uses_mylibrary_static PRIVATE include)
