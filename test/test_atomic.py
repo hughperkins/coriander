@@ -138,3 +138,31 @@ __global__ void mykernel(unsigned int *data) {
         if num_attempts in seen_num_attempts:
             raise Exception('already saw num_attempts %s' % num_attempts)
         seen_num_attempts.add(num_attempts)
+
+
+def test_atomic_inc_int(context, q, int_data, int_data_gpu):
+    # atomicCAS api based on usage in Eigen unsupported/Eigen/CXX11/src/Tensor/TensorReductionCuda.h
+    cu_code = """
+__global__ void mykernel(int *data, int limit) {
+    atomicInc((unsigned int *)data, limit);
+}
+"""
+    cl_code = test_common.cu_to_cl(cu_code, '_Z8mykernelPii', 1)
+    print('cl_code', cl_code)
+
+    int_data[0] = 0
+    int_data[1] = 0
+    kernel = test_common.build_kernel(context, cl_code, '_Z8mykernelPii')
+    cl.enqueue_copy(q, int_data_gpu, int_data)
+    num_blocks = 4
+    threads_per_block = 4
+    modulus = 11
+    kernel(q, (num_blocks * threads_per_block,), (threads_per_block,), int_data_gpu, offset_type(0), np.int32(256), cl.LocalMemory(32))
+    kernel(q, (num_blocks * threads_per_block,), (threads_per_block,), int_data_gpu, offset_type(4), np.int32(modulus - 1), cl.LocalMemory(32))
+    from_gpu = np.copy(int_data)
+    cl.enqueue_copy(q, from_gpu, int_data_gpu)
+    q.finish()
+    print('from_gpu', from_gpu[:2])
+
+    assert from_gpu[0] == num_blocks * threads_per_block
+    assert from_gpu[1] == num_blocks * threads_per_block % modulus
