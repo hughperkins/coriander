@@ -345,6 +345,13 @@ LLVM_LINK_FLAGS=`${CLANG_HOME}/bin/llvm-config --ldflags --system-libs --libs al
 # echo LLVM_COMPILE_FLAGS ${LLVM_COMPILE_FLAGS}
 # echo LLVM_LINK_FLAGS ${LLVM_LINK_FLAGS}
 
+OUTDIR=$(dirname ${OUTFILE})
+echo OUTDIR ${OUTDIR}
+if [[ ! -d ${OUTDIR} ]]; then {
+    echo making output folder ${OUTDIR}
+    mkdir -p ${OUTDIR}
+} fi
+
 set -x
 ${CLANG_HOME}/bin/clang++ ${PASSTHRU} -DUSE_CLEW \
     -std=c++11 -x cuda \
@@ -402,6 +409,7 @@ ${COCL_BIN}/patch_hostside \
     --devicellfile ${OUTPUTBASEPATH}-device.ll \
     --hostpatchedfile ${OUTPUTBASEPATH}-hostpatched.ll
 
+set -x
 ${CLANG_HOME}/bin/clang++ ${PASSTHRU} ${LLVM_LL_COMPILE_FLAGS} -DUSE_CLEW -c ${OUTPUTBASEPATH}-hostpatched.ll -O3 ${OPT_G} -o ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}
 
 if [ ! "$COMPILE" ]; then {
