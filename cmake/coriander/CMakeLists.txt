@@ -11,17 +11,6 @@ macro(cocl_build_objects target_name target_type shared)
     message("cocl_add_executable ${target_name} ${filenames}")
     message("shared ${shared}")
 
-    # get_target_property(CURRENT_INCLUDE ${target_name} INCLUDE_DIRECTORIES)
-    # message("target include directoires ${CURRENT_INCLUDE}")
-
-    set(INCLUDE_ARGS)
-    # get_directory_property(CURRENT_INCLUDE INCLUDE_DIRECTORIES)
-    # STRING(REGEX MATCHALL "[^;]+" CURRENT_INCLUDE "${CURRENT_INCLUDE}")
-    # foreach(INCDIR ${CURRENT_INCLUDE})
-    #     SET(INCLUDE_ARGS ${INCLUDE_ARGS} -I ${INCDIR})
-    # endforeach()
-    # message("INCLUDE_ARGS ${INCLUDE_ARGS}")
-
     set(DEF_CMDLINE)
     get_directory_property(DirDefs DIRECTORY ${CMAKE_SOURCE_DIR} COMPILE_DEFINITIONS)
     set(DEF_CMDLINE)
