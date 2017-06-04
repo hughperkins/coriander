@@ -71,17 +71,6 @@ inline float __atomic_add_float(volatile __global float *source, const float ope
 }
 )";
 
-    _shimClByName["__atomic_cas_uint"] = R"(
-inline unsigned int __atomic_cas_uint(volatile __global int *data, const unsigned int before, const unsigned int target) {
-    unsigned int prevVal;
-    do {
-        prevVal = *data;
-    } while (atomic_cmpxchg((volatile __global unsigned int *)data, prevVal, target) != prevVal);
-    return prevVal;
-}
-)";
-}
-
 std::string Shims::getClByName(std::string name) {
     return _shimClByName[name];
 }

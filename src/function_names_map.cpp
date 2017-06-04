@@ -67,10 +67,14 @@ void FunctionNamesMap::populateKnownValues() {
     knownFunctionsMap["_Z4sqrtf"] = "sqrt";
     knownFunctionsMap["_Z3logf"] = "log";
 
-    knownFunctionsMap["_Z9atomicCASIjET_PS0_S0_S0_"] = "atomic_cmpxchg";   // int
-    knownFunctionsMap["_Z10atomicExchIjET_PS0_S0_"] = "atomic_xchg";  // ints
-    knownFunctionsMap["_Z10atomicExchIfET_PS0_S0_"] = "atomic_xchg";   // floats
-    knownFunctionsMap["_Z9atomicIncIjET_PS0_S0_"] = "__atomic_inc";   // int
+    // CAS
+    knownFunctionsMap["_Z9atomicCASIjET_PS0_S0_S0_"] = "atomic_cmpxchg";   // cas int
+    knownFunctionsMap["_Z9atomicCASIiET_PS0_S0_S0_"] = "atomic_cmpxchg";   // cas uint
+    knownFunctionsMap["_Z9atomicCASPjjj"] = "atomic_cmpxchg";   // cas uint
+
+    // exchg
+    knownFunctionsMap["_Z10atomicExchIjET_PS0_S0_"] = "atomic_xchg";  // xchng ints
+    knownFunctionsMap["_Z10atomicExchIfET_PS0_S0_"] = "atomic_xchg";   // xchng floats
 
     // llvm 4.0:
     knownFunctionsMap["_Z5fminfff"] = "fmin";

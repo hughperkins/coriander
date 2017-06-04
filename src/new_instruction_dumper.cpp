@@ -1118,8 +1118,6 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
     } else if(functionName == "_Z9atomicAddIfET_PS0_S0_") {
         writeShimCall(localValueInfo, "__atomic_add_float", "", instr);
         return;
-    } else if(functionName == "_Z9atomicCASIiET_PS0_S0_S0_" || functionName == "_Z9atomicCASPjjj") {
-        writeShimCall(localValueInfo, "__atomic_cas_uint", "", instr);
         return;
     } else if(functionName == "_Z11__shfl_downIfET_S0_ii") {
         writeShimCall(localValueInfo, "__shfl_down_3", "scratch, ", instr);
