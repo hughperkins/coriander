@@ -1128,16 +1128,12 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         writeShimCall(localValueInfo, "__shfl_down_2", "scratch, ", instr);
         return;
     } else if(functionName == "llvm.lifetime.start") {
-        // return "";  // just ignore for now
+        // just ignore for now
         localValueInfo->skip();
-        // localValueInfo->setAddressSpace(0);
-        // localValueInfo->setExpression("");
         return;
     } else if(functionName == "llvm.lifetime.end") {
-        // return "";  // just ignore for now
+        // just ignore for now
         localValueInfo->skip();
-        // localValueInfo->setAddressSpace(0);
-        // localValueInfo->setExpression("");
         return;
     } else if(functionName == "_Z11make_float4ffff") {
         // change this into something like: (float4)(a, b, c, d)
@@ -1145,7 +1141,6 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         internalfunc = true;
     } else if(functionName == "_GLOBAL__sub_I_struct_initializer.cu") {
         cerr << "WARNING: skipping _GLOBAL__sub_I_struct_initializer.cu" << endl;
-        // return "";
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("");
         return;
@@ -1180,15 +1175,6 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         }
         localValueInfo->needDependencies = false;
         gencode += "scratch";
-        // Module *M = instr->getModule();
-        // std::string shortFunctionName = functionName;
-        // if(shortFnNameByOrigName->find(functionName) != shortFnNameByOrigName->end()) {
-        //     // string origFunctionName = functionName;
-        //     shortFunctionName = shortFnNameByOrigName->operator[](functionName);
-        //     cout << "new_instruction_dumper dumpCall() functionName=" << functionName << " => " << shortFunctionName << endl;
-        // }
-        // cout << "M " << M << endl;
-        // Function *F = M->getFunction(StringRef(functionName));
         Function *F = M->getFunction(functionName);
         if(F->isDeclaration()) { // ie, is it *just* a declaration, no definition?
             std::cout << functionName << " is called, but not defined" << std::endl;
@@ -1198,7 +1184,6 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         if(F != 0) {
             // check arguments...
             bool addressSpacesMatch = true;
-            // auto callit = instr->arg_begin();
             int i = 0;
             ostringstream manglingpostfix;
             for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
@@ -1226,39 +1211,23 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
                     manglingpostfix << thisaddressspacechar;
                     if(callPtr->getAddressSpace() != calleePtr->getAddressSpace()) {
                         addressSpacesMatch = false;
-                        // cout << "arg " << callArg->getName().str() << " needs address space mutation" << endl;
-                        // break;
                     }
                 }
                 i++;
             }
             if(!addressSpacesMatch) {
                 string newName = F->getName().str() + "_" + manglingpostfix.str();
-                // cout << "new name [" << newName << "]" << endl;
                 bool alreadyExists = globalNames->hasName(newName);
-                // cout << "alreadyeists? " << alreadyExists << endl;
-
-                // int numArgs = instr->getNumArgOperands();
-                // cout << "numArgs " << numArgs << endl;
                 int i;
 
                 Function *newFunc = 0;
                 if(!alreadyExists) {
-                    // cout << "cloning new funciton " << newName << endl;
                     ValueToValueMapTy valueMap;
-                    // #if(LLVM_VERSION_MAJOR == 4)
-                    // #pragma message("clang 4 detected")
                     newFunc = CloneFunction(F,
                                    valueMap);
-                    // #else
-                    // newFunc = CloneFunction(F,
-                    //                valueMap,
-                    //                false);
-                    // #endif
                     newFunc->setName(newName);
                     i = 0;
                     for(auto it=newFunc->arg_begin(); it != newFunc->arg_end(); it++) {
-                        // Argument *callArg = callit->;
                         Value *callArg = instr->getArgOperand(i);
                         Argument *calleeArg = &*it;
                         copyAddressSpace(callArg, calleeArg);
@@ -1277,7 +1246,6 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
                 // cout << "inserting new funciton into neededfunctions" << endl;
                 neededFunctions->insert(newFunc);
                 if(isa<PointerType>(newFunc->getReturnType()) && returnTypeByFunction.find(newFunc) == returnTypeByFunction.end()) {
-                    // needDependencies = true;
                     localValueInfo->needDependencies = true;
                     return;
                 }
@@ -1286,7 +1254,6 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
             } else {
                 neededFunctions->insert(F);
                 if(isa<PointerType>(F->getReturnType()) && returnTypeByFunction.find(F) == returnTypeByFunction.end()) {
-                    // needDependencies = true;
                     localValueInfo->needDependencies = true;
                     return;
                 }
@@ -1310,35 +1277,23 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
             gencode += "scratch";
             if(isa<PointerType>(F->getReturnType())) {
                 Type *returnType = returnTypeByFunction.at(F);
-                // cout << "function return type:" << endl;
-                // returnType->dump();
-                // cout << endl;
                 if(PointerType *retptr = dyn_cast<PointerType>(returnType)) {
                     int functionReturnAddressSpace = retptr->getAddressSpace();
-                    // cout << " updating call instruction to addressspace " << functionReturnAddressSpace << endl;
                     updateAddressSpace(instr, functionReturnAddressSpace);
                     localValueInfo->setAddressSpace(functionReturnAddressSpace);
                 }
             }
         } else {
             cout << "couldnt find function " + functionName << endl;
-            // cout << "here are available functions:" << endl;
-            // for(auto it = M->begin(); it != M->end(); it++) {
-            //     Function *thisF = &*it;
-            //     cout << "    " << thisF->getName().str() << endl;
-            // }
             throw runtime_error("couldnt find function " + functionName);
         }
     }
     gencode += ")";
-    // return gencode;
-    // cout << "dumpCall gencode[" << gencode << "]" << endl;
     localValueInfo->setExpression(gencode);
 }
 
 void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
     Instruction *instruction = cast<Instruction>(localValueInfo->value);
-    // needDependencies = false;
     localValueInfo->needDependencies = false;
     auto opcode = instruction->getOpcode();
     if(_addIRToCl) {
@@ -1348,17 +1303,11 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo, const s
         for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
             Value *op = &*it->get();
             originalInstruction += " ";
-            // originalInstruction += getOperand(op)->getExpr();
             if(localNames->hasValue(op)) {
                 originalInstruction += localNames->getName(op);
             } else {
                 originalInstruction += "<unk>";
             }
-            // if(origNameByValue.find(op) != origNameByValue.end()) {
-            //     originalInstruction += origNameByValue[op];
-            // } else {
-            //     originalInstruction += "<unk>";
-            // }
         }
         localValueInfo->inlineCl.push_back("/* " + originalInstruction + " */");
     }
@@ -1470,22 +1419,7 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo, const s
             break;
         case Instruction::Alloca:
             dumpAlloca(localValueInfo);
-            // return "";
-            // return;
             break;
-            // return true;
-        // case Instruction::Br:
-        //     instructionCode = dumpBranch(cast<BranchInst>(instruction));
-        //     return instructionCode;
-        //     // break;
-        // case Instruction::Ret:
-        //     instructionCode = dumpReturn(cast<ReturnInst>(instruction));
-        //     return instructionCode + ";\n";
-        //     // break;
-        // case Instruction::PHI:
-        //     addPHIDeclaration(cast<PHINode>(instruction));
-        //     return "";
-        //     // break;
         default:
             cout << "opcode string " << instruction->getOpcodeName() << endl;
             throw runtime_error("unknown opcode");
