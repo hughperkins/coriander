@@ -168,6 +168,7 @@ template<typename T>
 __device__ T atomicMax(T* address, T val);
 template<typename T>
 __device__ T atomicExch(T* address, T val);
+__device__ uint64_t atomicExch(uint64_t *address, uint64_t val);
 
 __device__ uint32_t atomicInc(uint32_t *address, uint32_t val);
 
