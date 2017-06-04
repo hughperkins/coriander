@@ -53,8 +53,8 @@ inline unsigned int __umulhi(unsigned int v0, unsigned int v1) {
 )";
 
 // this code is from http://suhorukov.blogspot.co.uk/2011/12/opencl-11-atomic-operations-on-floating.html
-    _shimClByName["__atomic_add"] = R"(
-inline float __atomic_add(volatile __global float *source, const float operand) {
+    _shimClByName["__atomic_add_float"] = R"(
+inline float __atomic_add_float(volatile __global float *source, const float operand) {
     union {
         unsigned int intVal;
         float floatVal;
@@ -68,6 +68,16 @@ inline float __atomic_add(volatile __global float *source, const float operand) 
         newVal.floatVal = prevVal.floatVal + operand;
     } while (atomic_cmpxchg((volatile __global unsigned int *)source, prevVal.intVal, newVal.intVal) != prevVal.intVal);
     return prevVal.floatVal;
+}
+)";
+
+    _shimClByName["__atomic_cas_uint"] = R"(
+inline unsigned int __atomic_cas_uint(volatile __global int *data, const unsigned int before, const unsigned int target) {
+    unsigned int prevVal;
+    do {
+        prevVal = *data;
+    } while (atomic_cmpxchg((volatile __global unsigned int *)data, prevVal, target) != prevVal);
+    return prevVal;
 }
 )";
 }
