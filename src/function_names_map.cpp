@@ -66,6 +66,7 @@ void FunctionNamesMap::populateKnownValues() {
     knownFunctionsMap["_Z3powff"] = "pow";
     knownFunctionsMap["_Z4sqrtf"] = "sqrt";
     knownFunctionsMap["_Z3logf"] = "log";
+    knownFunctionsMap["_Z5isnanf"] = "isnan";
 
     // CAS
     knownFunctionsMap["_Z9atomicCASIjET_PS0_S0_S0_"] = "atomic_cmpxchg";   // cas int

@@ -4,7 +4,8 @@ if [ ! -z "$SETX" ]; then {
    set -x
 } fi
 
-# set -x
+echo cocl args: $@
+
 set -e
 
 if [ x$CLANG_HOME = x ]; then {
@@ -131,7 +132,7 @@ EOF
 PASSTHRU=
 export IROOPENCLARGS=
 export DEVICELLOPT=
-while [ x$1 != x ]; do {
+while [ "x$1" != x ]; do {
     THISARG=$(echo $1 | cut -d = -f 1)
     DONE=0
     TWOLETTERS=$(echo $1 | cut -c 1-2)
@@ -148,7 +149,9 @@ while [ x$1 != x ]; do {
             DONE=1
             ;;
         -D)
-            PASSTHRU="$PASSTHRU $1"
+            # hacktastic :-D. Would be better to fix the cmake rules, sooner or later...
+            DSTRIPPED=$(echo $1 | sed -e 's/-D-D/-D/')
+            PASSTHRU="$PASSTHRU $DSTRIPPED"
             DONE=1
             ;;
         -O)
