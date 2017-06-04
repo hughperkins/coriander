@@ -171,7 +171,7 @@ __global__ void mykernel(float *data) {
     assert abs(expected - from_gpu[0].item()) < 1e-4
 
 
-@pytest.mark.skip
+@pytest.mark.skip(reason='double parameters to kernels not supported currently')
 def test_double_ieeefloats(context, q, float_data, float_data_gpu):
     cu_code = """
 __global__ void mykernel(double *data) {
