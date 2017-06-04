@@ -37,25 +37,6 @@ macro(cocl_build_objects target_name target_type shared)
         message("filename ${filename} EXT ${EXT}")
         if(${EXT} STREQUAL .cu)
             message("its a cu")
-            # set(COMMAND CLANG_HOME=${LLVM40_HOME}
-            #     /usr/local/bin/cocl
-            #     ${DEF_CMDLINE}
-            #     ${INCLUDE_ARGS}
-            #     ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
-            #     -o ${filename}.o
-            #     -c
-            #     ${_TESTS_COCL_OPTIONS}
-            # )
-            # message("COMMAND ${COMMAND}")
-            # add_custom_command(
-            #     OUTPUT ${filename}.o
-            #     COMMAND ${COMMAND} "-I$<JOIN:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>,;-I>"
-            #     DEPENDS ${filename}
-            # )
-            # add_custom_target(build_${target_name}_${filename}_o
-            #     DEPENDS ${filename}.o
-            # )
-            # set(OBJECT_TARGETS ${OBJECT_TARGETS} build_${target_name}_${filename}_o)
             set(OBJECTS ${OBJECTS} ${filename}.o)
         else()
             set(OBJECTS ${OBJECTS} ${filename})
@@ -69,27 +50,12 @@ macro(cocl_build_objects target_name target_type shared)
     endif()
     set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE CXX)
 
-    # get_target_property(CURRENT_INCLUDE ${target_name} INCLUDE_DIRECTORIES)
-    # message("target include directoires ${CURRENT_INCLUDE}")
-
     foreach(filename ${filenames})
         message("=====================")
         get_filename_component(EXT ${filename} EXT)
         message("filename ${filename} EXT ${EXT}")
-                # ${INCLUDE_ARGS}
         if(${EXT} STREQUAL .cu)
             message("its a cu")
-            set(COMMAND
-                CLANG_HOME=${LLVM40_HOME}
-                /usr/local/bin/cocl
-                ${DEF_CMDLINE}
-                # '\$\<\$\<BOOL:\$\<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>:-I\$\<JOIN:\$\<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>,;-I>>'
-                ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
-                -o ${filename}.o
-                -c
-                ${_TESTS_COCL_OPTIONS}
-            )
-            message("COMMAND ${COMMAND}")
             # for the bit with angle brackets, see https://cmake.org/cmake/help/v3.0/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7)
             # it's because we dot actually know the include directories yet, at the time of executing the contents of this macro
             # note that, despite what that page may claim, generator expressions cannot contain spaces, eg see:
