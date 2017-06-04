@@ -338,6 +338,7 @@ std::string FunctionDumper::dumpKernelFunctionDeclarationWithoutReturn(llvm::Fun
         }
         // declaration += 'global float *clmem' + easycl::toString(clmemIdx);
         declaration << "global char* clmem" << clmemIdx;
+        declaration << ", unsigned long clmem_vmem_offset" << clmemIdx;
         i++;
     }
     // structpointershimcode = "";

@@ -257,6 +257,7 @@ endif(BUILD_TESTS)
         testevents testfloat4 test_kernelcachedok testmath testmemcpydevicetodevice test_memhostalloc
         testneg testnullpointer testpartialcopy testshfl teststream test_types
         singlebuffer test_devices test_buffers longname test_char test_structs
+        test_floatstarstar
     )
 
     if(TESTS_DUMP_CL)
