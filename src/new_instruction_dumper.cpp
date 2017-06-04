@@ -1075,6 +1075,22 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("barrier(CLK_GLOBAL_MEM_FENCE)");
         return;
+    } else if(functionName == "_Z13__threadfencev") {
+        // Not sure if this is correct?
+        // seems to be correct-ish???
+        // what I understand:
+        // (from https://stackoverflow.com/questions/5232689/cuda-threadfence/5233737#5233737 )
+        // threadfence orders writes to memory, so if you do:
+        // - write data
+        // - threadfence
+        // - write flag
+        // => then if another thread sees the flag, the data that was written is guaranteed to be visible
+        // to it too
+        // I *think* that barrier(CLK_GLOBAL_MEM_FENCE) achieves the same thing, though it might be
+        // a bit too "strong" (ie slow)?
+        localValueInfo->setAddressSpace(0);
+        localValueInfo->setExpression("barrier(CLK_GLOBAL_MEM_FENCE)");
+        return;
     } else if(functionName == "llvm.dbg.value") {
         // ignore
         localValueInfo->skip();
@@ -1110,22 +1126,6 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         return;
     } else if(functionName == "_Z11__shfl_downIfET_S0_i") {
         writeShimCall(localValueInfo, "__shfl_down_2", "scratch, ", instr);
-        return;
-    } else if(functionName == "_Z13__threadfencev") {
-        // Not sure if this is correct?
-        // seems to be correct-ish???
-        // what I understand:
-        // (from https://stackoverflow.com/questions/5232689/cuda-threadfence/5233737#5233737 )
-        // threadfence orders writes to memory, so if you do:
-        // - write data
-        // - threadfence
-        // - write flag
-        // => then if another thread sees the flag, the data that was written is guaranteed to be visible
-        // to it too
-        // I *think* that barrier(CLK_GLOBAL_MEM_FENCE) achieves the same thing, though it might be
-        // a bit too "strong" (ie slow)?
-        localValueInfo->setAddressSpace(0);
-        localValueInfo->setExpression("barrier(CLK_GLOBAL_MEM_FENCE)");
         return;
     } else if(functionName == "llvm.lifetime.start") {
         // return "";  // just ignore for now
