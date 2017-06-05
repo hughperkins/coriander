@@ -56,12 +56,6 @@ extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
 }
 
-// #define COCL_PRINT(x)
-
-// #undef COCL_PRINT
-// #define COCL_PRINT(stuff) \
-//    stuff
-
 // stubs
 CUfunc_cache CU_FUNC_CACHE_PREFER_NONE;
 CUfunc_cache CU_FUNC_CACHE_PREFER_SHARED;
@@ -85,30 +79,19 @@ void hostside_opencl_funcs_assure_initialized(void) {
 }
 
 size_t cuInit(unsigned int flags) {
-    // COCL_PRINT("redirected cuInit()");
-    // hostside_opencl_funcs_assure_initialized();
     return 0;
 }
 
-// size_t cudaConfigureCall(
-//         unsigned long long grid_xy, unsigned int grid_z,
-//         unsigned long long block_xy, unsigned int block_z, size_t sharedMem, void *queue_as_voidstar) {
 int cudaConfigureCall(
         dim3 grid,
         dim3 block, long long sharedMem, char *queue_as_voidstar) {
-    // COCL_PRINT("locking launch mutex " << (void *)getThreadVars());
     pthread_mutex_lock(&launchMutex);
-    // COCL_PRINT("... locked launch mutex " << (void *)getThreadVars());
     CoclStream *coclStream = (CoclStream *)queue_as_voidstar;
     ThreadVars *v = getThreadVars();
     if(coclStream == 0) {
         coclStream = v->currentContext->default_stream.get();
-        // coclStream = defaultCoclStream;
-        // throw runtime_error("not implemented: default stream");
-        // COCL_PRINT("cudaConfigureCall using default_queue");
     }
     CLQueue *clqueue = coclStream->clqueue;
-    // COCL_PRINT("cudaConfigureCall queue=" << (void *)clqueue);
     if(sharedMem != 0) {
         COCL_PRINT("cudaConfigureCall: Not implemented: non-zero shared memory");
         throw runtime_error("cudaConfigureCall: Not implemented: non-zero shared memory");
@@ -119,8 +102,7 @@ int cudaConfigureCall(
     int block_x = block.x;
     int block_y = block.y;
     int block_z = block.z;
-    // COCL_PRINT("grid(" << grid_x << ", " << grid_y << ", " << grid_z << ")");
-    // COCL_PRINT("block(" << block_x << ", " << block_y << ", " << block_z << ")");
+
     launchConfiguration.queue = clqueue;
     launchConfiguration.coclStream = coclStream;
     launchConfiguration.grid[0] = grid_x;
@@ -172,24 +154,17 @@ CLKernel *compileOpenCLKernel(string originalKernelName, string uniqueKernelName
     }
     // compile the kernel.  we are still locking the mutex, but I cnat think of a better
     // way right now...
-    // cout << "compileOpenCLKernel building kernel unique name: " << uniqueKernelName << endl;
-    // cout << "shortname: " << shortKernelName << endl;
-    // cout << "source [" << clSourcecode << "]" << endl;
 
-    // string filename = "/tmp/" + uniqueKernelName + ".cl";
     string filename = "/tmp/" + easycl::toString(v->getContext()->kernelCache.size()) + ".cl";
     if(getenv("COCL_LOAD_CL") != 0) {
         cout << "loading cl sourcecode from " << filename << endl;
         ifstream f;
         f.open(filename, ios_base::in);
-        // f << launchConfiguration.kernelName << endl;
-        // f >> sourcecode;
         clSourcecode = "";
         string line = "";
         while(getline(f, line)) {
             clSourcecode += line + "\n";
         }
-        // cout << sourcecode << endl;
         f.close();
     } else if(getenv("COCL_DUMP_CL") != 0) {
         cout << "saving cl sourcecode to " << filename << endl;
@@ -199,30 +174,18 @@ CLKernel *compileOpenCLKernel(string originalKernelName, string uniqueKernelName
         f << "// unique kernelName: [" << uniqueKernelName << "]" << endl;
         f << "// short kernelname: [" << shortKernelName << "]" << endl;
         f << endl;
-        // f << launchConfiguration.kernelName << endl;
         f << clSourcecode << endl;
         f.close();
     }
 
     CLKernel *kernel = 0;
     try {
-        // string shortKernelName = "" + kernelName;
-        // if(shortKernelName.size() > 32) {
-        //     shortKernelName = shortKernelName.substr(0, 31);
-        // }
-        // cout << "clSourcecode [" << clSourcecode << "]" << endl;
         kernel = cl->buildKernelFromString(clSourcecode, shortKernelName, "", "__internal__");
-        // cout << "built kernel " << uniqueKernelName << endl;
-        // std::cout << " ... built" << std::endl;
     } catch(runtime_error &e) {
         cout << "compileOpenCLKernel failed to compile opencl sourcecode" << endl;
         cout << "unique kernel name " << uniqueKernelName << endl;
         cout << "short kernel name " << shortKernelName << endl;
         cout << "writing ll to /tmp/failed-kernel.ll" << endl;
-
-        // f.open("/tmp/failed-kernel.ll", ios_base::out);
-        // f << devicellsourcecode << endl;
-        // f.close();
 
         cout << "writing cl to /tmp/failed-kernel.cl" << endl;
         f.open("/tmp/failed-kernel.cl", ios_base::out);
@@ -231,7 +194,6 @@ CLKernel *compileOpenCLKernel(string originalKernelName, string uniqueKernelName
 
         throw e;
     }
-    // cout << " ... built" << endl;
     v->getContext()->kernelCache[uniqueKernelName] = kernel;
     cl->storeKernel(uniqueKernelName, kernel, true);  // this will cause the kernel to be deleted with cl.  Not clean yet, but a start
     return kernel;
@@ -242,13 +204,9 @@ GenerateOpenCLResult generateOpenCL(
     // generates OpenCL source-code, based on passed-in bytecode
     // returns cached source-code if available
 
-    // KernelByNameMutex mutex;
     ThreadVars *v = getThreadVars();
 
-    // EasyCL *cl = v->getContext()->getCl();
     ofstream f;
-    // std::cout << "generateOpenCL uniqueClmemCount=" << uniqueClmemCount << std::endl;
-    // std::ostringstream shortKernelName_ss;
     launchConfiguration.shortKernelName = origKernelName.substr(0, 20);
 
     std::ostringstream uniqueKernelName_ss;
@@ -257,29 +215,23 @@ GenerateOpenCLResult generateOpenCL(
         uniqueKernelName_ss << "_" << clmemIndexByClmemArgIndex[i];
     }
     launchConfiguration.uniqueKernelName = uniqueKernelName_ss.str();
-    // cout << "generateOpenCL() kernelNameAfterGenerate " << kernelNameAfterGenerate << endl;
     if(v->getContext()->clSourceCodeCache.find(launchConfiguration.uniqueKernelName) != v->getContext()->clSourceCodeCache.end()) {
         std::string clSourcecode = v->getContext()->clSourceCodeCache[launchConfiguration.uniqueKernelName];
         return GenerateOpenCLResult { clSourcecode, origKernelName, launchConfiguration.shortKernelName, launchConfiguration.uniqueKernelName };
-        // v->getContext()->numKernelCalls++;
-        // return v->getContext()->clSourceCodeByGeneratedName[kernelNameAfterGenerate];
     }
 
     // convert to opencl first... based on the kernel name required
     try {
-        // string filename = "/tmp/" + uniqueKernelName;
         string filename = "/tmp/" + easycl::toString(v->getContext()->clSourceCodeCache.size()) + "-device.ll";
         if(getenv("COCL_DUMP_BYTECODE") != 0) {
             cout << "saving deviceside bytecode to " << filename << endl;
             ofstream f;
             f.open(filename, ios_base::out);
-            // f << launchConfiguration.kernelName << endl;
             f << devicellsourcecode << endl;
             f.close();
         }
         string clSourcecode = convertLlStringToCl(
             uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, origKernelName, launchConfiguration.shortKernelName, v->offsets_32bit);
-        // std::string clSourcecode = convertLlToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, origKernelName, kernelNameAfterGenerate);
         v->getContext()->clSourceCodeCache[launchConfiguration.uniqueKernelName] = clSourcecode;
         return GenerateOpenCLResult { clSourcecode, origKernelName, launchConfiguration.shortKernelName, launchConfiguration.uniqueKernelName };
     } catch(runtime_error &e) {
@@ -300,11 +252,6 @@ GenerateOpenCLResult generateOpenCL(
 void configureKernel(const char *kernelName, const char *devicellsourcecode) {
     pthread_mutex_lock(&launchMutex);
     COCL_PRINT("=========================================");
-    // cout << "clSources.size() " << getNumClSources() << endl;
-    // for(auto it=clSources.begin(); it != clSources.end(); it++) {
-    // for(int i = 0; i < getNumClSources(); i++) {
-        // cout << "clsource: [" << getClSource(i) << "]" << endl;
-    // }
     launchConfiguration.kernelName = kernelName;
     launchConfiguration.devicellsourcecode = devicellsourcecode;
     pthread_mutex_unlock(&launchMutex);
@@ -316,10 +263,8 @@ void addClmemArg(cl_mem clmem) {
         clmemIndex = launchConfiguration.clmems.size();
         launchConfiguration.clmems.push_back(clmem);
         launchConfiguration.clmemIndexByClmem[clmem] = clmemIndex;
-        // cout << "   new clmem" << clmemIndex << endl;
     } else {
         clmemIndex = launchConfiguration.clmemIndexByClmem.find(clmem)->second;
-        // cout << "   existing clmem" << clmemIndex << endl;
     }
     launchConfiguration.clmemIndexByClmemArgIndex.push_back(clmemIndex);
 }
@@ -357,7 +302,6 @@ void setKernelArgHostsideBuffer(char *pCpuStruct, int structAllocateSize) {
     // deallocate the cl_mem after calling the kernel
     // (we assume hte struct is passed by-value, so we dont have to actually copy it back afterwards)
     COCL_PRINT("setKernelArgHostsideBuffer size=" << structAllocateSize);
-    // int idx = 
     if(structAllocateSize < 4) {
         structAllocateSize = 4;
     }
@@ -406,17 +350,12 @@ void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
         size_t offset = memory->getOffset(memory_as_charstar);
         cl_mem clmem = memory->clmem;
 
-        // size_t offsetElements = offset / elementSize;
         size_t offsetElements = offset;
 
         COCL_PRINT("setKernelArgGpuBuffer offset=" << offset);
 
-        // cout << "setKernelArgGpuBuffer offset=" << offset << " offsetElements=" << offsetElements << " newoffset=" << (offsetElements * elementSize) << endl;
-        // COCL_PRINT("setKernelArgGpuBuffer offset=" << offsetElements << " elementSize=" << elementSize);
-
         addClmemArg(clmem);
 
-        // COCL_PRINT("offset elements " << offsetElements);
         if(v->offsets_32bit) {
             launchConfiguration.args.push_back(std::unique_ptr<Arg>(new UInt32Arg((uint32_t)offsetElements)));
         } else {
@@ -476,7 +415,6 @@ void kernelGo() {
     GenerateOpenCLResult res = generateOpenCL(
         launchConfiguration.clmems.size(), launchConfiguration.clmemIndexByClmemArgIndex, launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
     COCL_PRINT("kernelGo() kernel: " << launchConfiguration.kernelName);
-    // cout << "kernelGo() OpenCL sourcecode:\n" << res.clSourcecode << endl;
     CLKernel *kernel = compileOpenCLKernel(launchConfiguration.kernelName, res.uniqueKernelName, res.shortKernelName, res.clSourcecode);
     COCL_PRINT("kernelGo() uniqueKernelName: " << launchConfiguration.uniqueKernelName);
 
@@ -490,19 +428,10 @@ void kernelGo() {
     }
 
     size_t global[3];
-     // COCL_PRINT("<<< global=dim3(");
     for(int i = 0; i < 3; i++) {
         global[i] = launchConfiguration.grid[i] * launchConfiguration.block[i];
-        // COCL_PRINT(global[i] << ",");
     }
-    // COCL_PRINT("), workgroupsize=dim3(");
-    // for(int i = 0; i < 3; i++) {
-    //     COCL_PRINT(launchConfiguration.block[i] << ",");
-    // }
-    // COCL_PRINT(")>>>");
-    // cout << "launching kernel, using OpenCL..." << endl;
     int workgroupSize = launchConfiguration.block[0] * launchConfiguration.block[1] * launchConfiguration.block[2];
-    // COCL_PRINT("workgroupSize=" << workgroupSize);
     kernel->localInts(workgroupSize);
 
     try {
@@ -510,12 +439,6 @@ void kernelGo() {
     } catch(runtime_error &e) {
         cout << "kernel failed to run" << endl;
         cout << "kernel name: [" << launchConfiguration.kernelName << "]" << endl;
-        // cout << "saving kernel soucecode to /tmp/failed-kernel.cl" << endl;
-        // ofstream f;
-        // f.open("/tmp/failed-kernel.cl", ios_base::out);
-        // f << launchConfiguration.kernelName << endl;
-        // f << launchConfiguration.kernelSource << endl;
-        // f.close();
         pthread_mutex_unlock(&launchMutex);
         pthread_mutex_unlock(&launchMutex);
         throw e;
@@ -526,12 +449,7 @@ void kernelGo() {
     EasyCL::checkError(err);
     debugDumper.maybeDump();
 
-    // cout << "trying cl->finihs()" << endl;
-    //cl->finish();
-    // cout << "cl->finihs() done" << endl;
-    // cout << ".. kernel finished" << endl;
     for(auto it=launchConfiguration.kernelArgsToBeReleased.begin(); it != launchConfiguration.kernelArgsToBeReleased.end(); it++) {
-        // COCL_PRINT("release arg");
         cl_mem memObject = *it;
         err = clReleaseMemObject(memObject);
         EasyCL::checkError(err);
@@ -545,7 +463,7 @@ void kernelGo() {
 
     err = clFinish(launchConfiguration.queue->queue);
     EasyCL::checkError(err);
-    // cout << "released args done" << endl;
+
     pthread_mutex_unlock(&launchMutex);
     pthread_mutex_unlock(&launchMutex);
     } catch(runtime_error &e) {
