@@ -52,7 +52,6 @@ public:
     bool _skip = false;
 
     bool toBeDeclared = false;  // do we plan on declaring it?
-    // bool declared = false;  // have we declared it?
 
     int addressSpace = 0;
     bool addressSpaceValid = false; // have we assigned the address space?
@@ -61,7 +60,6 @@ public:
                                         // this->name + " = " this->getExpr()
                                         // this is already handled by getExpr()
     std::vector<std::string> declarationCl;  // eg ["int v5;"]
-    // bool clGenerationDone = false; // are both inlineCl and declarationCl complete and valid?
     bool needDependencies = false;
 
     std::unique_ptr<ClWriter> clWriter;
@@ -81,8 +79,6 @@ public:
                                           // some instructoins will *always* write something, eg stores
 
     static LocalValueInfo *getOrCreate(cocl::LocalNames *localNames, std::map<llvm::Value *, std::unique_ptr< LocalValueInfo> > *localValueInfos, llvm::Value *value, std::string suggestedName="");
-
-    // std::unique_ptr<llvm::Value> _storeAllocatedValue; // this is for ConstantExpr::getAsInstruction, which allocates, and never frees
 };
 
 } // namespace cocl
