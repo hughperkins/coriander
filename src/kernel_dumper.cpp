@@ -245,6 +245,18 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
     }
     functionDeclarationsStream << typeDumper->dumpStructDefinitions() << "\n";
 
+    functionDeclarationsStream << R"(struct GlobalVars {
+    local int *scratch;
+    global char *clmem0;
+    unsigned long clmem_vmem_offset0;
+};
+
+inline global float *getGlobalPointer(unsigned long vmemloc, struct GlobalVars *globalVars) {
+    return (global float *)(globalVars->clmem0 + vmemloc - globalVars->clmem_vmem_offset0);
+}
+
+)";
+
     for(auto it=shimFunctionsNeeded.begin(); it != shimFunctionsNeeded.end(); it++) {
         string shimName = *it;
         string shimCl = shims.getClByName(shimName);

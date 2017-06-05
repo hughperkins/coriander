@@ -328,7 +328,8 @@ std::string FunctionDumper::dumpInternalFunctionDeclarationWithoutReturn(llvm::F
     if(i > 0) {
         declaration << ", ";
     }
-    declaration << "local int *scratch";
+    // declaration << "local int *scratch";
+    declaration << "struct GlobalVars *pGlobalVars";
     declaration << ")";
     return declaration.str();
 }
@@ -493,6 +494,12 @@ void FunctionDumper::toCl(ostream &os) {
     if(shimCode != "") {
         os << shimCode << "\n";
     }
+    if(isKernel) {
+    os << R"(    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
+
+)";
+}
 
     writeDeclarations("    ", os);
     os << "\n";
