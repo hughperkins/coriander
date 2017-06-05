@@ -141,20 +141,33 @@ std::string TypeDumper::addStructToGlobalNames(StructType *type) {
 }
 
 std::string TypeDumper::dumpStructType(StructType *type) {
+    std::cout << "TypeDumper::dumpStructType" << std::endl;
     return addStructToGlobalNames(type);
 }
 
 std::string TypeDumper::dumpArrayType(ArrayType *type, bool decayArraysToPointer) {
+    // if its an array of pointers, we assume those are global pointers
+    // see doc/assumptions.md for more details
+
+    std::cout << "TypeDumper::dumpArrayType" << std::endl;
+    type->dump();
+    std::cout << std::endl;
+    ostringstream oss;
     int length = type->getNumElements();
     Type *elementType = type->getElementType();
+    // if(isa<PointerType>(elementType)) {
+    //     oss << "global ";
+    // }
     if(decayArraysToPointer) {
-        return dumpType(elementType, decayArraysToPointer) + "*";
+        oss << dumpType(elementType, decayArraysToPointer) + "*";
     } else {
-        return dumpType(elementType, decayArraysToPointer) + "[" + easycl::toString(length) + "]";
+        oss << dumpType(elementType, decayArraysToPointer) + "[" + easycl::toString(length) + "]";
     }
+    return oss.str();
 }
 
 std::string TypeDumper::dumpVectorType(VectorType *vectorType, bool decayArraysToPointer) {
+    std::cout << "TypeDumper::dumpVectorType" << std::endl;
     int elementCount = vectorType->getNumElements();
     Type *elementType = vectorType->getElementType();
     if(elementType->getPrimitiveSizeInBits() == 0) {
@@ -190,6 +203,9 @@ std::string TypeDumper::dumpFunctionType(FunctionType *fn) {
 
 std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {
     Type::TypeID typeID = type->getTypeID();
+    // std::cout << "TypeDumper::Type " << dumpType(type) << std::endl;
+    // type->dump();
+    // std::cout << std::endl;
     switch(typeID) {
         case Type::VoidTyID:
             return "void";
@@ -234,6 +250,10 @@ std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {
 }
 
 std::string TypeDumper::dumpStructDefinition(StructType *type, string name) {
+    // dump deviceside struct opencl
+    // this will write pointers as global pointers, probably
+
+    std::cout << "TypeDumper::dumpStructDefinition" << std::endl;
     std::string declaration = "";
     declaration += name + " {\n";
     int i = 0;
@@ -255,7 +275,12 @@ std::string TypeDumper::dumpStructDefinition(StructType *type, string name) {
         if(ArrayType *arraytype = dyn_cast<ArrayType>(elementType)) {
             Type *arrayelementtype = arraytype->getElementType();
             int numElements = arraytype->getNumElements();
-            declaration += "    " + dumpType(arrayelementtype) + " ";
+            declaration += "    ";
+            // assume any pointers are global
+            if(isa<PointerType>(arrayelementtype)) {
+                declaration += "global ";
+            }
+            declaration += dumpType(arrayelementtype) + " ";
             declaration += memberName + "[" + easycl::toString(numElements) + "];\n";
         } else {
             declaration += "    ";

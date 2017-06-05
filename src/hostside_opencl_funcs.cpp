@@ -13,13 +13,10 @@
 // limitations under the License.
 
 #include "cocl/hostside_opencl_funcs.h"
-// #include "cocl_kernellaunch.h"
 #include "cocl/cocl.h"
 #include "cocl/cocl_memory.h"
 #include "cocl/cocl_clsources.h"
 #include "cocl/cocl_streams.h"
-
-#include "yaml-cpp/yaml.h"
 
 #include <iostream>
 #include <memory>
@@ -38,6 +35,8 @@
 
 #include "ir-to-opencl.h"
 #include "ir-to-opencl-common.h"
+
+#include "DebugDumper.h"
 
 using namespace std;
 using namespace easycl;
@@ -75,126 +74,12 @@ namespace cocl {
     #else
     pthread_mutex_t launchMutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
     #endif
-
-    LaunchConfiguration launchConfiguration;
 }
 
 using namespace cocl;
 
-
-// static pthread_mutex_t dumpConfigCreationMutex = PTHREAD_MUTEX_INITIALIZER;
-static bool checkedDumpEnabled = false;
-static bool dumpEnabled = false;
-static YAML::Node dumpConfig;
-
-static void dump() {
-    // we assume that dump config is enabled, and the dump config has been loaded ,successfully
-    YAML::Node kernelConfig = dumpConfig[launchConfiguration.uniqueKernelName];
-    if(kernelConfig) {
-        cout << "Dumping for " << launchConfiguration.uniqueKernelName << " in dump config" << endl;
-        // cout << dumpConfig[launchConfiguration.uniqueKernelName] << endl;
-        // YAML::Node kernelConfig = 
-        int argIdx = 0;
-        for(auto it=kernelConfig.begin(); it != kernelConfig.end(); it++) {
-            YAML::Node argConfig = *it;
-            // cout << "kernelConfig: " << argConfig << endl;
-
-            int count = argConfig["count"].as<int>();
-            uint64_t offsetBytes = 0;
-            cl_mem clmem;
-            std::string argTypeName = argConfig["type"].as<std::string>();
-
-            if(argConfig["virtualaddress"]) {
-                if(argConfig["offsetarg"] || argConfig["offsetbytes"] || argConfig["clmem"]) {
-                    std::cout << "buffer " << argIdx << ": cannot specify both virtualaddress, and any of offsetarg or offsetbytes or clmem" << endl;
-                    continue;
-                }
-                unsigned long virtualAddress = argConfig["virtualaddress"].as<int>();
-                Memory *memory = findMemory((char *)virtualAddress);
-                offsetBytes = memory->getOffset((char *)virtualAddress);
-                clmem = memory->clmem;
-                cout << "  Dumping buffer " << argIdx << " virtualaddress=" << virtualAddress << " " << " offset in buffer " << offsetBytes << " " << argTypeName << "s:" << endl;
-            } else {
-                if(argConfig["offsetarg"] && argConfig["offsetbytes"]) {
-                    cout << "buffer " << argIdx << ": cannot specify both offsetArg and offsetBytes. Choose one :-)  => skipping arg " << argIdx << endl;
-                    continue;
-                }
-                int clmemIndex = argConfig["clmem"].as<int>();
-                if(clmemIndex >= launchConfiguration.clmems.size() || clmemIndex < 0) {
-                    cout << "buffer " << argIdx << ": clmemIndex out of bounds => skipping arg" << endl;
-                    continue;
-                }
-                clmem = launchConfiguration.clmems[clmemIndex];
-                // cout << "offsetarg: " << offsetArg << endl;
-                if(argConfig["offsetarg"]) {
-                    int offsetArg = argConfig["offsetarg"].as<int>();
-                    if(offsetArg < 0 || offsetArg >= launchConfiguration.args.size()) {
-                        cout << "buffer " << argIdx << ": offsetArg out of bounds => skipping arg" << endl;
-                        continue;
-                    }
-                    offsetBytes = llvm::cast<Int64Arg>(launchConfiguration.args[offsetArg].get())->v;
-                } else {
-                    offsetBytes = argConfig["offsetbytes"].as<int>();
-                }
-                cout << "  Dumping buffer " << argIdx << " clmem" << clmemIndex << " offset=" << offsetBytes << " " << argTypeName << "s:" << endl;
-            }
-            // cout << "offsetBytes " << offsetBytes << endl;
-
-            // cout << "argTypeName: [" << argTypeName << "]" << endl;
-            if(argTypeName == "float" || argTypeName == "int32") {
-                float *hostBuffer = new float[count];
-                // cout << "clmem " << clmem << endl;
-                if(clmem == 0) {
-                    cout << "    [Null]" << endl;
-                } else {
-                    cl_int err = clEnqueueReadBuffer(launchConfiguration.queue->queue, clmem, CL_TRUE, offsetBytes,
-                                                     count * sizeof(float), hostBuffer, 0, NULL, NULL);
-                    EasyCL::checkError(err);
-                    ostringstream buf;
-                    // buf << "    ";
-                    for(int i = 0; i < count; i++) {
-                        if(argTypeName == "float") {
-                            buf << hostBuffer[i] << " ";
-                        } else if(argTypeName == "int32") {
-                            buf << *(int *)&hostBuffer[i] << " ";
-                        }
-                        if(buf.tellp() > 70) {
-                            cout << "    " << buf.str() << endl;
-                            buf.str("");
-                        }
-                    }
-                    if(buf.tellp() > 0) {
-                        cout << "    " << buf.str() << endl;
-                    }
-                }
-            } else {
-                cout << "type name [" + argTypeName + "] not recognized" << endl;
-            }
-            if(argConfig["stopafter"] && argConfig["stopafter"].as<bool>()) {
-                cout << "dump config requested stop after this arg, so stopping now" << endl;
-                exit(0);
-            }
-            argIdx++;
-        }
-    }
-}
-
-static void maybeDump() {
-    // we are going to assume we're already inside a mutex, and therefore
-    // guaranteed to be running single-threaded
-    if(!checkedDumpEnabled) {
-        if(getenv("COCL_DUMP_CONFIG") != 0) {
-            string dumpConfigFile = getenv("COCL_DUMP_CONFIG");
-            cout << "Attemptign to load dump config from [" << dumpConfigFile << "]" << endl;
-            dumpEnabled = true;
-            dumpConfig = YAML::LoadFile(dumpConfigFile);
-        }
-        checkedDumpEnabled = true;
-    }
-    if(dumpEnabled) {
-        dump();
-    }
-}
+static LaunchConfiguration launchConfiguration;
+static DebugDumper debugDumper(&launchConfiguration);
 
 void hostside_opencl_funcs_assure_initialized(void) {
 }
@@ -639,7 +524,7 @@ void kernelGo() {
     cl_int err;
     err = clFinish(launchConfiguration.queue->queue);
     EasyCL::checkError(err);
-    maybeDump();
+    debugDumper.maybeDump();
 
     // cout << "trying cl->finihs()" << endl;
     //cl->finish();
