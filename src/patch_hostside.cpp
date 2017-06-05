@@ -326,7 +326,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
         alloca->insertAfter(lastInst);
         lastInst = alloca;
 
-        lastInst = structCloner.createHostsideIrCopyPtrfullToNoptr(lastInst, structType, structPointer, alloca);
+        lastInst = structCloner.writeHostsideIrCopyToMarshallingStruct(lastInst, structType, structPointer, alloca);
         sourceStruct = alloca;
     } else {
         sourceStruct = structPointer;

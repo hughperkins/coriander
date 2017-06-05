@@ -39,46 +39,45 @@ namespace cocl {
 // this handles struct types passed into kernels
 // since OpenCL 1.2 forbids passing pointer types in such structs, we need to remove those, and pass those in separately
 
-llvm::StructType *StructCloner::createGlobalizedPointerStruct(std::map<llvm::StructType *, llvm::StructType *> &newByOld, llvm::StructType *inType) {
-    // this will return a struct type from the input struct type `inType`, with all pointer types having their address space converted
-    // to `global`
-    ///
-    // it will recursively call itself on any child structs
-    //
+// llvm::StructType *StructCloner::createDevicesideStructType(std::map<llvm::StructType *, llvm::StructType *> &newByOld, llvm::StructType *inType) {
+//     // creates a device-side struct declaration, based on inType
+//     //
+//     // concretely, this measn we have to handle addressing address space delcarations, ie we add `global` to all pointers
+//     //
 
-    LLVMContext &context = inType->getContext();
-    if(newByOld.find(inType) != newByOld.end()) {
-        return newByOld[inType];
-    }
-    string newName = inType->getName().str() + "_ptrglobal";
-    vector<Type *>newChildren;
-    for(auto it=inType->element_begin(); it != inType->element_end(); it++) {
-        Type *childType = *it;
-        if(StructType *childStructType = dyn_cast<StructType>(childType)) {
-            childType = createGlobalizedPointerStruct(newByOld, childStructType);
-            newChildren.push_back(childType);
-        } else if(PointerType *ptr = dyn_cast<PointerType>(childType)) {
-            Type *elementType = ptr->getElementType();
-            // assume fundamental for now
-            if(elementType->getPrimitiveSizeInBits() > 0) {
-                PointerType *newPtr = PointerType::get(elementType, 1);
-                newChildren.push_back(newPtr);
-            } else {
-                // just ignore...
-            }
-        } else {
-            newChildren.push_back(childType);
-        }
-    }
-    StructType *newType = 0;
-    if(newChildren.size() > 0) {
-        newType = StructType::create(ArrayRef<Type *>(&newChildren[0], &newChildren[newChildren.size()]), newName);
-    } else {
-        newType = StructType::get(context);
-    }
-    newByOld[inType] = newType;
-    return newType;
-}
+//     LLVMContext &context = inType->getContext();
+//     if(newByOld.find(inType) != newByOld.end()) {
+//         return newByOld[inType];
+//     }
+//     string newName = inType->getName().str() + "_ptrglobal";
+//     vector<Type *>newChildren;
+//     for(auto it=inType->element_begin(); it != inType->element_end(); it++) {
+//         Type *childType = *it;
+//         if(StructType *childStructType = dyn_cast<StructType>(childType)) {
+//             childType = createDevicesideStructType(newByOld, childStructType);
+//             newChildren.push_back(childType);
+//         } else if(PointerType *ptr = dyn_cast<PointerType>(childType)) {
+//             Type *elementType = ptr->getElementType();
+//             // assume fundamental for now
+//             if(elementType->getPrimitiveSizeInBits() > 0) {
+//                 PointerType *newPtr = PointerType::get(elementType, 1);
+//                 newChildren.push_back(newPtr);
+//             } else {
+//                 // just ignore...
+//             }
+//         } else {
+//             newChildren.push_back(childType);
+//         }
+//     }
+//     StructType *newType = 0;
+//     if(newChildren.size() > 0) {
+//         newType = StructType::create(ArrayRef<Type *>(&newChildren[0], &newChildren[newChildren.size()]), newName);
+//     } else {
+//         newType = StructType::get(context);
+//     }
+//     newByOld[inType] = newType;
+//     return newType;
+// }
 
 StructType *StructCloner::cloneNoPointers(StructType *inType) {
     // creates a new struct type, from `inType`, that has all pointer types removed from it
@@ -116,7 +115,7 @@ StructType *StructCloner::cloneNoPointers(StructType *inType) {
     return newType;
 }
 
-std::string StructCloner::writeClCopyNoPtrToPtrfull(llvm::StructType *ptrfullType,  std::string srcName, std::string destName) {
+std::string StructCloner::writeClCopyToDevicesideStruct(llvm::StructType *ptrfullType,  std::string srcName, std::string destName) {
     // This writes OpenCL code, that will be used a kernel boilerplate ,in deviceside kernels, to copy the contents
     // of a passed in struct, that contains no pointers, into a full-blown struct, that contains pointer members
     //
@@ -139,7 +138,7 @@ std::string StructCloner::writeClCopyNoPtrToPtrfull(llvm::StructType *ptrfullTyp
             dstidx++;
             continue;
         } else if(StructType *childStructType = dyn_cast<StructType>(childType)) {
-            gencode += writeClCopyNoPtrToPtrfull(childStructType, childSrcName, childDstName);
+            gencode += writeClCopyToDevicesideStruct(childStructType, childSrcName, childDstName);
             srcidx++;
             dstidx++;
         } else if(childType->getPrimitiveSizeInBits() > 0 ) {
@@ -165,7 +164,7 @@ std::string StructCloner::writeClCopyNoPtrToPtrfull(llvm::StructType *ptrfullTyp
     return gencode;
 }
 
-llvm::Instruction *StructCloner::createHostsideIrCopyPtrfullToNoptr(
+llvm::Instruction *StructCloner::writeHostsideIrCopyToMarshallingStruct(
         llvm::Instruction *lastInst, StructType *ptrfullType, Value *src, Value *dst) {
     // creates bytecode instructions to copy from a struct containing pointers, into
     // a new struct object that contains no pointers
@@ -205,7 +204,7 @@ llvm::Instruction *StructCloner::createHostsideIrCopyPtrfullToNoptr(
             lastInst = childDstInst;
 
             if(StructType *childStructType = dyn_cast<StructType>(childType)) {
-                lastInst = createHostsideIrCopyPtrfullToNoptr(lastInst, childStructType, childSrcInst, childDstInst);
+                lastInst = writeHostsideIrCopyToMarshallingStruct(lastInst, childStructType, childSrcInst, childDstInst);
             } else if(childType->getPrimitiveSizeInBits() > 0 ) {
                 Instruction *load = new LoadInst(childSrcInst, "loadint");
                 load->insertAfter(lastInst);

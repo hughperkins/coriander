@@ -435,7 +435,7 @@ std::string FunctionDumper::dumpKernelFunctionDeclarationWithoutReturn(llvm::Fun
             unique_ptr<StructInfo> structInfo(new StructInfo());
             StructCloner::walkStructType(F->getParent(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
             shimCode += typeDumper->dumpType(structType) + " " + argName + "[1];\n";
-            shimCode += structCloner.writeClCopyNoPtrToPtrfull(structType, argName + "_nopointers[0]", argName + "[0]");
+            shimCode += structCloner.writeClCopyToDevicesideStruct(structType, argName + "_nopointers[0]", argName + "[0]");
             for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
                 PointerInfo *pointerInfo = pointerit->get();
                 Type *pointerElementType = pointerInfo->type->getPointerElementType();
