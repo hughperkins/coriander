@@ -277,10 +277,12 @@ std::string TypeDumper::dumpStructDefinition(StructType *type, string name) {
             int numElements = arraytype->getNumElements();
             declaration += "    ";
             // assume any pointers are global
+            // also, we'll change them into unsigned longs ... :-P. (ie virtual mem locations)
             if(isa<PointerType>(arrayelementtype)) {
-                declaration += "global ";
+                declaration += "unsigned long ";
+            } else {
+                declaration += dumpType(arrayelementtype) + " ";
             }
-            declaration += dumpType(arrayelementtype) + " ";
             declaration += memberName + "[" + easycl::toString(numElements) + "];\n";
         } else {
             declaration += "    ";
