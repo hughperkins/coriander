@@ -20,16 +20,17 @@ namespace cocl {
         // otherwise, problems :-P
     };
 
-    // typedef Memory *PMemory;
     Memory *findMemory(const char *passedInPointer);
+    Memory *findMemoryByClmem(cl_mem clmem);
 }
 
 #define CU_MEMHOSTALLOC_PORTABLE 123
-// #define cudaSharedMemBankSizeFourByte 124244 // used in thrust block_radix_rank.cuh
+
 enum MemoryTypeEnum {
     CU_MEMORYTYPE_DEVICE = 60000,
     CU_MEMORYTYPE_HOST
 };
+
 enum cudaMemcpyKind {  // name used by thrust, in trivial_copy.inl, line 55 ish
     cudaMemcpyDeviceToHost=111,
     cudaMemcpyHostToDevice=222,
@@ -57,8 +58,6 @@ extern "C" {
     size_t cuMemsetD8(CUdeviceptr location, unsigned char value, uint32_t count);
     size_t cuMemsetD32(CUdeviceptr location, unsigned int value, uint32_t count);
 
-    // size_t cuMemcpyHtoD_v2(CUdeviceptr gpu_dst, const void *host_src, size_t size);
-    // size_t cuMemcpyDtoH_v2(void *host_dst, CUdeviceptr gpu_src, size_t size);
     size_t cuMemcpyHtoD(CUdeviceptr gpu_dst, const void *host_src, size_t size);
     size_t cuMemcpyDtoH(void *host_dst, CUdeviceptr gpu_src, size_t size);
     size_t cuMemcpyHtoDAsync(CUdeviceptr gpu_dst, const void *host_src, size_t size, char*queue);

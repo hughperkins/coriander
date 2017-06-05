@@ -67,3 +67,7 @@ Currently, assumed/tested to be a single GPU.
 ## Synchronization, on streams etc
 
 A bunch of the `async` commands are not in fact currently async, but include an implicit `clFinish()` after them.  It seems better to get stuff working for now, and then make it faster later. However if you have a use-case where this is causing an obvious, and significant, slow-down, then please log an issue, with as much information as possible on the use-case, why you feel this is causing a slow-down, etc.
+
+# Technical debt stuff
+
+- hostside gpu buffers should not have vmem offsets added to kernel declaration

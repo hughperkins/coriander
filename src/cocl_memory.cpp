@@ -114,22 +114,31 @@ namespace cocl {
         ThreadVars *v = getThreadVars();
         Context *context = v->getContext();
         ContextMutex contextMutex(context);
-        // MemoryMutex memoryMutex;
-        // char *passedInAsCharStar = (char *)passedInPointer;
         size_t pos = (size_t)passedInAsCharStar;
-        // COCL_PRINT("findMemory pos=" << pos << endl;)
         for(auto it=v->getContext()->memories.begin(), e=v->getContext()->memories.end(); it != e; it++) {
             Memory *memory = *it;
-            // COCL_PRINT("memory fakepos=" << memory->fakePos << " bytes " << memory->bytes << endl;)
             if(pos >= memory->fakePos && pos < memory->fakePos + memory->bytes) {
-                // COCL_PRINT("found memory: " << (void *)memory << " fakepos=" << memory->fakePos << " bytes=" << memory->bytes);
                 return memory;
             }
         }
-        // cout << "could not find memory for " << (void *)passedInAsCharStar << endl;
         return 0;
-        // throw runtime_error("could not find memory");
     }
+
+    Memory *findMemoryByClmem(cl_mem clmem) {
+        ThreadVars *v = getThreadVars();
+        Context *context = v->getContext();
+        ContextMutex contextMutex(context);
+
+        for(auto it=v->getContext()->memories.begin(), e=v->getContext()->memories.end(); it != e; it++) {
+            Memory *memory = *it;
+            std::cout << "findMemoryByClmem clmem=" << clmem << " memory->clmem " << memory->clmem << std::endl;
+            if(clmem == memory->clmem) {
+                return memory;
+            }
+        }
+        return 0;
+    }
+
     size_t Memory::getOffset(const char *passedInAsCharStar) {
         return (size_t)passedInAsCharStar - fakePos;
     }

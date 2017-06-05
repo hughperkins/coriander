@@ -338,7 +338,9 @@ void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
     ThreadVars *v = getThreadVars();
 
     Memory *memory = findMemory(memory_as_charstar);
+    std::cout << "setKernelArgGpuBuffer vmemloc=" << memory_as_charstar << " memory=" << memory << std::endl;
     if(memory == 0) {
+        std::cout << "  memory==0" << std::endl;
         COCL_PRINT("setKernelArgGpuBuffer nullptr");
         addClmemArg(0);
         if(v->offsets_32bit) {
@@ -349,6 +351,7 @@ void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
     } else {
         size_t offset = memory->getOffset(memory_as_charstar);
         cl_mem clmem = memory->clmem;
+        std::cout << " clmem=" << clmem << std::endl;
 
         size_t offsetElements = offset;
 
@@ -418,9 +421,25 @@ void kernelGo() {
     CLKernel *kernel = compileOpenCLKernel(launchConfiguration.kernelName, res.uniqueKernelName, res.shortKernelName, res.clSourcecode);
     COCL_PRINT("kernelGo() uniqueKernelName: " << launchConfiguration.uniqueKernelName);
 
+    ThreadVars *v = getThreadVars();
     for(int i = 0; i < launchConfiguration.clmems.size(); i++) {
         COCL_PRINT("clmem" << i);
         kernel->inout(&launchConfiguration.clmems[i]);
+        // we also need to write out the offset of this clmem, in our virtual memory system
+        cl_mem clmem = launchConfiguration.clmems[i];
+        // std::cout << "clmem " << clmem << std::endl;
+        Memory *memory = findMemoryByClmem(clmem);
+        // std::cout << "memory: " << memory << std::endl;
+        // std::cout << "vmem loc: " << memory->fakePos << std::endl;
+        uint64_t vmemloc = 0;
+        if(memory != 0) {  // hostsidegpu buffers will be 0
+            vmemloc = memory->fakePos;
+        }
+        if(v->offsets_32bit) {
+            kernel->in((uint32_t)vmemloc);
+        } else {
+            kernel->in((int64_t)vmemloc);
+        }
     }
     for(int i = 0; i < launchConfiguration.args.size(); i++) {
         COCL_PRINT("i=" << i << " " << launchConfiguration.args[i]->str());
