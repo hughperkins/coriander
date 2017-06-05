@@ -19,8 +19,6 @@
 
 #include "llvm/IR/Instructions.h"
 #include "llvm/Support/raw_ostream.h"
-// #include "llvm/IR/Type.h"
-// #include "llvm/IR/FunctionType.h"
 
 #include <iostream>
 #include <set>
@@ -30,6 +28,17 @@ using namespace llvm;
 using namespace cocl;
 
 namespace cocl {
+
+// everything here assumes device-side
+// (since hostside wouldnt be using opencl, just bytecode stuff)
+
+// having said that, we have two types of struct declarations:
+// - marshalling structs, which have pointers removed/transformed
+// - what we will call 'deviceside' structs, which are the structs used in the kernel code, after
+//.  any boilerplate etc
+//
+// This code handles only the 'deviceside' structs for now
+// 'marshalling' structs are handled by struct_clone.cpp, on the whole
 
 std::string TypeDumper::dumpAddressSpace(llvm::Type *type) {
     if(PointerType *ptr = dyn_cast<PointerType>(type)) {
@@ -96,18 +105,13 @@ std::string TypeDumper::dumpIntegerType(IntegerType *type) {
 }
 
 std::string TypeDumper::addStructToGlobalNames(StructType *type) {
-    // outs() << "dumpstructtype" << "\n";
     if(globalNames->hasName(type)) {
         return globalNames->getName(type);
     }
-    // cout << "typedumper:;addstructtoglobalnames" << endl;
-    // type->dump();
     if(type->hasName()) {
         string name = type->getName();
-        // outs() << "name " << name << "\n";
         name = easycl::replaceGlobal(name, ".", "_");
         name = easycl::replaceGlobal(name, ":", "_");
-        // cout << "typedumper::dumpstructtype, name=" << name << endl;
         if(name == "struct_float4") {
             name = "float4";
             name = globalNames->getOrCreateName(type, name);
@@ -116,20 +120,17 @@ std::string TypeDumper::addStructToGlobalNames(StructType *type) {
             if(name.find("struct_") == 0 || name.find("struct ") == 0) {
                 name[6] = ' ';
                 name = globalNames->getOrCreateName(type, name);
-                // structsToDefine[type] = name;
                 structsToDefine.insert(type);
                 return name;
             } else if(name.find("class_") != string::npos) {
                 name = "struct " + name;
                 name = globalNames->getOrCreateName(type, name);
-                // structsToDefine[type] = name;
                 structsToDefine.insert(type);
                 return name;
             } else {
                 name = "struct " + name;
                 name = globalNames->getOrCreateName(type, name);
                 structsToDefine.insert(type);
-                // structsToDefine[type] = name;
                 return name;
             }
         }
@@ -156,7 +157,6 @@ std::string TypeDumper::dumpArrayType(ArrayType *type, bool decayArraysToPointer
 std::string TypeDumper::dumpVectorType(VectorType *vectorType, bool decayArraysToPointer) {
     int elementCount = vectorType->getNumElements();
     Type *elementType = vectorType->getElementType();
-    // cout << "TypeDumper::dumpVectorType count=" << elementCount << " type=" << dumpType(elementType) << endl;
     if(elementType->getPrimitiveSizeInBits() == 0) {
         cout << endl;
         vectorType->dump();
@@ -172,12 +172,9 @@ std::string TypeDumper::dumpVectorType(VectorType *vectorType, bool decayArraysT
     }
     cout << oss.str();
     return oss.str();
-    // return dumpType(elementType);
 }
 
 std::string TypeDumper::dumpFunctionType(FunctionType *fn) {
-    // throw runtime_error("not implemented");
-    // // outs() << "function" << "\n";
     std::string params_str = "";
     int i = 0;
     for(auto it=fn->param_begin(); it != fn->param_end(); it++) {
@@ -188,7 +185,6 @@ std::string TypeDumper::dumpFunctionType(FunctionType *fn) {
         params_str += dumpType(paramType);
         i++;
     }
-    // outs() << "params_str " << params_str << "\n";
     return params_str;
 }
 
@@ -209,10 +205,6 @@ std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {
 
         case Type::VectorTyID:
             return dumpVectorType(cast<VectorType>(type));
-            // cout << endl;
-            // type->dump();
-            // cout << endl;
-            // throw runtime_error("TypeDumper::dumpType(...): not implemented: vector type");
 
         case Type::ArrayTyID:
             return dumpArrayType(cast<ArrayType>(type), decayArraysToPointer);
@@ -243,8 +235,6 @@ std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {
 
 std::string TypeDumper::dumpStructDefinition(StructType *type, string name) {
     std::string declaration = "";
-    // structDeclarations.insert(name);
-    // cout << "dumping struct " << name << endl;
     declaration += name + " {\n";
     int i = 0;
     for(auto it=type->element_begin(); it != type->element_end(); it++) {
@@ -264,17 +254,13 @@ std::string TypeDumper::dumpStructDefinition(StructType *type, string name) {
         std::string memberName = "f" + easycl::toString(i);
         if(ArrayType *arraytype = dyn_cast<ArrayType>(elementType)) {
             Type *arrayelementtype = arraytype->getElementType();
-            // outs() << "arrayelementtype " << dumpType(arrayelementtype) << "\n";
             int numElements = arraytype->getNumElements();
-            // outs() << "numelements " << numElements << "\n";
             declaration += "    " + dumpType(arrayelementtype) + " ";
             declaration += memberName + "[" + easycl::toString(numElements) + "];\n";
-            // throw runtime_error("not implemented declarestruct for arraytype elements");
         } else {
             declaration += "    ";
             // if its a pointer, lets assume its global, for now
             if(isa<PointerType>(elementType)) {
-                // updateAddressSpace(ptr, 1);
                 declaration += "global ";
 
             }
@@ -296,54 +282,31 @@ std::string TypeDumper::dumpStructDefinitions() {
             if(dumped.find(structType) != dumped.end()) {
                 continue;
             }
-            // cout << structType->getName().str() << endl;
             // check if we already defined its members
             bool dumpable = true;
-            // cout << "    dumping elements of " << structType->getName().str() << endl;
-            // cout << "    num elements " << structType->getNumElements() << endl;
             for(auto it2=structType->element_begin(); it2 != structType->element_end(); it2++) {
-                // Type *structElementType = *it2;
-                // (*it2)->dump();
-                // outs << "\n";
                 Type *subType = (*it2);
-                // cout << "array type? " << dyn_cast<ArrayType>(*it2) << endl;
                 if(ArrayType *elementArrayType = dyn_cast<ArrayType>(subType)) {
                     subType = elementArrayType->getElementType();
                 }
                 if(StructType *elementStructType = dyn_cast<StructType>(subType)) {
                     if(dumped.find(elementStructType) == dumped.end()) {
-                        // cout << "    needs: " << elementStructType->getName().str() << endl;
-                        // cout << "    adding to structs to define" << endl;
-                        // elementStructType->dump();
-                        // if(elementStructType->getName().str() == "") {
-                        //     throw runtime_error("anonymous struct");
-                        // }
                         structsToDefine.insert(elementStructType);
                         dumpable = false;
                         break;
                     } else {
-                        // cout << "    ok: " << elementStructType->getName().str() << endl;
                     }
                 }
             }
             if(!dumpable) {
-                // cout << "    skip" << std::endl;
                 continue;
             }
             dumped.insert(structType);
             addStructToGlobalNames(structType);
-            // cout << "    dump" << endl;
             gencode += dumpStructDefinition(structType, globalNames->getName(structType));
         }
     }
-    // cout << "all structs dumped" << endl;
     return gencode;
 }
-
-// void TypeDumper::dumpStructDeclarations(std::ostream &os) {
-//     for(auto it=structDeclarations.begin(); it != structDeclarations.end(); it++) {
-//         os << *it << ";\n";
-//     }
-// }
 
 } // namespace cocl;
