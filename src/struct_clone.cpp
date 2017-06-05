@@ -36,6 +36,9 @@ using namespace cocl;
 
 namespace cocl {
 
+// this handles struct types passed into kernels
+// since OpenCL 1.2 forbids passing pointer types in such structs, we need to remove those, and pass those in separately
+
 llvm::StructType *StructCloner::createGlobalizedPointerStruct(std::map<llvm::StructType *, llvm::StructType *> &newByOld, llvm::StructType *inType) {
     // this will return a struct type from the input struct type `inType`, with all pointer types having their address space converted
     // to `global`
