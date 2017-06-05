@@ -69,7 +69,7 @@ For installation, please see [installation.md](doc/installation.md)
 ## Adding to your own `cmake` project?
 
 - cmake targets `cocl_add_executable` and `cocl_add_library` are available
-- see [test/cmake](test/cmake) for an example
+- see [cmake_usage.md](doc/cmake_usage.md) for more details
 
 ## Testing
 
