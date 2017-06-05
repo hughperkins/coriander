@@ -75,9 +75,6 @@ using namespace cocl;
 static LaunchConfiguration launchConfiguration;
 static DebugDumper debugDumper(&launchConfiguration);
 
-void hostside_opencl_funcs_assure_initialized(void) {
-}
-
 size_t cuInit(unsigned int flags) {
     return 0;
 }

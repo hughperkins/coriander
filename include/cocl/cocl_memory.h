@@ -1,8 +1,5 @@
 #pragma once
 
-// #include "CL/cl.h"
-
-// #include "EasyCL.h"
 #include "clew.h"
 
 namespace cocl {

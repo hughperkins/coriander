@@ -179,13 +179,11 @@ namespace cocl {
     public:
         size_t grid[3];
         size_t block[3];
-        // CLKernel *kernel;
         easycl::CLQueue *queue = 0;  // NOT owned by us
         cocl::CoclStream *coclStream = 0; // NOT owned
 
         std::vector<std::unique_ptr<Arg> > args;
 
-        // map<cl_mem *, int> clmemIndexByClmem;
         std::map<cl_mem, int> clmemIndexByClmem;
         std::vector<cl_mem> clmems;
         std::vector<int> clmemIndexByClmemArgIndex;
@@ -199,7 +197,6 @@ namespace cocl {
 }
 
 extern "C" {
-    void hostside_opencl_funcs_assure_initialized(void);
     void configureKernel(
         const char *kernelName, const char *llsourcecode);
 
