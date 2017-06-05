@@ -348,7 +348,7 @@ void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
     ThreadVars *v = getThreadVars();
 
     Memory *memory = findMemory(memory_as_charstar);
-    std::cout << "setKernelArgGpuBuffer vmemloc=" << memory_as_charstar << " memory=" << memory << std::endl;
+    std::cout << "setKernelArgGpuBuffer vmemloc=" << (long)memory_as_charstar << " memory=" << (long)memory << std::endl;
     if(memory == 0) {
         std::cout << "  memory==0" << std::endl;
         COCL_PRINT("setKernelArgGpuBuffer nullptr");

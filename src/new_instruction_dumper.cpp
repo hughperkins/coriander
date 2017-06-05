@@ -458,9 +458,10 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                 rhs += string(".f") + easycl::toString(idx);
                 newType = elementType;
                 if(isa<PointerType>(newType)) {
-                    // ~~if its a pointer in a struct, hackily assume gloal for now~~
-                    // assume addressspace 5, which we define to mean: virtual memory
-                    addressspace = 5;
+                    // if its a pointer in a struct, hackily assume gloal for now
+                    addressspace = 1;
+                    // ~~assume addressspace 5, which we define to mean: virtual memory~~
+                    // ~~addressspace = 5;~~
                 } else {
                     // addressspace = 0;
                 }
