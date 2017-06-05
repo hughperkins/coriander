@@ -1,4 +1,4 @@
-# Cmake usage of Coriander
+# Example of using Coriander in a cmake project
 
 ## Example
 
