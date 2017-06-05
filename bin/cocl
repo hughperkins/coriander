@@ -349,7 +349,6 @@ LLVM_LL_COMPILE_FLAGS=$(echo " ${LLVM_COMPILE_FLAGS} " | sed -e 's/-I *[^ ]*/ /g
 LLVM_LINK_FLAGS=`${CLANG_HOME}/bin/llvm-config --ldflags --system-libs --libs all`
 
 OUTDIR=$(dirname ${OUTFILE})
-echo OUTDIR ${OUTDIR}
 if [[ ! -d ${OUTDIR} ]]; then {
     echo making output folder ${OUTDIR}
     (
