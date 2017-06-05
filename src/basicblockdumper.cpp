@@ -24,11 +24,6 @@ using namespace llvm;
 namespace cocl {
 
 
-std::string BasicBlockDumper::getAllocaDeclarations(string indent) {
-    ostringstream oss;
-    return oss.str();
-}
-
 bool BasicBlockDumper::checkIfNeedsAssign(Instruction *instruction) {
     Use *use = 0;
     User *use_user = 0;
