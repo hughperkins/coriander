@@ -75,12 +75,9 @@ For installation, please see [installation.md](doc/installation.md)
 
 See [testing.md](doc/testing.md)
 
-## Simplifications made by Coriander
+## Assumptions/relaxations made by Coriander
 
-Coriander makes the following relaxations/simplifications:
-- ints are generally assumed to be no longer than 32-bit, and truncated to 32-bit mostly
-- floats are assumed to be singles. doubles in the original kernels are converted to floats in the OpenCL code
-- buffer offsets are generally taken to be int32s for now.  This might change in the future
+See [assumptions.md](doc/assumptions.md)
 
 ## Libraries
 

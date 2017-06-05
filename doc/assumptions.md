@@ -38,6 +38,10 @@ Structs within a kernel dont need any particular boilerplate etc. However, the a
 
 I *think* that `float *`s inside structs are always assumed to be `global float *` for now, but I dont remember clearly. I might be not making this assumption :-P
 
+## floats in kernel-parameters
+
+Only 32-bit floats are allowed in kernel parameters for now.
+
 ## Allocation
 
 When a kernel uses a `float **` in a by-value struct, passed in as a kernel parameter, all gpu buffers are assumed to have been carved from a single gpu buffer allocation.  ie something like:
