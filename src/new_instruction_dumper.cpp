@@ -394,6 +394,9 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         throw runtime_error("dumpgetelementptr op0typeptr is 0");
     }
     int addressspace = op0typeptr->getAddressSpace();
+    std::cout << "gep" << std::endl;
+    instr->dump();
+    std::cout << std::endl;
     if(addressspace == 3) { // local/shared memory
         // pointer into shared memory.
         // so, this isnt a local value in llvm, its a global one
@@ -403,20 +406,40 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             localNames, localValueInfos, sharedValue, sharedValue->getName().str());
         sharedInfo->setAddressSpace(3);
     }
+    llvm::Type *prevType = nullptr;
     for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
+        std::cout << "---------------" << std::endl;
+        std::cout << "  gep d=" << d << " currentType=" << typeDumper->dumpType(currentType) << std::endl;
         if(SequentialType *seqType = dyn_cast<SequentialType>(currentType)) {
+            std::cout << "    gep is sequentialtype" << std::endl;
             if(d == 0) {
                 if(isa<ArrayType>(seqType->getElementType())) {
                     rhs = "(&" + rhs + ")";
                 }
             }
+
             LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
             string idxstring = thisInfo->getExpr();
             idxstring = ExpressionsHelper::stripOuterParams(idxstring);
             rhs += string("[") + idxstring + "]";
+
+            // if this is an array of pointers, inside a struct, we are going to assume
+            // it is an array of virtual mem offsets
+            // we should check the parent type
+            if(prevType != nullptr and isa<StructType>(prevType)) {
+                std::cout << "found array inside struct, assuming virtualmem" << std::endl;
+                // so we should call getGlobalPointer, and store into a variable
+                localValueInfo->inlineCl.push_back(
+                    "global float * " + localValueInfo->name + "_gptrstep = getGlobalPointer(" +
+                        rhs + ", pGlobalVars" +
+                    ")"
+                );
+                rhs = localValueInfo->name + "_gptrstep";
+            }
             newType = seqType->getElementType();
         } else if(PointerType *pointerType = dyn_cast<PointerType>(currentType)) {
+            std::cout << "    gep is pointertype" << std::endl;
             if(d == 0) {
                 if(isa<ArrayType>(pointerType->getElementType())) {
                     rhs = "(&" + rhs + ")";
@@ -428,6 +451,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             rhs += string("[") + idxstring + "]";
             newType = pointerType->getElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
+            std::cout << "    gep is structtype" << std::endl;
             string structName = ReadIR::getName(structtype);
             if(structName == "struct.float4") {
                 int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
@@ -443,8 +467,9 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                 rhs += string(".f") + easycl::toString(idx);
                 newType = elementType;
                 if(isa<PointerType>(newType)) {
-                    // if its a pointer in a struct, hackily assume gloal for now
-                    addressspace = 1;
+                    // ~~if its a pointer in a struct, hackily assume gloal for now~~
+                    // assume addressspace 5, which we define to mean: virtual memory
+                    addressspace = 5;
                 } else {
                     // addressspace = 0;
                 }
@@ -462,6 +487,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         }
         // if new type is a pointer, and old type was a struct, then we assume its a global pointer, and therefore
         // update the addressspace to be global, ie 1.  This is a bit hacky I know
+        prevType = currentType;
         currentType = newType;
     }
     updateAddressSpace(instr, addressspace);
@@ -469,6 +495,9 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     rhs = "(" + ExpressionsHelper::stripOuterParams(rhs) + ")";
     rhs = "(&" + rhs + ")";
 
+    std::cout << "final gep: " << rhs << std::endl;
+    std::cout << "=============================" << std::endl;
+    std::cout << std::endl;
     localValueInfo->setExpression(rhs);
 }
 

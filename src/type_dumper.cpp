@@ -50,6 +50,8 @@ std::string TypeDumper::dumpAddressSpace(llvm::Type *type) {
                 return "global";
             case 3:
                 return "local";
+            case 5:
+                return "/* vmem */ unsigned long";
             default:
                 throw runtime_error("not implemented, addressspace " + easycl::toString(addressspace));
         }
@@ -64,15 +66,31 @@ std::string TypeDumper::dumpPointerType(PointerType *ptr, bool decayArraysToPoin
     string elementTypeString = dumpType(elementType, decayArraysToPointer);
     int addressspace = ptr->getAddressSpace();
     string addressspacestr = "";
-    if(addressspace == 1) {
-        addressspacestr = "global";
+    switch(addressspace) {
+        case 0:
+            break;
+
+        case 1:
+            addressspacestr = "global";
+            break;
+
+        case 3:
+            addressspacestr = "local";
+            break;
+
+        case 4:
+            addressspacestr = "constant";
+            break;
+
+        case 5:
+            addressspacestr = "/* vmem */";
+            break;
+
+        default:
+            std::cout << "unimplemented addressspace " << addressspace << std::endl;
+            throw std::runtime_error("Unimplemented addressspace");
     }
-    if(addressspace == 3) {
-        addressspacestr = "local";
-    }
-    if(addressspace == 4) {
-        addressspacestr = "constant";
-    }
+
     // we're just going to hackily assume that anything that is `global **` should be `global * global *`
     // if(isa<PointerType>(ptr->getPointerElementType())) {
         // return "global " + elementTypeString + addressspacestr + " *";
@@ -146,18 +164,13 @@ std::string TypeDumper::dumpStructType(StructType *type) {
 }
 
 std::string TypeDumper::dumpArrayType(ArrayType *type, bool decayArraysToPointer) {
-    // if its an array of pointers, we assume those are global pointers
-    // see doc/assumptions.md for more details
-
     std::cout << "TypeDumper::dumpArrayType" << std::endl;
     type->dump();
     std::cout << std::endl;
     ostringstream oss;
     int length = type->getNumElements();
     Type *elementType = type->getElementType();
-    // if(isa<PointerType>(elementType)) {
-    //     oss << "global ";
-    // }
+
     if(decayArraysToPointer) {
         oss << dumpType(elementType, decayArraysToPointer) + "*";
     } else {
@@ -203,9 +216,6 @@ std::string TypeDumper::dumpFunctionType(FunctionType *fn) {
 
 std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {
     Type::TypeID typeID = type->getTypeID();
-    // std::cout << "TypeDumper::Type " << dumpType(type) << std::endl;
-    // type->dump();
-    // std::cout << std::endl;
     switch(typeID) {
         case Type::VoidTyID:
             return "void";
