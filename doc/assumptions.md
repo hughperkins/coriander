@@ -36,7 +36,22 @@ Structs within a kernel dont need any particular boilerplate etc. However, the a
 
 ### `float *`
 
-I *think* that `float *`s inside structs are always assumed to be `global float *` for now, but I dont remember clearly. I might be not making this assumption :-P
+Assumed to be a virtual memory pointer.
+
+Passed in as separate kernel parameters, then spliced in.
+
+Represented as `global float *` in kernel side.
+
+### `float *[]`
+
+Assumed to be array of virtual memory pointers.
+
+// Passed in by-value, as 
+
+## structs allocated device-side
+
+Basically treated as though they were passed in via kernel parameter. ie:
+- `float *` is always `global float *`, though we dont do any splicing on this, no assumption of virtual memory etc (I think?), its just the type we assume
 
 ## floats in kernel-parameters
 
@@ -72,3 +87,6 @@ A bunch of the `async` commands are not in fact currently async, but include an 
 
 - hostside (ie byvalue) gpu buffers should not have vmem offsets added to kernel declaration
 - thread virtual mem address space throughout device code
+- revamp how structs work, so we actually modify the type, rather than just modifying gep etc
+  - probably implies creating our own struct representation, which is mutable
+    - would need to link all usages of each instance in to it somehow
