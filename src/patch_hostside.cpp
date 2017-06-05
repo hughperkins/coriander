@@ -19,42 +19,23 @@
 #include "cocl_logging.h"
 
 #include "mutations.h"
-#include "struct_clone.h"
 #include "argparsecpp.h"
-#include "type_dumper.h"
-#include "GlobalNames.h"
 #include "EasyCL/util/easycl_stringhelper.h"
 
-#include "llvm/ADT/APFloat.h"
-#include "llvm/ADT/STLExtras.h"
-
 #include "llvm/IR/AssemblyAnnotationWriter.h"
-#include "llvm/IR/DerivedTypes.h"
-#include "llvm/IR/LLVMContext.h"
 #include "llvm/IRReader/IRReader.h"
-#include "llvm/IR/Module.h"
 #include "llvm/IR/Verifier.h"
 #include "llvm/IR/Type.h"
-#include "llvm/IR/Constants.h"
-#include "llvm/IR/ValueSymbolTable.h"
-#include "llvm/IR/Instructions.h"
-#include "llvm/IR/DebugInfoMetadata.h"
 
-#include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_os_ostream.h"
 
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 
-#include <cstdio>
-#include <cstdlib>
-#include <vector>
-#include <map>
-#include <set>
-#include <stdexcept>
-#include <memory>
-#include <sstream>
+#include <string>
 #include <fstream>
+#include <sstream>
+#include <memory>
 
 using namespace llvm;
 using namespace std;
