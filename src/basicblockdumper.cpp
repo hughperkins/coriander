@@ -14,18 +14,6 @@
 
 #include "basicblockdumper.h"
 
-#include "readIR.h"
-#include "mutations.h"
-
-#include "EasyCL/util/easycl_stringhelper.h"
-
-#include "llvm/IR/Instruction.h"
-#include "llvm/IR/Instructions.h"
-#include "llvm/IR/BasicBlock.h"
-#include "llvm/IR/Constants.h"
-#include "llvm/IR/Module.h"
-#include "llvm/Transforms/Utils/Cloning.h"
-
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
