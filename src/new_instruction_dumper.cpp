@@ -421,7 +421,11 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             // if this is an array of pointers, inside a struct, we are going to assume
             // it is an array of virtual mem offsets
             // we should check the parent type
-            if(prevType != nullptr and isa<StructType>(prevType)) {
+            // also, this should be an array of *pointers*, not just primitive elements
+            if(prevType != nullptr &&
+                    isa<StructType>(prevType) &&
+                    isa<PointerType>(seqType->getElementType())
+                    ) {
                 // so we should call getGlobalPointer, and store into a variable
                 localValueInfo->inlineCl.push_back(
                     "global float * " + localValueInfo->name + "_gptrstep = getGlobalPointer(" +
