@@ -254,6 +254,19 @@ void configureKernel(const char *kernelName, const char *devicellsourcecode) {
     COCL_PRINT("=========================================");
     launchConfiguration.kernelName = kernelName;
     launchConfiguration.devicellsourcecode = devicellsourcecode;
+
+    // in order to handle by-value structs containing pointers to gpu structs, we're first going
+    // to add the first Memory object to the clmems, so it is available to the kernel, for
+    // dereferencing vmemlocs
+    // we are going to assume the first memory is at vmemloc=128 :-). very hacky :-DDD
+    Memory *firstMem = findMemory((const char *)128);
+    std::cout << "setKernelArgHostsideBuffer firstMem=" << firstMem << std::endl;
+    // if its not zero, then pass it into kernel
+    if(firstMem != 0) {
+        launchConfiguration.clmems.push_back(firstMem->clmem);
+        // addClmemArg(firstMem->clmem);
+    }
+
     pthread_mutex_unlock(&launchMutex);
 }
 
@@ -402,10 +415,11 @@ void kernelGo() {
     // COCL_PRINT("kernelGo queue=" << (void *)launchConfiguration.queue);
 
     // launchConfiguration.kernelName += "_";
-    // for(int i = 0; i < launchConfiguration.clmemIndexByClmemArgIndex.size(); i++) {
-    //     int clmemIndex = launchConfiguration.clmemIndexByClmemArgIndex[i];
+    for(int i = 0; i < launchConfiguration.clmemIndexByClmemArgIndex.size(); i++) {
+        int clmemIndex = launchConfiguration.clmemIndexByClmemArgIndex[i];
+        std::cout << "   arg " << i << " clmemindex=" << clmemIndex << std::endl;
     //     launchConfiguration.kernelName += "_" + EasyCL::toString(clmemIndex);
-    // }
+    }
     // cout << "kernelGo() kernel name " << launchConfiguration.kernelName << " unique clmems=" << launchConfiguration.clmems.size() << endl;
     // cout << "kernelGo() clmems.size() " << launchConfiguration.clmems.size() << endl;
     // for(auto it = launchConfiguration.clmemIndexByClmemArgIndex.begin(); it != launchConfiguration.clmemIndexByClmemArgIndex.end(); it++) {

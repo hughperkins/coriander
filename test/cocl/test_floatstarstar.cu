@@ -30,14 +30,18 @@ int main(int argc, char *argv[]) {
 
     const int numBuffers = 3;
 
-    float *gpuArena;
-    cudaMalloc((void **)&gpuArena, numBuffers * N * 4 + 1024);
+    char *gpuArena;
+    // cudaMalloc((void **)&gpuArena, numBuffers * N * 4 + 1024);
+    int mallocSize = numBuffers * N * sizeof(float) + 256 + 1024;
+    std::cout << "mallocSize=" << mallocSize << std::endl;
+    cudaMalloc((void **)&gpuArena, mallocSize);
 
     struct BoundedArray boundedArray;
     float *hostFloats[numBuffers];
 
     for(int i = 0; i < numBuffers; i++) {
-        boundedArray.bounded_array[i] = gpuArena + 256 + i * N;
+        boundedArray.bounded_array[i] = (float *)(gpuArena + 256 + i * N * sizeof(float));
+        std::cout << "bounded_array[" << i << "]=" << (long)boundedArray.bounded_array[i] << std::endl;
         hostFloats[i] = new float[N];
     }
 
@@ -48,12 +52,23 @@ int main(int argc, char *argv[]) {
     }
     cuStreamSynchronize(stream);
 
+    std::cout << std::endl;
     for(int i = 0; i < numBuffers; i++) {
-        for(int j=0; j < 8; j++) {
+        for(int j=0; j < 4; j++) {
             cout << hostFloats[i][j] << " ";
-            assert(hostFloats[i][j] == 123.0f + 1 + i + j);
         }
         cout << endl;
+    }
+
+    for(int i = 0; i < numBuffers; i++) {
+        for(int j=0; j < N; j++) {
+            float expected = 123.0f + 1 + i + j;
+            float actual = hostFloats[i][j];
+            if(actual != expected) {
+                std::cout << "mismatch for i=" << i << " j=" << j << " expected=" << expected << " actual=" << actual << std::endl;
+                assert(false);
+            }
+        }
     }
 
     for(int i=0; i < numBuffers; i++) {
