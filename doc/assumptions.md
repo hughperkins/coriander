@@ -70,4 +70,5 @@ A bunch of the `async` commands are not in fact currently async, but include an 
 
 # Technical debt stuff
 
-- hostside gpu buffers should not have vmem offsets added to kernel declaration
+- hostside (ie byvalue) gpu buffers should not have vmem offsets added to kernel declaration
+- thread virtual mem address space throughout device code
