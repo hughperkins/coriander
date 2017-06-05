@@ -42,6 +42,10 @@ I *think* that `float *`s inside structs are always assumed to be `global float 
 
 Only 32-bit floats are allowed in kernel parameters for now.
 
+## floats inside kernels
+
+All floats are converted to 32-bit single floats, even if they are explicitly declared as 64-bit doubles in the underlying codebase.
+
 ## Allocation
 
 When a kernel uses a `float **` in a by-value struct, passed in as a kernel parameter, all gpu buffers are assumed to have been carved from a single gpu buffer allocation.  ie something like:
