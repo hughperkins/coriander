@@ -119,6 +119,7 @@ __device__ float tanhf(float in1);
 __device__ float acosf(float in1);
 __device__ float atanf(float in1);
 __device__ float fabsf(float in1);
+__device__ float fabs(float in1);
 __device__ float sqrtf(float in1);
 __device__ float rsqrtf(float in1);
 __device__ float ceilf(float in1);
@@ -166,9 +167,10 @@ __device__ T atomicAdd(T* address, T val);
 template<typename T>
 __device__ T atomicMax(T* address, T val);
 template<typename T>
-__device__ T atomicInc(T* address, T val);
-template<typename T>
 __device__ T atomicExch(T* address, T val);
+__device__ uint64_t atomicExch(uint64_t *address, uint64_t val);
+
+__device__ uint32_t atomicInc(uint32_t *address, uint32_t val);
 
 __device__ bool __isGlobal(const void *ptr);
 __device__ void __threadfence_block();

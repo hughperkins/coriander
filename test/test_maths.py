@@ -92,29 +92,6 @@ define void @kernel_float_constants(float* nocapture %data) #1 {
     assert 'data[0] = 1e-07f' in cl_code
 
 
-def test_atomic_add(context, q, float_data, float_data_gpu):
-    ll_code = """
-declare float @_Z9atomicAddIfET_PS0_S0_(float *, float)
-
-define void @mykernel(float* nocapture %data) #1 {
-  %1 = call float @_Z9atomicAddIfET_PS0_S0_(float * %data, float 3.25)
-  ret void
-}
-"""
-    cl_code = test_common.ll_to_cl(ll_code, 'mykernel', 1)
-    print('cl_code', cl_code)
-    # try compiling it, just to be sure...
-    float_data[0] = 0
-    kernel = test_common.build_kernel(context, cl_code, 'mykernel')
-    cl.enqueue_copy(q, float_data_gpu, float_data)
-    kernel(q, (128,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(32))
-    from_gpu = np.copy(float_data)
-    cl.enqueue_copy(q, from_gpu, float_data_gpu)
-    q.finish()
-    print('from_gpu[0]', from_gpu[0])
-    assert from_gpu[0] == 3.25 * 128
-
-
 def test_umulhi(context, q, int_data, int_data_gpu):
     ll_code = """
 declare i32 @_Z8__umulhiii(i32, i32)
@@ -150,7 +127,28 @@ define void @test_umulhi(i32* %data) {
     assert expected == from_gpu[0].item()
 
 
-@pytest.mark.skip
+def test_fabs_double(context, q, float_data, float_data_gpu):
+    cu_code = """
+__global__ void mykernel(float *data) {
+    data[0] = fabs(data[0]);
+}
+"""
+    cl_code = test_common.cu_to_cl(cu_code, '_Z8mykernelPf', 1)
+    print('cl_code', cl_code)
+    float_data[0] = -0.123
+    cl.enqueue_copy(q, float_data_gpu, float_data)
+    kernel = test_common.build_kernel(context, cl_code, '_Z8mykernelPf')
+    kernel(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(32))
+    from_gpu = np.copy(float_data)
+    cl.enqueue_copy(q, from_gpu, float_data_gpu)
+    q.finish()
+    expected = 0.123
+    print('expected', expected)
+    print('from_gpu[0]', from_gpu[0])
+    assert abs(expected - from_gpu[0].item()) < 1e-4
+
+
+@pytest.mark.skip(reason='double parameters to kernels not supported currently')
 def test_double_ieeefloats(context, q, float_data, float_data_gpu):
     cu_code = """
 __global__ void mykernel(double *data) {

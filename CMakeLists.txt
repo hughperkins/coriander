@@ -241,6 +241,7 @@ set(THIS_COCL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl)
 set(COCL_ARTIFACTS patch_hostside cocl)
 # set(THIS_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set(THIS_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(THIS_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cocl.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl-internal.cmake" @ONLY)
@@ -265,7 +266,8 @@ endif(BUILD_TESTS)
     endif()
     include_directories(include/cocl/proxy_includes)
     foreach(TEST ${TESTS})
-        add_cocl_executable(${TEST} ${TESTS_EXCLUDE} test/cocl/${TEST}.cu)
+        cocl_add_executable(${TEST} ${TESTS_EXCLUDE} test/cocl/${TEST}.cu)
+        target_link_libraries(${TEST} cocl clew clblast easycl)
         add_custom_target(run-${TEST}
             COMMAND echo
             COMMAND echo make run-${TEST}
@@ -341,7 +343,7 @@ INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/cocl DESTINATION bin)
 INSTALL(FILES ${CLEW_HEADERS} DESTINATION include)
 INSTALL(FILES ${EASYCL_HEADERS_ROOT} DESTINATION include/EasyCL)
 # INSTALL(FILES ${CMAKE_SOURCE_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
-INSTALL(FILES ${CMAKE_BINARY_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
+INSTALL(FILES ${CMAKE_BINARY_DIR}/cmake/cocl.cmake ${CMAKE_SOURCE_DIR}/cmake/cocl_impl.cmake DESTINATION share/cocl)
 install(TARGETS easycl clew clblast cocl patch_hostside EXPORT cocl-targets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
