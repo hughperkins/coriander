@@ -394,9 +394,6 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         throw runtime_error("dumpgetelementptr op0typeptr is 0");
     }
     int addressspace = op0typeptr->getAddressSpace();
-    std::cout << "gep" << std::endl;
-    instr->dump();
-    std::cout << std::endl;
     if(addressspace == 3) { // local/shared memory
         // pointer into shared memory.
         // so, this isnt a local value in llvm, its a global one
@@ -409,10 +406,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     llvm::Type *prevType = nullptr;
     for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
-        std::cout << "---------------" << std::endl;
-        std::cout << "  gep d=" << d << " currentType=" << typeDumper->dumpType(currentType) << std::endl;
         if(SequentialType *seqType = dyn_cast<SequentialType>(currentType)) {
-            std::cout << "    gep is sequentialtype" << std::endl;
             if(d == 0) {
                 if(isa<ArrayType>(seqType->getElementType())) {
                     rhs = "(&" + rhs + ")";
@@ -428,7 +422,6 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             // it is an array of virtual mem offsets
             // we should check the parent type
             if(prevType != nullptr and isa<StructType>(prevType)) {
-                std::cout << "found array inside struct, assuming virtualmem" << std::endl;
                 // so we should call getGlobalPointer, and store into a variable
                 localValueInfo->inlineCl.push_back(
                     "global float * " + localValueInfo->name + "_gptrstep = getGlobalPointer(" +
@@ -439,7 +432,6 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             }
             newType = seqType->getElementType();
         } else if(PointerType *pointerType = dyn_cast<PointerType>(currentType)) {
-            std::cout << "    gep is pointertype" << std::endl;
             if(d == 0) {
                 if(isa<ArrayType>(pointerType->getElementType())) {
                     rhs = "(&" + rhs + ")";
@@ -451,7 +443,6 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             rhs += string("[") + idxstring + "]";
             newType = pointerType->getElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
-            std::cout << "    gep is structtype" << std::endl;
             string structName = ReadIR::getName(structtype);
             if(structName == "struct.float4") {
                 int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
@@ -495,9 +486,6 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     rhs = "(" + ExpressionsHelper::stripOuterParams(rhs) + ")";
     rhs = "(&" + rhs + ")";
 
-    std::cout << "final gep: " << rhs << std::endl;
-    std::cout << "=============================" << std::endl;
-    std::cout << std::endl;
     localValueInfo->setExpression(rhs);
 }
 
