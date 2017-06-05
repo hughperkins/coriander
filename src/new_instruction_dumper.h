@@ -1,9 +1,21 @@
+// Copyright Hugh Perkins 2016, 2017
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #pragma once
 
 #include "LocalValueInfo.h"
 #include "InstructionDumper.h"
-
-// #include "llvm/Support/Casting.h"
 
 #include <string>
 #include <stdexcept>
@@ -22,50 +34,6 @@ public:
     llvm::Value *value;
 };
 
-// class Dependency {
-// public:
-//     virtual ~Dependency() {}
-
-// // http://llvm.org/docs/HowToSetUpLLVMStyleRTTI.html
-//     enum DependencyKind {
-//         DependencyKind_Base,
-//         DependencyKind_Function,
-//         DependencyKind_Value
-//     };
-//     Dependency(DependencyKind kind=DependencyKind_Base) : Kind(kind) {}
-//     DependencyKind getKind() const { return Kind; }
-//     static bool classof(const Dependency *target) {
-//         return target->getKind() == DependencyKind_Base;
-//     }
-
-// private:
-//     const DependencyKind Kind;
-// };
-
-// class FunctionDependency : public Dependency {
-// public:
-//     FunctionDependency(llvm::Function *F) : Dependency(DependencyKind_Function), F(F) {}
-//     virtual ~FunctionDependency() {}
-
-//     static bool classof(const Dependency *target) {
-//         return target->getKind() == DependencyKind_Function;
-//     }
-
-//     llvm::Function *F;
-// };
-
-// class ValueDependency : public Dependency {
-// public:
-//     ValueDependency(llvm::Value *value) : Dependency(DependencyKind_Value), value(value) {}
-//     virtual ~ValueDependency() {}
-
-//     static bool classof(const Dependency *target) {
-//         return target->getKind() == DependencyKind_Value;
-//     }
-
-//     llvm::Value *value;
-// };
-
 class NewInstructionDumper {
 public:
     NewInstructionDumper(
@@ -80,7 +48,6 @@ public:
 
         std::map<llvm::Value *, std::string> *globalExpressionByValue,
         std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos
-        // std::map<std::string, std::string> *shortFnNameByOrigName
     );
 
     void dumpIcmp(LocalValueInfo *localValueInfo);
@@ -103,8 +70,6 @@ public:
     LocalValueInfo *getOperand(llvm::Value *op);
     LocalValueInfo *dumpConstant(llvm::Constant *constant);
     void dumpConstantExpr(LocalValueInfo *localValueInfo);
-    // LocalValueInfo *CreateConstantInfo(Consant *constant);
-    // void dumpMemcpyCharCharLong(LocalValueInfo *localValueInfo);
     void dumpMemcpy(LocalValueInfo *localValueInfo, int align);
     void writeShimCall(LocalValueInfo *localValueInfo, std::string shimName, std::string extraArgs, llvm::CallInst *instr);
     void dumpCall(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
@@ -126,8 +91,6 @@ public:
 
     std::set<std::string> *shimFunctionsNeeded = 0; // for __shfldown_3 etc, that we provide as opencl directly
     std::set<llvm::Function *> *neededFunctions = 0;
-    // std::map<std::string, std::string> *shortFnNameByOrigName = 0;
-    // std::set<std::unique_ptr<Dependency> > neededDependencies; // this will probably replace neededFunctions soon, but for now is only for needed values
 
     std::map<llvm::Value *, std::string> *globalExpressionByValue = 0;
     std::map<llvm::Value *, std::unique_ptr<LocalValueInfo > > *localValueInfos = 0;
