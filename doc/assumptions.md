@@ -83,6 +83,59 @@ Currently, assumed/tested to be a single GPU.
 
 A bunch of the `async` commands are not in fact currently async, but include an implicit `clFinish()` after them.  It seems better to get stuff working for now, and then make it faster later. However if you have a use-case where this is causing an obvious, and significant, slow-down, then please log an issue, with as much information as possible on the use-case, why you feel this is causing a slow-down, etc.
 
+# Notes on virtual memory
+
+Virtual memory is implemented per-context.
+
+Virtual addresses are unique, within the context, and map onto either exactly one `cl_mem` buffer, are `nullptr` (?), or are invalid.
+
+When passed by-value into a kernel, eg as part of a struct that might look like:
+
+```
+struct SomeStruct {
+    float *buffers[8];
+};
+```
+... then the size of these pointers is 64-bit, matching the hostside (at least, I think; on Mac, this seems to be hte case; I might be assuming 64-bit OS I suppose...).
+
+On the GPU, these arrive as 64-bit, but eg the Radeon on my Mac uses 32-bit addressing.
+
+How to handle this point?
+
+So, we represent these virtual addresses as `unsigned long`, or just `long`, on the device side:
+
+```
+struct SomeStruct {
+    long buffers[8];
+};
+```
+
+If this array has one additional level of indirection, it will be... it's out of scope for these assuptions for now. We ignore such a case for now.
+
+At some point in the code, we will map these virtual memory pointers, on the device-side, into global pointers, somethign like:
+
+```
+global float *buffers0 = getGlobalPointer(buffers[0]);
+```
+
+We will only dereference once we reach the level of a value inside the `buffers` array, eg `buffers[0]` or `buffers[1]`. For example, this is invalid:
+
+```
+global float *buffers = getGlobalPointer(buffers);  // <= ERROR, buffers is not a `long`, not a virtual memory address. It's an array of memory addresses
+global float **buffers = getGlobalPointer(buffers);  // <= ERROR, cannot do this
+```
+
+We can write down the mapping between the representations:
+
+| value | as virtual memory | as deviceside memory |
+|-----|----------|-----------|
+| buffers[i] | unsigned long | global float * |
+| buffers | unsigned long * | not possible to represent, in general |
+| buffers[i][j] | not possible to represent | float |
+```
+
+We will dereference these types on the fly, in some combination of modifying getelementptr, and store, maybe also load.
+
 # Technical debt stuff
 
 - hostside (ie byvalue) gpu buffers should not have vmem offsets added to kernel declaration
