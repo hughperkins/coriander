@@ -58,3 +58,11 @@ endmacro(cocl_add_executable)
 macro(cocl_add_library target_name)
     cocl_build_objects(${target_name} LIBRARY ${ARGN})
 endmacro(cocl_add_library)
+
+find_library(COCL_RUNTIME_LIBRARY cocl HINTS ${COCL_LIB})
+find_library(CLBLAST_RUNTIME_LIBRARY clblast HINTS ${COCL_LIB})
+find_library(CLEW_RUNTIME_LIBRARY clew HINTS ${COCL_LIB})
+find_library(EASYCL_RUNTIME_LIBRARY easycl HINTS ${COCL_LIB})
+mark_as_advanced(FORCE COCL_RUNTIME_LIBRARY CLBLAST_RUNTIME_LIBRARY CLEW_RUNTIME_LIBRARY EASYCL_RUNTIME_LIBRARY)
+
+SET(Coriander_LIBRARIES ${COCL_RUNTIME_LIBRARY} ${CLBLAST_RUNTIME_LIBRARY} ${EASYCL_RUNTIME_LIBRARY} ${CLEW_RUNTIME_LIBRARY})
