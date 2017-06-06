@@ -115,12 +115,8 @@ llvm::Constant *createInt32Constant(llvm::LLVMContext *context, int value) {
 
 void updateAddressSpace(Value *value, int newSpace) {
     if(PointerType *pointerType = dyn_cast<PointerType>(value->getType())) {
-        // std::cout << "updating addresssapce" << std::endl;
         Type *newType = PointerType::get(pointerType->getElementType(), newSpace);
-        // newType->dump();
         value->mutateType(newType);
-        // value->dump();
-        // std::cout << std::endl;
     }
 }
 

@@ -378,64 +378,6 @@ void NewInstructionDumper::dumpSelect(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->setExpression(gencode);
 }
 
-// // void debugPrint(LocalValueInfo *lvi,)
-// class TargetedLogger {
-// public:
-//     TargetedLogger(const LocalValueInfo &lvi) :
-//         lvi(lvi) {
-//         // log = lvi.name == targetname;
-//     }
-//     void enableForName(std::string variableName) {
-//         if(lvi.name == variableName) {
-//             log = true;
-//         }
-//     }
-//     TargetedLogger &operator<<(std::string message) {
-//         // if(!log) { return *this; }
-//         oss << message;
-//         return *this;
-//     }
-//     TargetedLogger &operator<<(std::ostream &(*endl_fn)(ostream &)) {
-//         // if(!log) { return *this; }
-//         std::cout << oss.str() << std::endl;
-//         oss.str("");
-//         return *this;
-//     }
-//     const LocalValueInfo &lvi;
-//     // std::string targetname;
-//     std::ostringstream oss;
-//     bool log = false;
-// };
-
-// class RetrospectiveLogger {
-// public:
-//     RetrospectiveLogger() {
-//         // lvi(lvi) {
-//         // log = lvi.name == targetname;
-//     }
-//     // void enableForName(std::string variableName) {
-//     //     if(lvi.name == variableName) {
-//     //         log = true;
-//     //     }
-//     // }
-//     TargetedLogger &operator<<(std::string message) {
-//         // if(!log) { return *this; }
-//         oss << message;
-//         return *this;
-//     }
-//     TargetedLogger &operator<<(std::ostream &(*endl_fn)(ostream &)) {
-//         // if(!log) { return *this; }
-//         oss << std::endl;
-//         // std::cout << oss.str() << std::endl;
-//         // oss.str("");
-//         return *this;
-//     }
-//     // const LocalValueInfo &lvi;
-//     // std::string targetname;
-//     std::ostringstream oss;
-//     // bool log = false;
-// };
-
 void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     GetElementPtrInst *instr = cast<GetElementPtrInst>(localValueInfo->value);
@@ -489,9 +431,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                 newType = seqType->getElementType();
             }
         } else if(PointerType *pointerType = dyn_cast<PointerType>(currentType)) {
-            // l << "    gep pointertype" << std::endl;
             if(d == 0) {
-                // if(isa<ArrayType>(pointerType->getElementType()) || pointerType->getAddressSpace() == 5) {
                 if(isa<ArrayType>(pointerType->getElementType())) {
                     rhs = "(&" + rhs + ")";
                 }
@@ -502,7 +442,6 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             rhs += string("[") + idxstring + "]";
             newType = pointerType->getElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
-            // l << "    gep structype" << std::endl;
             string structName = ReadIR::getName(structtype);
             if(structName == "struct.float4") {
                 int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
@@ -527,12 +466,6 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                     if(isa<PointerType>(newTypeAsPointer->getElementType())) {
                         // l << "gep   struct child is pointer to pointer" << std::endl;
                         addressspace = 5;
-                        // newType = PointerType::get(PointerType::get(IntegerType::get(M->getContext(), 64), 5), 5);
-                        // newType = PointerType::get(IntegerType::get(M->getContext(), 64), 5);
-                        // std::cout << " gep pointerpointer type dump: " << std::endl;
-                        // newType->dump();
-                        // l << std::endl;
-                        // l << typeDumper->dumpType(newType) << std::endl;
                         // probably should unwrap this.  something for hte future...
                     }
                 } else {
@@ -723,7 +656,6 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
     for(int d=0; d < numIndices; d++) {
         int idx = indices[d];
         Type *newType = 0;
-        // if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
         if(SequentialType *seqType = dyn_cast<SequentialType>(currentType)) {
             if(d == 0) {
                 if(isa<ArrayType>(seqType->getElementType())) {
@@ -1103,8 +1035,6 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo, const s
                 originalInstruction += "<unk>";
             }
         }
-        // originalInstruction = easycl::replace(originalInstruction, "/*", "");
-        // originalInstruction = easycl::replace(originalInstruction, "*/", "");
         localValueInfo->inlineCl.push_back("/* " + originalInstruction + " */");
     }
     string instructionCode = "";
