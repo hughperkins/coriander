@@ -115,7 +115,6 @@ __global__ void mykernel(float *data) {
     print('cl_sourcecode', cl_sourcecode)
     # kernel = test_common.build_kernel(context, cl_sourcecode, kernelName)
 
-
     # %1 = load float, float* %p1
     # %2 = getelementptr
 

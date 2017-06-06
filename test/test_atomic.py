@@ -40,7 +40,7 @@ define void @mykernel(float* nocapture %data) #1 {
     float_data[0] = 0
     kernel = test_common.build_kernel(context, cl_code, 'mykernel')
     cl.enqueue_copy(q, float_data_gpu, float_data)
-    kernel(q, (128,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(32))
+    kernel(q, (128,), (32,), float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(32))
     from_gpu = np.copy(float_data)
     cl.enqueue_copy(q, from_gpu, float_data_gpu)
     q.finish()
@@ -75,7 +75,7 @@ __global__ void mykernel(int *data) {
     cl.enqueue_copy(q, int_data_gpu, int_data)
     num_blocks = 4
     threads_per_block = 4
-    kernel(q, (num_blocks * threads_per_block,), (threads_per_block,), int_data_gpu, offset_type(0), cl.LocalMemory(32))
+    kernel(q, (num_blocks * threads_per_block,), (threads_per_block,), int_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(32))
     from_gpu = np.copy(int_data)
     cl.enqueue_copy(q, from_gpu, int_data_gpu)
     q.finish()
@@ -121,7 +121,7 @@ __global__ void mykernel(unsigned int *data) {
     cl.enqueue_copy(q, int_data_gpu, int_data)
     num_blocks = 4
     threads_per_block = 4
-    kernel(q, (num_blocks * threads_per_block,), (threads_per_block,), int_data_gpu, offset_type(0), cl.LocalMemory(32))
+    kernel(q, (num_blocks * threads_per_block,), (threads_per_block,), int_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(32))
     from_gpu = np.copy(int_data)
     cl.enqueue_copy(q, from_gpu, int_data_gpu)
     q.finish()
@@ -157,8 +157,8 @@ __global__ void mykernel(int *data, int limit) {
     num_blocks = 4
     threads_per_block = 4
     modulus = 11
-    kernel(q, (num_blocks * threads_per_block,), (threads_per_block,), int_data_gpu, offset_type(0), np.int32(256), cl.LocalMemory(32))
-    kernel(q, (num_blocks * threads_per_block,), (threads_per_block,), int_data_gpu, offset_type(4), np.int32(modulus - 1), cl.LocalMemory(32))
+    kernel(q, (num_blocks * threads_per_block,), (threads_per_block,), int_data_gpu, offset_type(0), offset_type(0), np.int32(256), cl.LocalMemory(32))
+    kernel(q, (num_blocks * threads_per_block,), (threads_per_block,), int_data_gpu, offset_type(0), offset_type(4), np.int32(modulus - 1), cl.LocalMemory(32))
     from_gpu = np.copy(int_data)
     cl.enqueue_copy(q, from_gpu, int_data_gpu)
     q.finish()

@@ -443,10 +443,10 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     LocalValueInfo *op0info = getOperand(instr->getOperand(0));
 
     // TargetedLogger l(*localValueInfo);
-    ostringstream l;
-    l << "\n=============\nGEP\n---" << std::endl;
+    // ostringstream l;
+    // l << "\n=============\nGEP\n---" << std::endl;
 
-    l << "lvi->name " << localValueInfo->name << std::endl;
+    // l << "lvi->name " << localValueInfo->name << std::endl;
     // l << "op0info->name " << op0info->name << std::endl;
 
     // l.enableForName("v29");
@@ -479,9 +479,9 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     llvm::Type *prevType = nullptr;
     for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
-        l << "   gep d=" << d << " currnettype=" << typeDumper->dumpType(currentType) << std::endl;
+        // l << "   gep d=" << d << " currnettype=" << typeDumper->dumpType(currentType) << std::endl;
         if(SequentialType *seqType = dyn_cast<SequentialType>(currentType)) {
-            l << "    gep seqtype" << std::endl;
+            // l << "    gep seqtype" << std::endl;
             if(d == 0) {
                 if(isa<ArrayType>(seqType->getElementType())) {
                     rhs = "(&" + rhs + ")";
@@ -523,7 +523,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                 newType = seqType->getElementType();
             }
         } else if(PointerType *pointerType = dyn_cast<PointerType>(currentType)) {
-            l << "    gep pointertype" << std::endl;
+            // l << "    gep pointertype" << std::endl;
             if(d == 0) {
                 // if(isa<ArrayType>(pointerType->getElementType()) || pointerType->getAddressSpace() == 5) {
                 if(isa<ArrayType>(pointerType->getElementType())) {
@@ -536,7 +536,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             rhs += string("[") + idxstring + "]";
             newType = pointerType->getElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
-            l << "    gep structype" << std::endl;
+            // l << "    gep structype" << std::endl;
             string structName = ReadIR::getName(structtype);
             if(structName == "struct.float4") {
                 int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
@@ -559,7 +559,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
 
                     // if its a pointer to pointer, it's address space 5, otherwis 1
                     if(isa<PointerType>(newTypeAsPointer->getElementType())) {
-                        l << "gep   struct child is pointer to pointer" << std::endl;
+                        // l << "gep   struct child is pointer to pointer" << std::endl;
                         addressspace = 5;
                         // newType = PointerType::get(PointerType::get(IntegerType::get(M->getContext(), 64), 5), 5);
                         // newType = PointerType::get(IntegerType::get(M->getContext(), 64), 5);
@@ -589,8 +589,8 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         prevType = currentType;
         currentType = newType;
     }
-    l << "  gep final addressspace=" << addressspace << std::endl;
-    l << "  gep currenttype after loop=" << typeDumper->dumpType(currentType) << std::endl;
+    // l << "  gep final addressspace=" << addressspace << std::endl;
+    // l << "  gep currenttype after loop=" << typeDumper->dumpType(currentType) << std::endl;
     updateAddressSpace(instr, addressspace);
     // Type *gepType = PointerType::get(currentType, addressspace);
     // l << "  gepType: " << typeDumper->dumpType(gepType) << std::endl;
@@ -611,9 +611,9 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         // rhs = "(" + typeDumper->dumpType(instr->getType()) + ")" + rhs;
     }
 
-    l << "  gep final expr " << rhs << std::endl;
+    // l << "  gep final expr " << rhs << std::endl;
     // if(addressspace == 5) {
-        std::cout << l.str() << std::endl;
+        // std::cout << l.str() << std::endl;
     // }
     localValueInfo->setExpression(rhs);
     // std::cout << localValueInfo->name << std::endl;

@@ -266,7 +266,7 @@ void configureKernel(const char *kernelName, const char *devicellsourcecode) {
     // dereferencing vmemlocs
     // we are going to assume the first memory is at vmemloc=128 :-). very hacky :-DDD
     Memory *firstMem = findMemory((const char *)128);
-    std::cout << "setKernelArgHostsideBuffer firstMem=" << firstMem << std::endl;
+    // std::cout << "setKernelArgHostsideBuffer firstMem=" << firstMem << std::endl;
     // if its not zero, then pass it into kernel
     if(firstMem != 0) {
         launchConfiguration.clmems.push_back(firstMem->clmem);
@@ -357,9 +357,9 @@ void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
     ThreadVars *v = getThreadVars();
 
     Memory *memory = findMemory(memory_as_charstar);
-    std::cout << "setKernelArgGpuBuffer vmemloc=" << (long)memory_as_charstar << " memory=" << (long)memory << std::endl;
+    // std::cout << "setKernelArgGpuBuffer vmemloc=" << (long)memory_as_charstar << " memory=" << (long)memory << std::endl;
     if(memory == 0) {
-        std::cout << "  memory==0" << std::endl;
+        // std::cout << "  memory==0" << std::endl;
         COCL_PRINT("setKernelArgGpuBuffer nullptr");
         addClmemArg(0);
         if(v->offsets_32bit) {
@@ -370,7 +370,7 @@ void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
     } else {
         size_t offset = memory->getOffset(memory_as_charstar);
         cl_mem clmem = memory->clmem;
-        std::cout << " clmem=" << clmem << std::endl;
+        // std::cout << " clmem=" << clmem << std::endl;
 
         size_t offsetElements = offset;
 
@@ -421,11 +421,11 @@ void kernelGo() {
     // COCL_PRINT("kernelGo queue=" << (void *)launchConfiguration.queue);
 
     // launchConfiguration.kernelName += "_";
-    for(int i = 0; i < launchConfiguration.clmemIndexByClmemArgIndex.size(); i++) {
-        int clmemIndex = launchConfiguration.clmemIndexByClmemArgIndex[i];
-        std::cout << "   arg " << i << " clmemindex=" << clmemIndex << std::endl;
+    // for(int i = 0; i < launchConfiguration.clmemIndexByClmemArgIndex.size(); i++) {
+        // int clmemIndex = launchConfiguration.clmemIndexByClmemArgIndex[i];
+        // std::cout << "   arg " << i << " clmemindex=" << clmemIndex << std::endl;
     //     launchConfiguration.kernelName += "_" + EasyCL::toString(clmemIndex);
-    }
+    // }
     // cout << "kernelGo() kernel name " << launchConfiguration.kernelName << " unique clmems=" << launchConfiguration.clmems.size() << endl;
     // cout << "kernelGo() clmems.size() " << launchConfiguration.clmems.size() << endl;
     // for(auto it = launchConfiguration.clmemIndexByClmemArgIndex.begin(); it != launchConfiguration.clmemIndexByClmemArgIndex.end(); it++) {

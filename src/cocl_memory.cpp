@@ -106,7 +106,7 @@ namespace cocl {
 
         for(auto it=v->getContext()->memories.begin(), e=v->getContext()->memories.end(); it != e; it++) {
             Memory *memory = *it;
-            std::cout << "findMemoryByClmem clmem=" << clmem << " memory->clmem " << memory->clmem << std::endl;
+            // std::cout << "findMemoryByClmem clmem=" << clmem << " memory->clmem " << memory->clmem << std::endl;
             if(clmem == memory->clmem) {
                 return memory;
             }
