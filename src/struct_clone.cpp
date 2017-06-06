@@ -95,8 +95,21 @@ StructType *StructCloner::cloneNoPointers(StructType *inType) {
         if(StructType *childStructType = dyn_cast<StructType>(childType)) {
             childType = cloneNoPointers(childStructType);
             newChildren.push_back(childType);
-        } else if(isa<PointerType>(childType)) {
+        } else if(PointerType *childAsPointer = dyn_cast<PointerType>(childType)) {
             // ignore
+
+            // // assume is a virtual pointer
+            // Type *elementType = childAsPointer->getPointerElementType();
+            // if(isa<PointerType>(elementType)) {
+            //     std::cout << "pointer to pointer not handled yet..." << std::endl;
+            //     inType->dump();
+            //     std::cout << std::endl;
+            //     throw std::runtime_error("pointer to pointer not handled yet...");
+            // } else {
+            //     // virtual pointer is ... an unsigned long
+            //     Type *childType = IntegerType::get(context, 64);
+            //     newChildren.push_back(childType);
+            // }
         } else {
             newChildren.push_back(childType);
         }

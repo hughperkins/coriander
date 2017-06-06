@@ -56,6 +56,10 @@ extern "C" {
     void hostside_opencl_funcs_assure_initialized(void);
 }
 
+void hostside_opencl_funcs_assure_initialized(void) {
+
+}
+
 // stubs
 CUfunc_cache CU_FUNC_CACHE_PREFER_NONE;
 CUfunc_cache CU_FUNC_CACHE_PREFER_SHARED;
@@ -167,10 +171,10 @@ CLKernel *compileOpenCLKernel(string originalKernelName, string uniqueKernelName
         cout << "saving cl sourcecode to " << filename << endl;
         ofstream f;
         f.open(filename, ios_base::out);
-        f << "// original kernelName: [" << originalKernelName << "]" << endl;
-        f << "// unique kernelName: [" << uniqueKernelName << "]" << endl;
-        f << "// short kernelname: [" << shortKernelName << "]" << endl;
-        f << endl;
+        // f << "// original kernelName: [" << originalKernelName << "]" << endl;
+        // f << "// unique kernelName: [" << uniqueKernelName << "]" << endl;
+        // f << "// short kernelname: [" << shortKernelName << "]" << endl;
+        // f << endl;
         f << clSourcecode << endl;
         f.close();
     }
@@ -229,6 +233,11 @@ GenerateOpenCLResult generateOpenCL(
         }
         string clSourcecode = convertLlStringToCl(
             uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, origKernelName, launchConfiguration.shortKernelName, v->offsets_32bit);
+        clSourcecode = "// origKernelName: " + origKernelName + "\n" +
+            "// uniqueKernelName: " + launchConfiguration.uniqueKernelName + "\n" +
+            "// shortKernelName: " + launchConfiguration.shortKernelName + "\n" +
+            "\n" +
+            clSourcecode;
         v->getContext()->clSourceCodeCache[launchConfiguration.uniqueKernelName] = clSourcecode;
         return GenerateOpenCLResult { clSourcecode, origKernelName, launchConfiguration.shortKernelName, launchConfiguration.uniqueKernelName };
     } catch(runtime_error &e) {

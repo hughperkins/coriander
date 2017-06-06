@@ -48,7 +48,7 @@ __global__ void mykernel(float *data) {
     print('type(offset_type(0))', type(offset_type(0)))
     prog.__getattr__(kernelName)(
         q, (32,), (32,),
-        float_data_gpu, offset_type(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     # q.finish()
     # cl.enqueue_copy(q, float_data, float_data_gpu)
     # q.finish()

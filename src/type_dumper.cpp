@@ -65,6 +65,13 @@ std::string TypeDumper::dumpPointerType(PointerType *ptr, bool decayArraysToPoin
     Type *elementType = ptr->getPointerElementType();
     string elementTypeString = dumpType(elementType, decayArraysToPointer);
     int addressspace = ptr->getAddressSpace();
+    if(addressspace == 5) {
+        if(isa<PointerType>(elementType)) {
+            return "/* vmem */ unsigned long*";
+        } else {
+            return "/* vmem */ unsigned long";
+        }
+    }
     string addressspacestr = "";
     switch(addressspace) {
         case 0:
