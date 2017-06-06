@@ -26,6 +26,7 @@ macro(cocl_build_objects target_name target_type)
                 OUTPUT ${target_name}.d/${filename}.o
                 COMMAND
                     ${COCL_PATH}
+                    --clang-home ${CLANG_HOME}
                     "$<$<BOOL:$<TARGET_PROPERTY:${target_name},COMPILE_FLAGS>>:$<JOIN:$<TARGET_PROPERTY:${target_name},COMPILE_FLAGS>,;>>"
                     "$<$<BOOL:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>:-I$<JOIN:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>,;-I>>"
                     ${CMAKE_CURRENT_SOURCE_DIR}/${filename}

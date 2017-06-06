@@ -8,17 +8,6 @@ echo cocl args: $@
 
 set -e
 
-if [ x$CLANG_HOME = x ]; then {
-    echo
-    echo Please set CLANG_HOME, eg on Ubuntu you might do:
-    echo 
-    echo     export CLANG_HOME=/usr/local/opt/llvm-4.0
-    echo
-    exit 1
-} fi
-
-export CLANG=clang++
-
 export ADDFLAGS=
 export NATIVE_COMPILER=g++
 export SO_SUFFIX=.so
@@ -58,6 +47,7 @@ display_help () {
     Usage: cocl [options] <targetfile>
       -c compile to .o only, dont link
       -o final output filepath
+      --clang-home Path to llvm4.0
 
       Device IR optimization options
          These are applied to the device IR generation step
@@ -201,6 +191,10 @@ while [ "x$1" != x ]; do {
                 # PASSTHRU="$PASSTHRU $1 $2"
                 shift
                 ;;
+            --clang-home)
+                CLANG_HOME=$2
+                shift
+                ;;
             -isystem)
                 # PASSTHRU="$PASSTHRU $1 $2"
                 shift
@@ -275,6 +269,16 @@ while [ "x$1" != x ]; do {
     # echo doing shift
     shift
 } done
+
+if [ x$CLANG_HOME = x ]; then {
+    echo
+    echo Please set CLANG_HOME, eg on Ubuntu you might do:
+    echo 
+    echo     export CLANG_HOME=/usr/local/opt/llvm-4.0
+    echo
+    exit 1
+} fi
+export CLANG=clang++
 
 INPATH=${INFILES}
 
