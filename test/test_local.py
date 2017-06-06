@@ -36,7 +36,7 @@ def test_local(context, q, float_data, float_data_gpu):
     print('cl_sourcecode', cl_sourcecode)
     kernel = test_common.build_kernel(context, cl_sourcecode, kernelName)
     float_data_orig = np.copy(float_data)
-    kernel(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(4))
+    kernel(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     print('before', float_data_orig[:5])

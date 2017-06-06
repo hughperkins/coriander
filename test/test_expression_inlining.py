@@ -48,7 +48,7 @@ __global__ void myKernel(float *data) {
     # prog.__getattr__(kernelName)(
     kernel(
         q, (32,), (32,),
-        float_data_gpu, offset_type(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     q.finish()
     float_data2 = np.zeros((1024,), dtype=np.float32)
     cl.enqueue_copy(q, float_data2, float_data_gpu)
@@ -83,7 +83,7 @@ __global__ void myKernel(int *data) {
     # prog.__getattr__(kernelName)(
     kernel(
         q, (32,), (32,),
-        int_data_gpu, offset_type(0), cl.LocalMemory(4))
+        int_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     q.finish()
     gpu_data = np.zeros((1024,), dtype=np.int32)
     cl.enqueue_copy(q, gpu_data, int_data_gpu)

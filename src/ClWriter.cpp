@@ -92,7 +92,7 @@ void AllocaClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
     AllocaInst *alloca = cast<AllocaInst>(l->value);
     // AllocaInfo allocaInfo;
     if(PointerType *allocatypeptr = dyn_cast<PointerType>(alloca->getType())) {
-        Type *ptrElementType = allocatypeptr->getPointerElementType();
+        Type *ptrElementType = allocatypeptr->getElementType();
         std::string typestring = typeDumper->dumpType(ptrElementType);
         int count = ReadIR::readInt32Constant(alloca->getOperand(0));
         // string name = localNames->getOrCreateName(alloca);
@@ -229,7 +229,7 @@ void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
         if(addressSpace != 3) {
             throw runtime_error("shouldnt be here");
         }
-        Type *elementType = pointerType->getPointerElementType();
+        Type *elementType = pointerType->getElementType();
         // cout << "elementType:" << endl;
         // elementType->dump();
         // cout << endl;

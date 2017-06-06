@@ -64,7 +64,7 @@ __global__ void testIf(float *data, int N) {
     float_data_orig = np.copy(float_data)
 
     N = 2
-    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -93,7 +93,7 @@ __global__ void testIfElse(float *data, int N) {
     float_data_orig = np.copy(float_data)
 
     N = 2
-    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -124,7 +124,7 @@ __global__ void testIfElse(float *data, int N) {
     float_data_orig = np.copy(float_data)
 
     N = 2
-    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -148,7 +148,7 @@ __global__ void testInline(float *data, int N) {
     float_data_orig = np.copy(float_data)
 
     N = 4
-    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -173,7 +173,7 @@ __global__ void testFor(float *data, int N) {
     float_data_orig = np.copy(float_data)
 
     N = 4
-    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -209,7 +209,7 @@ __global__ void testTwoFors(float *data, int N) {
     float_data_orig = np.copy(float_data)
 
     N = 4
-    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -246,7 +246,7 @@ __global__ void mykernel(float *data, int a, int b) {
 
     a = 2
     b = 3
-    kernel(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(a), np.int32(b), cl.LocalMemory(4))
+    kernel(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), np.int32(a), np.int32(b), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -279,7 +279,7 @@ __global__ void longKernel(float *data, int N, float value) {
     float_data_orig = np.copy(float_data)
 
     N = 2
-    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), np.float32(123), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), np.int32(N), np.float32(123), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:
@@ -308,7 +308,7 @@ __global__ void testFor(float *data, int N) {
     float_data_orig = np.copy(float_data)
 
     N = 4
-    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(N), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), np.int32(N), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     with open('/tmp/testprog-device.cl', 'r') as f:

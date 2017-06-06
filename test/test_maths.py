@@ -48,7 +48,7 @@ __global__ void myKernel(float *data) {
     kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['float *']), num_clmems=1)['kernel']
     kernel(
         q, (32,), (32,),
-        float_data_gpu, offset_type(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -82,7 +82,7 @@ define void @kernel_float_constants(float* nocapture %data) #1 {
     print('cl_code', cl_code)
     # try compiling it, just to be sure...
     kernel = test_common.build_kernel(context, cl_code, 'kernel_float_constants')
-    kernel(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(32))
+    kernel(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(32))
     from_gpu = np.copy(float_data)
     cl.enqueue_copy(q, from_gpu, float_data_gpu)
     q.finish()
@@ -117,7 +117,7 @@ define void @test_umulhi(i32* %data) {
     int_data[2] = 2523123
     cl.enqueue_copy(q, int_data_gpu, int_data)
     kernel = test_common.build_kernel(context, cl_code, 'test_umulhi')
-    kernel(q, (32,), (32,), int_data_gpu, offset_type(0), cl.LocalMemory(32))
+    kernel(q, (32,), (32,), int_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(32))
     from_gpu = np.copy(int_data)
     cl.enqueue_copy(q, from_gpu, int_data_gpu)
     q.finish()
@@ -138,7 +138,7 @@ __global__ void mykernel(float *data) {
     float_data[0] = -0.123
     cl.enqueue_copy(q, float_data_gpu, float_data)
     kernel = test_common.build_kernel(context, cl_code, '_Z8mykernelPf')
-    kernel(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(32))
+    kernel(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(32))
     from_gpu = np.copy(float_data)
     cl.enqueue_copy(q, from_gpu, float_data_gpu)
     q.finish()
@@ -167,7 +167,7 @@ __global__ void mykernel(double *data) {
     kernel = test_common.build_kernel(context, cl_code, kernel_name)
     kernel(
         q, (32,), (32,),
-        float_data_gpu, offset_type(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -197,7 +197,7 @@ __global__ void myKernel(float *data) {
     cl.enqueue_copy(q, float_data_gpu, float_data)
     kernel(
         q, (32,), (32,),
-        float_data_gpu, offset_type(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -224,7 +224,7 @@ __global__ void myKernel(float *data) {
     cl.enqueue_copy(q, float_data_gpu, float_data)
     kernel(
         q, (32,), (32,),
-        float_data_gpu, offset_type(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -256,7 +256,7 @@ __global__ void mykernel(float *data) {
     kernel = test_common.build_kernel(context, cl_code, kernel_name)
     kernel(
         q, (32,), (32,),
-        float_data_gpu, offset_type(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -281,8 +281,8 @@ __global__ void myKernel(float *float_data, int *int_data) {
     cl.enqueue_copy(q, float_data_gpu, float_data)
     kernel(
         q, (32,), (32,),
-        float_data_gpu,
-        int_data_gpu,
+        float_data_gpu, offset_type(0),
+        int_data_gpu, offset_type(0),
         offset_type(0),
         offset_type(0),
         cl.LocalMemory(4))
@@ -309,8 +309,8 @@ __global__ void myKernel(float *float_data, int *int_data) {
     cl.enqueue_copy(q, int_data_gpu, int_data)
     kernel(
         q, (32,), (32,),
-        float_data_gpu,
-        int_data_gpu,
+        float_data_gpu, offset_type(0),
+        int_data_gpu, offset_type(0),
         offset_type(0),
         offset_type(0),
         cl.LocalMemory(4))
@@ -335,7 +335,7 @@ __global__ void myKernel(int *int_data) {
     cl.enqueue_copy(q, int_data_gpu, int_data)
     kernel(
         q, (32,), (32,),
-        int_data_gpu, offset_type(0),
+        int_data_gpu, offset_type(0), offset_type(0),
         cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, int_data, int_data_gpu)

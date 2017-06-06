@@ -97,7 +97,7 @@ TEST(test_struct_cloner, test_clone) {
     ASSERT_NE(structNoPtrCl.find("float f1;"), string::npos);
     ASSERT_NE(structNoPtrCl.find("int f2;"), string::npos);
 
-    string clCopyCode = structCloner.writeClCopyNoPtrToPtrfull(
+    string clCopyCode = structCloner.writeClCopyToDevicesideStruct(
         myStructType, "src", "dest");
     cout << "clCopyCode " << clCopyCode << endl;
     ASSERT_NE(clCopyCode.find("dest.f0 = src.f0;"), string::npos);
@@ -118,7 +118,7 @@ TEST(test_struct_cloner, test_clone) {
     Value *allocaPtrfull = builder.CreateAlloca(myStructType);
     Value *allocaNoptr = builder.CreateAlloca(structNoPtrs);
 
-    structCloner.createHostsideIrCopyPtrfullToNoptr(
+    structCloner.writeHostsideIrCopyToMarshallingStruct(
         cast<Instruction>(allocaNoptr), myStructType, allocaPtrfull, allocaNoptr);
 
     builder.CreateRetVoid();

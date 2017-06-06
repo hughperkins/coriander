@@ -160,8 +160,8 @@ __global__ void myKernel(float *data0, float *data1, int N) {
 
     kernel(
         queue, (global_size,), (workgroup_size,),
-        huge_buf_gpu,
-        huge_buf_gpu,
+        huge_buf_gpu, offset_type(0),
+        huge_buf_gpu, offset_type(0),
         offset_type(dst_offset),
         offset_type(src_offset),
         np.int32(N),

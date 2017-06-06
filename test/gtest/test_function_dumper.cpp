@@ -130,9 +130,12 @@ TEST(test_function_dumper, basic1) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl: [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void someKernel(global char* clmem0, global char* clmem1, uint d1_offset, uint d2_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void someKernel(global char* clmem0, unsigned long clmem_vmem_offset0, global char* clmem1, unsigned long clmem_vmem_offset1, uint d1_offset, uint d2_offset, local int *scratch) {
     global float* d2 = (global float*)(clmem1 + d2_offset);
     global float* d1 = (global float*)(clmem0 + d1_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     float v4;
     float* v2[1];
@@ -140,7 +143,7 @@ TEST(test_function_dumper, basic1) {
 
 v1:;
     v3 = v2[0];
-    v4 = someFunc_gp(d1, v3, scratch);
+    v4 = someFunc_gp(d1, v3, pGlobalVars);
     return;
 }
 )", os.str());
@@ -170,9 +173,12 @@ TEST(test_function_dumper, basic1Ints) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl: [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void someKernelInts(global char* clmem0, global char* clmem1, uint d1_offset, uint d2_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void someKernelInts(global char* clmem0, unsigned long clmem_vmem_offset0, global char* clmem1, unsigned long clmem_vmem_offset1, uint d1_offset, uint d2_offset, local int *scratch) {
     global int* d2 = (global int*)(clmem1 + d2_offset);
     global int* d1 = (global int*)(clmem0 + d1_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     int v4;
     int* v2[1];
@@ -180,7 +186,7 @@ TEST(test_function_dumper, basic1Ints) {
 
 v1:;
     v3 = v2[0];
-    v4 = someFuncInts_gp(d1, v3, scratch);
+    v4 = someFuncInts_gp(d1, v3, pGlobalVars);
     return;
 }
 )", os.str());
@@ -210,9 +216,12 @@ TEST(test_function_dumper, redundantclmems) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl: [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void someKernel(global char* clmem0, uint d1_offset, uint d2_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void someKernel(global char* clmem0, unsigned long clmem_vmem_offset0, uint d1_offset, uint d2_offset, local int *scratch) {
     global float* d2 = (global float*)(clmem0 + d2_offset);
     global float* d1 = (global float*)(clmem0 + d1_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     float v4;
     float* v2[1];
@@ -220,7 +229,7 @@ TEST(test_function_dumper, redundantclmems) {
 
 v1:;
     v3 = v2[0];
-    v4 = someFunc_gp(d1, v3, scratch);
+    v4 = someFunc_gp(d1, v3, pGlobalVars);
     return;
 }
 )", os.str());
@@ -249,8 +258,11 @@ TEST(test_function_dumper, usesShared1) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl: [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void usesShared(global char* clmem0, uint d1_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void usesShared(global char* clmem0, unsigned long clmem_vmem_offset0, uint d1_offset, local int *scratch) {
     global float* d1 = (global float*)(clmem0 + d1_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     float v7[1];
     float v8;
@@ -283,8 +295,11 @@ TEST(test_function_dumper, usesShared2) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void usesShared2(global char* clmem0, uint d1_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void usesShared2(global char* clmem0, unsigned long clmem_vmem_offset0, uint d1_offset, local int *scratch) {
     global float* d1 = (global float*)(clmem0 + d1_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     float v11[1];
     float v13;
@@ -345,8 +360,11 @@ TEST(test_function_dumper, usesPointerFunction) {
     os.str("");
     functionDumper2->toCl(os);
     cout << "cl, F2: [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel global float* returnsPointer_g(global char* clmem0, uint in_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel global float* returnsPointer_g(global char* clmem0, unsigned long clmem_vmem_offset0, uint in_offset, local int *scratch) {
     global float* in = (global float*)(clmem0 + in_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
 
 v1:;
@@ -366,13 +384,16 @@ v1:;
     os.str("");
     functionDumper->toCl(os);
     cout << "cl, F: [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void usesPointerFunction(global char* clmem0, uint in_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void usesPointerFunction(global char* clmem0, unsigned long clmem_vmem_offset0, uint in_offset, local int *scratch) {
     global float* in = (global float*)(clmem0 + in_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     global float* v2;
 
 v1:;
-    v2 = returnsPointer_g(in, scratch);
+    v2 = returnsPointer_g(in, pGlobalVars);
     return;
 }
 )", os.str());
@@ -395,8 +416,11 @@ TEST(test_function_dumper, returnsFloatConstant) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel float returnsFloatConstant(global char* clmem0, uint in_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel float returnsFloatConstant(global char* clmem0, unsigned long clmem_vmem_offset0, uint in_offset, local int *scratch) {
     global float* in = (global float*)(clmem0 + in_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
 
 v1:;
@@ -422,8 +446,11 @@ TEST(test_function_dumper, testBranches_nophi) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void testBranches_nophi(global char* clmem0, uint d1_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void testBranches_nophi(global char* clmem0, unsigned long clmem_vmem_offset0, uint d1_offset, local int *scratch) {
     global float* d1 = (global float*)(clmem0 + d1_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     float v3;
     float v6[1];
@@ -459,8 +486,11 @@ TEST(test_function_dumper, testBranches_onephi) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void testBranches_onephi(global char* clmem0, uint d1_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void testBranches_onephi(global char* clmem0, unsigned long clmem_vmem_offset0, uint d1_offset, local int *scratch) {
     global float* d1 = (global float*)(clmem0 + d1_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     float v3;
     float v6;
@@ -499,8 +529,11 @@ TEST(test_function_dumper, testBranches_phifromfuture) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void testBranches_phifromfuture(global char* clmem0, uint d1_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void testBranches_phifromfuture(global char* clmem0, unsigned long clmem_vmem_offset0, uint d1_offset, local int *scratch) {
     global float* d1 = (global float*)(clmem0 + d1_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     float v12;
     float v4;
@@ -544,8 +577,11 @@ TEST(test_function_dumper, testBranches_phifromfloat) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void testBranches_phifromfloat(global char* clmem0, uint d1_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void testBranches_phifromfloat(global char* clmem0, unsigned long clmem_vmem_offset0, uint d1_offset, local int *scratch) {
     global float* d1 = (global float*)(clmem0 + d1_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     float v13;
     float v8;
@@ -587,8 +623,11 @@ TEST(test_function_dumper, multigpu_Z8getValuePf) {
     os.str("");
     functionDumper->toCl(os);
     cout << "cl [" << os.str() << "]" << endl;
-    EXPECT_EQ(R"(kernel void multigpu_Z8getValuePf(global char* clmem0, uint outdata_offset, local int *scratch) {
+    EXPECT_EQ(R"(kernel void multigpu_Z8getValuePf(global char* clmem0, unsigned long clmem_vmem_offset0, uint outdata_offset, local int *scratch) {
     global float* outdata = (global float*)(clmem0 + outdata_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     float v10;
     float v15;
@@ -604,9 +643,9 @@ v1:;
     v7 = 0.0f;
     goto v3;
 v3:;
-    v10 = (&(outdata[v5]))[0];
-    v15 = (&(outdata[v5 + 1]))[0];
-    v21 = (&(outdata[v5 + 2]))[0];
+    v10 = (&(outdata[(long)v5]))[0];
+    v15 = (&(outdata[(long)(v5 + 1)]))[0];
+    v21 = (&(outdata[(long)(v5 + 2)]))[0];
     v22 = ((v7 + v10) + v15) + v21;
     v23 = v5 + 3;
     if ((v23) == (1024)) {
