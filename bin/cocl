@@ -127,6 +127,10 @@ while [ "x$1" != x ]; do {
     DONE=0
     TWOLETTERS=$(echo $1 | cut -c 1-2)
     case "${TWOLETTERS}" in
+        \;)
+           # ignore (artifact of cmake file hacking...
+           DONE=1
+           ;;
         -I)
             # echo got include
             # need to check if theres a space or not
@@ -136,13 +140,8 @@ while [ "x$1" != x ]; do {
             } else {
                 THESEINCLUDES=$(echo $1 | sed -e 's/;/ /g')
                 for THISINCLUDE in ${THESEINCLUDES}; do {
-                    echo THISINCLUDE {THISINCLUDE}
                     INCLUDES="${INCLUDES} ${THISINCLUDE}"
                 } done
-                # echo dollar $1
-                # echo THESEINCLUDES ${THESEINCLUDES}
-                echo INCLUDES ${INCLUDES}
-                # INCLUDES="$INCLUDES ${THESEINCLUDES}"
             } fi
             DONE=1
             ;;
