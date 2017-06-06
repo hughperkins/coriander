@@ -62,6 +62,10 @@ On beignet, you should do `export OFFSETS_32BIT=1`, before running any Coriander
 Technical details: this changes how memory buffer offsets are sent to the kernels. By default, they are passed as 64-bit integers. With this environment
 variable set, they will be transferred as 32-bit unsigned ints. Obviously this limits the size of memory buffers that can be used, but at least it will run :-)
 
+### `COCL_DUMP_BUILD_LOGS=1`
+
+Dump any opencl kernel build logs, suppressed by default.
+
 ### `COCL_DUMP_BYTECODE=1`
 
 This will dump the device-side bytecode into `/tmp`, as `/tmp/0-device.ll`, `/tmp/1-device.ll`, ... One file for each unique kernel.  Note that this bytecode is actually available at compile time, but it's slightly more convenient to retrieve via this option sometimes.

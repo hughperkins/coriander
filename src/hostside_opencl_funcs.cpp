@@ -177,6 +177,11 @@ CLKernel *compileOpenCLKernel(string originalKernelName, string uniqueKernelName
     CLKernel *kernel = 0;
     try {
         kernel = cl->buildKernelFromString(clSourcecode, shortKernelName, "", "__internal__", true);
+        if(getenv("COCL_DUMP_BUILD_LOGS") != 0) {
+            if(kernel->buildLog != "") {
+                std::cout << kernel->buildLog << std::endl;
+            }
+        }
     } catch(runtime_error &e) {
         cout << "compileOpenCLKernel failed to compile opencl sourcecode" << endl;
         cout << "unique kernel name " << uniqueKernelName << endl;
