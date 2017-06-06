@@ -24,11 +24,13 @@ macro(cocl_build_objects target_name target_type)
             # (finding this bit about whitespace cost me a world of pain...)
                     #"$<$<BOOL:$<TARGET_PROPERTY:${target_name},COMPILE_FLAGS>>:$<JOIN:$<TARGET_PROPERTY:${target_name},COMPILE_FLAGS>,;>>"
                     # "$<$<BOOL:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>:-I$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>"
+                    # "$<$<BOOL:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>:$<JOIN:-I$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>,;-I>>"
             add_custom_command(
                 OUTPUT ${target_name}.d/${filename}.o
                 COMMAND
                     ${COCL_PATH}
                     --clang-home ${CLANG_HOME}
+                    "$<$<BOOL:$<TARGET_PROPERTY:${target_name},COMPILE_FLAGS>>:$<JOIN:$<TARGET_PROPERTY:${target_name},COMPILE_FLAGS>,;>>;"
                     "$<$<BOOL:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>:$<JOIN:-I$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>,;-I>>"
                     ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
                     -o ${target_name}.d/${filename}.o
