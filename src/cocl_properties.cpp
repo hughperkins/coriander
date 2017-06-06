@@ -40,8 +40,6 @@ size_t cuDeviceGetAttribute(
     cocl::CoclDevice *coclDevice = getCoclDeviceByGpuOrdinal(device);
     COCL_PRINT(cout << "cuDeviceGetAttribute device ordinal=" << coclDevice->gpuOrdinal << endl);
     cl_device_id clDeviceId = coclDevice->deviceId;
-    // COCL_PRINT(cout << "cuDeviceGetAttribute current device=" << v->currentDevice << endl);
-    // COCL_PRINT(cout << "cuDeviceGetAttribute device=" << device << endl);
     switch(attribute) {
         case cudaDevAttrComputeCapabilityMajor:
             *value = 3;
@@ -57,17 +55,20 @@ size_t cuDeviceGetAttribute(
 
         case CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X:
         case cudaDevAttrMaxGridDimX:
-            *value = 1024;
+            COCL_PRINT(cout << "requesting gridx" << endl);
+            *value = 256;
             break;
 
         case CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y:
         case cudaDevAttrMaxGridDimY:
-            *value = 1024;
+            COCL_PRINT(cout << "requesting gridy" << endl);
+            *value = 256;
             break;
 
         case CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z:
         case cudaDevAttrMaxGridDimZ:
-            *value = 1024;
+            COCL_PRINT(cout << "requesting gridx" << endl);
+            *value = 256;
             break;
 
         case CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR:
@@ -120,20 +121,11 @@ size_t cudaDeviceGetAttribute(
 // cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
 
 size_t cuDeviceGetName(char *buf, int bufsize, CUdevice device) {
-    COCL_PRINT(cout << "cuDeviceGetName device=" << device << endl);
-    // ThreadVars *v = getThreadVars();
-    // ThreadVars *v = getThreadVars();
-    // cl_device_id deviceid = getDeviceByIdx(v->currentDevice);
-    // device -= 1000;
-    // cl_device_id deviceid = getDeviceByIdx(device);
-    // cocl::CoclDevice *coclDevice = static_cast<CoclDevice *>(device);
     cocl::CoclDevice *coclDevice = getCoclDeviceByGpuOrdinal(device);
     COCL_PRINT(cout << "cuDeviceGetName gpuOrdinal=" << coclDevice->gpuOrdinal << endl);
     cl_device_id clDeviceId = coclDevice->deviceId;
-    // EasyCL *cl = v->getCl();
     string name = easycl::getDeviceInfoString(clDeviceId, CL_DEVICE_NAME);
     sprintf(buf, "%s", name.c_str());
-    // sprintf(buf, "an opencl device");
     return 0;
 }
 
@@ -157,16 +149,11 @@ size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, CUdevice device) 
 }
 
 size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
-    // cocl::CoclDevice *coclDevice = static_cast<CoclDevice *>(device);
     cocl::CoclDevice *coclDevice = getCoclDeviceByGpuOrdinal(device);
     COCL_PRINT(cout << "cudaGetDeviceProperties gpuOrdinal=" << coclDevice->gpuOrdinal << endl);
-    // prop->totalGlobalMem = deviceinfo_helper->easycl::getDeviceInfoInt64(cl->device, CL_DEVICE_MAX_MEM_ALLOC_SIZE);
-    // ThreadVars *v = getThreadVars();
-    // cout << "initing clew..." << endl;
     clewInit();
-    // cl_device_id deviceid = getDeviceByIdx(device - 1000);
     cl_device_id clDeviceId = coclDevice->deviceId;
-    // EasyCL *cl = v->getCl();
+
     prop->totalGlobalMem = easycl::getDeviceInfoInt64(clDeviceId, CL_DEVICE_GLOBAL_MEM_SIZE);
     prop->sharedMemPerBlock = easycl::getDeviceInfoInt64(clDeviceId, CL_DEVICE_LOCAL_MEM_SIZE);
     prop->regsPerBlock = 64;
@@ -174,9 +161,9 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
     // prop->memPitch = 4; // whats this?
     // prop->maxThreadsPerBlock = easycl::getDeviceInfoInt(deviceid, CL_DEVICE_MAX_WORK_GROUP_SIZE);
     prop->maxThreadsPerBlock = 256;
-    prop->maxThreadsDim[0] = 1024;
-    prop->maxThreadsDim[1] = 1024;
-    prop->maxThreadsDim[2] = 1024;
+    prop->maxThreadsDim[0] = 256;
+    prop->maxThreadsDim[1] = 256;
+    prop->maxThreadsDim[2] = 256;
     prop->totalConstMem = 16 * 1024;
     prop->major = 3;
     prop->minor = 0;
