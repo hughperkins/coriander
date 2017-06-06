@@ -218,8 +218,8 @@ std::string TypeDumper::dumpStructType(StructType *type) {
 
 std::string TypeDumper::dumpArrayType(ArrayType *type, bool decayArraysToPointer) {
     // std::cout << "TypeDumper::dumpArrayType" << std::endl;
-    type->dump();
-    std::cout << std::endl;
+    // type->dump();
+    // std::cout << std::endl;
     ostringstream oss;
     int length = type->getNumElements();
     Type *elementType = type->getElementType();
@@ -316,7 +316,7 @@ std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {
 }
 
 int TypeDumper::getPointerDepth(Type *type) {
-    std::cout << " getPointerDepth()" << std::endl;
+    // std::cout << " getPointerDepth()" << std::endl;
     if(PointerType *nextLevel = dyn_cast<PointerType>(type)) {
         return getPointerDepth(nextLevel->getElementType()) + 1;
     }

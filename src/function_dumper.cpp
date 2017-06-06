@@ -91,8 +91,8 @@ std::string FunctionDumper::dumpPhi(std::string indent, llvm::BranchInst *branch
             if(_addIRToCl) {
                 string originalInstruction = typeDumper->dumpType(phi->getType()) + " " + phiValueInfo->name + " =";
                 originalInstruction += " phi " + sourceValueInfo->name;
-                originalInstruction = easycl::replace(originalInstruction, "/*", "");
-                originalInstruction = easycl::replace(originalInstruction, "*/", "");
+                // originalInstruction = easycl::replace(originalInstruction, "/*", "");
+                // originalInstruction = easycl::replace(originalInstruction, "*/", "");
                 gencode += indent + "/* " + originalInstruction + " */\n";
             }
             // std::cout << "  functiondumper::dumpphi name=" << phiValueInfo->name << " addr=" << phiValueInfo->addressSpace << std::endl;
@@ -193,9 +193,6 @@ std::string FunctionDumper::dumpBranch(llvm::BranchInst *instr) {
 // the address space should be correct on phi by the time this function is called
 void FunctionDumper::addPHIDeclaration(llvm::PHINode *phi) {
     string name = localNames.getOrCreateName(phi);
-    std::cout << "addPhiDeclaration" << std::endl;
-    phi->dump();
-    std::cout << std::endl;
     string declaration = typeDumper->dumpType(phi->getType()) + " " + name;
     phiDeclarationsByName[name] = declaration;
 }

@@ -629,11 +629,11 @@ void NewInstructionDumper::dumpLoad(cocl::LocalValueInfo *localValueInfo) {
 
     // instr->dump();
     // std::cout << std::endl;
-    std::cout << "dumpLoad op0 add space " << cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace() << std::endl;
+    // std::cout << "dumpLoad op0 add space " << cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace() << std::endl;
     string rhs= "";
     bool destIsSinglePointer = false;
     if(PointerType *l1pointer = dyn_cast<PointerType>(instr->getType())) {
-        std::cout << "dumpLoad instr l1 is pointer" << std::endl;
+        // std::cout << "dumpLoad instr l1 is pointer" << std::endl;
         if(PointerType *l2pointer = dyn_cast<PointerType>(l1pointer->getElementType())) {
             // std::cout << "dumpLoad instr l2 is pointer" << std::endl;
             // if(PointerType *l3pointer = dyn_cast<PointerType>(l2pointer->getElementType())) {
@@ -644,8 +644,8 @@ void NewInstructionDumper::dumpLoad(cocl::LocalValueInfo *localValueInfo) {
         }
     }
     if(cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace() == 5 && destIsSinglePointer) {
-        std::cout << "virtual memory address" << std:: endl;
-        std::cout << "instr type " << typeDumper->dumpType(instr->getType()) << std::endl;
+        // std::cout << "virtual memory address" << std:: endl;
+        // std::cout << "instr type " << typeDumper->dumpType(instr->getType()) << std::endl;
         // instr->getOperand(0)
         localValueInfo->inlineCl.push_back(
             "global " + typeDumper->dumpType(instr->getType()) + " " + localValueInfo->name + "_gptrstep = getGlobalPointer(" +
@@ -1057,7 +1057,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         localValueInfo->needDependencies = false;
         gencode += "scratch";
         Function *F = M->getFunction(functionName);
-        if(F->isDeclaration()) { // ie, is it *just* a declaration, no definition?
+        if(checkCalledFunctionsDefined && F->isDeclaration()) { // ie, is it *just* a declaration, no definition?
             std::cout << functionName << " is called, but not defined" << std::endl;
             std::cout << "This is probalby a bug in Coriander. Please file an issue at https://github.com/hughperkins/coriander/issues/new" << std::endl;
             throw std::runtime_error(functionName + " is called, but not defined => cannot continue.  Sorry :-(");
@@ -1190,8 +1190,8 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo, const s
                 originalInstruction += "<unk>";
             }
         }
-        originalInstruction = easycl::replace(originalInstruction, "/*", "");
-        originalInstruction = easycl::replace(originalInstruction, "*/", "");
+        // originalInstruction = easycl::replace(originalInstruction, "/*", "");
+        // originalInstruction = easycl::replace(originalInstruction, "*/", "");
         localValueInfo->inlineCl.push_back("/* " + originalInstruction + " */");
     }
     string instructionCode = "";

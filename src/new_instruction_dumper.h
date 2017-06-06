@@ -97,6 +97,7 @@ public:
 
     bool forceSingle = true;
     bool _addIRToCl = false;
+    bool checkCalledFunctionsDefined = true;
 };
 
 } // namespace cocl
