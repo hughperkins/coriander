@@ -235,7 +235,7 @@ std::string FunctionDumper::dumpKernelFunctionDeclarationWithoutReturn(llvm::Fun
         bool is_struct_needs_cloning = false;
         bool ispointer = isa<PointerType>(argType);
         if(PointerType *ptrType = dyn_cast<PointerType>(argType)) {
-            Type *elemType = ptrType->getPointerElementType();
+            Type *elemType = ptrType->getElementType();
             if(StructType *structType = dyn_cast<StructType>(elemType)) {
                 if(structType->getName().str() != "struct.float4") {
                     unique_ptr<StructInfo> structInfo(new StructInfo());
@@ -262,7 +262,7 @@ std::string FunctionDumper::dumpKernelFunctionDeclarationWithoutReturn(llvm::Fun
         }
         if(!is_struct_needs_cloning) {
             if(argType->getTypeID() == Type::PointerTyID) {
-                Type *elementType = argType->getPointerElementType();
+                Type *elementType = cast<PointerType>(argType)->getElementType();
                 Type *newtype = PointerType::get(elementType, 1);
                 arg->mutateType(newtype);
             }
@@ -291,7 +291,7 @@ std::string FunctionDumper::dumpKernelFunctionDeclarationWithoutReturn(llvm::Fun
         }
         int j = 0;
         if(is_struct_needs_cloning) {
-            StructType *structType = cast<StructType>(cast<PointerType>(argType)->getPointerElementType());
+            StructType *structType = cast<StructType>(cast<PointerType>(argType)->getElementType());
             // declare a pointerful struct, then copy the vlaues across, then copy the float *s in
             unique_ptr<StructInfo> structInfo(new StructInfo());
             StructCloner::walkStructType(F->getParent(), structInfo.get(), 0, 0, std::vector<int>(), "", structType);
@@ -299,12 +299,12 @@ std::string FunctionDumper::dumpKernelFunctionDeclarationWithoutReturn(llvm::Fun
             shimCode += structCloner.writeClCopyToDevicesideStruct(structType, argName + "_nopointers[0]", argName + "[0]");
             for(auto pointerit=structInfo->pointerInfos.begin(); pointerit != structInfo->pointerInfos.end(); pointerit++) {
                 PointerInfo *pointerInfo = pointerit->get();
-                Type *pointerElementType = pointerInfo->type->getPointerElementType();
+                Type *pointerElementType = cast<PointerType>(pointerInfo->type)->getElementType();
                 // for now only handle pointers to primitives
                 if(pointerElementType->getPrimitiveSizeInBits() == 0) {
                     continue;
                 }
-                pointerInfo->type = PointerType::get(pointerInfo->type->getPointerElementType(), 1);
+                pointerInfo->type = PointerType::get(cast<PointerType>(pointerInfo->type)->getElementType(), 1);
                 string pointerArgName = argName + "_ptr" + easycl::toString(j);
                 declaration << createOffsetDeclaration(pointerArgName);
                 int clmemIndex = kernelClmemIndexByArgIndex[clmemArgIndex];
@@ -485,7 +485,7 @@ void FunctionDumper::writeDeclarations(std::string indent, ostream &os) {
     vector<string> declarations;
     for(auto it = localValueInfos.begin(); it != localValueInfos.end(); it++) {
         LocalValueInfo *localValueInfo = it->second.get();
-        std::cout << "writedeclarations name=" << localValueInfo->name << " space=" << localValueInfo->addressSpace << std::endl;
+        // std::cout << "writedeclarations name=" << localValueInfo->name << " space=" << localValueInfo->addressSpace << std::endl;
         ostringstream oss;
         localValueInfo->writeDeclaration("    ", typeDumper, oss);
         declarations.push_back(oss.str());

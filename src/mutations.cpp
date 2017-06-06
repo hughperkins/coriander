@@ -21,6 +21,7 @@
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Module.h"
 
+#include <iostream>
 
 using namespace llvm;
 using namespace std;
@@ -34,8 +35,7 @@ void mutateGlobalConstructorNumElements(GlobalVariable *var, int numElements) {
 
 void appendGlobalConstructorCall(Module *M, std::string functionName) {
     GlobalVariable *ctors = cast<GlobalVariable>(M->getNamedValue("llvm.global_ctors"));
-    int oldNumConstructors = cast<ArrayType>(ctors->getType()->getPointerElementType())->getNumElements();
-    // outs() << "constructors " << oldNumConstructors << "\n";
+    int oldNumConstructors = cast<ArrayType>(cast<PointerType>(ctors->getType())->getElementType())->getNumElements();
     mutateGlobalConstructorNumElements(ctors, oldNumConstructors + 1);
 
     ConstantArray *initializer = cast<ConstantArray>(ctors->getInitializer());
@@ -72,9 +72,7 @@ GlobalVariable *addGlobalVariable(Module *M, string name, string value) {
 Instruction *addStringInstr(Module *M, string name, string value) {
     // check if already exists first
     GlobalVariable *probe = M->getNamedGlobal(name);
-    // outs() << "addStringInstr probe=" << probe << "\n";
     if(probe != 0) {
-        // outs() << "string aleady exists, reusing  " << "\n";
         return addStringInstrExistingGlobal(M, name);
     }
 
@@ -92,22 +90,14 @@ Instruction *addStringInstr(Module *M, string name, string value) {
 }
 
 Instruction *addStringInstrExistingGlobal(Module *M, string name) {
-    // GlobalVariable *var = addGlobalVariable(M, name, value);
     GlobalVariable *var = M->getNamedGlobal(name);
 
     Type *varType = var->getType();
-    if(ArrayType *arrayType1 = dyn_cast<ArrayType>(varType->getPointerElementType())) {
+    if(ArrayType *arrayType1 = dyn_cast<ArrayType>(cast<PointerType>(varType)->getElementType())) {
         int N = arrayType1->getNumElements();
 
         LLVMContext &context = M->getContext();
         ArrayType *arrayType = ArrayType::get(IntegerType::get(context, 8), N);
-        // Type *varType = var->getType();
-        // outs() << "arrayType->dump()" << "\n";
-        // ArrayType *elemType = cast<ArrayType>(varType->getPointerElementType());
-        // elemType->dump();
-        // outs() << "\n";
-        // outs() << "numelements " << elemType->getNumElements() << "\n";
-        // return 0;
         Value * indices[] = {
             ConstantInt::getSigned(IntegerType::get(context, 32), 0),
             ConstantInt::getSigned(IntegerType::get(context, 32), 0)
@@ -124,20 +114,18 @@ llvm::Constant *createInt32Constant(llvm::LLVMContext *context, int value) {
 }
 
 void updateAddressSpace(Value *value, int newSpace) {
-    if(!isa<PointerType>(value->getType())) {
-        return;
+    if(PointerType *pointerType = dyn_cast<PointerType>(value->getType())) {
+        // std::cout << "updating addresssapce" << std::endl;
+        Type *newType = PointerType::get(pointerType->getElementType(), newSpace);
+        // newType->dump();
+        value->mutateType(newType);
+        // value->dump();
+        // std::cout << std::endl;
     }
-    Type *elementType = value->getType()->getPointerElementType();
-    Type *newType = PointerType::get(elementType, newSpace);
-    value->mutateType(newType);
 }
 
 void copyAddressSpace(Value *src, Value *dest) {
     // copies address space from src value to dest value
-    int srcTypeID = src->getType()->getTypeID();
-    if(srcTypeID != Type::PointerTyID) { // not a pointer, so skipe
-        return;
-    }
     if(PointerType *srcType = dyn_cast<PointerType>(src->getType())) {
         if(isa<PointerType>(dest->getType())) {
             int addressspace = srcType->getAddressSpace();

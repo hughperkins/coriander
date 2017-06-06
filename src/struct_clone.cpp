@@ -145,7 +145,7 @@ std::string StructCloner::writeClCopyToDevicesideStruct(llvm::StructType *ptrful
         if(PointerType *pointerType = dyn_cast<PointerType>(childType)) {
             // ignore
             // as long as not pointer to pointer, set to 0 for now (think about how to generalize better later)
-            if(!isa<PointerType>(pointerType->getPointerElementType())) {
+            if(!isa<PointerType>(pointerType->getElementType())) {
                 gencode += childDstName + " = 0;\n";
             }
             dstidx++;
@@ -194,7 +194,7 @@ llvm::Instruction *StructCloner::writeHostsideIrCopyToMarshallingStruct(
     LLVMContext &context = src->getContext();
     int srcidx = 0;
     int dstidx = 0;
-    if(StructType *structType = dyn_cast<StructType>(src->getType()->getPointerElementType())) {
+    if(StructType *structType = dyn_cast<StructType>(cast<PointerType>(src->getType())->getElementType())) {
         for(auto it=structType->element_begin(); it != structType->element_end(); it++) {
             Type *childType = *it;
             if(isa<PointerType>(childType)) {
@@ -281,7 +281,7 @@ void StructCloner::walkType(Module *M, StructInfo *structInfo, int level, int of
     if(StructType *structtype = dyn_cast<StructType>(type)) {
         walkStructType(M, structInfo, level, offset, indices, path, structtype);
     } else if(PointerType *pointerType = dyn_cast<PointerType>(type)) {
-        Type *elementType = pointerType->getPointerElementType();
+        Type *elementType = pointerType->getElementType();
         // how to find out if this is gpu allocated or not?
         // let's just heuristically assume that all primitive*s are gpu allocated for now?
         // ~~and lets assume that structs are just sent one at a time now, and any contained structs are one at a time~~

@@ -51,7 +51,7 @@ std::string TypeDumper::dumpAddressSpace(llvm::Type *type) {
             case 3:
                 return "local";
             case 5:
-                return "/* vmem */ unsigned long";
+                return "__vmem__";
             default:
                 throw runtime_error("not implemented, addressspace " + easycl::toString(addressspace));
         }
@@ -61,16 +61,58 @@ std::string TypeDumper::dumpAddressSpace(llvm::Type *type) {
 }
 
 std::string TypeDumper::dumpPointerType(PointerType *ptr, bool decayArraysToPointer) {
+    // std::cout << "dumpPointerType" << std::endl;
     string gencode = "";
-    Type *elementType = ptr->getPointerElementType();
+    Type *elementType = ptr->getElementType();
     string elementTypeString = dumpType(elementType, decayArraysToPointer);
     int addressspace = ptr->getAddressSpace();
     if(addressspace == 5) {
-        if(isa<PointerType>(elementType)) {
-            return "/* vmem */ unsigned long*";
-        } else {
-            return "/* vmem */ unsigned long";
+        int depth = getPointerDepth(elementType);
+        std::cout << "dumpPointer type pointerdpeth=" << depth << std::endl;
+        // if(isa<PointerType>(elementType)) {
+        switch(depth) {
+            case 0:
+                return "__vmem__ unsigned long";
+                break;
+            case 1:
+                return "__vmem__ unsigned long global *";
+                break;
+            // case 2:
+            //     return "__vmem__ unsigned long**";
+            //     break;
+            default:
+                std::cout << "not implemented depth=" << depth << std::endl;
+                throw std::runtime_error("not implemenented depth");
         }
+        // if(depth  1) {
+        //     return "__vmem__ unsigned long*";
+        // } else {
+        //     return "__vmem__ unsigned long";
+        // }
+    }
+    if(addressspace == 6) {
+        int depth = getPointerDepth(elementType);
+        std::cout << "dumpPointer type pointerdpeth=" << depth << std::endl;
+        // if(isa<PointerType>(elementType)) {
+        switch(depth) {
+            // case 0:
+            //     return "__vmem__ unsigned long";
+            //     break;
+            case 1:
+                return "__vmem2__ unsigned long";
+                break;
+            // case 2:
+            //     return "__vmem__ unsigned long**";
+            //     break;
+            default:
+                std::cout << "not implemented depth=" << depth << std::endl;
+                throw std::runtime_error("not implemenented depth");
+        }
+        // if(depth  1) {
+        //     return "__vmem__ unsigned long*";
+        // } else {
+        //     return "__vmem__ unsigned long";
+        // }
     }
     string addressspacestr = "";
     switch(addressspace) {
@@ -90,7 +132,11 @@ std::string TypeDumper::dumpPointerType(PointerType *ptr, bool decayArraysToPoin
             break;
 
         case 5:
-            addressspacestr = "/* vmem */";
+            addressspacestr = "__vmem__";
+            break;
+
+        case 6:
+            addressspacestr = "__vmem2__";
             break;
 
         default:
@@ -166,12 +212,12 @@ std::string TypeDumper::addStructToGlobalNames(StructType *type) {
 }
 
 std::string TypeDumper::dumpStructType(StructType *type) {
-    std::cout << "TypeDumper::dumpStructType" << std::endl;
+    // std::cout << "TypeDumper::dumpStructType" << std::endl;
     return addStructToGlobalNames(type);
 }
 
 std::string TypeDumper::dumpArrayType(ArrayType *type, bool decayArraysToPointer) {
-    std::cout << "TypeDumper::dumpArrayType" << std::endl;
+    // std::cout << "TypeDumper::dumpArrayType" << std::endl;
     type->dump();
     std::cout << std::endl;
     ostringstream oss;
@@ -187,7 +233,7 @@ std::string TypeDumper::dumpArrayType(ArrayType *type, bool decayArraysToPointer
 }
 
 std::string TypeDumper::dumpVectorType(VectorType *vectorType, bool decayArraysToPointer) {
-    std::cout << "TypeDumper::dumpVectorType" << std::endl;
+    // std::cout << "TypeDumper::dumpVectorType" << std::endl;
     int elementCount = vectorType->getNumElements();
     Type *elementType = vectorType->getElementType();
     if(elementType->getPrimitiveSizeInBits() == 0) {
@@ -222,6 +268,9 @@ std::string TypeDumper::dumpFunctionType(FunctionType *fn) {
 }
 
 std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {
+    // std::cout << "  dumpType()" << std::endl;
+    // type->dump();
+    // std::cout << std::endl;
     Type::TypeID typeID = type->getTypeID();
     switch(typeID) {
         case Type::VoidTyID:
@@ -266,21 +315,33 @@ std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {
     }
 }
 
+int TypeDumper::getPointerDepth(Type *type) {
+    std::cout << " getPointerDepth()" << std::endl;
+    if(PointerType *nextLevel = dyn_cast<PointerType>(type)) {
+        return getPointerDepth(nextLevel->getElementType()) + 1;
+    }
+    return 0;
+}
+
 std::string TypeDumper::dumpStructDefinition(StructType *type, string name) {
     // dump deviceside struct opencl
     // this will write pointers as global pointers, probably
 
-    std::cout << "TypeDumper::dumpStructDefinition" << std::endl;
-    std::string declaration = "";
-    declaration += name + " {\n";
+    // std::cout << "TypeDumper::dumpStructDefinition" << std::endl;
+    // std::string declaration = "";
+    ostringstream declaration;
+    declaration << name << " {\n";
     int i = 0;
+    // std::cout << "dumpStructDefinition name=" << name << std::endl;
     for(auto it=type->element_begin(); it != type->element_end(); it++) {
         Type *elementType = *it;
+        // std::cout << "  dumpStructDefinition elemtype=" << dumpType(elementType) <<
+        //    " pointerDepth=" << getPointerDepth(elementType) << std::endl;
         bool isPtrPtrFunction = false;
         if(PointerType *ptr = dyn_cast<PointerType>(elementType)) {
-            Type *ptrElementType = ptr->getPointerElementType();
+            Type *ptrElementType = ptr->getElementType();
             if(PointerType *ptrptr = dyn_cast<PointerType>(ptrElementType)) {
-                Type *ptrptrElementType = ptrptr->getPointerElementType();
+                Type *ptrptrElementType = ptrptr->getElementType();
                 isPtrPtrFunction = isa<FunctionType>(ptrptrElementType);
             }
         }
@@ -292,29 +353,36 @@ std::string TypeDumper::dumpStructDefinition(StructType *type, string name) {
         if(ArrayType *arraytype = dyn_cast<ArrayType>(elementType)) {
             Type *arrayelementtype = arraytype->getElementType();
             int numElements = arraytype->getNumElements();
-            declaration += "    ";
+            declaration << "    ";
             // assume any pointers are global
             // also, we'll change them into unsigned longs ... :-P. (ie virtual mem locations)
             if(isa<PointerType>(arrayelementtype)) {
-                declaration += "unsigned long ";
+                declaration << "__vmem__ unsigned long ";
             } else {
-                declaration += dumpType(arrayelementtype) + " ";
+                declaration << dumpType(arrayelementtype) << " ";
             }
-            declaration += memberName + "[" + easycl::toString(numElements) + "];\n";
+            declaration << memberName << "[" << numElements << "];\n";
         } else {
-            declaration += "    ";
-            // if its a pointer, lets assume its global, for now
+            declaration << "    ";
+            // if its a pointer:
+            // - level 1 => global (we'll splice it in)
+            // - level 2 => vmem array
             if(isa<PointerType>(elementType)) {
-                declaration += "global ";
-
+                int pointerDepth = getPointerDepth(elementType);
+                if(pointerDepth > 1) {
+                    declaration << "__vmem2__ unsigned long " << memberName << ";\n";
+                } else {
+                    declaration << "global " << dumpType(elementType) << " " << memberName << ";\n";
+                }
+            } else {
+                declaration << dumpType(elementType) << " " << memberName << ";\n";
             }
-            declaration += dumpType(elementType) + " " + memberName + ";\n";
         }
         i++;
     }
-    declaration += "};\n";
+    declaration << "};\n";
 
-    return declaration;
+    return declaration.str();
 }
 
 std::string TypeDumper::dumpStructDefinitions() {

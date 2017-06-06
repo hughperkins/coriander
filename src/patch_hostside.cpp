@@ -160,7 +160,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction 
     Type *valueType = value->getType();
     Module *M = lastInst->getModule();
 
-    Type *elementType = cast<PointerType>(valueType)->getPointerElementType();
+    Type *elementType = cast<PointerType>(valueType)->getElementType();
     if(elementType->isDoubleTy()) {
         cout << "Executing functions with double arrays as kernel parameters is not supported" << endl;
         cout << "Note that this is not set-in-stone, but is really hard to do." << endl;
@@ -200,7 +200,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointerstruct(llvm::Instru
     // we'd better at least assert or something, if there are pointers in the struct
     Module *M = lastInst->getModule();
     Type *valueType = structPointer->getType();
-    StructType *structType = cast<StructType>(cast<PointerType>(valueType)->getPointerElementType());
+    StructType *structType = cast<StructType>(cast<PointerType>(valueType)->getElementType());
     unique_ptr<StructInfo> structInfo(new StructInfo());
     StructCloner::walkStructType(M, structInfo.get(), 0, 0, vector<int>(), "", structType);
     bool structHasPointers = structInfo->pointerInfos.size() > 0;
@@ -223,7 +223,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluevector(llvm::Instru
     // - element size
 
     Type *valueType = vectorPointer->getType();
-    VectorType *vectorType = cast<VectorType>(cast<PointerType>(valueType)->getPointerElementType());
+    VectorType *vectorType = cast<VectorType>(cast<PointerType>(valueType)->getElementType());
     int elementCount = vectorType->getNumElements();
     Type *elementType = vectorType->getElementType();
     int elementSizeBytes = elementType->getPrimitiveSizeInBits() / 8;
@@ -276,7 +276,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
 
     Indentor indentor;
     PointerType *structPointerType = cast<PointerType>(structPointer->getType());
-    if(!isa<StructType>(structPointerType->getPointerElementType())) {
+    if(!isa<StructType>(structPointerType->getElementType())) {
         BitCastInst *bitcast = new BitCastInst(structPointer, paramInfo->typeDevicesideFn);
         bitcast->insertAfter(lastInst);
         structPointer = bitcast;
@@ -285,7 +285,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
         structPointerType = cast<PointerType>(structPointer->getType());
     }
 
-    StructType *structType = cast<StructType>(structPointerType->getPointerElementType());
+    StructType *structType = cast<StructType>(structPointerType->getElementType());
     string typeName = structType->getName().str();
     if(typeName == "struct.float4") {
         return PatchHostside::addSetKernelArgInst_pointer(lastInst, structPointer);
@@ -371,7 +371,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
 
     if(paramInfo->devicesideByVal &&
             isa<PointerType>(devicesideType) &&
-            isa<StructType>(devicesideType->getPointerElementType())) {
+            isa<StructType>(cast<PointerType>(devicesideType)->getElementType())) {
         // lets walk up the gep???
         if(GetElementPtrInst *gep = dyn_cast<GetElementPtrInst>(valueAsPointerInstr)) {
             Value *beforeGep = gep->getOperand(0);
@@ -383,7 +383,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
     } else if(value->getType()->isFloatingPointTy()) {
         lastInst = PatchHostside::addSetKernelArgInst_float(lastInst, value);
     } else if(value->getType()->isPointerTy()) {
-        Type *elementType = dyn_cast<PointerType>(value->getType())->getPointerElementType();
+        Type *elementType = dyn_cast<PointerType>(value->getType())->getElementType();
         if(isa<StructType>(elementType)) {
             lastInst = PatchHostside::addSetKernelArgInst_pointerstruct(lastInst, value);
         } else {
@@ -457,7 +457,7 @@ void PatchHostside::getLaunchTypes(
     Function *hostFn = cast<Function>(bitcast->getOperand(0));
 
     PointerType *pointerFunctionType = cast<PointerType>(hostFn->getType());
-    FunctionType *hostFnType = cast<FunctionType>(pointerFunctionType->getPointerElementType());
+    FunctionType *hostFnType = cast<FunctionType>(pointerFunctionType->getElementType());
 
     info->kernelName = hostFn->getName();
 
@@ -466,7 +466,7 @@ void PatchHostside::getLaunchTypes(
         cout << "ERROR: failed to find device kernel [" << info->kernelName << "]" << endl;
         throw runtime_error("ERROR: failed to find device kernel " + info->kernelName);
     }
-    FunctionType *deviceFnType = cast<FunctionType>(deviceFn->getType()->getPointerElementType());
+    FunctionType *deviceFnType = cast<FunctionType>(cast<PointerType>(deviceFn->getType())->getElementType());
 
     int i = 0;
     vector<Argument *> devicesideArgs;

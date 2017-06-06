@@ -41,6 +41,8 @@ public:
     std::string dumpArrayType(llvm::ArrayType *type, bool decayArraysToPointer = false);
     std::string dumpVectorType(llvm::VectorType *type, bool decayArraysToPointer = false);
 
+    int getPointerDepth(llvm::Type *type);
+
     std::string dumpStructDefinitions();
     std::string dumpStructDefinition(llvm::StructType *type, std::string name);
     // void dumpStructDeclarations(std::ostream &os);
