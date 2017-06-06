@@ -29,7 +29,6 @@
 #include "EasyCL/EasyCL.h"
 #include "EasyCL/util/easycl_stringhelper.h"
 
-// #include "CL/cl.h"
 #include "cocl/cocl.h"
 #include "cocl/cocl_memory.h"
 
@@ -171,10 +170,6 @@ CLKernel *compileOpenCLKernel(string originalKernelName, string uniqueKernelName
         cout << "saving cl sourcecode to " << filename << endl;
         ofstream f;
         f.open(filename, ios_base::out);
-        // f << "// original kernelName: [" << originalKernelName << "]" << endl;
-        // f << "// unique kernelName: [" << uniqueKernelName << "]" << endl;
-        // f << "// short kernelname: [" << shortKernelName << "]" << endl;
-        // f << endl;
         f << clSourcecode << endl;
         f.close();
     }
@@ -357,9 +352,7 @@ void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
     ThreadVars *v = getThreadVars();
 
     Memory *memory = findMemory(memory_as_charstar);
-    // std::cout << "setKernelArgGpuBuffer vmemloc=" << (long)memory_as_charstar << " memory=" << (long)memory << std::endl;
     if(memory == 0) {
-        // std::cout << "  memory==0" << std::endl;
         COCL_PRINT("setKernelArgGpuBuffer nullptr");
         addClmemArg(0);
         if(v->offsets_32bit) {
@@ -420,21 +413,6 @@ void kernelGo() {
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT("kernelGo queue=" << (void *)launchConfiguration.queue);
 
-    // launchConfiguration.kernelName += "_";
-    // for(int i = 0; i < launchConfiguration.clmemIndexByClmemArgIndex.size(); i++) {
-        // int clmemIndex = launchConfiguration.clmemIndexByClmemArgIndex[i];
-        // std::cout << "   arg " << i << " clmemindex=" << clmemIndex << std::endl;
-    //     launchConfiguration.kernelName += "_" + EasyCL::toString(clmemIndex);
-    // }
-    // cout << "kernelGo() kernel name " << launchConfiguration.kernelName << " unique clmems=" << launchConfiguration.clmems.size() << endl;
-    // cout << "kernelGo() clmems.size() " << launchConfiguration.clmems.size() << endl;
-    // for(auto it = launchConfiguration.clmemIndexByClmemArgIndex.begin(); it != launchConfiguration.clmemIndexByClmemArgIndex.end(); it++) {
-    //     cout << " clmem index " << *it << endl;
-    // }
-    // for(int i = 0; i < launchConfiguration.args.size(); i++) {
-    //     cout << "  arg i=" << i << " " << launchConfiguration.args[i]->str() << endl;
-    // }
-
     GenerateOpenCLResult res = generateOpenCL(
         launchConfiguration.clmems.size(), launchConfiguration.clmemIndexByClmemArgIndex, launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
     COCL_PRINT("kernelGo() kernel: " << launchConfiguration.kernelName);
@@ -447,10 +425,7 @@ void kernelGo() {
         kernel->inout(&launchConfiguration.clmems[i]);
         // we also need to write out the offset of this clmem, in our virtual memory system
         cl_mem clmem = launchConfiguration.clmems[i];
-        // std::cout << "clmem " << clmem << std::endl;
         Memory *memory = findMemoryByClmem(clmem);
-        // std::cout << "memory: " << memory << std::endl;
-        // std::cout << "vmem loc: " << memory->fakePos << std::endl;
         uint64_t vmemloc = 0;
         if(memory != 0) {  // hostsidegpu buffers will be 0
             vmemloc = memory->fakePos;

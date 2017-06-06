@@ -45,14 +45,11 @@ public:
 
     std::string dumpStructDefinitions();
     std::string dumpStructDefinition(llvm::StructType *type, std::string name);
-    // void dumpStructDeclarations(std::ostream &os);
 
-    // std::set<std::string> structDeclarations;
     std::set<llvm::StructType *> structsToDefine;
     std::map<llvm::FunctionType *, std::string> functionsToDefine;
 
 protected:
-    // std::map<llvm::GlobalVariable *, std::string> globalVariablesToDefine;
     GlobalNames *globalNames = 0;
     bool forceSingle = true;
 };

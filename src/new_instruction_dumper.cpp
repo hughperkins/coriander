@@ -442,18 +442,6 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
 
     LocalValueInfo *op0info = getOperand(instr->getOperand(0));
 
-    // TargetedLogger l(*localValueInfo);
-    // ostringstream l;
-    // l << "\n=============\nGEP\n---" << std::endl;
-
-    // l << "lvi->name " << localValueInfo->name << std::endl;
-    // l << "op0info->name " << op0info->name << std::endl;
-
-    // l.enableForName("v29");
-    // std::cout << "gep vname " << localValueInfo->name << std::endl;
-    // std::cout << "  "
-    // l << "test message" << std::endl;
-
     string gencode = "";
     int numOperands = instr->getNumOperands();
     string rhs = "";
@@ -461,12 +449,6 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     Type *currentType = instr->getOperand(0)->getType();
     PointerType *op0typeptr = cast<PointerType>(instr->getOperand(0)->getType());
     int addressspace = op0typeptr->getAddressSpace();
-    // }
-    // std::cout << "\ndumpGEP" << std::endl;
-    // int addressspace = op0typeptr->getAddressSpace();
-    // std::cout << "gep addressspace=" << addressspace << std::endl;
-    // instr->dump();
-    // std::cout << std::endl;
     if(addressspace == 3) { // local/shared memory
         // pointer into shared memory.
         // so, this isnt a local value in llvm, its a global one
@@ -499,24 +481,8 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             // also, this should be an array of *pointers*, not just primitive elements
             if(prevType != nullptr &&
                     isa<StructType>(prevType) &&
-                    // typeDumper->getPointerDepth(seqType->getElementType()) == 1 &&
                     isa<PointerType>(seqType->getElementType())
-                    // !isa<PointerType>(cast<PointerType>(seqType->getElementType())->getElementType())
-                    // && true
                     ) {
-                // so we should call getGlobalPointer, and store into a variable
-                // localValueInfo->inlineCl.push_back(
-                //     "global float * " + localValueInfo->name + "_gptrstep = getGlobalPointer(" +
-                //         rhs + ", pGlobalVars" +
-                //     ")"
-                // );
-                // rhs = localValueInfo->name + "_gptrstep";
-                // newType = seqType->getElementType();
-
-                // newType = IntegerType::get(context, 64);
-                // newType = seqType->getElementType();
-                // currentType = PointerType::get(IntegerType::get(M->getContext(), 64), 5);
-                // newType = PointerType::get(IntegerType::get(M->getContext(), 64), 5);
                 addressspace = 5;
                 newType = seqType->getElementType();
             } else {
@@ -589,72 +555,33 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         prevType = currentType;
         currentType = newType;
     }
-    // l << "  gep final addressspace=" << addressspace << std::endl;
-    // l << "  gep currenttype after loop=" << typeDumper->dumpType(currentType) << std::endl;
     updateAddressSpace(instr, addressspace);
-    // Type *gepType = PointerType::get(currentType, addressspace);
-    // l << "  gepType: " << typeDumper->dumpType(gepType) << std::endl;
-    if(addressspace == 5) {
-        // l << "   gep add 5 detected => mutating type to " << typeDumper->dumpType(currentType) << std::endl;
-        // instr->mutateType(currentType);
-    }
-    // gepType->dump();
-    // if(ad)
-    // instr->dump();
-    // std::cout << std::endl;
     localValueInfo->setAddressSpace(addressspace);
     rhs = "(" + ExpressionsHelper::stripOuterParams(rhs) + ")";
     rhs = "(&" + rhs + ")";
-    if(addressspace == 5) {
-        // localValueInfo->setAsAssigned();
-        // rhs = "(" + typeDumper->dumpType(cast<PointerType>(instr->getType())->getElementType()) + ")" + rhs;
-        // rhs = "(" + typeDumper->dumpType(instr->getType()) + ")" + rhs;
-    }
 
-    // l << "  gep final expr " << rhs << std::endl;
-    // if(addressspace == 5) {
-        // std::cout << l.str() << std::endl;
-    // }
     localValueInfo->setExpression(rhs);
-    // std::cout << localValueInfo->name << std::endl;
-    // ostringstream oss;
-    // localValueInfo->writeDeclaration("", typeDumper, oss);
-    // localValueInfo->writeInlineCl("", oss);
-    // std::cout << "localvalueinfo declaration: " << oss.str() << std::endl;
 }
 
 void NewInstructionDumper::dumpLoad(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     Instruction *instr = cast<Instruction>(localValueInfo->value);
 
-    // instr->dump();
-    // std::cout << std::endl;
-    // std::cout << "dumpLoad op0 add space " << cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace() << std::endl;
     string rhs= "";
     bool destIsSinglePointer = false;
     if(PointerType *l1pointer = dyn_cast<PointerType>(instr->getType())) {
-        // std::cout << "dumpLoad instr l1 is pointer" << std::endl;
         if(PointerType *l2pointer = dyn_cast<PointerType>(l1pointer->getElementType())) {
-            // std::cout << "dumpLoad instr l2 is pointer" << std::endl;
-            // if(PointerType *l3pointer = dyn_cast<PointerType>(l2pointer->getElementType())) {
-            //     std::cout << "dumpLoad instr l3 is pointer" << std::endl;
-            // }
         } else {
             destIsSinglePointer = true;
         }
     }
     if(cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace() == 5 && destIsSinglePointer) {
-        // std::cout << "virtual memory address" << std:: endl;
-        // std::cout << "instr type " << typeDumper->dumpType(instr->getType()) << std::endl;
-        // instr->getOperand(0)
         localValueInfo->inlineCl.push_back(
             "global " + typeDumper->dumpType(instr->getType()) + " " + localValueInfo->name + "_gptrstep = getGlobalPointer(" +
-                // "(__vmem__ unsigned long)" +
                 getOperand(instr->getOperand(0))->getExpr() + "[0], pGlobalVars" +
             ")"
         );
         rhs = localValueInfo->name + "_gptrstep";
-        // newType = seqType->getElementType();
         updateAddressSpace(instr, 1);
         localValueInfo->addressSpace = 1;
     } else {
@@ -666,15 +593,6 @@ void NewInstructionDumper::dumpLoad(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->setExpression(rhs);
 }
 
-// so we should call getGlobalPointer, and store into a variable
-// localValueInfo->inlineCl.push_back(
-//     "global float * " + localValueInfo->name + "_gptrstep = getGlobalPointer(" +
-//         rhs + ", pGlobalVars" +
-//     ")"
-// );
-// rhs = localValueInfo->name + "_gptrstep";
-// newType = IntegerType::get(context, 64);
-
 void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new StoreClWriter(localValueInfo));
     StoreInst *instr = cast<StoreInst>(localValueInfo->value);
@@ -683,11 +601,6 @@ void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
     LocalValueInfo *op1info = getOperand(instr->getOperand(1));
 
     int destAddressSpace = cast<PointerType>(instr->getOperand(1)->getType())->getAddressSpace();
-    // std::cout << "\ndumpStore STORE !!!!!!!!!. dest addressspace=" << destAddressSpace << std::endl;
-    // instr->dump();
-    // instr->getOperand(0)->dump();
-    // instr->getOperand(1)->dump();
-    // std::cout << std::endl;
     std::string lhs = "";
     if(destAddressSpace == 5 && false) {  // vmem
         localValueInfo->inlineCl.push_back(

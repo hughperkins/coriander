@@ -51,7 +51,6 @@ public:
     virtual ~StructCloner() {
 
     }
-    // llvm::StructType *createDevicesideStructType(std::map<llvm::StructType *, llvm::StructType *> &newByOld, llvm::StructType *inType);
     llvm::StructType *cloneNoPointers(llvm::StructType *inStructType);
     std::string writeClCopyToDevicesideStruct(llvm::StructType *ptrfullType, std::string srcName, std::string destName);
     llvm::Instruction *writeHostsideIrCopyToMarshallingStruct(llvm::Instruction *lastInst, llvm::StructType *ptrfullType,

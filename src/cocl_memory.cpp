@@ -52,10 +52,8 @@ namespace cocl {
 
     Memory::Memory(cl_mem clmem, size_t bytes) :
             clmem(clmem), bytes(bytes) {
-        // MemoryMutex memoryMutex;
         ThreadVars *v = getThreadVars();
         fakePos = v->getContext()->nextAllocPos;
-        // COCL_PRINT("Memory::Memory bytes=" << bytes << endl;)
         // we should align it actually.  on 128-bytes?
         fakePos = ((fakePos + 127) / 128) * 128;
         v->getContext()->nextAllocPos = fakePos + bytes;
@@ -106,7 +104,6 @@ namespace cocl {
 
         for(auto it=v->getContext()->memories.begin(), e=v->getContext()->memories.end(); it != e; it++) {
             Memory *memory = *it;
-            // std::cout << "findMemoryByClmem clmem=" << clmem << " memory->clmem " << memory->clmem << std::endl;
             if(clmem == memory->clmem) {
                 return memory;
             }
@@ -134,7 +131,6 @@ size_t cuMemFreeHost(void *hostPointer) {
 size_t cuMemGetInfo(size_t *free, size_t *total) {
     COCL_PRINT("cuMemGetInfo redirected");
     ThreadVars *v = getThreadVars();
-    // cl_device_id deviceid = getDeviceByIdx(v->currentDevice);
     cocl::CoclDevice *coclDevice = cocl::getCoclDeviceByGpuOrdinal(v->currentGpuOrdinal);
     cl_device_id clDeviceId = coclDevice->deviceId;
     *free = getDeviceInfoInt64(clDeviceId, CL_DEVICE_MAX_MEM_ALLOC_SIZE);
