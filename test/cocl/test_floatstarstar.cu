@@ -78,12 +78,16 @@ void test1() {
     cuStreamDestroy(stream);
 }
 
-__global__ void run_bounded_array_two(struct BoundedArray boundedArray, int numBuffers, int N) {
-    float **starstar = boundedArray.bounded_array;
+struct BoundedArrayUnion {
+    float *bounded_array[8];
+    float **unbounded_array;
+};
+
+__global__ void run_bounded_array_two(struct BoundedArrayUnion mystruct, int useUnbounded, int numBuffers, int N) {
+    float **starstar = useUnbounded ? mystruct.unbounded_array : mystruct.bounded_array;
     for(int i = 0; i < numBuffers; i++) {
-        float *buf = starstar[i];
         for(int j = 0; j < N; j++) {
-            buf[j] = 123.0f + i + 1 + j;
+            starstar[i][j] = 123.0f + i + 1 + j;
         }
     }
 }
@@ -101,7 +105,7 @@ void test2() {
     std::cout << "mallocSize=" << mallocSize << std::endl;
     cudaMalloc((void **)&gpuArena, mallocSize);
 
-    struct BoundedArray boundedArray;
+    struct BoundedArrayUnion boundedArray;
     float *hostFloats[numBuffers];
 
     for(int i = 0; i < numBuffers; i++) {
@@ -110,7 +114,7 @@ void test2() {
         hostFloats[i] = new float[N];
     }
 
-    run_bounded_array_two<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(boundedArray, numBuffers, N);
+    run_bounded_array_two<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(boundedArray, 0, numBuffers, N);
 
     for(int i = 0; i < numBuffers; i++) {
         cudaMemcpy(hostFloats[i], boundedArray.bounded_array[i], N * sizeof(float), cudaMemcpyDeviceToHost);
