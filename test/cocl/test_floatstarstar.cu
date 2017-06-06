@@ -14,6 +14,14 @@ struct BoundedArray {
     float *bounded_array[8];
 };
 
+__global__ void wipe(int *buffer, int length) {
+    length >>= 5;
+    int tid = threadIdx.x;
+    for(int i = 0; i < length; i++) {
+        buffer[(i << 5) + tid] = -1;
+    }
+}
+
 __global__ void run_bounded_array(struct BoundedArray boundedArray, int numBuffers, int N) {
     for(int i = 0; i < numBuffers; i++) {
         for(int j = 0; j < N; j++) {
@@ -34,6 +42,7 @@ void test1() {
     int mallocSize = numBuffers * N * sizeof(float) + 256 + 1024;
     std::cout << "mallocSize=" << mallocSize << std::endl;
     cudaMalloc((void **)&gpuArena, mallocSize);
+    wipe<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>((int *)gpuArena, mallocSize >> 2);
 
     struct BoundedArray boundedArray;
     float *hostFloats[numBuffers];
@@ -76,6 +85,7 @@ void test1() {
     cudaFree(gpuArena);
 
     cuStreamDestroy(stream);
+    std::cout << "test1 finished ok" << std::endl;
 }
 
 struct BoundedArrayUnion {
@@ -104,6 +114,7 @@ void test2_bounded() {
     int mallocSize = numBuffers * N * sizeof(float) + 256 + 1024;
     std::cout << "mallocSize=" << mallocSize << std::endl;
     cudaMalloc((void **)&gpuArena, mallocSize);
+    wipe<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>((int *)gpuArena, mallocSize >> 2);
 
     struct BoundedArrayUnion boundedArray;
     float *hostFloats[numBuffers];
@@ -146,6 +157,7 @@ void test2_bounded() {
     cudaFree(gpuArena);
 
     cuStreamDestroy(stream);
+    std::cout << "finished test2_bounded" << std::endl;
 }
 
 void test3_unbounded() {
@@ -160,6 +172,7 @@ void test3_unbounded() {
     int mallocSize = numBuffers * N * sizeof(float) + 256 + 1024;
     std::cout << "mallocSize=" << mallocSize << std::endl;
     cudaMalloc((void **)&gpuArena, mallocSize);
+    wipe<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>((int *)gpuArena, mallocSize >> 2);
 
     struct BoundedArrayUnion boundedArray;
     float *hostFloats[numBuffers];
@@ -202,6 +215,7 @@ void test3_unbounded() {
     cudaFree(gpuArena);
 
     cuStreamDestroy(stream);
+    std::cout << "finished test3_unbounded" << std::endl;
 }
 
 int main(int argc, char *argv[]) {

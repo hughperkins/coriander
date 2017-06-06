@@ -328,7 +328,7 @@ std::string FunctionDumper::dumpInternalFunctionDeclarationWithoutReturn(llvm::F
     if(i > 0) {
         declaration << ", ";
     }
-    declaration << "struct GlobalVars *pGlobalVars";
+    declaration << "const struct GlobalVars *const pGlobalVars";
     declaration << ")";
     return declaration.str();
 }
@@ -492,8 +492,8 @@ void FunctionDumper::toCl(ostream &os) {
         os << shimCode << "\n";
     }
     if(isKernel) {
-    os << R"(    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
-    struct GlobalVars *pGlobalVars = &globalVars;
+    os << R"(    const struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    const struct GlobalVars * const pGlobalVars = &globalVars;
 
 )";
 }

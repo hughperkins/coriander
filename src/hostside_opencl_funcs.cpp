@@ -176,7 +176,7 @@ CLKernel *compileOpenCLKernel(string originalKernelName, string uniqueKernelName
 
     CLKernel *kernel = 0;
     try {
-        kernel = cl->buildKernelFromString(clSourcecode, shortKernelName, "", "__internal__");
+        kernel = cl->buildKernelFromString(clSourcecode, shortKernelName, "", "__internal__", true);
     } catch(runtime_error &e) {
         cout << "compileOpenCLKernel failed to compile opencl sourcecode" << endl;
         cout << "unique kernel name " << uniqueKernelName << endl;
@@ -451,6 +451,9 @@ void kernelGo() {
     try {
         kernel->run(launchConfiguration.queue, 3, global, launchConfiguration.block);
     } catch(runtime_error &e) {
+        if(kernel->buildLog != "") {
+            std::cout << kernel->buildLog << std::endl;
+        }
         cout << "kernel failed to run" << endl;
         cout << "kernel name: [" << launchConfiguration.kernelName << "]" << endl;
         pthread_mutex_unlock(&launchMutex);
