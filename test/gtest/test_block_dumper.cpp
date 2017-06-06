@@ -315,7 +315,7 @@ TEST(test_block_dumper, usesPointerFunction) {
     oss.str("");
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
-    EXPECT_EQ(R"(    v1 = returnsPointer(in, scratch);
+    EXPECT_EQ(R"(    v1 = returnsPointer(in, pGlobalVars);
 )", oss.str());
 
     oss.str("");

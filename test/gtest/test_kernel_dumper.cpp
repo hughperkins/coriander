@@ -80,15 +80,35 @@ TEST(test_kernel_dumper, basic) {
     // string cl = kernelDumper->toCl();
     string cl = runKernelDumper(kernelDumper, 2);
     cout << "kernel cl: [" << cl << "]" << endl;
-    EXPECT_EQ(R"(
-float someFunc_gg(global float* d1, global float* v11, local int *scratch);
-float someFunc_gp(global float* d1, float* v11, local int *scratch);
-float someFunc_pg(float* d1, global float* v11, local int *scratch);
-kernel void someKernel(global char* clmem0, global char* clmem1, uint d1_offset, uint d2_offset, local int *scratch);
+    EXPECT_EQ(R"(// __vmem__ is just a marker, so we can see which bits are vmems
+// It doesnt actually do anything; compiler ignores it
+#define __vmem__
 
-kernel void someKernel(global char* clmem0, global char* clmem1, uint d1_offset, uint d2_offset, local int *scratch) {
+// vmem2 is a pointer to a pointer (so we have to unwrap twice)
+#define __vmem2__
+
+struct GlobalVars {
+    local int *scratch;
+    global char *clmem0;
+    unsigned long clmem_vmem_offset0;
+};
+
+inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, struct GlobalVars *globalVars) {
+    return (global float *)(globalVars->clmem0 + vmemloc - globalVars->clmem_vmem_offset0);
+}
+
+
+float someFunc_gg(global float* d1, global float* v11, struct GlobalVars *pGlobalVars);
+float someFunc_gp(global float* d1, float* v11, struct GlobalVars *pGlobalVars);
+float someFunc_pg(float* d1, global float* v11, struct GlobalVars *pGlobalVars);
+kernel void someKernel(global char* clmem0, unsigned long clmem_vmem_offset0, global char* clmem1, unsigned long clmem_vmem_offset1, uint d1_offset, uint d2_offset, local int *scratch);
+
+kernel void someKernel(global char* clmem0, unsigned long clmem_vmem_offset0, global char* clmem1, unsigned long clmem_vmem_offset1, uint d1_offset, uint d2_offset, local int *scratch) {
     global float* d2 = (global float*)(clmem1 + d2_offset);
     global float* d1 = (global float*)(clmem0 + d1_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     float v4;
     float v5;
@@ -98,12 +118,12 @@ kernel void someKernel(global char* clmem0, global char* clmem1, uint d1_offset,
 
 v1:;
     v3 = v2[0];
-    v4 = someFunc_gp(d1, v3, scratch);
-    v5 = someFunc_pg(v3, d1, scratch);
-    v6 = someFunc_gg(d1, d1, scratch);
+    v4 = someFunc_gp(d1, v3, pGlobalVars);
+    v5 = someFunc_pg(v3, d1, pGlobalVars);
+    v6 = someFunc_gg(d1, d1, pGlobalVars);
     return;
 }
-float someFunc_gg(global float* d1, global float* v11, local int *scratch) {
+float someFunc_gg(global float* d1, global float* v11, struct GlobalVars *pGlobalVars) {
     float v5;
     global float* v6;
 
@@ -113,7 +133,7 @@ v1:;
     v6[0] = v5;
     return 4.5f;
 }
-float someFunc_gp(global float* d1, float* v11, local int *scratch) {
+float someFunc_gp(global float* d1, float* v11, struct GlobalVars *pGlobalVars) {
     float v5;
     global float* v6;
 
@@ -123,7 +143,7 @@ v1:;
     v6[0] = v5;
     return 4.5f;
 }
-float someFunc_pg(float* d1, global float* v11, local int *scratch) {
+float someFunc_pg(float* d1, global float* v11, struct GlobalVars *pGlobalVars) {
     float v5;
     float* v6;
 
@@ -146,15 +166,35 @@ TEST(test_kernel_dumper, redundant_clmems1) {
     argIndexes.push_back(0);
     string cl = kernelDumper->toCl(1, argIndexes);
     cout << "kernel cl: [" << cl << "]" << endl;
-    EXPECT_EQ(R"(
-float someFunc_gg(global float* d1, global float* v11, local int *scratch);
-float someFunc_gp(global float* d1, float* v11, local int *scratch);
-float someFunc_pg(float* d1, global float* v11, local int *scratch);
-kernel void someKernel(global char* clmem0, uint d1_offset, uint d2_offset, local int *scratch);
+    EXPECT_EQ(R"(// __vmem__ is just a marker, so we can see which bits are vmems
+// It doesnt actually do anything; compiler ignores it
+#define __vmem__
 
-kernel void someKernel(global char* clmem0, uint d1_offset, uint d2_offset, local int *scratch) {
+// vmem2 is a pointer to a pointer (so we have to unwrap twice)
+#define __vmem2__
+
+struct GlobalVars {
+    local int *scratch;
+    global char *clmem0;
+    unsigned long clmem_vmem_offset0;
+};
+
+inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, struct GlobalVars *globalVars) {
+    return (global float *)(globalVars->clmem0 + vmemloc - globalVars->clmem_vmem_offset0);
+}
+
+
+float someFunc_gg(global float* d1, global float* v11, struct GlobalVars *pGlobalVars);
+float someFunc_gp(global float* d1, float* v11, struct GlobalVars *pGlobalVars);
+float someFunc_pg(float* d1, global float* v11, struct GlobalVars *pGlobalVars);
+kernel void someKernel(global char* clmem0, unsigned long clmem_vmem_offset0, uint d1_offset, uint d2_offset, local int *scratch);
+
+kernel void someKernel(global char* clmem0, unsigned long clmem_vmem_offset0, uint d1_offset, uint d2_offset, local int *scratch) {
     global float* d2 = (global float*)(clmem0 + d2_offset);
     global float* d1 = (global float*)(clmem0 + d1_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     float v4;
     float v5;
@@ -164,12 +204,12 @@ kernel void someKernel(global char* clmem0, uint d1_offset, uint d2_offset, loca
 
 v1:;
     v3 = v2[0];
-    v4 = someFunc_gp(d1, v3, scratch);
-    v5 = someFunc_pg(v3, d1, scratch);
-    v6 = someFunc_gg(d1, d1, scratch);
+    v4 = someFunc_gp(d1, v3, pGlobalVars);
+    v5 = someFunc_pg(v3, d1, pGlobalVars);
+    v6 = someFunc_gg(d1, d1, pGlobalVars);
     return;
 }
-float someFunc_gg(global float* d1, global float* v11, local int *scratch) {
+float someFunc_gg(global float* d1, global float* v11, struct GlobalVars *pGlobalVars) {
     float v5;
     global float* v6;
 
@@ -179,7 +219,7 @@ v1:;
     v6[0] = v5;
     return 4.5f;
 }
-float someFunc_gp(global float* d1, float* v11, local int *scratch) {
+float someFunc_gp(global float* d1, float* v11, struct GlobalVars *pGlobalVars) {
     float v5;
     global float* v6;
 
@@ -189,7 +229,7 @@ v1:;
     v6[0] = v5;
     return 4.5f;
 }
-float someFunc_pg(float* d1, global float* v11, local int *scratch) {
+float someFunc_pg(float* d1, global float* v11, struct GlobalVars *pGlobalVars) {
     float v5;
     float* v6;
 
@@ -210,11 +250,31 @@ TEST(test_kernel_dumper, testBranches_phifromfuture) {
     // string cl = kernelDumper->toCl();
     string cl = runKernelDumper(kernelDumper, 1);
     cout << "kernel cl: [" << cl << "]" << endl;
-    EXPECT_EQ(R"(
-kernel void testBranches_phifromfuture(global char* clmem0, uint d1_offset, local int *scratch);
+    EXPECT_EQ(R"(// __vmem__ is just a marker, so we can see which bits are vmems
+// It doesnt actually do anything; compiler ignores it
+#define __vmem__
 
-kernel void testBranches_phifromfuture(global char* clmem0, uint d1_offset, local int *scratch) {
+// vmem2 is a pointer to a pointer (so we have to unwrap twice)
+#define __vmem2__
+
+struct GlobalVars {
+    local int *scratch;
+    global char *clmem0;
+    unsigned long clmem_vmem_offset0;
+};
+
+inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, struct GlobalVars *globalVars) {
+    return (global float *)(globalVars->clmem0 + vmemloc - globalVars->clmem_vmem_offset0);
+}
+
+
+kernel void testBranches_phifromfuture(global char* clmem0, unsigned long clmem_vmem_offset0, uint d1_offset, local int *scratch);
+
+kernel void testBranches_phifromfuture(global char* clmem0, unsigned long clmem_vmem_offset0, uint d1_offset, local int *scratch) {
     global float* d1 = (global float*)(clmem0 + d1_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     float v12;
     float v4;
@@ -250,31 +310,51 @@ TEST(test_kernel_dumper, usesPointerFunction) {
     // string cl = kernelDumper->toCl();
     string cl = runKernelDumper(kernelDumper, 1);
     cout << "kernel cl: [" << cl << "]" << endl;
-    EXPECT_EQ(R"(
-float* returnsPointer(float* in, local int *scratch);
-global float* returnsPointer_g(global float* in, local int *scratch);
-kernel void usesPointerFunction(global char* clmem0, uint in_offset, local int *scratch);
+    EXPECT_EQ(R"(// __vmem__ is just a marker, so we can see which bits are vmems
+// It doesnt actually do anything; compiler ignores it
+#define __vmem__
 
-global float* returnsPointer_g(global float* in, local int *scratch) {
+// vmem2 is a pointer to a pointer (so we have to unwrap twice)
+#define __vmem2__
+
+struct GlobalVars {
+    local int *scratch;
+    global char *clmem0;
+    unsigned long clmem_vmem_offset0;
+};
+
+inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, struct GlobalVars *globalVars) {
+    return (global float *)(globalVars->clmem0 + vmemloc - globalVars->clmem_vmem_offset0);
+}
+
+
+float* returnsPointer(float* in, struct GlobalVars *pGlobalVars);
+global float* returnsPointer_g(global float* in, struct GlobalVars *pGlobalVars);
+kernel void usesPointerFunction(global char* clmem0, unsigned long clmem_vmem_offset0, uint in_offset, local int *scratch);
+
+global float* returnsPointer_g(global float* in, struct GlobalVars *pGlobalVars) {
 
 v1:;
     return in;
 }
-float* returnsPointer(float* in, local int *scratch) {
+float* returnsPointer(float* in, struct GlobalVars *pGlobalVars) {
 
 v1:;
     return in;
 }
-kernel void usesPointerFunction(global char* clmem0, uint in_offset, local int *scratch) {
+kernel void usesPointerFunction(global char* clmem0, unsigned long clmem_vmem_offset0, uint in_offset, local int *scratch) {
     global float* in = (global float*)(clmem0 + in_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     float v3[1];
     float* v4;
     global float* v2;
 
 v1:;
-    v2 = returnsPointer_g(in, scratch);
-    v4 = returnsPointer(v3, scratch);
+    v2 = returnsPointer_g(in, pGlobalVars);
+    v4 = returnsPointer(v3, pGlobalVars);
     return;
 }
 )", cl);
@@ -291,19 +371,39 @@ TEST(test_kernel_dumper, usesFunctionReturningVoid) {
     // string cl = kernelDumper->toCl();
     string cl = runKernelDumper(kernelDumper, 1);
     cout << "kernel cl: [" << cl << "]" << endl;
-    EXPECT_EQ(R"(
-kernel void usesFunctionReturningVoid(global char* clmem0, uint in_offset, local int *scratch);
-void returnsVoid_g(global float* in, local int *scratch);
+    EXPECT_EQ(R"(// __vmem__ is just a marker, so we can see which bits are vmems
+// It doesnt actually do anything; compiler ignores it
+#define __vmem__
 
-kernel void usesFunctionReturningVoid(global char* clmem0, uint in_offset, local int *scratch) {
+// vmem2 is a pointer to a pointer (so we have to unwrap twice)
+#define __vmem2__
+
+struct GlobalVars {
+    local int *scratch;
+    global char *clmem0;
+    unsigned long clmem_vmem_offset0;
+};
+
+inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, struct GlobalVars *globalVars) {
+    return (global float *)(globalVars->clmem0 + vmemloc - globalVars->clmem_vmem_offset0);
+}
+
+
+kernel void usesFunctionReturningVoid(global char* clmem0, unsigned long clmem_vmem_offset0, uint in_offset, local int *scratch);
+void returnsVoid_g(global float* in, struct GlobalVars *pGlobalVars);
+
+kernel void usesFunctionReturningVoid(global char* clmem0, unsigned long clmem_vmem_offset0, uint in_offset, local int *scratch) {
     global float* in = (global float*)(clmem0 + in_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
 
 v1:;
-    returnsVoid_g(in, scratch);
+    returnsVoid_g(in, pGlobalVars);
     return;
 }
-void returnsVoid_g(global float* in, local int *scratch) {
+void returnsVoid_g(global float* in, struct GlobalVars *pGlobalVars) {
 
 v1:;
     in[0] = 3.0f;
@@ -322,14 +422,34 @@ TEST(test_kernel_dumper, test_randomintarray) {
     // string cl = kernelDumper->toCl();
     string cl = runKernelDumper(kernelDumper, 1);
     cout << "kernel cl: [" << cl << "]" << endl;
-    EXPECT_EQ(R"(struct class_tensorflow__random__Array {
+    EXPECT_EQ(R"(// __vmem__ is just a marker, so we can see which bits are vmems
+// It doesnt actually do anything; compiler ignores it
+#define __vmem__
+
+// vmem2 is a pointer to a pointer (so we have to unwrap twice)
+#define __vmem2__
+
+struct GlobalVars {
+    local int *scratch;
+    global char *clmem0;
+    unsigned long clmem_vmem_offset0;
+};
+
+inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, struct GlobalVars *globalVars) {
+    return (global float *)(globalVars->clmem0 + vmemloc - globalVars->clmem_vmem_offset0);
+}
+
+struct class_tensorflow__random__Array {
     int f0[4];
 };
 
-kernel void test_randomintarray(global char* clmem0, uint data_offset, local int *scratch);
+kernel void test_randomintarray(global char* clmem0, unsigned long clmem_vmem_offset0, uint data_offset, local int *scratch);
 
-kernel void test_randomintarray(global char* clmem0, uint data_offset, local int *scratch) {
+kernel void test_randomintarray(global char* clmem0, unsigned long clmem_vmem_offset0, uint data_offset, local int *scratch) {
     global int* data = (global int*)(clmem0 + data_offset);
+
+    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    struct GlobalVars *pGlobalVars = &globalVars;
 
     int v9;
     int* v4;
@@ -364,25 +484,25 @@ v1:;
 //         EXPECT_LE(line.size(), 128u);
 //     }
 //     EXPECT_EQ(R"(
-// kernel void mysuperlongfunctionnamemysuperl(global char* clmem0, uint d_offset, local int *scratch);
-// void mysuperlongfunctionnamemysup0_g(global float* d, local int *scratch);
-// void mysuperlongfunctionnamemysup1_g(global float* d, local int *scratch);
+// kernel void mysuperlongfunctionnamemysuperl(global char* clmem0, uint d_offset, struct GlobalVars *pGlobalVars);
+// void mysuperlongfunctionnamemysup0_g(global float* d, struct GlobalVars *pGlobalVars);
+// void mysuperlongfunctionnamemysup1_g(global float* d, struct GlobalVars *pGlobalVars);
 
-// kernel void mysuperlongfunctionnamemysuperl(global char* clmem0, uint d_offset, local int *scratch) {
+// kernel void mysuperlongfunctionnamemysuperl(global char* clmem0, uint d_offset, struct GlobalVars *pGlobalVars) {
 //     global float* d = (global float*)clmem0 + d_offset;
 
 
 // v1:;
-//     mysuperlongfunctionnamemysup0_g(d, scratch);
-//     mysuperlongfunctionnamemysup1_g(d, scratch);
+//     mysuperlongfunctionnamemysup0_g(d, pGlobalVars);
+//     mysuperlongfunctionnamemysup1_g(d, pGlobalVars);
 //     return;
 // }
-// void mysuperlongfunctionnamemysup0_g(global float* d, local int *scratch) {
+// void mysuperlongfunctionnamemysup0_g(global float* d, struct GlobalVars *pGlobalVars) {
 
 // v1:;
 //     return;
 // }
-// void mysuperlongfunctionnamemysup1_g(global float* d, local int *scratch) {
+// void mysuperlongfunctionnamemysup1_g(global float* d, struct GlobalVars *pGlobalVars) {
 
 // v1:;
 //     return;

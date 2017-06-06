@@ -1003,10 +1003,10 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         writeShimCall(localValueInfo, "__atomic_inc_uint", "", instr);
         return;
     } else if(functionName == "_Z11__shfl_downIfET_S0_ii") {
-        writeShimCall(localValueInfo, "__shfl_down_3", "scratch, ", instr);
+        writeShimCall(localValueInfo, "__shfl_down_3", "pGlobalVars->scratch, ", instr);
         return;
     } else if(functionName == "_Z11__shfl_downIfET_S0_i") {
-        writeShimCall(localValueInfo, "__shfl_down_2", "scratch, ", instr);
+        writeShimCall(localValueInfo, "__shfl_down_2", "pGlobalVars->scratch, ", instr);
         return;
     } else if(functionName == "llvm.lifetime.start") {
         // just ignore for now
@@ -1055,7 +1055,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
             gencode += ", ";
         }
         localValueInfo->needDependencies = false;
-        gencode += "scratch";
+        gencode += "pGlobalVars";
         Function *F = M->getFunction(functionName);
         if(checkCalledFunctionsDefined && F->isDeclaration()) { // ie, is it *just* a declaration, no definition?
             std::cout << functionName << " is called, but not defined" << std::endl;
@@ -1155,7 +1155,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
             if(i > 0) {
                 gencode += ", ";
             }
-            gencode += "scratch";
+            gencode += "pGlobalVars";
             if(isa<PointerType>(F->getReturnType())) {
                 Type *returnType = returnTypeByFunction.at(F);
                 if(PointerType *retptr = dyn_cast<PointerType>(returnType)) {
