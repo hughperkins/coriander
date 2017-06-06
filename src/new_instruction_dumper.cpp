@@ -463,10 +463,26 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                     // ~~addressspace = 5;~~
 
                     // if its a pointer to pointer, it's address space 5, otherwis 1
-                    if(isa<PointerType>(newTypeAsPointer->getElementType())) {
+                    int pointerDepth = typeDumper->getPointerDepth(newTypeAsPointer);
+                    std::cout << "pointerDepth=" << pointerDepth << std::endl;
+                    // if(isa<PointerType>(newTypeAsPointer->getElementType())) {
+                    if(pointerDepth == 2) {
+                        std::cout << "pointerdpeth=2 => unwrap virtualmem" << std::endl;
+                        instr->dump();
+                        std::cout << std::endl;
                         // l << "gep   struct child is pointer to pointer" << std::endl;
-                        addressspace = 5;
                         // probably should unwrap this.  something for hte future...
+
+                        localValueInfo->inlineCl.push_back(
+                            "__vmem__ unsigned long " + localValueInfo->name + "_gptrstep = getGlobalPointer(" +
+                                getOperand(instr->getOperand(0))->getExpr() + "[0], pGlobalVars" +
+                            ")"
+                        );
+                        rhs = localValueInfo->name + "_gptrstep";
+                        // since this is a pointer to a pointer, the contents are also virtual pointers :-P
+                        updateAddressSpace(instr, 5);
+                        localValueInfo->addressSpace = 5;
+                        addressspace = 5;
                     }
                 } else {
                     // addressspace = 0;
