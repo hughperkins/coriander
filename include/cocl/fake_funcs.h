@@ -168,9 +168,9 @@ template<typename T>
 __device__ T atomicMax(T* address, T val);
 template<typename T>
 __device__ T atomicExch(T* address, T val);
-__device__ uint64_t atomicExch(uint64_t *address, uint64_t val);
+__device__ unsigned long long atomicExch(unsigned long long *address, unsigned long long val);
 
-__device__ uint32_t atomicInc(uint32_t *address, uint32_t val);
+__device__ unsigned int atomicInc(unsigned int  *address, unsigned int val);
 
 __device__ bool __isGlobal(const void *ptr);
 __device__ void __threadfence_block();
@@ -195,6 +195,7 @@ __device__ int __shfl_xor(int a, int b);
 __device__ int __umulhi(int magic, int n);
 
 __device__ void __assert_rtn(const char *, const char *, int, const char *);
+__device__ void __assert_fail(const char *, const char *, size_t, const char *);
 
 __device__ unsigned int atomicCAS(unsigned int* address, unsigned int compare, unsigned int val);
 

@@ -134,7 +134,15 @@ while [ "x$1" != x ]; do {
                 INCLUDES="$INCLUDES -I$2"
                 shift
             } else {
-                INCLUDES="$INCLUDES $1"
+                THESEINCLUDES=$(echo $1 | sed -e 's/;/ /g')
+                for THISINCLUDE in ${THESEINCLUDES}; do {
+                    echo THISINCLUDE {THISINCLUDE}
+                    INCLUDES="${INCLUDES} ${THISINCLUDE}"
+                } done
+                # echo dollar $1
+                # echo THESEINCLUDES ${THESEINCLUDES}
+                echo INCLUDES ${INCLUDES}
+                # INCLUDES="$INCLUDES ${THESEINCLUDES}"
             } fi
             DONE=1
             ;;

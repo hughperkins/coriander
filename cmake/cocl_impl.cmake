@@ -22,18 +22,19 @@ macro(cocl_build_objects target_name target_type)
             # note that, despite what that page may claim, generator expressions cannot contain spaces, eg see:
             # http://cmake.3232098.n2.nabble.com/Custom-Commands-Generator-Expressions-tp7586630p7586631.html
             # (finding this bit about whitespace cost me a world of pain...)
+                    #"$<$<BOOL:$<TARGET_PROPERTY:${target_name},COMPILE_FLAGS>>:$<JOIN:$<TARGET_PROPERTY:${target_name},COMPILE_FLAGS>,;>>"
+                    # "$<$<BOOL:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>:-I$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>"
             add_custom_command(
                 OUTPUT ${target_name}.d/${filename}.o
                 COMMAND
                     ${COCL_PATH}
                     --clang-home ${CLANG_HOME}
-                    "$<$<BOOL:$<TARGET_PROPERTY:${target_name},COMPILE_FLAGS>>:$<JOIN:$<TARGET_PROPERTY:${target_name},COMPILE_FLAGS>,;>>"
-                    "$<$<BOOL:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>:-I$<JOIN:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>,;-I>>"
+                    "$<$<BOOL:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>:$<JOIN:-I$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>,;-I>>"
                     ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
                     -o ${target_name}.d/${filename}.o
                     -c
                 DEPENDS ${filename}
-                COMMAND_EXPAND_LISTS
+                VERBATIM
             )
             add_custom_target(build_${target_name}_${FILENAME_NO_SLASH}_o
                 DEPENDS ${target}.d/${filename}.o
