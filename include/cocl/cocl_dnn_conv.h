@@ -6,15 +6,31 @@
 #include <cstdint>
 
 enum cudnnConvolutionFwdAlgo_t {
-   cudnnConvolutionFwdAlgo_GEMM = 126742
+    cudnnConvolutionFwdAlgo_GEMM = 126742,
+    CUDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_GEMM,
+    CUDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_PRECOMP_GEMM,
+    CUDNN_CONVOLUTION_FWD_ALGO_GEMM,
+    CUDNN_CONVOLUTION_FWD_ALGO_DIRECT,
+    CUDNN_CONVOLUTION_FWD_ALGO_FFT,
+    CUDNN_CONVOLUTION_FWD_ALGO_FFT_TILING,
+    CUDNN_CONVOLUTION_FWD_ALGO_WINOGRAD
 };
 
 enum cudnnConvolutionBwdDataAlgo_t {
-   cudnnConvolutionBwdDataAlgo_GEMM = 315315
+    cudnnConvolutionBwdDataAlgo_GEMM = 315315,
+    CUDNN_CONVOLUTION_BWD_DATA_ALGO_0,
+    CUDNN_CONVOLUTION_BWD_DATA_ALGO_1,
+    CUDNN_CONVOLUTION_BWD_DATA_ALGO_FFT,
+    CUDNN_CONVOLUTION_BWD_DATA_ALGO_FFT_TILING,
+    CUDNN_CONVOLUTION_BWD_DATA_ALGO_WINOGRAD
 };
 
 enum cudnnConvolutionBwdFilterAlgo_t {
-   cudnnConvolutionBwdFilterAlgo_GEMM = 563543
+    cudnnConvolutionBwdFilterAlgo_GEMM = 563543,
+    CUDNN_CONVOLUTION_BWD_FILTER_ALGO_3,
+    CUDNN_CONVOLUTION_BWD_FILTER_ALGO_0,
+    CUDNN_CONVOLUTION_BWD_FILTER_ALGO_FFT,
+    CUDNN_CONVOLUTION_BWD_FILTER_ALGO_1
 };
 // cudnnConvolutionBwdFilterAlgo_t
 
@@ -69,7 +85,7 @@ extern "C" {
         cudnnFilterDescriptor_t filter,
         cudnnConvolutionDescriptor_t conv,
         cudnnTensorDescriptor_t dstTensor,
-        CoclDnnLayout algoPreference,
+        cudnnConvolutionFwdPreference_t algoPreference,
         CoclDnnGeometryType a,
         cudnnConvolutionFwdAlgo_t *p_algo
     );
@@ -77,13 +93,13 @@ extern "C" {
     size_t cudnnConvolutionForward(
         cudnnHandle_t handle,
         float *p_alpha,
-        cudnnTensorDescriptor_t inputTensorDesc, float *inputData,
-        cudnnFilterDescriptor_t filterDesc, float *filterData,
+        cudnnTensorDescriptor_t inputTensorDesc, const void *inputData,
+        cudnnFilterDescriptor_t filterDesc, const void *filterData,
         cudnnConvolutionDescriptor_t convDesc,
         cudnnConvolutionFwdAlgo_t algo,
         void *workspaceData, CoclDnnSizeType workspaceSize,
         float *p_beta,
-        cudnnTensorDescriptor_t outputTensorDesc, float *outputData
+        cudnnTensorDescriptor_t outputTensorDesc, void *outputData
     );
     size_t cudnnGetConvolutionBackwardFilterAlgorithm(
         cudnnHandle_t handle,
@@ -91,33 +107,33 @@ extern "C" {
         cudnnTensorDescriptor_t tensor2Desc,
         cudnnConvolutionDescriptor_t convDesc,
         cudnnFilterDescriptor_t filterDesc,
-        CoclDnnLayout filterMode,
+        cudnnConvolutionBwdFilterPreference_t filterMode,
         CoclDnnGeometryType a,
         cudnnConvolutionBwdFilterAlgo_t *p_algo
     );
     size_t cudnnConvolutionBackwardFilter(
         cudnnHandle_t handle,
         float *p_alpha,
-        cudnnTensorDescriptor_t inputDesc, float *input_data,
-        cudnnTensorDescriptor_t gradOutputDesc, float *gradOutput_data,
+        cudnnTensorDescriptor_t inputDesc, const void *input_data,
+        cudnnTensorDescriptor_t gradOutputDesc, void *gradOutput_data,
         cudnnConvolutionDescriptor_t convDesc,
         cudnnConvolutionBwdFilterAlgo_t algo,
         void *workspace_data, CoclDnnGeometryType workspaceSize,
         float *p_beta,
-        cudnnFilterDescriptor_t filterDesc, float *gradInput_data
+        cudnnFilterDescriptor_t filterDesc, void *gradInput_data
     );
 
     size_t cudnnConvolutionBackwardData(
         cudnnHandle_t handle,
         float *p_alpha,
-        cudnnFilterDescriptor_t filtersDesc, float *filters_data,
-        cudnnTensorDescriptor_t gradOutputDesc, float *gradOutput_data,
+        cudnnFilterDescriptor_t filtersDesc, const void *filters_data,
+        cudnnTensorDescriptor_t gradOutputDesc, void *gradOutput_data,
         cudnnConvolutionDescriptor_t convDesc,
         cudnnConvolutionBwdDataAlgo_t algo,
         void *workspace,
         CoclDnnGeometryType workspaceSize,
         float *p_beta,
-        cudnnTensorDescriptor_t gradInputDesc, float *gradInput
+        cudnnTensorDescriptor_t gradInputDesc, void *gradInput
     );
     size_t cudnnGetConvolutionBackwardFilterWorkspaceSize(
         cudnnHandle_t handle,
@@ -134,7 +150,7 @@ extern "C" {
         cudnnTensorDescriptor_t tensor1Desc,
         cudnnConvolutionDescriptor_t convDesc,
         cudnnTensorDescriptor_t tensor2Desc,
-        CoclDnnLayout convMode,
+        cudnnConvolutionBwdDataPreference_t convMode,
         CoclDnnGeometryType a,
         cudnnConvolutionBwdDataAlgo_t *p_algo
     );
@@ -150,10 +166,8 @@ extern "C" {
     size_t cudnnConvolutionBackwardBias(
         cudnnHandle_t handle,
         float *p_alpha,
-        cudnnTensorDescriptor_t tensor1Desc,
-        float *tensor1,
+        cudnnTensorDescriptor_t tensor1Desc, const void *tensor1,
         float *p_beta,
-        cudnnTensorDescriptor_t tensor2Desc,
-        float *tensor2
+        cudnnTensorDescriptor_t tensor2Desc, void *tensor2
     );
 }

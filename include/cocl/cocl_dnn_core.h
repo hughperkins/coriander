@@ -15,9 +15,7 @@ enum dnnStatusCodes {
 };
 
 enum CoclDnnLayout {
-    CUDNN_TENSOR_NCHW = 35333,
-    CUDNN_DATA_FLOAT,
-    CUDNN_POOLING_MAX,
+    CUDNN_POOLING_MAX=35333,
     CUDNN_PROPAGATE_NAN,
     CUDNN_ACTIVATION_RELU,
     CUDNN_ACTIVATION_SIGMOID,
@@ -99,22 +97,59 @@ extern "C" {
     );
     size_t cudnnAddTensor(
         cudnnHandle_t handle,
-        float *p_alpha,
-        cudnnTensorDescriptor_t tensorDesc1,
-        float *tensor,
-        float *p_beta,
-        cudnnTensorDescriptor_t tensorDesc2,
-        float * tensor2
+        const float *p_alpha,
+        cudnnTensorDescriptor_t tensorDesc1, const void *tensor,
+        const float *p_beta,
+        cudnnTensorDescriptor_t tensorDesc2, void *tensor2
     );
     size_t cudnnSoftmaxForward(
         cudnnHandle_t handle,
         CoclDnnLayout softmaxMode,
         CoclDnnLayout softmaxChannel,
         float *p_alpha,
-        cudnnTensorDescriptor_t tensor1Desc,
-        float *tensor1_data,
+        cudnnTensorDescriptor_t tensor1Desc, float *tensor1_data,
         float *p_beta,
-        cudnnTensorDescriptor_t tensor2Desc,
-        float *out_data
+        cudnnTensorDescriptor_t tensor2Desc, float *out_data
     );
 }
+
+// used by tensorflow dnn classes:
+
+#define CUDNN_VERSION 5000
+
+enum cudnnDataType_t {
+    CUDNN_DATA_DOUBLE=5344,
+    CUDNN_DATA_FLOAT,
+    CUDNN_DATA_HALF
+};
+
+enum cudnnConvolutionFwdPreference_t {
+    CUDNN_CONVOLUTION_FWD_SPECIFY_WORKSPACE_LIMIT=124534,
+    CUDNN_CONVOLUTION_FWD_NO_WORKSPACE
+};
+
+enum cudnnConvolutionBwdDataPreference_t {
+    CUDNN_CONVOLUTION_BWD_DATA_SPECIFY_WORKSPACE_LIMIT=73543,
+    CUDNN_CONVOLUTION_BWD_DATA_NO_WORKSPACE
+};
+
+enum cudnnTensorFormat_t {
+    CUDNN_TENSOR_NCHW = 35333
+};
+
+enum cudnnConvolutionBwdFilterPreference_t {
+    CUDNN_CONVOLUTION_BWD_FILTER_SPECIFY_WORKSPACE_LIMIT=32352,
+    CUDNN_CONVOLUTION_BWD_FILTER_NO_WORKSPACE
+};
+
+namespace cocl {
+    namespace dnn {
+        class ConvolutionDescriptor;
+    }
+}
+
+size_t cudnnSetStream(cocl::dnn::Dnn *, char *);
+size_t cudnnSetTensorNdDescriptor(cocl::dnn::TensorDescriptor *, cudnnDataType_t, int, int *, int *);
+size_t cudnnSetFilterNdDescriptor(cocl::dnn::FilterDescriptor *, cudnnDataType_t, cudnnTensorFormat_t, unsigned long, int *);
+size_t cudnnSetConvolutionNdDescriptor(cocl::dnn::ConvolutionDescriptor *, int, int *, int *, int *, CoclDnnLayout, cudnnDataType_t);
+size_t cudnnTransformTensor(cocl::dnn::Dnn *, float *, cocl::dnn::TensorDescriptor *, void *, float *, cocl::dnn::TensorDescriptor *, void *);
