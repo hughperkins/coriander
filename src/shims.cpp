@@ -110,7 +110,6 @@ void Shims::writeCl(std::ostream &os) {
     while(written.size() < shimsToBeUsed.size() && attempts < 10) {
         for(auto it=shimsToBeUsed.begin(); it != shimsToBeUsed.end(); it++) {
             std::string shimName = *it;
-            std::cout << "write check " << shimName << std::endl;
             if(written.find(shimName) != written.end()) {
                 continue;
             }
@@ -120,7 +119,6 @@ void Shims::writeCl(std::ostream &os) {
             for(auto childit=deps.begin(); childit != deps.end(); childit++) {
                 std::string childName = *childit;
                 if(written.find(childName) == written.end()) {
-                    std::cout << "  missing dep " << childName << std::endl;
                     writtenDependencies = false;
                     break;
                 }
