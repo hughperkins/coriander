@@ -38,6 +38,33 @@ enum CoclDnnLayout {
     CUDNN_STATUS_NOT_SUPPORTED
 };
 
+#define CUDNN_VERSION 5000
+
+enum cudnnDataType_t {
+    CUDNN_DATA_DOUBLE=5344,
+    CUDNN_DATA_FLOAT,
+    CUDNN_DATA_HALF
+};
+
+enum cudnnConvolutionFwdPreference_t {
+    CUDNN_CONVOLUTION_FWD_SPECIFY_WORKSPACE_LIMIT=124534,
+    CUDNN_CONVOLUTION_FWD_NO_WORKSPACE
+};
+
+enum cudnnConvolutionBwdDataPreference_t {
+    CUDNN_CONVOLUTION_BWD_DATA_SPECIFY_WORKSPACE_LIMIT=73543,
+    CUDNN_CONVOLUTION_BWD_DATA_NO_WORKSPACE
+};
+
+enum cudnnTensorFormat_t {
+    CUDNN_TENSOR_NCHW = 35333
+};
+
+enum cudnnConvolutionBwdFilterPreference_t {
+    CUDNN_CONVOLUTION_BWD_FILTER_SPECIFY_WORKSPACE_LIMIT=32352,
+    CUDNN_CONVOLUTION_BWD_FILTER_NO_WORKSPACE
+};
+
 namespace cocl {
 namespace dnn {
 
@@ -85,14 +112,14 @@ extern "C" {
 
     size_t cudnnSetTensor4dDescriptor(
         cudnnTensorDescriptor_t tensor,
-        CoclDnnLayout layout,
-        CoclDnnLayout datatype,
+        cudnnTensorFormat_t layout,
+        cudnnDataType_t datatype,
         CoclDnnGeometryType N, CoclDnnGeometryType C, CoclDnnGeometryType H, CoclDnnGeometryType W);
 
     size_t cudnnSetFilter4dDescriptor(
         cudnnFilterDescriptor_t filter,
-        CoclDnnLayout layout,
-        CoclDnnLayout dataType,
+        cudnnDataType_t layout,
+        cudnnTensorFormat_t dataType,
         CoclDnnGeometryType N, CoclDnnGeometryType C, CoclDnnGeometryType H, CoclDnnGeometryType W
     );
     size_t cudnnAddTensor(
@@ -114,33 +141,6 @@ extern "C" {
 }
 
 // used by tensorflow dnn classes:
-
-#define CUDNN_VERSION 5000
-
-enum cudnnDataType_t {
-    CUDNN_DATA_DOUBLE=5344,
-    CUDNN_DATA_FLOAT,
-    CUDNN_DATA_HALF
-};
-
-enum cudnnConvolutionFwdPreference_t {
-    CUDNN_CONVOLUTION_FWD_SPECIFY_WORKSPACE_LIMIT=124534,
-    CUDNN_CONVOLUTION_FWD_NO_WORKSPACE
-};
-
-enum cudnnConvolutionBwdDataPreference_t {
-    CUDNN_CONVOLUTION_BWD_DATA_SPECIFY_WORKSPACE_LIMIT=73543,
-    CUDNN_CONVOLUTION_BWD_DATA_NO_WORKSPACE
-};
-
-enum cudnnTensorFormat_t {
-    CUDNN_TENSOR_NCHW = 35333
-};
-
-enum cudnnConvolutionBwdFilterPreference_t {
-    CUDNN_CONVOLUTION_BWD_FILTER_SPECIFY_WORKSPACE_LIMIT=32352,
-    CUDNN_CONVOLUTION_BWD_FILTER_NO_WORKSPACE
-};
 
 namespace cocl {
     namespace dnn {
