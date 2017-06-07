@@ -19,6 +19,8 @@
 #include "cocl/cocl_context.h"
 #include "cocl/cocl_device.h"
 
+#include "fill_buffer.h"
+
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -201,11 +203,43 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
     return 0;
 }
 
-size_t cudaMemsetAsync(void *devPtr, int value, size_t count, char *_queue) {
-    COCL_PRINT("cudaMemsetAsync stub value=" << value << " count=" << count << " queue=" << (long)_queue);
-    std::cout << "cudaMemsetAsync not implemented" << std::endl;
-    throw runtime_error("cudaMemsetAsync not implemented");
+size_t cudaMemsetAsync(void *location, int value, size_t count, char *_queue) {
+    COCL_PRINT("cudaMemsetAsync value=" << value << " count=" << count << " queue=" << (long)_queue);
 
+    // this is not terribly async for now :-P
+
+    Memory *memory = findMemory((char *)location);
+    ThreadVars *v = getThreadVars();
+    size_t offsetBytes = memory->getOffset((char *)location);
+    // std::cout << "memory " << (long)memory << std::endl;
+    // std::cout << " memory bytes " << memory->bytes << std::endl;
+    // std::cout << " offsetBytes " << offsetBytes << std::endl;
+
+    cl_int err;
+
+    err = clFinish(v->currentContext->default_stream.get()->clqueue->queue);
+    EasyCL::checkError(err);
+    // std::cout << "clfinished the queue" << std::endl;
+
+    if(count % 4 == 0) {
+        unsigned int fourbytes = 0;
+        for(int j=0; j < 4; j++) {
+            fourbytes <<= 8;
+            fourbytes |= (value & 255);
+        }
+        int intCount = count >> 2;
+        myEnqueueFillBuffer(
+            v->currentContext->default_stream.get()->clqueue->queue,
+            memory->clmem,
+            fourbytes,
+            offsetBytes, intCount);
+    } else {
+        cout << "memset should be multiple of 4 count" << std::endl;
+        throw std::runtime_error("cudaMemsetAsync should have count multiple of 4");
+    }
+    err = clFinish(v->currentContext->default_stream.get()->clqueue->queue);
+    EasyCL::checkError(err);
+    // COCL_PRINT("finished cudaMemsetAsync");
     return 0;
 }
 

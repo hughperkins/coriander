@@ -83,7 +83,7 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
     src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cpp src/cocl_device.cpp src/cocl_error.cpp
     src/cocl_memory.cpp src/cocl_properties.cpp src/cocl_streams.cpp src/cocl_clsources.cpp src/cocl_context.cpp
     src/ir-to-opencl.cpp src/shims.cpp src/LocalValueInfo.cpp src/ClWriter.cpp src/cocl_vector_types.cpp
-    src/cocl_logging.cpp src/DebugDumper.cpp
+    src/cocl_logging.cpp src/DebugDumper.cpp src/fill_buffer.cpp
 )
 
 set(CMAKE_CC_FLAGS "-fPIC")
