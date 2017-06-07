@@ -100,7 +100,7 @@ cd ~/git
 hg clone https://bitbucket.org/hughperkins/eigen
 cd eigen
 # switch to your preferred branch... eg
-hg update eigen-cl
+hg update tf-coriander
 ```
 from the root of Coriander repo, and having already installed coriander, do:
 ```
