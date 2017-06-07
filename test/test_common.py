@@ -1,6 +1,7 @@
 import os
 from os.path import join
 import subprocess
+from os.path import join
 import numpy as np
 import pyopencl as cl
 
@@ -65,7 +66,8 @@ def cocl_options():
 
 
 def offset_type(offset):
-    if 'OFFSET_32BIT' in os.environ:
+    if os.environ.get('COCL_OFFSETS_32BIT', None) == '1':
+        print('using 32bit offsets')
         return np.uint32(offset)
     return np.int64(offset)
 
@@ -238,6 +240,27 @@ def cu_to_ll(cu_sourcecode):
     with open('/tmp/testprog-device.ll', 'r') as f:
         ll_sourcecode = f.read()
     return ll_sourcecode
+
+
+def cu_to_devicell_noopt(cu_sourcecode):
+    for file in os.listdir('/tmp'):
+        if file.startswith('testprog'):
+            os.unlink('/tmp/%s' % file)
+    with open('/tmp/testprog.cu', 'w') as f:
+        f.write(cu_sourcecode)
+    print(subprocess.check_output([
+        clang_path,
+        '--cuda-device-only',
+        '-nocudainc',
+        '-nocudalib',
+        '-emit-llvm',
+        '/tmp/testprog.cu',
+        '-S',
+        '-O0',
+        '-o', '/tmp/testprog.ll'
+    ]).decode('utf-8'))
+    with open('/tmp/testprog.ll', 'r') as f:
+        return f.read()
 
 
 def cu_to_cl(cu_sourcecode, kernelName, num_clmems):

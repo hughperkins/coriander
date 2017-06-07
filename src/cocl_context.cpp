@@ -1,4 +1,4 @@
-// Copyright Hugh Perkins 2016
+// Copyright Hugh Perkins 2016, 2017
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@
 #include <set>
 #include "pthread.h"
 
-// #include "CL/cl.h"
-
 #include "EasyCL/EasyCL.h"
 
 using namespace std;
@@ -35,9 +33,9 @@ using namespace easycl;
 #undef COCL_PRINT
 #define COCL_PRINT(x)
 
-namespace cocl {
-    // int globalNumGpus = -1;
+#define OFFSETS_32BIT_ENV_VAR "COCL_OFFSETS_32BIT"
 
+namespace cocl {
     static pthread_key_t key;
     static pthread_once_t key_once = PTHREAD_ONCE_INIT;
 
@@ -46,33 +44,11 @@ namespace cocl {
     static void make_key() {
         (void) pthread_key_create(&key, NULL);
     }
-    // int getNumGpus() {
-    //     if(globalNumGpus >= 0) {
-    //         return globalNumGpus;
-    //     }
-    //     pthread_mutex_lock(&clcontextcreation_mutex);
-    //     globalNumGpus = easycl::DevicesInfo::getNumGpus();
-    //     pthread_mutex_unlock(&clcontextcreation_mutex);
-    //     return globalNumGpus;
-    // }
     Context::Context(int gpuOrdinal) : gpuOrdinal(gpuOrdinal) {
         COCL_PRINT(cout << "Context() " << this << endl);
         pthread_mutex_lock(&clcontextcreation_mutex);
-        // int deviceId = getThreadVars()->currentDevice;
-        // bool coclDevicesAll = false;
-        // if(getenv("COCL_DEVICES_ALL")) {
-        //     if(string(getenv("COCL_DEVICES_ALL")) == "1") {
-        //         cout << "COCL_DEVICES_ALL=1 activated.  WARNING!  this is a maintainer option, and will likely not do anything useful for you ,and probably cause lots of errors."  << endl;
-        //         coclDevicesAll = true;
-        //     }
-        // }
-        // if(coclDevicesAll) {
-        //     cl.reset(EasyCL::createForIndexedDevice(device));
-        // } else {
         cocl::CoclDevice *coclDevice = cocl::getCoclDeviceByGpuOrdinal(gpuOrdinal);
         cl.reset(EasyCL::createForPlatformDeviceIds(coclDevice->platformId, coclDevice->deviceId));
-            // cl.reset(EasyCL::createForIndexedGpu(deviceOrdinal));
-        // }
         pthread_mutex_unlock(&clcontextcreation_mutex);
         default_stream.reset(new CoclStream(cl.get()));
     }
@@ -81,20 +57,21 @@ namespace cocl {
     }
 
     ContextMutex::ContextMutex(Context *context) : context(context) {
-        // COCL_PRINT(cout << "locking context mutex " << (void *)getThreadVars() << endl);
         pthread_mutex_lock(&context->mutex);
-        // COCL_PRINT(cout << "... got context mutex " << (void *)getThreadVars() << endl);
     }
     ContextMutex::~ContextMutex() {
-        // COCL_PRINT(cout << "releasing mutex " << (void *)getThreadVars() << endl);
         pthread_mutex_unlock(&context->mutex);
     }
 
     ThreadVars::ThreadVars() {
-        // currentContext = new Context();
+        if(getenv(OFFSETS_32BIT_ENV_VAR) != 0) {
+            if(string(getenv(OFFSETS_32BIT_ENV_VAR)) == "1") {
+                cout << OFFSETS_32BIT_ENV_VAR << " enabled" << endl;
+                this->offsets_32bit = true;
+            }
+        }
     }
     ThreadVars::~ThreadVars() {
-        // if()
     }
     Context *ThreadVars::getContext() {
         if(currentContext == 0) {
@@ -104,10 +81,7 @@ namespace cocl {
         return currentContext;
     }
 
-    // ThreadVars::currentContext = 0;
-
     ThreadVars *getThreadVars() {
-        // cout << "getThreadVars()" << endl;
         pthread_once(&key_once, make_key);
         ThreadVars *threadVars = (ThreadVars *)pthread_getspecific(key);
         if(threadVars == 0) {
@@ -117,13 +91,6 @@ namespace cocl {
         return threadVars;
     }
 }
-
-// extern "C" {
-//     size_t cuCtxSynchronize(void);
-//     size_t cuCtxCreate_v2(char **pcontext, unsigned int flags, long long device);
-//     size_t cuCtxGetCurrent(char **pcontext);
-//     size_t cuCtxSetCurrent(char *context);
-// }
 
 size_t cuCtxGetDevice(CUdevice *pdevice) {
     COCL_PRINT(cout << "cuCtxGetDevice" << endl);
@@ -141,7 +108,6 @@ size_t cuCtxSynchronize(void) {
 
 size_t cuCtxGetCurrent(char **_ppContext) {
     Context **ppContext = (Context **)_ppContext;
-    // cout << "cuCtxGetCurrent redirected" << endl;
     ThreadVars *threadVars = getThreadVars();
     *ppContext = threadVars->currentContext;
     COCL_PRINT(cout << "cuCtxGetCurrent context=" << (void *)threadVars->currentContext << endl);

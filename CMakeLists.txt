@@ -7,7 +7,6 @@ option(TESTS_DEVICELL_INLINE "cocl option for tests" ON)
 option(TESTS_DEVICELL_MEM2REG "cocl option for tests" ON)
 option(TESTS_DEVICELL_INSTCOMBINE "cocl option for tests" ON)
 set(TESTS_DEVICELL_OPT "O2" CACHE STRING "cocl option for tests")
-option(OFFSET_32BIT "type to use for offsets. off lets you use more memory.  on is necessary on beignet" ON)
 option(EXPLAIN_CL "Add IR code into OpenCL.  For maintainers mostly" OFF)
 option(TESTS_DUMP_CL "Writes OpenCL for tests to stdout.  For maintainers mostly" OFF)
 option(COCL_SPAM "Lots of scrolly debug text.  Mostly for maintainer usage" OFF)
@@ -19,6 +18,26 @@ endif()
 
 if(TESTS_CL_BRANCHES_AS_SWITCH)
     unset(TESTS_CL_RUN_TRANSFORMS CACHE)
+endif()
+
+if(COCL_SPAM)
+  option(COCL_SPAM_EVENTS "spam about events" OFF)
+  option(COCL_SPAM_MEMORY "spam about memory" OFF)
+  option(COCL_SPAM_KERNELLAUNCH "spam about kernel launch" OFF)
+else()
+  unset(COCL_SPAM_EVENTS CACHE)
+  unset(COCL_SPAM_MEMORY CACHE)
+  unset(COCL_SPAM_KERNELLAUNCH CACHE)
+endif()
+
+if(COCL_SPAM_EVENTS)
+  add_definitions(-DCOCL_SPAM_EVENTS)
+endif()
+if(COCL_SPAM_MEMORY)
+  add_definitions(-DCOCL_SPAM_MEMORY)
+endif()
+if(COCL_SPAM_KERNELLAUNCH)
+  add_definitions(-DCOCL_SPAM_KERNELLAUNCH)
 endif()
 
 set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS})
@@ -41,6 +60,9 @@ endif()
 # set($ENV{COCL_DUMP_CL} "1")
 # endif()
 
+FILE(GLOB YAMLCPP_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/yaml-cpp/src/*.cpp)
+# message("YAMLCPP_SRCS ${YAMLCPP_SRCS}")
+
 set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/platforminfo_helper.cpp src/EasyCL/EasyCL.cpp
     src/EasyCL/deviceinfo_helper.cpp src/EasyCL/util/easycl_stringhelper.cpp src/EasyCL/DevicesInfo.cpp src/EasyCL/DeviceInfo.cpp)
 
@@ -61,7 +83,7 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
     src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cpp src/cocl_device.cpp src/cocl_error.cpp
     src/cocl_memory.cpp src/cocl_properties.cpp src/cocl_streams.cpp src/cocl_clsources.cpp src/cocl_context.cpp
     src/ir-to-opencl.cpp src/shims.cpp src/LocalValueInfo.cpp src/ClWriter.cpp src/cocl_vector_types.cpp
-    src/cocl_logging.cpp
+    src/cocl_logging.cpp src/DebugDumper.cpp src/fill_buffer.cpp
 )
 
 set(CMAKE_CC_FLAGS "-fPIC")
@@ -118,9 +140,6 @@ target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
 target_include_directories(ir-to-opencl PRIVATE ${CLANG_HOME}/include)
 target_compile_options(ir-to-opencl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 target_link_libraries(ir-to-opencl cocl ${LLVM_SYSLIBS})
-# if(OFFSET_32BIT)
-#     target_compile_definitions(ir-to-opencl PRIVATE -DOFFSET_32BIT)
-# endif()
 
 add_executable(patch_hostside
     src/patch_hostside.cpp src/struct_clone.cpp src/mutations.cpp src/readIR.cpp
@@ -142,19 +161,17 @@ target_include_directories(easycl PRIVATE src/EasyCL/thirdparty/clew/include)
 target_include_directories(easycl PRIVATE src/EasyCL)
 target_link_libraries(easycl clew)
 
-add_library(cocl SHARED ${COCL_SRCS})
+add_library(cocl SHARED ${COCL_SRCS} ${YAMLCPP_SRCS})
 target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
 target_include_directories(cocl PRIVATE src/CLBlast/include)
 target_include_directories(cocl PRIVATE include)
 target_include_directories(cocl PRIVATE src)
 target_include_directories(cocl PRIVATE third_party/argparsecpp)
+target_include_directories(cocl PRIVATE third_party/yaml-cpp/include)
 target_include_directories(cocl PRIVATE ${CLANG_HOME}/include)
 target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include)
 if(COCL_SPAM)
     set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DCOCL_SPAM)
-endif()
-if(OFFSET_32BIT)
-    set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DOFFSET_32BIT)
 endif()
 if(COCL_DEFINITIONS)
     target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
@@ -224,18 +241,24 @@ set(THIS_COCL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl)
 set(COCL_ARTIFACTS patch_hostside cocl)
 # set(THIS_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set(THIS_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(THIS_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cocl.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl-internal.cmake" @ONLY)
 
 include("${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl-internal.cmake")
 
+set(TESTS_EXCLUDE EXCLUDE_FROM_ALL)
 if(BUILD_TESTS)
+  set(TESTS_EXCLUDE)
+endif(BUILD_TESTS)
+
     set(TESTS testblas cuda_sample context byvaluestructwithpointer multigpu multithreading
         offsetkernelargs properties test_bitcast test_callbacks testcumemcpy testevents2
         testevents testfloat4 test_kernelcachedok testmath testmemcpydevicetodevice test_memhostalloc
         testneg testnullpointer testpartialcopy testshfl teststream test_types
         singlebuffer test_devices test_buffers longname test_char test_structs
+        test_floatstarstar
     )
 
     if(TESTS_DUMP_CL)
@@ -243,7 +266,8 @@ if(BUILD_TESTS)
     endif()
     include_directories(include/cocl/proxy_includes)
     foreach(TEST ${TESTS})
-        add_cocl_executable(${TEST} test/cocl/${TEST}.cu)
+        cocl_add_executable(${TEST} ${TESTS_EXCLUDE} test/cocl/${TEST}.cu)
+        target_link_libraries(${TEST} cocl clew clblast easycl)
         add_custom_target(run-${TEST}
             COMMAND echo
             COMMAND echo make run-${TEST}
@@ -261,13 +285,13 @@ if(BUILD_TESTS)
           run-testnullpointer run-testpartialcopy run-teststream run-singlebuffer)
 
     if(UNIX)
-        add_library(cocl_gtest SHARED third_party/gtest/gtest-all.cc)
+        add_library(cocl_gtest SHARED  ${TESTS_EXCLUDE} third_party/gtest/gtest-all.cc)
         target_link_libraries(cocl_gtest pthread)
     else()
-        add_library(cocl_gtest third_party/gtest/gtest-all.cc)
+        add_library(cocl_gtest  ${TESTS_EXCLUDE} third_party/gtest/gtest-all.cc)
     endif()
 
-    add_executable(cocl_unittests test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
+    add_executable(cocl_unittests ${TESTS_EXCLUDE} test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
         test/gtest/test_block_dumper.cpp test/gtest/test_new_instruction_dumper.cpp
         test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
         test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
@@ -275,7 +299,7 @@ if(BUILD_TESTS)
         test/gtest/test_dnn_conv.cpp test/gtest/test_dnn_pooling.cpp test/gtest/test_dnn_act.cpp
         test/gtest/test_dnn_loss.cpp
         test/gtest/test_hostside_opencl_funcs.cpp test/gtest/test_logging.cpp
-        test/gtest/test_expressions_helper.cpp
+        test/gtest/test_expressions_helper.cpp test/gtest/test_shims.cpp
         # test/gtest/test_simple.cu
         # test/gtest/test_cocl_simple.cu
     )
@@ -286,7 +310,7 @@ if(BUILD_TESTS)
     target_include_directories(cocl_unittests PRIVATE ${CLANG_HOME}/include)
     target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} ${LLVM_SYSLIBS})
     target_compile_options(cocl_unittests PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-endif(BUILD_TESTS)
+# endif(BUILD_TESTS)
 
 FILE(GLOB_RECURSE COCL_HEADERS
   LIST_DIRECTORIES false
@@ -319,7 +343,7 @@ INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/cocl DESTINATION bin)
 INSTALL(FILES ${CLEW_HEADERS} DESTINATION include)
 INSTALL(FILES ${EASYCL_HEADERS_ROOT} DESTINATION include/EasyCL)
 # INSTALL(FILES ${CMAKE_SOURCE_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
-INSTALL(FILES ${CMAKE_BINARY_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
+INSTALL(FILES ${CMAKE_BINARY_DIR}/cmake/cocl.cmake ${CMAKE_SOURCE_DIR}/cmake/cocl_impl.cmake DESTINATION share/cocl)
 install(TARGETS easycl clew clblast cocl patch_hostside EXPORT cocl-targets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib

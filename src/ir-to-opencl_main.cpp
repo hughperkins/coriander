@@ -29,9 +29,7 @@ using namespace std;
 using namespace cocl;
 using namespace llvm;
 
-// extern bool add_ir_to_cl;
-
-// void convertLlFileToClFile(string llFilename, string ClFilename, string specificFunction);
+#define OFFSETS_32BIT_ENV_VAR "COCL_OFFSETS_32BIT"
 
 int main(int argc, char *argv[]) {
     string llFilename;
@@ -39,25 +37,13 @@ int main(int argc, char *argv[]) {
     string kernelname = "";
     string cmem_indexes = "";
     bool add_ir_to_cl = false;
-    // bool dumpCl = false;
-    // string rcFile = "";
 
     argparsecpp::ArgumentParser parser;
     parser.add_string_argument("--inputfile", &llFilename)->required();
     parser.add_string_argument("--outputfile", &ClFilename)->required();
     parser.add_string_argument("--kernelname", &kernelname)->required();
     parser.add_string_argument("--cmem-indexes", &cmem_indexes)->required()->help("comma-separated, eg 0,1,2,1");
-
-    // parser.add_bool_argument("--debug", &debug);
-    // parser.add_string_argument("--rcfile", &rcFile)
-    //     ->help("Path to rcfile, containing default options, set to blank to disable")
-    //     ->defaultValue("~/.coclrc");
-    // parser.add_bool_argument("--no-load_rcfile", &add_ir_to_cl)->help("Dont load the ~/.coclrc file");
     parser.add_bool_argument("--add_ir_to_cl", &add_ir_to_cl)->help("Adds some approximation of the original IR to the opencl code, for debugging");
-    // parser.add_bool_argument("--dump_cl", &dumpCl)->help("prints the opencl code to stdout");
-    // parser.add_bool_argument("--run_branching_transforms", &runBranchingTransforms)->help("might make the kernels more acceptable to your gpu driver; buggy though...");
-    // parser.add_bool_argument("--branches_as_switch", &branchesAsSwitch)->help("might make the kernels more acceptable to your gpu driver; slow though...");
-    // parser.add_bool_argument("--dump_transforms", &dumpTransforms)->help("mostly for dev/debug.  prints the results of branching transforms");
     if(!parser.parse_args(argc, argv)) {
         return -1;
     }
@@ -79,17 +65,21 @@ int main(int argc, char *argv[]) {
     std::unique_ptr<llvm::Module> M = parseIRFile(llFilename, smDiagnostic, context);
     if(!M) {
         smDiagnostic.print("irtoopencl", errs());
-        // return 1;
         throw runtime_error("failed to parse IR");
     }
 
-    KernelDumper kernelDumper(M.get(), kernelname, kernelname);
+    bool offsets_32bit = false;
+    if(getenv(OFFSETS_32BIT_ENV_VAR) != 0) {
+        if(string(getenv(OFFSETS_32BIT_ENV_VAR)) == "1") {
+            cout << OFFSETS_32BIT_ENV_VAR << " enabled" << endl;
+            offsets_32bit = true;
+        }
+    }
+
+    KernelDumper kernelDumper(M.get(), kernelname, kernelname, offsets_32bit);
     if(add_ir_to_cl) {
         kernelDumper.addIRToCl();
     }
-    // if(dumpCl) {
-    //     kernelDumper.setDumpCl();
-    // }
     try {
         string cl = kernelDumper.toCl(numCmems, cmemIndexes);
         ofstream of;

@@ -41,16 +41,15 @@ public:
     std::string dumpArrayType(llvm::ArrayType *type, bool decayArraysToPointer = false);
     std::string dumpVectorType(llvm::VectorType *type, bool decayArraysToPointer = false);
 
+    int getPointerDepth(llvm::Type *type);
+
     std::string dumpStructDefinitions();
     std::string dumpStructDefinition(llvm::StructType *type, std::string name);
-    // void dumpStructDeclarations(std::ostream &os);
 
-    // std::set<std::string> structDeclarations;
     std::set<llvm::StructType *> structsToDefine;
     std::map<llvm::FunctionType *, std::string> functionsToDefine;
 
 protected:
-    // std::map<llvm::GlobalVariable *, std::string> globalVariablesToDefine;
     GlobalNames *globalNames = 0;
     bool forceSingle = true;
 };

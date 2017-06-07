@@ -115,7 +115,7 @@ __global__ void somekernel(float *data) {
 def test_foo(context, q, float_data, float_data_gpu, cuSourcecode):
     kernelName = test_common.mangle('foo', ['float *'])
     testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName, num_clmems=1)
-    testcudakernel1.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(4))
+    testcudakernel1.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     assert float_data[0] == 123
@@ -125,7 +125,7 @@ def test_copy_float(cuSourcecode, context, q, float_data, float_data_gpu):
     argTypes = ['float *']
     kernelName = test_common.mangle('copy_float', argTypes)
     testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName, num_clmems=1)
-    testcudakernel1.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(4))
+    testcudakernel1.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
     assert float_data[0] == float_data[1]
@@ -135,7 +135,7 @@ def test_use_tid2(cuSourcecode, context, q, int_data, int_data_gpu):
     int_data_orig = np.copy(int_data)
     kernelName = test_common.mangle('use_tid2', ['int *'])
     testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName, num_clmems=1)
-    testcudakernel1.__getattr__(kernelName)(q, (32,), (32,), int_data_gpu, offset_type(0), cl.LocalMemory(4))
+    testcudakernel1.__getattr__(kernelName)(q, (32,), (32,), int_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, int_data, int_data_gpu)
     q.finish()
     assert int_data[0] == int_data_orig[0] + 0
@@ -162,7 +162,7 @@ __global__ void use_template1(float *data, int *intdata) {
     float_data_orig = np.copy(float_data)
     int_data_orig = np.copy(int_data)
 
-    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, int_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
+    prog.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), int_data_gpu, offset_type(0), offset_type(0), offset_type(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     cl.enqueue_copy(q, int_data, int_data_gpu)
     q.finish()
@@ -191,12 +191,12 @@ __global__ void testTernary(float *data) {
 
     def set_float_value(gpu_buffer, idx, value):
         setValueProg.__getattr__(setValueKernelName)(
-            q, (32,), (32,), float_data_gpu, offset_type(0), np.int32(idx), np.float32(value), cl.LocalMemory(4))
+            q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), np.int32(idx), np.float32(value), cl.LocalMemory(4))
 
     cl.enqueue_copy(q, float_data_gpu, float_data)
     print('float_data[:8]', float_data[:8])
     set_float_value(float_data_gpu, 1, 10)
-    testTernaryProg.__getattr__(testTernaryName)(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(4))
+    testTernaryProg.__getattr__(testTernaryName)(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -204,7 +204,7 @@ __global__ void testTernary(float *data) {
     assert float_data[0] == float_data_orig[2]
 
     set_float_value(float_data_gpu, 1, -2)
-    testTernaryProg.__getattr__(testTernaryName)(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(4))
+    testTernaryProg.__getattr__(testTernaryName)(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -214,7 +214,7 @@ __global__ void testTernary(float *data) {
 
 # Note: this test seems to fail on HD5500, but ok on 940M
 # The generated opencl code seems correct, so...
-@pytest.mark.xfail(reason='fails on hd5500, not because of cocl itself, I think')
+# @pytest.mark.xfail(reason='fails on hd5500, not because of cocl itself, I think')
 def test_structs(context, q, float_data, float_data_gpu, int_data, int_data_gpu):
 
     code = """
@@ -241,8 +241,8 @@ __global__ void testStructs(MyStruct *structs, float *float_data, int *int_data)
     my_struct = cl.tools.get_or_register_dtype("MyStruct", my_struct)
     structs = np.empty(2, my_struct)
     structs[0]['myint'] = 123
-    structs[1]['myint'] = 33
     structs[0]['myfloat'] = 567
+    structs[1]['myint'] = 33
     structs[1]['myfloat'] = 44
     structs_gpu = cl.array.to_device(q, structs)
     # p = structs_gpu.map_to_host(q)
@@ -250,7 +250,7 @@ __global__ void testStructs(MyStruct *structs, float *float_data, int *int_data)
     # q.finish()
     kernel(
         q, (32,), (32,),
-        structs_gpu.data, offset_type(0), float_data_gpu, offset_type(0), int_data_gpu, offset_type(0), cl.LocalMemory(4))
+        structs_gpu.data, offset_type(0), float_data_gpu, offset_type(0), int_data_gpu, offset_type(0), offset_type(0), offset_type(0), offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     cl.enqueue_copy(q, int_data, int_data_gpu)
@@ -270,7 +270,7 @@ def test_float4(cuSourcecode, context, ctx, q, float_data, float_data_gpu):
     float_data_orig = np.copy(float_data)
     kernelName = test_common.mangle('testFloat4', ['float4 *'])
     testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName, num_clmems=1)
-    testcudakernel1.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(4))
+    testcudakernel1.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
 
@@ -284,7 +284,7 @@ def test_float4_test2(cuSourcecode, context, ctx, q, float_data, float_data_gpu)
     float_data_orig = np.copy(float_data)
     kernelName = test_common.mangle('testFloat4_test2', ['float4 *'])
     testcudakernel1 = compile_code(cl, context, cuSourcecode, kernelName, num_clmems=1)
-    testcudakernel1.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(4))
+    testcudakernel1.__getattr__(kernelName)(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
 

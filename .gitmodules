@@ -7,3 +7,6 @@
 [submodule "third_party/thrust"]
 	path = third_party/thrust
 	url = https://github.com/hughperkins/thrust
+[submodule "third_party/yaml-cpp"]
+	path = third_party/yaml-cpp
+	url = https://github.com/hughperkins/yaml-cpp

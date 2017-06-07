@@ -21,6 +21,7 @@
 #include "struct_clone.h"
 #include "LocalValueInfo.h"
 #include "new_instruction_dumper.h"
+#include "shims.h"
 
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Instructions.h"
@@ -41,7 +42,8 @@ public:
                 llvm::Module *M,
                 llvm::Function *F, std::string shortName, bool isKernel, int kernelNumUniqueClmems, std::vector<int> &kernelClmemIndexByArgIndex,
                 GlobalNames *globalNames, TypeDumper *typeDumper,
-                FunctionNamesMap *functionNamesMap) :
+                FunctionNamesMap *functionNamesMap,
+                bool offsets_32bit) :
                 // std::map<std::string, std::string> *shortFnNameByOrigName) :
             M(M),
             F(F),
@@ -52,7 +54,8 @@ public:
             globalNames(globalNames),
             typeDumper(typeDumper),
             structCloner(typeDumper, globalNames),
-            functionNamesMap(functionNamesMap) {
+            functionNamesMap(functionNamesMap),
+            offsets_32bit(offsets_32bit) {
             // shortFnNameByOrigName(shortFnNameByOrigName) {
         // block_it = F->begin();
         // std::cout << "functiondumper, numuniqueclmems " << this->kernelNumUniqueClmems << std::endl;
@@ -63,7 +66,7 @@ public:
             typeDumper,
             functionNamesMap,
 
-            &shimFunctionsNeeded,
+            &shims,
             &neededFunctions,
 
             &globalExpressionByValue,
@@ -83,6 +86,7 @@ public:
     void toCl(std::ostream &os);
     bool generationDone();
 
+    std::string getOffsetType();
     std::string createOffsetDeclaration(std::string argName);
     std::string createOffsetShim(llvm::Type *argType, std::string argName, int clmemIndex);
     std::string dumpKernelFunctionDeclarationWithoutReturn(llvm::Function *F);
@@ -105,7 +109,8 @@ public:
         return this;
     }
 
-    std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
+    // std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
+    cocl::Shims shims;
     std::set<llvm::Function *> neededFunctions;
     std::set<llvm::StructType *> structsToDefine;
     std::map<llvm::Value *, std::string> globalExpressionByValue;
@@ -118,6 +123,8 @@ public:
     std::string functionDeclarations = "";
 
     llvm::Type *returnType = 0;
+    bool usesVmem = false;
+    bool usesScratch = false;
 
 protected:
     // llvm::Function::iterator block_it;
@@ -140,6 +147,7 @@ protected:
     TypeDumper *typeDumper;
     StructCloner structCloner;
     const FunctionNamesMap *functionNamesMap;
+    bool offsets_32bit;
     // std::map<std::string, std::string> *shortFnNameByOrigName;
 
     std::unique_ptr<NewInstructionDumper> instructionDumper;

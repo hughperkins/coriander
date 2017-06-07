@@ -1,4 +1,4 @@
-// Copyright Hugh Perkins 2016
+// Copyright Hugh Perkins 2016, 2017
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,79 +36,81 @@ using namespace cocl;
 
 namespace cocl {
 
-// static std::map<Type *, Type *> pointerlessTypeByOriginalType;
+// this handles struct types passed into kernels
+// since OpenCL 1.2 forbids passing pointer types in such structs, we need to remove those, and pass those in separately
 
-// extern std::set<string> declaredStructs;
-// extern std::string declarations_to_write;
-// extern bool single_precision;
+// llvm::StructType *StructCloner::createDevicesideStructType(std::map<llvm::StructType *, llvm::StructType *> &newByOld, llvm::StructType *inType) {
+//     // creates a device-side struct declaration, based on inType
+//     //
+//     // concretely, this measn we have to handle addressing address space delcarations, ie we add `global` to all pointers
+//     //
 
-// StructType *StructCloner::cloneNoPointers(StructType *inStructType) {
-
+//     LLVMContext &context = inType->getContext();
+//     if(newByOld.find(inType) != newByOld.end()) {
+//         return newByOld[inType];
+//     }
+//     string newName = inType->getName().str() + "_ptrglobal";
+//     vector<Type *>newChildren;
+//     for(auto it=inType->element_begin(); it != inType->element_end(); it++) {
+//         Type *childType = *it;
+//         if(StructType *childStructType = dyn_cast<StructType>(childType)) {
+//             childType = createDevicesideStructType(newByOld, childStructType);
+//             newChildren.push_back(childType);
+//         } else if(PointerType *ptr = dyn_cast<PointerType>(childType)) {
+//             Type *elementType = ptr->getElementType();
+//             // assume fundamental for now
+//             if(elementType->getPrimitiveSizeInBits() > 0) {
+//                 PointerType *newPtr = PointerType::get(elementType, 1);
+//                 newChildren.push_back(newPtr);
+//             } else {
+//                 // just ignore...
+//             }
+//         } else {
+//             newChildren.push_back(childType);
+//         }
+//     }
+//     StructType *newType = 0;
+//     if(newChildren.size() > 0) {
+//         newType = StructType::create(ArrayRef<Type *>(&newChildren[0], &newChildren[newChildren.size()]), newName);
+//     } else {
+//         newType = StructType::get(context);
+//     }
+//     newByOld[inType] = newType;
+//     return newType;
 // }
 
-// Type *cloneStructTypeNoPointers(StructType *inType) {
-
-llvm::StructType *StructCloner::createGlobalizedPointerStruct(std::map<llvm::StructType *, llvm::StructType *> &newByOld, llvm::StructType *inType) {
-    LLVMContext &context = inType->getContext();
-    if(newByOld.find(inType) != newByOld.end()) {
-        return newByOld[inType];
-    }
-    string newName = inType->getName().str() + "_ptrglobal";
-    vector<Type *>newChildren;
-    for(auto it=inType->element_begin(); it != inType->element_end(); it++) {
-        Type *childType = *it;
-        if(StructType *childStructType = dyn_cast<StructType>(childType)) {
-            childType = createGlobalizedPointerStruct(newByOld, childStructType);
-            newChildren.push_back(childType);
-        } else if(PointerType *ptr = dyn_cast<PointerType>(childType)) {
-            Type *elementType = ptr->getElementType();
-            // assume fundamental for now
-            if(elementType->getPrimitiveSizeInBits() > 0) {
-                PointerType *newPtr = PointerType::get(elementType, 1);
-                newChildren.push_back(newPtr);
-            } else {
-                // just ignore...
-                // elementType->dump();
-                // throw runtime_error("not implemented");
-            }
-        } else {
-            newChildren.push_back(childType);
-        }
-    }
-    // outs() << "newchildren.size() " << newChildren.size() << "\n";
-    StructType *newType = 0;
-    if(newChildren.size() > 0) {
-        newType = StructType::create(ArrayRef<Type *>(&newChildren[0], &newChildren[newChildren.size()]), newName);
-    } else {
-        newType = StructType::get(context);
-    }
-    newByOld[inType] = newType;
-    return newType;
-}
-
 StructType *StructCloner::cloneNoPointers(StructType *inType) {
+    // creates a new struct type, from `inType`, that has all pointer types removed from it
+    // we'll use this to send structs containing pointer into gpu kernels, by passing the pointer
+    // members in separately, via additional kernel parameters
+
     LLVMContext &context = inType->getContext();
     if(pointerlessTypeByOriginalType.find(inType) != pointerlessTypeByOriginalType.end()) {
         return pointerlessTypeByOriginalType[inType];
     }
-    // string name = globalNames->getName(inType);
-    // string newName = name + "_nopointers";
     string newName = inType->getName().str() + "_nopointers";
-    // cout << newName << " cloning " << newName << endl;
     vector<Type *>newChildren;
     for(auto it=inType->element_begin(); it != inType->element_end(); it++) {
         Type *childType = *it;
-        // cout << newName << " child element:" << endl;
-        // childType->dump();
         if(StructType *childStructType = dyn_cast<StructType>(childType)) {
-            // cout << newName << " child is struct, so cloning that" << endl;
             childType = cloneNoPointers(childStructType);
             newChildren.push_back(childType);
-        } else if(isa<PointerType>(childType)) {
+        } else if(PointerType *childAsPointer = dyn_cast<PointerType>(childType)) {
             // ignore
-            // cout << newName << " child is pointer type => ignoring" << endl;
+
+            // // assume is a virtual pointer
+            // Type *elementType = childAsPointer->getPointerElementType();
+            // if(isa<PointerType>(elementType)) {
+            //     std::cout << "pointer to pointer not handled yet..." << std::endl;
+            //     inType->dump();
+            //     std::cout << std::endl;
+            //     throw std::runtime_error("pointer to pointer not handled yet...");
+            // } else {
+            //     // virtual pointer is ... an unsigned long
+            //     Type *childType = IntegerType::get(context, 64);
+            //     newChildren.push_back(childType);
+            // }
         } else {
-            // cout << newName << " child is neither pointer nor struct, so blindly adding..." << endl;
             newChildren.push_back(childType);
         }
     }
@@ -116,7 +118,6 @@ StructType *StructCloner::cloneNoPointers(StructType *inType) {
         // add some dummy thing...
         newChildren.push_back(IntegerType::get(context, 32));
     }
-    // outs() << "newchildren.size() " << newChildren.size() << "\n";
     StructType *newType = 0;
     if(newChildren.size() > 0) {
         newType = StructType::create(ArrayRef<Type *>(&newChildren[0], &newChildren[newChildren.size()]), newName);
@@ -124,57 +125,50 @@ StructType *StructCloner::cloneNoPointers(StructType *inType) {
         newType = StructType::get(context);
     }
     pointerlessTypeByOriginalType[inType] = newType;
-    // cout << newName << " final struct:" << endl;
-    // newType->dump();
     return newType;
 }
 
-std::string StructCloner::writeClCopyNoPtrToPtrfull(llvm::StructType *ptrfullType,  std::string srcName, std::string destName) {
+std::string StructCloner::writeClCopyToDevicesideStruct(llvm::StructType *ptrfullType,  std::string srcName, std::string destName) {
+    // This writes OpenCL code, that will be used a kernel boilerplate ,in deviceside kernels, to copy the contents
+    // of a passed in struct, that contains no pointers, into a full-blown struct, that contains pointer members
+    //
+    // This wont populate the pointer members of the target struct, but at least copies everything else across, ie everything
+    // that was passed by-value in the original struct
+
     string gencode = "";
     int srcidx = 0;
     int dstidx = 0;
-    // outs() << "writeStructCopyCodeNoPointers " << dumpType(structType) << "\n";
     for(auto it=ptrfullType->element_begin(); it != ptrfullType->element_end(); it++) {
         Type *childType = *it;
         string childSrcName = srcName + ".f" + easycl::toString(srcidx);
         string childDstName = destName + ".f" + easycl::toString(dstidx);
         if(PointerType *pointerType = dyn_cast<PointerType>(childType)) {
             // ignore
-            // srcidx++;
             // as long as not pointer to pointer, set to 0 for now (think about how to generalize better later)
-            if(!isa<PointerType>(pointerType->getPointerElementType())) {
-                // pointerType->getPointerElementType()->dump();
-                // if(isa<PointerType>(pointerType->getPointerElementType())) {
-                //     cout << "pointer elemnet type is also poitner" << endl;
-                // }
-                // cout << "writing " << childDstName + " = 0;" << endl;
+            if(!isa<PointerType>(pointerType->getElementType())) {
                 gencode += childDstName + " = 0;\n";
             }
             dstidx++;
             continue;
         } else if(StructType *childStructType = dyn_cast<StructType>(childType)) {
-            gencode += writeClCopyNoPtrToPtrfull(childStructType, childSrcName, childDstName);
+            gencode += writeClCopyToDevicesideStruct(childStructType, childSrcName, childDstName);
             srcidx++;
             dstidx++;
         } else if(childType->getPrimitiveSizeInBits() > 0 ) {
             gencode += childDstName + " = " + childSrcName + ";\n";
-            // outs() << "copying " << dumpType(childType) << "\n";
             srcidx++;
             dstidx++;
         } else if(ArrayType *arrayType = dyn_cast<ArrayType>(childType)) {
             int numElements = arrayType->getNumElements();
-            // outs() << "numlemenets " << numElements << "\n";
             for(int i=0; i < numElements; i++) {
                 gencode += childDstName + "[" + easycl::toString(i) + "] = " + childSrcName + "[" + easycl::toString(i) +  "];\n";
             }
             srcidx++;
             dstidx++;
-            // throw runtime_error("unhandled type " + dumpType(childType));
         } else {
             outs() << "unhandled type\n";
             childType->dump();
             outs() << "\n";
-            // outs() << "unhandled type " + dumpType(childType) << "\n";
             throw runtime_error("unhandled type");
             srcidx++;
             dstidx++;
@@ -183,13 +177,24 @@ std::string StructCloner::writeClCopyNoPtrToPtrfull(llvm::StructType *ptrfullTyp
     return gencode;
 }
 
-llvm::Instruction *StructCloner::createHostsideIrCopyPtrfullToNoptr(
+llvm::Instruction *StructCloner::writeHostsideIrCopyToMarshallingStruct(
         llvm::Instruction *lastInst, StructType *ptrfullType, Value *src, Value *dst) {
+    // creates bytecode instructions to copy from a struct containing pointers, into
+    // a new struct object that contains no pointers
+    //
+    // This will be used on the hostside, to prepare structs coming from hostside client code,
+    // for being sent into a kernel.  (The kernel will then 'unpack' these, on the gpuside,
+    // splicing in any pointers, which will have been passed in separately, as additional
+    // kernel parameters)
+    //
+    // This walks the struct members, and ignores any pointer members
+    //
+
     // assumes incoming values are pointers to struct
     LLVMContext &context = src->getContext();
     int srcidx = 0;
     int dstidx = 0;
-    if(StructType *structType = dyn_cast<StructType>(src->getType()->getPointerElementType())) {
+    if(StructType *structType = dyn_cast<StructType>(cast<PointerType>(src->getType())->getElementType())) {
         for(auto it=structType->element_begin(); it != structType->element_end(); it++) {
             Type *childType = *it;
             if(isa<PointerType>(childType)) {
@@ -212,15 +217,8 @@ llvm::Instruction *StructCloner::createHostsideIrCopyPtrfullToNoptr(
             lastInst = childDstInst;
 
             if(StructType *childStructType = dyn_cast<StructType>(childType)) {
-                lastInst = createHostsideIrCopyPtrfullToNoptr(lastInst, childStructType, childSrcInst, childDstInst);
-            // } else if(IntegerType *intType = dyn_cast<IntegerType>(childType)) {
+                lastInst = writeHostsideIrCopyToMarshallingStruct(lastInst, childStructType, childSrcInst, childDstInst);
             } else if(childType->getPrimitiveSizeInBits() > 0 ) {
-                // do we have to do `load` followed by `store`?
-                // outs() << "copying " << dumpType(childType) << "\n";
-                // Instruction *alloca = new AllocaInst(intType, "allocateint");
-                // alloca->insertAfter(lastInst);
-                // lastInst = alloca;
-
                 Instruction *load = new LoadInst(childSrcInst, "loadint");
                 load->insertAfter(lastInst);
                 lastInst = load;
@@ -230,7 +228,6 @@ llvm::Instruction *StructCloner::createHostsideIrCopyPtrfullToNoptr(
                 lastInst = store;
             } else if(ArrayType *arrayType = dyn_cast<ArrayType>(childType)) {
                 int numElements = arrayType->getNumElements();
-                // outs() << "numlemenets " << numElements << "\n";
                 for(int i=0; i < numElements; i++) {
                     Value *arrayindex[2];
                     arrayindex[0] = ConstantInt::getSigned(IntegerType::get(context, 32), 0);
@@ -251,7 +248,6 @@ llvm::Instruction *StructCloner::createHostsideIrCopyPtrfullToNoptr(
                     store->insertAfter(load);
                     lastInst = store;
                 }
-                // throw runtime_error("unhandled type " + dumpType(childType));
             } else {
                 outs() << "unhandled type:\n";
                 childType->dump();
@@ -270,14 +266,22 @@ llvm::Instruction *StructCloner::createHostsideIrCopyPtrfullToNoptr(
 }
 
 void StructCloner::walkType(Module *M, StructInfo *structInfo, int level, int offset, vector<int> indices, string path, Type *type) {
+    // walk type in parameter 'type', and:
+    // - note any pointers into structInfo
+    // - descend into any child structs
+    //
+    // Everything else is ignored, since is neither itself a pointer, nor can contain a pointer
+    //
+    // This includes arraytypes, such as `float foo[10]`. Even though such types decay into pointers, they are
+    // passed by value, with the struct. They are stored as part of the struct layout.
+    //
+    // this function is more general than `walkStructType`, since it will handle any type
+    // however, if the incoming type is a struct type, it will delagate to `walkStructtype` to handle it
+
     if(StructType *structtype = dyn_cast<StructType>(type)) {
         walkStructType(M, structInfo, level, offset, indices, path, structtype);
     } else if(PointerType *pointerType = dyn_cast<PointerType>(type)) {
-        Type *elementType = pointerType->getPointerElementType();
-        // outs() << getIndent(level) << "pointer type " << dumpType(elementType) << " addressspace " << addressspace << " offset=" << offset << "\n";
-        // outs() << level << " pointer type     offset=" << offset << "\n";
-        // pointerType->dump();
-        // outs() << '\n';
+        Type *elementType = pointerType->getElementType();
         // how to find out if this is gpu allocated or not?
         // let's just heuristically assume that all primitive*s are gpu allocated for now?
         // ~~and lets assume that structs are just sent one at a time now, and any contained structs are one at a time~~
@@ -286,16 +290,11 @@ void StructCloner::walkType(Module *M, StructInfo *structInfo, int level, int of
         // pointer to pointer is not allowed, so we should remove
         // actually, anything except float *s, we're just going to leave as-is (or set to zero), for now
         if(elementType->getPrimitiveSizeInBits() != 0) {
-            // outs() << "primitive type size " << elementType->getPrimitiveSizeInBits() << "\n";
             structInfo->pointerInfos.push_back(unique_ptr<PointerInfo>(new PointerInfo(offset, pointerType, indices, path)));
         }
     } else if(isa<ArrayType>(type)) {
-        // outs() << getIndent(level) << dumpType(elemType) << "[" << count << "] offset=" << offset << "\n";
     } else if(isa<IntegerType>(type)) {
-        // outs() << getIndent(level) << "int" << bitwidth << " offset=" << offset << "\n";
     } else if(type->getPrimitiveSizeInBits() != 0) {
-        // int bitwidth = intType->getBitWidth();
-        // outs() << getIndent(level) << " someprimitive " << " offset=" << offset << "\n";
     } else {
         type->dump();
         throw runtime_error("walktype type not handled");
@@ -303,32 +302,19 @@ void StructCloner::walkType(Module *M, StructInfo *structInfo, int level, int of
 }
 
 void StructCloner::walkStructType(Module *M, StructInfo *structInfo, int level, int offset, vector<int> indices, string path, StructType *type) {
-    // Type *type = value->getType();
-    // if(isa<StructType>(type)) {
-        // outs() << "walkvalue type is struct" << "\n";
-        // walk each member of the struct
+    // this handles walking struct types. It is used by `walkType`, to handle struct types
+    // it will also delegate handling each of the child types of the struct to `walkType` for further processing
 
-    // outs() << getIndent(level) << string(type->getName());
-    // outs() << " offset=" << offset << " allocsize=" << M->getDataLayout().getTypeAllocSize(type) << "\n";
     int childoffset = offset;
     int i = 0;
-    // Module *M = type->
     for(auto it=type->element_begin(); it != type->element_end(); it++) {
         Type *child = *it;
-        // printIndent(level);
-        // outs() << getIndent(level) + "child type " << dumpType(child) << "\n";
         vector<int> childindices(indices);
         childindices.push_back(i);
         walkType(M, structInfo, level + 1, childoffset, childindices, path + ".f" + easycl::toString(i), child);
         childoffset += M->getDataLayout().getTypeAllocSize(child);
         i++;
     }
-
-    // } else {
-    //     throw runtime_error("walkvalue unhandled type " + dumpType(type));
-    // }
-    //     throw runtime_error("walkvalue unhandled type " + dumpType(type));
-    // }
 }
 
 /*

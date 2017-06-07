@@ -31,9 +31,14 @@ using namespace std;
 using namespace cocl;
 using namespace easycl;
 
-#ifdef COCL_SPAM
+#ifdef COCL_PRINT
 #undef COCL_PRINT
-#define COCL_PRINT(x) std::cout << "[COCL] " << x << std::endl;
+#endif
+
+#ifdef COCL_SPAM_EVENTS
+#define COCL_PRINT(x) std::cout << "[EVT] " << x << std::endl;
+#else
+#define COCL_PRINT(x) 
 #endif
 
 // I guess that events should only be called from a single thread, so there might 

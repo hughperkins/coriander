@@ -22,34 +22,6 @@ using namespace std;
 namespace cocl {
 
 void FunctionNamesMap::populateKnownValues() {
-    // ignoredFunctionNames.insert("llvm.ptx.read.tid.x");
-    // ignoredFunctionNames.insert("llvm.ptx.read.tid.y");
-    // ignoredFunctionNames.insert("llvm.ptx.read.tid.z");
-    // ignoredFunctionNames.insert("llvm.cuda.syncthreads");
-    // ignoredFunctionNames.insert("_Z11syncthreadsv");
-    // ignoredFunctionNames.insert("_ZL21__nvvm_reflect_anchorv");
-    // ignoredFunctionNames.insert("__nvvm_reflect");
-    // ignoredFunctionNames.insert("llvm.ptx.read.ctaid.x");
-    // ignoredFunctionNames.insert("llvm.ptx.read.ctaid.y");
-    // ignoredFunctionNames.insert("llvm.ptx.read.ctaid.z");
-    // ignoredFunctionNames.insert("llvm.ptx.read.nctaid.x");
-    // ignoredFunctionNames.insert("llvm.ptx.read.nctaid.y");
-    // ignoredFunctionNames.insert("llvm.ptx.read.nctaid.z");
-    // ignoredFunctionNames.insert("llvm.ptx.read.ntid.x");
-    // ignoredFunctionNames.insert("llvm.ptx.read.ntid.y");
-    // ignoredFunctionNames.insert("llvm.ptx.read.ntid.z");
-    // ignoredFunctionNames.insert("llvm.memcpy.p0i8.p0i8.i64");
-    // ignoredFunctionNames.insert("llvm.memcpy.p0i8.p0i8.i32");
-    // ignoredFunctionNames.insert("llvm.lifetime.start");
-    // ignoredFunctionNames.insert("llvm.lifetime.end");
-    // ignoredFunctionNames.insert("pow");
-    // ignoredFunctionNames.insert("_Z11make_float4ffff");
-    // ignoredFunctionNames.insert("_GLOBAL__sub_I_struct_initializer.cu");
-    // ignoredFunctionNames.insert("_Z13__threadfencev");
-    // ignoredFunctionNames.insert("_Z11__shfl_downIfET_S0_ii"); // 3 args, int
-    // ignoredFunctionNames.insert("_Z11__shfl_downIfET_S0_i");  // 2 args, int
-    // ignoredFunctionNames.insert("llvm.dbg.value");
-
     knownFunctionsMap["_ZSt4sqrtf"] = "sqrt";
     knownFunctionsMap["llvm.nvvm.sqrt.rn.d"] = "sqrt";
     knownFunctionsMap["llvm.nvvm.fabs.f"] = "fabs";
@@ -69,6 +41,7 @@ void FunctionNamesMap::populateKnownValues() {
     knownFunctionsMap["_ZSt3powff"] = "pow";
     knownFunctionsMap["_Z3minff"] = "fmin";
     knownFunctionsMap["_Z3maxff"] = "fmax";
+    knownFunctionsMap["_Z4fabsf"] = "fabs";
 
     knownFunctionsMap["fminf"] = "fmin";
     knownFunctionsMap["fmaxf"] = "fmax";
@@ -76,6 +49,7 @@ void FunctionNamesMap::populateKnownValues() {
     knownFunctionsMap["tanhf"] = "tanh";
     knownFunctionsMap["expf"] = "exp";
     knownFunctionsMap["fabsf"] = "fabs";
+    knownFunctionsMap["fabs"] = "fabs";
     knownFunctionsMap["acosf"] = "acos";
     knownFunctionsMap["asinf"] = "asin";
     knownFunctionsMap["atanf"] = "atan";
@@ -92,14 +66,16 @@ void FunctionNamesMap::populateKnownValues() {
     knownFunctionsMap["_Z3powff"] = "pow";
     knownFunctionsMap["_Z4sqrtf"] = "sqrt";
     knownFunctionsMap["_Z3logf"] = "log";
+    knownFunctionsMap["_Z5isnanf"] = "isnan";
 
-    knownFunctionsMap["_Z9atomicCASIjET_PS0_S0_S0_"] = "atomic_cmpxchg";   // int
-    knownFunctionsMap["_Z10atomicExchIjET_PS0_S0_"] = "atomic_xchg";  // ints
-    knownFunctionsMap["_Z10atomicExchIfET_PS0_S0_"] = "atomic_xchg";   // floats
-    knownFunctionsMap["_Z9atomicIncIjET_PS0_S0_"] = "__atomic_inc";   // int
-    // knownFunctionsMap["_Z11__shfl_downIfET_S0_ii"] = "__shfl_down_3";   // float, and see cl_add_definitions, at top
-    // knownFunctionsMap["_Z11__shfl_downIfET_S0_i"] = "__shfl_down_2";   // float, and see cl_add_definitions, at top
-    knownFunctionsMap["_Z9atomicAddIfET_PS0_S0_"] = "__atomic_add"; // float
+    // CAS
+    knownFunctionsMap["_Z9atomicCASIjET_PS0_S0_S0_"] = "atomic_cmpxchg";   // cas int
+    knownFunctionsMap["_Z9atomicCASIiET_PS0_S0_S0_"] = "atomic_cmpxchg";   // cas uint
+    knownFunctionsMap["_Z9atomicCASPjjj"] = "atomic_cmpxchg";   // cas uint
+
+    // exchg
+    knownFunctionsMap["_Z10atomicExchIjET_PS0_S0_"] = "atomic_xchg";  // xchng ints
+    knownFunctionsMap["_Z10atomicExchIfET_PS0_S0_"] = "atomic_xchg";   // xchng floats
 
     // llvm 4.0:
     knownFunctionsMap["_Z5fminfff"] = "fmin";

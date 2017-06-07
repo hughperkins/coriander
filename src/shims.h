@@ -26,12 +26,15 @@ class Shims {
 public:
     Shims();
     virtual ~Shims() {}
-    std::string getClByName(std::string name);
-    std::set<std::string> getDependenciesByName(std::string name);
+    void use(std::string name);
+    void copyFrom(const Shims &source);
+    void writeCl(std::ostream &os);
+    bool isUsed(std::string name);
 
 protected:
     std::map<std::string, std::string> _shimClByName;
     std::map<std::string, std::set<std::string> > _dependenciesByName;
+    std::set<std::string> shimsToBeUsed;
 };
 
 } // namespace cocl

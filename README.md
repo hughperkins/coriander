@@ -2,11 +2,6 @@
 
 Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 
-## Branch notes
-
-This branch is for llvm-4.0.  The `make run-tests` end-to-end tests run/pass ok.  I can compile at least one Tensorflow file with it (`xent_op_gpu.cc`),
-but note that I needed to use cutting-edge Eigen for this, ie the one in `default` branch, of the eigen mercurial, https://bitbucket.org/eigen/eigen/commits/branch/default . I tested when the 25th april commit 2b969e5 was tip
-
 ## Concept
 
 - leave applications in NVIDIA® CUDA™
@@ -60,32 +55,46 @@ Slides on the [IWOCL](http://iwocl.org) website, [here](http://www.iwocl.org/wp-
 
 Coriander development is carried out using the following platforms:
 - Ubuntu 16.04, with:
-  - NVIDIA K80 GPU
-- Mac Sierra, with:
+  - NVIDIA K80 GPU and/or NVIDIA K520 GPU (via aws)
+- Mac Book Pro 4th generation (thank you [ASAPP](http://asapp.com) :-) ), with:
   - Intel HD Graphics 530
   - Radeon Pro 450
+  - Sierra OS
 
 Other systems should work too, ideally.  You will need at a minimum at least one OpenCL-enabled GPU,
 and appropriate OpenCL drivers installed, for the GPU. Both linux and Mac systems stand a reasonable chance of working ok.
 
 For installation, please see [installation.md](doc/installation.md)
 
+## Adding to your own `cmake` project?
+
+- cmake targets `cocl_add_executable` and `cocl_add_library` are available
+- see [cmake_usage.md](doc/cmake_usage.md) for more details
+
 ## Testing
 
 See [testing.md](doc/testing.md)
 
-## Simplifications made by Coriander
+## Assumptions/relaxations made by Coriander
 
-Coriander makes the following relaxations/simplifications:
-- ints are generally assumed to be no longer than 32-bit, and truncated to 32-bit mostly
-- floats are assumed to be singles. doubles in the original kernels are converted to floats in the OpenCL code
-- buffer offsets are generally taken to be int32s for now.  This might change in the future
+See [assumptions.md](doc/assumptions.md)
+
+## Libraries
+
+Coriander uses the following libraries:
+
+- [clang/llvm](http://llvm.org/): c/c++ parser/compiler; many contributors
+- [CLBlast](https://github.com/cnugteren/CLBlast): Cedric Nugteren's excellent BLAS for OpenCL
+- [thrust](https://github.com/thrust/thrust): parallel GPU library, from NVIDIA®
+- [yaml-cpp](https://github.com/jbeder/yaml-cpp): yaml for c++, by Jesse Beder
+- [EasyCL](https://github.com/hughperkins/EasyCL): wrapper for OpenCL 1.2 boilerplate
+- [argparsecpp](https://github.com/hughperkins/argparsecpp): command-line parser for c++
+- [gtest](https://github.com/google/googletest): unit tests for c++, from Google
 
 ## Related projects
 
-- Eigen-CL: Minimally-tweaked fork of Eigen, which can be compiled/run using Coriander, on an OpenCL device, https://bitbucket.org/hughperkins/eigen/commits/branch/eigen-cl
-- Tensorflow-CL: Fork of Tensorflow, that can be built and run on an OpenCL-1.2 enabled GPU, using Coriander, https://github.com/hughperkins/tensorflow-cl
-- CLBlast: Cedric Nugteren's excellent BLAS implementation for OpenCL  [CLBlast](https://github.com/cnugteren/CLBlast)
+- [Eigen-CL](https://bitbucket.org/hughperkins/eigen/commits/branch/eigen-cl): Minimally-tweaked fork of Eigen, for OpenCL 1.2
+- [tf-coriander](https://github.com/hughperkins/tf-coriander): Tensorflow for OpenCL-1.2
 
 ## How to Cite
 
@@ -97,6 +106,19 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
 
 ## News
 
+- June 4:
+  - added cmake macros `cocl_add_executable` and `cocl_add_library`
+  - these replace the previous `add_cocl_executable`, and have the advantage that they are standard targets, that you can use with `target_link_libraries` and so on
+  - see [test/cmake](test/cmake) for an example
+- May 31:
+  - added a developer debugging option `COCL_DUMP_CONFIG`, to allow easy inspection of buffers returned by kernel calls, see [advanced usage](doc/advanced_usage.md)
+- May 28:
+  - revamped how we choose the type of buffer offsets passed into the kernels:
+    - it's always done at runtime now, never at compile time
+    - when you run an already built app, simply set the environment variable `COCL_OFFSETS_32BIT` to the string `1` to use 32-bit offsets
+    - otherwise it will default to 64-bit offsets (means, can access more memory)
+    - basically, unless you're using beignet, you can ignore this, and stop having to think about the 32-bit offsets variables any more :-)
+  - if you build with `BUILD_TESTS` set to `OFF`, you can still build the tests, eg by doing `make cocl_unittests`, and you can still run them eg by doing `make run-tests`: just, no longer builds them by default, when you do `make`
 - May 27:
   - updated to LLVM 4.0. Thank you to @iame6162013 for inspiring me to do this
   - Tensorflow `random_op_gpu.cc` compiles and runs ok now :-). There were a few hoops to jump through, https://github.com/hughperkins/coriander/issues/24
@@ -104,15 +126,4 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
   - renamed to Coriander
 - May 18:
   - Presented Coriander at this year's [IWOCL](http://iwocl.org) :-)  Full IWOCL program [here](http://www.iwocl.org/iwocl-2017/conference-program/), and there is a link to my own slides
-- May 5:
-  - Eigen unit tests at https://bitbucket.org/hughperkins/eigen/src/75842846799e15f1c26ef6885565d64c3d0a67b2/unsupported/test/Coriander/?at=eigen-cl pass on Mac Pro 4th Generation with both:
-    - Intel HD Graphics 530, and
-    - Radeon Pro 450 (using env var `CL_GPUOFFSET=1` to select)
-  - I suspect this may have broken some other stuff, since one of the unit tests fails now, but I think it's a gentle step forward
-- May 1:
-  - dnn tests pass on Radeon Pro 450, on Mac Sierra now
-  - fix crash bugs in pooling forward/backward, on Mac Sierra
-  - thanks to my employer [ASAPP](http://www.asapp.com/) giving me use of a nice Mac Book Pro 4th Generation, with Radeon Pro 450, unit tests now pass on said hardware :-)
-- April 29:
-  - Updated to latest EasyCL. This lets you use environment variable `CL_GPUOFFSET` to choose different gpus, eg set to `1` to use second gpu, to `2` to use third gpu, etc
 - [Older news](doc/news.md)

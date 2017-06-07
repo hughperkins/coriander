@@ -13,6 +13,9 @@
 #include "cocl/cocl_memory.h"
 #include "cocl/hostside_opencl_funcs.h"
 // #include "cocl/cocl_blas.h"
+
+#include "fill_buffer.h"
+
 #include <clblast_c.h>
 
 #include <iostream>
@@ -27,7 +30,6 @@ namespace gemm_im2col {
 static string get_im2col_sourcecode();
 static string get_col2im_sourcecode();
 static string get_convbackbias_sourcecode();
-static string get_enqueueFillBuffer_sourcecode();
 
 CoclDnnGeometryType getColumnsNumElements(
         cudnnHandle_t handle,
@@ -63,26 +65,6 @@ inline int getNumThreads() {
 // CL: number of blocks for threads.
 inline int GET_BLOCKS(const int N) {
   return (N + getNumThreads() - 1) / getNumThreads();
-}
-
-int myEnqueueFillBuffer(
-    cl_command_queue queue,
-    cl_mem clmem,
-    float value,
-    int offsetElements, int countElements) {
-
-    easycl::CLKernel *kernel = compileOpenCLKernel("enqueueFillBuffer", get_enqueueFillBuffer_sourcecode());
-
-    kernel->inout(&clmem);
-    kernel->in((int32_t)offsetElements);
-
-    kernel->in((int32_t)countElements);
-    kernel->in(value);
-
-    int workgroupSize = getNumThreads();
-    int globalSize = GET_BLOCKS(countElements) * workgroupSize;
-    kernel->run_1d(&queue, globalSize, workgroupSize);
-    return 0;
 }
 
 void im2col(cl_mem im_buf, size_t im_offset_bytes, const CoclDnnGeometryType channels,
@@ -767,31 +749,6 @@ kernel void convbackbias(
             bias += image[outhw];
         }
         gradBias[outc] = oldBias + bias;
-    }
-  }
-}
-)";
-}
-
-// this shouldnt be necessary, since clEnqueueFillBuffer should do this, but
-// clEnqueueFillBuffer fails for me on Radeon Pro 450, eg see
-// http://stackoverflow.com/questions/38556710/clenqueuefillbuffer-fills-a-buffer-correctly-only-at-random/43727913#43727913
-string get_enqueueFillBuffer_sourcecode() {
-    return R"(
-// CL: grid stride looping
-#define CL_KERNEL_LOOP(i, n)                        \
-  for (int i = get_group_id(0) * get_local_size(0) + get_local_id(0); \
-      i < (n);                                       \
-      i += get_local_size(0) * get_num_groups(0))
-
-kernel void enqueueFillBuffer(
-        global float *target_data, const int target_offset,
-        const int N,
-        float value) {
-    global float *target = target_data + target_offset;
-  CL_KERNEL_LOOP(n, N) {
-    if(n < N) {
-        target[n] = value;
     }
   }
 }

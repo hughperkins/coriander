@@ -18,6 +18,7 @@
 #include "function_names_map.h"
 #include "new_instruction_dumper.h"
 #include "InstructionDumper.h"
+#include "shims.h"
 
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/IR/Module.h"
@@ -71,7 +72,7 @@ public:
         instructionDumper.reset(
             new NewInstructionDumper(
                 myblock.M.get(), &globalNames, &localNames, typeDumper.get(), &functionNamesMap,
-                &shimFunctionsNeeded,
+                &shims,
                 &neededFunctions,
                 &globalExpressionByValue, &localValueInfos));
                 // &emptyStringMap));
@@ -99,7 +100,8 @@ public:
 
     map<Function *, Type*> returnTypeByFunction;
 
-    std::set<std::string> shimFunctionsNeeded;
+    // std::set<std::string> shimFunctionsNeeded;
+    cocl::Shims shims;
     std::set<llvm::Function *> neededFunctions;
 
     std::map<llvm::Value *, std::string> globalExpressionByValue;
@@ -593,7 +595,7 @@ TEST(test_new_instruction_dumper, test_sext) {
 
     string expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
-    ASSERT_EQ("v_a", expr);
+    ASSERT_EQ("((int)v_a)", expr);
 
     ostringstream oss;
     instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
@@ -616,7 +618,7 @@ TEST(test_new_instruction_dumper, test_sext) {
     oss.str("");
     instrInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
-    ASSERT_EQ("    myinstr = v_a;\n", oss.str());
+    ASSERT_EQ("    myinstr = (int)v_a;\n", oss.str());
 
     expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
@@ -644,7 +646,7 @@ TEST(test_new_instruction_dumper, test_zext) {
 
     string expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
-    ASSERT_EQ("v_a", expr);
+    ASSERT_EQ("((int)v_a)", expr);
 
     ostringstream oss;
     instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
@@ -667,7 +669,7 @@ TEST(test_new_instruction_dumper, test_zext) {
     oss.str("");
     instrInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
-    ASSERT_EQ("    myinstr = v_a;\n", oss.str());
+    ASSERT_EQ("    myinstr = (int)v_a;\n", oss.str());
 
     expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
@@ -695,7 +697,7 @@ TEST(test_new_instruction_dumper, test_fpext) {
 
     string expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
-    ASSERT_EQ("v_a", expr);
+    ASSERT_EQ("((float)v_a)", expr);
 
     ostringstream oss;
     instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
@@ -718,7 +720,7 @@ TEST(test_new_instruction_dumper, test_fpext) {
     oss.str("");
     instrInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
-    ASSERT_EQ("    myinstr = v_a;\n", oss.str());
+    ASSERT_EQ("    myinstr = (float)v_a;\n", oss.str());
 
     expr = instrInfo->getExpr();
     cout << "expr " << expr << endl;
@@ -1120,6 +1122,7 @@ TEST(test_new_instruction_dumper, callsomething) {
     myblock.block->dump();
 
     std::map<llvm::Function *, llvm::Type *> returnTypeByFunction;
+    instructionDumper->checkCalledFunctionsDefined = false;
     instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
 
     ASSERT_TRUE(instrInfo->needDependencies);
@@ -1160,7 +1163,7 @@ TEST(test_new_instruction_dumper, callsomething) {
     cout << "hasexpr " << instrInfo->hasExpr() << endl;
     ASSERT_TRUE(instrInfo->hasExpr());
     cout << "expr: " << instrInfo->getExpr() << endl;
-    ASSERT_EQ("mychildfunc(charArray, scratch)", instrInfo->getExpr());
+    ASSERT_EQ("mychildfunc(charArray, pGlobalVars)", instrInfo->getExpr());
 
     oss.str("");
     instrInfo->writeDeclaration("    ", wrapper.typeDumper.get(), oss);
@@ -1205,7 +1208,7 @@ TEST(test_new_instruction_dumper, callsomething) {
     oss.str("");
     instrInfo->writeInlineCl("    ", oss);
     cout << "inelineCl [" << oss.str() << "]" << endl;
-    ASSERT_EQ("    myinstr = mychildfunc(charArray, scratch);\n", oss.str());
+    ASSERT_EQ("    myinstr = mychildfunc(charArray, pGlobalVars);\n", oss.str());
 }
 
 TEST(test_new_instruction_dumper, sharedmem_nocast) {

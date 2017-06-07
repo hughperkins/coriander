@@ -22,22 +22,18 @@
 #include <string>
 #include <vector>
 
-// std::string dumpInstruction(std::string indent, llvm::Instruction *instruction);
-// std::string dumpOperand(llvm::Value *value);
-// std::string dumpChainedInstruction(int level, llvm::Instruction * instr);
-// void updateAddressSpace(llvm::Value *value, int newSpace);
-// void copyAddressSpace(llvm::Value *src, llvm::Value *dest);
-// std::string getName(llvm::Value *value);
-// std::string getName(llvm::StructType *value);
-// std::string getName(llvm::Function *value);
-// void addPHIDeclaration(llvm::PHINode *phi);
-// std::string dumpValue(llvm::Value *value);
-// std::string dumpReturn(llvm::ReturnInst *retInst);
-// std::string dumpPhi(llvm::BranchInst *branchInstr, llvm::BasicBlock *nextBlock);
-// std::string convertLlStringToCl(std::string llString, std::string specificFunction);
+namespace cocl {
 
-std::string convertModuleToCl(
-    int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, llvm::Module *M, std::string specificFunction, std::string generatedName);
-std::string convertLlStringToCl(
-    int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, std::string llString, std::string specificFunction, std::string generatedName);
-void convertLlFileToClFile(std::string llFilename, std::string ClFilename, std::string specificFunction);
+class ModuleClRes {
+public:
+    std::string clSourcecode = "";
+    bool usesVmem = false;
+    bool usesScratch = false;
+};
+
+ModuleClRes convertModuleToCl(
+    int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, llvm::Module *M, std::string specificFunction, std::string generatedName, bool offsets_32bit);
+ModuleClRes convertLlStringToCl(
+    int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, std::string llString, std::string specificFunction, std::string generatedName, bool offsets_32bit);
+
+} // namespace cocl

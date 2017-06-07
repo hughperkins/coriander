@@ -1,5 +1,7 @@
 # dockerfile
 
+*Note that these are outdated: should be updated to use llvm-4.0. Pull requests welcome :-)
+
 Dockerfiles for Beignet and NVIDIA systems.
 
 Note that the nvidia dockerfile uses Ubuntu 14.04 for now.

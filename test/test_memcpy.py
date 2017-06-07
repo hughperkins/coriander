@@ -41,7 +41,7 @@ define void @mykernel(i32* %data) {
         int_data[i] = 3 + i
     cl.enqueue_copy(q, int_data_gpu, int_data)
     kernel = test_common.build_kernel(context, cl_code, 'mykernel')
-    kernel(q, (32,), (32,), int_data_gpu, offset_type(0), cl.LocalMemory(32))
+    kernel(q, (32,), (32,), int_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(32))
     from_gpu = np.copy(int_data)
     cl.enqueue_copy(q, from_gpu, int_data_gpu)
     q.finish()

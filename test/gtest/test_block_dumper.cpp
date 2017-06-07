@@ -162,13 +162,13 @@ TEST(test_block_dumper, basic) {
 )";
     // ASSERT_EQ(expectedBlockCl, cl);
 
-    cout << "alloca declrations:" << endl;
-    cout << blockDumper->getAllocaDeclarations("    ") << endl;
-    string expectedAllocaDeclarations = R"(    int v6[1];
-    float v8[1];
-    struct mystruct v25[1];
-    long v34[1];
-)";
+//     cout << "alloca declrations:" << endl;
+//     cout << blockDumper->getAllocaDeclarations("    ") << endl;
+//     string expectedAllocaDeclarations = R"(    int v6[1];
+//     float v8[1];
+//     struct mystruct v25[1];
+//     long v34[1];
+// )";
     // ASSERT_EQ(expectedAllocaDeclarations, blockDumper.getAllocaDeclarations("    "));
 
     cout << "variable declarations:" << endl;
@@ -315,7 +315,7 @@ TEST(test_block_dumper, usesPointerFunction) {
     oss.str("");
     blockDumper->toCl(oss);
     cout << "cl: [" << oss.str() << "]" << endl;
-    EXPECT_EQ(R"(    v1 = returnsPointer(in, scratch);
+    EXPECT_EQ(R"(    v1 = returnsPointer(in, pGlobalVars);
 )", oss.str());
 
     oss.str("");

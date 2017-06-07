@@ -20,6 +20,7 @@
 #include "ExpressionsHelper.h"
 #include "function_names_map.h"
 #include "new_instruction_dumper.h"
+#include "shims.h"
 
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Instructions.h"
@@ -46,7 +47,6 @@ public:
 
             std::map<llvm::Value *, std::string> *globalExpressionByValue,
             std::map<llvm::Value *, std::unique_ptr<cocl::LocalValueInfo> > *localValueInfos
-            // std::map<std::string, std::string> *shortFnNameByOrigName
             ) :
         M(M),
         block(block),
@@ -62,44 +62,39 @@ public:
             new NewInstructionDumper(
                 M,
                 globalNames, localNames, typeDumper, functionNamesMap,
-                &shimFunctionsNeeded, &neededFunctions,
+                // &shimFunctionsNeeded,
+                &shims,
+                &neededFunctions,
                 globalExpressionByValue, localValueInfos
-                // shortFnNameByOrigName
                 ));
         instruction_it = block->begin();
     }
     bool runGeneration(const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
     void toCl(std::ostream &os);
-    // void storeValueName(llvm::Value *value);
     std::string dumpChainedInstruction(int level, llvm::Instruction * instr, bool ignoreCasts=false);
-    // bool dumpInstruction(llvm::Instruction *instruction, const std::set< llvm::Function *> &dumpedFunctions, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
 
-    std::string getAllocaDeclarations(std::string indent);
     void writeDeclaration(std::ostream &os, llvm::Value *value);
     void writeDeclarations(std::string indent, std::ostream &os);
     bool checkIfNeedsAssign(llvm::Instruction *instruction);
 
     BasicBlockDumper *addIRToCl(bool set=true) {
-        // _addIRToCl = set;
         instructionDumper->addIRToCl(set);
         return this;
     }
 
-    std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
+    // std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
+    cocl::Shims shims;
     std::set<llvm::Function *> neededFunctions;
-    // std::set<llvm::Value *> variablesToDeclare;
-    // std::set<llvm::Value *> sharedVariablesToDeclare;
-    // std::vector<AllocaInfo> allocaDeclarations;
-    // std::map<llvm::Value *, std::string> localExpressionByValue;
-    // std::vector<std::string> clcode;
 
     int maxInstructionsToGenerate = -1; // -1 means no limit, 0 will cause runGeneration to do nothing; otherwise however many instructions to process
     llvm::BasicBlock::iterator instruction_it;
 
+    bool usesVmem = false;
+    bool usesScratch = false;
+
 protected:
     llvm::Module *M;
     llvm::BasicBlock *block;
-    // bool _addIRToCl = false;
     bool forceSingle = true;
 
     GlobalNames *globalNames;

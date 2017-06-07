@@ -1,3 +1,17 @@
+// Copyright Hugh Perkins 2016, 2017
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "new_instruction_dumper.h"
 
 #include "ClWriter.h"
@@ -29,13 +43,12 @@ NewInstructionDumper::NewInstructionDumper(
         llvm::Module *M,
         GlobalNames *globalNames, LocalNames *localNames, TypeDumper *typeDumper, const FunctionNamesMap *functionNamesMap,
 
-        std::set<std::string> *shimFunctionsNeeded,
+        // std::set<std::string> *shimFunctionsNeeded,
+        cocl::Shims *shims,
         std::set<llvm::Function *> *neededFunctions,
 
         std::map<llvm::Value *, std::string> *globalExpressionByValue,
         std::map<llvm::Value *, unique_ptr<LocalValueInfo > > *localValueInfos
-        // std::map<std::string, std::string> *shortFnNameByOrigName
-        // std::vector<AllocaInfo> *allocaDeclarations
         ) :
     M(M),
     globalNames(globalNames),
@@ -43,13 +56,11 @@ NewInstructionDumper::NewInstructionDumper(
     typeDumper(typeDumper),
     functionNamesMap(functionNamesMap),
 
-    shimFunctionsNeeded(shimFunctionsNeeded),
+    shims(shims),
     neededFunctions(neededFunctions),
 
     globalExpressionByValue(globalExpressionByValue),
     localValueInfos(localValueInfos)
-    // shortFnNameByOrigName(shortFnNameByOrigName)
-    // allocaDeclarations(allocaDeclarations)
         {
     if(M == 0) {
         cout << "NewInstructionDumper constr() M is 0" << endl;
@@ -58,125 +69,66 @@ NewInstructionDumper::NewInstructionDumper(
 }
 
 LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
-// maybe this should be somewhere more generic?
-// string BasicBlockDumper::dumpConstant(Constant *constant) {
+    // maybe this should be somewhere more generic?
     LocalValueInfo *constantInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, constant, constant->getName().str());
-    // cout << "dumpConstant " << constantInfo->name << endl;
-    // constant->dump();
-    // cout << endl;
     unsigned int valueTy = constant->getValueID();
-    // ostringstream oss;
     if(ConstantInt *constantInt = dyn_cast<ConstantInt>(constant)) {
-        // cout << "constantint" << endl;
         constantInfo->setAddressSpace(0);
         constantInfo->setExpression(easycl::toString(constantInt->getSExtValue()));
         constantInfo->clWriter.reset(new ClWriter(constantInfo));
-        // string constantintval = oss.str();
-        // return constantintval;
         return constantInfo;
     } else if(isa<ConstantStruct>(constant)) {
         throw runtime_error("constantStruct not implemented in basicblockdumper.dumpconstant");
     } else if(isa<ConstantExpr>(constant)) {
-        // cout << "constantexpr " << constantInfo->name << endl;
-        // cout << "constantexpr" << endl;
-        // return dumpConstantExpr(expr);
         dumpConstantExpr(constantInfo);
-        // cout << "dumpconstant, constantexpr, " << constantInfo->name << " needs declraation? " << constantInfo->toBeDeclared << endl;
         return constantInfo;
-        // throw runtime_error("constantExpr not implemented in basicblockdumper.dumpconstnat");
-        // Instruction *instr = expr->getAsInstruction();
-        // cout << "dumping:" << endl;
-        // instr->dump();
-        // copyAddressSpace(constant, instr);
-        // string dcires = dumpInstruction(instr);
-        // cout << "calling dci" << endl;
-        // string dcires = dumpChainedInstruction(0, instr, true);
-        // cout << "dcires " << dcires << endl;
-        // // copyAddressSpace(instr, constant);
-        // nameByValue[constant] = dcires;
-        // cout << "exprByValue has constant? " << (exprByValue.find(constant) != exprByValue.end()) << endl;
-        // exprByValue[constant] = dcires;
-        // return dcires;
     } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
         constantInfo->clWriter.reset(new ClWriter(constantInfo));
         constantInfo->setAddressSpace(0);
         constantInfo->setExpression(ReadIR::dumpFloatConstant(forceSingle, constantFP));
         return constantInfo;
     } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
-        // cout << "dumpconstnat, globalvalue" << endl;
-        // throw runtime_error("GlobalValue not implemented in basicblockdumper.dumpconstant");
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
             int addressspace = pointerType->getAddressSpace();
             if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
-                // cout << "dumpconstnat, globalvalue, addressspace 3 " << constantInfo->name << endl;
-                // sharedVariablesToDeclare->insert(global);
-                // string name = global->getName().str();
-                // name = localNames->getOrCreateName(global, name);
-
-                // LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, global, name);
                 constantInfo->clWriter.reset(new SharedClWriter(constantInfo));
                 constantInfo->setAddressSpace(3);
                 constantInfo->setAsAssigned();
                 constantInfo->setExpression(constantInfo->name);
-                // localValueInfo->declarationCl.push_back(
-                //     typeDumper->dumpType(pointerType) + " " + name + "[1]");
-                // }
-                // (*localExpressionByValue)[global] = name;
-                // cout << "shared memory, creating in localnames name=" << name << endl;
-                // constantInfo->
-                // oss << name;
-                // cout << "returning constantinfo" << endl;
-                // cout << "dumpconstant, globalvalue, addresspace 3 " <<  constantInfo->name << " needs declraation? " << constantInfo->toBeDeclared << endl;
                 return constantInfo;
-                // return name;
             }
         }
         // at about this point we should pehaps swap to come global-specific class to handle this?
         if(globalNames->hasName(constant)) {
-            // cout << "found constnat in globalanesm, returning" << endl;
-           // return globalNames->getName(constant);
             // hmmmm, shouldwe be handling global values too???
             constantInfo->clWriter.reset(new ClWriter(constantInfo));
             constantInfo->setAddressSpace(4);
             constantInfo->setExpression(globalNames->getName(constant));
-            // oss << globalNames->getName(constant);
-            // cout << "dumpconstant, globalvalue, constant, add 4 " << constantInfo->name << " needs declraation? " << constantInfo->toBeDeclared << endl;
             return constantInfo;
         }
         string name = global->getName().str();
-        // cout << "using global's native name " << name << endl;
         string ourinstrstr = "(&" + name + ")";
         updateAddressSpace(constant, 4);  // 4 means constant
         constantInfo->setAddressSpace(4);
         constantInfo->clWriter.reset(new ClWriter(constantInfo));
-        // cout << "adding to globalExpressionByValue [" << ourinstrstr << "]" << endl;
         globalExpressionByValue->operator[](constant) = ourinstrstr;
 
         constantInfo->setExpression(ourinstrstr);
-        // oss << ourinstrstr;
-        // cout << "dumpconstant, globalvalue, not addresspace 3 " << constantInfo->name << " needs declraation? " << constantInfo->toBeDeclared << endl;
         return constantInfo;
-        // return ourinstrstr;
     } else if(isa<UndefValue>(constant)) {
-        // return "";
         cout << "undef, not hnalded" << endl;
         throw runtime_error("dumpconstnat, doesnt handle undef, for now");
-        // return;
     } else if(isa<ConstantPointerNull>(constant)) {
-        // return "0";
-        // oss << "0";
         constantInfo->clWriter.reset(new ClWriter(constantInfo));
         constantInfo->setAddressSpace(0);
         constantInfo->setExpression("0");
         return constantInfo;
     } else {
         cout << "dumpconstant, unhandled valuetype valueTy " << valueTy << endl;
-        // oss << "unknown";
         constant->dump();
         cout << endl;
         throw runtime_error("unknown constnat type");
     }
-    // return oss.str();
 }
 
 // lets assumes hit is always local for now
@@ -186,48 +138,14 @@ void NewInstructionDumper::dumpConstantExpr(LocalValueInfo *localValueInfo) {
     ConstantExpr *expr = cast<ConstantExpr>(localValueInfo->value);
     // this means things like:
     // shared memory 
-    // cout << "dumping constnat expr " << localValueInfo->name << ":" << endl;
-    // expr->dump();
-    // cout << endl;
     Instruction *instr = expr->getAsInstruction();
-    // cout << "dumpConstantExpr" << endl;
-    // instr->dump();
-    // cout << endl;
-    // LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(localnames, localValueInfos, instr,)
-    // InstructionDumper childInstructionDumper;
-    // string rhs = dumpInstruction(instr);
-    // vector<string> excessLines;
-    // std::set< llvm::Function *> dumpedFunctions;
     std::map<llvm::Function *, llvm::Type*> returnTypeByFunction;
     LocalValueInfo *instrValueInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, instr);
-    // instrValueInfo->_storeAllocatedValue.reset(instr);
     runGeneration(instrValueInfo, returnTypeByFunction);
-    // cout << "dumpconstantexpr" << endl;
-    // ostringstream temposs;
-    // cout << instrValueInfo->name << " needs declraation? " << instrValueInfo->toBeDeclared << endl;
-    // runRhsGeneration(instrValueInfo, returnTypeByFunction);
 
     string rhs = instrValueInfo->getExpr();
-    // string rhs = (*localExpressionByValue)[instr];
-    // string rhs = dumpInstructionRhs(instr, &excessLines);
-    // cout << "dumpConstantExpr rhs: [" << rhs << "]" << endl;
-    // if(excessLines.size() > 0) {
-    //     throw runtime_error("InstructionDumper::dumpConstantExpr cannot handle excess lines > 0");
-    // }
     localValueInfo->setAddressSpaceFrom(instrValueInfo);
     localValueInfo->setExpression(rhs);
-    // return rhs;  // this is kind of broken for now...
-    // throw 
-    // string thisinstrstr = "";
-    // if((*localExpressionByValue).find(instr) != localExpressionByValue->end()) {
-    //     thisinstrstr = (*localExpressionByValue)[instr];
-    // } else {
-    //     thisinstrstr = (*globalExpressionByValue)[instr];
-    // }
-    // string thisinstrstr = globalExpressionByValue->operator[](instr);
-    // cout << "thisinstrstr: [" << thisinstrstr << "]" << endl;
-    // return thisinstrstr;
-    // throw runtime_error("not implemented");
 }
 
 LocalValueInfo *NewInstructionDumper::getOperand(Value *op) {
@@ -237,19 +155,8 @@ LocalValueInfo *NewInstructionDumper::getOperand(Value *op) {
     if(Constant *constant = dyn_cast<Constant>(op)) {
         LocalValueInfo *valueInfo = dumpConstant(constant);
         return valueInfo;
-        // ostringstream oss;
-        // dumpConstant(oss, constant);
-        // return oss.str();
     }
-    // cout << "newinstrucoitndumper::getoperand: need dependent value:" << endl;
-    // op->dump();
     throw NeedValueDependencyException(op);
-
-    // needDependencies.insert(new ValueDependency(op));
-    // return 0;
-    // cout << "getoperand not implemented for:" << endl;
-    // cout << endl;
-    // throw runtime_error("not implemented");
 }
 
 void NewInstructionDumper::dumpIcmp(cocl::LocalValueInfo *localValueInfo) {
@@ -257,30 +164,20 @@ void NewInstructionDumper::dumpIcmp(cocl::LocalValueInfo *localValueInfo) {
     CmpInst *instr = cast<CmpInst>(localValueInfo->value);
     localValueInfo->setAddressSpace(0);
 
-    // cout << "newinstructiondumpre, dumpicmp, instr:" << endl;
-    // instr->dump();
-    // cout << endl;
     string gencode = "";
-    // CmpInst::Predicate predicate = instr->getSignedPredicate();  // note: we should detect signedness...
     CmpInst::Predicate predicate = instr->getPredicate();  // note: we should detect signedness...
-    // cout << "predicate " << instr->getPredicate() << endl;
-    // cout << "signed predicate " << predicate << endl;
-    // cout << "unsigned predicate " << instr->getUnsignedPredicate() << endl;
     string predicate_string = "";
     switch(predicate) {
         case CmpInst::ICMP_SLT:
         case CmpInst::ICMP_ULT:
-            // cout << "slt" << endl;
             predicate_string = "<";
             break;
         case CmpInst::ICMP_SGT:
         case CmpInst::ICMP_UGT:
-            // cout << "sgt" << endl;
             predicate_string = ">";
             break;
         case CmpInst::ICMP_SGE:
         case CmpInst::ICMP_UGE:
-            // cout << "sge" << endl;
             predicate_string = ">=";
             break;
         case CmpInst::ICMP_SLE:
@@ -297,10 +194,7 @@ void NewInstructionDumper::dumpIcmp(cocl::LocalValueInfo *localValueInfo) {
             cout << "predicate " << predicate << endl;
             throw runtime_error("predicate not supported");
     }
-    // cout << "newinstructiondumepr::dumpIcmp, predicatestring: " << predicate_string << endl;
 
-    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
-    // LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
     LocalValueInfo *op0info = getOperand(instr->getOperand(0));
     LocalValueInfo *op1info = getOperand(instr->getOperand(1));
 
@@ -308,27 +202,17 @@ void NewInstructionDumper::dumpIcmp(cocl::LocalValueInfo *localValueInfo) {
     string op1 = op1info->getExpr();
 
     // handle case like `a & 3 == 0`
-    // if(op0.find('&') == string::npos) {
     op0 = ExpressionsHelper::stripOuterParams(op0);
-    // }
-    // if(op1.find('&') == string::npos) {
     op1 = ExpressionsHelper::stripOuterParams(op1);
-    // }
-    // gencode += "(";
 
-    // == and != bind more strongly than &, but < > etc ok
-    // if(predicatestring.find("=="))
     bool parenthesizeOps = predicate_string == "==" || predicate_string == "!=";
     if(parenthesizeOps) {
         gencode += "(" + op0 + ") " + predicate_string + " (" + op1 + ")";
     } else {
         gencode += op0 + " " + predicate_string + " " + op1;
     }
-    // gencode += ")";
-    // cout << "dumpIcmp gencode op0[" << op0 << "] op1[" << op1 << "] gencode [" << gencode << "]" << endl;
 
     localValueInfo->setExpression("(" + gencode + ")");
-    // return gencode;
 }
 
 void NewInstructionDumper::dumpFcmp(cocl::LocalValueInfo *localValueInfo) {
@@ -369,16 +253,12 @@ void NewInstructionDumper::dumpFcmp(cocl::LocalValueInfo *localValueInfo) {
             throw runtime_error("predicate not supported");
     }
 
-    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
-    // LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
     LocalValueInfo *op0info = getOperand(instr->getOperand(0));
     LocalValueInfo *op1info = getOperand(instr->getOperand(1));
 
     string op0 = op0info->getExpr();
     string op1 = op1info->getExpr();
 
-    // op0 = "(" + ExpressionsHelper::stripOuterParams(op0) + ")";
-    // op1 = "(" + ExpressionsHelper::stripOuterParams(op1) + ")";
     op0 = ExpressionsHelper::stripOuterParams(op0);
     op1 = ExpressionsHelper::stripOuterParams(op1);
     gencode += op0;
@@ -391,48 +271,35 @@ void NewInstructionDumper::dumpFcmp(cocl::LocalValueInfo *localValueInfo) {
 void NewInstructionDumper::dumpBinaryOperator(LocalValueInfo *localValueInfo, std::string opstring) {
     Instruction *instr = cast<Instruction>(localValueInfo->value);
     string gencode = "";
-    // copyAddressSpace(instr->getOperand(0), instr);
-    // Value *op1 = instr->getOperand(0);
-    // LocalValueInfo *op1info = localValueInfos->at(op1).get();
     LocalValueInfo *op1info = getOperand(instr->getOperand(0));
-    // gencode += dumpOperand(op1) + " ";
-    // gencode += "(";
     gencode += op1info->getExpr() + " ";
 
     gencode += opstring + " ";
 
-    // Value *op2 = instr->getOperand(1);
-    // LocalValueInfo *op2info = localValueInfos->at(op2).get();
     LocalValueInfo *op2info = getOperand(instr->getOperand(1));
     gencode += op2info->getExpr();
-    // gencode += ")";
-
-    // cout << "dumpbinaryoperator()" << endl;
-    // cout << "gencode [" << gencode << "]" << endl;
 
     localValueInfo->setExpression("(" + gencode + ")");
     localValueInfo->setAddressSpace(0);
     localValueInfo->clWriter.reset(new BinaryClWriter(localValueInfo));
-    // localValueInfo->setAddressSpace()
-    // return gencode;
 }
 
 void NewInstructionDumper::dumpExt(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     Instruction *instr = cast<Instruction>(localValueInfo->value);
 
+    ostringstream gencode;
     LocalValueInfo *op0info = getOperand(instr->getOperand(0));
-    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
-    string op0 = op0info->getExpr();
+    gencode << "(" << typeDumper->dumpType(instr->getType()) << ")" << op0info->getExpr();
 
-    localValueInfo->setExpression(op0);
+    localValueInfo->setExpression("(" + gencode.str() + ")");
+    localValueInfo->setAddressSpace(0);
 }
 
 void NewInstructionDumper::dumpTrunc(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     Instruction *instr = cast<Instruction>(localValueInfo->value);
 
-    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
     LocalValueInfo *op0info = getOperand(instr->getOperand(0));
     string op0 = op0info->getExpr();
 
@@ -446,7 +313,6 @@ void NewInstructionDumper::dumpBitCast(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     BitCastInst *instr = cast<BitCastInst>(localValueInfo->value);
 
-    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
     LocalValueInfo *op0info = getOperand(instr->getOperand(0));
     string op0 = op0info->getExpr();
 
@@ -468,7 +334,6 @@ void NewInstructionDumper::dumpBitCast(cocl::LocalValueInfo *localValueInfo) {
         }
     } else {
         // just pass through?
-        // cout << "bitcast, not a pointer" << endl;
         gencode += "*(" + typeDumper->dumpType(instr->getDestTy()) + " *)&(" + op0str + ")";
     }
     localValueInfo->setExpression(gencode);
@@ -478,7 +343,6 @@ void NewInstructionDumper::dumpAddrSpaceCast(cocl::LocalValueInfo *localValueInf
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     AddrSpaceCastInst *instr = cast<AddrSpaceCastInst>(localValueInfo->value);
 
-    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
     LocalValueInfo *op0info = getOperand(instr->getOperand(0));
     string op0 = op0info->getExpr();
 
@@ -488,10 +352,8 @@ void NewInstructionDumper::dumpAddrSpaceCast(cocl::LocalValueInfo *localValueInf
     localValueInfo->setAddressSpaceFrom(instr->getOperand(0));
     // hackily ignore casts if shared address space
     // actually, just ignore all address space casts, since they're all illegal in opencl...
-    // gencode += "((" + typeDumper->dumpType(instr->getType()) + ")" + op0str + ")";
     gencode += op0str;
     localValueInfo->setExpression(gencode);
-    // return gencode;
 }
 
 void NewInstructionDumper::dumpSelect(cocl::LocalValueInfo *localValueInfo) {
@@ -501,10 +363,6 @@ void NewInstructionDumper::dumpSelect(cocl::LocalValueInfo *localValueInfo) {
     LocalValueInfo *op0info = getOperand(instr->getOperand(0));
     LocalValueInfo *op1info = getOperand(instr->getOperand(1));
     LocalValueInfo *op2info = getOperand(instr->getOperand(2));
-
-    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
-    // LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
-    // LocalValueInfo *op2info = localValueInfos->at(instr->getOperand(2)).get();
 
     string op0 = op0info->getExpr();
     string op1 = op1info->getExpr();
@@ -519,14 +377,12 @@ void NewInstructionDumper::dumpSelect(cocl::LocalValueInfo *localValueInfo) {
     gencode = "(" + gencode + ")";
 
     localValueInfo->setExpression(gencode);
-    // return gencode;
 }
 
 void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     GetElementPtrInst *instr = cast<GetElementPtrInst>(localValueInfo->value);
 
-    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
     LocalValueInfo *op0info = getOperand(instr->getOperand(0));
 
     string gencode = "";
@@ -534,10 +390,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     string rhs = "";
     rhs += "" + op0info->getExpr();  // dumpOperand(instr->getOperand(0));
     Type *currentType = instr->getOperand(0)->getType();
-    PointerType *op0typeptr = dyn_cast<PointerType>(instr->getOperand(0)->getType());
-    if(op0typeptr == 0) {
-        throw runtime_error("dumpgetelementptr op0typeptr is 0");
-    }
+    PointerType *op0typeptr = cast<PointerType>(instr->getOperand(0)->getType());
     int addressspace = op0typeptr->getAddressSpace();
     if(addressspace == 3) { // local/shared memory
         // pointer into shared memory.
@@ -546,55 +399,50 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         Value *sharedValue = instr->getOperand(0);
         LocalValueInfo *sharedInfo = LocalValueInfo::getOrCreate(
             localNames, localValueInfos, sharedValue, sharedValue->getName().str());
-        // sharedInfo->clWriter.reset(new SharedClWriter(sharedInfo));
         sharedInfo->setAddressSpace(3);
-        // sharedInfo->setAsAssigned();
-        // sharedVariablesToDeclare->insert();
     }
-    // cout << "gep" << endl;
-    // cout << "   inst:" << endl;
-    // instr->dump();
-    // cout << endl;
-    // cout << "   currenttype:" << endl;
-    // currentType->dump();
-    // cout << endl;
+    llvm::Type *prevType = nullptr;
     for(int d=0; d < numOperands - 1; d++) {
-        // cout << "d=" << d << endl;
         Type *newType = 0;
+        // l << "   gep d=" << d << " currnettype=" << typeDumper->dumpType(currentType) << std::endl;
         if(SequentialType *seqType = dyn_cast<SequentialType>(currentType)) {
-            // cout << "sequentialtype" << endl;
+            // l << "    gep seqtype" << std::endl;
             if(d == 0) {
                 if(isa<ArrayType>(seqType->getElementType())) {
-                    // cout << " d is 0 and is arraytype" << endl;
                     rhs = "(&" + rhs + ")";
                 }
             }
-            // LocalValueInfo *thisInfo = localValueInfos->at(instr->getOperand(d + 1)).get();
+
             LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
             string idxstring = thisInfo->getExpr();
             idxstring = ExpressionsHelper::stripOuterParams(idxstring);
             rhs += string("[") + idxstring + "]";
-            // currentType->dump();
-            // cout << endl;
-            newType = seqType->getElementType();
+
+            // if this is an array of pointers, inside a struct, we are going to assume
+            // it is an array of virtual mem offsets
+            // we should check the parent type
+            // also, this should be an array of *pointers*, not just primitive elements
+            if(prevType != nullptr &&
+                    isa<StructType>(prevType) &&
+                    isa<PointerType>(seqType->getElementType())
+                    ) {
+                addressspace = 5;
+                newType = seqType->getElementType();
+            } else {
+                newType = seqType->getElementType();
+            }
         } else if(PointerType *pointerType = dyn_cast<PointerType>(currentType)) {
-            // cout << "pointertype" << endl;
-            // PointerType *pointerType = cast<PointerType>(currentType);
             if(d == 0) {
                 if(isa<ArrayType>(pointerType->getElementType())) {
                     rhs = "(&" + rhs + ")";
                 }
             }
-            // LocalValueInfo *thisInfo = localValueInfos->at(instr->getOperand(d + 1)).get();
             LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
             string idxstring = thisInfo->getExpr();
             idxstring = ExpressionsHelper::stripOuterParams(idxstring);
             rhs += string("[") + idxstring + "]";
-            // currentType->dump();
-            // cout << endl;
             newType = pointerType->getElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
-            // cout << "structtype" << endl;
             string structName = ReadIR::getName(structtype);
             if(structName == "struct.float4") {
                 int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
@@ -609,9 +457,18 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                 Type *elementType = structtype->getElementType(idx);
                 rhs += string(".f") + easycl::toString(idx);
                 newType = elementType;
-                if(isa<PointerType>(newType)) {
+                if(PointerType *newTypeAsPointer = dyn_cast<PointerType>(newType)) {
                     // if its a pointer in a struct, hackily assume gloal for now
                     addressspace = 1;
+                    // ~~assume addressspace 5, which we define to mean: virtual memory~~
+                    // ~~addressspace = 5;~~
+
+                    // if its a pointer to pointer, it's address space 5, otherwis 1
+                    if(isa<PointerType>(newTypeAsPointer->getElementType())) {
+                        // l << "gep   struct child is pointer to pointer" << std::endl;
+                        addressspace = 5;
+                        // probably should unwrap this.  something for hte future...
+                    }
                 } else {
                     // addressspace = 0;
                 }
@@ -629,55 +486,78 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         }
         // if new type is a pointer, and old type was a struct, then we assume its a global pointer, and therefore
         // update the addressspace to be global, ie 1.  This is a bit hacky I know
+        prevType = currentType;
         currentType = newType;
     }
     updateAddressSpace(instr, addressspace);
     localValueInfo->setAddressSpace(addressspace);
     rhs = "(" + ExpressionsHelper::stripOuterParams(rhs) + ")";
     rhs = "(&" + rhs + ")";
-    // cout << "gep rhs=" << rhs << endl;
 
     localValueInfo->setExpression(rhs);
-    // return rhs;
 }
 
 void NewInstructionDumper::dumpLoad(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     Instruction *instr = cast<Instruction>(localValueInfo->value);
 
-    string rhs = getOperand(instr->getOperand(0))->getExpr() + "[0]";
-    copyAddressSpace(instr->getOperand(0), instr);
-    localValueInfo->setAddressSpaceFrom(instr->getOperand(0));
-    // return rhs;
+    string rhs= "";
+    bool destIsSinglePointer = false;
+    if(PointerType *l1pointer = dyn_cast<PointerType>(instr->getType())) {
+        if(PointerType *l2pointer = dyn_cast<PointerType>(l1pointer->getElementType())) {
+        } else {
+            destIsSinglePointer = true;
+        }
+    }
+    if(cast<PointerType>(instr->getOperand(0)->getType())->getAddressSpace() == 5 && destIsSinglePointer) {
+        localValueInfo->inlineCl.push_back(
+            "global " + typeDumper->dumpType(instr->getType()) + " " + localValueInfo->name + "_gptrstep = getGlobalPointer(" +
+                getOperand(instr->getOperand(0))->getExpr() + "[0], pGlobalVars" +
+            ")"
+        );
+        this->usesVmem = true;
+        rhs = localValueInfo->name + "_gptrstep";
+        updateAddressSpace(instr, 1);
+        localValueInfo->addressSpace = 1;
+    } else {
+        rhs = getOperand(instr->getOperand(0))->getExpr() + "[0]";
+        copyAddressSpace(instr->getOperand(0), instr);
+        localValueInfo->setAddressSpaceFrom(instr->getOperand(0));
+    }
+
     localValueInfo->setExpression(rhs);
 }
 
 void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new StoreClWriter(localValueInfo));
     StoreInst *instr = cast<StoreInst>(localValueInfo->value);
-    // string gencode = "";
-    localValueInfo->setAddressSpaceFrom(instr->getOperand(1));
-    copyAddressSpace(instr->getOperand(0), instr->getOperand(1));
 
     LocalValueInfo *op0info = getOperand(instr->getOperand(0));
     LocalValueInfo *op1info = getOperand(instr->getOperand(1));
 
-    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
-    // LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
+    int destAddressSpace = cast<PointerType>(instr->getOperand(1)->getType())->getAddressSpace();
+    std::string lhs = "";
+    if(destAddressSpace == 5 && false) {  // vmem
+        localValueInfo->inlineCl.push_back(
+            "global float * " + localValueInfo->name + "_gptrstep = getGlobalPointer(" +
+                op1info->getExpr() + ", pGlobalVars" +
+            ")"
+        );
+        this->usesVmem = true;
+        lhs = localValueInfo->name + "_gptrstep";
+    } else {
+        localValueInfo->setAddressSpaceFrom(instr->getOperand(1));
+        copyAddressSpace(instr->getOperand(0), instr->getOperand(1));
+        lhs = op1info->getExpr();
+    }
 
-    string rhs = op0info->getExpr(); // dumpOperand(instr->getOperand(0));
+    string rhs = op0info->getExpr();
     rhs = ExpressionsHelper::stripOuterParams(rhs);
-    string inlinecode = op1info->getExpr() + "[0] = " + rhs;
-    // cout << "dumpStore, gencode=[" << inlinecode << "]" << endl;
+    string inlinecode = lhs + "[0] = " + rhs;
     localValueInfo->inlineCl.push_back(inlinecode);
-    // localValueInfo->setExpression(o1info->getExpr());
-    // (*localExpressionByValue)[instr] = 
-    // return gencode;
 }
 
 void NewInstructionDumper::dumpAlloca(cocl::LocalValueInfo *localValueInfo) {
-    // string gencode = "";
-    // AllocaInst *alloca = cast<AllocaInst>(localValueInfo->value);
     AllocaInfo allocaInfo;
     localValueInfo->clWriter.reset(new AllocaClWriter(localValueInfo));
     string name = localValueInfo->name;
@@ -687,102 +567,41 @@ void NewInstructionDumper::dumpAlloca(cocl::LocalValueInfo *localValueInfo) {
 void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     ExtractValueInst *instr = cast<ExtractValueInst>(localValueInfo->value);
-    // string gencode = "";
 
-    // string incomingOperand = getOperand(instr->getAggregateOperand());
     // if rhs is empty, that means its 'undef', so we better declare it, I guess...
-    // Type *currentType = instr->getAggregateOperand()->getType();
-
-
     LocalValueInfo *aggInfo = getOperand(instr->getAggregateOperand());
     localValueInfo->setAddressSpaceFrom(aggInfo);
     copyAddressSpace(instr, aggInfo->value);
 
-    // LocalValueInfo *op0info = localValueInfos->at(instr->getOperand(0)).get();
     ostringstream gencode;
-    // string lhs = "";
     ostringstream rhs;
 
-    // string incomingOperand = dumpOperand(instr->getAggregateOperand());
-    // LocalValueInfo *incomingOperandInfo = this->getOperand(instr->getAggregateOperand());
-    // string incomingOperand = incomingOperandInfo->getExpr();
     string incomingOperand = aggInfo->getExpr();
-    // cout << "incomingOperand " << incomingOperand << endl;
+
     // if rhs is empty, that means its 'undef', so we better declare it, I guess...
     Type *currentType = instr->getAggregateOperand()->getType();
     rhs << incomingOperand;
     ArrayRef<unsigned> indices = instr->getIndices();
     int numIndices = instr->getNumIndices();
-    // cout << "dumpExtractValue()" << endl;
-    // currentType->dump();
-    // cout << endl;
-    // cout << "  numIndices=" << numIndices << endl;
+
     for(int d=0; d < numIndices; d++) {
         int idx = indices[d];
         Type *newType = 0;
         if(PointerType *pointerType = dyn_cast<PointerType>(currentType)) {
-            // cout << "pointer type" << endl;
-            // pointerType->dump();
-            // cout << endl;
-        // if(currentType->isPointerTy()) {
-            // cout << "pointer or array" << endl;
-            // cout << "ispointerty? " << currentType->isPointerTy() << endl;
-            // cout << "isa<ArrayType>? " << isa<ArrayType>(currentType) << endl;
-            // if(d == 0) {
-            //     if(isa<ArrayType>(currentType->getPointerElementType())) {
-            //         // cout << "element type is arraytype" << endl;
-            //         string oldRhs = rhs.str();
-            //         rhs.str("");
-            //         rhs << "(&" << oldRhs << ")";
-            //     }
-            // }
-            // if(numIndices > 0) {
-            // cout << "d + 1" << (d + 1) << endl;
-            // Value *operand = instr->getOperand(d + 1);
-            // cout << "got operand " << d << endl;
             LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
             rhs << "[" << thisInfo->getExpr() << "]";
             newType = pointerType->getElementType();
         } else if(ArrayType *arrayType = dyn_cast<ArrayType>(currentType)) {
-            // cout << "arrayType" << endl;
-            // arrayType->dump();
-            // cout << endl;
-            // if(d == 0) {
-            //     string oldRhs = rhs.str();
-            //     rhs.str("");
-            //     rhs << "(&" << oldRhs << ")";
-            // }
-            // if(numIndices > 0) {
-            // cout << "d + 1" << (d + 1) << endl;
-            // Value *operand = instr->getOperand(d + 1);
-            // cout << "got operand " << d << endl;
-            // LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
-            // rhs << "[" << thisInfo->getExpr() << "]";
-            // newType = arrayType->getElementType();
-
-            // cout << "pointer or array" << endl;
-            // cout << "ispointerty? " << currentType->isPointerTy() << endl;
-            // cout << "  isa<ArrayType>? " << isa<ArrayType>(currentType) << endl;
-            // cout << "  d=" << d << endl;
             if(d == 0) {
                 if(isa<ArrayType>(arrayType->getElementType())) {
-                    // cout << "element type is arraytype" << endl;
                     string oldRhs = rhs.str();
                     rhs.str("");
                     rhs << "(&" << oldRhs << ")";
                 }
             }
-            // if(numIndices > 0) {
-            // cout << "d + 1" << (d + 1) << endl;
-            // Value *operand = instr->getOperand(d);
-            // int index = indices[d];
-            // cout << "  idx=" << idx << endl;
-            // LocalValueInfo *thisInfo = getOperand(instr->getOperand(d));
             rhs << "[" << idx << "]";
-            // cout << "  rhs [" << rhs.str() << "]" << endl;
             newType = arrayType->getElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
-            // cout << "struct" << endl;
             string structName = ReadIR::getName(structtype);
             if(structName == "struct.float4") {
                 Type *elementType = structtype->getElementType(idx);
@@ -805,10 +624,6 @@ void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo
         }
         currentType = newType;
     }
-    // gencode << rhs.str();
-    // return gencode;
-    // cout << "  dumpExtractValue, rhs=[" << rhs.str() << "]" << endl;
-    // cout << "gencode " << gencode << endl;
     localValueInfo->setExpression(rhs.str());
 }
 
@@ -817,35 +632,24 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
     InsertValueClWriter *clWriter = cast<InsertValueClWriter>(localValueInfo->clWriter.get());
     InsertValueInst *instr = cast<InsertValueInst>(localValueInfo->value);
 
-    // bool incomingIsUndef = false;
     LocalValueInfo *op0info = 0;
     if(isa<UndefValue>(instr->getOperand(0))) {
         clWriter->fromUndef = true;
     } else {
         op0info = getOperand(instr->getOperand(0));
-        // op0info = localValueInfos->at(instr->getOperand(0)).get();
     }
     LocalValueInfo *op1info = getOperand(instr->getOperand(1));
-    // LocalValueInfo *op1info = localValueInfos->at(instr->getOperand(1)).get();
 
     string lhs = "";
 
-    // cout << "lhs undef value? " << isa<UndefValue>(instr->getOperand(0)) << endl;
-    // string incomingOperand = dumpOperand(instr->getOperand(0));
     // if rhs is empty, that means its 'undef', so we better declare it, I guess...
     Type *currentType = instr->getType();
-    // bool declaredVar = false;
     string incomingOperand = "";
     if(clWriter->fromUndef) {
-        // cout << "incomingoperand is undef, so adding insertvalue instr to variables to declare" << endl;
         localValueInfo->toBeDeclared = true;
-        // variablesToDeclare->insert(instr);
-        // localNames->getOrCreateName(instr);
-        // incomingOperand = dumpOperand(instr);
         localValueInfo->toBeDeclared = true;
         localValueInfo->setExpression(localValueInfo->name);
         incomingOperand = localValueInfo->getExpr();
-        // declaredVar = true;
     } else {
         incomingOperand = op0info->getExpr();
     }
@@ -855,31 +659,23 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
     for(int d=0; d < numIndices; d++) {
         int idx = indices[d];
         Type *newType = 0;
-        if(currentType->isPointerTy() || isa<ArrayType>(currentType)) {
-            // cout << "insertvalue: pointer or array type" << endl;
+        if(SequentialType *seqType = dyn_cast<SequentialType>(currentType)) {
             if(d == 0) {
-                if(isa<ArrayType>(currentType->getPointerElementType())) {
+                if(isa<ArrayType>(seqType->getElementType())) {
                     lhs = "(&" + lhs + ")";
                 }
             }
-            // Value *thisop = instr->getOperand(d + 1);
-            // LocalValueInfo* thisvalueinfo = localValueInfos->at(thisop).get();
-            // lhs += string("[") + thisvalueinfo->getExpr() + "]";
             lhs += string("[") + easycl::toString(idx) + "]";
-            newType = currentType->getPointerElementType();
+            newType = seqType->getElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
-            // cout << "insertvalue: struct type" << endl;
             string structName = ReadIR::getName(structtype);
             if(structName == "struct.float4") {
-                // cout << "is struct.float4" << endl;
                 Type *elementType = structtype->getElementType(idx);
                 Type *castType = PointerType::get(elementType, 0);
                 newType = elementType;
                 lhs = "((" + typeDumper->dumpType(castType) + ")&" + lhs + ")";
                 lhs += string("[") + easycl::toString(idx) + "]";
             } else {
-                // generic struct
-                // cout << "is generic struct" << endl;
                 Type *elementType = structtype->getElementType(idx);
                 lhs += string(".f") + easycl::toString(idx);
                 newType = elementType;
@@ -890,32 +686,16 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
         }
         currentType = newType;
     }
-    // std::vector<std::string> res;
-    // string updateline = lhs + " = " + dumpOperand(instr->getOperand(1));
     string updateline = lhs + " = " + op1info->getExpr();
-    // extralines->push_back(updateline);
     localValueInfo->inlineCl.push_back(updateline);
-    // res.push_back(lhs + " = " + dumpOperand(instr->getOperand(1)));
-    // cout << "dumpinsertvalue lhs=" << lhs << endl;
-    // if(false && declaredVar) {
-    //     // variablesToDeclare->insert(instr);
-    //     string assignline = dumpOperand(instr) + " = " + incomingOperand;
-    //     cout << "declaredvar=" << declaredVar << " so adding line " << assignline << endl;
-    //     extralines->push_back(assignline);
-    // }
-    // (*localExpressionByValue)[instr] = dumpOperand(instr);
-    // (*localExpressionByValue)[instr] = incomingOperand;
     localValueInfo->setExpression(incomingOperand);
-    // return "";
 }
 
 // this will be slowtastic, but at least it gets things working...
 void NewInstructionDumper::dumpMemcpy(LocalValueInfo *localValueInfo, int align) {
-    // std::string gencode = "";
     localValueInfo->clWriter.reset(new NoExpressionClWriter(localValueInfo));
     Instruction *instr = cast<Instruction>(localValueInfo->value);
     int totalLength = cast<ConstantInt>(instr->getOperand(2))->getSExtValue();
-    // int align = cast<ConstantInt>(instr->getOperand(3))->getSExtValue();
     string dstAddressSpaceStr = typeDumper->dumpAddressSpace(instr->getOperand(0)->getType());
     string srcAddressSpaceStr = typeDumper->dumpAddressSpace(instr->getOperand(1)->getType());
     string elementTypeString = "";
@@ -932,7 +712,6 @@ void NewInstructionDumper::dumpMemcpy(LocalValueInfo *localValueInfo, int align)
     }
     int numElements = totalLength / align;
     if(numElements >1) {
-        // localValueInfo->inlineCl.push_back("#pragma unroll");
         localValueInfo->inlineCl.push_back("for(int __i=0; __i < " + easycl::toString(numElements) + "; __i++) {");
         localValueInfo->inlineCl.push_back("    ((" + dstAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(0))->getExpr() + ")[__i] = " +
             "((" + srcAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(1))->getExpr() + ")[__i]");
@@ -941,61 +720,39 @@ void NewInstructionDumper::dumpMemcpy(LocalValueInfo *localValueInfo, int align)
         localValueInfo->inlineCl.push_back("((" + dstAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(0))->getExpr() + ")[0] = " +
             "((" + srcAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(1))->getExpr() + ")[0]");
     }
-    // return gencode;
-    // localValueInfo
 }
 
-// void NewInstructionDumper::dumpMemcpy(LocalValueInfo *localValueInfo, int align) {
-//     // std::string gencode = "";
-//     localValueInfo->clWriter.reset(new NoExpressionClWriter(localValueInfo));
-//     Instruction *instr = cast<Instruction>(localValueInfo->value);
-//     int totalLength = cast<ConstantInt>(instr->getOperand(2))->getSExtValue();
-//     // int align = cast<ConstantInt>(instr->getOperand(3))->getSExtValue();
-//     // int align = 1;
-//     string dstAddressSpaceStr = typeDumper->dumpAddressSpace(instr->getOperand(0)->getType());
-//     string srcAddressSpaceStr = typeDumper->dumpAddressSpace(instr->getOperand(1)->getType());
-//     string elementTypeString = "";
-//     if(align == 1) {
-//         elementTypeString = "char";
-//     } else if(align == 4) {
-//         elementTypeString = "int";
-//     } else if(align == 8) {
-//         elementTypeString = "int2";
-//     } else if(align == 16) {
-//         elementTypeString = "int4";
-//     } else {
-//         throw runtime_error("not implemented dumpmemcpy for align " + easycl::toString(align));
-//     }
-//     int numElements = totalLength / align;
-//     if(numElements >1) {
-//         // localValueInfo->inlineCl.push_back("#pragma unroll");
-//         localValueInfo->inlineCl.push_back("for(int __i=0; __i < " + easycl::toString(numElements) + "; __i++) {");
-//         localValueInfo->inlineCl.push_back("    ((" + dstAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(0))->getExpr() + ")[__i] = " +
-//             "((" + srcAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(1))->getExpr() + ")[__i]");
-//         localValueInfo->inlineCl.push_back("}\n");
-//     } else {
-//         localValueInfo->inlineCl.push_back("((" + dstAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(0))->getExpr() + ")[0] = " +
-//             "((" + srcAddressSpaceStr + " " + elementTypeString + " *)" + getOperand(instr->getOperand(1))->getExpr() + ")[0]");
-//     }
-//     // return gencode;
-//     // localValueInfo
-// }
+void NewInstructionDumper::writeShimCall(LocalValueInfo *localValueInfo, std::string shimName, std::string extraArgs, CallInst *instr) {
+    // this probalby assumes:
+    // - returns a primitive
+    // - parameters are all primitives (no pointers)
+
+    ostringstream gencode_ss;
+    gencode_ss << shimName << "(" << extraArgs;
+    int i = 0;
+    for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
+        Value *op = &*it->get();
+        if(i > 0) {
+            gencode_ss << ", ";
+        }
+        gencode_ss << ExpressionsHelper::stripOuterParams(getOperand(op)->getExpr());
+        i++;
+    }
+    gencode_ss << ")";
+    // shimFunctionsNeeded->insert(shimName);
+    shims->use(shimName);
+    localValueInfo->setAddressSpace(0);
+    localValueInfo->setExpression(gencode_ss.str());
+}
 
 void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
     localValueInfo->clWriter.reset(new CallClWriter(localValueInfo));
-    // ClWriter *clWriter = cast<ClWriter>(localValueInfo->clWriter.get());
     CallInst *instr = cast<CallInst>(localValueInfo->value);
 
-    // string gencode = "";
     Value *calledValue = instr->getCalledValue();
     string calledName = calledValue->getName().str();
-    // if(calledName.size() > 32) {
-    //     calledName = calledName.substr(0, 31);
-    //     calledValue->setName(calledName);
-    // }
 
     string functionName = instr->getCalledValue()->getName().str();
-    // cout << "called function: [" << functionName << "]" << endl;
     bool internalfunc = false;
     if(functionName == "llvm.ptx.read.tid.x" || functionName == "llvm.nvvm.read.ptx.sreg.tid.x") { // second on is llvm 4.0, first is 3.8
         localValueInfo->setAddressSpace(0);
@@ -1049,75 +806,10 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("barrier(CLK_GLOBAL_MEM_FENCE)");
         return;
-    } else if(functionName == "llvm.dbg.value") {
-        // ignore
-        localValueInfo->skip();
-        // localValueInfo->setAddressSpace(0);
-        // localValueInfo->setExpression("");
-        return;
-    } else if(functionName == "llvm.dbg.declare") {
-        // ignore
-        localValueInfo->skip();
-        // localValueInfo->setAddressSpace(0);
-        // localValueInfo->setExpression("");
-        // return "";
-        return;
-    } else if(functionName == "_Z8__umulhiii") {
-        // cout << "nid got an umulhi" << endl;
-        string gencode = "";
-        gencode += "__umulhi(";
-        int i = 0;
-        for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
-            Value *op = &*it->get();
-            if(i > 0) {
-                gencode += ", ";
-            }
-            gencode += ExpressionsHelper::stripOuterParams(getOperand(op)->getExpr());
-            i++;
-        }
-        gencode += ")";
-        // cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
-        shimFunctionsNeeded->insert("__umulhi");
+    } else if(functionName == "llvm.nvvm.barrier0") {
         localValueInfo->setAddressSpace(0);
-        localValueInfo->setExpression(gencode);
-        // cout << "shimming call to [" << gencode << "]" << endl;
+        localValueInfo->setExpression("barrier(CLK_LOCAL_MEM_FENCE)");
         return;
-    } else if(functionName == "_Z11__shfl_downIfET_S0_ii") {
-        string gencode = "";
-        gencode += "__shfl_down_3(scratch, ";
-        int i = 0;
-        for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
-            Value *op = &*it->get();
-            if(i > 0) {
-                gencode += ", ";
-            }
-            gencode += ExpressionsHelper::stripOuterParams(getOperand(op)->getExpr());
-            i++;
-        }
-        gencode += ")";
-        // cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
-        shimFunctionsNeeded->insert("__shfl_down_3");
-        localValueInfo->setAddressSpace(0);
-        localValueInfo->setExpression(gencode);
-        return;
-    } else if(functionName == "_Z11__shfl_downIfET_S0_i") {
-        string gencode = "__shfl_down_2(scratch, ";
-        int i = 0;
-        for(auto it=instr->arg_begin(); it != instr->arg_end(); it++) {
-            Value *op = &*it->get();
-            if(i > 0) {
-                gencode += ", ";
-            }
-            gencode += ExpressionsHelper::stripOuterParams(getOperand(op)->getExpr());
-            i++;
-        }
-        gencode += ")";
-        // cout << "inserting " << functionName << " into shimfunctionsneeded" << endl;
-        shimFunctionsNeeded->insert("__shfl_down_2");
-        localValueInfo->setAddressSpace(0);
-        localValueInfo->setExpression(gencode);
-        return;
-        // return gencode;
     } else if(functionName == "_Z13__threadfencev") {
         // Not sure if this is correct?
         // seems to be correct-ish???
@@ -1134,17 +826,46 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("barrier(CLK_GLOBAL_MEM_FENCE)");
         return;
-    } else if(functionName == "llvm.lifetime.start") {
-        // return "";  // just ignore for now
+    } else if(functionName == "llvm.dbg.value") {
+        // ignore
         localValueInfo->skip();
-        // localValueInfo->setAddressSpace(0);
-        // localValueInfo->setExpression("");
+        return;
+    } else if(functionName == "llvm.dbg.declare") {
+        // ignore
+        localValueInfo->skip();
+        return;
+    } else if(functionName == "_Z8__umulhiii") {
+        writeShimCall(localValueInfo, "__umulhi", "", instr);
+        return;
+    } else if(functionName == "_Z7sincosffPfS_") {
+        localValueInfo->setAddressSpace(0);
+        std::ostringstream gencode;
+        gencode << "*" << getOperand(instr->getOperand(1))->getExpr() << " = sincos(";
+        gencode << getOperand(instr->getOperand(0))->getExpr() << ", ";
+        gencode << getOperand(instr->getOperand(2))->getExpr() << ");";
+        localValueInfo->setExpression(gencode.str());
+        return;
+    } else if(functionName == "_Z9atomicAddIfET_PS0_S0_") {
+        writeShimCall(localValueInfo, "__atomic_add_float", "", instr);
+        return;
+    } else if(functionName == "_Z9atomicIncPjj") {
+        writeShimCall(localValueInfo, "__atomic_inc_uint", "", instr);
+        return;
+    } else if(functionName == "_Z11__shfl_downIfET_S0_ii") {
+        writeShimCall(localValueInfo, "__shfl_down_3", "pGlobalVars->scratch, ", instr);
+        this->usesScratch = true;
+        return;
+    } else if(functionName == "_Z11__shfl_downIfET_S0_i") {
+        writeShimCall(localValueInfo, "__shfl_down_2", "pGlobalVars->scratch, ", instr);
+        this->usesScratch = true;
+        return;
+    } else if(functionName == "llvm.lifetime.start") {
+        // just ignore for now
+        localValueInfo->skip();
         return;
     } else if(functionName == "llvm.lifetime.end") {
-        // return "";  // just ignore for now
+        // just ignore for now
         localValueInfo->skip();
-        // localValueInfo->setAddressSpace(0);
-        // localValueInfo->setExpression("");
         return;
     } else if(functionName == "_Z11make_float4ffff") {
         // change this into something like: (float4)(a, b, c, d)
@@ -1152,7 +873,6 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         internalfunc = true;
     } else if(functionName == "_GLOBAL__sub_I_struct_initializer.cu") {
         cerr << "WARNING: skipping _GLOBAL__sub_I_struct_initializer.cu" << endl;
-        // return "";
         localValueInfo->setAddressSpace(0);
         localValueInfo->setExpression("");
         return;
@@ -1165,7 +885,7 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         dumpMemcpy(localValueInfo, align);
         return;
     } else if(functionName == "_Z6memcpyPvPKvm") {
-        dumpMemcpy(localValueInfo, 1);
+        dumpMemcpy(localValueInfo, 4);
         return;
     } else if(functionNamesMap->isMappedFunction(functionName)) {
         functionName = functionNamesMap->getFunctionMappedName(functionName);
@@ -1186,21 +906,16 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
             gencode += ", ";
         }
         localValueInfo->needDependencies = false;
-        gencode += "scratch";
-        // Module *M = instr->getModule();
-        // std::string shortFunctionName = functionName;
-        // if(shortFnNameByOrigName->find(functionName) != shortFnNameByOrigName->end()) {
-        //     // string origFunctionName = functionName;
-        //     shortFunctionName = shortFnNameByOrigName->operator[](functionName);
-        //     cout << "new_instruction_dumper dumpCall() functionName=" << functionName << " => " << shortFunctionName << endl;
-        // }
-        // cout << "M " << M << endl;
-        // Function *F = M->getFunction(StringRef(functionName));
+        gencode += "pGlobalVars";
         Function *F = M->getFunction(functionName);
+        if(checkCalledFunctionsDefined && F->isDeclaration()) { // ie, is it *just* a declaration, no definition?
+            std::cout << functionName << " is called, but not defined" << std::endl;
+            std::cout << "This is probalby a bug in Coriander. Please file an issue at https://github.com/hughperkins/coriander/issues/new" << std::endl;
+            throw std::runtime_error(functionName + " is called, but not defined => cannot continue.  Sorry :-(");
+        }
         if(F != 0) {
             // check arguments...
             bool addressSpacesMatch = true;
-            // auto callit = instr->arg_begin();
             int i = 0;
             ostringstream manglingpostfix;
             for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
@@ -1228,39 +943,23 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
                     manglingpostfix << thisaddressspacechar;
                     if(callPtr->getAddressSpace() != calleePtr->getAddressSpace()) {
                         addressSpacesMatch = false;
-                        // cout << "arg " << callArg->getName().str() << " needs address space mutation" << endl;
-                        // break;
                     }
                 }
                 i++;
             }
             if(!addressSpacesMatch) {
                 string newName = F->getName().str() + "_" + manglingpostfix.str();
-                // cout << "new name [" << newName << "]" << endl;
                 bool alreadyExists = globalNames->hasName(newName);
-                // cout << "alreadyeists? " << alreadyExists << endl;
-
-                // int numArgs = instr->getNumArgOperands();
-                // cout << "numArgs " << numArgs << endl;
                 int i;
 
                 Function *newFunc = 0;
                 if(!alreadyExists) {
-                    // cout << "cloning new funciton " << newName << endl;
                     ValueToValueMapTy valueMap;
-                    #if(LLVM_VERSION_MAJOR == 4)
-                    // #pragma message("clang 4 detected")
                     newFunc = CloneFunction(F,
                                    valueMap);
-                    #else
-                    newFunc = CloneFunction(F,
-                                   valueMap,
-                                   false);
-                    #endif
                     newFunc->setName(newName);
                     i = 0;
                     for(auto it=newFunc->arg_begin(); it != newFunc->arg_end(); it++) {
-                        // Argument *callArg = callit->;
                         Value *callArg = instr->getArgOperand(i);
                         Argument *calleeArg = &*it;
                         copyAddressSpace(callArg, calleeArg);
@@ -1279,7 +978,6 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
                 // cout << "inserting new funciton into neededfunctions" << endl;
                 neededFunctions->insert(newFunc);
                 if(isa<PointerType>(newFunc->getReturnType()) && returnTypeByFunction.find(newFunc) == returnTypeByFunction.end()) {
-                    // needDependencies = true;
                     localValueInfo->needDependencies = true;
                     return;
                 }
@@ -1288,7 +986,6 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
             } else {
                 neededFunctions->insert(F);
                 if(isa<PointerType>(F->getReturnType()) && returnTypeByFunction.find(F) == returnTypeByFunction.end()) {
-                    // needDependencies = true;
                     localValueInfo->needDependencies = true;
                     return;
                 }
@@ -1309,38 +1006,26 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
             if(i > 0) {
                 gencode += ", ";
             }
-            gencode += "scratch";
+            gencode += "pGlobalVars";
             if(isa<PointerType>(F->getReturnType())) {
                 Type *returnType = returnTypeByFunction.at(F);
-                // cout << "function return type:" << endl;
-                // returnType->dump();
-                // cout << endl;
                 if(PointerType *retptr = dyn_cast<PointerType>(returnType)) {
                     int functionReturnAddressSpace = retptr->getAddressSpace();
-                    // cout << " updating call instruction to addressspace " << functionReturnAddressSpace << endl;
                     updateAddressSpace(instr, functionReturnAddressSpace);
                     localValueInfo->setAddressSpace(functionReturnAddressSpace);
                 }
             }
         } else {
             cout << "couldnt find function " + functionName << endl;
-            // cout << "here are available functions:" << endl;
-            // for(auto it = M->begin(); it != M->end(); it++) {
-            //     Function *thisF = &*it;
-            //     cout << "    " << thisF->getName().str() << endl;
-            // }
             throw runtime_error("couldnt find function " + functionName);
         }
     }
     gencode += ")";
-    // return gencode;
-    // cout << "dumpCall gencode[" << gencode << "]" << endl;
     localValueInfo->setExpression(gencode);
 }
 
 void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction) {
     Instruction *instruction = cast<Instruction>(localValueInfo->value);
-    // needDependencies = false;
     localValueInfo->needDependencies = false;
     auto opcode = instruction->getOpcode();
     if(_addIRToCl) {
@@ -1350,17 +1035,11 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo, const s
         for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
             Value *op = &*it->get();
             originalInstruction += " ";
-            // originalInstruction += getOperand(op)->getExpr();
             if(localNames->hasValue(op)) {
                 originalInstruction += localNames->getName(op);
             } else {
                 originalInstruction += "<unk>";
             }
-            // if(origNameByValue.find(op) != origNameByValue.end()) {
-            //     originalInstruction += origNameByValue[op];
-            // } else {
-            //     originalInstruction += "<unk>";
-            // }
         }
         localValueInfo->inlineCl.push_back("/* " + originalInstruction + " */");
     }
@@ -1472,22 +1151,7 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo, const s
             break;
         case Instruction::Alloca:
             dumpAlloca(localValueInfo);
-            // return "";
-            // return;
             break;
-            // return true;
-        // case Instruction::Br:
-        //     instructionCode = dumpBranch(cast<BranchInst>(instruction));
-        //     return instructionCode;
-        //     // break;
-        // case Instruction::Ret:
-        //     instructionCode = dumpReturn(cast<ReturnInst>(instruction));
-        //     return instructionCode + ";\n";
-        //     // break;
-        // case Instruction::PHI:
-        //     addPHIDeclaration(cast<PHINode>(instruction));
-        //     return "";
-        //     // break;
         default:
             cout << "opcode string " << instruction->getOpcodeName() << endl;
             throw runtime_error("unknown opcode");

@@ -1,5 +1,16 @@
 # Older News
 
+- May 5:
+  - Eigen unit tests at https://bitbucket.org/hughperkins/eigen/src/75842846799e15f1c26ef6885565d64c3d0a67b2/unsupported/test/Coriander/?at=eigen-cl pass on Mac Pro 4th Generation with both:
+    - Intel HD Graphics 530, and
+    - Radeon Pro 450 (using env var `CL_GPUOFFSET=1` to select)
+  - I suspect this may have broken some other stuff, since one of the unit tests fails now, but I think it's a gentle step forward
+- May 1:
+  - dnn tests pass on Radeon Pro 450, on Mac Sierra now
+  - fix crash bugs in pooling forward/backward, on Mac Sierra
+  - thanks to my employer [ASAPP](http://www.asapp.com/) giving me use of a nice Mac Book Pro 4th Generation, with Radeon Pro 450, unit tests now pass on said hardware :-)
+- April 29:
+  - Updated to latest EasyCL. This lets you use environment variable `CL_GPUOFFSET` to choose different gpus, eg set to `1` to use second gpu, to `2` to use third gpu, etc
 - April 15:
   - added max pooling
   - added ReLU, sigmoid and tanh activations

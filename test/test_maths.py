@@ -48,7 +48,7 @@ __global__ void myKernel(float *data) {
     kernel = test_common.compile_code_v3(cl, context, code, test_common.mangle('myKernel', ['float *']), num_clmems=1)['kernel']
     kernel(
         q, (32,), (32,),
-        float_data_gpu, offset_type(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -82,7 +82,7 @@ define void @kernel_float_constants(float* nocapture %data) #1 {
     print('cl_code', cl_code)
     # try compiling it, just to be sure...
     kernel = test_common.build_kernel(context, cl_code, 'kernel_float_constants')
-    kernel(q, (32,), (32,), float_data_gpu, offset_type(0), cl.LocalMemory(32))
+    kernel(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(32))
     from_gpu = np.copy(float_data)
     cl.enqueue_copy(q, from_gpu, float_data_gpu)
     q.finish()
@@ -113,21 +113,42 @@ define void @test_umulhi(i32* %data) {
     cl_code = test_common.ll_to_cl(ll_code, 'test_umulhi', 1)
     print('cl_code', cl_code)
     int_data[0] = 0
-    int_data[1] = 353534
+    int_data[1] = -50
     int_data[2] = 2523123
     cl.enqueue_copy(q, int_data_gpu, int_data)
     kernel = test_common.build_kernel(context, cl_code, 'test_umulhi')
-    kernel(q, (32,), (32,), int_data_gpu, offset_type(0), cl.LocalMemory(32))
+    kernel(q, (32,), (32,), int_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(32))
     from_gpu = np.copy(int_data)
     cl.enqueue_copy(q, from_gpu, int_data_gpu)
     q.finish()
-    expected = (int_data[1].item() * int_data[2].item()) >> 32
+    expected = (np.uint64(np.uint32(2523123)) * np.uint64(np.uint32(-50))) // 2**32
     print('expected', expected)
     print('from_gpu[0]', from_gpu[0])
     assert expected == from_gpu[0].item()
 
 
-@pytest.mark.skip
+def test_fabs_double(context, q, float_data, float_data_gpu):
+    cu_code = """
+__global__ void mykernel(float *data) {
+    data[0] = fabs(data[0]);
+}
+"""
+    cl_code = test_common.cu_to_cl(cu_code, '_Z8mykernelPf', 1)
+    print('cl_code', cl_code)
+    float_data[0] = -0.123
+    cl.enqueue_copy(q, float_data_gpu, float_data)
+    kernel = test_common.build_kernel(context, cl_code, '_Z8mykernelPf')
+    kernel(q, (32,), (32,), float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(32))
+    from_gpu = np.copy(float_data)
+    cl.enqueue_copy(q, from_gpu, float_data_gpu)
+    q.finish()
+    expected = 0.123
+    print('expected', expected)
+    print('from_gpu[0]', from_gpu[0])
+    assert abs(expected - from_gpu[0].item()) < 1e-4
+
+
+@pytest.mark.skip(reason='double parameters to kernels not supported currently')
 def test_double_ieeefloats(context, q, float_data, float_data_gpu):
     cu_code = """
 __global__ void mykernel(double *data) {
@@ -146,7 +167,7 @@ __global__ void mykernel(double *data) {
     kernel = test_common.build_kernel(context, cl_code, kernel_name)
     kernel(
         q, (32,), (32,),
-        float_data_gpu, offset_type(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -176,7 +197,7 @@ __global__ void myKernel(float *data) {
     cl.enqueue_copy(q, float_data_gpu, float_data)
     kernel(
         q, (32,), (32,),
-        float_data_gpu, offset_type(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -203,7 +224,7 @@ __global__ void myKernel(float *data) {
     cl.enqueue_copy(q, float_data_gpu, float_data)
     kernel(
         q, (32,), (32,),
-        float_data_gpu, offset_type(0), cl.LocalMemory(4))
+        float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, float_data, float_data_gpu)
     q.finish()
@@ -214,6 +235,36 @@ __global__ void myKernel(float *data) {
         else:
             assert math.isnan(float_data[i])
         # print('float_data[]', i, float_data[i])
+
+
+def test_sincos(context, q, float_data, float_data_gpu):
+
+    cu_code = """
+__global__ void mykernel(float *data) {
+    sincosf(0.1, &data[0], &data[1]);
+    sincosf(data[2], &data[3], &data[4]);
+}
+"""
+    kernel_name = test_common.mangle('mykernel', ['float*'])
+    cl_code = test_common.cu_to_cl(cu_code, kernel_name, num_clmems=1)
+    print('cl_code', cl_code)
+
+    float_data[2] = -0.3
+    float_data_orig = np.copy(float_data)
+    cl.enqueue_copy(q, float_data_gpu, float_data)
+
+    kernel = test_common.build_kernel(context, cl_code, kernel_name)
+    kernel(
+        q, (32,), (32,),
+        float_data_gpu, offset_type(0), offset_type(0), cl.LocalMemory(4))
+    q.finish()
+    cl.enqueue_copy(q, float_data, float_data_gpu)
+    q.finish()
+    print(float_data[:5])
+    assert abs(float_data[0] - math.sin(0.1)) < 1e-4
+    assert abs(float_data[1] - math.cos(0.1)) < 1e-4
+    assert abs(float_data[3] - math.sin(float_data_orig[2])) < 1e-4
+    assert abs(float_data[4] - math.cos(float_data_orig[2])) < 1e-4
 
 
 def test_fptosi(context, q, float_data, float_data_gpu, int_data, int_data_gpu):
@@ -230,8 +281,8 @@ __global__ void myKernel(float *float_data, int *int_data) {
     cl.enqueue_copy(q, float_data_gpu, float_data)
     kernel(
         q, (32,), (32,),
-        float_data_gpu,
-        int_data_gpu,
+        float_data_gpu, offset_type(0),
+        int_data_gpu, offset_type(0),
         offset_type(0),
         offset_type(0),
         cl.LocalMemory(4))
@@ -258,8 +309,8 @@ __global__ void myKernel(float *float_data, int *int_data) {
     cl.enqueue_copy(q, int_data_gpu, int_data)
     kernel(
         q, (32,), (32,),
-        float_data_gpu,
-        int_data_gpu,
+        float_data_gpu, offset_type(0),
+        int_data_gpu, offset_type(0),
         offset_type(0),
         offset_type(0),
         cl.LocalMemory(4))
@@ -284,7 +335,7 @@ __global__ void myKernel(int *int_data) {
     cl.enqueue_copy(q, int_data_gpu, int_data)
     kernel(
         q, (32,), (32,),
-        int_data_gpu, offset_type(0),
+        int_data_gpu, offset_type(0), offset_type(0),
         cl.LocalMemory(4))
     q.finish()
     cl.enqueue_copy(q, int_data, int_data_gpu)

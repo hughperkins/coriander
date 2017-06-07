@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cp libcocl.so ~/env3/lib/python3.5/site-packages/tensorflow/third_party/coriander/
+
