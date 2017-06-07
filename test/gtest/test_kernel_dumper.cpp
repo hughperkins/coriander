@@ -93,22 +93,22 @@ struct GlobalVars {
     unsigned long clmem_vmem_offset0;
 };
 
-inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, struct GlobalVars *globalVars) {
+inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, const struct GlobalVars* const globalVars) {
     return (global float *)(globalVars->clmem0 + vmemloc - globalVars->clmem_vmem_offset0);
 }
 
 
-float someFunc_gg(global float* d1, global float* v11, struct GlobalVars *pGlobalVars);
-float someFunc_gp(global float* d1, float* v11, struct GlobalVars *pGlobalVars);
-float someFunc_pg(float* d1, global float* v11, struct GlobalVars *pGlobalVars);
+float someFunc_gg(global float* d1, global float* v11, const struct GlobalVars *const pGlobalVars);
+float someFunc_gp(global float* d1, float* v11, const struct GlobalVars *const pGlobalVars);
+float someFunc_pg(float* d1, global float* v11, const struct GlobalVars *const pGlobalVars);
 kernel void someKernel(global char* clmem0, unsigned long clmem_vmem_offset0, global char* clmem1, unsigned long clmem_vmem_offset1, uint d1_offset, uint d2_offset, local int *scratch);
 
 kernel void someKernel(global char* clmem0, unsigned long clmem_vmem_offset0, global char* clmem1, unsigned long clmem_vmem_offset1, uint d1_offset, uint d2_offset, local int *scratch) {
     global float* d2 = (global float*)(clmem1 + d2_offset);
     global float* d1 = (global float*)(clmem0 + d1_offset);
 
-    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
-    struct GlobalVars *pGlobalVars = &globalVars;
+    const struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    const struct GlobalVars* const pGlobalVars = &globalVars;
 
     float v4;
     float v5;
@@ -123,7 +123,7 @@ v1:;
     v6 = someFunc_gg(d1, d1, pGlobalVars);
     return;
 }
-float someFunc_gg(global float* d1, global float* v11, struct GlobalVars *pGlobalVars) {
+float someFunc_gg(global float* d1, global float* v11, const struct GlobalVars *const pGlobalVars) {
     float v5;
     global float* v6;
 
@@ -133,7 +133,7 @@ v1:;
     v6[0] = v5;
     return 4.5f;
 }
-float someFunc_gp(global float* d1, float* v11, struct GlobalVars *pGlobalVars) {
+float someFunc_gp(global float* d1, float* v11, const struct GlobalVars *const pGlobalVars) {
     float v5;
     global float* v6;
 
@@ -143,7 +143,7 @@ v1:;
     v6[0] = v5;
     return 4.5f;
 }
-float someFunc_pg(float* d1, global float* v11, struct GlobalVars *pGlobalVars) {
+float someFunc_pg(float* d1, global float* v11, const struct GlobalVars *const pGlobalVars) {
     float v5;
     float* v6;
 
@@ -179,22 +179,22 @@ struct GlobalVars {
     unsigned long clmem_vmem_offset0;
 };
 
-inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, struct GlobalVars *globalVars) {
+inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, const struct GlobalVars* const globalVars) {
     return (global float *)(globalVars->clmem0 + vmemloc - globalVars->clmem_vmem_offset0);
 }
 
 
-float someFunc_gg(global float* d1, global float* v11, struct GlobalVars *pGlobalVars);
-float someFunc_gp(global float* d1, float* v11, struct GlobalVars *pGlobalVars);
-float someFunc_pg(float* d1, global float* v11, struct GlobalVars *pGlobalVars);
+float someFunc_gg(global float* d1, global float* v11, const struct GlobalVars *const pGlobalVars);
+float someFunc_gp(global float* d1, float* v11, const struct GlobalVars *const pGlobalVars);
+float someFunc_pg(float* d1, global float* v11, const struct GlobalVars *const pGlobalVars);
 kernel void someKernel(global char* clmem0, unsigned long clmem_vmem_offset0, uint d1_offset, uint d2_offset, local int *scratch);
 
 kernel void someKernel(global char* clmem0, unsigned long clmem_vmem_offset0, uint d1_offset, uint d2_offset, local int *scratch) {
     global float* d2 = (global float*)(clmem0 + d2_offset);
     global float* d1 = (global float*)(clmem0 + d1_offset);
 
-    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
-    struct GlobalVars *pGlobalVars = &globalVars;
+    const struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    const struct GlobalVars* const pGlobalVars = &globalVars;
 
     float v4;
     float v5;
@@ -209,7 +209,7 @@ v1:;
     v6 = someFunc_gg(d1, d1, pGlobalVars);
     return;
 }
-float someFunc_gg(global float* d1, global float* v11, struct GlobalVars *pGlobalVars) {
+float someFunc_gg(global float* d1, global float* v11, const struct GlobalVars *const pGlobalVars) {
     float v5;
     global float* v6;
 
@@ -219,7 +219,7 @@ v1:;
     v6[0] = v5;
     return 4.5f;
 }
-float someFunc_gp(global float* d1, float* v11, struct GlobalVars *pGlobalVars) {
+float someFunc_gp(global float* d1, float* v11, const struct GlobalVars *const pGlobalVars) {
     float v5;
     global float* v6;
 
@@ -229,7 +229,7 @@ v1:;
     v6[0] = v5;
     return 4.5f;
 }
-float someFunc_pg(float* d1, global float* v11, struct GlobalVars *pGlobalVars) {
+float someFunc_pg(float* d1, global float* v11, const struct GlobalVars *const pGlobalVars) {
     float v5;
     float* v6;
 
@@ -263,7 +263,7 @@ struct GlobalVars {
     unsigned long clmem_vmem_offset0;
 };
 
-inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, struct GlobalVars *globalVars) {
+inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, const struct GlobalVars* const globalVars) {
     return (global float *)(globalVars->clmem0 + vmemloc - globalVars->clmem_vmem_offset0);
 }
 
@@ -273,8 +273,8 @@ kernel void testBranches_phifromfuture(global char* clmem0, unsigned long clmem_
 kernel void testBranches_phifromfuture(global char* clmem0, unsigned long clmem_vmem_offset0, uint d1_offset, local int *scratch) {
     global float* d1 = (global float*)(clmem0 + d1_offset);
 
-    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
-    struct GlobalVars *pGlobalVars = &globalVars;
+    const struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    const struct GlobalVars* const pGlobalVars = &globalVars;
 
     float v12;
     float v4;
@@ -323,21 +323,21 @@ struct GlobalVars {
     unsigned long clmem_vmem_offset0;
 };
 
-inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, struct GlobalVars *globalVars) {
+inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, const struct GlobalVars* const globalVars) {
     return (global float *)(globalVars->clmem0 + vmemloc - globalVars->clmem_vmem_offset0);
 }
 
 
-float* returnsPointer(float* in, struct GlobalVars *pGlobalVars);
-global float* returnsPointer_g(global float* in, struct GlobalVars *pGlobalVars);
+float* returnsPointer(float* in, const struct GlobalVars *const pGlobalVars);
+global float* returnsPointer_g(global float* in, const struct GlobalVars *const pGlobalVars);
 kernel void usesPointerFunction(global char* clmem0, unsigned long clmem_vmem_offset0, uint in_offset, local int *scratch);
 
-global float* returnsPointer_g(global float* in, struct GlobalVars *pGlobalVars) {
+global float* returnsPointer_g(global float* in, const struct GlobalVars *const pGlobalVars) {
 
 v1:;
     return in;
 }
-float* returnsPointer(float* in, struct GlobalVars *pGlobalVars) {
+float* returnsPointer(float* in, const struct GlobalVars *const pGlobalVars) {
 
 v1:;
     return in;
@@ -345,8 +345,8 @@ v1:;
 kernel void usesPointerFunction(global char* clmem0, unsigned long clmem_vmem_offset0, uint in_offset, local int *scratch) {
     global float* in = (global float*)(clmem0 + in_offset);
 
-    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
-    struct GlobalVars *pGlobalVars = &globalVars;
+    const struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    const struct GlobalVars* const pGlobalVars = &globalVars;
 
     float v3[1];
     float* v4;
@@ -384,26 +384,26 @@ struct GlobalVars {
     unsigned long clmem_vmem_offset0;
 };
 
-inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, struct GlobalVars *globalVars) {
+inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, const struct GlobalVars* const globalVars) {
     return (global float *)(globalVars->clmem0 + vmemloc - globalVars->clmem_vmem_offset0);
 }
 
 
 kernel void usesFunctionReturningVoid(global char* clmem0, unsigned long clmem_vmem_offset0, uint in_offset, local int *scratch);
-void returnsVoid_g(global float* in, struct GlobalVars *pGlobalVars);
+void returnsVoid_g(global float* in, const struct GlobalVars *const pGlobalVars);
 
 kernel void usesFunctionReturningVoid(global char* clmem0, unsigned long clmem_vmem_offset0, uint in_offset, local int *scratch) {
     global float* in = (global float*)(clmem0 + in_offset);
 
-    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
-    struct GlobalVars *pGlobalVars = &globalVars;
+    const struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    const struct GlobalVars* const pGlobalVars = &globalVars;
 
 
 v1:;
     returnsVoid_g(in, pGlobalVars);
     return;
 }
-void returnsVoid_g(global float* in, struct GlobalVars *pGlobalVars) {
+void returnsVoid_g(global float* in, const struct GlobalVars *const pGlobalVars) {
 
 v1:;
     in[0] = 3.0f;
@@ -435,7 +435,7 @@ struct GlobalVars {
     unsigned long clmem_vmem_offset0;
 };
 
-inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, struct GlobalVars *globalVars) {
+inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, const struct GlobalVars* const globalVars) {
     return (global float *)(globalVars->clmem0 + vmemloc - globalVars->clmem_vmem_offset0);
 }
 
@@ -448,8 +448,8 @@ kernel void test_randomintarray(global char* clmem0, unsigned long clmem_vmem_of
 kernel void test_randomintarray(global char* clmem0, unsigned long clmem_vmem_offset0, uint data_offset, local int *scratch) {
     global int* data = (global int*)(clmem0 + data_offset);
 
-    struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
-    struct GlobalVars *pGlobalVars = &globalVars;
+    const struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
+    const struct GlobalVars* const pGlobalVars = &globalVars;
 
     int v9;
     int* v4;
@@ -484,11 +484,11 @@ v1:;
 //         EXPECT_LE(line.size(), 128u);
 //     }
 //     EXPECT_EQ(R"(
-// kernel void mysuperlongfunctionnamemysuperl(global char* clmem0, uint d_offset, struct GlobalVars *pGlobalVars);
-// void mysuperlongfunctionnamemysup0_g(global float* d, struct GlobalVars *pGlobalVars);
-// void mysuperlongfunctionnamemysup1_g(global float* d, struct GlobalVars *pGlobalVars);
+// kernel void mysuperlongfunctionnamemysuperl(global char* clmem0, uint d_offset, const struct GlobalVars *const pGlobalVars);
+// void mysuperlongfunctionnamemysup0_g(global float* d, const struct GlobalVars *const pGlobalVars);
+// void mysuperlongfunctionnamemysup1_g(global float* d, const struct GlobalVars *const pGlobalVars);
 
-// kernel void mysuperlongfunctionnamemysuperl(global char* clmem0, uint d_offset, struct GlobalVars *pGlobalVars) {
+// kernel void mysuperlongfunctionnamemysuperl(global char* clmem0, uint d_offset, const struct GlobalVars *const pGlobalVars) {
 //     global float* d = (global float*)clmem0 + d_offset;
 
 
@@ -497,12 +497,12 @@ v1:;
 //     mysuperlongfunctionnamemysup1_g(d, pGlobalVars);
 //     return;
 // }
-// void mysuperlongfunctionnamemysup0_g(global float* d, struct GlobalVars *pGlobalVars) {
+// void mysuperlongfunctionnamemysup0_g(global float* d, const struct GlobalVars *const pGlobalVars) {
 
 // v1:;
 //     return;
 // }
-// void mysuperlongfunctionnamemysup1_g(global float* d, struct GlobalVars *pGlobalVars) {
+// void mysuperlongfunctionnamemysup1_g(global float* d, const struct GlobalVars *const pGlobalVars) {
 
 // v1:;
 //     return;
