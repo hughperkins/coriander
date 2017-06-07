@@ -74,8 +74,8 @@ public:
 
 class TensorDescriptor {
 public:
-    CoclDnnLayout layout;
-    CoclDnnLayout datatype;
+    cudnnTensorFormat_t layout;
+    cudnnDataType_t datatype;
     CoclDnnGeometryType N;
     CoclDnnGeometryType C;
     CoclDnnGeometryType H;
@@ -84,8 +84,8 @@ public:
 
 class FilterDescriptor {
 public:
-    CoclDnnLayout layout;
-    CoclDnnLayout dataType;
+    cudnnDataType_t dataType;
+    cudnnTensorFormat_t layout;
     CoclDnnGeometryType outC;
     CoclDnnGeometryType inC;
     CoclDnnGeometryType kH;

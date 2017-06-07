@@ -75,8 +75,8 @@ size_t cudnnDestroyFilterDescriptor(cudnnFilterDescriptor_t desc) {
 
 size_t cudnnSetTensor4dDescriptor(
     cudnnTensorDescriptor_t tensor,
-    CoclDnnLayout layout,
-    CoclDnnLayout datatype,
+    cudnnTensorFormat_t layout,
+    cudnnDataType_t datatype,
     CoclDnnGeometryType N, CoclDnnGeometryType C, CoclDnnGeometryType H, CoclDnnGeometryType W) {
     tensor->layout = layout;
     tensor->datatype = datatype;
@@ -88,8 +88,8 @@ size_t cudnnSetTensor4dDescriptor(
 }
 size_t cudnnSetFilter4dDescriptor(
     cudnnFilterDescriptor_t filter,
-    CoclDnnLayout layout,
-    CoclDnnLayout dataType,
+    cudnnDataType_t dataType,
+    cudnnTensorFormat_t layout,
     CoclDnnGeometryType outC, CoclDnnGeometryType inC, CoclDnnGeometryType kH, CoclDnnGeometryType kW
 ) {
     filter->layout = layout;
