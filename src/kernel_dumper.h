@@ -19,6 +19,7 @@
 
 #include "GlobalNames.h"
 #include "type_dumper.h"
+#include "shims.h"
 
 #include "llvm/IR/Module.h"
 
@@ -45,7 +46,7 @@ public:
 
     std::set<std::string> functionDeclarations;
     std::set<llvm::StructType *>structsToDefine;
-    std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
+    // std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
 
     KernelDumper *addIRToCl() {
         _addIRToCl = true;
@@ -56,6 +57,7 @@ protected:
     bool _addIRToCl = false;
     cocl::GlobalNames globalNames;
     std::unique_ptr<cocl::TypeDumper> typeDumper;
+    cocl::Shims shims;
 };
 
 } // namespace cocl

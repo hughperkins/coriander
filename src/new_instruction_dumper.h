@@ -16,6 +16,7 @@
 
 #include "LocalValueInfo.h"
 #include "InstructionDumper.h"
+#include "shims.h"
 
 #include <string>
 #include <stdexcept>
@@ -43,7 +44,8 @@ public:
         TypeDumper *typeDumper,
         const FunctionNamesMap *functionNamesMap,
 
-        std::set<std::string> *shimFunctionsNeeded,
+        // std::set<std::string> *shimFunctionsNeeded,
+        cocl::Shims *shims,
         std::set<llvm::Function *> *neededFunctions,
 
         std::map<llvm::Value *, std::string> *globalExpressionByValue,
@@ -89,7 +91,8 @@ public:
     cocl::TypeDumper *typeDumper = 0;
     const cocl::FunctionNamesMap *functionNamesMap = 0;
 
-    std::set<std::string> *shimFunctionsNeeded = 0; // for __shfldown_3 etc, that we provide as opencl directly
+    // std::set<std::string> *shimFunctionsNeeded = 0; // for __shfldown_3 etc, that we provide as opencl directly
+    cocl::Shims *shims = 0;
     std::set<llvm::Function *> *neededFunctions = 0;
 
     std::map<llvm::Value *, std::string> *globalExpressionByValue = 0;

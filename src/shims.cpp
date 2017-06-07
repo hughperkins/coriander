@@ -14,8 +14,10 @@
 
 #include "shims.h"
 
-using namespace cocl;
-using namespace std;
+#include <iostream>
+
+// using namespace cocl;
+// using namespace std;
 
 namespace cocl {
 
@@ -88,12 +90,77 @@ inline unsigned int __atomic_inc_uint(volatile __global int *data, const unsigne
 )";
 }
 
-std::string Shims::getClByName(std::string name) {
-    return _shimClByName[name];
+void Shims::use(std::string name) {
+    if(_shimClByName.find(name) == _shimClByName.end()) {
+        std::cout << "shim " << name << " does not exist.  This is a bug in Coriander" << std::endl;
+        throw std::runtime_error("shim " + name + " does not exist. This is a bug in Coriander");
+    }
+    shimsToBeUsed.insert(name);
+    if(_dependenciesByName.find(name) != _dependenciesByName.end()) {
+        const std::set<std::string> &deps = _dependenciesByName[name];
+        for(auto it=deps.begin(); it != deps.end(); it++) {
+            shimsToBeUsed.insert(*it);
+        }
+    }
 }
 
-std::set<std::string> Shims::getDependenciesByName(std::string name) {
-    return _dependenciesByName[name];
+void Shims::writeCl(std::ostream &os) {
+    std::set<std::string> written;
+    int attempts = 0;
+    while(written.size() < shimsToBeUsed.size() && attempts < 10) {
+        for(auto it=shimsToBeUsed.begin(); it != shimsToBeUsed.end(); it++) {
+            std::string shimName = *it;
+            std::cout << "write check " << shimName << std::endl;
+            if(written.find(shimName) != written.end()) {
+                continue;
+            }
+            bool writtenDependencies = true;
+            // check written dependencies
+            const std::set<std::string> &deps = _dependenciesByName[shimName];
+            for(auto childit=deps.begin(); childit != deps.end(); childit++) {
+                std::string childName = *childit;
+                if(written.find(childName) == written.end()) {
+                    std::cout << "  missing dep " << childName << std::endl;
+                    writtenDependencies = false;
+                    break;
+                }
+            }
+            if(writtenDependencies) {
+                os << _shimClByName[shimName];
+                written.insert(shimName);
+            }
+        }
+        attempts++;
+    }
+    if(written.size() < shimsToBeUsed.size()) {
+        for(auto it=written.begin(); it != written.end(); it++) {
+            std::cout << "wrote " << *it << " ok" << std::endl;
+        }
+        std::cout << std::endl;
+        std::cout << "ERROR: Failed to write shims. This is a Coriander bug. Please log at https://github.com/hughperkins/coriander/issues" << std::endl;
+        std::cout << std::endl;
+        throw std::runtime_error("Failed to write shims");
+    }
 }
+
+void Shims::copyFrom(const Shims &source) {
+    for(auto it=source.shimsToBeUsed.begin(); it != source.shimsToBeUsed.end(); it++) {
+        // shimsToBeUsed.insert(*it);
+    }
+    shimsToBeUsed.insert(source.shimsToBeUsed.begin(), source.shimsToBeUsed.end());
+}
+
+bool Shims::isUsed(std::string name) {
+    return shimsToBeUsed.find(name) != shimsToBeUsed.end();
+}
+
+
+// std::string Shims::getClByName(std::string name) {
+//     return _shimClByName[name];
+// }
+
+// std::set<std::string> Shims::getDependenciesByName(std::string name) {
+//     return _dependenciesByName[name];
+// }
 
 } // namespace cocl

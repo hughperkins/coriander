@@ -43,7 +43,8 @@ NewInstructionDumper::NewInstructionDumper(
         llvm::Module *M,
         GlobalNames *globalNames, LocalNames *localNames, TypeDumper *typeDumper, const FunctionNamesMap *functionNamesMap,
 
-        std::set<std::string> *shimFunctionsNeeded,
+        // std::set<std::string> *shimFunctionsNeeded,
+        cocl::Shims *shims,
         std::set<llvm::Function *> *neededFunctions,
 
         std::map<llvm::Value *, std::string> *globalExpressionByValue,
@@ -55,7 +56,7 @@ NewInstructionDumper::NewInstructionDumper(
     typeDumper(typeDumper),
     functionNamesMap(functionNamesMap),
 
-    shimFunctionsNeeded(shimFunctionsNeeded),
+    shims(shims),
     neededFunctions(neededFunctions),
 
     globalExpressionByValue(globalExpressionByValue),
@@ -736,7 +737,8 @@ void NewInstructionDumper::writeShimCall(LocalValueInfo *localValueInfo, std::st
         i++;
     }
     gencode_ss << ")";
-    shimFunctionsNeeded->insert(shimName);
+    // shimFunctionsNeeded->insert(shimName);
+    shims->use(shimName);
     localValueInfo->setAddressSpace(0);
     localValueInfo->setExpression(gencode_ss.str());
 }

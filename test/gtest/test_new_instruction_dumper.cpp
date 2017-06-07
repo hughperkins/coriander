@@ -18,6 +18,7 @@
 #include "function_names_map.h"
 #include "new_instruction_dumper.h"
 #include "InstructionDumper.h"
+#include "shims.h"
 
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/IR/Module.h"
@@ -71,7 +72,7 @@ public:
         instructionDumper.reset(
             new NewInstructionDumper(
                 myblock.M.get(), &globalNames, &localNames, typeDumper.get(), &functionNamesMap,
-                &shimFunctionsNeeded,
+                &shims,
                 &neededFunctions,
                 &globalExpressionByValue, &localValueInfos));
                 // &emptyStringMap));
@@ -99,7 +100,8 @@ public:
 
     map<Function *, Type*> returnTypeByFunction;
 
-    std::set<std::string> shimFunctionsNeeded;
+    // std::set<std::string> shimFunctionsNeeded;
+    cocl::Shims shims;
     std::set<llvm::Function *> neededFunctions;
 
     std::map<llvm::Value *, std::string> globalExpressionByValue;

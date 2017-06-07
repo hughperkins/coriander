@@ -435,7 +435,8 @@ bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *
             blockstream << label << ":;\n";
             basicBlockDumper.toCl(blockstream);
 
-            shimFunctionsNeeded.insert(basicBlockDumper.shimFunctionsNeeded.begin(), basicBlockDumper.shimFunctionsNeeded.end());
+            // shimFunctionsNeeded.insert(basicBlockDumper.shimFunctionsNeeded.begin(), basicBlockDumper.shimFunctionsNeeded.end());
+            shims.copyFrom(basicBlockDumper.shims);
             neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
 
             try {
@@ -493,7 +494,7 @@ void FunctionDumper::toCl(ostream &os) {
     }
     if(isKernel) {
     os << R"(    const struct GlobalVars globalVars = { scratch, clmem0, clmem_vmem_offset0 };
-    const struct GlobalVars * const pGlobalVars = &globalVars;
+    const struct GlobalVars* const pGlobalVars = &globalVars;
 
 )";
 }

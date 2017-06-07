@@ -20,6 +20,7 @@
 #include "ExpressionsHelper.h"
 #include "function_names_map.h"
 #include "new_instruction_dumper.h"
+#include "shims.h"
 
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Instructions.h"
@@ -61,7 +62,9 @@ public:
             new NewInstructionDumper(
                 M,
                 globalNames, localNames, typeDumper, functionNamesMap,
-                &shimFunctionsNeeded, &neededFunctions,
+                // &shimFunctionsNeeded,
+                &shims,
+                &neededFunctions,
                 globalExpressionByValue, localValueInfos
                 ));
         instruction_it = block->begin();
@@ -79,7 +82,8 @@ public:
         return this;
     }
 
-    std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
+    // std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
+    cocl::Shims shims;
     std::set<llvm::Function *> neededFunctions;
 
     int maxInstructionsToGenerate = -1; // -1 means no limit, 0 will cause runGeneration to do nothing; otherwise however many instructions to process

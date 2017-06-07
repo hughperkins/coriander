@@ -19,7 +19,6 @@
 #include "function_names_map.h"
 #include "type_dumper.h"
 #include "function_dumper.h"
-#include "shims.h"
 #include "mutations.h"
 #include "EasyCL/util/easycl_stringhelper.h"
 
@@ -84,7 +83,7 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
     }
 
     FunctionNamesMap functionNamesMap;
-    Shims shims;
+    // Shims shims;
 
     ostringstream moduleClStream;
 
@@ -136,7 +135,8 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
 
             structsToDefine.insert(childFunctionDumper.structsToDefine.begin(), childFunctionDumper.structsToDefine.end());
             functionDeclarations.insert(childFunctionDumper.getDeclaration());
-            shimFunctionsNeeded.insert(childFunctionDumper.shimFunctionsNeeded.begin(), childFunctionDumper.shimFunctionsNeeded.end());
+            shims.copyFrom(childFunctionDumper.shims);
+            // shimFunctionsNeeded.insert(childFunctionDumper.shimFunctionsNeeded.begin(), childFunctionDumper.shimFunctionsNeeded.end());
             neededFunctions.insert(childFunctionDumper.neededFunctions.begin(), childFunctionDumper.neededFunctions.end());
 
             moduleClStream << childFunctionCl;
@@ -153,11 +153,11 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
     }
 
     // get all shim names
-    for(auto it=shimFunctionsNeeded.begin(); it != shimFunctionsNeeded.end(); it++) {
-        string shimName = *it;
-        set<string> dependencies = shims.getDependenciesByName(shimName);
-        shimFunctionsNeeded.insert(dependencies.begin(), dependencies.end());
-    }
+    // for(auto it=shimFunctionsNeeded.begin(); it != shimFunctionsNeeded.end(); it++) {
+    //     string shimName = *it;
+    //     set<string> dependencies = shims.getDependenciesByName(shimName);
+    //     shimFunctionsNeeded.insert(dependencies.begin(), dependencies.end());
+    // }
 
     ostringstream functionDeclarationsStream;
     for(auto it=structsToDefine.begin(); it != structsToDefine.end(); it++) {
@@ -177,7 +177,7 @@ struct GlobalVars {
     unsigned long clmem_vmem_offset0;
 };
 
-inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, struct GlobalVars *globalVars) {
+inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, const struct GlobalVars* const globalVars) {
     return (global float *)(globalVars->clmem0 + vmemloc - globalVars->clmem_vmem_offset0);
 }
 
@@ -185,11 +185,13 @@ inline global float *getGlobalPointer(__vmem__ unsigned long vmemloc, struct Glo
 
     functionDeclarationsStream << typeDumper->dumpStructDefinitions() << "\n";
 
-    for(auto it=shimFunctionsNeeded.begin(); it != shimFunctionsNeeded.end(); it++) {
-        string shimName = *it;
-        string shimCl = shims.getClByName(shimName);
-        functionDeclarationsStream << shimCl << "\n";
-    }
+    shims.writeCl(functionDeclarationsStream);
+
+    // for(auto it=shimFunctionsNeeded.begin(); it != shimFunctionsNeeded.end(); it++) {
+    //     string shimName = *it;
+    //     string shimCl = shims.getClByName(shimName);
+    //     functionDeclarationsStream << shimCl << "\n";
+    // }
 
     for(auto it=functionDeclarations.begin(); it != functionDeclarations.end(); it++) {
         functionDeclarationsStream << *it << ";\n";
