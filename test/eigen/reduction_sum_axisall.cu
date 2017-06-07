@@ -37,22 +37,23 @@ void test_cuda_reduction()
 
   gpu_out.device(gpu_device) = gpu_in1.sum();
   // float out = gpu_in1.sum();
-  std::cout << "out: " << out << std::endl;
 
-  // assert(cudaMemcpyAsync(out.data(), d_out, out_bytes, cudaMemcpyDeviceToHost, gpu_device.stream()) == cudaSuccess);
-  // assert(cudaStreamSynchronize(gpu_device.stream()) == cudaSuccess);
+  assert(cudaMemcpyAsync(out.data(), d_out, out_bytes, cudaMemcpyDeviceToHost, gpu_device.stream()) == cudaSuccess);
+  assert(cudaStreamSynchronize(gpu_device.stream()) == cudaSuccess);
+  std::cout << "actual sum, from gpu: " << out << std::endl;
 
-  // for (int i = 0; i < 72; ++i) {
-  //   for (int j = 0; j < 97; ++j) {
-  //     float sum = 0;
-  //     for (int k = 0; k < 53; ++k) {
-  //       for (int l = 0; l < 113; ++l) {
-  //         sum += in1(i, k, j, l);
-  //       }
-  //     }
-  //     VERIFY_IS_APPROX(out(i,j), sum);
-  //   }
-  // }
+  float sum = 0;
+  for (int i = 0; i < 72; ++i) {
+    for (int j = 0; j < 97; ++j) {
+      for (int k = 0; k < 53; ++k) {
+        for (int l = 0; l < 113; ++l) {
+          sum += in1(i, k, j, l);
+        }
+      }
+    }
+  }
+  std::cout << "expected sum, from cpu: " << sum << std::endl;
+  // VERIFY_IS_APPROX(out, sum);
 
   cudaFree(d_in1);
   cudaFree(d_out);
