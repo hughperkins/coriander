@@ -84,6 +84,12 @@ bool BasicBlockDumper::runGeneration(const std::map<llvm::Function *, llvm::Type
         try {
             LocalValueInfo *instrInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, inst);
             instructionDumper->runGeneration(instrInfo, returnTypeByFunction);
+            if(instructionDumper->usesVmem) {
+                this->usesVmem = true;
+            }
+            if(instructionDumper->usesScratch) {
+                this->usesScratch = true;
+            }
             if(instrInfo->needDependencies) {
                 return false;
             }

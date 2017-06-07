@@ -25,16 +25,23 @@
 #include "llvm/IR/Verifier.h"
 #include "llvm/Support/SourceMgr.h"
 
-std::string convertModuleToCl(
+
+namespace cocl {
+
+ModuleClRes convertModuleToCl(
         int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, llvm::Module *M, std::string specificFunction, std::string generatedName,
         bool offsets_32bit) {
     cocl::KernelDumper kernelDumper(M, specificFunction, generatedName, offsets_32bit);
     kernelDumper.addIRToCl();
     std::string cl = kernelDumper.toCl(uniqueClmemCount, clmemIndexByClmemArgIndex);
-    return cl;
+    ModuleClRes res;
+    res.clSourcecode = cl;
+    res.usesVmem = kernelDumper.usesVmem;
+    res.usesScratch = kernelDumper.usesScratch;
+    return res;
 }
 
-std::string convertLlStringToCl(
+ModuleClRes convertLlStringToCl(
         int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, std::string llString, std::string specificFunction, std::string generatedName,
         bool offsets_32bit) {
     llvm::StringRef llStringRef(llString);
@@ -47,6 +54,8 @@ std::string convertLlStringToCl(
         smDiagnostic.print("irtopencl", llvm::errs());
         throw std::runtime_error("failed to parse IR");
     }
-    std::string gencode = convertModuleToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, M.get(), specificFunction, generatedName, offsets_32bit);
-    return gencode;
+    ModuleClRes res = convertModuleToCl(uniqueClmemCount, clmemIndexByClmemArgIndex, M.get(), specificFunction, generatedName, offsets_32bit);
+    return res;
 }
+
+} // namespace cocl

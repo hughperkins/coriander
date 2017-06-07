@@ -126,6 +126,12 @@ std::string KernelDumper::toCl(int uniqueClmemCount, std::vector<int> &clmemInde
                 neededFunctions.insert(childFunctionDumper.neededFunctions.begin(), childFunctionDumper.neededFunctions.end());
                 continue;
             }
+            if(childFunctionDumper.usesVmem) {
+                this->usesVmem = true;
+            }
+            if(childFunctionDumper.usesScratch) {
+                this->usesScratch = true;
+            }
 
             returnTypeByFunction[childF] = childFunctionDumper.returnType;
             changedSomething = true;

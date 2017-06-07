@@ -53,6 +53,9 @@ public:
         return this;
     }
 
+    bool usesVmem = false;
+    bool usesScratch = false;
+
 protected:
     bool _addIRToCl = false;
     cocl::GlobalNames globalNames;

@@ -36,6 +36,13 @@ namespace cocl {
     class Memory;
     class CoclStream;
 
+    class KernelInfo {
+    public:
+        // CLKernel *kernel = 0;
+        bool usesVmem = false;
+        bool usesScratch = false;
+    };
+
     class Context {
     public:
         Context(int device);
@@ -43,6 +50,7 @@ namespace cocl {
         std::unique_ptr<easycl::EasyCL> cl;
         std::unique_ptr<cocl::CoclStream> default_stream;
         std::map<std::string, easycl::CLKernel *> kernelCache;
+        std::map<std::string, cocl::KernelInfo> kernelInfoByUniqueName;
         std::map<std::string, std::string > clSourceCodeCache;
         std::set<cocl::Memory *>memories;
         long long nextAllocPos = 1;

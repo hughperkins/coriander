@@ -515,6 +515,7 @@ void NewInstructionDumper::dumpLoad(cocl::LocalValueInfo *localValueInfo) {
                 getOperand(instr->getOperand(0))->getExpr() + "[0], pGlobalVars" +
             ")"
         );
+        this->usesVmem = true;
         rhs = localValueInfo->name + "_gptrstep";
         updateAddressSpace(instr, 1);
         localValueInfo->addressSpace = 1;
@@ -542,6 +543,7 @@ void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
                 op1info->getExpr() + ", pGlobalVars" +
             ")"
         );
+        this->usesVmem = true;
         lhs = localValueInfo->name + "_gptrstep";
     } else {
         localValueInfo->setAddressSpaceFrom(instr->getOperand(1));
@@ -851,9 +853,11 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
         return;
     } else if(functionName == "_Z11__shfl_downIfET_S0_ii") {
         writeShimCall(localValueInfo, "__shfl_down_3", "pGlobalVars->scratch, ", instr);
+        this->usesScratch = true;
         return;
     } else if(functionName == "_Z11__shfl_downIfET_S0_i") {
         writeShimCall(localValueInfo, "__shfl_down_2", "pGlobalVars->scratch, ", instr);
+        this->usesScratch = true;
         return;
     } else if(functionName == "llvm.lifetime.start") {
         // just ignore for now

@@ -231,14 +231,19 @@ GenerateOpenCLResult generateOpenCL(
             f << devicellsourcecode << endl;
             f.close();
         }
-        string clSourcecode = convertLlStringToCl(
+        ModuleClRes res = convertLlStringToCl(
             uniqueClmemCount, clmemIndexByClmemArgIndex, devicellsourcecode, origKernelName, launchConfiguration.shortKernelName, v->offsets_32bit);
+        std::string clSourcecode = res.clSourcecode;
+        KernelInfo kernelInfo;
+        kernelInfo.usesVmem = res.usesVmem;
+        kernelInfo.usesScratch = res.usesScratch;
         clSourcecode = "// origKernelName: " + origKernelName + "\n" +
             "// uniqueKernelName: " + launchConfiguration.uniqueKernelName + "\n" +
             "// shortKernelName: " + launchConfiguration.shortKernelName + "\n" +
             "\n" +
             clSourcecode;
         v->getContext()->clSourceCodeCache[launchConfiguration.uniqueKernelName] = clSourcecode;
+        v->getContext()->kernelInfoByUniqueName[launchConfiguration.uniqueKernelName] = kernelInfo;
         return GenerateOpenCLResult { clSourcecode, origKernelName, launchConfiguration.shortKernelName, launchConfiguration.uniqueKernelName };
     } catch(runtime_error &e) {
         cout << "generateOpenCL failed to generate opencl sourcecode" << endl;
@@ -265,7 +270,12 @@ void configureKernel(const char *kernelName, const char *devicellsourcecode) {
     // to add the first Memory object to the clmems, so it is available to the kernel, for
     // dereferencing vmemlocs
     // we are going to assume the first memory is at vmemloc=128 :-). very hacky :-DDD
-    Memory *firstMem = findMemory((const char *)128);
+    // Memory *firstMem = findMemory((const char *)128);
+
+    // we're simply going to assume there is a single memory allocated and take that
+    // we'll verify this assumption before launhc, if we are in fact using vmem
+    ThreadVars *v = getThreadVars();
+    Memory *firstMem = *v->getContext()->memories.begin();
     // std::cout << "setKernelArgHostsideBuffer firstMem=" << firstMem << std::endl;
     // if its not zero, then pass it into kernel
     if(firstMem != 0) {
@@ -418,13 +428,37 @@ void kernelGo() {
     pthread_mutex_lock(&launchMutex);
     // COCL_PRINT("kernelGo queue=" << (void *)launchConfiguration.queue);
 
+    ThreadVars *v = getThreadVars();
+
     GenerateOpenCLResult res = generateOpenCL(
         launchConfiguration.clmems.size(), launchConfiguration.clmemIndexByClmemArgIndex, launchConfiguration.kernelName, launchConfiguration.devicellsourcecode);
     COCL_PRINT("kernelGo() kernel: " << launchConfiguration.kernelName);
     CLKernel *kernel = compileOpenCLKernel(launchConfiguration.kernelName, res.uniqueKernelName, res.shortKernelName, res.clSourcecode);
     COCL_PRINT("kernelGo() uniqueKernelName: " << launchConfiguration.uniqueKernelName);
 
-    ThreadVars *v = getThreadVars();
+    KernelInfo kernelInfo = v->getContext()->kernelInfoByUniqueName[launchConfiguration.uniqueKernelName];
+    COCL_PRINT("kernel uses vmem?: " << kernelInfo.usesVmem);
+    COCL_PRINT("kernel uses scratch?: " << kernelInfo.usesScratch);
+    if(kernelInfo.usesVmem) {
+        if(v->getContext()->memories.size() > 1) {
+            std::cout << std::endl;
+            std::cout << "Error: you are trying to use a kernel that uses double-indirected pointers ('float **' et al)" << std::endl;
+            std::cout << "whilst you have allocated multiple gpu buffers" << std::endl;
+            std::cout << std::endl;
+            std::cout << "This is currently not supported by Coriander" << std::endl;
+            std::cout << std::endl;
+            std::cout << "Your options are:" << std::endl;
+            std::cout << "- update your GPU kernel" << std::endl;
+            std::cout << "- make one single huge GPU memory allocation, instead of many smaller ones" << std::endl;
+            std::cout << std::endl;
+            throw std::runtime_error("Error: using vmem with multiple allocations");
+        } else {
+            Memory *memory = *v->getContext()->memories.begin();
+            COCL_PRINT("Memory allocation ok: one single allocation at vmem=" << memory->fakePos << " sizeByes=" << memory->bytes);
+        }
+    }
+
+    // ThreadVars *v = getThreadVars();
     for(int i = 0; i < launchConfiguration.clmems.size(); i++) {
         COCL_PRINT("clmem" << i);
         kernel->inout(&launchConfiguration.clmems[i]);

@@ -438,6 +438,12 @@ bool FunctionDumper::runGeneration(const std::map<llvm::Function *, llvm::Type *
             // shimFunctionsNeeded.insert(basicBlockDumper.shimFunctionsNeeded.begin(), basicBlockDumper.shimFunctionsNeeded.end());
             shims.copyFrom(basicBlockDumper.shims);
             neededFunctions.insert(basicBlockDumper.neededFunctions.begin(), basicBlockDumper.neededFunctions.end());
+            if(basicBlockDumper.usesVmem) {
+                this->usesVmem = true;
+            }
+            if(basicBlockDumper.usesScratch) {
+                this->usesScratch = true;
+            }
 
             try {
                 blockstream << dumpTerminator(&returnType, basicBlock->getTerminator());

@@ -89,6 +89,9 @@ public:
     int maxInstructionsToGenerate = -1; // -1 means no limit, 0 will cause runGeneration to do nothing; otherwise however many instructions to process
     llvm::BasicBlock::iterator instruction_it;
 
+    bool usesVmem = false;
+    bool usesScratch = false;
+
 protected:
     llvm::Module *M;
     llvm::BasicBlock *block;

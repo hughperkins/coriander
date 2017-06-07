@@ -101,6 +101,8 @@ public:
     bool forceSingle = true;
     bool _addIRToCl = false;
     bool checkCalledFunctionsDefined = true;
+    bool usesVmem = false;
+    bool usesScratch = false;
 };
 
 } // namespace cocl

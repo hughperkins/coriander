@@ -123,6 +123,8 @@ public:
     std::string functionDeclarations = "";
 
     llvm::Type *returnType = 0;
+    bool usesVmem = false;
+    bool usesScratch = false;
 
 protected:
     // llvm::Function::iterator block_it;
