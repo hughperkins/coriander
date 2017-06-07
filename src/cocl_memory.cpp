@@ -202,7 +202,8 @@ size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMem
 }
 
 size_t cudaMemsetAsync(void *devPtr, int value, size_t count, char *_queue) {
-    COCL_PRINT("cudaMemsetAsync stub value=" << value << " count=" << count << " queue=" << _queue);
+    COCL_PRINT("cudaMemsetAsync stub value=" << value << " count=" << count << " queue=" << (long)_queue);
+    std::cout << "cudaMemsetAsync not implemented" << std::endl;
     throw runtime_error("cudaMemsetAsync not implemented");
 
     return 0;
