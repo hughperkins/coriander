@@ -127,7 +127,7 @@ TEST(test_dnn_conv, simple_cpu_im2col) {
     delete[] inImageStack;
 }
 
-TEST(test_dnn_conv, DISABLED_simple_gpu_im2col) {
+TEST(test_dnn_conv, simple_gpu_im2col) {
     int C = 3;
     int inH = 5;
     int inW = 5;
