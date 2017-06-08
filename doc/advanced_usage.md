@@ -22,6 +22,7 @@ hostFloats[2] 444
 
 | Option | Description |
 |--------|-------------|
+| -g    | build for debugging |
 | -I   | provide an include directory, eg `-I /usr/local/eigen` |
 | -o   | output filepath, eg `-o foo.o` |
 | -c   | compile to .o file; dont link |
@@ -169,3 +170,9 @@ You're best turning on the option `COCL_SPAM`, in `ccmake ..`, and also `COCL_SP
 We get the unique kernel name from the output to stdout, usign `COCL_SPAM_KERNELLAUNCH` cmake options.  We can then grep for this kernel name in `/tmp/*.cl`, to find the correspdonding `.cl` file.
 
 To find out more about how this works, you can look at `src/hostside_opencl_funcs.cpp`, function `dump()`. (you really should do this, since this doc is almost certainly already out of date :-P )
+
+## Debug build, `-g`
+
+These work since June 8th. Piccie of a `gdb` backtrace, on Ubuntu 16.04, with line numbers :-)
+
+<img src="img/gdb_backtrace.png?raw=true" />
