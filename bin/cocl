@@ -187,7 +187,7 @@ while [ "x$1" != x ]; do {
                 COMPILE=1
                 ;;
             -g)
-                # OPT_G=-g
+                OPT_G=-g
                 # ignore, so we dont get llvm stuff everywehere...
                 ;;
             -o)
@@ -404,6 +404,7 @@ if [[ ! -d ${OUTDIR} ]]; then {
     ${CLANG_HOME}/bin/clang++ ${PASSTHRU} \
         ${INCLUDES} -DUSE_CLEW \
         -std=c++11 -x cuda -nocudainc --cuda-host-only -emit-llvm  -O3 -S \
+        ${OPT_G} \
         -D__CUDACC__ \
         -D__CORIANDERCC__ \
         -Wno-gnu-anonymous-struct \
@@ -438,7 +439,8 @@ if [[ ! -d ${OUTDIR} ]]; then {
         ${PASSTHRU} \
         ${LLVM_LL_COMPILE_FLAGS} \
         -DUSE_CLEW \
-        -O3 ${OPT_G} \
+        -O3 \
+        ${OPT_G} \
         -c ${OUTPUTBASEPATH}-hostpatched.ll \
         -o ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}
 )
@@ -449,6 +451,7 @@ if [ ! "$COMPILE" ]; then {
         ${NATIVE_COMPILER} \
             -Wl,-rpath,${COCL_LIB} \
             -Wl,-rpath,$$ORIGIN \
+            ${OPT_G} \
             -o ${OUTPUTBASEPATH}${FINALPOSTFIX} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} \
             -L${COCL_LIB} -lcocl -lclblast -leasycl -lclew -lpthread \
             ${LLVM_LINK_FLAGS}
