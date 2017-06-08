@@ -1,5 +1,19 @@
 # Older News
 
+- May 28:
+  - revamped how we choose the type of buffer offsets passed into the kernels:
+    - it's always done at runtime now, never at compile time
+    - when you run an already built app, simply set the environment variable `COCL_OFFSETS_32BIT` to the string `1` to use 32-bit offsets
+    - otherwise it will default to 64-bit offsets (means, can access more memory)
+    - basically, unless you're using beignet, you can ignore this, and stop having to think about the 32-bit offsets variables any more :-)
+  - if you build with `BUILD_TESTS` set to `OFF`, you can still build the tests, eg by doing `make cocl_unittests`, and you can still run them eg by doing `make run-tests`: just, no longer builds them by default, when you do `make`
+- May 27:
+  - updated to LLVM 4.0. Thank you to @iame6162013 for inspiring me to do this
+  - Tensorflow `random_op_gpu.cc` compiles and runs ok now :-). There were a few hoops to jump through, https://github.com/hughperkins/coriander/issues/24
+- May 20:
+  - renamed to Coriander
+- May 18:
+  - Presented Coriander at this year's [IWOCL](http://iwocl.org) :-)  Full IWOCL program [here](http://www.iwocl.org/iwocl-2017/conference-program/), and there is a link to my own slides
 - May 5:
   - Eigen unit tests at https://bitbucket.org/hughperkins/eigen/src/75842846799e15f1c26ef6885565d64c3d0a67b2/unsupported/test/Coriander/?at=eigen-cl pass on Mac Pro 4th Generation with both:
     - Intel HD Graphics 530, and
