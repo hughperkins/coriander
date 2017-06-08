@@ -29,6 +29,12 @@ hostFloats[2] 444
 | --devicell-opt [option] | pass [option] through to device ll optimization phase.  Affects success and quality of OpenCL generation. |
 | -fPIC | passed to clang object-code compiler |
 
+### Debug build, `-g`
+
+Debug builds work since June 8th. Piccie of a `gdb` backtrace, on Ubuntu 16.04, with line numbers :-)
+
+<img src="img/gdb_backtrace.png?raw=true" />
+
 ### `-devicell-opt` options
 
 These are passed through to `opt-4.0`, http://llvm.org/docs/Passes.html.  Generally speaking, you dont need to modify these, nor should you. Just use the 
@@ -45,7 +51,6 @@ You dont really want to mess with these options much/at all because:
 - the main impact is how well the OpenCL generation works: too much optimization, or too little, and the OpenCL generation step will have issues
 - really, the optimization should be applied after OpenCL generation, by the driver, at runtime
 - I spent ages trying different options, and came up with these, that work ok-ish :-)
-
 ## Runtime options
 
 You can control the behavior of the Coriander runtime using environment variables.
@@ -170,9 +175,3 @@ You're best turning on the option `COCL_SPAM`, in `ccmake ..`, and also `COCL_SP
 We get the unique kernel name from the output to stdout, usign `COCL_SPAM_KERNELLAUNCH` cmake options.  We can then grep for this kernel name in `/tmp/*.cl`, to find the correspdonding `.cl` file.
 
 To find out more about how this works, you can look at `src/hostside_opencl_funcs.cpp`, function `dump()`. (you really should do this, since this doc is almost certainly already out of date :-P )
-
-## Debug build, `-g`
-
-These work since June 8th. Piccie of a `gdb` backtrace, on Ubuntu 16.04, with line numbers :-)
-
-<img src="img/gdb_backtrace.png?raw=true" />
