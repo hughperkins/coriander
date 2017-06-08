@@ -31,6 +31,16 @@ using namespace std;
 using namespace cocl;
 // using namespace easycl;
 
+#ifdef COCL_PRINT
+#undef COCL_PRINT
+#endif
+
+#ifdef COCL_SPAM_PROPERTIES
+#define COCL_PRINT(x) std::cout << "[PROPERTIES] " << x << std::endl;
+#else
+#define COCL_PRINT(x)
+#endif
+
 size_t cuDeviceGetAttribute(
        int *value, int attribute, CUdevice device) {
 
@@ -38,70 +48,81 @@ size_t cuDeviceGetAttribute(
     // cudaDevAttrComputeCapabilityMinor,
 
     cocl::CoclDevice *coclDevice = getCoclDeviceByGpuOrdinal(device);
-    COCL_PRINT(cout << "cuDeviceGetAttribute device ordinal=" << coclDevice->gpuOrdinal << endl);
+    // COCL_PRINT("cuDeviceGetAttribute device ordinal=" << coclDevice->gpuOrdinal);
     cl_device_id clDeviceId = coclDevice->deviceId;
     switch(attribute) {
         case cudaDevAttrComputeCapabilityMajor:
             *value = 3;
+            COCL_PRINT("requesting cudaDevAttrComputeCapabilityMajor: " << *value);
             break;
 
         case cudaDevAttrComputeCapabilityMinor:
             *value = 0;
+            COCL_PRINT("requesting cudaDevAttrComputeCapabilityMinor " << *value);
             break;
 
         case CU_DEVICE_ATTRIBUTE_ECC_ENABLED:
             *value = 0;
+            COCL_PRINT("requesting ecc enabled: " << *value);
             break;
 
         case CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X:
         case cudaDevAttrMaxGridDimX:
-            COCL_PRINT(cout << "requesting gridx" << endl);
             *value = 256;
+            COCL_PRINT("requesting gridx " << *value);
             break;
 
         case CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y:
         case cudaDevAttrMaxGridDimY:
-            COCL_PRINT(cout << "requesting gridy" << endl);
             *value = 256;
+            COCL_PRINT("requesting gridy: " << *value);
             break;
 
         case CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z:
         case cudaDevAttrMaxGridDimZ:
-            COCL_PRINT(cout << "requesting gridx" << endl);
             *value = 256;
+            COCL_PRINT("requesting gridx: " << *value);
             break;
 
         case CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR:
             *value = 65536;
+            COCL_PRINT("requesting MAX_SHARED_MEMORY_PER_MULTIPROCESSOR: " << *value);
             break;
 
         case CU_DEVICE_ATTRIBUTE_SHARED_MEMORY_PER_BLOCK:
         case cudaDevAttrMaxSharedMemoryPerBlock:
             *value = easycl::getDeviceInfoInt64(clDeviceId, CL_DEVICE_LOCAL_MEM_SIZE);
+            COCL_PRINT("requesting SHARED_MEMORY_PER_BLOCK: " << *value);
+            break;
 
         case CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT:
         case cudaDevAttrMultiProcessorCount:
             *value = easycl::getDeviceInfoInt(clDeviceId, CL_DEVICE_MAX_COMPUTE_UNITS);
+            COCL_PRINT("requesting MULTIPROCESSOR_COUNT: " << *value);
             break;
 
         case CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK:
         case cudaDevAttrMaxRegistersPerBlock:
             *value = 64;
+            COCL_PRINT("requesting MAX_REGISTERS_PER_BLOCK: " << * value);
             break;
 
         case CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR:
         case cudaDevAttrMaxThreadsPerBlock:  // ok, this is probably wrong...
         case cudaDevAttrMaxThreadsPerMultiProcessor:
             *value = 128;
+            COCL_PRINT("requesting MAX_THREADS_PER_MULTIPROCESSOR: " << *value);
             break;
 
         case CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_BLOCK:
             *value = easycl::getDeviceInfoInt64(clDeviceId, CL_DEVICE_LOCAL_MEM_SIZE);
+            COCL_PRINT("requesting MAX_SHARED_MEMORY_PER_BLOCK: " << *value);
             break;
 
         case CU_DEVICE_ATTRIBUTE_WARP_SIZE:
         case cudaDevAttrWarpSize:
             *value = 32;  // should do like: if amd then 64, else 32
+            COCL_PRINT("requesting warp size: " << *value);
             break;
 
         default:
@@ -122,27 +143,27 @@ size_t cudaDeviceGetAttribute(
 
 size_t cuDeviceGetName(char *buf, int bufsize, CUdevice device) {
     cocl::CoclDevice *coclDevice = getCoclDeviceByGpuOrdinal(device);
-    COCL_PRINT(cout << "cuDeviceGetName gpuOrdinal=" << coclDevice->gpuOrdinal << endl);
     cl_device_id clDeviceId = coclDevice->deviceId;
     string name = easycl::getDeviceInfoString(clDeviceId, CL_DEVICE_NAME);
     sprintf(buf, "%s", name.c_str());
+    COCL_PRINT("cuDeviceGetName gpuOrdinal=" << coclDevice->gpuOrdinal << ": " << name);
     return 0;
 }
 
 size_t cuDeviceGetPCIBusId(char *buf, int bufsize, CUdevice device) {
-    COCL_PRINT(cout << "cuDeviceGetPCIBusId" << endl);
     sprintf(buf, "0000.0000");
+    COCL_PRINT("cuDeviceGetPCIBusId: " << buf);
     return 0;
 }
 
 size_t cuDriverGetVersion(int *driver_version) {
-    COCL_PRINT(cout << "cuDriverGetVersion" << endl);
     *driver_version = 1;
+    COCL_PRINT("cuDriverGetVersion: " << *driver_version);
     return 0;
 }
 
 size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, CUdevice device) {
-    COCL_PRINT(cout << "cuDeviceComputeCapability" << endl);
+    COCL_PRINT("cuDeviceComputeCapability");
     *cc_major = 3;
     *cc_minor = 5;
     return 0;
@@ -150,7 +171,7 @@ size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, CUdevice device) 
 
 size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
     cocl::CoclDevice *coclDevice = getCoclDeviceByGpuOrdinal(device);
-    COCL_PRINT(cout << "cudaGetDeviceProperties gpuOrdinal=" << coclDevice->gpuOrdinal << endl);
+    COCL_PRINT("cudaGetDeviceProperties gpuOrdinal=" << coclDevice->gpuOrdinal);
     clewInit();
     cl_device_id clDeviceId = coclDevice->deviceId;
 
@@ -187,12 +208,13 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
 }
 
 size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, CUdevice device_ordinal) {
-    COCL_PRINT(cout << "cuDeviceGetProperties ordinal=" << device_ordinal << endl);
+    // COCL_PRINT("cuDeviceGetProperties ordinal=" << device_ordinal);
     return cudaGetDeviceProperties(device_properties, device_ordinal);
     // return -1;
 }
 
 size_t cudaDeviceSetSharedMemConfig(cudaSharedMemConfig config) {
     // stub
+    COCL_PRINT("*STUB* cudaDeviceSetSharedMemConfig");
     return 0;
 }
