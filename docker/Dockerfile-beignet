@@ -2,22 +2,35 @@ FROM ubuntu:16.04
 
 ARG GIT_BRANCH=master
 
-RUN apt-get update
+RUN apt-get update && \
+    apt-get install -y beignet-opencl-icd clinfo
 
-RUN apt-get install -y beignet-opencl-icd clinfo
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cmake cmake-curses-gui git gcc g++ libc6-dev zlib1g-dev \
+    libtinfo-dev \
+    curl ca-certificates build-essential wget xz-utils \
+    bash-completion
 
-RUN apt-get install -y --no-install-recommends \
-    cmake cmake-curses-gui git llvm-3.8-dev clang-3.8 gcc g++ libc6-dev zlib1g-dev \
-    curl ca-certificates build-essential
+RUN git clone --recursive https://github.com/hughperkins/coriander -b ${GIT_BRANCH}
 
-RUN git clone --recursive https://github.com/hughperkins/Coriander -b ${GIT_BRANCH}
+RUN cd coriander && \
+    mkdir soft && \
+    cd soft && \
+    wget http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz
 
-RUN cd Coriander && \
+RUN cd coriander/soft && \
+    tar -xf clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz && \
+    mv clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04 llvm-4.0
+
+RUN cd coriander && \
     mkdir build && \
     cd build && \
-    cmake .. -DBUILD_TESTS=ON && \
+    cmake .. -DCMAKE_BUILD_TYPE=Debug -DCLANG_HOME=$PWD/../soft/llvm-4.0 && \
     make -j 8
 
-RUN cd Coriander && \
-    cd build && \
+RUN cd coriander/build && \
+    make -j 8 tests
+
+RUN cd coriander/build && \
     make install
+

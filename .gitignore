@@ -85,3 +85,4 @@ include/cocl/local_config.h
 cmbuild/
 mac/
 build*/
+/soft/

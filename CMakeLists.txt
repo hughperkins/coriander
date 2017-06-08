@@ -253,64 +253,78 @@ if(BUILD_TESTS)
   set(TESTS_EXCLUDE)
 endif(BUILD_TESTS)
 
-    set(TESTS testblas cuda_sample context byvaluestructwithpointer multigpu multithreading
-        offsetkernelargs properties test_bitcast test_callbacks testcumemcpy testevents2
-        testevents testfloat4 test_kernelcachedok testmath testmemcpydevicetodevice test_memhostalloc
-        testneg testnullpointer testpartialcopy testshfl teststream test_types
-        singlebuffer test_devices test_buffers longname test_char test_structs
-        test_floatstarstar
+set(TESTS testblas cuda_sample context byvaluestructwithpointer multigpu multithreading
+    offsetkernelargs properties test_bitcast test_callbacks testcumemcpy testevents2
+    testevents testfloat4 test_kernelcachedok testmath testmemcpydevicetodevice test_memhostalloc
+    testneg testnullpointer testpartialcopy testshfl teststream test_types
+    singlebuffer test_devices test_buffers longname test_char test_structs
+    test_floatstarstar
+)
+
+if(TESTS_DUMP_CL)
+    set(COCL_DUMP_CL_STR "COCL_DUMP_CL=1")
+endif()
+include_directories(include/cocl/proxy_includes)
+foreach(TEST ${TESTS})
+    cocl_add_executable(${TEST} ${TESTS_EXCLUDE} test/cocl/${TEST}.cu)
+    target_link_libraries(${TEST} cocl clew clblast easycl)
+    add_custom_target(run-${TEST}
+        COMMAND echo
+        COMMAND echo make run-${TEST}
+        COMMAND ${COCL_DUMP_CL_STR} ${CMAKE_CURRENT_BINARY_DIR}/${TEST}
+        DEPENDS ${TEST}
+        DEPENDS cocl
+        DEPENDS patch_hostside
     )
+    set(RUN_TEST_TARGETS ${RUN_TEST_TARGETS} run-${TEST})
+    set(BUILD_TEST_TARGETS ${BUILD_TEST_TARGETS} ${TEST})
+endforeach()
+add_custom_target(run-tests-travis
+  DEPENDS run-cuda_sample run-context run-offsetkernelargs run-test_callbacks run-testcumemcpy
+      run-testnullpointer run-testpartialcopy run-teststream run-singlebuffer)
 
-    if(TESTS_DUMP_CL)
-        set(COCL_DUMP_CL_STR "COCL_DUMP_CL=1")
-    endif()
-    include_directories(include/cocl/proxy_includes)
-    foreach(TEST ${TESTS})
-        cocl_add_executable(${TEST} ${TESTS_EXCLUDE} test/cocl/${TEST}.cu)
-        target_link_libraries(${TEST} cocl clew clblast easycl)
-        add_custom_target(run-${TEST}
-            COMMAND echo
-            COMMAND echo make run-${TEST}
-            COMMAND ${COCL_DUMP_CL_STR} ${CMAKE_CURRENT_BINARY_DIR}/${TEST}
-            DEPENDS ${TEST}
-            DEPENDS cocl
-            DEPENDS patch_hostside
-        )
-        set(TEST_TARGETS ${TEST_TARGETS} run-${TEST})
-    endforeach()
-    add_custom_target(run-tests
-        DEPENDS ${TEST_TARGETS})
-    add_custom_target(run-tests-travis
-      DEPENDS run-cuda_sample run-context run-offsetkernelargs run-test_callbacks run-testcumemcpy
-          run-testnullpointer run-testpartialcopy run-teststream run-singlebuffer)
+if(UNIX)
+    add_library(cocl_gtest SHARED  ${TESTS_EXCLUDE} third_party/gtest/gtest-all.cc)
+    target_link_libraries(cocl_gtest pthread)
+else()
+    add_library(cocl_gtest  ${TESTS_EXCLUDE} third_party/gtest/gtest-all.cc)
+endif()
 
-    if(UNIX)
-        add_library(cocl_gtest SHARED  ${TESTS_EXCLUDE} third_party/gtest/gtest-all.cc)
-        target_link_libraries(cocl_gtest pthread)
-    else()
-        add_library(cocl_gtest  ${TESTS_EXCLUDE} third_party/gtest/gtest-all.cc)
-    endif()
+add_executable(cocl_unittests ${TESTS_EXCLUDE} test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
+    test/gtest/test_block_dumper.cpp test/gtest/test_new_instruction_dumper.cpp
+    test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
+    test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
+    test/gtest/test_kernel_dumper.cpp test/gtest/test_global_constants.cpp
+    test/gtest/test_dnn_conv.cpp test/gtest/test_dnn_pooling.cpp test/gtest/test_dnn_act.cpp
+    test/gtest/test_dnn_loss.cpp
+    test/gtest/test_hostside_opencl_funcs.cpp test/gtest/test_logging.cpp
+    test/gtest/test_expressions_helper.cpp test/gtest/test_shims.cpp
+    # test/gtest/test_simple.cu
+    # test/gtest/test_cocl_simple.cu
+)
+target_include_directories(cocl_unittests PRIVATE src)
+target_include_directories(cocl_unittests PRIVATE include)
+target_include_directories(cocl_unittests PRIVATE src/EasyCL/thirdparty/clew/include)
+target_include_directories(cocl_unittests PRIVATE third_party/gtest)
+target_include_directories(cocl_unittests PRIVATE ${CLANG_HOME}/include)
+target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} ${LLVM_SYSLIBS})
+target_compile_options(cocl_unittests PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 
-    add_executable(cocl_unittests ${TESTS_EXCLUDE} test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
-        test/gtest/test_block_dumper.cpp test/gtest/test_new_instruction_dumper.cpp
-        test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
-        test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
-        test/gtest/test_kernel_dumper.cpp test/gtest/test_global_constants.cpp
-        test/gtest/test_dnn_conv.cpp test/gtest/test_dnn_pooling.cpp test/gtest/test_dnn_act.cpp
-        test/gtest/test_dnn_loss.cpp
-        test/gtest/test_hostside_opencl_funcs.cpp test/gtest/test_logging.cpp
-        test/gtest/test_expressions_helper.cpp test/gtest/test_shims.cpp
-        # test/gtest/test_simple.cu
-        # test/gtest/test_cocl_simple.cu
-    )
-    target_include_directories(cocl_unittests PRIVATE src)
-    target_include_directories(cocl_unittests PRIVATE include)
-    target_include_directories(cocl_unittests PRIVATE src/EasyCL/thirdparty/clew/include)
-    target_include_directories(cocl_unittests PRIVATE third_party/gtest)
-    target_include_directories(cocl_unittests PRIVATE ${CLANG_HOME}/include)
-    target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} ${LLVM_SYSLIBS})
-    target_compile_options(cocl_unittests PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-# endif(BUILD_TESTS)
+add_custom_target(run-cocl_unittests
+    COMMAND echo
+    COMMAND echo make run-cocl_unittests
+    COMMAND ${COCL_DUMP_CL_STR} ${CMAKE_CURRENT_BINARY_DIR}/cocl_unittests
+    DEPENDS cocl_unittests
+    DEPENDS cocl
+    DEPENDS patch_hostside
+)
+
+add_custom_target(tests
+    DEPENDS ${BUILD_TEST_TARGETS} cocl_unittests)
+add_custom_target(run-end-to-end-tests
+    DEPENDS ${RUN_TEST_TARGETS})
+add_custom_target(run-tests
+    DEPENDS ${RUN_TEST_TARGETS} run-cocl_unittests)
 
 FILE(GLOB_RECURSE COCL_HEADERS
   LIST_DIRECTORIES false

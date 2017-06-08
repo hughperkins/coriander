@@ -15,7 +15,7 @@ The following tests are available:
 
 ```
 cd build
-make -j 4
+make -j 8 tests
 ./cocl_unittests
 ```
 
@@ -63,7 +63,8 @@ turn on `BUILD_TESTS`, and run the build.
 
 Now you can do, from `build` directory:
 ```
-make run-tests
+make -j 8 tests
+make run-end-to-end-tests
 ```
 
 You can run a test by name, eg:

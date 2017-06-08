@@ -1028,7 +1028,7 @@ TEST(test_dnn_conv, simple_gpu_conv_backward_data) {
     delete[] gradInImages;
 }
 
-TEST(test_dnn_conv, simple_gpu_conv_backward_filters) {
+TEST(test_dnn_conv, DISABLED_simple_gpu_conv_backward_filters) {
     int N = 4;
     int inC = 3;
     int outC = 5;
