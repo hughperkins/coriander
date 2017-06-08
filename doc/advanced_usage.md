@@ -1,32 +1,14 @@
 # Advanced usage
 
-## Two-step compilation
-
-If you want, you can compile in two steps:
-
-```
-cocl -c teststream.cu
-g++ -o teststream teststream.o -lcocl -lclblast -leasycl -lclew
-```
-Result is the same:
-```
-$ ./cuda_sample
-Using Intel , OpenCL platform: Intel Gen OCL Driver
-Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
-hostFloats[2] 123
-hostFloats[2] 222
-hostFloats[2] 444
-```
-
 ## Compile options
 
 | Option | Description |
 |--------|-------------|
 | -g    | build for debugging |
+| -D   | pass in preprcoessing directive |
 | -I   | provide an include directory, eg `-I /usr/local/eigen` |
 | -o   | output filepath, eg `-o foo.o` |
 | -c   | compile to .o file; dont link |
-| --devicell-opt [option] | pass [option] through to device ll optimization phase.  Affects success and quality of OpenCL generation. |
 | -fPIC | passed to clang object-code compiler |
 
 ### Debug build, `-g`
@@ -35,22 +17,10 @@ Debug builds work since June 8th. Piccie of a `gdb` backtrace, on Ubuntu 16.04, 
 
 <img src="img/gdb_backtrace.png?raw=true" />
 
-### `-devicell-opt` options
+### `-devicell-opt` option
 
-These are passed through to `opt-4.0`, http://llvm.org/docs/Passes.html.  Generally speaking, you dont need to modify these, nor should you. Just use the 
-default options, no need to think about it.  The standard options used are:
+An additional option, not shown in the above table, is `--devicell-opt [option]`.  This family of options affects the success and quality of OpenCL generation. Generally speaking, you dont need to modify these, just use the default options. More information on this advanced option at [ll-optimization-options.md](ll-optimization-options.md)
 
-- `--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine --devicell-opt O2`
-
-`opt-4.0` fits in as follows:
-- `clang-4.0 -x cuda --device-only` converts the incoming `.cu` file to device-side LLVM IR
-- `opt-4.0` optimizes the IR.  `-devicell-opt` options are passed to `opt-4.0` at this point
-- the resulting device-side IR is stored into the executable, for use at runtime
-
-You dont really want to mess with these options much/at all because:
-- the main impact is how well the OpenCL generation works: too much optimization, or too little, and the OpenCL generation step will have issues
-- really, the optimization should be applied after OpenCL generation, by the driver, at runtime
-- I spent ages trying different options, and came up with these, that work ok-ish :-)
 ## Runtime options
 
 You can control the behavior of the Coriander runtime using environment variables.
