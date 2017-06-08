@@ -30,4 +30,3 @@ RUN cd coriander/build && \
 
 RUN cd coriander/build && \
     make install
-
