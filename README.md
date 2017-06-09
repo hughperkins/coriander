@@ -68,7 +68,7 @@ For installation, please see [installation](doc/installation.md)
 
 ## Add to your own `cmake` project
 
-- simply call `cocl_add_executable` and `cocl_add_library`
+- use `cocl_add_executable` and `cocl_add_library`
 - see [cmake usage](doc/cmake_usage.md)
 
 ## Testing
