@@ -142,4 +142,4 @@ To find out more about how this works, you can look at `src/hostside_opencl_func
 
 ## Advanced options
 
-- [advanced_options.md](advanced_options.md)
+- [advanced options](advanced_options.md)
