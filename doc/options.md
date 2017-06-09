@@ -11,6 +11,8 @@
 | -c   | compile to .o file; dont link |
 | -fPIC | compile relocatable code |
 
+Piccie of using gdb for debugging:
+
 <img src="img/gdb_backtrace.png?raw=true" />
 
 ## Runtime options
