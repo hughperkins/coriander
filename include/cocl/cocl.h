@@ -90,25 +90,37 @@
 // #include "cocl/EasyCL/EasyCL.h"
 #include "cocl/vector_types.h"
 
+#include <iostream>
+
 // used by stream_executor/cl_driver.h; we just declare them for now...
 typedef void *CUfunction;
 typedef void *CUfunction_attribute;
 typedef const std::discrete_distribution<int> CUfunc_cache;
+// this is things *used* by the function
+// make sure they're low enough that thrust wont send the occupancy to zero...
 struct cudaFuncAttributes {
-    size_t constSizeBytes;
-    size_t localSizeBytes;
-    int maxThreadsPerBlock;
-    int numRegs;
+    size_t constSizeBytes = 0;
+    size_t localSizeBytes = 512;
+    int maxThreadsPerBlock = 256;
+    int numRegs = 64;
     int ptxVersion;
-    size_t sharedSizeBytes;
+    size_t sharedSizeBytes = 4 * 1024;
 };
+std::ostream &operator<<(std::ostream &os, const cudaFuncAttributes &attr);
 typedef void (*fun_ptr_type)();
 inline size_t cudaFuncGetAttributes(cudaFuncAttributes *p_attributes, fun_ptr_type fn) {
-    std::cout << "cocl.h cudaFuncGetAttributes()" << std::endl;
+    std::cout << "cocl.h cudaFuncGetAttributes(p_attributes, fun_ptr_type fn)" << std::endl;
+    // throw std::runtime_error("not implemented: cudaFuncGetAttributes()");
+    cudaFuncAttributes attrs;
+    *p_attributes = attrs;
+    std::cout << "cudafuncgetattributes threadsperblock =" << p_attributes->maxThreadsPerBlock << std::endl;
     return 0;
 }
 inline size_t cudaFuncGetAttributes(cudaFuncAttributes *p_attributes, void *pfn) {
-    std::cout << "cocl.h cudaFuncGetAttributes()" << std::endl;
+    std::cout << "cocl.h cudaFuncGetAttributes(p_attributes, void *pfn)" << std::endl;
+    // throw std::runtime_error("not implemented: cudaFuncGetAttributes()");
+    cudaFuncAttributes attrs;
+    *p_attributes = attrs;
     return 0;
 }
 

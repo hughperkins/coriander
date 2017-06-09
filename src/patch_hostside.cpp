@@ -16,7 +16,7 @@
 
 #include "patch_hostside.h"
 
-#include "cocl_logging.h"
+#include "cocl/cocl_logging.h"
 
 #include "mutations.h"
 #include "argparsecpp.h"

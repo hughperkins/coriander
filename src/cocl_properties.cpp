@@ -103,14 +103,14 @@ size_t cuDeviceGetAttribute(
 
         case CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK:
         case cudaDevAttrMaxRegistersPerBlock:
-            *value = 64;
+            *value = 16384;  // should be high enough so thrust doesnt send occupancy to zero
             COCL_PRINT("requesting MAX_REGISTERS_PER_BLOCK: " << * value);
             break;
 
         case CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR:
         case cudaDevAttrMaxThreadsPerBlock:  // ok, this is probably wrong...
         case cudaDevAttrMaxThreadsPerMultiProcessor:
-            *value = 128;
+            *value = 2048;
             COCL_PRINT("requesting MAX_THREADS_PER_MULTIPROCESSOR: " << *value);
             break;
 
@@ -169,6 +169,9 @@ size_t cuDeviceComputeCapability(int *cc_major, int *cc_minor, CUdevice device) 
     return 0;
 }
 
+// these properties should be such that thrust wont set num groups and group size to 0
+// see>       thrust/system/cuda/bulk/detail/cuda_launcher/cuda_launch_config.hpp
+// (Note: NOT thrust/system/cuda/detail/cuda_launch_config.h ...)
 size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
     cocl::CoclDevice *coclDevice = getCoclDeviceByGpuOrdinal(device);
     COCL_PRINT("cudaGetDeviceProperties gpuOrdinal=" << coclDevice->gpuOrdinal);
@@ -177,7 +180,7 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
 
     prop->totalGlobalMem = easycl::getDeviceInfoInt64(clDeviceId, CL_DEVICE_GLOBAL_MEM_SIZE);
     prop->sharedMemPerBlock = easycl::getDeviceInfoInt64(clDeviceId, CL_DEVICE_LOCAL_MEM_SIZE);
-    prop->regsPerBlock = 64;
+    prop->regsPerBlock = 1024; // should be high enough that thrust wont set occupancy to 0
     prop->warpSize = 32;
     // prop->memPitch = 4; // whats this?
     // prop->maxThreadsPerBlock = easycl::getDeviceInfoInt(deviceid, CL_DEVICE_MAX_WORK_GROUP_SIZE);
@@ -203,7 +206,7 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
     // prop->pciBusID = 0;
     // prop->pciDeviceID = 0;
     // prop->tccDriver = 0; // no idea
-    prop->maxThreadsPerMultiProcessor = 128;
+    prop->maxThreadsPerMultiProcessor = 2560;  // used by thrust to calculate occupancy.  occupancy cannot go above maxThreadsPerSM / maxThreadsPerBlock (ish)
     return 0;
 }
 

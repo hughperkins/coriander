@@ -9,31 +9,31 @@
 // order of members is arbitrary, just need our sourcecode to use the same declaration
 struct cudaDeviceProp {
     // size_t memPitch;
-    size_t totalConstMem;
-    size_t totalGlobalMem;
-    size_t sharedMemPerBlock;
+    size_t totalConstMem = 0;
+    size_t totalGlobalMem = 0;
+    size_t sharedMemPerBlock = 0;
     // size_t textureAlignment;
-    int regsPerBlock;
-    int warpSize;
+    int regsPerBlock = 0;
+    int warpSize = 0;
     // int pciDeviceID;
     int maxThreadsPerBlock;  // <=
-    int maxThreadsDim[3];
-    int maxGridSize[3];
-    int maxThreadsPerMultiProcessor;  // <=
-    int clockRate;
+    int maxThreadsDim[3] = {0, 0, 0};
+    int maxGridSize[3] = {0, 0, 0};
+    int maxThreadsPerMultiProcessor = 0;  // <=
+    int clockRate = 0;
     // int deviceOverlap;
-    int multiProcessorCount;  // <=
-    int kernelExecTimeoutEnabled;
-    int integrated;
-    int canMapHostMemory;
-    int major;
-    int minor;
+    int multiProcessorCount = 0;  // <=
+    int kernelExecTimeoutEnabled = 0;
+    int integrated = 0;
+    int canMapHostMemory = 0;
+    int major = 0;
+    int minor = 0;
     // int computeMode;
     // int concurrentKernels;
     // int ECCEnabled;
     // int pciBusID;
     // int tccDriver;
-    char name[256];
+    char name[256] = "";
 };
 typedef cudaDeviceProp CUdevprop;
 

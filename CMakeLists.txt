@@ -89,6 +89,7 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
     src/cocl_memory.cpp src/cocl_properties.cpp src/cocl_streams.cpp src/cocl_clsources.cpp src/cocl_context.cpp
     src/ir-to-opencl.cpp src/shims.cpp src/LocalValueInfo.cpp src/ClWriter.cpp src/cocl_vector_types.cpp
     src/cocl_logging.cpp src/DebugDumper.cpp src/fill_buffer.cpp
+    src/cocl_funcs.cpp
 )
 
 set(CMAKE_CC_FLAGS "-fPIC")
@@ -152,6 +153,7 @@ add_executable(patch_hostside
     src/EasyCL/util/easycl_stringhelper.cpp src/cocl_logging.cpp
 )
 target_include_directories(patch_hostside PRIVATE ${CLANG_HOME}/include)
+target_include_directories(patch_hostside PRIVATE include)
 target_include_directories(patch_hostside PRIVATE third_party/argparsecpp)
 target_include_directories(patch_hostside PRIVATE src/EasyCL)
 target_compile_options(patch_hostside PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
