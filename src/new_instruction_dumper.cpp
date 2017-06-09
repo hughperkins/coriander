@@ -402,11 +402,12 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         sharedInfo->setAddressSpace(3);
     }
     llvm::Type *prevType = nullptr;
+    std:ostream &l = std::cout;
     for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
-        // l << "   gep d=" << d << " currnettype=" << typeDumper->dumpType(currentType) << std::endl;
+        l << "gep d=" << d << " currnettype=" << typeDumper->dumpType(currentType) << std::endl;
         if(SequentialType *seqType = dyn_cast<SequentialType>(currentType)) {
-            // l << "    gep seqtype" << std::endl;
+            l << "    gep seqtype" << std::endl;
             if(d == 0) {
                 if(isa<ArrayType>(seqType->getElementType())) {
                     rhs = "(&" + rhs + ")";
@@ -432,6 +433,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                 newType = seqType->getElementType();
             }
         } else if(PointerType *pointerType = dyn_cast<PointerType>(currentType)) {
+            std::cout << "gep pointertype" << std::endl;
             if(d == 0) {
                 if(isa<ArrayType>(pointerType->getElementType())) {
                     rhs = "(&" + rhs + ")";
@@ -443,6 +445,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             rhs += string("[") + idxstring + "]";
             newType = pointerType->getElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
+            std::cout << "gep structtype" << std::endl;
             string structName = ReadIR::getName(structtype);
             if(structName == "struct.float4") {
                 int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
@@ -452,6 +455,8 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                 rhs = "((" + typeDumper->dumpType(castType) + ")&" + rhs + ")";
                 rhs += string("[") + easycl::toString(idx) + "]";
             } else {
+                localValueInfo->inlineCl.push_back(typeDumper->dumpType(currentType) + " " + localValueInfo->name + "_d" + easycl::toString(d) + " = " + rhs);
+
                 // generic struct
                 int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
                 Type *elementType = structtype->getElementType(idx);

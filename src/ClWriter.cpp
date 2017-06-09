@@ -242,10 +242,13 @@ void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
             primitiveType = arrayType->getElementType();
             // cout << "numElements " << numElements << endl;
             // primitiveType->dump();
+        // } else if(SequentialType *seqType = dyn) {
+            // os << indent << "local " << typeDumper->dumpType(pointerType) << " " << localValueInfo->name << "[1]\n";
         } else {
-            cout << "ERROR: sharedclwriter::writedlecaraiotn, not implemneted for:" << endl;
-            value->dump();
-            cout << endl;
+            os << indent << "local " << typeDumper->dumpType(elementType) << " " << localValueInfo->name << "[1];\n";
+            // cout << "ERROR: sharedclwriter::writedlecaraiotn, not implemneted for:" << endl;
+            // value->dump();
+            // cout << endl;
             // TODO: uncomment this line FIXME
             return;
             // throw runtime_error("not handled/implemented");
