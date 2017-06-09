@@ -196,7 +196,22 @@ namespace cocl {
     };
 }
 
+class  dim3 {
+public:
+dim3(unsigned int x, unsigned y, unsigned int z ) :x(x), y(y), z(z) {}
+dim3(unsigned int x, unsigned y ) :x(x), y(y), z(1) {}
+dim3(unsigned int x ) :x(x), y(1), z(1) {}
+dim3() :x(1), y(1), z(1) {}
+unsigned int x;
+unsigned int y;
+unsigned int z;
+};
+
+std::ostream &operator<<(std::ostream &os, const dim3 &value);
+
 extern "C" {
+    int cudaConfigureCall(const dim3 grid, const dim3 block, long long shared = 0,  char * stream = 0);
+
     void configureKernel(
         const char *kernelName, const char *llsourcecode);
 

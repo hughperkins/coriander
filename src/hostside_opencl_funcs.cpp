@@ -13,10 +13,11 @@
 // limitations under the License.
 
 #include "cocl/hostside_opencl_funcs.h"
-#include "cocl/cocl.h"
+// #include "cocl/cocl.h"
 #include "cocl/cocl_memory.h"
 #include "cocl/cocl_clsources.h"
 #include "cocl/cocl_streams.h"
+#include "cocl/cocl_funcs.h"
 
 #include <iostream>
 #include <memory>
@@ -59,12 +60,6 @@ void hostside_opencl_funcs_assure_initialized(void) {
 
 }
 
-// stubs
-CUfunc_cache CU_FUNC_CACHE_PREFER_NONE;
-CUfunc_cache CU_FUNC_CACHE_PREFER_SHARED;
-CUfunc_cache CU_FUNC_CACHE_PREFER_L1;
-CUfunc_cache CU_FUNC_CACHE_PREFER_EQUAL;
-
 namespace cocl {
     #ifdef __APPLE__
     pthread_mutex_t launchMutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
@@ -77,6 +72,11 @@ using namespace cocl;
 
 static LaunchConfiguration launchConfiguration;
 static DebugDumper debugDumper(&launchConfiguration);
+
+std::ostream &operator<<(std::ostream &os, const dim3 &value) {
+    os << "dim3{" << value.x << "," << value.y << "," << value.z << "}";
+    return os;
+}
 
 size_t cuInit(unsigned int flags) {
     return 0;
@@ -102,6 +102,8 @@ int cudaConfigureCall(
     int block_x = block.x;
     int block_y = block.y;
     int block_z = block.z;
+
+    COCL_PRINT("cudaConfigureCall(grid=" << grid << ",block=" << block << ",sharedMem=" << sharedMem << ",queue=" << (uint64_t)queue_as_voidstar << ")")
 
     launchConfiguration.queue = clqueue;
     launchConfiguration.coclStream = coclStream;

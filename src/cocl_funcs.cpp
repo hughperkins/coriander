@@ -1,4 +1,4 @@
-#include "cocl/cocl.h"
+#include "cocl/cocl_funcs.h"
 
 #include <iostream>
 
@@ -12,3 +12,9 @@ std::ostream &operator<<(std::ostream &os, const cudaFuncAttributes &attr) {
     <<"}";
     return os;
 }
+
+// stubs
+CUfunc_cache CU_FUNC_CACHE_PREFER_NONE;
+CUfunc_cache CU_FUNC_CACHE_PREFER_SHARED;
+CUfunc_cache CU_FUNC_CACHE_PREFER_L1;
+CUfunc_cache CU_FUNC_CACHE_PREFER_EQUAL;

@@ -1,5 +1,7 @@
 #pragma once
 
+// This file is kind of a catch-all, until we move it somewhere more principled/cleaner
+
 #ifndef _COCL_H  // since pragma once doesnt work if two files have same name and content, but different location...
 #define _COCL_H
 
@@ -87,72 +89,12 @@
 #include "cocl/cocl_properties.h"
 #include "cocl/cocl_blas.h"
 #include "cocl/cocl_kernellaunch.h"
+#include "cocl/cocl_funcs.h"
+#include "cocl/hostside_opencl_funcs.h"
 // #include "cocl/EasyCL/EasyCL.h"
 #include "cocl/vector_types.h"
 
 #include <iostream>
-
-// used by stream_executor/cl_driver.h; we just declare them for now...
-typedef void *CUfunction;
-typedef void *CUfunction_attribute;
-typedef const std::discrete_distribution<int> CUfunc_cache;
-// this is things *used* by the function
-// make sure they're low enough that thrust wont send the occupancy to zero...
-struct cudaFuncAttributes {
-    size_t constSizeBytes = 0;
-    size_t localSizeBytes = 512;
-    int maxThreadsPerBlock = 256;
-    int numRegs = 64;
-    int ptxVersion;
-    size_t sharedSizeBytes = 4 * 1024;
-};
-std::ostream &operator<<(std::ostream &os, const cudaFuncAttributes &attr);
-typedef void (*fun_ptr_type)();
-inline size_t cudaFuncGetAttributes(cudaFuncAttributes *p_attributes, fun_ptr_type fn) {
-    std::cout << "cocl.h cudaFuncGetAttributes(p_attributes, fun_ptr_type fn)" << std::endl;
-    // throw std::runtime_error("not implemented: cudaFuncGetAttributes()");
-    cudaFuncAttributes attrs;
-    *p_attributes = attrs;
-    std::cout << "cudafuncgetattributes threadsperblock =" << p_attributes->maxThreadsPerBlock << std::endl;
-    return 0;
-}
-inline size_t cudaFuncGetAttributes(cudaFuncAttributes *p_attributes, void *pfn) {
-    std::cout << "cocl.h cudaFuncGetAttributes(p_attributes, void *pfn)" << std::endl;
-    // throw std::runtime_error("not implemented: cudaFuncGetAttributes()");
-    cudaFuncAttributes attrs;
-    *p_attributes = attrs;
-    return 0;
-}
-
-template<typename T>
-size_t cudaSetupArgument(T arg, int flags) {
-    std::cout << "cudaSetupArgument from cocl.h" << std::endl;
-    return 0;
-}
-template<typename T>
-size_t cudaLaunch(T fn) {
-    std::cout << "cudaLaunch from cocl.h" << std::endl;
-    return 0;
-}
-
-// struct CUfunc_cache {
-// };
-typedef void *CUmodule;
-extern CUfunc_cache CU_FUNC_CACHE_PREFER_NONE;
-extern CUfunc_cache CU_FUNC_CACHE_PREFER_SHARED;
-extern CUfunc_cache CU_FUNC_CACHE_PREFER_L1;
-extern CUfunc_cache CU_FUNC_CACHE_PREFER_EQUAL;
-
-class  dim3 {
-public:
-dim3(unsigned int x, unsigned y, unsigned int z ) :x(x), y(y), z(z) {}
-dim3(unsigned int x, unsigned y ) :x(x), y(y), z(1) {}
-dim3(unsigned int x ) :x(x), y(1), z(1) {}
-dim3() :x(1), y(1), z(1) {}
-unsigned int x;
-unsigned int y;
-unsigned int z;
-};
 
 __devicehost__ inline long long __double_as_longlong(double val) {
     return (long long)val;
@@ -185,15 +127,6 @@ __host__ inline unsigned long long atomicExch(volatile unsigned long long *p, un
 #endif
 
 // #define atomicExch atomic_xchg
-
-extern "C" {
-    int cudaConfigureCall(const dim3 grid, const dim3 block, long long shared = 0,  char * stream = 0);
-    ///int cudaConfigureCall(long long xy, int z, long long xy, int z, long long shared,  char * stream);
-    // size_t cudaConfigureCall(
-    //     unsigned long long grid_xy, unsigned int grid_z,
-    //     unsigned long long block_xy, unsigned int block_z, size_t sharedMem=0, void *stream=0);
-
-}
 
 // int cudaConfigureCall(int gridx, int blockx, long long shared = 0,  char * stream = 0);
 

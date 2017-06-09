@@ -1,5 +1,7 @@
 #include "cocl/vector_types.h"
 
+#include <iostream>
+
 float4 make_float4(float x, float y, float z, float w) {
     return float4(x,y,z,w);
 }
