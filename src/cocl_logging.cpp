@@ -47,6 +47,36 @@ Indentor &Indentor::operator<<(const int value) {
     messageSoFar << value;
     return *this;
 }
+Indentor &Indentor::operator<<(const unsigned int value) {
+    // cout << indent << message << endl;
+    // messageSoFar = message
+    messageSoFar << value;
+    return *this;
+}
+Indentor &Indentor::operator<<(const unsigned long long value) {
+    // cout << indent << message << endl;
+    // messageSoFar = message
+    messageSoFar << value;
+    return *this;
+}
+Indentor &Indentor::operator<<(const size_t value) {
+    // cout << indent << message << endl;
+    // messageSoFar = message
+    messageSoFar << value;
+    return *this;
+}
+Indentor &Indentor::operator<<(const long long value) {
+    // cout << indent << message << endl;
+    // messageSoFar = message
+    messageSoFar << value;
+    return *this;
+}
+Indentor &Indentor::operator<<(const float value) {
+    // cout << indent << message << endl;
+    // messageSoFar = message
+    messageSoFar << value;
+    return *this;
+}
 // Indentor &Indentor::operator<<(Indentor &indentor, const std::endl) {
 Indentor &Indentor::operator<<(const endl_fn &fn) {
     // cout << indentor.indent << message << endl;
@@ -55,5 +85,13 @@ Indentor &Indentor::operator<<(const endl_fn &fn) {
     messageSoFar.str("");
     return *this;
 }
+// template<typename T>
+// Indentor &Indentor::operator<<(const T &value) {
+//     messageSoFar << value;
+//     return *this;
+// }
+
+// template Indentor &Indentor::operator<< <char *>(const char *&value);
+// template Indentor &Indentor::operator<< <int>(const int &value);
 
 } // namespace cocl

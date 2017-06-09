@@ -30,7 +30,14 @@ namespace cocl {
         virtual Indentor &operator<<(const std::string &message);
         virtual Indentor &operator<<(const char *message);
         virtual Indentor &operator<<(const int value);
+        virtual Indentor &operator<<(const unsigned int value);
+        virtual Indentor &operator<<(const unsigned long long value);
+        virtual Indentor &operator<<(const long long value);
+        virtual Indentor &operator<<(const size_t value);
+        virtual Indentor &operator<<(const float value);
         virtual Indentor &operator<<(const endl_fn &fn);
+        // template<typename T>
+        // Indentor &operator<<(const T &value);
         std::ostringstream messageSoFar;
     };
 } // namespace cocl
