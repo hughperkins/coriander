@@ -111,7 +111,7 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
 - June 4:
   - added cmake macros `cocl_add_executable` and `cocl_add_library`
   - these replace the previous `add_cocl_executable`, and have the advantage that they are standard targets, that you can use with `target_link_libraries` and so on
-  - see [test/cmake](test/cmake) for an example
+  - see [cmake usage](doc/cmake_usage.md)
 - May 31:
   - added a developer debugging option `COCL_DUMP_CONFIG`, to allow easy inspection of buffers returned by kernel calls, see [options](doc/options.md)
 - [Older news](doc/news.md)
