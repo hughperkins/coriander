@@ -64,20 +64,20 @@ Coriander development is carried out using the following platforms:
 Other systems should work too, ideally.  You will need at a minimum at least one OpenCL-enabled GPU,
 and appropriate OpenCL drivers installed, for the GPU. Both linux and Mac systems stand a reasonable chance of working ok.
 
-For installation, please see [installation.md](doc/installation.md)
+For installation, please see [installation](doc/installation.md)
 
 ## Adding to your own `cmake` project?
 
 - cmake targets `cocl_add_executable` and `cocl_add_library` are available
-- see [cmake_usage.md](doc/cmake_usage.md) for more details
+- see [cmake usage](doc/cmake_usage.md) for more details
 
 ## Testing
 
-See [testing.md](doc/testing.md)
+See [testing](doc/testing.md)
 
 ## Assumptions/relaxations made by Coriander
 
-See [assumptions.md](doc/assumptions.md)
+See [assumptions](doc/assumptions.md)
 
 ## Libraries
 
@@ -107,8 +107,7 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
 ## News
 
 - June 8:
-  - enabled debug builds, `-g`
-    - work on both Mac Sierra, and Ubuntu 16.04
+  - enabled debug builds, `-g`, see [options][doc/options.md]
 - June 4:
   - added cmake macros `cocl_add_executable` and `cocl_add_library`
   - these replace the previous `add_cocl_executable`, and have the advantage that they are standard targets, that you can use with `target_link_libraries` and so on
