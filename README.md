@@ -106,8 +106,6 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
 
 ## News
 
-- June 8:
-  - enabled debug builds, `-g`, see [options](doc/options.md)
 - June 4:
   - added cmake macros `cocl_add_executable` and `cocl_add_library`
   - these replace the previous `add_cocl_executable`, and have the advantage that they are standard targets, that you can use with `target_link_libraries` and so on
