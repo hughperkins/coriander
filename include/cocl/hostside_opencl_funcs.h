@@ -16,6 +16,8 @@
 
 #include "cocl/cocl_launch_args.h"
 
+#include "cocl/vector_types.h"
+
 #include <memory>
 #include <cstdint>
 
@@ -66,19 +68,6 @@ namespace cocl {
     };
 }
 
-class  dim3 {
-public:
-dim3(unsigned int x, unsigned y, unsigned int z ) :x(x), y(y), z(z) {}
-dim3(unsigned int x, unsigned y ) :x(x), y(y), z(1) {}
-dim3(unsigned int x ) :x(x), y(1), z(1) {}
-dim3() :x(1), y(1), z(1) {}
-unsigned int x;
-unsigned int y;
-unsigned int z;
-};
-
-std::ostream &operator<<(std::ostream &os, const dim3 &value);
-
 // #define __launch_bounds__(x) __attribute__((launch_bounds(x)))
 // #define __launch_bounds__(x)
 // #define __launch_bounds__(x, y)
@@ -104,3 +93,42 @@ extern "C" {
     void setKernelArgFloat(float value);
     void kernelGo();
 }
+
+class ArgStore_base {
+public:
+    ArgStore_base() {
+    }
+    virtual ~ArgStore_base() {
+    }
+};
+
+template<typename T>
+class ArgStore : public ArgStore_base {
+public:
+    ArgStore(T arg) : arg(arg) {
+    }
+    T arg;
+};
+
+extern std::unique_ptr< ArgStore_base > g_arg;
+
+#ifdef __CUDACC__
+template<typename T>
+size_t cudaSetupArgument(T arg, int flags) {
+    std::cout << "cudaSetupArgument(T arg, int flags) from hostsideopencl_funcs.h" << std::endl;
+    g_arg.reset(new ArgStore<T>(arg));
+    return 0;
+}
+template<typename Function, typename Arg1>
+void then_execute(Function fn, Arg1 arg1) {
+    fn<<<(32,1,1), (32,1,1), 0>>>(arg1);
+}
+template<typename Function, typename Arg1>
+size_t cudaLaunch(Function (*fn)(Arg1 arg1)) {
+    std::cout << "cudaLaunch(T fn) from hostsideopencl_funcs.h" << std::endl;
+    Arg1 arg1 = dynamic_cast<ArgStore<Arg1> *>(g_arg.get())->arg;
+    // then_execute<Function,
+    fn<<<(32,1,1), (32,1,1), 0>>>(arg1);
+    return 0;
+}
+#endif // __CUDACC__

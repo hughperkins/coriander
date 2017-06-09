@@ -1,8 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "cocl/cocl_attributes.h"
 
-#include "cocl.h"
+#include <cstdint>
+#include <cstddef>
+#include <iostream>
 
 // #ifdef __CUDA_ARCH__ // means device-side
 // #define __devicehost__ __attribute__((device))
@@ -87,3 +89,17 @@ __device__ double2 make_double2(double x, double y);
 float4 make_float4(float x, float y, float z, float w);
 float2 make_float2(float x, float y);
 double2 make_double2(double x, double y);
+
+struct dim3 {
+    dim3(unsigned int x, unsigned y, unsigned int z ) :x(x), y(y), z(z) {}
+    dim3(unsigned int x, unsigned y ) :x(x), y(y), z(1) {}
+    dim3(unsigned int x ) :x(x), y(1), z(1) {}
+    dim3() :x(1), y(1), z(1) {}
+    // unsigned int pad;
+    unsigned int x;
+    unsigned int y;
+    unsigned int z;
+};
+
+std::ostream &operator<<(std::ostream &os, const dim3 &value);
+std::ostream &operator<<(std::ostream &os, const size_t value[3]);

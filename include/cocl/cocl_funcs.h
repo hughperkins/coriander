@@ -5,17 +5,6 @@
 #include <string>
 #include <random>
 
-template<typename T>
-size_t cudaSetupArgument(T arg, int flags) {
-    std::cout << "cudaSetupArgument from cocl_funcs.h" << std::endl;
-    return 0;
-}
-template<typename T>
-size_t cudaLaunch(T fn) {
-    std::cout << "cudaLaunch from cocl_funcs.h" << std::endl;
-    return 0;
-}
-
 // used by stream_executor/cl_driver.h; we just declare them for now...
 typedef void *CUfunction;
 typedef void *CUfunction_attribute;

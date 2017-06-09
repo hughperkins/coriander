@@ -73,10 +73,7 @@ using namespace cocl;
 static LaunchConfiguration launchConfiguration;
 static DebugDumper debugDumper(&launchConfiguration);
 
-std::ostream &operator<<(std::ostream &os, const dim3 &value) {
-    os << "dim3{" << value.x << "," << value.y << "," << value.z << "}";
-    return os;
-}
+std::unique_ptr< ArgStore_base > g_arg;
 
 size_t cuInit(unsigned int flags) {
     return 0;
@@ -486,8 +483,11 @@ void kernelGo() {
     for(int i = 0; i < 3; i++) {
         global[i] = launchConfiguration.grid[i] * launchConfiguration.block[i];
     }
+    cout << "grid: " << launchConfiguration.grid << " block: " << launchConfiguration.block
+        << " global: " << global << endl;
     int workgroupSize = launchConfiguration.block[0] * launchConfiguration.block[1] * launchConfiguration.block[2];
-    kernel->localInts(workgroupSize);
+    COCL_PRINT("workgroupSize=" << workgroupSize);
+    kernel->localInts(min(4, workgroupSize));
 
     try {
         kernel->run(launchConfiguration.queue, 3, global, launchConfiguration.block);
