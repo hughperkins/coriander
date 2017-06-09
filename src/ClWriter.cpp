@@ -227,6 +227,7 @@ void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
         int addressSpace = pointerType->getAddressSpace();
         // cout << "addressSpace " << addressSpace << endl;
         if(addressSpace != 3) {
+            std::cout << "SharedClWriter::writeDeclaration, addressSpace=" << addressSpace << ".  This codepath not handled" << std::endl;
             throw runtime_error("shouldnt be here");
         }
         Type *elementType = pointerType->getElementType();
@@ -242,10 +243,12 @@ void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
             // cout << "numElements " << numElements << endl;
             // primitiveType->dump();
         } else {
-            cout << "sharedclwriter::writedlecaraiotn, not implemneted for:" << endl;
+            cout << "ERROR: sharedclwriter::writedlecaraiotn, not implemneted for:" << endl;
             value->dump();
             cout << endl;
-            throw runtime_error("not handled/implemented");
+            // TODO: uncomment this line FIXME
+            return;
+            // throw runtime_error("not handled/implemented");
         }
         // GlobalVariable *globalVariable = cast<GlobalVariable>(value);
         // int count = pointerType->getArrayNumElements();
