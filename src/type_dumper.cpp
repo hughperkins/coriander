@@ -161,6 +161,9 @@ std::string TypeDumper::addStructToGlobalNames(StructType *type) {
         string name = type->getName();
         name = easycl::replaceGlobal(name, ".", "_");
         name = easycl::replaceGlobal(name, ":", "_");
+        name = easycl::replaceGlobal(name, "<", "_");
+        name = easycl::replaceGlobal(name, ">", "_");
+        name = easycl::replaceGlobal(name, ", ", "_");
         if(name == "struct_float4") {
             name = "float4";
             name = globalNames->getOrCreateName(type, name);
