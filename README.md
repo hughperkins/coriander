@@ -34,7 +34,7 @@ hostFloats[2] 444
 
 <img src="doc/img/mac_run_cuda_sample.png?raw=true" />
 
-[Advanced usage](doc/advanced_usage.md)
+[Options](doc/options.md)
 
 ## What Coriander provides
 
@@ -107,14 +107,12 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
 ## News
 
 - June 8:
-  - enable debug builds
-    - this was actually really easy to do; I just never realized it would work before :-)
-    - tested on both Mac Sierra, and Ubuntu 16.04
-    - see [advanced usage](doc/advanced_usage.md)
+  - enabled debug builds, `-g`
+    - work on both Mac Sierra, and Ubuntu 16.04
 - June 4:
   - added cmake macros `cocl_add_executable` and `cocl_add_library`
   - these replace the previous `add_cocl_executable`, and have the advantage that they are standard targets, that you can use with `target_link_libraries` and so on
   - see [test/cmake](test/cmake) for an example
 - May 31:
-  - added a developer debugging option `COCL_DUMP_CONFIG`, to allow easy inspection of buffers returned by kernel calls, see [advanced usage](doc/advanced_usage.md)
+  - added a developer debugging option `COCL_DUMP_CONFIG`, to allow easy inspection of buffers returned by kernel calls, see [options](doc/options.md)
 - [Older news](doc/news.md)
