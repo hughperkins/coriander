@@ -78,6 +78,8 @@ public:
 
     void runGeneration(LocalValueInfo *localValueInfo, const std::map<llvm::Function *, llvm::Type *> &returnTypeByFunction);
 
+    void skipChildrenRecursively(LocalValueInfo *lvi);
+
     NewInstructionDumper *addIRToCl(bool set=true) {
         _addIRToCl = set;
         return this;

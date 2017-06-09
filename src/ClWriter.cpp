@@ -246,6 +246,8 @@ void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
             cout << "ERROR: sharedclwriter::writedlecaraiotn, not implemneted for:" << endl;
             value->dump();
             cout << endl;
+            cout << "elementtype ispointer? " << isa<PointerType>(elementType) << std::endl;
+            cout << "elementtype isseq? " << isa<SequentialType>(elementType) << std::endl;
             // TODO: uncomment this line FIXME
             return;
             // throw runtime_error("not handled/implemented");
