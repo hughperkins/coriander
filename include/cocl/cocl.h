@@ -74,13 +74,6 @@
 #define __shared__ __attribute__((shared))
 #define __align__(x) __attribute__((aligned(x)))
 
-// #define __launch_bounds__(x) __attribute__((launch_bounds(x)))
-// #define __launch_bounds__(x)
-// #define __launch_bounds__(x, y)
-
-// found this at https://gist.github.com/eliben/b014ac17cbe5a452803f
-#define __launch_bounds__(...) __attribute__((launch_bounds(__VA_ARGS__)))
-
 #include "cocl/cocl_memory.h"
 #include "cocl/cocl_streams.h"
 #include "cocl/cocl_context.h"
@@ -91,10 +84,9 @@
 #include "cocl/cocl_kernellaunch.h"
 #include "cocl/cocl_funcs.h"
 #include "cocl/hostside_opencl_funcs.h"
-// #include "cocl/EasyCL/EasyCL.h"
 #include "cocl/vector_types.h"
 
-#include <iostream>
+// #include <iostream>
 
 __devicehost__ inline long long __double_as_longlong(double val) {
     return (long long)val;
@@ -104,42 +96,13 @@ __devicehost__ inline double __longlong_as_double(long long val) {
     return (double)val;
 }
 
-// __attribute__((device)) <template typename T> T atomicExch(volatile T *p, T val);
-// __attribute__((host)) int atomic_xchg
-
-
-// __attribute__((host)) <template typename T> T atomicExch(volatile T *p, T val) {
-//     throw std::runtime_error("not implemented: atomicExch on host");
-//     // std::atomic<T> global;
-//     // return atomic::exchange(p, val)
-// }
-
-// __device__ unsigned long long atomicExch(volatile unsigned long long *p, unsigned long long val);
-
 #ifdef __CUDA_ARCH__
 __device__ unsigned long long atomicExch(volatile unsigned long long *p, unsigned long long val);
 #else
 __host__ inline unsigned long long atomicExch(volatile unsigned long long *p, unsigned long long val) {
     throw std::runtime_error("not implemented: atomicExch on host");
-    // std::atomic<T> global;
-    // return atomic::exchange(p, val)
 }
 #endif
-
-// #define atomicExch atomic_xchg
-
-// int cudaConfigureCall(int gridx, int blockx, long long shared = 0,  char * stream = 0);
-
-// stuff for device
-// struct float4 {
-// // public:
-//     float4();
-//     float4(const float4 &second);
-//     float x;
-//     float y;
-//     float z;
-//     float w;
-// };
 
 #define clock64() 0
 
@@ -156,18 +119,12 @@ enum cujitenum {
 
 #define CUDART_CB
 
-// we'll need to hack this call later on, when we write out the OpenCL.  At least, this placeholder lets us compile to IR
-// for now
-// __device___ bool __isGlobal(void *ptr);
-
-// ==========================================
 #ifdef __CUDA_ARCH__  // deviceside?
 namespace std {
 __device__ void *malloc(size_t count);
 __device__ void free(void *ptr);
 } // namespace std
 
-// used by util_ptx.cuh, warpAny etc
 #endif // __CUDA_ARCH__ deviceside
 
 typedef int64_t cudaTextureObject_t;
@@ -176,21 +133,11 @@ struct cudaChannelFormatDesc {
 };
 struct cudaTextureDesc {
 };
-// typedef int64_t cudaCreateChannelDesc;
 struct cudaResourceDesc {
 };
 typedef int64_t cudaResourceTypeLinear;
 
 template<typename T> cudaChannelFormatDesc cudaCreateChannelDesc();
 template<typename T> TextureWord tex1Dfetch();
-// end of thrust stuff ===============================
-
-
-// end of thrust bits
-// =====================
-
-// bool __isGlobal(const void *ptr) {
-//     return true;
-// }
 
 #endif // _COCL_H
