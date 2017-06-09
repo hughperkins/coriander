@@ -143,7 +143,8 @@ size_t cuMemGetInfo(size_t *free, size_t *total) {
 size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t cudaMemcpyKind, char *_queue) {
     ThreadVars *v = getThreadVars();
     CoclStream *coclStream = (CoclStream *)_queue;
-    COCL_PRINT("cudaMemcpyAsync count=" << count << " cudaMemcpyKind=" << cudaMemcpyKind << " context=" << (void *)v->currentContext);
+    COCL_PRINT("cudaMemcpyAsync kind=" << cudaMemcpyKind << " ctx=" << (void *)v->currentContext
+       << " src=" << src << " dst=" << dst << " count=" << count);
 
     if(coclStream == 0) {
         coclStream = v->currentContext->default_stream.get();
