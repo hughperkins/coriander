@@ -66,10 +66,10 @@ and appropriate OpenCL drivers installed, for the GPU. Both linux and Mac system
 
 For installation, please see [installation](doc/installation.md)
 
-## Adding to your own `cmake` project?
+## Add to your own `cmake` project
 
-- cmake targets `cocl_add_executable` and `cocl_add_library` are available
-- see [cmake usage](doc/cmake_usage.md) for more details
+- simply call `cocl_add_executable` and `cocl_add_library`
+- see [cmake usage](doc/cmake_usage.md)
 
 ## Testing
 
