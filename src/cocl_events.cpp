@@ -163,10 +163,17 @@ size_t cudaEventSynchronize(cocl::CoclEvent *event) {
 
 size_t cuEventRecord(CoclEvent *event, char *_queue) {
     pthread_mutex_lock(&cocl_events_mutex);
+    COCL_PRINT("cuEventRecord CoclEvent=" << (long)event << " _queue=" << (long)_queue);
     CoclStream *coclStream = (CoclStream *)_queue;
+
+    ThreadVars *v = getThreadVars();
+    // EasyCL *cl = v->getContext()->getCl();
+    if(coclStream == 0) {
+        coclStream = v->currentContext->default_stream.get();
+    }
     CLQueue *queue = coclStream->clqueue;
+    COCL_PRINT("  cuEventRecord queue=" << queue);
     // CLQueue *queue = (CLQueue *)_queue;
-    COCL_PRINT("cuEventRecord CoclEvent=" << event << " queue=" << queue);
     if(queue == 0) {
         cout << "cuEventRecord not implemented for stream 0" << endl;
         throw runtime_error("cuEventRecord not implemented for stream 0");
