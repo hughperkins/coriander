@@ -33,7 +33,7 @@ if(INDEXES_32BIT)
     add_definitions(-DEIGEN_DEFAULT_DENSE_INDEX_TYPE=int32_t)
 endif()
 
-include(/usr/local/share/cocl/cocl.cmake)
+# include(/usr/local/share/cocl/cocl.cmake)
 
 foreach(EIGEN_TEST ${EIGEN_TESTS})
     cocl_add_executable(${EIGEN_TEST} ${TESTS_EXCLUDE} ${EIGEN_TEST}.cu)
