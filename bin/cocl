@@ -26,13 +26,13 @@ set -e
 # which wont be the case if their optimizaiton levels differ
 
 if [ -z ${DEVICE_PARSE_OPT_LEVEL} ]; then {
-    export DEVICE_PARSE_OPT_LEVEL=0
+    export DEVICE_PARSE_OPT_LEVEL=2
 } fi
 if [ -z ${DEVICE_PARSE_PASSES} ]; then {
     export DEVICE_PARSE_PASSES=inline,mem2reg,instcombine
 } fi
 if [ -z ${HOSTSIDE_PARSE_OPT_LEVEL} ]; then {
-    export HOSTSIDE_PARSE_OPT_LEVEL=0
+    export HOSTSIDE_PARSE_OPT_LEVEL=2
 } fi
 if [ -z ${HOSTSIDE_COMPILE_OPT_LEVEL} ]; then {
     export HOSTSIDE_COMPILE_OPT_LEVEL=3
