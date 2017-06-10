@@ -166,7 +166,11 @@ endif()
 if(COCL_DEFINITIONS)
     target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
 endif()
-target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES} -Wno-sign-compare -Wno-covered-switch-default)
+set(NO_COVERED_SWITCH_DEFAULT)
+if(APPLE)
+  set(NO_COVERED_SWITCH_DEFAULT "-Wno-covered-switch-default")
+endif()
+target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES} -Wno-sign-compare ${NO_COVERED_SWITCH_DEFAULT})
 target_link_libraries(cocl easycl ${LLVM_LIBS} ${LLVM_SYSLIBS})
 
 # ==================================================================================================
