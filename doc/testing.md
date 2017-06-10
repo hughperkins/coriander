@@ -27,6 +27,8 @@ No dependencies on graphics card etc.  It simply takes some hand-crafted IR, and
 
 ### Pre-requisites
 
+- built Coriander
+- installed python pre-requisites:
 ```
 pip install -r test/requirements.txt
 ```
@@ -34,36 +36,24 @@ pip install -r test/requirements.txt
 ### Procedure
 
 ```
-OFFSET_32BIT=1 \
-COCL_OPTIONS='--devicell-opt inline --devicell-opt mem2reg --devicell-opt instcombine --devicell-opt O2' \
 py.test -v
 ```
 
 - python tests are at [test](test)
 
-You can modify the options in `COCL_OPTIONS`.  There are passed to the `cocl` command, see section #Options above.
-
-If you set `OFFSET_32BIT` to off in your cmake options, you should remove the `OFFSET_32BIT=1` optio nwhen running py.test
-
-If you get lots of errors, you probably should double-check that you have done `export OFFSET_32BIT=1`.  If you're sure you have, and you're still getting errors, please log an issue with:
-  - `git log -n 5 --oneline`, from the coriander directory (via https://gist.github.com )
-  - which operating system (eg 'ubuntu 16.04', 'mac sierra')
-  - which GPU(s) (eg 'nvidia 940m', 'radeon pro 450', ....)
-  - the output of `clinfo` (via https://gist.github.com )
-  - the full output of the command that produced the error, as well as the command (via https://gist.github.com )
+In theory, these should all pass, so please raise an issue for any that are failing, stating your operating system, and providing `clinfo` output
 
 ## End-to-end tests
 
-Run:
+Build:
 ```
 cd build
 ccmake ..
-```
-turn on `BUILD_TESTS`, and run the build.
-
-Now you can do, from `build` directory:
-```
 make -j 8 tests
+```
+
+Run:
+```
 make run-end-to-end-tests
 ```
 
@@ -82,12 +72,6 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 126.456
 ```
 - end-to-end tests are at [test/cocl](test/cocl)
-
-### Options
-
-From `ccmake ..`, there are various options you can choose, that affect hte OpenCL code produced.  These options will affect how well the OpenCL generation works, and how acceptable it is to your GPU driver.  If you're reading the OpenCL code ,they will affect readability too.
-
-You can see the section `Options`, in [advanced_usage](doc/advanced_usage.md), for more details.
 
 ## Eigen tests
 

@@ -6,7 +6,16 @@ import numpy as np
 import pyopencl as cl
 
 
-clang_path = join(os.environ['CLANG_HOME'], 'bin', 'clang++')
+with open('build/bin/cocl', 'r') as f:
+    for line in f:
+        if line.strip().startswith('export CLANG_HOME='):
+            CLANG_HOME = line.strip().split('=')[1]
+    # CLANG_HOME = f.read().split('\n')
+clang_path = join(CLANG_HOME, 'bin', 'clang++')
+cocl_path = 'build/bin/cocl'
+
+# opt_level = 0
+# opt_passes = ['-mem2reg', '-inline', '-instcombine']
 
 
 def run_process(cmdline_list, cwd=None, env=None):
@@ -51,18 +60,20 @@ def enqueue_read_buffer_ext(cl, queue, mem, hostbuf, device_offset=0, size=None,
     return cl.cffi_cl.NannyEvent._create(ptr_event[0])
 
 
-def cocl_options():
-    options = []
-    # if os.environ.get('COCL_BRANCHES_AS_SWITCH', '0') != '0':
-    #     options.append('--branches_as_switch')
+# def cocl_options
 
-    # if os.environ.get('COCL_RUN_TRANSFORMS', '0') != '0':
-    #     options.append('--run_transforms')
+# def cocl_options():
+#     options = []
+#     # if os.environ.get('COCL_BRANCHES_AS_SWITCH', '0') != '0':
+#     #     options.append('--branches_as_switch')
 
-    options = os.environ.get('COCL_OPTIONS', '').split()
+#     # if os.environ.get('COCL_RUN_TRANSFORMS', '0') != '0':
+#     #     options.append('--run_transforms')
 
-    print('options', options)
-    return options
+#     options = os.environ.get('COCL_OPTIONS', '').split()
+
+#     print('options', options)
+#     return options
 
 
 def offset_type(offset):
@@ -111,10 +122,11 @@ def compile_code(cl, context, kernelSource, kernelName, num_clmems):
     env['COCL_BIN'] = 'build'
     env['COCL_LIB'] = 'build'
     run_process([
-        'bin/cocl',
+        'bash',
+        cocl_path,
         '-c',
         '/tmp/testprog.cu'
-    ] + cocl_options(),
+    ],
         env=env)
 
     run_process([
@@ -147,10 +159,11 @@ def compile_code_v2(cl, context, kernelSource, kernelName, num_clmems):
     env['COCL_BIN'] = 'build'
     env['COCL_LIB'] = 'build'
     run_process([
-        'bin/cocl',
+        'bash',
+        cocl_path,
         '-c',
         '/tmp/testprog.cu'
-    ] + cocl_options(), env=env)
+    ], env=env)
 
     run_process([
         'build/ir-to-opencl',
@@ -182,10 +195,11 @@ def compile_code_v3(cl, context, kernelSource, kernelName, num_clmems):
     env['COCL_BIN'] = 'build'
     env['COCL_LIB'] = 'build'
     run_process([
-        'bin/cocl',
+        'bash',
+        cocl_path,
         '-c',
         '/tmp/testprog.cu'
-    ] + cocl_options(), env=env)
+    ], env=env)
 
     run_process([
         'build/ir-to-opencl',
@@ -233,16 +247,17 @@ def cu_to_ll(cu_sourcecode):
     env['COCL_BIN'] = 'build'
     env['COCL_LIB'] = 'build'
     run_process([
-        'bin/cocl',
+        'bash',
+        cocl_path,
         '-c',
         '/tmp/testprog.cu'
-    ] + cocl_options(), env=env)
+    ], env=env)
     with open('/tmp/testprog-device.ll', 'r') as f:
         ll_sourcecode = f.read()
     return ll_sourcecode
 
 
-def cu_to_devicell_noopt(cu_sourcecode):
+def cu_to_devicell_explicit_opt(cu_sourcecode, opt=0):
     for file in os.listdir('/tmp'):
         if file.startswith('testprog'):
             os.unlink('/tmp/%s' % file)
@@ -250,17 +265,23 @@ def cu_to_devicell_noopt(cu_sourcecode):
         f.write(cu_sourcecode)
     print(subprocess.check_output([
         clang_path,
+        '-x', 'cuda',
+        '-include', 'include/cocl/cocl_attributes.h',
         '--cuda-device-only',
         '-nocudainc',
         '-nocudalib',
         '-emit-llvm',
         '/tmp/testprog.cu',
         '-S',
-        '-O0',
+        '-O%s' % opt,
         '-o', '/tmp/testprog.ll'
     ]).decode('utf-8'))
     with open('/tmp/testprog.ll', 'r') as f:
         return f.read()
+
+
+def cu_to_devicell_noopt(cu_sourcecode):
+    return cu_to_devicell_explicit_opt(cu_sourcecode, opt=0)
 
 
 def cu_to_cl(cu_sourcecode, kernelName, num_clmems):
@@ -276,10 +297,11 @@ def cu_to_cl(cu_sourcecode, kernelName, num_clmems):
     env['COCL_BIN'] = 'build'
     env['COCL_LIB'] = 'build'
     run_process([
-        'bin/cocl',
+        'bash',
+        cocl_path,
         '-c',
         '/tmp/testprog.cu'
-    ] + cocl_options(), env=env)
+    ], env=env)
 
     run_process([
         'build/ir-to-opencl',

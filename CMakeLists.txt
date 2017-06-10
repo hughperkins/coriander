@@ -1,14 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
 option(BUILD_TESTS "Build tests" OFF)
-set(TESTS_COCL_OPTIONS "" CACHE STRING "cocl options, semicolon-separated.  See cocl -h")
-# option(TESTS_RUN_TRANSFORM_BRANCHES "")
-option(TESTS_DEVICELL_INLINE "cocl option for tests" ON)
-option(TESTS_DEVICELL_MEM2REG "cocl option for tests" ON)
-option(TESTS_DEVICELL_INSTCOMBINE "cocl option for tests" ON)
-set(TESTS_DEVICELL_OPT "O2" CACHE STRING "cocl option for tests")
-option(EXPLAIN_CL "Add IR code into OpenCL.  For maintainers mostly" OFF)
-option(TESTS_DUMP_CL "Writes OpenCL for tests to stdout.  For maintainers mostly" OFF)
 option(COCL_SPAM "Lots of scrolly debug text.  Mostly for maintainer usage" OFF)
 if(APPLE)
 set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE STRING "the downloaded clang-4.0.0 folder, containing lib, bin etc")
@@ -16,8 +8,26 @@ else()
 set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE STRING "the downloaded clang-4.0.0 folder, containing lib, bin etc")
 endif()
 
-if(TESTS_CL_BRANCHES_AS_SWITCH)
-    unset(TESTS_CL_RUN_TRANSFORMS CACHE)
+if(APPLE)
+  mark_as_advanced(CMAKE_OSX_ARCHITECTURES)
+  mark_as_advanced(CMAKE_OSX_DEPLOYMENT_TARGET)
+  mark_as_advanced(CMAKE_OSX_SYSROOT)
+endif(APPLE)
+
+# old deprecated options
+unset(TESTS_COCL_OPTIONS CACHE)
+unset(TESTS_DEVICELL_INLINE CACHE)
+unset(TESTS_DEVICELL_MEM2REG CACHE)
+unset(TESTS_DEVICELL_INSTCOMBINE CACHE)
+unset(TESTS_DEVICELL_OPT CACHE)
+unset(EXPLAIN_CL CACHE)
+unset(TESTS_DUMP_CL CACHE)
+unset(TESTS_CL_BRANCHES_AS_SWITCH CACHE)
+unset(TESTS_CL_RUN_TRANSFORMS CACHE)
+
+if (NOT CMAKE_BUILD_TYPE)
+    # message("Setting build type to 'Debug'")
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif()
 
 if(COCL_SPAM)
@@ -45,40 +55,10 @@ if(COCL_SPAM_PROPERTIES)
   add_definitions(-DCOCL_SPAM_PROPERTIES)
 endif()
 
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS})
-if(TESTS_DEVICELL_INLINE)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--devicell-opt;inline)
-endif()
-if(TESTS_DEVICELL_MEM2REG)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--devicell-opt;mem2reg)
-endif()
-if(TESTS_DEVICELL_INSTCOMBINE)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--devicell-opt;instcombine)
-endif()
-if(TESTS_DEVICELL_OPT)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--devicell-opt;${TESTS_DEVICELL_OPT})
-endif()
-if(EXPLAIN_CL)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--add_ir_to_cl)
-endif()
-# if(TESTS_DUMP_CL)
-# set($ENV{COCL_DUMP_CL} "1")
-# endif()
-
 FILE(GLOB YAMLCPP_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/yaml-cpp/src/*.cpp)
-# message("YAMLCPP_SRCS ${YAMLCPP_SRCS}")
 
 set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/platforminfo_helper.cpp src/EasyCL/EasyCL.cpp
     src/EasyCL/deviceinfo_helper.cpp src/EasyCL/util/easycl_stringhelper.cpp src/EasyCL/DevicesInfo.cpp src/EasyCL/DeviceInfo.cpp)
-
-# set(COCL_BRANCHING_SRCS
-#     src/branches_as_switch/branches_as_switch.cpp
-#     src/handle_branching.cpp src/branching_transforms.cpp src/flowcontrolinstructions.cpp
-#     src/flowcontrol/returnblock.cpp src/flowcontrol/sequence.cpp src/flowcontrol/basicblockblock.cpp
-#     src/flowcontrol/conditionalbranch.cpp src/flowcontrol/dowhile.cpp src/flowcontrol/if.scpp
-#     src/flowcontrol/for.cpp src/flowcontrol/rootblock.cpp src/flowcontrol/block.cpp)
-
-# message("CLANG_HOME: ${CLANG_HOME}")
 
 set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new_instruction_dumper.cpp
     src/struct_clone.cpp src/basicblockdumper.cpp src/ExpressionsHelper.cpp src/readIR.cpp
@@ -268,9 +248,7 @@ set(TESTS testblas cuda_sample context byvaluestructwithpointer multigpu multith
     test_floatstarstar
 )
 
-if(TESTS_DUMP_CL)
-    set(COCL_DUMP_CL_STR "COCL_DUMP_CL=1")
-endif()
+# set(COCL_DUMP_CL_STR "COCL_DUMP_CL=1")
 include_directories(include/cocl/proxy_includes)
 foreach(TEST ${TESTS})
     cocl_add_executable(${TEST} ${TESTS_EXCLUDE} test/cocl/${TEST}.cu)
@@ -327,11 +305,11 @@ add_custom_target(run-cocl_unittests
 )
 
 add_custom_target(tests
-    DEPENDS ${BUILD_TEST_TARGETS} cocl_unittests)
+    DEPENDS ${BUILD_TEST_TARGETS} cocl_unittests clblast clew easycl cocl patch_hostside ir-to-opencl)
 add_custom_target(run-end-to-end-tests
-    DEPENDS ${RUN_TEST_TARGETS})
+    DEPENDS tests ${RUN_TEST_TARGETS})
 add_custom_target(run-tests
-    DEPENDS ${RUN_TEST_TARGETS} run-cocl_unittests)
+    DEPENDS tests ${RUN_TEST_TARGETS} run-cocl_unittests)
 
 FILE(GLOB_RECURSE COCL_HEADERS
   LIST_DIRECTORIES false

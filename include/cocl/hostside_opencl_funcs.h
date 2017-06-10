@@ -113,6 +113,7 @@ public:
 extern std::unique_ptr< ArgStore_base > g_arg;
 
 #ifdef __CUDACC__
+#pragma clang diagnostic ignored "-Wunused-value"  // prevents warnings for the triple chevron launch syntax
 template<typename T>
 size_t cudaSetupArgument(T arg, int flags) {
     std::cout << "cudaSetupArgument(T arg, int flags) from hostsideopencl_funcs.h" << std::endl;

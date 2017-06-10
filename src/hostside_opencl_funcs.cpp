@@ -48,8 +48,10 @@ using namespace cocl;
 
 #ifdef COCL_SPAM_KERNELLAUNCH
 #define COCL_PRINT(x) std::cout << "[LAUNCH] " << x << std::endl;
+#define WHEN_SPAMMING(x) x
 #else
 #define COCL_PRINT(x) 
+#define WHEN_SPAMMING(x)
 #endif
 
 extern "C" {
@@ -452,7 +454,7 @@ void kernelGo() {
             std::cout << std::endl;
             throw std::runtime_error("Error: using vmem with multiple allocations");
         } else {
-            Memory *memory = *v->getContext()->memories.begin();
+            WHEN_SPAMMING(Memory *memory = *v->getContext()->memories.begin());
             COCL_PRINT("Memory allocation ok: one single allocation at vmem=" << memory->fakePos << " sizeByes=" << memory->bytes);
         }
     }
@@ -483,8 +485,8 @@ void kernelGo() {
     for(int i = 0; i < 3; i++) {
         global[i] = launchConfiguration.grid[i] * launchConfiguration.block[i];
     }
-    cout << "grid: " << launchConfiguration.grid << " block: " << launchConfiguration.block
-        << " global: " << global << endl;
+    COCL_PRINT("grid: " << launchConfiguration.grid << " block: " << launchConfiguration.block
+        << " global: " << global);
     int workgroupSize = launchConfiguration.block[0] * launchConfiguration.block[1] * launchConfiguration.block[2];
     COCL_PRINT("workgroupSize=" << workgroupSize);
     kernel->localInts(min(4, workgroupSize));
