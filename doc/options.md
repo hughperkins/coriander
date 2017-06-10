@@ -1,25 +1,19 @@
-# Advanced usage
+# Options
 
 ## Compile options
 
 | Option | Description |
 |--------|-------------|
-| -g    | build for debugging |
-| -D   | pass in preprcoessing directive |
+| -g    | debug build |
+| -D   | defines, eg `-DENABLE_SOMETHING` |
 | -I   | provide an include directory, eg `-I /usr/local/eigen` |
 | -o   | output filepath, eg `-o foo.o` |
 | -c   | compile to .o file; dont link |
-| -fPIC | passed to clang object-code compiler |
+| -fPIC | compile relocatable code |
 
-### Debug build, `-g`
-
-Debug builds work since June 8th. Piccie of a `gdb` backtrace, on Ubuntu 16.04, with line numbers :-)
+Piccie of using gdb for debugging:
 
 <img src="img/gdb_backtrace.png?raw=true" />
-
-### `-devicell-opt` option
-
-An additional option, not shown in the above table, is `--devicell-opt [option]`.  This family of options affects the success and quality of OpenCL generation. Generally speaking, you dont need to modify these, just use the default options. More information on this advanced option at [ll-optimization-options.md](ll-optimization-options.md)
 
 ## Runtime options
 
@@ -145,3 +139,7 @@ You're best turning on the option `COCL_SPAM`, in `ccmake ..`, and also `COCL_SP
 We get the unique kernel name from the output to stdout, usign `COCL_SPAM_KERNELLAUNCH` cmake options.  We can then grep for this kernel name in `/tmp/*.cl`, to find the correspdonding `.cl` file.
 
 To find out more about how this works, you can look at `src/hostside_opencl_funcs.cpp`, function `dump()`. (you really should do this, since this doc is almost certainly already out of date :-P )
+
+## Advanced options
+
+- [advanced options](advanced_options.md)

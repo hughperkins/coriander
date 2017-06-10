@@ -1,4 +1,10 @@
-# ll optimization options
+# Advanced options
+
+| Option | Description |
+|--------|-------------|
+| --devicell-opt [option] | Passed to `opt-4.0`, http://llvm.org/docs/Passes.html, affects OpenCL generation |
+
+## `--devicell-opt [option]`
 
 These are passed through to `opt-4.0`, http://llvm.org/docs/Passes.html.  Generally speaking, you dont need to modify these, nor should you. Just use the 
 default options, no need to think about it.
