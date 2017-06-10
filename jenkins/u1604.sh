@@ -2,6 +2,9 @@
 
 # assumed to run from the base of the cloned Coriander git repo
 
+set -e
+set -x
+
 BASEDIR=$(pwd)
 hg clone https://bitbucket.org/hughperkins/eigen -b tf-coriander
 mkdir build
