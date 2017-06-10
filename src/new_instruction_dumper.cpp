@@ -383,7 +383,8 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     GetElementPtrInst *instr = cast<GetElementPtrInst>(localValueInfo->value);
 
-    LocalValueInfo *op0info = getOperand(instr->getOperand(0));
+    Value *incomingOp = instr->getOperand(0);
+    LocalValueInfo *op0info = getOperand(incomingOp);
 
     string gencode = "";
     int numOperands = instr->getNumOperands();
@@ -402,7 +403,8 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         sharedInfo->setAddressSpace(3);
     }
     llvm::Type *prevType = nullptr;
-    for(int d=0; d < numOperands - 1; d++) {
+    int d = 0;
+    // for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
         // l << "   gep d=" << d << " currnettype=" << typeDumper->dumpType(currentType) << std::endl;
         if(SequentialType *seqType = dyn_cast<SequentialType>(currentType)) {
@@ -488,14 +490,48 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         // update the addressspace to be global, ie 1.  This is a bit hacky I know
         prevType = currentType;
         currentType = newType;
-    }
-    updateAddressSpace(instr, addressspace);
-    localValueInfo->setAddressSpace(addressspace);
+    // }
+    // updateAddressSpace(instr, addressspace);
+    // localValueInfo->setAddressSpace(addressspace);
     rhs = "(" + ExpressionsHelper::stripOuterParams(rhs) + ")";
     rhs = "(&" + rhs + ")";
 
+    // Value *idxList[2];
+    // args[0] = bitcast;
+    cout << "instr:" << std::endl;
+    instr->dump();
+    cout << "instr->getType()->dump()" << endl;
+    instr->getType()->dump();
+    // idxList[0] = createInt32Constant(&M->getContext(), 0);
+    std::vector<Value *> idxList;
+    idxList.push_back(createInt32Constant(&M->getContext(), 0));
+    // idxList.push_back(createInt32Constant(&M->getContext(), 0));
+    // idxList.push_back(createInt32Constant(&M->getContext(), 0));
+
+    cout << "incomingOp->getType()->dump()" << std::endl;
+    incomingOp->getType()->dump();
+
+    cout << "incomingOp->getType()->getPointerElementType()->dump()" << std::endl;
+    cast<PointerType>(incomingOp->getType())->getElementType()->dump();
+    // instr->dump();
+    cout << "currentType->dump()" << std::endl;
+    currentType->dump();
+    cout << endl;
+    GetElementPtrInst *childInst = GetElementPtrInst::Create(currentType, incomingOp, ArrayRef<Value *>(idxList));
+    // childInst->insertAfter(instr);
+    std::cout << "childinst:" << std::endl;
+    childInst->dump();
+    std::cout << std::endl;
+    cout << "childinst->getType()->dump" << endl;
+    childInst->getType()->dump();
+    cout << endl;
+    LocalValueInfo *thisInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, childInst);
+    
     localValueInfo->setExpression(rhs);
 }
+            // LocalValueInfo *instrInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, inst);
+// static GetElementPtrInst *  Create (Type *PointeeType, Value *Ptr, ArrayRef< Value * > IdxList, const Twine &NameStr="", Instruction *InsertBefore=nullptr)
+// static GetElementPtrInst *  Create (Type *PointeeType, Value *Ptr, ArrayRef< Value * > IdxList, const Twine &NameStr, BasicBlock *InsertAtEnd)
 
 void NewInstructionDumper::dumpLoad(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
