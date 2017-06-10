@@ -207,7 +207,10 @@ endforeach()
 
 include_directories(src/CLBlast/src)
 add_library(clblast SHARED ${CLBLAST_SOURCES})
-target_compile_options(clblast PRIVATE -Wno-switch)
+if(APPLE)
+  # remove covered switch build warnings
+  target_compile_options(clblast PRIVATE -Wno-switch)
+endif(APPLE)
 target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
 target_include_directories(clblast PRIVATE src/CLBlast/include)
 target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include)
