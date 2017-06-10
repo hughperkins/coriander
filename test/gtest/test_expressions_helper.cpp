@@ -34,15 +34,15 @@ TEST(test_expressions_helper, basic) {
     EXPECT_EQ("1.0f", cocl::ExpressionsHelper::stripOuterParams("(1.0f)"));
     EXPECT_EQ("1.0f", cocl::ExpressionsHelper::stripOuterParams("((1.0f))"));
 
-    EXPECT_EQ(true, cocl::ExpressionsHelper::isValidExpression("v1"));
-    EXPECT_EQ(true, cocl::ExpressionsHelper::isValidExpression("(v1)"));
-    EXPECT_EQ(false, cocl::ExpressionsHelper::isValidExpression("v1 + v2) + (v3 + v4"));
+    EXPECT_TRUE(cocl::ExpressionsHelper::isValidExpression("v1"));
+    EXPECT_TRUE(cocl::ExpressionsHelper::isValidExpression("(v1)"));
+    EXPECT_FALSE(cocl::ExpressionsHelper::isValidExpression("v1 + v2) + (v3 + v4"));
 
-    EXPECT_EQ(true, cocl::ExpressionsHelper::isSingleExpression("v1"));
-    EXPECT_EQ(false, cocl::ExpressionsHelper::isSingleExpression("v1 + v2"));
-    EXPECT_EQ(true, cocl::ExpressionsHelper::isSingleExpression("(v1 + v2)"));
-    EXPECT_EQ(true, cocl::ExpressionsHelper::isSingleExpression("((v1 + v2))"));
-    EXPECT_EQ(false, cocl::ExpressionsHelper::isSingleExpression("(v1 + v2) + (v3 + v4)"));
+    EXPECT_TRUE(cocl::ExpressionsHelper::isSingleExpression("v1"));
+    EXPECT_FALSE(cocl::ExpressionsHelper::isSingleExpression("v1 + v2"));
+    EXPECT_TRUE(cocl::ExpressionsHelper::isSingleExpression("(v1 + v2)"));
+    EXPECT_TRUE(cocl::ExpressionsHelper::isSingleExpression("((v1 + v2))"));
+    EXPECT_FALSE(cocl::ExpressionsHelper::isSingleExpression("(v1 + v2) + (v3 + v4)"));
 }
 
 } // namespade
