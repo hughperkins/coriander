@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "cocl/hostside_opencl_funcs.h"
+#include "hostside_opencl_funcs.h"
 
 #include "yaml-cpp/yaml.h"
 

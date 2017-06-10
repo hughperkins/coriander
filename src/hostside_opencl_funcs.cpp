@@ -1,4 +1,4 @@
-// Copyright Hugh Perkins 2016
+// Copyright Hugh Perkins 2016, 2017
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "cocl/hostside_opencl_funcs.h"
+#include "cocl/hostside_opencl_funcs_ext.h"
+#include "hostside_opencl_funcs.h"
 // #include "cocl/cocl.h"
 #include "cocl/cocl_memory.h"
 #include "cocl/cocl_clsources.h"

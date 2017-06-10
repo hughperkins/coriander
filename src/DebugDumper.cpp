@@ -18,7 +18,7 @@
 
 #include "EasyCL/EasyCL.h"
 
-#include "cocl/hostside_opencl_funcs.h"
+#include "hostside_opencl_funcs.h"
 #include "cocl/cocl_memory.h"
 
 using namespace std;

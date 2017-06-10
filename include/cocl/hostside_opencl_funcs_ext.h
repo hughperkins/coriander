@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#pragma once
+// Things we want client code to be able to include, without having to include
+// eg llvm 4.0
 
-#include "cocl/cocl_launch_args.h"
+#pragma once
 
 #include "cocl/vector_types.h"
 
@@ -24,49 +25,6 @@
 #include "EasyCL/EasyCL.h"
 
 #include "cocl/cocl_defs.h"
-
-namespace easycl {
-    class CLKernel;
-    class EasyCL;
-}
-
-namespace cocl {
-    class CoclStream;
-
-    int32_t getNumCachedKernels(); // this should be per-context or something, though right now, it is not yet
-    int32_t getNumKernelCalls();
-
-    struct GenerateOpenCLResult {
-        std::string clSourcecode;
-        std::string originalKernelName;
-        std::string shortKernelName;
-        std::string uniqueKernelName;
-    };
-    GenerateOpenCLResult generateOpenCL(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, std::string origKernelName, std::string devicellsourcecode);
-    easycl::CLKernel *compileOpenCLKernel(std::string originalKernelName, std::string uniqueKernelName, std::string shortKernelName, std::string clSourcecode);
-    easycl::CLKernel *compileOpenCLKernel(std::string shortKernelName, std::string clSourcecode);
-
-
-    class LaunchConfiguration {
-    public:
-        size_t grid[3];
-        size_t block[3];
-        easycl::CLQueue *queue = 0;  // NOT owned by us
-        cocl::CoclStream *coclStream = 0; // NOT owned
-
-        std::vector<std::unique_ptr<Arg> > args;
-
-        std::map<cl_mem, int> clmemIndexByClmem;
-        std::vector<cl_mem> clmems;
-        std::vector<int> clmemIndexByClmemArgIndex;
-
-        std::vector<cl_mem> kernelArgsToBeReleased;
-        std::string kernelName = "";
-        std::string uniqueKernelName = "";
-        std::string shortKernelName = "";
-        std::string devicellsourcecode = "";
-    };
-}
 
 // #define __launch_bounds__(x) __attribute__((launch_bounds(x)))
 // #define __launch_bounds__(x)
