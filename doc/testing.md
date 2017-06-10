@@ -15,25 +15,27 @@ The following tests are available:
 
 ```
 cd build
-make -j 8 tests
-./cocl_unittests
+make -j 8 cocl_unittests
+make run-cocl_unittests
 ```
 
 No dependencies on graphics card etc.  It simply takes some hand-crafted IR, and writes it to OpenCL.  It never actually tries to run the OpenCL, so it validates:
 - can Coriander handle the IR without choking/crashing?
 - do the hand-crafted OpenCL expected results match up with the actual cocl outputs?
 
+gtest tests are at [test/gtest](test/gtest)
+
 ## pyopencl tests
 
 ### Pre-requisites
 
-- built Coriander
+- built Coriander (from `build` folder, do `make -j 8`)
 - installed python pre-requisites:
 ```
 pip install -r test/requirements.txt
 ```
 
-### Procedure
+### Run
 
 ```
 py.test -v
@@ -45,14 +47,12 @@ In theory, these should all pass, so please raise an issue for any that are fail
 
 ## End-to-end tests
 
-Build:
+### Build
 ```
-cd build
-ccmake ..
-make -j 8 tests
+make -j 8 end-to-end-tests
 ```
 
-Run:
+### Run
 ```
 make run-end-to-end-tests
 ```
@@ -75,26 +75,29 @@ Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 
 ## Eigen tests
 
-There are tests in this repo at [test/eigen](test/eigen)
+### Pre-requisites
 
-To run them:
-- firstly, clone eigen somewhere, let's say, into `~/git/eigen`:
+- have mercurial installed (so you can download Eigen)
+- have downloaded a Coriander-adapted version of Eigen, eg:
 ```
-mkdir ~/git
-cd ~/git
-hg clone https://bitbucket.org/hughperkins/eigen
+hg clone https://github.com/hughperkins/eigen
 cd eigen
-# switch to your preferred branch... eg
 hg update tf-coriander
 ```
-from the root of Coriander repo, and having already installed coriander, do:
+
+### Build
+
+- build Coriander tests as normal, but set `EIGEN_TESTS` to `ON` in the `ccmake ..` options
+- make sure to specify `EIGEN_HOME`, which should be set to the downloaded Eigen folder, from 'pre-requisites', above
+Then do:
 ```
-cd test/eigen
-mkdir build
-cd build
-ccmake ..
-# press 'c' for configure
-# set 'EIGEN_HOME' to the path of the cloned `eigen` folder, from just now
-# press 'c' twice, then g'
-make run-tests
+make -j 8 eigen-tests
 ```
+
+### Run
+
+```
+make run-eigen-tests
+```
+
+Eigen tests are at [test/eigen](test/eigen)

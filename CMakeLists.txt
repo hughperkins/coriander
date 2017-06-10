@@ -7,12 +7,18 @@ set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE STRING "the downloaded clang-4.0.
 else()
 set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE STRING "the downloaded clang-4.0.0 folder, containing lib, bin etc")
 endif()
+option(EIGEN_TESTS "Build eigen tests?  Needs eigen."  OFF)
 
 if(APPLE)
   mark_as_advanced(CMAKE_OSX_ARCHITECTURES)
   mark_as_advanced(CMAKE_OSX_DEPLOYMENT_TARGET)
   mark_as_advanced(CMAKE_OSX_SYSROOT)
 endif(APPLE)
+
+if(EIGEN_TESTS)
+else()
+  unset(EIGEN_HOME CACHE)
+endif()
 
 # old deprecated options
 unset(TESTS_COCL_OPTIONS CACHE)
@@ -245,81 +251,7 @@ CONFIGURE_FILE(
 
 include("${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl-internal.cmake")
 
-set(TESTS_EXCLUDE EXCLUDE_FROM_ALL)
-if(BUILD_TESTS)
-  set(TESTS_EXCLUDE)
-endif(BUILD_TESTS)
-
-set(TESTS testblas cuda_sample context byvaluestructwithpointer multigpu multithreading
-    offsetkernelargs properties test_bitcast test_callbacks testcumemcpy testevents2
-    testevents testfloat4 test_kernelcachedok testmath testmemcpydevicetodevice test_memhostalloc
-    testneg testnullpointer testpartialcopy testshfl teststream test_types
-    singlebuffer test_devices test_buffers longname test_char test_structs
-    test_floatstarstar
-)
-
-# set(COCL_DUMP_CL_STR "COCL_DUMP_CL=1")
-include_directories(include/cocl/proxy_includes)
-foreach(TEST ${TESTS})
-    cocl_add_executable(${TEST} ${TESTS_EXCLUDE} test/cocl/${TEST}.cu)
-    target_link_libraries(${TEST} cocl clew clblast easycl)
-    add_custom_target(run-${TEST}
-        COMMAND echo
-        COMMAND echo make run-${TEST}
-        COMMAND ${COCL_DUMP_CL_STR} ${CMAKE_CURRENT_BINARY_DIR}/${TEST}
-        DEPENDS ${TEST}
-        DEPENDS cocl
-        DEPENDS patch_hostside
-    )
-    set(RUN_TEST_TARGETS ${RUN_TEST_TARGETS} run-${TEST})
-    set(BUILD_TEST_TARGETS ${BUILD_TEST_TARGETS} ${TEST})
-endforeach()
-add_custom_target(run-tests-travis
-  DEPENDS run-cuda_sample run-context run-offsetkernelargs run-test_callbacks run-testcumemcpy
-      run-testnullpointer run-testpartialcopy run-teststream run-singlebuffer)
-
-if(UNIX)
-    add_library(cocl_gtest SHARED  ${TESTS_EXCLUDE} third_party/gtest/gtest-all.cc)
-    target_link_libraries(cocl_gtest pthread)
-else()
-    add_library(cocl_gtest  ${TESTS_EXCLUDE} third_party/gtest/gtest-all.cc)
-endif()
-
-add_executable(cocl_unittests ${TESTS_EXCLUDE} test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
-    test/gtest/test_block_dumper.cpp test/gtest/test_new_instruction_dumper.cpp
-    test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
-    test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
-    test/gtest/test_kernel_dumper.cpp test/gtest/test_global_constants.cpp
-    test/gtest/test_dnn_conv.cpp test/gtest/test_dnn_pooling.cpp test/gtest/test_dnn_act.cpp
-    test/gtest/test_dnn_loss.cpp
-    test/gtest/test_hostside_opencl_funcs.cpp test/gtest/test_logging.cpp
-    test/gtest/test_expressions_helper.cpp test/gtest/test_shims.cpp
-    # test/gtest/test_simple.cu
-    # test/gtest/test_cocl_simple.cu
-)
-target_include_directories(cocl_unittests PRIVATE src)
-target_include_directories(cocl_unittests PRIVATE include)
-target_include_directories(cocl_unittests PRIVATE src/EasyCL/thirdparty/clew/include)
-target_include_directories(cocl_unittests PRIVATE third_party/gtest)
-target_include_directories(cocl_unittests PRIVATE ${CLANG_HOME}/include)
-target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} ${LLVM_SYSLIBS})
-target_compile_options(cocl_unittests PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-
-add_custom_target(run-cocl_unittests
-    COMMAND echo
-    COMMAND echo make run-cocl_unittests
-    COMMAND ${COCL_DUMP_CL_STR} ${CMAKE_CURRENT_BINARY_DIR}/cocl_unittests
-    DEPENDS cocl_unittests
-    DEPENDS cocl
-    DEPENDS patch_hostside
-)
-
-add_custom_target(tests
-    DEPENDS ${BUILD_TEST_TARGETS} cocl_unittests clblast clew easycl cocl patch_hostside ir-to-opencl)
-add_custom_target(run-end-to-end-tests
-    DEPENDS tests ${RUN_TEST_TARGETS})
-add_custom_target(run-tests
-    DEPENDS tests ${RUN_TEST_TARGETS} run-cocl_unittests)
+include(test/CMakeLists.txt)
 
 FILE(GLOB_RECURSE COCL_HEADERS
   LIST_DIRECTORIES false
