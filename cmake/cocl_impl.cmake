@@ -26,10 +26,10 @@ macro(cocl_build_objects target_name target_type)
                     # "$<$<BOOL:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>:-I$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>"
                     # "$<$<BOOL:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>:$<JOIN:-I$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>,;-I>>"
             set(G_OPT)
-            if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+            if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
                 set(G_OPT "-g")
             endif()
-            if(${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebug")
+            if("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebug")
                 set(G_OPT "-g")
             endif()
             add_custom_command(
