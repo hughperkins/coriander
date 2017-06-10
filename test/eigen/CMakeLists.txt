@@ -1,4 +1,4 @@
-project(EIGEN_TESTS)
+# project(EIGEN_TESTS)
 
 # cmake_minimum_required(VERSION 3.0)
 

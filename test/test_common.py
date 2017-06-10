@@ -12,7 +12,7 @@ with open('build/bin/cocl', 'r') as f:
             CLANG_HOME = line.strip().split('=')[1]
     # CLANG_HOME = f.read().split('\n')
 clang_path = join(CLANG_HOME, 'bin', 'clang++')
-cocl_path = 'build/bin/cocl'
+cocl_path = 'build/bin/cocl-internal'
 
 # opt_level = 0
 # opt_passes = ['-mem2reg', '-inline', '-instcombine']

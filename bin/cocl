@@ -56,19 +56,6 @@ case `uname` in
         ;;
 esac
 
-SCRIPT_DIR=$( cd "$( dirname "$0" )" && pwd )
-export COCL_HOME=$(dirname ${SCRIPT_DIR})
-
-if [[ x${COCL_BIN} == x ]]; then {
-    if [ -f ${COCL_HOME}/bin/patch_hostside ]; then {
-        export COCL_BIN=${COCL_HOME}/bin
-        export COCL_LIB=${COCL_HOME}/lib
-    } else {
-        export COCL_BIN=${PWD}
-        export COCL_LIB=${PWD}
-    } fi
-} fi
-
 # Using this weird bash, compared to other possibilities because:
 # - getopts cant handle long options
 # - would rather not make cocl dependent on python (although I know that tensorflow already is)
@@ -190,6 +177,18 @@ while [ "x$1" != x ]; do {
                 CLANG_HOME=$2
                 shift
                 ;;
+            --cocl-bin)
+                COCL_BIN=$2
+                shift
+                ;;
+            --cocl-lib)
+                COCL_LIB=$2
+                shift
+                ;;
+            --cocl-include)
+                COCL_INCLUDE=$2
+                shift
+                ;;
             -isystem)
                 # PASSTHRU="$PASSTHRU $1 $2"
                 shift
@@ -254,14 +253,24 @@ while [ "x$1" != x ]; do {
     shift
 } done
 
+SCRIPT_DIR=$( cd "$( dirname "$0" )" && pwd )
+
 if [ x$CLANG_HOME = x ]; then {
-    echo
-    echo Please set CLANG_HOME, eg on Ubuntu you might do:
-    echo 
-    echo     export CLANG_HOME=/usr/local/opt/llvm-4.0
-    echo
-    exit 1
+    export COCL_HOME=$(dirname ${SCRIPT_DIR})
 } fi
+
+if [ x$COCL_BIN = x ]; then {
+    export COCL_BIN=${COCL_HOME}/bin
+} fi
+
+if [ x$COCL_LIB = x ]; then {
+    export COCL_LIB=${COCL_HOME}/lib
+} fi
+
+if [ x$COCL_INCLUDE = x ]; then {
+    export COCL_INCLUDE=${COCL_HOME}/include
+} fi
+
 export CLANG=clang++
 
 INPATH=${INFILES}
@@ -359,18 +368,19 @@ if [[ ! -d ${OUTDIR} ]]; then {
         -Wno-gnu-anonymous-struct \
         -Wno-nested-anon-types \
         ${LLVM_COMPILE_FLAGS} \
-        -I${COCL_HOME}/include/EasyCL \
-        -I${COCL_HOME}/include/cocl \
-        -I${COCL_HOME}/src \
-        -I${COCL_HOME}/src/EasyCL \
-        -I${COCL_HOME}/src/EasyCL/thirdparty/clew/include \
-        -include ${COCL_HOME}/include/cocl/cocl.h \
-        -include ${COCL_HOME}/include/cocl/fake_funcs.h \
-        -include ${COCL_HOME}/include/cocl/cocl_deviceside.h \
-        -I${COCL_HOME}/include \
+        -I${COCL_INCLUDE}/EasyCL \
+        -I${COCL_INCLUDE}/cocl \
+        -include ${COCL_INCLUDE}/cocl/cocl.h \
+        -include ${COCL_INCLUDE}/cocl/fake_funcs.h \
+        -include ${COCL_INCLUDE}/cocl/cocl_deviceside.h \
+        -I${COCL_INCLUDE} \
         ${INCLUDES} \
         ${INPUTBASEPATH}${INPUTPOSTFIX} -o ${OUTPUTBASEPATH}-device-noopt.ll
 )
+
+        # -I${COCL_HOME}/src \
+        # -I${COCL_HOME}/src/EasyCL \
+        # -I${COCL_HOME}/src/EasyCL/thirdparty/clew/include \
 
 (
     set -x
@@ -392,20 +402,21 @@ if [[ ! -d ${OUTDIR} ]]; then {
         -Wno-gnu-anonymous-struct \
         -Wno-nested-anon-types \
         ${LLVM_COMPILE_FLAGS} \
-        -I${COCL_HOME}/include \
-        -I${COCL_HOME}/include/EasyCL \
-        -I${COCL_HOME}/include/cocl \
-        -I${COCL_HOME}/src \
-        -I${COCL_HOME}/src/EasyCL/thirdparty/clew/include \
-        -I${COCL_HOME}/src/EasyCL \
+        -I${COCL_INCLUDE} \
+        -I${COCL_INCLUDE}/EasyCL \
+        -I${COCL_INCLUDE}/cocl \
         ${ADDFLAGS} \
         ${LLVM_COMPILE_FLAGS} \
-        -include ${COCL_HOME}/include/cocl/cocl.h \
-        -include ${COCL_HOME}/include/cocl/fake_funcs.h \
-        -include ${COCL_HOME}/include/cocl/cocl_hostside.h \
+        -include ${COCL_INCLUDE}/cocl/cocl.h \
+        -include ${COCL_INCLUDE}/cocl/fake_funcs.h \
+        -include ${COCL_INCLUDE}/cocl/cocl_hostside.h \
         ${INPUTBASEPATH}${INPUTPOSTFIX} \
         -o ${OUTPUTBASEPATH}-hostraw.ll
 )
+
+        # -I${COCL_HOME}/src \
+        # -I${COCL_HOME}/src/EasyCL/thirdparty/clew/include \
+        # -I${COCL_HOME}/src/EasyCL \
 
 (
     set -x

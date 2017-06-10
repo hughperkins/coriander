@@ -38,6 +38,9 @@ macro(cocl_build_objects target_name target_type)
                     ${COCL_PATH}
                     ${G_OPT}
                     --clang-home ${CLANG_HOME}
+                    --cocl-bin ${COCL_BIN}
+                    --cocl-lib ${COCL_LIB}
+                    --cocl-include ${COCL_INCLUDE}
                     "$<$<BOOL:$<TARGET_PROPERTY:${target_name},COMPILE_FLAGS>>:$<JOIN:$<TARGET_PROPERTY:${target_name},COMPILE_FLAGS>,;>>;"
                     "$<$<BOOL:$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>>:$<JOIN:-I$<TARGET_PROPERTY:${target_name},INCLUDE_DIRECTORIES>,;-I>>"
                     ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
