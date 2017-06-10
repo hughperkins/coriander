@@ -11,7 +11,7 @@
 #include "cocl/cocl.h"
 #include "cocl/cocl_dnn.h"
 #include "cocl/cocl_memory.h"
-#include "cocl/hostside_opencl_funcs.h"
+#include "hostside_opencl_funcs.h"
 // #include "cocl/cocl_blas.h"
 
 #include "fill_buffer.h"

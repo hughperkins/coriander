@@ -95,7 +95,8 @@ StructType *StructCloner::cloneNoPointers(StructType *inType) {
         if(StructType *childStructType = dyn_cast<StructType>(childType)) {
             childType = cloneNoPointers(childStructType);
             newChildren.push_back(childType);
-        } else if(PointerType *childAsPointer = dyn_cast<PointerType>(childType)) {
+        // } else if(PointerType *childAsPointer = dyn_cast<PointerType>(childType)) {
+        } else if(isa<PointerType>(childType)) {
             // ignore
 
             // // assume is a virtual pointer

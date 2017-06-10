@@ -15,7 +15,7 @@
 #include "cocl/cocl_streams.h"
 
 #include "cocl/cocl_events.h"
-#include "cocl/hostside_opencl_funcs.h"
+#include "hostside_opencl_funcs.h"
 #include "cocl/cocl_context.h"
 
 #include "EasyCL/EasyCL.h"

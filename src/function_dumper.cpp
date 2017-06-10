@@ -318,9 +318,9 @@ std::string FunctionDumper::dumpInternalFunctionDeclarationWithoutReturn(llvm::F
         }
         Argument *arg = &*it;
         string argName = localNames.getOrCreateName(arg, arg->getName().str());
-        Type *argType = arg->getType();
+        // Type *argType = arg->getType();
         string argdeclaration = "";
-        bool ispointer = isa<PointerType>(argType);
+        // bool ispointer = isa<PointerType>(argType);
         argdeclaration = typeDumper->dumpType(arg->getType()) + " " + argName;
         declaration << argdeclaration;
         i++;

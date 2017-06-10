@@ -1,4 +1,4 @@
-// Copyright Hugh Perkins 2016
+// Copyright Hugh Perkins 2016, 2017
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "cocl/hostside_opencl_funcs.h"
+#include "cocl/hostside_opencl_funcs_ext.h"
+#include "hostside_opencl_funcs.h"
 // #include "cocl/cocl.h"
 #include "cocl/cocl_memory.h"
 #include "cocl/cocl_clsources.h"
@@ -48,8 +49,10 @@ using namespace cocl;
 
 #ifdef COCL_SPAM_KERNELLAUNCH
 #define COCL_PRINT(x) std::cout << "[LAUNCH] " << x << std::endl;
+#define WHEN_SPAMMING(x) x
 #else
 #define COCL_PRINT(x) 
+#define WHEN_SPAMMING(x)
 #endif
 
 extern "C" {
@@ -447,12 +450,12 @@ void kernelGo() {
             std::cout << "This is currently not supported by Coriander" << std::endl;
             std::cout << std::endl;
             std::cout << "Your options are:" << std::endl;
-            std::cout << "- update your GPU kernel" << std::endl;
-            std::cout << "- make one single huge GPU memory allocation, instead of many smaller ones" << std::endl;
+            std::cout << "- update your GPU kernel, to not use double-indirected pointers" << std::endl;
+            std::cout << "- allocate one single huge GPU memory buffer, instead of many smaller ones" << std::endl;
             std::cout << std::endl;
             throw std::runtime_error("Error: using vmem with multiple allocations");
         } else {
-            Memory *memory = *v->getContext()->memories.begin();
+            WHEN_SPAMMING(Memory *memory = *v->getContext()->memories.begin());
             COCL_PRINT("Memory allocation ok: one single allocation at vmem=" << memory->fakePos << " sizeByes=" << memory->bytes);
         }
     }
@@ -483,11 +486,11 @@ void kernelGo() {
     for(int i = 0; i < 3; i++) {
         global[i] = launchConfiguration.grid[i] * launchConfiguration.block[i];
     }
-    cout << "grid: " << launchConfiguration.grid << " block: " << launchConfiguration.block
-        << " global: " << global << endl;
+    COCL_PRINT("grid: " << launchConfiguration.grid << " block: " << launchConfiguration.block
+        << " global: " << global);
     int workgroupSize = launchConfiguration.block[0] * launchConfiguration.block[1] * launchConfiguration.block[2];
     COCL_PRINT("workgroupSize=" << workgroupSize);
-    kernel->localInts(min(4, workgroupSize));
+    kernel->localInts(max(4, workgroupSize));
 
     try {
         kernel->run(launchConfiguration.queue, 3, global, launchConfiguration.block);

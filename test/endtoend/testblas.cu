@@ -9,7 +9,7 @@ using namespace std;
 #include "cublas_v2.h"
 
 void transpose(float *in, float *out, int rows, int cols) {
-    int newrows = cols;
+    // int newrows = cols;
     int newcols = rows;
     for(int oldrow = 0; oldrow < rows; oldrow++) {
         for(int oldcol = 0; oldcol < cols; oldcol++) {

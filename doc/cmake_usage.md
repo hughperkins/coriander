@@ -2,7 +2,7 @@
 
 Coriander provides macros `cocl_add_executable` and `cocl_add_library`, for usage in your own cmake projects
 
-## Enabling Coriander 
+## Enable Coriander
 
 Simply add:
 
@@ -11,19 +11,25 @@ include(/usr/local/share/cocl/cocl.cmake)
 ```
 .... near the top of your cmake file
 
-## Building an executable
+## Creating targets
+
+### Executable
 
 ```
 cocl_add_executable(foo foo.cu)
 ```
 
-## Building a library
+### Library
 
 ```
 cocl_add_library(mylibrary foo.cu anotherfile.cu somecpp.cpp)
 ```
 
-## Include directories
+## Target configuration
+
+Standard target configuration is available:
+
+### Include directories
 
 You can use `target_include_directories` to add include directories to a target:
 ```
@@ -31,7 +37,7 @@ cocl_add_executable(foo foo.cu)
 target_include_directories(foo PRIVATE include)
 ```
 
-## Link libraries
+### Link libraries
 
 You can use `target_link_libraries` on targets, as normal:
 
@@ -40,7 +46,7 @@ cocl_add_executable(foo foo.cu)
 target_link_libraries(foo somelibrary)
 ```
 
-## Compile flags
+### Compile flags
 
 You can use `set_target_properties(... PROPERTIES COMPILE_FLAGS ...)` to set defines and so on:
 ```

@@ -1,34 +1,24 @@
-These tests are for compiling Eigen for OpenCL 1.2, using [coriander](https://github.com/hughperkins/coriander), an opensource
-utility for building NVIDIA® CUDA™ source-code for OpenCL 1.2 GPUs.
+# Eigen tests
+
+Eigen is used by Tensorflow, so being able to build and run Eigen is a pre-requisite for running Eigen.
+
+There are tests in Eigen repository itelf, but I find I use these tests instead, which are a subset of the Eigen repo tests,
+and represent operations that are needed to build convolutional networks in Tensorflow.
 
 ## Pre-requisites
 
 - [clang-4.0.0](http://releases.llvm.org/download.html#4.0.0)
 - have installed [coriander](https://github.com/hughperkins/coriander)
 - NVIDIA® CUDA™ Toolkit should not be in the include search path, ie not in /usr/local etc
+- have mercurial installed (so you can download Eigen)
+- have downloaded a Coriander-adapted version of Eigen, eg:
+```
+hg clone https://github.com/hughperkins/eigen
+cd eigen
+hg update tf-coriander
+```
 
 ## How to run
 
-From this directory:
-```
-mkdir build
-cd build
-ccmake ..
-# press 'c', then modify CLANG_HOME to point to the the clang/llvm 4.0.0 downloaded folder
-# then 'c' again, then 'g'
-make run-tests
-```
-Or to run just one test, eg:
-```
-make run-test_cuda_elementwise
-```
-
-## News
-
-- 2017 June 4 2017:
-  - updated code and doc, in line with Coriander using llvm 4.0.0 now
-  - renamed directory to coriander
-- 2017 May 5:
-  - tests pass on Mac Sierra, with following devices:
-    - Intel HD Graphics 530
-    - Radeon Pro 450 (using environment variable `CL_GPUOFFSET=1`)
+- simply build Coriander tests as normal, but select 'EIGEN_TESTS' in the `ccmake ..` options
+- make sure to specify EIGEN_HOME, which should be set to the downloaded Eigen folder, from 'pre-requisites', above

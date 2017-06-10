@@ -12,7 +12,7 @@ from test.test_common import offset_type
 import pytest
 
 
-CLANG_HOME = os.environ['CLANG_HOME']
+# CLANG_HOME = os.environ['CLANG_HOME']
 
 
 def myrun(cmd_list):
@@ -28,42 +28,13 @@ def myrun(cmd_list):
 
 @pytest.mark.skipif(os.environ.get('TRAVIS', None) == 'true', reason='fails on travis mac cpu, not looked into why yet')
 def test_cwise_sqrt(context, q, float_data, float_data_gpu):
-    options = test_common.cocl_options()
-    i = 0
-    opt_options = []
-    iropencl_options = []
-    while i < len(options):
-        if options[i] == '--devicell-opt':
-            opt_options.append('-' + options[i + 1])
-            i += 2
-            continue
-        if options[i] in ['--run_branching_transforms', '--branches_as_switch']:
-            iropencl_options.append(options[i])
-            i += 1
-            continue
-        raise Exception('unknown option ', options[i])
-        i += 1
-    print('opt_options', opt_options)
-    print('iropencl_options', iropencl_options)
-    myrun([
-        join(CLANG_HOME, 'bin/opt')
-    ] + opt_options + [
-        '-S',
-        'test/tf/samples/cwise_op_gpu_sqrt-device-noopt.ll',
-        '-o', '/tmp/test-opt.ll'
-    ])
+    with open('test/tf/samples/cwise_op_gpu_sqrt-device-noopt.ll', 'r') as f:
+        ll_code = f.read()
 
-    myrun([
-        'build/ir-to-opencl'
-    ] + iropencl_options + [
-        '--inputfile', '/tmp/test-opt.ll',
-        '--outputfile', '/tmp/test-device.cl',
-        '--cmem-indexes', '0,1,2',
-        '--kernelname', '_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_'
-    ])
-
-    with open('/tmp/test-device.cl', 'r') as f:
-        cl_sourcecode = f.read()
+    cl_sourcecode = test_common.ll_to_cl(
+        ll_code,
+        '_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_',
+        num_clmems=3)
 
     print('creating program...')
     prog_unbuilt = cl.Program(context, cl_sourcecode)
@@ -125,49 +96,13 @@ def test_cwise_sqrt(context, q, float_data, float_data_gpu):
 
 @pytest.mark.skipif(os.environ.get('TRAVIS', None) == 'true', reason='fails on travis mac cpu, not looked into why yet')
 def test_cwise_sqrt_singlebuffer(context, queue, float_data, float_data_gpu):
-    options = test_common.cocl_options()
-    i = 0
-    opt_options = []
-    iropencl_options = []
-    while i < len(options):
-        if options[i] == '--devicell-opt':
-            opt_options.append('-' + options[i + 1])
-            i += 2
-            continue
-        if options[i] in ['--run_branching_transforms', '--branches_as_switch']:
-            iropencl_options.append(options[i])
-            i += 1
-            continue
-        raise Exception('unknown option ', options[i])
-        i += 1
-    print('opt_options', opt_options)
-    print('iropencl_options', iropencl_options)
-    if 'NOREBUILD' not in os.environ:
-        res = subprocess.run([
-            join(CLANG_HOME, 'bin/opt')
-        ] + opt_options + [
-            '-S',
-            'test/tf/samples/cwise_op_gpu_sqrt-device-noopt.ll',
-            '-o', '/tmp/test-opt.ll'
-        ], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        print(' '.join(res.args))
-        print(res.stdout.decode('utf-8'))
-        assert res.returncode == 0
+    with open('test/tf/samples/cwise_op_gpu_sqrt-device-noopt.ll', 'r') as f:
+        ll_code = f.read()
 
-        res = subprocess.run([
-            'build/ir-to-opencl'
-        ] + iropencl_options + [
-            '--inputfile', '/tmp/test-opt.ll',
-            '--outputfile', '/tmp/test-device.cl',
-            '--cmem-indexes', '0,1,2',
-            '--kernelname', '_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_'
-        ], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        print(' '.join(res.args))
-        print(res.stdout.decode('utf-8'))
-        assert res.returncode == 0
-
-    with open('/tmp/test-device.cl', 'r') as f:
-        cl_sourcecode = f.read()
+    cl_sourcecode = test_common.ll_to_cl(
+        ll_code,
+        '_ZN5Eigen8internal15EigenMetaKernelINS_15TensorEvaluatorIKNS_14TensorAssignOpINS_9TensorMapINS_6TensorIfLi1ELi1EiEELi16ENS_11MakePointerEEEKNS_18TensorCwiseUnaryOpINS0_14scalar_sqrt_opIfEEKNS4_INS5_IKfLi1ELi1EiEELi16ES7_EEEEEENS_9GpuDeviceEEEiEEvT_T0_',
+        num_clmems=3)
 
     prog = cl.Program(context, cl_sourcecode).build()
 

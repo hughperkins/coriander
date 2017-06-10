@@ -3,7 +3,7 @@
 #include "cocl/cocl_dnn.h"
 #include "cocl/cocl_dnn_gemm.h"
 #include "cocl/cocl_memory.h"
-#include "cocl/hostside_opencl_funcs.h"
+#include "hostside_opencl_funcs.h"
 #include "cocl/cocl.h"
 #include "EasyCL/util/easycl_stringhelper.h"
 

@@ -61,7 +61,7 @@ void test_cuda_elementwise()
     for (int j = 0; j < 53; ++j) {
       for (int k = 0; k < 97; ++k) {
         float diff = out(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)) - (in1(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)) + in2(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)) * in3(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)));
-        if(abs(diff) >= 0.00001f) {
+        if(std::abs(diff) >= 0.00001f) {
           std::cout << "i=" << i << " j=" << j << " k=" << k << " diff=" << diff << std::endl;
         }
         VERIFY_IS_APPROX(out(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)), in1(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)) + in2(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)) * in3(Eigen::array<Eigen::DenseIndex, 3>(i,j,k)));

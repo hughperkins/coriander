@@ -16,7 +16,7 @@ __global__ void longKernel(float *data, int N, float value) {
 int main(int argc, char *argv[]) {
     int N = 202400; // * 1024;
 
-    float *hostfloats = new float[N];
+    // float *hostfloats = new float[N];
     float *gpufloats;
     cudaMalloc((void **)&gpufloats, N * sizeof(float));
 

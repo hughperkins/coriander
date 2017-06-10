@@ -540,7 +540,8 @@ void NewInstructionDumper::dumpLoad(cocl::LocalValueInfo *localValueInfo) {
     string rhs= "";
     bool destIsSinglePointer = false;
     if(PointerType *l1pointer = dyn_cast<PointerType>(instr->getType())) {
-        if(PointerType *l2pointer = dyn_cast<PointerType>(l1pointer->getElementType())) {
+        // if(PointerType *l2pointer = dyn_cast<PointerType>(l1pointer->getElementType())) {
+        if(isa<PointerType>(l1pointer->getElementType())) {
         } else {
             destIsSinglePointer = true;
         }

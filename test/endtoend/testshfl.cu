@@ -10,7 +10,7 @@ using namespace std;
 
 __global__ void getValue(float *data) {
     int tid = threadIdx.x;
-    int warpid = tid % 32;  // assume warpsize 32.  Anyway, CUDA code uses warpsize 32.
+    // int warpid = tid % 32;  // assume warpsize 32.  Anyway, CUDA code uses warpsize 32.
     float me = data[tid];
     me = __shfl_down(me, 1, 32);
     data[tid] = me;

@@ -34,7 +34,7 @@ hostFloats[2] 444
 
 <img src="doc/img/mac_run_cuda_sample.png?raw=true" />
 
-[Advanced usage](doc/advanced_usage.md)
+[Options](doc/options.md)
 
 ## What Coriander provides
 
@@ -64,20 +64,20 @@ Coriander development is carried out using the following platforms:
 Other systems should work too, ideally.  You will need at a minimum at least one OpenCL-enabled GPU,
 and appropriate OpenCL drivers installed, for the GPU. Both linux and Mac systems stand a reasonable chance of working ok.
 
-For installation, please see [installation.md](doc/installation.md)
+For installation, please see [installation](doc/installation.md)
 
-## Adding to your own `cmake` project?
+## Add to your own `cmake` project
 
-- cmake targets `cocl_add_executable` and `cocl_add_library` are available
-- see [cmake_usage.md](doc/cmake_usage.md) for more details
+- use `cocl_add_executable` and `cocl_add_library`
+- see [cmake usage](doc/cmake_usage.md)
 
 ## Testing
 
-See [testing.md](doc/testing.md)
+See [testing](doc/testing.md)
 
 ## Assumptions/relaxations made by Coriander
 
-See [assumptions.md](doc/assumptions.md)
+See [assumptions](doc/assumptions.md)
 
 ## Libraries
 
@@ -106,15 +106,10 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
 
 ## News
 
-- June 8:
-  - enable debug builds
-    - this was actually really easy to do; I just never realized it would work before :-)
-    - tested on both Mac Sierra, and Ubuntu 16.04
-    - see [advanced usage](doc/advanced_usage.md)
 - June 4:
   - added cmake macros `cocl_add_executable` and `cocl_add_library`
   - these replace the previous `add_cocl_executable`, and have the advantage that they are standard targets, that you can use with `target_link_libraries` and so on
-  - see [test/cmake](test/cmake) for an example
+  - see [cmake usage](doc/cmake_usage.md)
 - May 31:
-  - added a developer debugging option `COCL_DUMP_CONFIG`, to allow easy inspection of buffers returned by kernel calls, see [advanced usage](doc/advanced_usage.md)
+  - added a developer debugging option `COCL_DUMP_CONFIG`, to allow easy inspection of buffers returned by kernel calls, see [options](doc/options.md)
 - [Older news](doc/news.md)

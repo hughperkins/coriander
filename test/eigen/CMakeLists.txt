@@ -1,9 +1,11 @@
-cmake_minimum_required(VERSION 3.0)
+# project(EIGEN_TESTS)
 
-set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE STRING "the clang-4.0.0 folder, containing lib, bin etc")
+# cmake_minimum_required(VERSION 3.0)
+
+# set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE STRING "the clang-4.0.0 folder, containing lib, bin etc")
 set(EIGEN_HOME "UNKNOWN" CACHE STRING "eigen folder")
 
-set(TESTS test_cuda_elementwise_small test_cuda_elementwise test_cuda_nullary reduction_tiny reduction_sum reduction reduction_prod reduction_mean
+set(EIGEN_TESTS test_cuda_elementwise_small test_cuda_elementwise test_cuda_nullary reduction_tiny reduction_sum reduction reduction_prod reduction_mean
   argmax test_cuda_elementwise_equal test_equal_int32 test_equal_int64 test_cuda_elementwise_abs reduction_sum_axisall
 )
 
@@ -31,18 +33,21 @@ if(INDEXES_32BIT)
     add_definitions(-DEIGEN_DEFAULT_DENSE_INDEX_TYPE=int32_t)
 endif()
 
-include(/usr/local/share/cocl/cocl.cmake)
+# include(/usr/local/share/cocl/cocl.cmake)
 
-foreach(TEST ${TESTS})
-    cocl_add_executable(${TEST} ${TEST}.cu)
-    target_link_libraries(${TEST} ${Coriander_LIBRARIES})
-    target_include_directories(${TEST} PRIVATE ${EIGEN_HOME}/test)
-    add_custom_target(run-${TEST}
-        COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TEST}
-        DEPENDS ${TEST} ${CMAKE_CURRENT_SOURCE_DIR}/${TEST}.cu
+foreach(EIGEN_TEST ${EIGEN_TESTS})
+    cocl_add_executable(${EIGEN_TEST} ${TESTS_EXCLUDE} ${EIGEN_TEST}.cu)
+    target_link_libraries(${EIGEN_TEST} cocl clblast clew easycl)
+    target_include_directories(${EIGEN_TEST} PRIVATE ${EIGEN_HOME}/test)
+    add_custom_target(run-${EIGEN_TEST}
+        COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${EIGEN_TEST}
+        DEPENDS ${EIGEN_TEST} ${CMAKE_CURRENT_SOURCE_DIR}/${EIGEN_TEST}.cu
     )
-    set(TEST_TARGETS ${TEST_TARGETS} run-${TEST})
+    set(BUILD_EIGEN_TEST_TARGETS ${BUILD_EIGEN_TEST_TARGETS} ${EIGEN_TEST})
+    set(RUN_EIGEN_TEST_TARGETS ${RUN_EIGEN_TEST_TARGETS} run-${EIGEN_TEST})
 endforeach()
 
-add_custom_target(run-tests
-    DEPENDS ${TEST_TARGETS})
+add_custom_target(eigen-tests
+    DEPENDS ${BUILD_EIGEN_TEST_TARGETS})
+add_custom_target(run-eigen-tests
+    DEPENDS eigen-tests ${RUN_EIGEN_TEST_TARGETS})

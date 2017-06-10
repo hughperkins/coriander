@@ -1,23 +1,39 @@
 cmake_minimum_required(VERSION 2.8)
 
 option(BUILD_TESTS "Build tests" OFF)
-set(TESTS_COCL_OPTIONS "" CACHE STRING "cocl options, semicolon-separated.  See cocl -h")
-# option(TESTS_RUN_TRANSFORM_BRANCHES "")
-option(TESTS_DEVICELL_INLINE "cocl option for tests" ON)
-option(TESTS_DEVICELL_MEM2REG "cocl option for tests" ON)
-option(TESTS_DEVICELL_INSTCOMBINE "cocl option for tests" ON)
-set(TESTS_DEVICELL_OPT "O2" CACHE STRING "cocl option for tests")
-option(EXPLAIN_CL "Add IR code into OpenCL.  For maintainers mostly" OFF)
-option(TESTS_DUMP_CL "Writes OpenCL for tests to stdout.  For maintainers mostly" OFF)
 option(COCL_SPAM "Lots of scrolly debug text.  Mostly for maintainer usage" OFF)
 if(APPLE)
 set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE STRING "the downloaded clang-4.0.0 folder, containing lib, bin etc")
 else()
 set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE STRING "the downloaded clang-4.0.0 folder, containing lib, bin etc")
 endif()
+option(EIGEN_TESTS "Build eigen tests?  Needs eigen."  OFF)
 
-if(TESTS_CL_BRANCHES_AS_SWITCH)
-    unset(TESTS_CL_RUN_TRANSFORMS CACHE)
+if(APPLE)
+  mark_as_advanced(CMAKE_OSX_ARCHITECTURES)
+  mark_as_advanced(CMAKE_OSX_DEPLOYMENT_TARGET)
+  mark_as_advanced(CMAKE_OSX_SYSROOT)
+endif(APPLE)
+
+if(EIGEN_TESTS)
+else()
+  unset(EIGEN_HOME CACHE)
+endif()
+
+# old deprecated options
+unset(TESTS_COCL_OPTIONS CACHE)
+unset(TESTS_DEVICELL_INLINE CACHE)
+unset(TESTS_DEVICELL_MEM2REG CACHE)
+unset(TESTS_DEVICELL_INSTCOMBINE CACHE)
+unset(TESTS_DEVICELL_OPT CACHE)
+unset(EXPLAIN_CL CACHE)
+unset(TESTS_DUMP_CL CACHE)
+unset(TESTS_CL_BRANCHES_AS_SWITCH CACHE)
+unset(TESTS_CL_RUN_TRANSFORMS CACHE)
+
+if (NOT CMAKE_BUILD_TYPE)
+    # message("Setting build type to 'Debug'")
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif()
 
 if(COCL_SPAM)
@@ -45,40 +61,10 @@ if(COCL_SPAM_PROPERTIES)
   add_definitions(-DCOCL_SPAM_PROPERTIES)
 endif()
 
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS})
-if(TESTS_DEVICELL_INLINE)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--devicell-opt;inline)
-endif()
-if(TESTS_DEVICELL_MEM2REG)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--devicell-opt;mem2reg)
-endif()
-if(TESTS_DEVICELL_INSTCOMBINE)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--devicell-opt;instcombine)
-endif()
-if(TESTS_DEVICELL_OPT)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--devicell-opt;${TESTS_DEVICELL_OPT})
-endif()
-if(EXPLAIN_CL)
-set(_TESTS_COCL_OPTIONS ${TESTS_COCL_OPTIONS};--add_ir_to_cl)
-endif()
-# if(TESTS_DUMP_CL)
-# set($ENV{COCL_DUMP_CL} "1")
-# endif()
-
 FILE(GLOB YAMLCPP_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/yaml-cpp/src/*.cpp)
-# message("YAMLCPP_SRCS ${YAMLCPP_SRCS}")
 
 set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/platforminfo_helper.cpp src/EasyCL/EasyCL.cpp
     src/EasyCL/deviceinfo_helper.cpp src/EasyCL/util/easycl_stringhelper.cpp src/EasyCL/DevicesInfo.cpp src/EasyCL/DeviceInfo.cpp)
-
-# set(COCL_BRANCHING_SRCS
-#     src/branches_as_switch/branches_as_switch.cpp
-#     src/handle_branching.cpp src/branching_transforms.cpp src/flowcontrolinstructions.cpp
-#     src/flowcontrol/returnblock.cpp src/flowcontrol/sequence.cpp src/flowcontrol/basicblockblock.cpp
-#     src/flowcontrol/conditionalbranch.cpp src/flowcontrol/dowhile.cpp src/flowcontrol/if.scpp
-#     src/flowcontrol/for.cpp src/flowcontrol/rootblock.cpp src/flowcontrol/block.cpp)
-
-# message("CLANG_HOME: ${CLANG_HOME}")
 
 set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new_instruction_dumper.cpp
     src/struct_clone.cpp src/basicblockdumper.cpp src/ExpressionsHelper.cpp src/readIR.cpp
@@ -92,8 +78,11 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
     src/cocl_funcs.cpp
 )
 
-set(CMAKE_CC_FLAGS "-fPIC")
-set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC -g -Wno-covered-switch-default -Wno-sign-compare")
+set(CMAKE_CC_FLAGS "${CMAKE_CC_FLAGS} -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -g -Wno-sign-compare")
+if(APPLE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-covered-switch-default")
+endif(APPLE)
 add_definitions(-DUSE_CLEW)  # turns off direct linking with libOpenCL.so, all goes via clew dynamic loader (no need to link with libOpenCL at build time)
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 
@@ -183,7 +172,11 @@ endif()
 if(COCL_DEFINITIONS)
     target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
 endif()
-target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES} -Wno-sign-compare -Wno-covered-switch-default)
+set(NO_COVERED_SWITCH_DEFAULT)
+if(APPLE)
+  set(NO_COVERED_SWITCH_DEFAULT "-Wno-covered-switch-default")
+endif()
+target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES} -Wno-sign-compare ${NO_COVERED_SWITCH_DEFAULT})
 target_link_libraries(cocl easycl ${LLVM_LIBS} ${LLVM_SYSLIBS})
 
 # ==================================================================================================
@@ -227,7 +220,10 @@ endforeach()
 
 include_directories(src/CLBlast/src)
 add_library(clblast SHARED ${CLBLAST_SOURCES})
-target_compile_options(clblast PRIVATE -Wno-switch)
+if(APPLE)
+  # remove covered switch build warnings
+  target_compile_options(clblast PRIVATE -Wno-switch)
+endif(APPLE)
 target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
 target_include_directories(clblast PRIVATE src/CLBlast/include)
 target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include)
@@ -247,91 +243,21 @@ endif()
 set(THIS_COCL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl)
 set(COCL_ARTIFACTS patch_hostside cocl)
 # set(THIS_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(THIS_COCL_BIN ${CMAKE_CURRENT_BINARY_DIR})
+set(THIS_COCL_LIB ${CMAKE_CURRENT_BINARY_DIR})
+set(THIS_COCL_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(THIS_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set(THIS_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cocl.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl-internal.cmake" @ONLY)
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl-wrap.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/bin/cocl-internal" @ONLY)
 
 include("${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl-internal.cmake")
 
-set(TESTS_EXCLUDE EXCLUDE_FROM_ALL)
-if(BUILD_TESTS)
-  set(TESTS_EXCLUDE)
-endif(BUILD_TESTS)
-
-set(TESTS testblas cuda_sample context byvaluestructwithpointer multigpu multithreading
-    offsetkernelargs properties test_bitcast test_callbacks testcumemcpy testevents2
-    testevents testfloat4 test_kernelcachedok testmath testmemcpydevicetodevice test_memhostalloc
-    testneg testnullpointer testpartialcopy testshfl teststream test_types
-    singlebuffer test_devices test_buffers longname test_char test_structs
-    test_floatstarstar
-)
-
-if(TESTS_DUMP_CL)
-    set(COCL_DUMP_CL_STR "COCL_DUMP_CL=1")
-endif()
-include_directories(include/cocl/proxy_includes)
-foreach(TEST ${TESTS})
-    cocl_add_executable(${TEST} ${TESTS_EXCLUDE} test/cocl/${TEST}.cu)
-    target_link_libraries(${TEST} cocl clew clblast easycl)
-    add_custom_target(run-${TEST}
-        COMMAND echo
-        COMMAND echo make run-${TEST}
-        COMMAND ${COCL_DUMP_CL_STR} ${CMAKE_CURRENT_BINARY_DIR}/${TEST}
-        DEPENDS ${TEST}
-        DEPENDS cocl
-        DEPENDS patch_hostside
-    )
-    set(RUN_TEST_TARGETS ${RUN_TEST_TARGETS} run-${TEST})
-    set(BUILD_TEST_TARGETS ${BUILD_TEST_TARGETS} ${TEST})
-endforeach()
-add_custom_target(run-tests-travis
-  DEPENDS run-cuda_sample run-context run-offsetkernelargs run-test_callbacks run-testcumemcpy
-      run-testnullpointer run-testpartialcopy run-teststream run-singlebuffer)
-
-if(UNIX)
-    add_library(cocl_gtest SHARED  ${TESTS_EXCLUDE} third_party/gtest/gtest-all.cc)
-    target_link_libraries(cocl_gtest pthread)
-else()
-    add_library(cocl_gtest  ${TESTS_EXCLUDE} third_party/gtest/gtest-all.cc)
-endif()
-
-add_executable(cocl_unittests ${TESTS_EXCLUDE} test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
-    test/gtest/test_block_dumper.cpp test/gtest/test_new_instruction_dumper.cpp
-    test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
-    test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
-    test/gtest/test_kernel_dumper.cpp test/gtest/test_global_constants.cpp
-    test/gtest/test_dnn_conv.cpp test/gtest/test_dnn_pooling.cpp test/gtest/test_dnn_act.cpp
-    test/gtest/test_dnn_loss.cpp
-    test/gtest/test_hostside_opencl_funcs.cpp test/gtest/test_logging.cpp
-    test/gtest/test_expressions_helper.cpp test/gtest/test_shims.cpp
-    # test/gtest/test_simple.cu
-    # test/gtest/test_cocl_simple.cu
-)
-target_include_directories(cocl_unittests PRIVATE src)
-target_include_directories(cocl_unittests PRIVATE include)
-target_include_directories(cocl_unittests PRIVATE src/EasyCL/thirdparty/clew/include)
-target_include_directories(cocl_unittests PRIVATE third_party/gtest)
-target_include_directories(cocl_unittests PRIVATE ${CLANG_HOME}/include)
-target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} ${LLVM_SYSLIBS})
-target_compile_options(cocl_unittests PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-
-add_custom_target(run-cocl_unittests
-    COMMAND echo
-    COMMAND echo make run-cocl_unittests
-    COMMAND ${COCL_DUMP_CL_STR} ${CMAKE_CURRENT_BINARY_DIR}/cocl_unittests
-    DEPENDS cocl_unittests
-    DEPENDS cocl
-    DEPENDS patch_hostside
-)
-
-add_custom_target(tests
-    DEPENDS ${BUILD_TEST_TARGETS} cocl_unittests)
-add_custom_target(run-end-to-end-tests
-    DEPENDS ${RUN_TEST_TARGETS})
-add_custom_target(run-tests
-    DEPENDS ${RUN_TEST_TARGETS} run-cocl_unittests)
+include(test/CMakeLists.txt)
 
 FILE(GLOB_RECURSE COCL_HEADERS
   LIST_DIRECTORIES false
@@ -343,6 +269,9 @@ FILE(GLOB EASYCL_HEADERS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/*.h)
 set(THIS_COCL_PATH ${CMAKE_INSTALL_PREFIX}/bin/cocl)
 # set(THIS_BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
 set(THIS_LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib)
+set(THIS_COCL_LIB ${CMAKE_INSTALL_PREFIX}/lib)
+set(THIS_COCL_BIN ${CMAKE_INSTALL_PREFIX}/bin)
+set(THIS_COCL_INCLUDE ${CMAKE_INSTALL_PREFIX}/include)
 set(COCL_ARTIFACTS )
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cocl.cmake.in"

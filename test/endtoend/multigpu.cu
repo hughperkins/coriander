@@ -83,7 +83,7 @@ void testfloatstar() {
     }
     cout << "created contexts" << endl;
 
-    pthread_t threads[ deviceCount ];
+    pthread_t *threads = new pthread_t[deviceCount];
     for(long long i = 0; i < deviceCount; i++) {
         pthread_create(&threads[i], NULL, thread_func, (void *)i);
     }
@@ -102,6 +102,7 @@ void testfloatstar() {
         assert(cocl::getNumKernelCalls() == 10);
     }
 
+    delete[] threads;
     delete[] context;
 }
 

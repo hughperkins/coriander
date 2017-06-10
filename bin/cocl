@@ -8,6 +8,41 @@ echo cocl args: $@
 
 set -e
 
+# environment variables for controlling parse and compile optimizations:
+
+# export DEVICE_PARSE_OPT_LEVEL=0
+# export DEVICE_PARSE_PASSES="inline,mem2reg,instcombine"
+
+# export HOSTSIDE_PARSE_OPT_LEVEL=0
+# export HOSTSIDE_COMPILE_OPT_LEVEL=3
+
+# device-side, we only use clang for parsing. After parsing to bytecode,
+# no further optimization steps are run. Note that running high values of
+# optimization on devide-side parsing will generate insanely complex
+# opencl, which is probably slowtastic
+
+# hostside, optimization pretty much works as normal, I think. The only
+# nuance is, hostside interface and deviceside interface should ideally match,
+# which wont be the case if their optimizaiton levels differ
+
+if [ -z ${DEVICE_PARSE_OPT_LEVEL} ]; then {
+    export DEVICE_PARSE_OPT_LEVEL=0
+} fi
+if [ -z ${DEVICE_PARSE_PASSES} ]; then {
+    export DEVICE_PARSE_PASSES=inline,mem2reg,instcombine
+} fi
+if [ -z ${HOSTSIDE_PARSE_OPT_LEVEL} ]; then {
+    export HOSTSIDE_PARSE_OPT_LEVEL=0
+} fi
+if [ -z ${HOSTSIDE_COMPILE_OPT_LEVEL} ]; then {
+    export HOSTSIDE_COMPILE_OPT_LEVEL=3
+} fi
+
+DEVICE_PARSE_PASSES_STR=
+if [ ! -z ${DEVICE_PARSE_PASSES} ]; then {
+    export DEVICE_PARSE_PASSES_STR=$(echo "-${DEVICE_PARSE_PASSES}" | sed -e 's/,/ -/g')
+} fi
+
 export ADDFLAGS=
 export NATIVE_COMPILER=g++
 export SO_SUFFIX=.so
@@ -20,19 +55,6 @@ case `uname` in
     *)
         ;;
 esac
-
-SCRIPT_DIR=$( cd "$( dirname "$0" )" && pwd )
-export COCL_HOME=$(dirname ${SCRIPT_DIR})
-
-if [[ x${COCL_BIN} == x ]]; then {
-    if [ -f ${COCL_HOME}/bin/patch_hostside ]; then {
-        export COCL_BIN=${COCL_HOME}/bin
-        export COCL_LIB=${COCL_HOME}/lib
-    } else {
-        export COCL_BIN=${PWD}
-        export COCL_LIB=${PWD}
-    } fi
-} fi
 
 # Using this weird bash, compared to other possibilities because:
 # - getopts cant handle long options
@@ -48,53 +70,6 @@ display_help () {
       -c compile to .o only, dont link
       -o final output filepath
       --clang-home Path to llvm4.0
-
-      Device IR optimization options
-         These are applied to the device IR generation step
-         This is before the OpenCL generation step
-         These options strongly affect the success or not of the OpenCL generation step
-         They will also affect the 'look' of the final OpenCL, which will influence whether
-         different GPU drivers can read it, and probably affects final execution speed
-         Optimization at this point is not important for speed, but does affect how
-         easy the resulting IR is to parse, and convert to OpenCL
-         Too much optimization makes the code long, and branching hard to disentangle
-         Too little optimization causes lots of memory allocaiton/free, which invariably
-         makes it hard to handle address spaces
-
-         These options will mostly be passed through to opt-3.8
-
-          -devicell-opt [OPTION]
-             Passed through to opt-3.8
-
-           Examples:
-
-         --devicell-opt inline
-             Try to inline OpenCL functions
-             Generally required, otherwise you'll get errors about address space mismatch
-
-         --devicell-opt mem2reg
-             Try to convert heap allocations to registers
-             Generally required, otherwise you'll get errors about address space mismatch
-
-          -devicell-opt instcombine
-             Pass to combine instructions where possible
-             This generally has no downsides.  You want this :-)
-
-          -devicell-opt O3
-          -devicell-opt O2
-          -devicell-opt O1
-          -devicell-opt O0
-             Set various standard optimization levels
-             O0 works, as long as you set inline, mem2reg and instcombine
-             O1 and O2 are probably good options in general
-             O3 produces really long, gnarly llvm code, that is harder for the opencl generation
-             pass to deal with
-
-      OpenCL generation options:
-
-        --add_ir_to_cl
-             Add the original IR code into the generated OpenCL code, as comments
-             Mainly useful to coriander maintainers
 
       Options passed through to clang compiler:
         -fPIC
@@ -121,7 +96,7 @@ EOF
 
 PASSTHRU=
 export IROOPENCLARGS=
-export DEVICELLOPT=
+# export DEVICELLOPT=
 while [ "x$1" != x ]; do {
     THISARG=$(echo $1 | cut -d = -f 1)
     DONE=0
@@ -202,20 +177,21 @@ while [ "x$1" != x ]; do {
                 CLANG_HOME=$2
                 shift
                 ;;
+            --cocl-bin)
+                COCL_BIN=$2
+                shift
+                ;;
+            --cocl-lib)
+                COCL_LIB=$2
+                shift
+                ;;
+            --cocl-include)
+                COCL_INCLUDE=$2
+                shift
+                ;;
             -isystem)
                 # PASSTHRU="$PASSTHRU $1 $2"
                 shift
-                ;;
-             --devicell-opt)
-                if [ x$2 = x ]; then {
-                    echo Please provide a value for -devicell-opt
-                    exit 1
-                } fi
-                DEVICELLOPT="${DEVICELLOPT} -$2"
-                shift
-                ;;
-            --add_ir_to_cl)
-                IROOPENCLARGS="${IROOPENCLARGS} $1"
                 ;;
             -?)
                 display_help
@@ -277,14 +253,24 @@ while [ "x$1" != x ]; do {
     shift
 } done
 
+SCRIPT_DIR=$( cd "$( dirname "$0" )" && pwd )
+
 if [ x$CLANG_HOME = x ]; then {
-    echo
-    echo Please set CLANG_HOME, eg on Ubuntu you might do:
-    echo 
-    echo     export CLANG_HOME=/usr/local/opt/llvm-4.0
-    echo
-    exit 1
+    export COCL_HOME=$(dirname ${SCRIPT_DIR})
 } fi
+
+if [ x$COCL_BIN = x ]; then {
+    export COCL_BIN=${COCL_HOME}/bin
+} fi
+
+if [ x$COCL_LIB = x ]; then {
+    export COCL_LIB=${COCL_HOME}/lib
+} fi
+
+if [ x$COCL_INCLUDE = x ]; then {
+    export COCL_INCLUDE=${COCL_HOME}/include
+} fi
+
 export CLANG=clang++
 
 INPATH=${INFILES}
@@ -351,7 +337,7 @@ if [ ! "$COMPILE" ]; then {
 
 
 LLVM_COMPILE_FLAGS=`${CLANG_HOME}/bin/llvm-config --cppflags --cxxflags | sed -e 's/ -fno-exceptions/ -fexceptions/g' -e 's/ -fno-rtti//g' -e 's/ -DNDEBUG//g' -e 's/ -g / /g' -e 's/ -std=c++0x/ -std=c++11/g' -e 's% -isysroot [^ ]*%%g'`
-LLVM_COMPILE_FLAGS=${LLVM_COMPILE_FLAGS//-Wno-maybe-uninitialized/}
+# LLVM_COMPILE_FLAGS=${LLVM_COMPILE_FLAGS//-Wno-maybe-uninitialized/}
 
 # we're going to use LLVM_LL_COMPILE_FLAGS for linking
 # technically, we should be using LLVM_LINK_FLAGS for that, but that seems to
@@ -368,33 +354,37 @@ if [[ ! -d ${OUTDIR} ]]; then {
     )
 } fi
 
+# note to self: hmmmm, should we be defining in addition __CUDA_ARCH__ here?
 (
     set -x
     ${CLANG_HOME}/bin/clang++ ${PASSTHRU} -DUSE_CLEW \
         -std=c++11 -x cuda \
         -D__CORIANDERCC__ \
-        --cuda-gpu-arch=sm_30 -nocudalib -nocudainc --cuda-device-only -emit-llvm -O0 -S \
-        ${ADDFLAGS} \
         -D__CUDACC__ \
+        --cuda-gpu-arch=sm_30 -nocudalib -nocudainc --cuda-device-only -emit-llvm \
+        -O${DEVICE_PARSE_OPT_LEVEL} \
+        -S \
+        ${ADDFLAGS} \
         -Wno-gnu-anonymous-struct \
         -Wno-nested-anon-types \
         ${LLVM_COMPILE_FLAGS} \
-        -I${COCL_HOME}/include/EasyCL \
-        -I${COCL_HOME}/include/cocl \
-        -I${COCL_HOME}/src \
-        -I${COCL_HOME}/src/EasyCL \
-        -I${COCL_HOME}/src/EasyCL/thirdparty/clew/include \
-        -include ${COCL_HOME}/include/cocl/cocl.h \
-        -include ${COCL_HOME}/include/cocl/fake_funcs.h \
-        -include ${COCL_HOME}/include/cocl/cocl_deviceside.h \
-        -I${COCL_HOME}/include \
+        -I${COCL_INCLUDE}/EasyCL \
+        -I${COCL_INCLUDE}/cocl \
+        -include ${COCL_INCLUDE}/cocl/cocl.h \
+        -include ${COCL_INCLUDE}/cocl/fake_funcs.h \
+        -include ${COCL_INCLUDE}/cocl/cocl_deviceside.h \
+        -I${COCL_INCLUDE} \
         ${INCLUDES} \
         ${INPUTBASEPATH}${INPUTPOSTFIX} -o ${OUTPUTBASEPATH}-device-noopt.ll
 )
 
+        # -I${COCL_HOME}/src \
+        # -I${COCL_HOME}/src/EasyCL \
+        # -I${COCL_HOME}/src/EasyCL/thirdparty/clew/include \
+
 (
     set -x
-    ${CLANG_HOME}/bin/opt ${DEVICELLOPT} -S \
+    ${CLANG_HOME}/bin/opt ${DEVICE_PARSE_PASSES_STR} -S \
         -o ${OUTPUTBASEPATH}-device.ll \
         ${OUTPUTBASEPATH}-device-noopt.ll
 )
@@ -403,27 +393,30 @@ if [[ ! -d ${OUTDIR} ]]; then {
     set -x
     ${CLANG_HOME}/bin/clang++ ${PASSTHRU} \
         ${INCLUDES} -DUSE_CLEW \
-        -std=c++11 -x cuda -nocudainc --cuda-host-only -emit-llvm  -O3 -S \
+        -std=c++11 -x cuda -nocudainc --cuda-host-only -emit-llvm \
+        -O${HOSTSIDE_PARSE_OPT_LEVEL} \
+        -S \
         ${OPT_G} \
         -D__CUDACC__ \
         -D__CORIANDERCC__ \
         -Wno-gnu-anonymous-struct \
         -Wno-nested-anon-types \
         ${LLVM_COMPILE_FLAGS} \
-        -I${COCL_HOME}/include \
-        -I${COCL_HOME}/include/EasyCL \
-        -I${COCL_HOME}/include/cocl \
-        -I${COCL_HOME}/src \
-        -I${COCL_HOME}/src/EasyCL/thirdparty/clew/include \
-        -I${COCL_HOME}/src/EasyCL \
+        -I${COCL_INCLUDE} \
+        -I${COCL_INCLUDE}/EasyCL \
+        -I${COCL_INCLUDE}/cocl \
         ${ADDFLAGS} \
         ${LLVM_COMPILE_FLAGS} \
-        -include ${COCL_HOME}/include/cocl/cocl.h \
-        -include ${COCL_HOME}/include/cocl/fake_funcs.h \
-        -include ${COCL_HOME}/include/cocl/cocl_hostside.h \
+        -include ${COCL_INCLUDE}/cocl/cocl.h \
+        -include ${COCL_INCLUDE}/cocl/fake_funcs.h \
+        -include ${COCL_INCLUDE}/cocl/cocl_hostside.h \
         ${INPUTBASEPATH}${INPUTPOSTFIX} \
         -o ${OUTPUTBASEPATH}-hostraw.ll
 )
+
+        # -I${COCL_HOME}/src \
+        # -I${COCL_HOME}/src/EasyCL/thirdparty/clew/include \
+        # -I${COCL_HOME}/src/EasyCL \
 
 (
     set -x
@@ -439,7 +432,7 @@ if [[ ! -d ${OUTDIR} ]]; then {
         ${PASSTHRU} \
         ${LLVM_LL_COMPILE_FLAGS} \
         -DUSE_CLEW \
-        -O3 \
+        -O${HOSTSIDE_COMPILE_OPT_LEVEL} \
         ${OPT_G} \
         -c ${OUTPUTBASEPATH}-hostpatched.ll \
         -o ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}

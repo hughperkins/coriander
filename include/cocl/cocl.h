@@ -20,7 +20,7 @@
 #include "cocl/cocl_blas.h"
 #include "cocl/cocl_kernellaunch.h"
 #include "cocl/cocl_funcs.h"
-#include "cocl/hostside_opencl_funcs.h"
+#include "cocl/hostside_opencl_funcs_ext.h"
 #include "cocl/vector_types.h"
 
 // #include <iostream>

@@ -45,7 +45,7 @@ namespace cocl {
     public:
         Int8Arg(char v) : Arg(AK_Int8Arg), v(v) {}
         void inject(easycl::CLKernel *kernel) {
-            kernel->in(v);
+            kernel->in_char(v);
         }
         virtual std::string str() { return "Int8Arg"; }
         char v;
@@ -57,7 +57,7 @@ namespace cocl {
     public:
         Int32Arg(int v) : Arg(AK_Int32Arg), v(v) {}
         void inject(easycl::CLKernel *kernel) {
-            kernel->in(v);
+            kernel->in_int32(v);
         }
         virtual std::string str();
         int v;
@@ -81,7 +81,7 @@ namespace cocl {
     public:
         Int64Arg(int64_t v) : Arg(AK_Int64Arg), v(v) {}
         void inject(easycl::CLKernel *kernel) {
-            kernel->in(v);
+            kernel->in_int64(v);
         }
         virtual std::string str();
         int64_t v;
@@ -93,7 +93,7 @@ namespace cocl {
     public:
         FloatArg(float v) : Arg(AK_FloatArg), v(v) {}
         void inject(easycl::CLKernel *kernel) {
-            kernel->in(v);
+            kernel->in_float(v);
         }
         virtual std::string str() { return "FloatArg"; }
         float v;
