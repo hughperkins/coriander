@@ -37,7 +37,7 @@ endif()
 
 foreach(EIGEN_TEST ${EIGEN_TESTS})
     cocl_add_executable(${EIGEN_TEST} ${TESTS_EXCLUDE} ${EIGEN_TEST}.cu)
-    target_link_libraries(${EIGEN_TEST} ${Coriander_LIBRARIES})
+    target_link_libraries(${EIGEN_TEST} cocl clblast clew easycl)
     target_include_directories(${EIGEN_TEST} PRIVATE ${EIGEN_HOME}/test)
     add_custom_target(run-${EIGEN_TEST}
         COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${EIGEN_TEST}
