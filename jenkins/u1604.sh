@@ -11,8 +11,12 @@ mkdir build
 cd build
 cmake  -DEIGEN_TESTS=ON -DEIGEN_HOME=${BASEDIR}/eigen ..
 make -j 16
-make -j 16 tests
-make run-tests
+make -j 16 gtest-tests
+make -j 16 endtoend-tests
+make -j 16 eigen-tests
+make run-gtest-tests
+make run-endtoend-tests
+make run-eigen-tests
 
 # cd docker
 # sudo docker build --no-cache ./ -t coriander
