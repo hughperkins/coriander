@@ -9,7 +9,7 @@ int returnerror() {
 }
 
 int main(int argc, char *argv[]) {
-    CUdevice device;
+    // CUdevice device;
     std::cout << returnerror() << std::endl;
     std::cout << CUDA_ERROR_INVALID_IMAGE << std::endl;
     std::cout << CUDA_ERROR_NOT_READY << std::endl;

@@ -72,8 +72,11 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
     src/cocl_funcs.cpp
 )
 
-set(CMAKE_CC_FLAGS "-fPIC")
-set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC -g -Wno-covered-switch-default -Wno-sign-compare")
+set(CMAKE_CC_FLAGS "${CMAKE_CC_FLAGS} -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -g -Wno-sign-compare")
+if(APPLE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-covered-switch-default")
+endif(APPLE)
 add_definitions(-DUSE_CLEW)  # turns off direct linking with libOpenCL.so, all goes via clew dynamic loader (no need to link with libOpenCL at build time)
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 

@@ -9,7 +9,7 @@ using namespace std;
 
 #include <cuda.h>
 
-const int N = 1024;
+// const int N = 1024;
 
 int main(int argc, char *argv[]) {
     cudaDeviceProp prop;

@@ -158,7 +158,7 @@ void testtwostructs() {
     float *hostFloats2 = new float[N];
     float *hostFloats3 = new float[N];
 
-    struct Struct_fp_fp_f_f mystruct = {(float *)gpuFloats1, (float *)gpuFloats2};
+    struct Struct_fp_fp_f_f mystruct = {(float *)gpuFloats1, (float *)gpuFloats2, 0.0f, 0.0f};
     struct Struct_fp mystruct2 = {(float *)gpuFloats3};
 
     kernel_twostructs<<<dim3(1,1,1), dim3(32,1,1), 0, stream>>>(mystruct, mystruct2);

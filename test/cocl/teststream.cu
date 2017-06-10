@@ -14,7 +14,7 @@ __global__ void longKernel(float *data, int N, float value) {
 }
 
 void test1() {
-    int N = 102400;
+    const int N = 102400;
 
     CUstream stream;
     cuStreamCreate(&stream, 0);
@@ -63,7 +63,7 @@ void fill(float *M, int N, float val) {
 void test2() {
     // use a long running kernel, queue an async copy back from device
     // => returned values should, in theory, be correct...
-    int N = 102400;
+    const int N = 102400;
 
     CUstream stream;
     cuStreamCreate(&stream, 0);

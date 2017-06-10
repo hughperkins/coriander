@@ -456,8 +456,8 @@ void PatchHostside::getLaunchTypes(
     BitCastInst *bitcast = cast<BitCastInst>(cast<ConstantExpr>(inst->getArgOperand(0))->getAsInstruction());
     Function *hostFn = cast<Function>(bitcast->getOperand(0));
 
-    PointerType *pointerFunctionType = cast<PointerType>(hostFn->getType());
-    FunctionType *hostFnType = cast<FunctionType>(pointerFunctionType->getElementType());
+    // PointerType *pointerFunctionType = cast<PointerType>(hostFn->getType());
+    // FunctionType *hostFnType = cast<FunctionType>(pointerFunctionType->getElementType());
 
     info->kernelName = hostFn->getName();
 
@@ -472,7 +472,7 @@ void PatchHostside::getLaunchTypes(
     vector<Argument *> devicesideArgs;
     for(auto it=deviceFn->arg_begin(); it != deviceFn->arg_end(); it++) {
         Argument *arg = &*it;
-        devicesideArgs.push_back(&*it);
+        devicesideArgs.push_back(arg);
     }
     for(auto it=deviceFnType->param_begin(); it != deviceFnType->param_end(); it++) {
         Type * typeDevicesideFn = *it;
@@ -559,7 +559,7 @@ void PatchHostside::patchFunction(llvm::Module *M, const llvm::Module *MDevice, 
 
     // MDevice is only for information, so we can see the declaration of kernels on the device-side
 
-    bool is_main = (string(F->getName().str()) == "main");
+    // bool is_main = (string(F->getName().str()) == "main");
     vector<Instruction *> to_replace_with_zero;
     IntegerType *inttype = IntegerType::get(context, 32);
     ConstantInt *constzero = ConstantInt::getSigned(inttype, 0);

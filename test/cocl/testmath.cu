@@ -55,8 +55,7 @@ int main(int argc, char *argv[]) {
     // cout << hostFloats1[4] << endl;
     // cout << hostFloats1[5] << endl;
 
-    float diff = std::abs(hostFloats1[0] - 140.296);
-    assert(diff < 0.01);
+    assert(std::abs(hostFloats1[0] - 140.296) < 0.01);
 
     assert(hostFloats1[4] == 3);
     assert(hostFloats1[5] == 4.5f);
