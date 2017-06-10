@@ -449,8 +449,8 @@ void kernelGo() {
             std::cout << "This is currently not supported by Coriander" << std::endl;
             std::cout << std::endl;
             std::cout << "Your options are:" << std::endl;
-            std::cout << "- update your GPU kernel" << std::endl;
-            std::cout << "- make one single huge GPU memory allocation, instead of many smaller ones" << std::endl;
+            std::cout << "- update your GPU kernel, to not use double-indirected pointers" << std::endl;
+            std::cout << "- allocate one single huge GPU memory buffer, instead of many smaller ones" << std::endl;
             std::cout << std::endl;
             throw std::runtime_error("Error: using vmem with multiple allocations");
         } else {
@@ -489,7 +489,7 @@ void kernelGo() {
         << " global: " << global);
     int workgroupSize = launchConfiguration.block[0] * launchConfiguration.block[1] * launchConfiguration.block[2];
     COCL_PRINT("workgroupSize=" << workgroupSize);
-    kernel->localInts(min(4, workgroupSize));
+    kernel->localInts(max(4, workgroupSize));
 
     try {
         kernel->run(launchConfiguration.queue, 3, global, launchConfiguration.block);
