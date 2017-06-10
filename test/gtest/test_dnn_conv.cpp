@@ -654,7 +654,7 @@ TEST(test_dnn_conv, simple_cpu_back_filters) {
     delete[] inImages;
 }
 
-TEST(test_dnn_conv, simple_gpu_conv) {
+TEST(test_dnn_conv, DISABLED_simple_gpu_conv) {
     int N = 4;
     int inC = 3;
     int outC = 5;
@@ -819,7 +819,7 @@ TEST(test_dnn_conv, simple_gpu_conv) {
     delete[] inImages;
 }
 
-TEST(test_dnn_conv, simple_gpu_conv_backward_data) {
+TEST(test_dnn_conv, DISABLED_simple_gpu_conv_backward_data) {
     int N = 4;
     int inC = 3;
     int outC = 5;
