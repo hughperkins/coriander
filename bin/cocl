@@ -336,7 +336,8 @@ if [ ! "$COMPILE" ]; then {
 } fi
 
 
-LLVM_COMPILE_FLAGS=`${CLANG_HOME}/bin/llvm-config --cppflags --cxxflags | sed -e 's/ -fno-exceptions/ -fexceptions/g' -e 's/ -fno-rtti//g' -e 's/ -DNDEBUG//g' -e 's/ -g / /g' -e 's/ -std=c++0x/ -std=c++11/g' -e 's% -isysroot [^ ]*%%g'`
+LLVM_COMPILE_FLAGS=`${CLANG_HOME}/bin/llvm-config --cppflags --cxxflags | sed -e 's/ -fno-exceptions/ -fexceptions/g' -e 's/ -fno-rtti//g' -e 's/ -DNDEBUG//g' -e 's/ -g / /g' -e 's/ -std=c++0x/ -std=c++11/g' -e 's/ -O[0123] / /g' -e 's% -isysroot [^ ]*%%g'`
+echo LLVM_COMPILE_FLAGS ${LLVM_COMPILE_FLAGS}
 # LLVM_COMPILE_FLAGS=${LLVM_COMPILE_FLAGS//-Wno-maybe-uninitialized/}
 
 # we're going to use LLVM_LL_COMPILE_FLAGS for linking
@@ -354,6 +355,7 @@ if [[ ! -d ${OUTDIR} ]]; then {
     )
 } fi
 
+# device-side: .cu => -deviceside-noopt.ll
 # note to self: hmmmm, should we be defining in addition __CUDA_ARCH__ here?
 (
     set -x
@@ -382,6 +384,7 @@ if [[ ! -d ${OUTDIR} ]]; then {
         # -I${COCL_HOME}/src/EasyCL \
         # -I${COCL_HOME}/src/EasyCL/thirdparty/clew/include \
 
+# opt: -device-noopt.ll => -device.ll
 (
     set -x
     ${CLANG_HOME}/bin/opt ${DEVICE_PARSE_PASSES_STR} -S \
@@ -389,6 +392,7 @@ if [[ ! -d ${OUTDIR} ]]; then {
         ${OUTPUTBASEPATH}-device-noopt.ll
 )
 
+# host-side: -.cu => -hostraw.cll
 (
     set -x
     ${CLANG_HOME}/bin/clang++ ${PASSTHRU} \
@@ -418,6 +422,7 @@ if [[ ! -d ${OUTDIR} ]]; then {
         # -I${COCL_HOME}/src/EasyCL/thirdparty/clew/include \
         # -I${COCL_HOME}/src/EasyCL \
 
+# patch_hostside: -hostraw.ll => -hostpatched.ll
 (
     set -x
     ${COCL_BIN}/patch_hostside \
@@ -426,6 +431,7 @@ if [[ ! -d ${OUTDIR} ]]; then {
         --hostpatchedfile ${OUTPUTBASEPATH}-hostpatched.ll
 )
 
+# -hostpatched.ll => .o
 (
     set -x
     ${CLANG_HOME}/bin/clang++ \
@@ -439,6 +445,7 @@ if [[ ! -d ${OUTDIR} ]]; then {
 )
 
 if [ ! "$COMPILE" ]; then {
+    # .o => executable
     (
         set -x
         ${NATIVE_COMPILER} \

@@ -33,6 +33,11 @@
 // found this at https://gist.github.com/eliben/b014ac17cbe5a452803f
 #define __launch_bounds__(...) __attribute__((launch_bounds(__VA_ARGS__)))
 
+namespace cocl {
+    int32_t getNumCachedKernels(); // this should be per-context or something, though right now, it is not yet
+    int32_t getNumKernelCalls();
+}
+
 extern "C" {
     int cudaConfigureCall(const dim3 grid, const dim3 block, long long shared = 0,  char * stream = 0);
 

@@ -2,7 +2,7 @@
 
 #include "pthread.h"
 
-#include "hostside_opencl_funcs.h"
+#include "hostside_opencl_funcs_ext.h"
 
 #include <iostream>
 #include <memory>

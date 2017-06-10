@@ -5,4 +5,4 @@ export COCL_BIN=@THIS_COCL_BIN@
 export COCL_LIB=@THIS_COCL_LIB@
 export COCL_INCLUDE=@THIS_COCL_INCLUDE@
 
-@CMAKE_INSTALL_PREFIX@/bin/cocl_wrapped "$@"
+@CMAKE_SOURCE_DIR@/bin/cocl "$@"
