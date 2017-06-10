@@ -1,22 +1,25 @@
 # Testing
 
 The following tests are available:
-- low-level tests, using gtest
-- pyopencl tests
-- end-to-end tests
-- Eigen tests
-  ~~in Eigen repo, https://bitbucket.org/hughperkins/eigen/src/eigen-cl/unsupported/test/Coriander/?at=eigen-cl~~
-  - there are tests in the eigen repo, and they somewhat run, but I dont use them for testing, I use the tests in this repo, at [test/eigen](test/eigen), since they're easier for me to use in a 'bite-size' way
-- cudnn:
-  - I'm using a branch of Tal Ben-Nun's [cudnn-training](https://github.com/tbennun/cudnn-training), at https://github.com/hughperkins/cudnn-training , to add/test cudnn implementation
-  - there are tests within Coriander, in the `gtest` tests, eg run `./cocl_unittests tests=*dnn*`
+- gtest
+- pytest
+- end-to-end
+- Eigen
+
+Tests can theoretically be added to any of gtest, pytest, or end-to-end.  Each has its own advantages:
+
+- gtest: good for low-level unit tests. Runs quickly.
+- pytest: easy to write unit-tests using bytecode, OpenCL, NVIDIA® CUDA™
+- end-to-end: full end to end builds of NVIDIA® CUDA™ source-code files.  Probably the most convincing tests :-)
+
+The Eigen tests are because Eigen is a framework used in Tensorflow, and being able to build/run Eigen is a key pre-requisite for that.
 
 ## `gtest` tests
 
 ```
 cd build
-make -j 8 cocl_unittests
-make run-cocl_unittests
+make -j 8 gtest-tests
+make run-gtest-tests
 ```
 
 No dependencies on graphics card etc.  It simply takes some hand-crafted IR, and writes it to OpenCL.  It never actually tries to run the OpenCL, so it validates:
@@ -49,12 +52,12 @@ In theory, these should all pass, so please raise an issue for any that are fail
 
 ### Build
 ```
-make -j 8 end-to-end-tests
+make -j 8 endtoend-tests
 ```
 
 ### Run
 ```
-make run-end-to-end-tests
+make run-endtoend-tests
 ```
 
 You can run a test by name, eg:
@@ -71,7 +74,7 @@ Using Intel , OpenCL platform: Intel Gen OCL Driver
 Using OpenCL device: Intel(R) HD Graphics 5500 BroadWell U-Processor GT2
 126.456
 ```
-- end-to-end tests are at [test/cocl](test/cocl)
+- end-to-end tests are at [test/endtoend](test/endtoend)
 
 ## Eigen tests
 

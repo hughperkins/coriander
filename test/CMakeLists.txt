@@ -19,7 +19,7 @@ include_directories(include/cocl/proxy_includes)
 set(E2E_TEST_BUILD_TARGETS)
 set(E2E_TEST_RUN_TARGETS)
 foreach(TEST ${TESTS})
-    cocl_add_executable(${TEST} ${TESTS_EXCLUDE} test/cocl/${TEST}.cu)
+    cocl_add_executable(${TEST} ${TESTS_EXCLUDE} test/endtoend/${TEST}.cu)
     target_link_libraries(${TEST} cocl clew clblast easycl)
     add_custom_target(run-${TEST}
         COMMAND echo
@@ -33,13 +33,13 @@ foreach(TEST ${TESTS})
     set(E2E_TEST_RUN_TARGETS ${E2E_TEST_RUN_TARGETS} run-${TEST})
 endforeach()
 
-add_custom_target(end-to-end-tests
+add_custom_target(endtoend-tests
     DEPENDS ${E2E_TEST_BUILD_TARGETS})
-add_custom_target(run-end-to-end-tests
-    DEPENDS end-to-end-tests ${E2E_TEST_RUN_TARGETS})
+add_custom_target(run-endtoend-tests
+    DEPENDS endtoend-tests ${E2E_TEST_RUN_TARGETS})
 
-set(BUILD_TEST_TARGETS ${BUILD_TEST_TARGETS} end-to-end-tests)
-set(RUN_TEST_TARGETS ${RUN_TEST_TARGETS} run-end-to-end-tests)
+set(BUILD_TEST_TARGETS ${BUILD_TEST_TARGETS} endtoend-tests)
+set(RUN_TEST_TARGETS ${RUN_TEST_TARGETS} run-endtoend-tests)
 
 # add_custom_target(run-tests-travis
 #   DEPENDS run-cuda_sample run-context run-offsetkernelargs run-test_callbacks run-testcumemcpy
@@ -52,7 +52,7 @@ else()
     add_library(cocl_gtest  ${TESTS_EXCLUDE} third_party/gtest/gtest-all.cc)
 endif()
 
-add_executable(cocl_unittests ${TESTS_EXCLUDE} test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
+add_executable(gtest-tests ${TESTS_EXCLUDE} test/gtest/gtest_main.cpp test/gtest/GtestGlobals.cpp
     test/gtest/test_block_dumper.cpp test/gtest/test_new_instruction_dumper.cpp
     test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
     test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
@@ -64,25 +64,25 @@ add_executable(cocl_unittests ${TESTS_EXCLUDE} test/gtest/gtest_main.cpp test/gt
     # test/gtest/test_simple.cu
     # test/gtest/test_cocl_simple.cu
 )
-target_include_directories(cocl_unittests PRIVATE src)
-target_include_directories(cocl_unittests PRIVATE include)
-target_include_directories(cocl_unittests PRIVATE src/EasyCL/thirdparty/clew/include)
-target_include_directories(cocl_unittests PRIVATE third_party/gtest)
-target_include_directories(cocl_unittests PRIVATE ${CLANG_HOME}/include)
-target_link_libraries(cocl_unittests cocl_gtest easycl cocl ${LLVM_LIBS} ${LLVM_SYSLIBS})
-target_compile_options(cocl_unittests PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
+target_include_directories(gtest-tests PRIVATE src)
+target_include_directories(gtest-tests PRIVATE include)
+target_include_directories(gtest-tests PRIVATE src/EasyCL/thirdparty/clew/include)
+target_include_directories(gtest-tests PRIVATE third_party/gtest)
+target_include_directories(gtest-tests PRIVATE ${CLANG_HOME}/include)
+target_link_libraries(gtest-tests cocl_gtest easycl cocl ${LLVM_LIBS} ${LLVM_SYSLIBS})
+target_compile_options(gtest-tests PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 
-add_custom_target(run-cocl_unittests
+add_custom_target(run-gtest-tests
     COMMAND echo
-    COMMAND echo make run-cocl_unittests
-    COMMAND ${COCL_DUMP_CL_STR} ${CMAKE_CURRENT_BINARY_DIR}/cocl_unittests
-    DEPENDS cocl_unittests
+    COMMAND echo make run-gtest-tests
+    COMMAND ${COCL_DUMP_CL_STR} ${CMAKE_CURRENT_BINARY_DIR}/gtest-tests
+    DEPENDS gtest-tests
     DEPENDS cocl
     DEPENDS patch_hostside
 )
 
-set(BUILD_TEST_TARGETS ${BUILD_TEST_TARGETS} cocl_unittests)
-set(RUN_TEST_TARGETS ${RUN_TEST_TARGETS} run-cocl_unittests)
+set(BUILD_TEST_TARGETS ${BUILD_TEST_TARGETS} gtest-tests)
+set(RUN_TEST_TARGETS ${RUN_TEST_TARGETS} run-gtest-tests)
 
 if(EIGEN_TESTS)
   add_subdirectory(test/eigen)
