@@ -28,9 +28,6 @@ namespace easycl {
 namespace cocl {
     class CoclStream;
 
-    int32_t getNumCachedKernels(); // this should be per-context or something, though right now, it is not yet
-    int32_t getNumKernelCalls();
-
     struct GenerateOpenCLResult {
         std::string clSourcecode;
         std::string originalKernelName;
