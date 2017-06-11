@@ -14,6 +14,16 @@ if [ -z "${BUILD_NUMBER}" ]; then {
 GIT_COMMIT_SHORT=$(git log --oneline -n 1 | awk '{print $1}')
 # } fi
 
+(
+set +x
+
+BUILD_URL="https://s3.amazonaws.com/hughperkins-ci/coriander/${BUILD_NUMBER}-${GIT_COMMIT_SHORT}.d/index.html"
+curl -XPOST -H "Authorization: token ${OAUTH_TOKEN}" https://api.github.com/repos/hughperkins/coriander/statuses/$(git rev-parse HEAD) -d "{
+  \"state\": \"pending\",
+  \"description\": \"Building\"
+}"
+)
+
 bash jenkins/u1604.sh | tee out.log
 
 echo '<html><body>' > newhtml.html
@@ -34,6 +44,7 @@ for filename in $(aws s3 ls s3://hughperkins-ci/coriander/ | grep PRE | awk '{pr
 echo '</body></html>' >> newhtml.html
 aws s3 cp newhtml.html s3://hughperkins-ci/coriander/index.html
 
+(
 set +x
 
 BUILD_URL="https://s3.amazonaws.com/hughperkins-ci/coriander/${BUILD_NUMBER}-${GIT_COMMIT_SHORT}.d/index.html"
@@ -42,3 +53,4 @@ curl -XPOST -H "Authorization: token ${OAUTH_TOKEN}" https://api.github.com/repo
   \"target_url\": \"${BUILD_URL}\",
   \"description\": \"Build and tests completed successfully\"
 }"
+)
