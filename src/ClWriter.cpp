@@ -54,13 +54,13 @@ void ClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std:
     }
     if(localValueInfo->toBeDeclared) {
         // cout << "in localvalueinfo.toBeDeclared:" << endl;
-        // cout << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name << ";" << endl;
+        cout << "base ClWriter::writeDelcaration: " << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name << ";" << endl;
         os << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name << ";\n";
     }
     // if(localValueInfo->toBeDeclared) {
     //     os << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name;\n";
     // }
-    // cout << "ClWriter::writeDeclaration()" << endl;
+    // cout << "done ClWriter::writeDeclaration()" << endl;
 }
 
 void ClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes any cl required, eg if we toggled setAsAssigned, we need to do the assignment
@@ -111,30 +111,32 @@ void AllocaClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
                 // allocaInfo.refValue = alloca;
                 // allocaInfo.definition = allocaDeclaration;
                 // allocaDeclarations->push_back(allocaInfo);
+                std::cout << "allocadeclaration: " << allocaDeclaration << std::endl;
                 os << indent << allocaDeclaration << ";\n";
                 return;
             } else {
                 // cout << "alloca, non-arraytype" << endl;
                 // Value *refInstruction = alloca;
                 // if the elementType is a pointer, assume its global?
-                if(isa<PointerType>(ptrElementType)) {
-                    // cout << "alloca, pointertype" << endl;
-                    // find the store
-                    for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
-                        User *user = *it;
-                        if(StoreInst *store = dyn_cast<StoreInst>(user)) {
-                            int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
-                            // refInstruction = store->getOperand(0);
-                            if(storeop0space == 1) {
-                                gencode += "global ";
-                                updateAddressSpace(alloca, 1);
-                            }
-                            copyAddressSpace(user, alloca);
-                            typestring = typeDumper->dumpType(ptrElementType);
-                        }
-                    }
-                }
+                // if(isa<PointerType>(ptrElementType)) {
+                //     // cout << "alloca, pointertype" << endl;
+                //     // find the store
+                //     for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
+                //         User *user = *it;
+                //         if(StoreInst *store = dyn_cast<StoreInst>(user)) {
+                //             int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
+                //             // refInstruction = store->getOperand(0);
+                //             if(storeop0space == 1) {
+                //                 gencode += "global ";
+                //                 updateAddressSpace(alloca, 1);
+                //             }
+                //             copyAddressSpace(user, alloca);
+                //             typestring = typeDumper->dumpType(ptrElementType);
+                //         }
+                //     }
+                // }
                 string allocaDeclaration = gencode + typestring + " " + localValueInfo->name + "[1]";
+                std::cout << "allocadeclaration: " << allocaDeclaration << std::endl;
                 // find the store
                 // for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
                     // User *user = *it;
@@ -203,6 +205,22 @@ void InsertValueClWriter::writeDeclaration(std::string indent, TypeDumper *typeD
         os << indent << *it << ";\n";
     }
     if(fromUndef) {
+        if(ArrayType *arrayType = dyn_cast<ArrayType>(localValueInfo->value->getType())) {
+            cout << "InsertValueClWriter::writedeclaration() is arraytype" << endl;
+            int innercount = arrayType->getNumElements();
+            Type *elementType = arrayType->getElementType();
+            string allocaDeclaration = typeDumper->dumpType(elementType) + " " + 
+                localValueInfo->name + "[" + easycl::toString(innercount) + "]";
+            // allocaInfo.alloca = alloca;
+            // allocaInfo.refValue = alloca;
+            // allocaInfo.definition = allocaDeclaration;
+            // allocaDeclarations->push_back(allocaInfo);
+            std::cout << "insertvaluedelcaration: " << allocaDeclaration << std::endl;
+            os << indent << allocaDeclaration << ";\n";
+            return;
+        }
+
+        std::cout << "InsertValueClWriter:writeDeclaration: " << typeDumper->dumpType(localValueInfo->value->getType()) << " " << localValueInfo->name << std::endl;
         os << indent << typeDumper->dumpType(localValueInfo->value->getType()) << " " << localValueInfo->name << ";\n";
     }
 }
