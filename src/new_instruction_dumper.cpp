@@ -84,23 +84,42 @@ NewInstructionDumper::NewInstructionDumper(
 LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
     // maybe this should be somewhere more generic?
     LocalValueInfo *constantInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, constant, constant->getName().str());
+    WHEN_SPAMMING(std::cout << constantInfo->name << ": constant" << std::endl);
+
+    WHEN_SPAMMING(ostringstream l);
+    WHEN_SPAMMING(l << "Constant" << std::endl);
+    WHEN_SPAMMING(l << "========" << std::endl);
+    WHEN_SPAMMING(l << std::endl);
+    WHEN_SPAMMING(l << constantInfo->name << endl);
+    // WHEN_SPAMMING(l << "src name: " << srcInfo->name << endl);
+    // WHEN_SPAMMING(l << "src type: " << typeDumper->dumpType(srcValue->getType()) << endl);
+    // WHEN_SPAMMING(l << "dest type: " << typeDumper->dumpType(instr->getDestTy()) << endl);
+
     unsigned int valueTy = constant->getValueID();
     if(ConstantInt *constantInt = dyn_cast<ConstantInt>(constant)) {
         constantInfo->setAddressSpace(0);
-        constantInfo->setExpression(easycl::toString(constantInt->getSExtValue()));
+        std::string valueString = easycl::toString(constantInt->getSExtValue());
+        constantInfo->setExpression(valueString);
         constantInfo->clWriter.reset(new ClWriter(constantInfo));
-        return constantInfo;
+        WHEN_SPAMMING(l << "constantInt: " << valueString << std::endl);
+        // return constantInfo;
     } else if(isa<ConstantStruct>(constant)) {
         throw runtime_error("constantStruct not implemented in basicblockdumper.dumpconstant");
     } else if(isa<ConstantExpr>(constant)) {
         dumpConstantExpr(constantInfo);
-        return constantInfo;
+        WHEN_SPAMMING(l << "constantExpr" << std::endl);
+        WHEN_SPAMMING(l << "final expr: " << constantInfo->getExpr() << std::endl);
+        // return constantInfo;
     } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
         constantInfo->clWriter.reset(new ClWriter(constantInfo));
         constantInfo->setAddressSpace(0);
-        constantInfo->setExpression(ReadIR::dumpFloatConstant(forceSingle, constantFP));
-        return constantInfo;
+        std::string valueString = ReadIR::dumpFloatConstant(forceSingle, constantFP);
+        constantInfo->setExpression(valueString);
+        WHEN_SPAMMING(l << "constantFloat: " << valueString << std::endl);
+        // return constantInfo;
     } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
+        bool processed = false;
+        WHEN_SPAMMING(l << "GlobalValue" << std::endl);
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
             int addressspace = pointerType->getAddressSpace();
             if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
@@ -108,26 +127,35 @@ LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
                 constantInfo->setAddressSpace(3);
                 constantInfo->setAsAssigned();
                 constantInfo->setExpression(constantInfo->name);
-                return constantInfo;
+                WHEN_SPAMMING(l << "pointertype, addressspace 3" << std::endl);
+                processed = true;
+                // return constantInfo;
             }
         }
-        // at about this point we should pehaps swap to come global-specific class to handle this?
-        if(globalNames->hasName(constant)) {
-            // hmmmm, shouldwe be handling global values too???
-            constantInfo->clWriter.reset(new ClWriter(constantInfo));
-            constantInfo->setAddressSpace(4);
-            constantInfo->setExpression(globalNames->getName(constant));
-            return constantInfo;
+        if(!processed) {
+            // at about this point we should pehaps swap to come global-specific class to handle this?
+            if(globalNames->hasName(constant)) {
+                // hmmmm, shouldwe be handling global values too???
+                constantInfo->clWriter.reset(new ClWriter(constantInfo));
+                constantInfo->setAddressSpace(4);
+                constantInfo->setExpression(globalNames->getName(constant));
+                // return constantInfo;
+                WHEN_SPAMMING(l << "is global name" << std::endl);
+                processed = true;
+            }
         }
-        string name = global->getName().str();
-        string ourinstrstr = "(&" + name + ")";
-        updateAddressSpace(constant, 4);  // 4 means constant
-        constantInfo->setAddressSpace(4);
-        constantInfo->clWriter.reset(new ClWriter(constantInfo));
-        globalExpressionByValue->operator[](constant) = ourinstrstr;
+        if(!processed) {
+            string name = global->getName().str();
+            string ourinstrstr = "(&" + name + ")";
+            updateAddressSpace(constant, 4);  // 4 means constant
+            constantInfo->setAddressSpace(4);
+            constantInfo->clWriter.reset(new ClWriter(constantInfo));
+            globalExpressionByValue->operator[](constant) = ourinstrstr;
+            WHEN_SPAMMING(l << "is global constant, addressspace 4" << std::endl);
 
-        constantInfo->setExpression(ourinstrstr);
-        return constantInfo;
+            constantInfo->setExpression(ourinstrstr);
+        }
+        // return constantInfo;
     } else if(isa<UndefValue>(constant)) {
         cout << "undef, not hnalded" << endl;
         throw runtime_error("dumpconstnat, doesnt handle undef, for now");
@@ -135,13 +163,24 @@ LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
         constantInfo->clWriter.reset(new ClWriter(constantInfo));
         constantInfo->setAddressSpace(0);
         constantInfo->setExpression("0");
-        return constantInfo;
+        // return constantInfo;
     } else {
         cout << "dumpconstant, unhandled valuetype valueTy " << valueTy << endl;
         constant->dump();
         cout << endl;
         throw runtime_error("unknown constnat type");
     }
+
+    #ifdef COCL_SPAM_INSTRUCTIONS
+    // l << "final expr: " << gencode << std::endl;
+
+    ofstream f;
+    f.open("/tmp/" + constantInfo->name + "_constant.txt", ios_base::out);
+    f << l.str();
+    f.close();
+    #endif
+
+    return constantInfo;
 }
 
 // lets assumes hit is always local for now
