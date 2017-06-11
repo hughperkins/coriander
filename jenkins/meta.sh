@@ -7,9 +7,9 @@ if [ -z "${BUILD_NUMBER}" ]; then {
     BUILD_NUMBER=test
 } fi
 
-if [ -z "${GIT_COMMIT}" ]; then {
-    GIT_COMMIT=$(git log --oneline -n 1 | awk '{print $1}')
-} fi
+# if [ -z "${GIT_COMMIT}" ]; then {
+GIT_COMMIT=$(git log --oneline -n 1 | awk '{print $1}')
+# } fi
 
 bash jenkins/u1604.sh | tee out.log
 
