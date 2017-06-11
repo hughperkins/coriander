@@ -11,7 +11,7 @@ mkdir build
 cd build
 cmake  -DEIGEN_TESTS=ON -DEIGEN_HOME=${BASEDIR}/eigen ..
 make -j 16
-zip artifacts.zip libcocl.so libclew.so libclblast.so libeasycl.so
+zip ../artifacts.zip libcocl.so libclew.so libclblast.so libeasycl.so
 make -j 16 gtest-tests
 make -j 16 endtoend-tests
 make -j 16 eigen-tests
