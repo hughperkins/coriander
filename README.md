@@ -79,6 +79,10 @@ See [testing](doc/testing.md)
 
 See [assumptions](doc/assumptions.md)
 
+## Roadmap
+
+<img src="doc/img/roadmap.png?raw=true" />
+
 ## Libraries
 
 Coriander uses the following libraries:
