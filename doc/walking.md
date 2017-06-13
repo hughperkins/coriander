@@ -256,7 +256,7 @@ But we can write:
 Perhaps we can use a `*` in struct delcarations? :
 ```
 struct Foo {
-    <float:*> somefloat;  
+    <float:*> somefloat;
 };
 ```
 
@@ -272,6 +272,50 @@ So, now, this makes me think: what is actually allowed in the OpenCL 1.2 standar
 - function return types cannot be assigned an address space (6.5p6). Prsumably they are implicitly private (?)
 
 Importantly, section 6.9o "Elements of a struct or union must belong to the same address space. Declaring a struct or union whose elements are in different address spaces is illegal.".  Thats interesting. New information for me :-P However, it doesnt say antyhing about, do they have to be private. Nor does it say they cannot point into other address spaces, and potentially into different address spaces.
+
+So, at this point, I started drafting an email/post, to put in some Khronos-type forum, to ask about this. But then it occurred to me that, it's basically exaclty as above, and entirely general:
+
+- everything in a struct will all itself be in the same address space, corresponding to wherever the struct is stored, which can be in any of the address spaces, without needing a new struct declaration for each address space
+- however, any pointers in the struct will have a concrete address space (I assume?)
+- therefore I think the `*` syntax is not entirely unacceptable.  or maybe `s` (for struct).  As `s` it would look like:
+
+```
+struct Foo {
+    <float:1,s> pointerToLocal;
+};
+```
+
+I prefer `*` though, since it makes it clear we need to populate it. or posisbly `.` or `?` . How would `.` or `?` look? 
+
+```
+struct Foo {
+    <float:1,.> pointerToLocal;
+}
+```
+
+```
+struct Foo {
+    <float:1,?> pointerToLocal;
+}
+```
+
+I quite like the `.` notation.  `*` makes it sound like it can be any address space, which is not true: must match the struct emplacement address space. `?` makes it sound like we dont know, which is not strictly true either: it's defined by the struct's physical emplacement, as an instance.
+
+So, I'm going to use `.`, provisionally ,for now.
+
+So, here is the syntax, some examples:
+
+```
+<float:0>  someScalarFloat;
+<float:3,0> privatePointerToGlobalFloat;
+<float:3,1,0> privatePointerToLocalPointerToGlobalFloat;
+
+struct Foo {
+    <float:.> someFloat;
+    <float:3,.> pointerToGlobalFloat;
+    <float:3,1,.> pointerToLocalPointerToGlobalFloat
+}
+```
 
 ### Possible walks/connections
 
