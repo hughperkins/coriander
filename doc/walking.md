@@ -34,3 +34,9 @@ One challenge with this is that rewriting address spaces in llvm StructType is n
 Therefore, in the proposed version, the address-spaces will be not be stored onto the llvm Values and structs themsevles, but stored in a separate data structure, which is mutable. This means taht we can update the address space of struct members without needing to replace all the values. As I write, it occurs to me that the values will need to be updated, however we can make this task easier in a couple of ways:
 - our own struct info objects can contain a pointer to all values that have that struct type, making it easy to update them
 - we can leave values pointing at a generic struct info, with undefined address spaces, and then just swap it to an address-space mapped struct info later on
+
+## Walks
+
+1. Find which values link where
+1. Propagate address spaces, splitting fucntions and structs where necessary
+1. Generate opencl

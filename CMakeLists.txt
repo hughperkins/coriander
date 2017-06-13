@@ -84,6 +84,7 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
 )
 
 set(CMAKE_CC_FLAGS "${CMAKE_CC_FLAGS} -fPIC")
+# Note to self: think about why is there a -g here. Can we remove it?
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -g -Wno-sign-compare")
 if(APPLE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-covered-switch-default")
@@ -134,6 +135,12 @@ foreach(LIB ${LLVM_LIBFILES})
    set(LLVM_LIBS "${CLANG_HOME}/lib/${LIB}")
    endif()
 endforeach()
+
+add_executable(walk src/addressspacewalk/connections_walker.cpp src/addressspacewalk/walker_main.cpp)
+target_link_libraries(walk cocl clew clblast easycl)
+target_include_directories(walk PRIVATE src)
+target_include_directories(walk PRIVATE third_party/argparsecpp)
+target_compile_options(walk PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 
 add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp)
 target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
