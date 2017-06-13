@@ -61,12 +61,19 @@ void ConnectionsWalker::dumpValues(){
                 if(it != neededBy.begin()) {
                     outs << ",";
                 }
-                outs << (*it)->globalId << ",";
+                outs << (*it)->globalId;
             }
 
-            std::cout << "[" << ins.str() << "] => " << i << " " << typeDumper.dumpType(coclValue->type) <<
-            std::cout << "[" << outs.str() << "]" << std::endl;
-            std::cout << "]" << std::endl;
+            // if(isa<FunctionType>(coclValue->type)) {
+            //     std::cout << "[" << ins.str() << "]";
+            //     std::cout << " => " << i << " " << typeDumper.dumpType(coclValue->type) <<
+            //     std::cout << "[" << outs.str() << "]" << std::endl;
+            // } else {
+                std::cout << "[" << outs.str() << "]" << std::endl;
+                std::cout << " <- ";
+                std::cout << typeDumper.dumpType(coclValue->type) <<
+                std::cout << "[" << ins.str() << "]";
+            // }
         }
     }
 }
