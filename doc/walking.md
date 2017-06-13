@@ -1,5 +1,9 @@
 # Walking
 
+## Meta
+
+This document is going to be very stream-of-consciousny :-)  It is mostly to help me think through the problem, rather than to present things to other people. But, it might be useful, or you might be able to prod it into a useful form :-)  Anyway, I am keeping it with the repo for now.
+
 ## Current
 
 Walking is in two passes:
@@ -54,6 +58,8 @@ One point to think about is, what should be connected to what?  Should we have a
 
 But, the address space of a call doesnt really exist. Maybe the return type perhaps.  Or the entire function type perhaps.  So, maybe it does exist actually. But for thinking about one speific value, we cant do a simple one-line comparison between function types. Easier to connect the actual value passed int to a single arg, and that specific function arg value.
 
+### Undirected graph
+
 In fact, for address space mapping, we dont necessarily have or need a dag, but an undirected graph.  For example, if we have:
 
 ```
@@ -94,3 +100,177 @@ c = somefun();
 Even though the value of b is overwritten before it is assigned to c, since C++ types are static, cannot change during assignment, then we know that the address space of c must equal that of a.
 
 Therefore, to reduce confusion, for the connections walking, what we will walk is: address space connections, and we will make this explicit. To avoid any ambiguity of what is 'flowing throuhg' the connections.
+
+### Graph use-cases
+
+We have the following graph use-cases (list to be populated over time):
+- address space propagation: undirected graph of pools of nodes sharing an address space
+- variable declaration: variables must be declared before they are used
+- struct declaration: structs must be declared before they are used, and only once contained structs have been declared
+- ~~function declaration: functions must be declared or defined before they are used.~~ Removed, since we can declare in any order, prior to definition
+- scratch propagation: which functions need scratch space provided to them?
+- vmem table propagation: which functions need vmem table propagated to them?
+
+### Address-space propagation
+
+For address-space propagation, we need:
+- an undirected graph of 'pool's of address spaces: each pool is two or more values, that obligatorily share an address space
+
+Note that pointer relationships can preserve address spaces, just with a level of indirection added/removed. However, we can maybe propagate this via links between two pools? And just walk over this.
+
+Values which are not pointer types have no address space (just default 0 perhaps), and cannot propagate address spaces (?).  Thinking this through, eg:
+
+```
+global float *a; // global
+float b = *a;  // no address space. not a pointer. 0 perhaps
+[unk] float *c = &b;  // [unk] must be 'private', since it is a pointer to b, and b is private.
+```
+
+Thinking about this, it's not true that `b` doesnt have an address space: it is a private variable, as are all our variables, and in address space 0. Writing numerically now, for generality:
+
+```
+float<1> *a; // global, address space 1, using <> to denote address space
+float<0> b = *a;
+float<0> *c = &b;
+```
+Let's write out all address spaces, explicitly, including for scalars, and for the pointers themselves.  Eg, descriptively, 'a private pointer to global float'. Let's find a notation to depict 'private pointer to global float'. Let's write down some possibilities. These all are attempst to depict the same variable type:
+
+```
+float<1>:*<0> a;
+float<1>:*<0> a;
+float<1>*<0> a;
+float<1:0> a;
+float<1*0> a;
+float<1,0> a;
+```
+
+The last syntax looks nice-ish, but we should be able to depict pointers that go through tstructs, eg:
+```
+struct MyStruct {
+    global float *floats;
+}
+
+struct MyStruct somevar;
+```
+In this case, `somevar` points to different things, at different levels, though thinking this through, ultimately, it is:
+- a struct, held in private memory
+
+However, `somevar.floats` is:
+- a private pointer to floats in global memory
+
+What if we have:
+```
+struct MyStructL1 {
+    global float *floats;
+}
+
+struct MyStructL2 {
+    struct MyStructL1 l1;
+}
+
+struct MyStructL2 myStructL2;
+```
+So, now `mystructL2` is a struct, held in prviate memory, by value. `myStructL2.l1` is also a struct, held in private memory, by value. No change. In fact, `mystructL2.l1` is simply embedded in part of the memory held by `myStructL2`.  And so `myStructL2.l1.floats` is simply a private pointer to global float.
+
+Ok, what if we have:
+
+```
+struct MyStructL1 {
+    global float *floats;
+}
+
+struct MyStructL2 {
+    struct MyStructL1 l1;
+}
+
+local myStructsL2[3];
+
+[unk] struct MyStructL2 *pMyStruct2 = &myStructsL2[0];
+```
+
+Soo... now, `pMyStruct2` is a private pointer, which points to ... well... thinking this through:
+- the declaration `local myStructsL2[3]` is an array of structs, in shared memory, address space 3
+- `myStructsL2[0]` is one of these structs, by value. If we do anything with this, it is copied by value, eg if we use it in a function call:
+```
+myfn(myStructsL2[0]);
+```
+The function would not assign an address space to the parameter, its just by value:
+```
+void myfn(struct MyStructL2 arg1);
+```
+
+However, if we take the address, now it's a private pointer to shared memory. ie `&myStructsL2[0]` is a private pointer to shared memory, ie `pMyStruct2`, above, is of this type.
+
+We should be able to depict this. Technically, this is probably covered by C99 syntax, something like maybe:
+
+```
+local struct MyStructL2 *pMyStruct2 = &myStructsL2[0];
+```
+
+However, personally I find this insanely hard to read, parse, understand, reason about.  I want something easier for me to read. Something that corresponds more intuitively to me to the description 'a private pointer to a local struct'.  Let's try some ways of writing this:
+
+```
+local struct MyStructL2 *pMyStruct2 = &myStructsL2[0];
+struct MyStructL2<3:0> pMyStruct2 = ...;
+<3:struct MyStructL2><0> pMyStruct2 = ...;
+struct MyStructL2<3*0> ...;
+<struct MyStructL2:3,0> ...;
+```
+
+I kind of like the last syntax.  It's not ideal, but it is at least easy for me to parse personally, without figuring out where to put the 'local' and '*'s and so on, as in c99 syntax.  Is it complete? Can it represent all scenarios? Let's try some more scenarios. The earlier float is:
+
+```
+<float:1,0> a;  // private pointer to global float
+```
+A scalar is:
+
+```
+<float:0> b = *a;   // a private float primitive
+```
+
+But ... what if we have values in a struct. Does it make sense to label these? eg we have the following struct:
+```
+struct Foo {
+    float somefloat;
+};
+```
+The physical space used to store `somefloat` depends on where `struct Foo` is stored. We cannot say a priorae what is the address space of `somefloat`, without knowing the address space of a specific instance of `struct Foo`:
+```
+struct Foo privateFoo[1]; // privateFoo[0].somefloat is in private memory
+local struct Foo sharedFoo[1]; // sharedFoo[0].somefloat is in local memory
+```
+
+So, whilst we can write down the address space for privateFoo.somefloat and sharedFoo.somefloat, in the abvove notation, ie:
+```
+<float:0> v1 = privateFoo[0].somefloat;
+<float:3> v2 = sharedFoo[1].somefloat;
+// no: this is an implicit/explicit `load`, and even though `sharedFoo[0].somefloat` is in shared memory,
+// v2 is not...
+```
+But we can write:
+```
+<float:0> v1 = <float:0> privateFoo[0].somefloat;
+<float:0> v2 = <float:3> sharedFoo[1].somefloat; // correct, and the load is fairly explicit/obvious. maybe?
+```
+
+Perhaps we can use a `*` in struct delcarations? :
+```
+struct Foo {
+    <float:*> somefloat;  
+};
+```
+
+And for pointers in said structs, eg:
+```
+struct Foo {
+    <float:1,*> pointerToLocal;
+};
+```
+
+
+
+### Possible walks/connections
+
+We might be interested in the following types of connections, between Values etc:
+
+- which values share an address space (undirected address space mapping, to)
