@@ -16,6 +16,8 @@
 
 #include "addressspacewalk/connections_walker.h"
 
+#include "type_dumper.h"
+
 #include "llvm/IR/DebugInfoMetadata.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/SourceMgr.h"
@@ -23,6 +25,7 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Value.h"
+#include "llvm/IR/Instructions.h"
 
 #include <iostream>
 #include <string>
@@ -31,12 +34,51 @@
 namespace cocl {
 namespace addressspacewalk {
 
+
+void ConnectionsWalker::dumpValues(){
+    GlobalNames globalNames;
+    TypeDumper typeDumper(&globalNames);
+    for(int i = 0; i < nextValueId; i++) {
+        CoclValue *coclValue = coclValueByGlobalId[i];
+        if(coclValue != 0) {
+            llvm::Value *value = coclValue->value;   
+            llvm::Value *value = coclValue->value;
+            std::string opName = "";
+            if(llvm::Instruction *inst = llvm::dyn_cast<llvm::Instruction>(value)) {
+                opName = inst->getOpcodeName();
+            }
+
+            ostringstream ins;
+            for(auto it=coclValue->needs.begin(); it != coclValue->needs.end(); it++) {
+                if(it != needs.begin()) {
+                    outs << ",";
+                }
+                outs << (*it)->globalId;
+            }
+
+            ostringstream outs;
+            for(auto it=coclValue->neededBy.begin(); it != coclValue->neededBy.end(); it++) {
+                if(it != neededBy.begin()) {
+                    outs << ",";
+                }
+                outs << (*it)->globalId << ",";
+            }
+
+            std::cout << "[" << ins.str() << "] => " << i << " " << typeDumper.dumpType(coclValue->type) <<
+            std::cout << "[" << outs.str() << "]" << std::endl;
+            std::cout << "]" << std::endl;
+        }
+    }
+}
+
 CoclValue *ConnectionsWalker::getOrCreateCoclValue(llvm::Value *value) {
     if(coclValueByValue.find(value) == coclValueByValue.end()) {
-        std::unique_ptr< CoclValue >newCoclValue(new CoclValue());
+        std::unique_ptr< CoclValue >newCoclValue(new CoclValue(nextValueId));
+        nextValueId++;
         newCoclValue->type = value->getType();
         newCoclValue->value = value;
         coclValueByValue[value] = newCoclValue.get();
+        coclValueByGlobalId[nextValueId - 1] = newCoclValue.get();
         // coclValue = newCoclValue.get();
         coclValues.insert(std::move(newCoclValue));
     }
@@ -54,8 +96,22 @@ void ConnectionsWalker::walk(llvm::Function *F, llvm::BasicBlock *block) {
         for(auto childit = value->user_begin(); childit != value->user_end(); childit++) {
             llvm::Value *child = *childit;
             CoclValue *childCoclValue = getOrCreateCoclValue(child);
-            coclValue->needs.insert(childCoclValue);
-            childCoclValue->neededBy.insert(coclValue);
+            coclValue->neededBy.insert(childCoclValue);
+            childCoclValue->needs.insert(coclValue);
+        }
+        if(llvm::CallInst *call = llvm::dyn_cast<llvm::CallInst>(value)) {
+            std::cout << "its a call" << std::endl;
+            llvm::Function *called = call->getCalledFunction();
+            // std::cout << "F " << (long)called << std::endl;
+            // called->dump();
+            // std::cout << std::endl;
+            if(functionsDone.find(called) == functionsDone.end()) {
+                std::cout << "adding to to walk" << std::endl;
+                functionsToWalk.insert(called);
+            }
+            CoclValue *childCoclValue = getOrCreateCoclValue(called);
+            coclValue->neededBy.insert(childCoclValue);
+            childCoclValue->needs.insert(coclValue);
         }
     }
 }
@@ -81,7 +137,12 @@ void ConnectionsWalker::walkArgs(llvm::Function *F) {
 }
 
 void ConnectionsWalker::walk(llvm::Function *F) {
-    std::cout << "function " << F->getName().str() << std::endl;
+    std::cout << "F " << (long)F << std::endl;
+    // if(F->hasName()) {
+        std::cout << "function " << F->getName().str() << std::endl;
+    // } else {
+        // std::cout << "function " << std::endl;
+    // }
     walkArgs(F);
     for(auto it=F->begin(); it != F->end(); it++) {
         llvm::BasicBlock *block = &*it;
@@ -90,6 +151,8 @@ void ConnectionsWalker::walk(llvm::Function *F) {
             walk(F, block);
         }
     }
+    functionsDone.insert(F);
+    functionsToWalk.erase(F);
 }
 
 void ConnectionsWalker::walk() {
@@ -98,13 +161,26 @@ void ConnectionsWalker::walk() {
         throw std::runtime_error("Couldnt find kernel " + kernelName);
     }
     functionsToWalk.insert(F);
+    // std::cout << "F " << (long)F << std::endl;
     bool progressMade = true;
-    while(!functionsToWalk.empty() && progressMade) {
-        progressMade = false;
+    int iteration = 0;
+    while(!functionsToWalk.empty() && progressMade && iteration < 100) {
+        // progressMade = false;
+        std::vector<llvm::Function *> todo;
         for(auto it=functionsToWalk.begin(); it != functionsToWalk.end(); it++) {
             llvm::Function *fn = *it;
-            walk(fn);
+            if(functionsDone.find(fn) == functionsDone.end()) {
+                todo.push_back(fn);
+            }
         }
+        for(auto it=todo.begin(); it != todo.end() ;it++) {
+            llvm::Function *fn = *it;
+            if(functionsDone.find(fn) == functionsDone.end()) {
+                // std::cout << "walk() fn: " << (long)fn << std::endl;
+                walk(fn);
+            }
+        }
+        iteration++;
     }
     std::cout << "size of coclValues " << coclValues.size() << std::endl;
     // for(auto it = M->begin(); it != M->end(); it++) {

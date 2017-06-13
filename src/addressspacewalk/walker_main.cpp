@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
     cocl::addressspacewalk::ConnectionsWalker walker(M.get(), kernelname);
     try {
         walker.walk();
+        walker.dumpValues();
     } catch(std::runtime_error &e) {
         std::cout << "got exception: " << e.what() << std::endl;
         return -1;

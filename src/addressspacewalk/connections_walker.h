@@ -46,6 +46,7 @@ public:
     void walk(llvm::Function *function);
     void walkArgs(llvm::Function *F);
     void walk();
+    void dumpValues();
     // void walk(llvm::Module *block);
 
     CoclValue *getOrCreateCoclValue(llvm::Value *value);
@@ -67,6 +68,9 @@ public:
     // std::map<llvm::Argument *, int> addressSpaceByArg;
     // std::map<llvm::Function *, int> returnAddressSpaceByFunction;
     // std::map<llvm::StructType *, StructInfo *> structInfoByStructType;
+
+    int nextValueId = 1;
+    std::map<int, CoclValue *> coclValueByGlobalId;
 
     llvm::Module *M;
     std::string kernelName;

@@ -29,6 +29,8 @@ namespace addressspacewalk {
 
 class CoclValue {
 public:
+    CoclValue(int globalId) : globalId(globalId) {}
+
     std::set<CoclValue *> needs;
     std::set<CoclValue *> neededBy;
 
@@ -39,6 +41,8 @@ public:
     llvm::BasicBlock *block = nullptr;
     llvm::Function *function = nullptr;
     llvm::Module *module = nullptr;
+
+    const int globalId;
 
     int addressSpace = -1;  // -1 means, not yet deduced
 };
