@@ -317,6 +317,23 @@ struct Foo {
 }
 ```
 
+Nuance: we can modify the notation very slightly, so it is compilable in C99, or at least, ignored, by C99. By using the notation `__space(3:1:0)`, we can create a macro, so the compiler ignores it:
+
+```
+#include <stdio.h>
+
+#define __space(a)
+
+int main(int argc, char *argv[]) {
+    __space(0) float a;
+    __space(3;0) float *pa;
+    __space(3:0) float *pb;
+    __space(3:0:0) float **ppb;
+    __space(3:0:0) float **ppc;
+    return 0;
+}
+```
+
 ### Possible walks/connections
 
 We might be interested in the following types of connections, between Values etc:
