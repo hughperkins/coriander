@@ -267,7 +267,11 @@ struct Foo {
 };
 ```
 
+So, now, this makes me think: what is actually allowed in the OpenCL 1.2 standard?  Looking at the standard 1.2, https://www.khronos.org/registry/OpenCL/specs/opencl-1.2.pdf , we have:
+- all kernel parameters, and all function parameters in general, must be in private address space (6.5 p3). reasonable. kernel parameters can be private pointers into global, local or constant address space though (6.5 p4). again reasaonble.
+- function return types cannot be assigned an address space (6.5p6). Prsumably they are implicitly private (?)
 
+Importantly, section 6.9o "Elements of a struct or union must belong to the same address space. Declaring a struct or union whose elements are in different address spaces is illegal.".  Thats interesting. New information for me :-P However, it doesnt say antyhing about, do they have to be private. Nor does it say they cannot point into other address spaces, and potentially into different address spaces.
 
 ### Possible walks/connections
 
