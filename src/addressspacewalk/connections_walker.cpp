@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <stdexcept>
 
 namespace cocl {
@@ -41,24 +42,23 @@ void ConnectionsWalker::dumpValues(){
     for(int i = 0; i < nextValueId; i++) {
         CoclValue *coclValue = coclValueByGlobalId[i];
         if(coclValue != 0) {
-            llvm::Value *value = coclValue->value;   
             llvm::Value *value = coclValue->value;
             std::string opName = "";
             if(llvm::Instruction *inst = llvm::dyn_cast<llvm::Instruction>(value)) {
                 opName = inst->getOpcodeName();
             }
 
-            ostringstream ins;
+            std::ostringstream ins;
             for(auto it=coclValue->needs.begin(); it != coclValue->needs.end(); it++) {
-                if(it != needs.begin()) {
-                    outs << ",";
+                if(it != coclValue->needs.begin()) {
+                    ins << ",";
                 }
-                outs << (*it)->globalId;
+                ins << (*it)->globalId;
             }
 
-            ostringstream outs;
+            std::ostringstream outs;
             for(auto it=coclValue->neededBy.begin(); it != coclValue->neededBy.end(); it++) {
-                if(it != neededBy.begin()) {
+                if(it != coclValue->neededBy.begin()) {
                     outs << ",";
                 }
                 outs << (*it)->globalId;
@@ -69,10 +69,10 @@ void ConnectionsWalker::dumpValues(){
             //     std::cout << " => " << i << " " << typeDumper.dumpType(coclValue->type) <<
             //     std::cout << "[" << outs.str() << "]" << std::endl;
             // } else {
-                std::cout << "[" << outs.str() << "]" << std::endl;
+                std::cout << "[" << outs.str() << "]";
                 std::cout << " <- ";
-                std::cout << typeDumper.dumpType(coclValue->type) <<
-                std::cout << "[" << ins.str() << "]";
+                std::cout << typeDumper.dumpType(coclValue->type) << " ";
+                std::cout << "[" << ins.str() << "]" << std::endl;
             // }
         }
     }
