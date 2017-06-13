@@ -53,7 +53,7 @@ void ConnectionsWalker::dumpValues(){
                 if(it != coclValue->needs.begin()) {
                     ins << ",";
                 }
-                ins << (*it)->globalId;
+                ins << "%" << (*it)->globalId;
             }
 
             std::ostringstream outs;
@@ -61,19 +61,24 @@ void ConnectionsWalker::dumpValues(){
                 if(it != coclValue->neededBy.begin()) {
                     outs << ",";
                 }
-                outs << (*it)->globalId;
+                outs << "%" << (*it)->globalId;
             }
 
-            // if(isa<FunctionType>(coclValue->type)) {
-            //     std::cout << "[" << ins.str() << "]";
-            //     std::cout << " => " << i << " " << typeDumper.dumpType(coclValue->type) <<
-            //     std::cout << "[" << outs.str() << "]" << std::endl;
-            // } else {
-                std::cout << "[" << outs.str() << "]";
-                std::cout << " <- ";
-                std::cout << typeDumper.dumpType(coclValue->type) << " ";
-                std::cout << "[" << ins.str() << "]" << std::endl;
-            // }
+            std::cout << " [" << outs.str() << "]";
+            std::cout << " <-";
+
+            std::cout << " %" << i;
+
+            if(llvm::CallInst *call = llvm::dyn_cast<llvm::CallInst>(value)) {
+                std::cout << " call @" << call->getCalledFunction()->getName().str();
+            } else if(llvm::Function *F = llvm::dyn_cast<llvm::Function>(value)) {
+                std::cout << " define @" << F->getName().str();
+            } else {
+                std::cout << " " << opName;
+            }
+
+            std::cout << " " << typeDumper.dumpType(coclValue->type);
+            std::cout << " [" << ins.str() << "]" << std::endl;
         }
     }
 }
@@ -107,18 +112,27 @@ void ConnectionsWalker::walk(llvm::Function *F, llvm::BasicBlock *block) {
             childCoclValue->needs.insert(coclValue);
         }
         if(llvm::CallInst *call = llvm::dyn_cast<llvm::CallInst>(value)) {
-            std::cout << "its a call" << std::endl;
             llvm::Function *called = call->getCalledFunction();
+            std::cout << "its a call, to " << called->getName().str() << std::endl;
             // std::cout << "F " << (long)called << std::endl;
             // called->dump();
             // std::cout << std::endl;
             if(functionsDone.find(called) == functionsDone.end()) {
                 std::cout << "adding to to walk" << std::endl;
-                functionsToWalk.insert(called);
+                // functionsToWalk.insert(called);
             }
-            CoclValue *childCoclValue = getOrCreateCoclValue(called);
-            coclValue->neededBy.insert(childCoclValue);
-            childCoclValue->needs.insert(coclValue);
+            CoclValue *functionCoclValue = getOrCreateCoclValue(called);
+            coclValue->needs.insert(functionCoclValue);
+            functionCoclValue->neededBy.insert(coclValue);
+
+            // need to walk args to function to figure out reverse direction dependencies,
+            // of the function on the current coclValue
+            // for(auto argit = called->arg_begin(); argit != called->arg_end(); argit++) {
+            //     llvm::Value *arg = &*argit;
+            //     CoclValue *argCoclValue = getOrCreateCoclValue(arg);
+            //     coclValue->neededBy.insert(functionCoclValue);
+            //     functionCoclValue->neededBy.insert(coclValue);
+            // }
         }
     }
 }
