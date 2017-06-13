@@ -24,6 +24,8 @@ There are restarts at multiple levels, eg blocks within a function.
 
 What works:
 - sufficient to build eigen, tensorflow, ...
+
+But:
 - a bunch of hacks with respect to struct address spaces, and address spaces in general
 - not easy to maintain, or understand
 

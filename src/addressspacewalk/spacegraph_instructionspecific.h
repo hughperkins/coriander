@@ -14,39 +14,10 @@
 
 #pragma once
 
-#include <set>
-
-namespace llvm {
-class Type;
-class Value;
-class Function;
-class BasicBlock;
-class Module;
-}
+#include "addressspacewalk/spacegraph.h"
 
 namespace cocl {
 namespace addressspacewalk {
 
-class CoclValue {
-public:
-    CoclValue(int globalId) : globalId(globalId) {}
-
-    // std::set<CoclValue *> uses;
-    // std::set<CoclValue *> usedBy;
-    // std::
-
-    llvm::Type *type = nullptr;
-
-    // back pointers:
-    llvm::Value *value = nullptr;
-    llvm::BasicBlock *block = nullptr;
-    llvm::Function *function = nullptr;
-    llvm::Module *module = nullptr;
-
-    const int globalId;
-
-    int addressSpace = -1;  // -1 means, not yet deduced
-};
-
-}
-}
+} // addressspacewalk
+} // cocl

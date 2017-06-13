@@ -1,4 +1,4 @@
-#include "addressspacewalk/connections_walker.h"
+#include "addressspacewalk/spacegraph.h"
 
 #include "argparsecpp.h"
 
@@ -35,10 +35,10 @@ int main(int argc, char *argv[]) {
         throw std::runtime_error("failed to parse IR");
     }
 
-    cocl::addressspacewalk::ConnectionsWalker walker(M.get(), kernelname);
+    cocl::addressspacewalk::SpaceGraph spaceGraph(M.get(), kernelname);
     try {
-        walker.walk();
-        walker.dumpValues();
+        spaceGraph.acquire();
+        spaceGraph.dump();
     } catch(std::runtime_error &e) {
         std::cout << "got exception: " << e.what() << std::endl;
         return -1;

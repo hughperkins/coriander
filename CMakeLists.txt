@@ -136,7 +136,7 @@ foreach(LIB ${LLVM_LIBFILES})
    endif()
 endforeach()
 
-add_executable(walk src/addressspacewalk/connections_walker.cpp src/addressspacewalk/walker_main.cpp)
+add_executable(walk src/addressspacewalk/spacegraph.cpp src/addressspacewalk/spacegraph_instructionspecific.cpp src/addressspacewalk/walker_main.cpp)
 target_link_libraries(walk cocl clew clblast easycl)
 target_include_directories(walk PRIVATE src)
 target_include_directories(walk PRIVATE third_party/argparsecpp)

@@ -21,6 +21,8 @@
 
 #include "addressspacewalk/nodes.h"
 
+#include "type_dumper.h"
+
 #include "llvm/IR/Module.h"
 #include "llvm/IR/DebugInfoMetadata.h"
 #include "llvm/Support/raw_ostream.h"
@@ -34,22 +36,47 @@
 namespace cocl {
 namespace addressspacewalk {
 
-class ConnectionsWalker {
+const int MAX_SPACE_DEPTH = 5;
+
+class SpaceNode {
 public:
-    ConnectionsWalker(llvm::Module *M, std::string kernelName) : M(M), kernelName(kernelName) {
+    SpaceNode(int id, int spaceDepth) : id(id), spaceDepth(spaceDepth) {
+        for(int i = 0; i < spaceDepth; i++) {
+            assigned[i] = false;
+        }
+    }
+    std::set<llvm::Value *> values;
+    const int spaceDepth = 0;  // scalar will have spaceDepth 1
+    // bool spaceAssigned = false;  // change to true once we've assigned it
+    bool assigned[MAX_SPACE_DEPTH]; // we dont have to assign all spaces in one go
+    int spaces[MAX_SPACE_DEPTH];  // eg a private pointer to local pointer to global would have conceptually spaces[] = {0, 3, 1};
+    // in a struct, the first space will be -1, meaning whatever space the struct is in.
+
+    const int id;
+};
+
+class SpaceGraph {
+public:
+    SpaceGraph(llvm::Module *M, std::string kernelName) :
+        M(M),
+        kernelName(kernelName),
+        typeDumper(&globalNames) {
 
     }
-    ~ConnectionsWalker() {
+    ~SpaceGraph() {
 
     }
+    void acquire();
+    void dump();
+
+protected:
+    void findLinkedValues(SpaceNode *node, llvm::Value *value);
     void walk(llvm::Function *F, llvm::BasicBlock *block);
     void walk(llvm::Function *function);
     void walkArgs(llvm::Function *F);
-    void walk();
-    void dumpValues();
     // void walk(llvm::Module *block);
 
-    CoclValue *getOrCreateCoclValue(llvm::Value *value);
+    SpaceNode *getOrCreateNode(llvm::Value *value);
 
     std::set<llvm::BasicBlock *> blocksToWalk;
     std::set<llvm::Function *> functionsToWalk;
@@ -61,20 +88,24 @@ public:
 
     // llvm::Function *kernel = 0;
 
-    std::set< std::unique_ptr<CoclValue> > coclValues;  // coclValues and coclValueByValue should ocntain the exact same values
-    std::map<llvm::Value *, CoclValue *> coclValueByValue;
+    std::set< std::unique_ptr<SpaceNode> > nodes;  // coclValues and coclValueByValue should ocntain the exact same values
+    std::map<llvm::Value *, SpaceNode *> nodeByValue;
 
     // std::map<llvm::Value *, int> addressSpaceByValue; // either a value exists, and the space is known; or it doesnt
     // std::map<llvm::Argument *, int> addressSpaceByArg;
     // std::map<llvm::Function *, int> returnAddressSpaceByFunction;
     // std::map<llvm::StructType *, StructInfo *> structInfoByStructType;
 
-    int nextValueId = 1;
-    std::map<int, CoclValue *> coclValueByGlobalId;
+    int nextNodeId = 1;
+    // std::set<std::uni
+    std::map<int, SpaceNode *> nodeById;
 
     llvm::Module *M;
     std::string kernelName;
+
+    GlobalNames globalNames;
+    TypeDumper typeDumper;
 };
 
-} // addressspaceConnectionsWalker
+} // addressspaceSpaceGraph
 } // cocl
