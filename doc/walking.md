@@ -497,3 +497,7 @@ kernel void myKernel(<float:1,0> arg1) {
     <float:1,0> a1 = fn1(<float:1,0> arg1)
 }
 ```
+
+Ah, after re-reading, I know why we cant merge address spaces, and look up by address space. I mean, we can, or we could, but initially, when we write the graph, we will only write the relationships between nodes and pools. We wont know concretely what the address space of each pool is. For example, we might knkow that everythign in a pool is a pointer into the same address space, for example for the function above. Howeer, we wont know until something calls that fucntion taht everything in taht pool is eg a pointer to global. Moreoever, in the case of the function, the pool can be ... instantiated? ... multiple times, with a different address space each time.
+
+So, we will assign instructions to pools purely by looking at what instructions are being called, and the operands of those, not by looking up the address space in some index.
