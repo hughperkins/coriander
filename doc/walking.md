@@ -430,4 +430,4 @@ So:
 
 Actually, a deeper node can be connected to multiple shallower nodes, as long as they each have a different depth. otherwise they could be merged.  However, if a deeper does point to two shallower pools ,they can be sequenced:
 
-<img src="img/sequencing.png?raw=true" />
+<img src="img/space_sequencing.png?raw=true" />
