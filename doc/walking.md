@@ -319,25 +319,25 @@ struct Foo {
 }
 ```
 
-Nuance: we can modify the notation very slightly, so it is compilable in C99, or at least, ignored, by C99. By using the notation `__space(3:1:0)`, we can create a macro, so the compiler ignores it:
+Nuance: we can modify the notation very slightly, so it is compilable in C99, or at least, ignored, by C99. By using the notation `__space__(3:1:0)`, we can create a macro, so the compiler ignores it:
 
 ```
 #include <stdio.h>
 
-#define __space(a)
+#define __space__(a)
 
 struct MyStruct {
-    __space(3:.) float *pFloat;
+    __space__(3:.) float *pFloat;
 };
 
 int main(int argc, char *argv[]) {
-    __space(0) float a;
-    __space(3;0) float *pa;
-    __space(3:0) float *pb;
-    __space(3:0:0) float **ppb;
-    __space(3:0:0) float **ppc;
-    __space(0) struct MyStruct myStruct;
-    __space(3:0) float *pFloat = myStruct.pFloat;
+    __space__(0) float a;
+    __space__(3;0) float *pa;
+    __space__(3:0) float *pb;
+    __space__(3:0:0) float **ppb;
+    __space__(3:0:0) float **ppc;
+    __space__(0) struct MyStruct myStruct;
+    __space__(3:0) float *pFloat = myStruct.pFloat;
     return 0;
 }
 ```
@@ -347,3 +347,55 @@ int main(int argc, char *argv[]) {
 We might be interested in the following types of connections, between Values etc:
 
 - which values share an address space (undirected address space mapping, to)
+
+### Links which change space depth?
+
+Let us first define space depth:
+
+__Definition__:
+
+Given a space `__space(s1,s2,...,sn)`, where `s1`, `s2`, .... `sn` are integers indicating address spaces, the "space depth" is the value of "n".
+
+Let us also define "pointer depth", for clarity
+
+__Definition__:
+
+```
+pointer_depth = space_depth - 1
+```
+
+__Links which change space depth__
+
+Consider an alloca followed by a load:
+```
+%0 = alloca float*
+%1 = load float*, float ** %0
+```
+
+Type of `%0` is: `float **`. The type of `%1` is: `float *`.   However, there is an address space relationship between these two values.  If the address space of `%0` is:
+
+```
+__spaceof__(%0) == __space__(s1,s2,...sn)
+```
+Then, we know that the address space of `%1` is:
+
+```
+__spaceof__(%1) == __space__(s2,...sn)
+```
+
+We could simply leave the alloca etc in the graph, but I think it will be cleaner and easier to separate out such links as a generic link. So, we can create links like:
+
+```
+__spaceof__(%1) == __reducedepth__(__spaceof__(%0), 1)
+```
+
+We can express this relationship with `PartialDepth` nodes:
+
+```
+class PartialDepthLink {
+public:
+    SpaceNode *deeper; // %0;
+    SpaceNode *shallower; // %1;
+    int depthChange = 1
+}
+```
