@@ -512,3 +512,4 @@ Nuance: might have to merge one or more pairs of shallower nodes? And maybe recu
 
 <img src="img/merge_shallowers.png?raw=true" />
 
+<img src="img/merge_shallowers2.png?raw=true" />
