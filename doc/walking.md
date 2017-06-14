@@ -431,3 +431,12 @@ So:
 Actually, a deeper node can be connected to multiple shallower nodes, as long as they each have a different depth. otherwise they could be merged.  However, if a deeper does point to two shallower pools ,they can be sequenced:
 
 <img src="img/space_sequencing.png?raw=true" />
+
+
+So, to summarize:
+
+- nodes only for pools
+- values are indexed in a global `value => pool` index
+- pools have a single `shallower` attribute, pointing to one or zero shallower pool
+- pools have set of `deeper` pools, pointing to zero, one, or many deeper pools
+- if a pool already has a shallower pool, and we need to connect another shallower to it, we choose the deepest, and connect that, then connect from this node to the shallower. So each pool has either zero or one shallower pool connected to it.
