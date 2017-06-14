@@ -426,6 +426,6 @@ So:
 - we can have one attribute on the deeper node, pointing to the shallower node
 - and a set on the shallower node, pointing to the deeper nodes
 
-<img src="pools_no_separate_links.png?raw=true" />
+<img src="img/pools_no_separate_links.png?raw=true" />
 
 Actually, a deeper node can be connected to multiple shallower nodes, as long as they each have a different depth. otherwise they could be merged.  However, if a deeper does point to two 
