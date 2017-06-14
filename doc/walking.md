@@ -507,3 +507,8 @@ __Relationship with sequencing shallow pools__
 Does this mean then that we cannot sequence shallow pools of a deeper pool?
 
 No, it's fine: we will always know the depth of the address space, not just the concrete address spaces at each depth. Therefore we can ompare the space depth of each of the shallower nodes, nad sequence them.
+
+Nuance: might have to merge one or more pairs of shallower nodes? And maybe recursively?
+
+<img src="img/merge_shallowers.png?raw=true" />
+
