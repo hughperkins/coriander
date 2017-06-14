@@ -440,3 +440,60 @@ So, to summarize:
 - pools have a single `shallower` attribute, pointing to one or zero shallower pool
 - pools have set of `deeper` pools, pointing to zero, one, or many deeper pools
 - if a pool already has a shallower pool, and we need to connect another shallower to it, we choose the deepest, and connect that, then connect from this node to the shallower. So each pool has either zero or one shallower pool connected to it.
+
+### Connecting pools with no use/dependency links?
+
+Can we connect pools with no use/dependency links? will this help us reason about the graph, or propagate address-spaces?
+
+One possible advantage is taht it would make looking up pools easy, since we could look up a pool by address space.
+
+So, let's consider an example:
+
+```
+<float:3,1,0> p0_p1_p3_float1;
+<float:1,0> p0_p1_float2 = *p0_p1_p3_float1;
+```
+
+Well... let's think about why we want/need a graph in the first place:
+- we want to be able to propagate address spaces
+- particular challenges we have:
+  - propagating to/through functions and return values
+- propagating through structs
+- propagating from input values, ie kernel parameters
+
+So, let's say we have a function:
+
+```
+<float:?,0> fn1(<float:?,0> arg1) {
+    return <float:?,0> arg1;
+}
+```
+
+Here, using `?` to denote that the address space pointed to is unknown. Then we have a kernel fucntion:
+
+```
+kernel void myKernel(<float:?,0> arg1) {
+    <float:?,0> a1 = fn1(<float:?,0> arg1)
+}
+```
+We know taht `arg1` must be global:
+
+```
+kernel void myKernel(<float:1,0> arg1) {
+    <float:?,0> a1 = fn1(<float:1,0> arg1)
+}
+```
+So, the `<float:1,0>` address space propagates through `fn1`:
+
+```
+<float:1,0> fn1(<float:1,0> arg1) {
+    return <float:1,0> arg1;
+}
+```
+And therefore `a1` is `<float:1,0>`:
+
+```
+kernel void myKernel(<float:1,0> arg1) {
+    <float:1,0> a1 = fn1(<float:1,0> arg1)
+}
+```
