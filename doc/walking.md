@@ -411,3 +411,21 @@ class IncreaseDepth : public SpaceNode {
 
 Well, something like:
 <img src="img/spacelinks.png?raw=true" />
+
+(or maybe we can drop the `truncate=1` attribute, since the information is readily available by comparing the pools on either side, and avoids redundancy)
+
+Should the non-pool nodes be simply `Value`s, or should they be leaf nodes? Presumably, we want to be able to traverse from a leaf node to the pool node? So, using our own leaf nodes, that hold the leaf values, mgiht make this easier?  But one option coudl be to create a global map from values to pools, and if we merge two pools, we can just update this map.
+
+And maybe we can make the pools be the nodes on either side of the depth cahnge?
+
+Observation: when decreasing depth, the mapping is onto, surjective: there is only one possible resulting address space, given the original, untruncated, address space, and the number of spaces to truncate. However, when increasing depth, there are multiple possible resulting address spaces, corresponding to each possibility for the new, additional, spaces.
+
+Therefore there can be multiple deeper pools connected to one shallower pool, even if the deeper pools all have the same space depth.
+
+So:
+- we can have one attribute on the deeper node, pointing to the shallower node
+- and a set on the shallower node, pointing to the deeper nodes
+
+<img src="pools_no_separate_links.png?raw=true" />
+
+Actually, a deeper node can be connected to multiple shallower nodes, as long as they each have a different depth. otherwise they could be merged.  However, if a deeper does point to two 
