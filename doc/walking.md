@@ -399,3 +399,15 @@ public:
     int depthChange = 1
 }
 ```
+
+Or ... maybe we can imagine that `PartialDepthLink` inherits from `SpaceNode`, and we can change it to `IncreaseDepth`:
+
+```
+class IncreaseDepth : public SpaceNode {
+    int depthIncrease;
+    int addedSpaces[MAX_DEPTH];
+};
+```
+
+Well, something like:
+<img src="img/spacelinks.png?raw=true" />
