@@ -35,6 +35,9 @@ git submodule update --init --recursive
 msbuild llvm-headers.vcxproj
 ```
 - THIS FAILS => going to retry with msvc2015 tools
+- tried with msvc 2015 commmadnline tools => FAILS, needs update 3
+- looked in windows update for updated version => none
+- going to try with standard msvc 2015 ~~community~~ express, "Visual Studio Express 2015 for Windows Desktop"
 8.
 ```
 cd %USERPROFILE%
