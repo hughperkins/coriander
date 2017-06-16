@@ -250,7 +250,7 @@ size_t cudnnConvolutionForward(
 // v->getContext()->getCl()->finish();
 // v->currentContext->getCl()->finish();
         // Do GEMM (note: this is a bit confusing because gemm assumes column-major matrices)
-        StatusCode status = CLBlastSgemm(kColMajor, kNo, kNo,
+        CLBlastStatusCode status = CLBlastSgemm(CLBlastLayoutColMajor, CLBlastTransposeNo, CLBlastTransposeNo,
                                        n, m, k,
                                        1.0f,
                                        workspaceMemory->clmem, columnsOffset / sizeof(float), n,
@@ -400,7 +400,7 @@ size_t cudnnConvolutionBackwardData(
         CoclDnnGeometryType n = outH * outW; // columns->size[1] = outputHeight*outputWidth;
         CoclDnnGeometryType k = outC; // nOutputPlane;
 
-        StatusCode status = CLBlastSgemm(kColMajor, kNo, kYes,
+        CLBlastStatusCode status = CLBlastSgemm(CLBlastLayoutColMajor, CLBlastTransposeNo, CLBlastTransposeYes,
                                        n, m, k,
                                        1.0f,
                                        gradOutputMemory->clmem, gradOutput3dOffsetBytes / sizeof(float), n,
@@ -543,8 +543,8 @@ size_t cudnnConvolutionBackwardFilter(
         CoclDnnGeometryType n = inC * kW * kH;   // nInputPlane*kW*kH;
         CoclDnnGeometryType k = outH * outW;   // columns->size[1] = outputHeight*outputWidth
         // v->getContext()->getCl()->finish();
-        StatusCode status = CLBlastSgemm(kColMajor,
-                                       kYes, kNo,
+        CLBlastStatusCode status = CLBlastSgemm(CLBlastLayoutColMajor,
+                                       CLBlastTransposeYes, CLBlastTransposeNo,
                                        n, m, k,
                                        1.0f,
                                        workspaceMemory->clmem, columnsOffset / sizeof(float), k,
