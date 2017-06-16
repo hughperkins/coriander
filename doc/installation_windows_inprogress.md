@@ -2,8 +2,9 @@
 
 Work in progress. For now, it's just notes of some initial steps.
 
-1. (~~installed an ie8 + windows 2010 vm from microsoft modern.ie site~~ Looks like should be 64-bit windows. went aws Windows Server 2016 in the end)
+1. (~~installed an ie8 + windows 2010 vm from microsoft modern.ie site~~ Looks like should be 64-bit windows. ~~went aws Windows Server 2016 in the end~~ NVIDIA K520 driver doesnt work on win2016, switched to Server 2012 R2)
 2. ~~installed all windows updates, did the reboot~~ (no need to run 'update' when running from aws; at least, the msvc installer doesnt require it)
+2b. Install GPU Driver and GPU-specific OpenCL headers, libraries
 3. installed http://landinghub.visualstudio.com/visual-cpp-build-tools
 
 <img src="img/msvc_cmdlinetools_setup.png?raw=true" />
@@ -31,6 +32,6 @@ mkdir build
 cd build
 cmake-gui ..
 # press 'configure'
-# accept default msvc2017 native compiler
+# msvc2017 native compiler, make sure to choose the one with 'win64' suffix
 msbuild ALL_BUILD.vcxproj
 ```
