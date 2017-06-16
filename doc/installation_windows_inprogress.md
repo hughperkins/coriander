@@ -14,7 +14,7 @@ Work in progress. For now, it's just notes of some initial steps.
 ```
 mkdir git
 cd git
-git clone https://github.com/hughperkins/coriander
+git clone https://github.com/hughperkins/coriander -b winbuild
 cd coriander
 git submodule update --init --recursive
 ```
@@ -22,7 +22,7 @@ git submodule update --init --recursive
 6. download teh 64-bit binary msi installer for windows, and run this
 - choose defaults, except for I selected option 'add cmake to the system path for the current user'
 7. go to http://releases.llvm.org/download.html#4.0.0 , and download and run the windows 64-bit pre-built binary
-- I chose option 'add to system path for current user'
+- choose option 'add to system path for current user', and install to default path `c:\Program Files\LLVM`
 7. open an msvc2017 developer prompt
 8.
 ```
