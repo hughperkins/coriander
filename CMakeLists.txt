@@ -3,9 +3,11 @@ cmake_minimum_required(VERSION 2.8)
 option(BUILD_TESTS "Build tests" OFF)
 option(COCL_SPAM "Lots of scrolly debug text.  Mostly for maintainer usage" OFF)
 if(APPLE)
-set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE STRING "the downloaded clang-4.0.0 folder, containing lib, bin etc")
+set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE PATH "the downloaded clang-4.0.0 folder, containing lib, bin etc")
+elseif(WIN32)
+set(CLANG_HOME "C:\\Program Files\\LLVM" CACHE PATH "the downloaded clang-4.0.0 folder, containing lib, bin etc")
 else()
-set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE STRING "the downloaded clang-4.0.0 folder, containing lib, bin etc")
+set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE PATH "the downloaded clang-4.0.0 folder, containing lib, bin etc")
 endif()
 option(EIGEN_TESTS "Build eigen tests?  Needs eigen."  OFF)
 
@@ -78,11 +80,18 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
     src/cocl_funcs.cpp
 )
 
-set(CMAKE_CC_FLAGS "${CMAKE_CC_FLAGS} -fPIC")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -g -Wno-sign-compare")
+SET(PLATFORM_OPTIONS "")
+if(UNIX)
+    SET(PLATFORM_OPTIONS "-Wno-sign-compare")
+endif()
 if(APPLE)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-covered-switch-default")
-endif(APPLE)
+  set(PLATFORM_OPTIONS "${PLATFORM_OPTIONS} -Wno-covered-switch-default")
+endif()
+message("PLATFORM_OPTIONS ${PLATFORM_OPTIONS}")
+
+set(CMAKE_CC_FLAGS "-fPIC")
+set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC -g ${PLATFORM_OPTIONS}")
+message("CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
 add_definitions(-DUSE_CLEW)  # turns off direct linking with libOpenCL.so, all goes via clew dynamic loader (no need to link with libOpenCL at build time)
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 
@@ -91,23 +100,19 @@ execute_process(
     OUTPUT_VARIABLE LLVM_CXXFLAGS
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-# message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 STRING(REGEX REPLACE " " ";" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
-# message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-std=c\\+\\+0x" ";-std=c++11" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-fno-exceptions" ";-fexceptions" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
-# string(REGEX REPLACE ";-fno-rtti" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-DNDEBUG" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-isysroot;[^;]" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
-# message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 
 # split LLVM_CXXFLAGS into defines vs other options
 STRING(REGEX MATCHALL ";-D[^;]+" LLVM_DEFINES "${LLVM_CXXFLAGS}")
 STRING(REGEX REPLACE ";+" ";" LLVM_DEFINES "${LLVM_DEFINES}")
 STRING(REGEX REPLACE ";-D[^;]+" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
-# message("LLVM_DEFINES ${LLVM_DEFINES}")
-# message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 
+if(WIN32)
+else()
 execute_process(
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/llvm-syslibs.sh ${CLANG_HOME}
     OUTPUT_VARIABLE LLVM_SYSLIBS
@@ -119,6 +124,7 @@ execute_process(
     OUTPUT_VARIABLE LLVM_LIBFILES
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+endif()
 
 STRING(REGEX MATCHALL "[^ ]+" LLVM_LIBFILES "${LLVM_LIBFILES}")
 
@@ -150,7 +156,9 @@ target_link_libraries(patch_hostside "${LLVM_LIBS}"  ${LLVM_SYSLIBS})
 
 add_library(clew SHARED src/EasyCL/thirdparty/clew/src/clew.c)
 target_include_directories(clew PRIVATE src/EasyCL/thirdparty/clew/include)
-target_link_libraries(clew dl)
+if(UNIX)
+    target_link_libraries(clew dl)
+endif()
 
 add_library(easycl SHARED ${EASYCL_SRCS})
 target_include_directories(easycl PRIVATE src/EasyCL/thirdparty/clew/include)
@@ -172,11 +180,8 @@ endif()
 if(COCL_DEFINITIONS)
     target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
 endif()
-set(NO_COVERED_SWITCH_DEFAULT)
-if(APPLE)
-  set(NO_COVERED_SWITCH_DEFAULT "-Wno-covered-switch-default")
-endif()
-target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES} -Wno-sign-compare ${NO_COVERED_SWITCH_DEFAULT})
+separate_arguments(PLATFORM_OPTIONS)
+target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES} ${PLATFORM_OPTIONS})
 target_link_libraries(cocl easycl ${LLVM_LIBS} ${LLVM_SYSLIBS})
 
 # ==================================================================================================
