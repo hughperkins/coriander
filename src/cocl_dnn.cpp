@@ -126,7 +126,7 @@ size_t cudnnAddTensor(
     int H = xDesc->H;
     int W = xDesc->W;
     int n = N * C * H * W;
-    StatusCode status = CLBlastSaxpy(n, *p_alpha,
+    CLBlastStatusCode status = CLBlastSaxpy(n, *p_alpha,
                                      xMemory->clmem, xOffset, 1,
                                      yMemory->clmem, yOffset, 1,
                                      &v->currentContext->default_stream.get()->clqueue->queue, 0);

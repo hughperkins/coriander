@@ -20,13 +20,15 @@
 
 #include <iostream>
 #include <clblast_c.h>
+#include <clblast.h>
 
 using namespace std;
 using namespace cocl;
 using namespace easycl;
 
 namespace clblast {
-    StatusCode CacheClearAll();
+    // clblast::StatusCode CacheClearAll();
+    CLBlastStatusCode CLBlastClearCache();
 }
 
 namespace cocl {
@@ -52,20 +54,20 @@ size_t cublasCreate(cublasHandle_t *phandle) {
 
 std::size_t cublasDestroy(cublasHandle_t handle) {
     cout << "clearing clblast cache..." << endl;
-    clblast::CacheClearAll();
+    CLBlastClearCache();
     cout << "... cache cleared" << endl;
     CoclBlas *coclBlas = (CoclBlas *)handle;
     delete coclBlas;
     return 0;
 }
 
-static Transpose trans_cutocl(int trans) {
+static CLBlastTranspose trans_cutocl(int trans) {
     if(trans == CUBLAS_OP_N) {
-        return kNo;
+        return CLBlastTransposeNo;
     } else if(trans == CUBLAS_OP_Y) {
-        return kYes;
+        return CLBlastTransposeYes;
     } else if(trans == CUBLAS_OP_T) {
-        return kConjugate;
+        return CLBlastTransposeConjugate;
     } else {
         cout << "trans value: " << trans << endl;
         throw runtime_error("unexpected trans value");
@@ -115,10 +117,10 @@ std::size_t cublasSgemm(cublasHandle_t blas, int transA, int transB, int M, int 
     Memory *CMemory = findMemory((const char *)CDevice);
     size_t C_offset = CMemory->getOffset((const char *)CDevice) >> 2;
 
-    Transpose transAcl = trans_cutocl(transA);
-    Transpose transBcl = trans_cutocl(transB);
+    CLBlastTranspose transAcl = trans_cutocl(transA);
+    CLBlastTranspose transBcl = trans_cutocl(transB);
 
-    StatusCode status = CLBlastSgemm(kColMajor, transAcl, transBcl,
+    CLBlastStatusCode status = CLBlastSgemm(CLBlastLayoutColMajor, transAcl, transBcl,
                                    M, N, K,
                                    *p_alpha,
                                    AMemory->clmem, A_offset, lda,
@@ -148,9 +150,9 @@ std::size_t cublasSgemv(
     Memory *yMemory = findMemory((const char *)yDevice);
     size_t yOffset = yMemory->getOffset((const char *)yDevice) >> 2;
 
-    Transpose transAcl = trans_cutocl(transA);
+    CLBlastTranspose transAcl = trans_cutocl(transA);
 
-    StatusCode status = CLBlastSgemv(kColMajor, transAcl,
+    CLBlastStatusCode status = CLBlastSgemv(CLBlastLayoutColMajor, transAcl,
                                      M, N,
                                      *p_alpha,
                                      AMemory->clmem, AOffset, lda,
@@ -175,7 +177,7 @@ std::size_t cublasSaxpy(
     Memory *yMemory = findMemory((const char *)yDevice);
     size_t yOffset = yMemory->getOffset((const char *)yDevice) >> 2;
 
-    StatusCode status = CLBlastSaxpy(n, *p_alpha,
+    CLBlastStatusCode status = CLBlastSaxpy(n, *p_alpha,
                                       xMemory->clmem, xOffset, incx,
                                       yMemory->clmem, yOffset, incy,
                                       &coclBlas->queue->queue, 0);
@@ -192,7 +194,7 @@ std::size_t cublasSscal(cublasHandle_t blas, int n, const float *p_alpha, float 
     Memory *xMemory = findMemory((const char *)xDevice);
     size_t xOffset = xMemory->getOffset((const char *)xDevice) >> 2;
 
-    StatusCode status = CLBlastSscal(n, *p_alpha, xMemory->clmem, xOffset, incx,
+    CLBlastStatusCode status = CLBlastSscal(n, *p_alpha, xMemory->clmem, xOffset, incx,
                                      &coclBlas->queue->queue, 0);
     if(status != 0) {
         cout << "sscal status code " << status << endl;

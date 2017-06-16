@@ -194,9 +194,9 @@ target_link_libraries(cocl easycl ${LLVM_LIBS} ${LLVM_SYSLIBS})
 set(CLBLAST_KERNELS copy_fast copy_pad transpose_fast transpose_pad xaxpy xdot xger xgemm xgemv)
 set(CLBLAST_LEVEL1_ROUTINES xswap xscal xcopy xaxpy xdot xdotu xdotc xnrm2 xasum xamax)
 set(CLBLAST_LEVEL2_ROUTINES xgemv xgbmv xhemv xhbmv xhpmv xsymv xsbmv xspmv xtrmv xtbmv xtpmv
-                    xger xgeru xgerc xher xhpr xher2 xhpr2 xsyr xspr xsyr2 xspr2)
-set(CLBLAST_LEVEL3_ROUTINES xgemm xsymm xhemm xsyrk xherk xsyr2k xher2k xtrmm)
-set(CLBLAST_LEVELX_ROUTINES xomatcopy)
+                    xger xgeru xgerc xher xhpr xher2 xhpr2 xsyr xspr xsyr2 xspr2 xtrsv)
+set(CLBLAST_LEVEL3_ROUTINES xgemm xsymm xhemm xsyrk xherk xsyr2k xher2k xtrmm xtrsm)
+set(CLBLAST_LEVELX_ROUTINES xomatcopy xaxpybatched xgemmbatched xinvert)
 set(CLBLAST_ROUTINES ${CLBLAST_LEVEL1_ROUTINES} ${CLBLAST_LEVEL2_ROUTINES} ${CLBLAST_LEVEL3_ROUTINES} ${CLBLAST_LEVELX_ROUTINES})
 set(CLBLAST_PRECISIONS 32 64 3232 6464 16)
 
@@ -208,7 +208,8 @@ set(CLBLAST_SOURCES
   src/CLBlast/src/clblast.cpp
   src/CLBlast/src/clblast_c.cpp
   src/CLBlast/src/routine.cpp
-  src/CLBlast/src/utilities.cpp
+  src/CLBlast/src/utilities/clblast_exceptions.cpp
+  src/CLBlast/src/utilities/utilities.cpp
 )
 foreach(ROUTINE ${CLBLAST_LEVEL1_ROUTINES})
   set(CLBLAST_SOURCES ${CLBLAST_SOURCES} src/CLBlast/src/routines/level1/${ROUTINE}.cpp)
