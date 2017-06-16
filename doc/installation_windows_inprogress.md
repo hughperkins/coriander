@@ -34,7 +34,7 @@ git submodule update --init --recursive
 ```
 msbuild llvm-headers.vcxproj
 ```
-THIS FAILS => going to retry with msvc2015 tools
+- THIS FAILS => going to retry with msvc2015 tools
 8.
 ```
 cd %USERPROFILE%
