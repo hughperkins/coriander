@@ -80,18 +80,22 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
     src/cocl_funcs.cpp
 )
 
-SET(PLATFORM_OPTIONS "")
-if(UNIX)
-    SET(PLATFORM_OPTIONS "-Wno-sign-compare")
-endif()
-if(APPLE)
-  set(PLATFORM_OPTIONS "${PLATFORM_OPTIONS} -Wno-covered-switch-default")
-endif()
+if(WIN32)
+  set(CMAKE_CXX_FLAGS "/EHsc")
+else()
+  SET(PLATFORM_OPTIONS "")
+  if(UNIX)
+      SET(PLATFORM_OPTIONS "-Wno-sign-compare")
+  endif()
+  if(APPLE)
+    set(PLATFORM_OPTIONS "${PLATFORM_OPTIONS} -Wno-covered-switch-default")
+  endif()
 
-set(CMAKE_CC_FLAGS "-fPIC")
-set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC -g ${PLATFORM_OPTIONS}")
+  set(CMAKE_CC_FLAGS "-fPIC")
+  set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC -g ${PLATFORM_OPTIONS}")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
+endif()
 add_definitions(-DUSE_CLEW)  # turns off direct linking with libOpenCL.so, all goes via clew dynamic loader (no need to link with libOpenCL at build time)
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 
 execute_process(
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/get-llvm-cxxflags.sh ${CLANG_HOME}

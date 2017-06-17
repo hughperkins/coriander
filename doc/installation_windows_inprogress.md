@@ -39,6 +39,8 @@ git submodule update --init --recursive
 - right-click `llvm-tblgen`, and do `build`
 8. scroll down, locate `llvm-headers` project
 - right-click, `build`
+8b. from the Explorer window, navigate to the `build` folder, and then naviagte to the subfolder `include\llvm\IR`
+- open the `intrinsics_gen.vcxproj`, in visual studio, and build it 
 9. from the Explorer window, navigate to the `build` folder, and then navigate to the subfolder `include\llvm`
 - copy the folders `Config`, `IR`, and `Support` into `c:\program files\include\llvm`
 10. open the 'MSBuild Command Prompt for VS2015'
