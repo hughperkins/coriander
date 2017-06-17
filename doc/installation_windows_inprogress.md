@@ -18,9 +18,9 @@ git clone https://github.com/hughperkins/coriander -b winbuild
 cd coriander
 git submodule update --init --recursive
 ```
-5. go to https://cmake.org/download/
-6. download teh 64-bit binary msi installer for windows, and run this
-- choose defaults, except for I selected option 'add cmake to the system path for the current user'
+6. go to https://cmake.org/download/
+- download teh 64-bit binary msi installer for windows, and run this
+  - choose defaults, except for I selected option 'add cmake to the system path for the current user'
 7. go to http://python.org , download and install python 2.7.x
 8. go to http://releases.llvm.org/download.html#4.0.0 , and download and run the windows 64-bit pre-built binary
 - choose option 'add to system path for current user', and install to default path `c:\Program Files\LLVM`
