@@ -48,12 +48,14 @@ msbuild llvm-headers.vcxproj
 - right-click `llvm-tblgen`, and do `build`
 8. scroll down, locate `llvm-headers` project
 - right-click, `build`
-9. back in cmake, unselect `LLVM_BUILD_RUNTIME`, and `LLVM_BUILD_TOOLS`
+~~9. back in cmake, unselect `LLVM_BUILD_RUNTIME`, and `LLVM_BUILD_TOOLS`
 - click 'configure' then 'generate'
 - switch back to msvc ide
 - say 'reload all', when asked
-- locate the project 'install', right click, then 'build'
-8.
+- locate the project 'install', right click, then 'build'~~
+9. from the Explorer window, navigate to the `build` folder, and then navigate to the subfolder `include\llvm`
+- copy the folders `Config`, `IR`, and `Support` into `c:\program files\include\llvm`
+10. open the 'MSBuild Command Prompt for VS2015'
 ```
 cd %USERPROFILE%
 cd git/coriander
@@ -62,5 +64,9 @@ cd build
 cmake-gui ..
 # press 'configure'
 # msvc2017 native compiler, make sure to choose the one with 'win64' suffix
+# press 'configure' then 'generate'
+11. From the 'MSBuild Command Prompt for VS2015'
+```
+cd %USERPROFILE%/git/coriander/build
 msbuild ALL_BUILD.vcxproj
 ```
