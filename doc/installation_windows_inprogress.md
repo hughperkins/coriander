@@ -2,13 +2,13 @@
 
 Work in progress. For now, it's just notes of some initial steps.
 
-1. (~~installed an ie8 + windows 2010 vm from microsoft modern.ie site~~ Looks like should be 64-bit windows. ~~went aws Windows Server 2016 in the end~~ NVIDIA K520 driver doesnt work on win2016, switched to Server 2012 R2)
-2. ~~installed all windows updates, did the reboot~~ (no need to run 'update' when running from aws; at least, the msvc installer doesnt require it)
-2b. Install GPU Driver and GPU-specific OpenCL headers, libraries
-3. installed http://landinghub.visualstudio.com/visual-cpp-build-tools
-
-<img src="img/msvc_cmdlinetools_setup.png?raw=true" />
-
+1. I used an aws Windows 2012 R2 instance for this, on a g2.2xlarge.  Other things I tried, and why I abandoned them:
+- 32-bit microsft modern.ie vm => 32-bit doesnt seem supported eg by CLBlast, and other libraries
+- Windows 2016 => Windows 2016 doesnt seem to have an obvious NVIDIA K520 GPU Driver available
+2. Install GPU Driver and GPU-specific OpenCL headers, libraries
+3. Installed "Visual Studio Express 2015 for Windows Desktop".  Design decision: why not eg the command tools?
+- Visual Studio 2017 command tools => got an error about '-ologo', when compiling llvm.  This might not be insurmountable in fact, since we get this with msvc 2015 too anyway...
+- Visual Studio 2015 command tools => llvm requires msvc2015 update 3, and I couldnt see an obvious way of installing update 3, into command tools
 4. Downloaded git, 64-bit, from https://git-scm.com/download/win , and run/installed this. (accepted all defaults, during installation)
 5. open git command prompt
 ```
@@ -28,16 +28,7 @@ git submodule update --init --recursive
 10. download the llvm sourcecode, and uncompress using 7zip
 11. open cmake gui, and set the sourcecode directory as the llvm sourcecode folder, and a new `build` subdirectory as the build folder
 - press 'configure' button
-- ~~unselect `LLVM_BUILD_RUNTIME`, `LLVM_BUILD_TOOLS`, `LLVM_BUILD_UTILS`~~
 - click 'configure' and 'generate'
-~~7. open an msvc2017 developer prompt, cd into the llvm source `build` folder, and do:~~
-```
-msbuild llvm-headers.vcxproj
-```
-- ~~THIS FAILS => going to retry with msvc2015 tools
-- tried with msvc 2015 commmadnline tools => FAILS, needs update 3
-- looked in windows update for updated version => none
-- going to try with standard msvc 2015 ~~community~~ express, "Visual Studio Express 2015 for Windows Desktop"~~
 7. open msvc2015 express ide
 - load the `all_build` project or solution ,from the build directory created using cmake
 - scroll down, and look fro the `llvm-tblgen` project, under `utils` section
@@ -48,11 +39,6 @@ msbuild llvm-headers.vcxproj
 - right-click `llvm-tblgen`, and do `build`
 8. scroll down, locate `llvm-headers` project
 - right-click, `build`
-~~9. back in cmake, unselect `LLVM_BUILD_RUNTIME`, and `LLVM_BUILD_TOOLS`
-- click 'configure' then 'generate'
-- switch back to msvc ide
-- say 'reload all', when asked
-- locate the project 'install', right click, then 'build'~~
 9. from the Explorer window, navigate to the `build` folder, and then navigate to the subfolder `include\llvm`
 - copy the folders `Config`, `IR`, and `Support` into `c:\program files\include\llvm`
 10. open the 'MSBuild Command Prompt for VS2015'
