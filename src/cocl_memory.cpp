@@ -29,8 +29,6 @@
 
 #include "EasyCL/EasyCL.h"
 
-#include "pthread.h"
-
 using namespace std;
 using namespace cocl;
 using namespace easycl;
@@ -44,10 +42,6 @@ using namespace easycl;
 #else
 #define COCL_PRINT(x) 
 #endif
-
-namespace cocl {
-    pthread_mutex_t print_mutex = PTHREAD_MUTEX_INITIALIZER;
-}
 
 namespace cocl {
     // we should index these, but a set is ok-ish for now. maybe

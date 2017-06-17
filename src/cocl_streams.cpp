@@ -26,9 +26,6 @@
 #include <map>
 #include <set>
 
-#include "pthread.h"
-
-// #include "CL/cl.h"
 
 using namespace std;
 using namespace cocl;
@@ -55,35 +52,17 @@ namespace cocl {
     CoclStream::~CoclStream() {
         delete clqueue;
     }
-    // StreamLock::StreamLock(CoclStream *stream) {
-    //     this->stream = stream;
-    //     pthread_mutex_lock(&stream->mutex);
-    // }
-    // StreamLock::~StreamLock() {
-    //     pthread_mutex_unlock(&stream->mutex);
-    // }
 }
 
 size_t cudaStreamSynchronize(char *_queue) {
-    // cout << "cudaStreamSynchronize()" << endl;
     CoclStream *stream = (CoclStream *)_queue;
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getContext()->getCl();
     if(stream == 0) {
         stream = v->currentContext->default_stream.get();
     }
-    // cout << "got stream " << (void *)stream << endl;
-    // cout << "got v" << endl;
-    // cout << "got cl" << endl;
-    // StreamLock streamlock(stream);
     CLQueue *queue = stream->clqueue;
-    // cout << "got queu" << endl;
-    // CLQueue *queue = (CLQueue*)_queue;
     COCL_PRINT(cout << "cudaStreamSynchronize queue=" << queue << endl);
-    // hostside_opencl_funcs_assure_initialized();
-
-    // assert(stream == 0);
-
     if(queue == 0) {
         cl->finish();
     } else {
@@ -94,24 +73,15 @@ size_t cudaStreamSynchronize(char *_queue) {
 }
 
 size_t cuStreamSynchronize(char *_queue) {
-    // CLQueue *queue = (CLQueue*)_queue;
-    // cout << "cuStreamSynchronize()" << endl;
     return cudaStreamSynchronize(_queue);
 }
 
 size_t cuStreamCreate(char **_pstream, unsigned int flags) {
-    // COCL_PRINT(cout << "cuStreamCreate redirected" << endl);
     CoclStream **pstream = (CoclStream**)_pstream;
     ThreadVars *v = getThreadVars();
-    // COCL_PRINT(cout << "cuStreamCreate current context=" << (void *)v->currentContext << endl);
     EasyCL *cl = v->getContext()->getCl();
-    // hostside_opencl_funcs_assure_initialized();
-    // CLQueue *clqueue = cl->newQueue();
     CoclStream *coclStream = new CoclStream(cl);
-    // COCL_PRINT(cout << "cuStreamCreate redirected new stream " << (void *)coclStream << endl);
-    // coclStream->clqueue = clqueue;
     *pstream = coclStream;
-    // cout << "done assign" << endl;
     return 0;
 }
 
@@ -121,8 +91,6 @@ size_t cudaStreamCreate(char **_pstream) {
 
 size_t cuStreamDestroy_v2(char *_queue) {
     CoclStream *stream = (CoclStream *)_queue;
-    // StreamLock streamlock(stream);
-    // COCL_PRINT(cout << "cuStreamDestroy_v2 redirected stream=" << (void *)stream << endl);
     delete stream;
     return 0;
 }
@@ -141,9 +109,7 @@ size_t cuStreamQuery(char *_queue) {
 
 size_t cudaStreamAddCallback(char *_queue, cudacallbacktype callback, void *userdata, int flags) {
     CoclStream *stream = (CoclStream *)_queue;
-    // StreamLock streamlock(stream);
     CLQueue *queue = stream->clqueue;
-    // CLQueue *queue = (CLQueue*)_queue;
     // we need to queue an event, and attach the callback to that;
     cl_int err;
     cl_event event;
@@ -154,13 +120,10 @@ size_t cudaStreamAddCallback(char *_queue, cudacallbacktype callback, void *user
         );
     EasyCL::checkError(err);
     CoclCallbackInfo *info = new CoclCallbackInfo();
-    // cout << "created info" << endl;
     info->callback = callback;
     info->userdata = userdata;
     info->_queue = _queue;
-    // cout << "calling seteventcallback" << endl;
     err = clSetEventCallback(event, CL_COMPLETE, cocl::coclCallback, info);
-    // cout << "called clseteventcallback" << endl;
     EasyCL::checkError(err);
     return 0;
 }
