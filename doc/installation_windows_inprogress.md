@@ -29,7 +29,7 @@ git submodule update --init --recursive
 11. open cmake gui, and set the sourcecode directory as the llvm sourcecode folder, and a new `build` subdirectory as the build folder
 - press 'configure' button
 - click 'configure' and 'generate'
-7. open msvc2015 express ide
+12. open msvc2015 express ide
 - load the `all_build` project or solution ,from the build directory created using cmake
 - scroll down, and look fro the `llvm-tblgen` project, under `utils` section
 - right click, 'properties'
@@ -37,13 +37,13 @@ git submodule update --init --recursive
 - change suppress start banner to 'no'
 - click 'ok'
 - right-click `llvm-tblgen`, and do `build`
-8. scroll down, locate `llvm-headers` project
+13. scroll down, locate `llvm-headers` project
 - right-click, `build`
-8b. from the Explorer window, navigate to the `build` folder, and then naviagte to the subfolder `include\llvm\IR`
+14. from the Explorer window, navigate to the `build` folder, and then naviagte to the subfolder `include\llvm\IR`
 - open the `intrinsics_gen.vcxproj`, in visual studio, and build it 
-9. from the Explorer window, navigate to the `build` folder, and then navigate to the subfolder `include\llvm`
+15. from the Explorer window, navigate to the `build` folder, and then navigate to the subfolder `include\llvm`
 - copy the folders `Config`, `IR`, and `Support` into `c:\program files\include\llvm`
-10. open the 'MSBuild Command Prompt for VS2015'
+16. open the 'MSBuild Command Prompt for VS2015'
 ```
 cd %USERPROFILE%
 cd git/coriander
@@ -53,7 +53,7 @@ cmake-gui ..
 # press 'configure'
 # msvc2017 native compiler, make sure to choose the one with 'win64' suffix
 # press 'configure' then 'generate'
-11. From the 'MSBuild Command Prompt for VS2015'
+17. From the 'MSBuild Command Prompt for VS2015'
 ```
 cd %USERPROFILE%/git/coriander/build
 msbuild ALL_BUILD.vcxproj
