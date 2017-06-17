@@ -87,11 +87,9 @@ endif()
 if(APPLE)
   set(PLATFORM_OPTIONS "${PLATFORM_OPTIONS} -Wno-covered-switch-default")
 endif()
-message("PLATFORM_OPTIONS ${PLATFORM_OPTIONS}")
 
 set(CMAKE_CC_FLAGS "-fPIC")
 set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC -g ${PLATFORM_OPTIONS}")
-message("CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
 add_definitions(-DUSE_CLEW)  # turns off direct linking with libOpenCL.so, all goes via clew dynamic loader (no need to link with libOpenCL at build time)
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 
