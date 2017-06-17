@@ -186,7 +186,7 @@ if(COCL_DEFINITIONS)
 endif()
 separate_arguments(PLATFORM_OPTIONS)
 target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES} ${PLATFORM_OPTIONS})
-target_link_libraries(cocl easycl ${LLVM_LIBS} ${LLVM_SYSLIBS})
+target_link_libraries(cocl easycl clblast ${LLVM_LIBS} ${LLVM_SYSLIBS})
 
 # ==================================================================================================
 
