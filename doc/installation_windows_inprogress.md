@@ -30,14 +30,29 @@ git submodule update --init --recursive
 - press 'configure' button
 - ~~unselect `LLVM_BUILD_RUNTIME`, `LLVM_BUILD_TOOLS`, `LLVM_BUILD_UTILS`~~
 - click 'configure' and 'generate'
-7. open an msvc2017 developer prompt, cd into the llvm source `build` folder, and do:
+~~7. open an msvc2017 developer prompt, cd into the llvm source `build` folder, and do:~~
 ```
 msbuild llvm-headers.vcxproj
 ```
-- THIS FAILS => going to retry with msvc2015 tools
+- ~~THIS FAILS => going to retry with msvc2015 tools
 - tried with msvc 2015 commmadnline tools => FAILS, needs update 3
 - looked in windows update for updated version => none
-- going to try with standard msvc 2015 ~~community~~ express, "Visual Studio Express 2015 for Windows Desktop"
+- going to try with standard msvc 2015 ~~community~~ express, "Visual Studio Express 2015 for Windows Desktop"~~
+7. open msvc2015 express ide
+- load the `all_build` project or solution ,from the build directory created using cmake
+- scroll down, and look fro the `llvm-tblgen` project, under `utils` section
+- right click, 'properties'
+- naviaate to 'resources', 'general'
+- change suppress start banner to 'no'
+- click 'ok'
+- right-click `llvm-tblgen`, and do `build`
+8. scroll down, locate `llvm-headers` project
+- right-click, `build`
+9. back in cmake, unselect `LLVM_BUILD_RUNTIME`, and `LLVM_BUILD_TOOLS`
+- click 'configure' then 'generate'
+- switch back to msvc ide
+- say 'reload all', when asked
+- locate the project 'install', right click, then 'build'
 8.
 ```
 cd %USERPROFILE%
