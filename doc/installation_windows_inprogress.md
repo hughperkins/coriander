@@ -2,6 +2,16 @@
 
 Work in progress. For now, it's just notes of some initial steps.
 
+## Pre-requisites
+
+- tested on the following system:
+  - Windows 2012 R2 64-bit
+- disk space:
+  - Visual Studio 2015 Express: ~10-15GB
+  - LLVM debug build: ~15GB (~6GB if you store it on a compressed volume)
+
+## Procedure
+
 1. I used an aws Windows 2012 R2 instance for this, on a g2.2xlarge.  Other things I tried, and why I abandoned them:
 - 32-bit microsft modern.ie vm => 32-bit doesnt seem supported eg by CLBlast, and other libraries
 - Windows 2016 => Windows 2016 doesnt seem to have an obvious NVIDIA K520 GPU Driver available
@@ -37,7 +47,17 @@ git submodule update --init --recursive
 - right-click the `ALL_BUILD` project, and select `build`
 - any errors about `-ologo`, double-check you are using cmake 3.7.2
 - right-click `INSTALL`, and select `build`
-13. open the 'MSBuild Command Prompt for VS2015'
+13. sanity checking on the llvm build/install:
+- if you look in `c:\program files\LLVM\bin`, you should see `llvm-config.exe`
+- in `c:\program files\llvm\include\llvm\support`, you should see `Datatypes.h`. Double-check that the extension is `.h`, since this is a genearted file, and the same name exists, with otehr extensions, which are not the files we need
+- in `c:\program files\llvm\include\llvm\IR`, you should see `Intrinsics.gen`. Again, the extension is important
+- in `c:\program files\llvm\lib`, you should see a bunch of `.lib` files, eg `LLVMCore.lib` and `LLVMSupport.lib`
+- open a cmd, and run:
+```
+"c:\program files\llvm\bin\llvm-config" --libs
+```
+- it should give a list of llvm library file paths
+14. open the 'MSBuild Command Prompt for VS2015'
 ```
 cd %USERPROFILE%
 cd git/coriander
