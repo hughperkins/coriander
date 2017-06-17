@@ -53,6 +53,7 @@ cmake-gui ..
 # press 'configure'
 # msvc2017 native compiler, make sure to choose the one with 'win64' suffix
 # press 'configure' then 'generate'
+```
 17. From the 'MSBuild Command Prompt for VS2015'
 ```
 cd %USERPROFILE%/git/coriander/build
