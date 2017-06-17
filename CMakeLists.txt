@@ -115,29 +115,35 @@ STRING(REGEX REPLACE ";+" ";" LLVM_DEFINES "${LLVM_DEFINES}")
 STRING(REGEX REPLACE ";-D[^;]+" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 
 if(WIN32)
+    execute_process(
+        COMMAND ${CLANG_HOME}\\bin\\llvm-config --libs
+        OUTPUT_VARIABLE LLVM_SYSLIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    message("LLVM_SYSLIBS ${LLVM_SYSLIBS}")
 else()
-execute_process(
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/llvm-syslibs.sh ${CLANG_HOME}
-    OUTPUT_VARIABLE LLVM_SYSLIBS
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+    execute_process(
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/llvm-syslibs.sh ${CLANG_HOME}
+        OUTPUT_VARIABLE LLVM_SYSLIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
 
-execute_process(
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/get-llvm-libs.sh ${CLANG_HOME}
-    OUTPUT_VARIABLE LLVM_LIBFILES
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+    execute_process(
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/get-llvm-libs.sh ${CLANG_HOME}
+        OUTPUT_VARIABLE LLVM_LIBFILES
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    STRING(REGEX MATCHALL "[^ ]+" LLVM_LIBFILES "${LLVM_LIBFILES}")
+
+    foreach(LIB ${LLVM_LIBFILES})
+       if(LLVM_LIBS)
+           set(LLVM_LIBS ${LLVM_LIBS} ${CLANG_HOME}/lib/${LIB})
+       else()
+           set(LLVM_LIBS "${CLANG_HOME}/lib/${LIB}")
+       endif()
+    endforeach()
 endif()
-
-STRING(REGEX MATCHALL "[^ ]+" LLVM_LIBFILES "${LLVM_LIBFILES}")
-
-foreach(LIB ${LLVM_LIBFILES})
-   if(LLVM_LIBS)
-   set(LLVM_LIBS ${LLVM_LIBS} ${CLANG_HOME}/lib/${LIB})
-   else()
-   set(LLVM_LIBS "${CLANG_HOME}/lib/${LIB}")
-   endif()
-endforeach()
 
 add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp)
 target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
