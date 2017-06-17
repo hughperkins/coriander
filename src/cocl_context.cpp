@@ -22,7 +22,6 @@
 #include <vector>
 #include <map>
 #include <set>
-#include "pthread.h"
 
 #include "EasyCL/EasyCL.h"
 

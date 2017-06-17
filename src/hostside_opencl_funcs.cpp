@@ -14,7 +14,6 @@
 
 #include "cocl/hostside_opencl_funcs_ext.h"
 #include "hostside_opencl_funcs.h"
-// #include "cocl/cocl.h"
 #include "cocl/cocl_memory.h"
 #include "cocl/cocl_clsources.h"
 #include "cocl/cocl_streams.h"
@@ -26,7 +25,7 @@
 #include <map>
 #include <set>
 #include <cstdlib>
-#include "pthread.h"
+#include <mutex>
 
 #include "EasyCL/EasyCL.h"
 #include "EasyCL/util/easycl_stringhelper.h"
@@ -64,11 +63,17 @@ void hostside_opencl_funcs_assure_initialized(void) {
 }
 
 namespace cocl {
-    #ifdef __APPLE__
-    pthread_mutex_t launchMutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
-    #else
-    pthread_mutex_t launchMutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
-    #endif
+    // this lock works as follows:
+    // - configureKernel takes out a lock, and does not release it. This first level of locking will remain locked, until
+    //   the kernelGo funcgtion is called, and completed
+    // - then, each setArg etc method takes out an additional level of locking, in case they are called in parallel
+    //   (this second level might not be stricly necessary, I'm not sure...)
+    //   this second level is per-call, released at hte end
+    // - finally, kernelGo is called, takes out a second-level lock, then at the end releases both levels
+    //
+    // I suppose we could do this with two standard locks, rather than one recursive one. Might be easier to udnerstand/read
+    // in fact
+    std::recursive_mutex launchMutex;
 }
 
 using namespace cocl;
@@ -85,7 +90,9 @@ size_t cuInit(unsigned int flags) {
 int cudaConfigureCall(
         dim3 grid,
         dim3 block, long long sharedMem, char *queue_as_voidstar) {
-    pthread_mutex_lock(&launchMutex);
+    // pthread_mutex_lock(&launchMutex);
+    // std::lock_guard< std::recursive_mutex > guard(launchMutex);
+    launchMutex.lock();
     CoclStream *coclStream = (CoclStream *)queue_as_voidstar;
     ThreadVars *v = getThreadVars();
     if(coclStream == 0) {
@@ -263,7 +270,9 @@ GenerateOpenCLResult generateOpenCL(
 } // namespace cocl
 
 void configureKernel(const char *kernelName, const char *devicellsourcecode) {
-    pthread_mutex_lock(&launchMutex);
+    // pthread_mutex_lock(&launchMutex);
+    // launchMutex.lock();
+    std::lock_guard< std::recursive_mutex > guard(launchMutex);
     COCL_PRINT("=========================================");
     launchConfiguration.kernelName = kernelName;
     launchConfiguration.devicellsourcecode = devicellsourcecode;
@@ -285,7 +294,7 @@ void configureKernel(const char *kernelName, const char *devicellsourcecode) {
         // addClmemArg(firstMem->clmem);
     }
 
-    pthread_mutex_unlock(&launchMutex);
+    // pthread_mutex_unlock(&launchMutex);
 }
 
 void addClmemArg(cl_mem clmem) {
@@ -320,7 +329,8 @@ void setKernelArgHostsideBuffer(char *pCpuStruct, int structAllocateSize) {
     //   anything to the setKernelArgGpuBuffer method (which expects an incoming
     //   pointer to be a virtual pointer, not a cl_mem)
 
-    pthread_mutex_lock(&launchMutex);
+    std::lock_guard< std::recursive_mutex > guard(launchMutex);
+    // pthread_mutex_lock(&launchMutex);
     ThreadVars *v = getThreadVars();
     EasyCL *cl = v->getContext()->getCl();
     cl_context *ctx = cl->context;
@@ -354,7 +364,7 @@ void setKernelArgHostsideBuffer(char *pCpuStruct, int structAllocateSize) {
        launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int64Arg((int64_t)offsetElements)));
     }
 
-    pthread_mutex_unlock(&launchMutex);
+    // pthread_mutex_unlock(&launchMutex);
 }
 
 void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
@@ -365,7 +375,8 @@ void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
     // The elementSize used to be used, but is no longer used/needed. Should probably be
     // removed from the method parameters at some point.
 
-    pthread_mutex_lock(&launchMutex);
+    // pthread_mutex_lock(&launchMutex);
+    std::lock_guard< std::recursive_mutex > guard(launchMutex);
     ThreadVars *v = getThreadVars();
 
     Memory *memory = findMemory(memory_as_charstar);
@@ -394,40 +405,45 @@ void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize) {
             launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int64Arg((int64_t)offsetElements)));
         }
     }
-    pthread_mutex_unlock(&launchMutex);
+    // pthread_mutex_unlock(&launchMutex);
 }
 
 void setKernelArgInt64(int64_t value) {
-    pthread_mutex_lock(&launchMutex);
+    std::lock_guard< std::recursive_mutex > guard(launchMutex);
+    // pthread_mutex_lock(&launchMutex);
     launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int64Arg(value)));
     COCL_PRINT("setKernelArgInt64 " << value);
-    pthread_mutex_unlock(&launchMutex);
+    // pthread_mutex_unlock(&launchMutex);
 }
 
 void setKernelArgInt32(int value) {
-    pthread_mutex_lock(&launchMutex);
+    std::lock_guard< std::recursive_mutex > guard(launchMutex);
+    // pthread_mutex_lock(&launchMutex);
     launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int32Arg(value)));
     COCL_PRINT("setKernelArgInt32 " << value);
-    pthread_mutex_unlock(&launchMutex);
+    // pthread_mutex_unlock(&launchMutex);
 }
 
 void setKernelArgInt8(char value) {
-    pthread_mutex_lock(&launchMutex);
+    std::lock_guard< std::recursive_mutex > guard(launchMutex);
+    // pthread_mutex_lock(&launchMutex);
     launchConfiguration.args.push_back(std::unique_ptr<Arg>(new Int8Arg(value)));
     COCL_PRINT("setKernelArgInt8 " << value);
-    pthread_mutex_unlock(&launchMutex);
+    // pthread_mutex_unlock(&launchMutex);
 }
 
 void setKernelArgFloat(float value) {
-    pthread_mutex_lock(&launchMutex);
+    std::lock_guard< std::recursive_mutex > guard(launchMutex);
+    // pthread_mutex_lock(&launchMutex);
     launchConfiguration.args.push_back(std::unique_ptr<Arg>(new FloatArg(value)));
     COCL_PRINT("setKernelArgFloat " << value);
-    pthread_mutex_unlock(&launchMutex);
+    // pthread_mutex_unlock(&launchMutex);
 }
 
 void kernelGo() {
     try {
-    pthread_mutex_lock(&launchMutex);
+    launchMutex.lock();
+    // pthread_mutex_lock(&launchMutex);
     // COCL_PRINT("kernelGo queue=" << (void *)launchConfiguration.queue);
 
     ThreadVars *v = getThreadVars();
@@ -500,8 +516,10 @@ void kernelGo() {
         }
         cout << "kernel failed to run" << endl;
         cout << "kernel name: [" << launchConfiguration.kernelName << "]" << endl;
-        pthread_mutex_unlock(&launchMutex);
-        pthread_mutex_unlock(&launchMutex);
+        launchMutex.unlock();
+        launchMutex.unlock();
+        // pthread_mutex_unlock(&launchMutex);
+        // pthread_mutex_unlock(&launchMutex);
         throw e;
     }
     COCL_PRINT(".. kernel queued");
@@ -525,8 +543,10 @@ void kernelGo() {
     err = clFinish(launchConfiguration.queue->queue);
     EasyCL::checkError(err);
 
-    pthread_mutex_unlock(&launchMutex);
-    pthread_mutex_unlock(&launchMutex);
+    launchMutex.unlock();
+    launchMutex.unlock();
+    // pthread_mutex_unlock(&launchMutex);
+    // pthread_mutex_unlock(&launchMutex);
     } catch(runtime_error &e) {
         std::cout << "caught runtime error " << e.what() << std::endl;
         throw e;

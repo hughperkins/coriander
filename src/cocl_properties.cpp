@@ -25,11 +25,8 @@
 
 #include "EasyCL/EasyCL.h"
 
-// #include "CL/cl.h"
-
 using namespace std;
 using namespace cocl;
-// using namespace easycl;
 
 #ifdef COCL_PRINT
 #undef COCL_PRINT
@@ -48,7 +45,6 @@ size_t cuDeviceGetAttribute(
     // cudaDevAttrComputeCapabilityMinor,
 
     cocl::CoclDevice *coclDevice = getCoclDeviceByGpuOrdinal(device);
-    // COCL_PRINT("cuDeviceGetAttribute device ordinal=" << coclDevice->gpuOrdinal);
     cl_device_id clDeviceId = coclDevice->deviceId;
     switch(attribute) {
         case cudaDevAttrComputeCapabilityMajor:
@@ -130,7 +126,6 @@ size_t cuDeviceGetAttribute(
             throw runtime_error("attribute not implemented");
     }
 
-    // cout << "cuDeviceGetAttribute redirected att=" << attribute << " value=" << *value << endl;
     return 0;
 }
 
@@ -138,8 +133,6 @@ size_t cudaDeviceGetAttribute(
        int *value, int attribute, CUdevice device) {
     return cuDeviceGetAttribute(value, attribute, device);
 }
-
-// cudaSharedMemConfig cudaSharedMemBankSizeEightByte;
 
 size_t cuDeviceGetName(char *buf, int bufsize, CUdevice device) {
     cocl::CoclDevice *coclDevice = getCoclDeviceByGpuOrdinal(device);
@@ -211,9 +204,7 @@ size_t cudaGetDeviceProperties (struct cudaDeviceProp *prop, CUdevice device) {
 }
 
 size_t cuDeviceGetProperties(struct cudaDeviceProp *device_properties, CUdevice device_ordinal) {
-    // COCL_PRINT("cuDeviceGetProperties ordinal=" << device_ordinal);
     return cudaGetDeviceProperties(device_properties, device_ordinal);
-    // return -1;
 }
 
 size_t cudaDeviceSetSharedMemConfig(cudaSharedMemConfig config) {
