@@ -19,7 +19,7 @@ cd coriander
 git submodule update --init --recursive
 ```
 6. go to https://cmake.org/download/
-- download teh 64-bit binary msi installer for windows, and run this
+- download teh 64-bit binary msi installer for windows, and run this. IMPORTANT: should be 3.7.2.  The latest cmake will give errors about `-ologo`, when building llvm
   - choose defaults, except for I selected option 'add cmake to the system path for the current user'
 7. go to http://python.org , download and install python 2.7.x
 8. go to http://releases.llvm.org/download.html#4.0.0 , and download and run the windows 64-bit pre-built binary
@@ -28,22 +28,16 @@ git submodule update --init --recursive
 10. download the llvm sourcecode, and uncompress using 7zip
 11. open cmake gui, and set the sourcecode directory as the llvm sourcecode folder, and a new `build` subdirectory as the build folder
 - press 'configure' button
+- select msvc 2015 64-bit compiler
+- change `CMAKE_CONFIGURATION_TYPES` to "Debug"
+- change `LLVM_TARGETS_TO_BUILD` to "X86"
 - click 'configure' and 'generate'
 12. open msvc2015 express ide
 - load the `all_build` project or solution ,from the build directory created using cmake
-- scroll down, and look fro the `llvm-tblgen` project, under `utils` section
-- right click, 'properties'
-- naviaate to 'resources', 'general'
-- change suppress start banner to 'no'
-- click 'ok'
-- right-click `llvm-tblgen`, and do `build`
-13. scroll down, locate `llvm-headers` project
-- right-click, `build`
-14. from the Explorer window, navigate to the `build` folder, and then naviagte to the subfolder `include\llvm\IR`
-- open the `intrinsics_gen.vcxproj`, in visual studio, and build it 
-15. from the Explorer window, navigate to the `build` folder, and then navigate to the subfolder `include\llvm`
-- copy the folders `Config`, `IR`, and `Support` into `c:\program files\include\llvm`
-16. open the 'MSBuild Command Prompt for VS2015'
+- right-click the `ALL_BUILD` project, and select `build`
+- any errors about `-ologo`, double-check you are using cmake 3.7.2
+- right-click `INSTALL`, and select `build`
+13. open the 'MSBuild Command Prompt for VS2015'
 ```
 cd %USERPROFILE%
 cd git/coriander
@@ -54,8 +48,9 @@ cmake-gui ..
 # msvc2017 native compiler, make sure to choose the one with 'win64' suffix
 # press 'configure' then 'generate'
 ```
-17. From the 'MSBuild Command Prompt for VS2015'
+14. From the 'MSBuild Command Prompt for VS2015'
 ```
 cd %USERPROFILE%/git/coriander/build
 msbuild ALL_BUILD.vcxproj
 ```
+(this fails currently, need to add the llvm libraries into the cmakelists.txt somehow)
