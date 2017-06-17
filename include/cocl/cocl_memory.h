@@ -2,6 +2,8 @@
 
 #include "clew.h"
 
+#include <cstdint>
+
 namespace cocl {
     class Memory {
     protected:

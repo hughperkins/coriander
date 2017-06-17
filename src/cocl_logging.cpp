@@ -59,12 +59,14 @@ Indentor &Indentor::operator<<(const unsigned long long value) {
     messageSoFar << value;
     return *this;
 }
+#ifndef _WIN32
 Indentor &Indentor::operator<<(const size_t value) {
     // cout << indent << message << endl;
     // messageSoFar = message
     messageSoFar << value;
     return *this;
 }
+#endif
 Indentor &Indentor::operator<<(const long long value) {
     // cout << indent << message << endl;
     // messageSoFar = message
