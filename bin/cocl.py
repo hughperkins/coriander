@@ -252,6 +252,26 @@ def split_path(filepath):
     return BASEPATH, POSTFIX
 
 
+# handle plugin include directories
+plugins_include_dir = '/usr/local/include/coriander_plugins'   # obviously this should be generalized somewhat
+if path.isdir(plugins_include_dir):
+    for plugin in os.listdir(plugins_include_dir):
+        print('adding %s to includes' % plugin)
+        INCLUDES += ['-I' + join(plugins_include_dir, plugin)]
+print('INCLUDES', INCLUDES)
+
+# handle plugin libraries
+LIBS = []
+plugins_lib_dir = '/usr/local/lib/coriander_plugins'  # should generalize this too...
+if path.isdir(plugins_lib_dir):
+    LIBS += ['-L%s' % plugins_lib_dir]
+    for lib in os.listdir(plugins_lib_dir):
+        print('adding %s to libs' % lib)
+        # LIBS += ['-l%s' % join(plugins_lib_dir, lib)]
+        LIBS += ['-l%s' % lib.replace('lib', '').split('.')[0]]
+print('LIBS', LIBS)
+
+
 def run(cmdline_list):
     print(' '.join(cmdline_list))
     print(check_output(cmdline_list))
@@ -390,4 +410,5 @@ if not COMPILE_ONLY:
             '-Wl,-rpath,$$ORIGIN'
         ]
         cmdline_list += ['-lcocl', '-lclblast', '-leasycl', '-lclew', '-lpthread']
+    cmdline_list += LIBS
     run(cmdline_list)

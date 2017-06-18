@@ -1,4 +1,4 @@
-#!/usr/env/bin python
+#!/usr/bin/env python
 import subprocess
 import argparse
 import os
@@ -7,7 +7,8 @@ from os.path import join
 
 
 SCRIPT_DIR = path.dirname(path.realpath(__file__))
-CORIANDER_DIR = path.dirname(SCRIPT_DIR)
+# CORIANDER_DIR = path.dirname(SCRIPT_DIR)
+CORIANDER_DIR = '/usr/local'
 print('CORIANDER_DIR', CORIANDER_DIR)
 
 
@@ -24,7 +25,7 @@ def install(repo_url):
     build_dir = join(repo_dir, 'build')
     os.makedirs(build_dir)
     print(subprocess.check_output([
-        'cmake', '..', '-DCORIANDER_DIR=%s' % CORIANDER_DIR
+        'cmake', '..', '-DCORIANDER_DIR=%s' % CORIANDER_DIR, '-DCMAKE_INSTALL_PREFIX=%s' % CORIANDER_DIR
     ], cwd=build_dir))
     print(subprocess.check_output([
         'make', '-j', '8'
@@ -43,7 +44,10 @@ if __name__ == '__main__':
     parser_.set_defaults(func=install)
 
     args = parser.parse_args()
-    func = args.func
-    args_dict = args.__dict__
-    del args_dict['func']
-    func(**args_dict)
+    if 'func' not in args.__dict__:
+        print('please choose a function, eg install')
+    else:
+        func = args.func
+        args_dict = args.__dict__
+        del args_dict['func']
+        func(**args_dict)
