@@ -8,6 +8,7 @@ import os
 import platform
 import os
 import sys
+import subprocess
 from os import path
 from os.path import join
 
@@ -84,11 +85,11 @@ while len(args) > 0:
     THISARG = args[0].split('=')[0]
     DONE = False
     TWOLETTERS = args[0][:2]
+
     if TWOLETTERS == ';':
-           # ignore (artifact of cmake file hacking...
-           DONE = True
+       # ignore (artifact of cmake file hacking...
+       DONE = True
     elif TWOLETTERS == '-I':
-        # echo got include
         # need to check if theres a space or not
         if THISARG == '-I':
             INCLUDES.append(args[1])
@@ -101,13 +102,8 @@ while len(args) > 0:
         DSTRIPPED = THISARG.REPLACE('-D-D', '-D')
         PASSTHRU += ' %s' % DSTRIPPED
         DONE = True
-    elif TWOLETTERS == '-O':
-        # ignore...
-        DONE = True
-    elif TWOLETTERS == '-G':
+    elif TWOLETTERS in ['-O', '-G', '-U']:
         # ignore
-        DONE = True
-    elif TWOLETTERS == '-U':
         DONE = True
     elif TWOLETTERS == '-x':
         # not sure why we are receiving -x cu? ignore for now
@@ -218,6 +214,39 @@ for infile in INFILES:
     if not COMPILE_ONLY:
         FINALPOSTFIX = OUTPUTPOSTFIX
         OUTPUTPOSTFIX = '.o'
+
+LLVM_COMPILE_FLAGS = subprocess.check_output([
+    join(CLANG_HOME, 'bin', 'llvm-config'), '--cppflags', '--cxxflags'
+])
+print('LLVM_COMPILE_FLAGS [%s]' % LLVM_COMPILE_FLAGS)
+for orig, new in {
+        '-fno-rtti': '',
+        '-NDEBUG': '',
+        '-g': '',
+        '-fno-exceptions': '-fexceptions',
+        '-std=c++0x': '-std=c++11',
+        '-O0': '', '-O1': '', '-O2': '', '-O3': ''
+    }.items():
+        LLVM_COMPILE_FLAGS = LLVM_COMPILE_FLAGS.replace(' %s' % orig, new)
+LLVM_COMPILE_FLAGS = re.sub(r' -isysroot [^ ]+', '', LLVM_COMPILE_FLAGS)
+print('LLVM_COMPILE_FLAGS [%s]' % LLVM_COMPILE_FLAGS)
+
+
+
+# we're going to use LLVM_LL_COMPILE_FLAGS for linking
+# technically, we should be using LLVM_LINK_FLAGS for that, but that seems to
+# not have the libraries we need, though that might be fixable (and thus clearn)
+LLVM_LL_COMPILE_FLAGS=$(echo " ${LLVM_COMPILE_FLAGS} " | sed -e 's/-I *[^ ]*/ /g')
+LLVM_LINK_FLAGS=`${CLANG_HOME}/bin/llvm-config --ldflags --system-libs --libs all`
+
+OUTDIR=$(dirname ${OUTFILE})
+if [[ ! -d ${OUTDIR} ]]; then {
+    echo making output folder ${OUTDIR}
+    (
+        set -x
+        mkdir -p ${OUTDIR}
+    )
+} fi
 
 
 
