@@ -8,6 +8,7 @@ import os
 import platform
 import os
 import sys
+import re
 import subprocess
 from os import path
 from os.path import join
@@ -175,6 +176,31 @@ elif len(INFILES) > 1:
         print('hard to understand?  Therefore, not supported')
         sys.exit(-1)
 
+LLVM_COMPILE_FLAGS = subprocess.check_output([
+    join(CLANG_HOME, 'bin', 'llvm-config'), '--cppflags', '--cxxflags'
+])
+print('LLVM_COMPILE_FLAGS [%s]' % LLVM_COMPILE_FLAGS)
+for orig, new in {
+        '-fno-rtti': '',
+        '-NDEBUG': '',
+        '-g': '',
+        '-fno-exceptions': '-fexceptions',
+        '-std=c++0x': '-std=c++11',
+        '-O0': '', '-O1': '', '-O2': '', '-O3': ''
+    }.items():
+        LLVM_COMPILE_FLAGS = LLVM_COMPILE_FLAGS.replace(' %s' % orig, new)
+LLVM_COMPILE_FLAGS = re.sub(r' -isysroot [^ ]+', '', LLVM_COMPILE_FLAGS)
+print('LLVM_COMPILE_FLAGS [%s]' % LLVM_COMPILE_FLAGS)
+
+# we're going to use LLVM_LL_COMPILE_FLAGS for linking
+# technically, we should be using LLVM_LINK_FLAGS for that, but that seems to
+# not have the libraries we need, though that might be fixable (and thus clearn)
+LLVM_LL_COMPILE_FLAGS = re.sub(r'-I *[^ ]+', ' ', ' %s ' % LLVM_COMPILE_FLAGS)
+LLVM_LINK_FLAGS = subprocess.check_output([
+    join(CLANG_HOME, 'bin', 'llvm-config'), '--ldflags', '--system-libs', '--libs', 'all'
+])
+print('LLVM_LINK_FLAGS [%s]' % LLVM_LINK_FLAGS)
+
 # since tf feeds us weird postfixes like '.cu.cc' ,and '.cu.pic.d' (is that a foldername? unclear for now...), so
 # we need to do something more robust than just assume the files end in '.cu' or '.o'
 #
@@ -197,7 +223,6 @@ def split_path(filepath):
     print('POSTFIX %s' % POSTFIX)
     return BASEPATH, POSTFIX
 
-
 for infile in INFILES:
     print('infile', infile)
     INPUTBASEPATH, INPUTPOSTFIX = split_path(infile)
@@ -214,30 +239,6 @@ for infile in INFILES:
     if not COMPILE_ONLY:
         FINALPOSTFIX = OUTPUTPOSTFIX
         OUTPUTPOSTFIX = '.o'
-
-LLVM_COMPILE_FLAGS = subprocess.check_output([
-    join(CLANG_HOME, 'bin', 'llvm-config'), '--cppflags', '--cxxflags'
-])
-print('LLVM_COMPILE_FLAGS [%s]' % LLVM_COMPILE_FLAGS)
-for orig, new in {
-        '-fno-rtti': '',
-        '-NDEBUG': '',
-        '-g': '',
-        '-fno-exceptions': '-fexceptions',
-        '-std=c++0x': '-std=c++11',
-        '-O0': '', '-O1': '', '-O2': '', '-O3': ''
-    }.items():
-        LLVM_COMPILE_FLAGS = LLVM_COMPILE_FLAGS.replace(' %s' % orig, new)
-LLVM_COMPILE_FLAGS = re.sub(r' -isysroot [^ ]+', '', LLVM_COMPILE_FLAGS)
-print('LLVM_COMPILE_FLAGS [%s]' % LLVM_COMPILE_FLAGS)
-
-
-
-# we're going to use LLVM_LL_COMPILE_FLAGS for linking
-# technically, we should be using LLVM_LINK_FLAGS for that, but that seems to
-# not have the libraries we need, though that might be fixable (and thus clearn)
-LLVM_LL_COMPILE_FLAGS=$(echo " ${LLVM_COMPILE_FLAGS} " | sed -e 's/-I *[^ ]*/ /g')
-LLVM_LINK_FLAGS=`${CLANG_HOME}/bin/llvm-config --ldflags --system-libs --libs all`
 
 OUTDIR=$(dirname ${OUTFILE})
 if [[ ! -d ${OUTDIR} ]]; then {
