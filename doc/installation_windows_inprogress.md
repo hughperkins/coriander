@@ -71,3 +71,10 @@ cmake-gui ..
 15. in msvc 2015 ide, open the `ALL_BUILD` solution file, from the Coriander build directory
 - double-check taht buid configuration is `Debug`, `x64` (in the toolbar, in the middle)
 - right-click target 'cocl', in the right-hand pane, and do 'Build'
+- right click target 'patch_hostside', and do 'Build'
+- right click target 'ir-to-opencl', adn do 'Build'
+16. download clang binaries from http://releases.llvm.org/4.0.0/LLVM-4.0.0-win64.exe , and install to default directory, ie `c:\program files\LLVM`
+- so this folder now contains two conceptual things:
+  - the clang binaries ,from the installer you just ran
+  - the llvm headers and libraries, which we build and isntalled earlier
+- we need both
