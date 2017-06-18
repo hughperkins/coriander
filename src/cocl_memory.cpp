@@ -14,12 +14,12 @@
 
 #include "cocl/cocl_memory.h"
 
-#include "hostside_opencl_funcs.h"
+#include "cocl/hostside_opencl_funcs.h"
 #include "cocl/cocl_streams.h"
 #include "cocl/cocl_context.h"
 #include "cocl/cocl_device.h"
 
-#include "fill_buffer.h"
+#include "cocl/fill_buffer.h"
 
 #include <iostream>
 #include <memory>

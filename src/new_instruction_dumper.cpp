@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "new_instruction_dumper.h"
+#include "cocl/new_instruction_dumper.h"
 
-#include "ClWriter.h"
-#include "LocalNames.h"
-#include "GlobalNames.h"
-#include "type_dumper.h"
-#include "function_names_map.h"
-#include "LocalValueInfo.h"
-#include "mutations.h"
-#include "ExpressionsHelper.h"
-#include "readIR.h"
+#include "cocl/ClWriter.h"
+#include "cocl/LocalNames.h"
+#include "cocl/GlobalNames.h"
+#include "cocl/type_dumper.h"
+#include "cocl/function_names_map.h"
+#include "cocl/LocalValueInfo.h"
+#include "cocl/mutations.h"
+#include "cocl/ExpressionsHelper.h"
+#include "cocl/readIR.h"
 #include "EasyCL/util/easycl_stringhelper.h"
 
 #include "llvm/IR/Instructions.h"

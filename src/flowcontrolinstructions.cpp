@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "flowcontrolinstructions.h"
-#include "ir-to-opencl.h"
-#include "util.h"
+#include "cocl/flowcontrolinstructions.h"
+#include "cocl/ir-to-opencl.h"
+#include "cocl/util.h"
 
 #include <iostream>
 #include <sstream>

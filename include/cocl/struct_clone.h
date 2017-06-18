@@ -14,8 +14,8 @@
 
 #pragma once
 
-#include "type_dumper.h"
-#include "GlobalNames.h"
+#include "cocl/type_dumper.h"
+#include "cocl/GlobalNames.h"
 
 #include <string>
 

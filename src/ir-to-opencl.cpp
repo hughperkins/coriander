@@ -14,10 +14,10 @@
 
 // input: IR from cuda compilation
 
-#include "ir-to-opencl.h"
+#include "cocl/ir-to-opencl.h"
 
-#include "ir-to-opencl-common.h"
-#include "kernel_dumper.h"
+#include "cocl/ir-to-opencl-common.h"
+#include "cocl/kernel_dumper.h"
 
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/IR/Module.h"

@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "function_dumper.h"
+#include "cocl/function_dumper.h"
 
-#include "struct_clone.h"
-#include "mutations.h"
-#include "basicblockdumper.h"
+#include "cocl/struct_clone.h"
+#include "cocl/mutations.h"
+#include "cocl/basicblockdumper.h"
 #include "EasyCL/util/easycl_stringhelper.h"
-#include "new_instruction_dumper.h"
+#include "cocl/new_instruction_dumper.h"
 
 #include "llvm/IR/Function.h"
 

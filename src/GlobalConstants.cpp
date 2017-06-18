@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "GlobalConstants.h"
+#include "cocl/GlobalConstants.h"
 
 using namespace llvm;
 using namespace std;

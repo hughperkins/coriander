@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "handle_branching.h"
-#include "flowcontrolinstructions.h"
-#include "branching_transforms.h"
-#include "ir-to-opencl.h"
-#include "ir-to-opencl-common.h"
+#include "cocl/handle_branching.h"
+#include "cocl/flowcontrolinstructions.h"
+#include "cocl/branching_transforms.h"
+#include "cocl/ir-to-opencl.h"
+#include "cocl/ir-to-opencl-common.h"
 
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"

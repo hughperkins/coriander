@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "GlobalNames.h"
+#include "cocl/GlobalNames.h"
 
 #include "llvm/IR/Type.h"
 #include "llvm/IR/DerivedTypes.h"

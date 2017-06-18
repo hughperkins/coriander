@@ -18,7 +18,7 @@
 // input: not sure :-P
 // output: ditto :-P
 
-#include "flowcontrolinstructions.h"
+#include "cocl/flowcontrolinstructions.h"
 
 #include "llvm/IR/Function.h"
 

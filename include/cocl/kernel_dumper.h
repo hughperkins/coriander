@@ -17,16 +17,16 @@
 // this takes in the module, and the name of a kernel, and does whatever we need to do to get some
 // working opencl code out of it :-)
 
-#include "GlobalNames.h"
-#include "type_dumper.h"
-#include "shims.h"
+#include "cocl/GlobalNames.h"
+#include "cocl/type_dumper.h"
+#include "cocl/shims.h"
 
 #include "llvm/IR/Module.h"
 
 #include <string>
 #include <set>
 
-#include "cocl_export.h"
+#include "cocl/cocl_export.h"
 
 namespace cocl {
 

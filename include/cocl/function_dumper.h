@@ -14,14 +14,14 @@
 
 #pragma once
 
-#include "GlobalNames.h"
-#include "LocalNames.h"
-#include "function_names_map.h"
-#include "type_dumper.h"
-#include "struct_clone.h"
-#include "LocalValueInfo.h"
-#include "new_instruction_dumper.h"
-#include "shims.h"
+#include "cocl/GlobalNames.h"
+#include "cocl/LocalNames.h"
+#include "cocl/function_names_map.h"
+#include "cocl/type_dumper.h"
+#include "cocl/struct_clone.h"
+#include "cocl/LocalValueInfo.h"
+#include "cocl/new_instruction_dumper.h"
+#include "cocl/shims.h"
 
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Instructions.h"

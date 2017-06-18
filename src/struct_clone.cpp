@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "struct_clone.h"
+#include "cocl/struct_clone.h"
 
-#include "ir-to-opencl-common.h"
+#include "cocl/ir-to-opencl-common.h"
 #include "EasyCL/util/easycl_stringhelper.h"
-#include "mutations.h"
+#include "cocl/mutations.h"
 
 #include "llvm/Support/raw_os_ostream.h"
 #include "llvm/IR/Constants.h"

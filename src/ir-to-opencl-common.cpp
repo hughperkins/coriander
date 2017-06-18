@@ -33,8 +33,8 @@
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 #include "llvm/Support/raw_os_ostream.h"
 
-#include "mutations.h"
-#include "ir-to-opencl-common.h"
+#include "cocl/mutations.h"
+#include "cocl/ir-to-opencl-common.h"
 
 using namespace std;
 using namespace llvm;

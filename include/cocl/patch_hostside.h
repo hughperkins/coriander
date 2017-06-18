@@ -52,7 +52,7 @@ Ok, so the doc is mostly below, inside the class declaration, at the bottom of t
 
 #pragma once
 
-#include "struct_clone.h"
+#include "cocl/struct_clone.h"
 
 #include <string>
 #include <vector>

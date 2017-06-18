@@ -75,8 +75,7 @@ set(EASYCL_SRCS src/EasyCL/CLKernel.cpp src/EasyCL/CLWrapper.cpp src/EasyCL/plat
 set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new_instruction_dumper.cpp
     src/struct_clone.cpp src/basicblockdumper.cpp src/ExpressionsHelper.cpp src/readIR.cpp
     src/function_names_map.cpp src/function_dumper.cpp src/kernel_dumper.cpp src/mutations.cpp
-    third_party/argparsecpp/argparsecpp.cpp src/cocl_dnn.cpp src/cocl_dnn_gemm.cpp src/cocl_dnn_pooling.cpp
-    src/cocl_dnn_conv.cpp src/cocl_dnn_act.cpp
+    third_party/argparsecpp/argparsecpp.cpp
     src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cpp src/cocl_device.cpp src/cocl_error.cpp
     src/cocl_memory.cpp src/cocl_properties.cpp src/cocl_streams.cpp src/cocl_clsources.cpp src/cocl_context.cpp
     src/ir-to-opencl.cpp src/shims.cpp src/LocalValueInfo.cpp src/ClWriter.cpp src/cocl_vector_types.cpp
@@ -167,14 +166,15 @@ target_include_directories(easycl PRIVATE src/EasyCL)
 target_link_libraries(easycl clew)
 
 add_library(cocl SHARED ${COCL_SRCS} ${YAMLCPP_SRCS})
-target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
-target_include_directories(cocl PRIVATE src/CLBlast/include)
-target_include_directories(cocl PRIVATE include)
-target_include_directories(cocl PRIVATE src)
-target_include_directories(cocl PRIVATE third_party/argparsecpp)
-target_include_directories(cocl PRIVATE third_party/yaml-cpp/include)
-target_include_directories(cocl PRIVATE ${CLANG_HOME}/include)
-target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include)
+target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl BEFORE)
+target_include_directories(cocl PRIVATE src/CLBlast/include BEFORE)
+target_include_directories(cocl PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include BEFORE)
+target_include_directories(cocl PRIVATE src) # needed for easycl/easycl
+target_include_directories(cocl PRIVATE third_party BEFORE)
+target_include_directories(cocl PRIVATE third_party/yaml-cpp/include BEFORE)
+message("CLANG_HOME ${CLANG_HOME}")
+target_include_directories(cocl PRIVATE ${CLANG_HOME}/include BEFORE)
+target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include BEFORE)
 if(COCL_SPAM)
     set(COCL_DEFINITIONS ${COCL_DEFINITIONS} -DCOCL_SPAM)
 endif()
@@ -182,11 +182,13 @@ if(COCL_DEFINITIONS)
     target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
 endif()
 separate_arguments(PLATFORM_OPTIONS)
+# message("cocl compile options ${LLVM_CXXFLAGS} ${LLVM_DEFINES} ${PLATFORM_OPTIONS}")
 target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES} ${PLATFORM_OPTIONS})
 target_link_libraries(cocl easycl clblast ${LLVM_LIBPATHS} ${LLVM_SYSLIBS})
 
 add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp)
-target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
+target_include_directories(ir-to-opencl PRIVATE include)
+target_include_directories(ir-to-opencl PRIVATE third_party)
 target_include_directories(ir-to-opencl PRIVATE ${CLANG_HOME}/include)
 target_compile_options(ir-to-opencl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 target_link_libraries(ir-to-opencl cocl ${LLVM_SYSLIBS})
@@ -198,7 +200,7 @@ add_executable(patch_hostside
 )
 target_include_directories(patch_hostside PRIVATE ${CLANG_HOME}/include)
 target_include_directories(patch_hostside PRIVATE include)
-target_include_directories(patch_hostside PRIVATE third_party/argparsecpp)
+target_include_directories(patch_hostside PRIVATE third_party)
 target_include_directories(patch_hostside PRIVATE src/EasyCL)
 target_compile_options(patch_hostside PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 target_link_libraries(patch_hostside "${LLVM_LIBPATHS}"  ${LLVM_SYSLIBS})
@@ -298,7 +300,9 @@ FILE(GLOB_RECURSE COCL_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/include/cocl/*)
 set(CLEW_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/thirdparty/clew/include/clew.h)
 FILE(GLOB EASYCL_HEADERS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/*.h)
-# FILE(GLOB CLEW_PROXYHEADERS) ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/thirdparty/clew/include/proxy-opencl/*.h)
+FILE(GLOB EASYCL_HEADERS_UTIL ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/util/*.h)
+FILE(GLOB CLBLAST_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/CLBlast/include/*.h)
+FILE(GLOB CLEW_PROXYHEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/thirdparty/clew/include/proxy-opencl/CL/*.h)
 
 set(THIS_COCL_PATH ${CMAKE_INSTALL_PREFIX}/bin/cocl.py)
 # set(THIS_BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
@@ -334,6 +338,10 @@ endif()
 # INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/share/cocl/cocl.Makefile DESTINATION share/cocl)
 INSTALL(FILES ${CLEW_HEADERS} DESTINATION include)
 INSTALL(FILES ${EASYCL_HEADERS_ROOT} DESTINATION include/EasyCL)
+INSTALL(FILES ${EASYCL_HEADERS_UTIL} DESTINATION include/EasyCL/util)
+INSTALL(FILES ${CLBLAST_HEADERS} DESTINATION include/CLBlast)
+INSTALL(FILES ${CLEW_PROXYHEADERS} DESTINATION include/clew/proxy-headers/CL)
+INSTALL(FILES ${CLEW_PROXYHEADERS} DESTINATION include/clew/proxy-headers/OpenCL)
 # INSTALL(FILES ${CMAKE_SOURCE_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
 INSTALL(FILES ${CMAKE_BINARY_DIR}/cmake/cocl.cmake ${CMAKE_SOURCE_DIR}/cmake/cocl_impl.cmake DESTINATION share/cocl)
 install(TARGETS easycl clew clblast cocl patch_hostside EXPORT cocl-targets

@@ -14,7 +14,7 @@
 
 #include "cocl/cocl_properties.h"
 
-#include "hostside_opencl_funcs.h"
+#include "cocl/hostside_opencl_funcs.h"
 #include "cocl/cocl_context.h"
 
 #include <iostream>

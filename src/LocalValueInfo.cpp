@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "LocalValueInfo.h"
-#include "mutations.h"
-#include "ClWriter.h"
+#include "cocl/LocalValueInfo.h"
+#include "cocl/mutations.h"
+#include "cocl/ClWriter.h"
 
 #include <iostream>
 #include <ostream>

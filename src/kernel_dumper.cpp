@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "kernel_dumper.h"
+#include "cocl/kernel_dumper.h"
 
-#include "GlobalNames.h"
-#include "LocalNames.h"
-#include "function_names_map.h"
-#include "type_dumper.h"
-#include "function_dumper.h"
-#include "mutations.h"
+#include "cocl/GlobalNames.h"
+#include "cocl/LocalNames.h"
+#include "cocl/function_names_map.h"
+#include "cocl/type_dumper.h"
+#include "cocl/function_dumper.h"
+#include "cocl/mutations.h"
 #include "EasyCL/util/easycl_stringhelper.h"
 
 #include "llvm/IR/Constants.h"

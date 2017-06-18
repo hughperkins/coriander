@@ -14,9 +14,9 @@
 
 #pragma once
 
-#include "LocalValueInfo.h"
-#include "InstructionDumper.h"
-#include "shims.h"
+#include "cocl/LocalValueInfo.h"
+#include "cocl/InstructionDumper.h"
+#include "cocl/shims.h"
 
 #include <string>
 #include <stdexcept>

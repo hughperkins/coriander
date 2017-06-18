@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "function_names_map.h"
+#include "cocl/function_names_map.h"
 
 #include <set>
 #include <map>

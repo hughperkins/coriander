@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "readIR.h"
+#include "cocl/readIR.h"
 
 #include "llvm/Support/raw_os_ostream.h"
 #include "llvm/IR/Constants.h"

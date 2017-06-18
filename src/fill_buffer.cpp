@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "fill_buffer.h"
+#include "cocl/fill_buffer.h"
 
-#include "hostside_opencl_funcs.h"
+#include "cocl/hostside_opencl_funcs.h"
 
 #include "EasyCL/EasyCL.h"
 

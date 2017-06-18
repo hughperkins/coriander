@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cocl_events.h"
+#include "cocl/cocl_events.h"
 
 namespace easycl {
     class EasyCL;

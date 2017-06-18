@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "branching_transforms.h"
+#include "cocl/branching_transforms.h"
 
-#include "handle_branching.h"
+#include "cocl/handle_branching.h"
 
 #include <vector>
 #include <iostream>

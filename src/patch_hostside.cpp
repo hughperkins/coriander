@@ -14,12 +14,12 @@
 
 // For doc, please see the corresponding include file, patch_hostside.h
 
-#include "patch_hostside.h"
+#include "cocl/patch_hostside.h"
 
 #include "cocl/cocl_logging.h"
 
-#include "mutations.h"
-#include "argparsecpp.h"
+#include "cocl/mutations.h"
+#include "argparsecpp/argparsecpp.h"
 #include "EasyCL/util/easycl_stringhelper.h"
 
 #include "llvm/IR/AssemblyAnnotationWriter.h"

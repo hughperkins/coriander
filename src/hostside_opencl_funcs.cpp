@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include "cocl/hostside_opencl_funcs_ext.h"
-#include "hostside_opencl_funcs.h"
+#include "cocl/hostside_opencl_funcs.h"
 #include "cocl/cocl_memory.h"
 #include "cocl/cocl_clsources.h"
 #include "cocl/cocl_streams.h"
@@ -33,10 +33,10 @@
 #include "cocl/cocl.h"
 #include "cocl/cocl_memory.h"
 
-#include "ir-to-opencl.h"
-#include "ir-to-opencl-common.h"
+#include "cocl/ir-to-opencl.h"
+#include "cocl/ir-to-opencl-common.h"
 
-#include "DebugDumper.h"
+#include "cocl/DebugDumper.h"
 
 using namespace std;
 using namespace easycl;

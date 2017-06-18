@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "type_dumper.h"
+#include "cocl/type_dumper.h"
 
-#include "mutations.h"
+#include "cocl/mutations.h"
 #include "EasyCL/util/easycl_stringhelper.h"
 
 #include "llvm/IR/Instructions.h"

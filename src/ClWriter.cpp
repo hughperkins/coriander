@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "ClWriter.h"
+#include "cocl/ClWriter.h"
 
-#include "readIR.h"
-#include "LocalValueInfo.h"
-#include "mutations.h"
+#include "cocl/readIR.h"
+#include "cocl/LocalValueInfo.h"
+#include "cocl/mutations.h"
 #include "EasyCL/util/easycl_stringhelper.h"
-#include "InstructionDumper.h"
-#include "ExpressionsHelper.h"
+#include "cocl/InstructionDumper.h"
+#include "cocl/ExpressionsHelper.h"
 
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Constants.h"

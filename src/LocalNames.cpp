@@ -1,4 +1,4 @@
-#include "LocalNames.h"
+#include "cocl/LocalNames.h"
 
 #include "EasyCL/util/easycl_stringhelper.h"
 

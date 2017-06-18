@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "argparsecpp.h"
-#include "kernel_dumper.h"
+#include "argparsecpp/argparsecpp.h"
+#include "cocl/kernel_dumper.h"
 
 #include "EasyCL/util/easycl_stringhelper.h"
 
