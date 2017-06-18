@@ -141,7 +141,6 @@ else()
         OUTPUT_VARIABLE LLVM_LIBNAMES
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    # STRING(REGEX MATCHALL "[^ ]+" LLVM_LIBFILES "${LLVM_LIBFILES}")
 endif()
 separate_arguments(LLVM_LIBNAMES)
 separate_arguments(LLVM_SYSLIBS)
@@ -150,11 +149,7 @@ separate_arguments(LLVM_SYSLIBS)
 # output of this bit is that LLVM_LIBPATHS should be semi-colon separated, and each item
 # should be a full filepath of one llvm link library
 foreach(LIBNAME ${LLVM_LIBNAMES})
-   # if(LLVM_LIBS)
-      set(LLVM_LIBPATHS ${LLVM_LIBPATHS} ${CLANG_HOME}/lib/${LIBNAME})
-   # else()
-       # set(LLVM_LIBS "${CLANG_HOME}/lib/${LIB}")
-   # endif()
+    set(LLVM_LIBPATHS ${LLVM_LIBPATHS} ${CLANG_HOME}/lib/${LIBNAME})
 endforeach()
 message("LLVM_LIBPATHS ${LLVM_LIBPATHS}")
 message("LLVM_SYSLIBS ${LLVM_SYSLIBS}")
