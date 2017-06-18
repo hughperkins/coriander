@@ -30,7 +30,7 @@
 
 namespace cocl {
 
-cocl_EXPORT class KernelDumper {
+class cocl_EXPORT KernelDumper {
 public:
     KernelDumper(llvm::Module *M, std::string kernelName, std::string generatedName, bool offsets_32bit) :
             M(M), kernelName(kernelName), generatedName(generatedName), offsets_32bit(offsets_32bit) {
