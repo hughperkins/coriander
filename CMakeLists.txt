@@ -117,10 +117,10 @@ STRING(REGEX REPLACE ";-D[^;]+" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 if(WIN32)
     execute_process(
         COMMAND ${CLANG_HOME}\\bin\\llvm-config --libnames
-        OUTPUT_VARIABLE LLVM_LIBFILES
+        OUTPUT_VARIABLE LLVM_LIBNAMES
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    message("LLVM_LIBFILES ${LLVM_LIBFILES}")
+    message("LLVM_LIBNAMES ${LLVM_LIBNAMES}")
     execute_process(
         COMMAND ${CLANG_HOME}\\bin\\llvm-config --system-libs
         OUTPUT_VARIABLE LLVM_SYSLIBS
@@ -138,19 +138,24 @@ else()
     # llvm-libs is the actual llvm libs, like LLVMCore, etc
     execute_process(
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/get-llvm-libs.sh ${CLANG_HOME}
-        OUTPUT_VARIABLE LLVM_LIBFILES
+        OUTPUT_VARIABLE LLVM_LIBNAMES
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    STRING(REGEX MATCHALL "[^ ]+" LLVM_LIBFILES "${LLVM_LIBFILES}")
+    # STRING(REGEX MATCHALL "[^ ]+" LLVM_LIBFILES "${LLVM_LIBFILES}")
 endif()
-foreach(LIB ${LLVM_LIBFILES})
-   if(LLVM_LIBS)
-       set(LLVM_LIBS ${LLVM_LIBS} ${CLANG_HOME}/lib/${LIB})
-   else()
-       set(LLVM_LIBS "${CLANG_HOME}/lib/${LIB}")
-   endif()
+separate_arguments(LLVM_LIBNAMES)
+# at this point, LLVM_LIBNAMES should be semi-colon separated, comprising llvm libfile names, without
+# paths. We will add the path now:
+# output of this bit is that LLVM_LIBPATHS should be semi-colon separated, and each item
+# should be a full filepath of one llvm link library
+foreach(LIBNAME ${LLVM_LIBNAMES})
+   # if(LLVM_LIBS)
+      set(LLVM_LIBPATHS ${LLVM_LIBPATHS} ${CLANG_HOME}/lib/${LIBNAME})
+   # else()
+       # set(LLVM_LIBS "${CLANG_HOME}/lib/${LIB}")
+   # endif()
 endforeach()
-message("LLVM_LIBFILES ${LLVM_LIBFILES}")
+message("LLVM_LIBPATHS ${LLVM_LIBPATHS}")
 message("LLVM_SYSLIBS ${LLVM_SYSLIBS}")
 
 add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp)
@@ -169,7 +174,7 @@ target_include_directories(patch_hostside PRIVATE include)
 target_include_directories(patch_hostside PRIVATE third_party/argparsecpp)
 target_include_directories(patch_hostside PRIVATE src/EasyCL)
 target_compile_options(patch_hostside PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-target_link_libraries(patch_hostside "${LLVM_LIBS}"  ${LLVM_SYSLIBS})
+target_link_libraries(patch_hostside "${LLVM_LIBPATHS}"  ${LLVM_SYSLIBS})
 
 add_library(clew SHARED src/EasyCL/thirdparty/clew/src/clew.c)
 target_include_directories(clew PRIVATE src/EasyCL/thirdparty/clew/include)
@@ -200,7 +205,7 @@ if(COCL_DEFINITIONS)
 endif()
 separate_arguments(PLATFORM_OPTIONS)
 target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES} ${PLATFORM_OPTIONS})
-target_link_libraries(cocl easycl clblast ${LLVM_LIBS} ${LLVM_SYSLIBS})
+target_link_libraries(cocl easycl clblast ${LLVM_LIBPATHS} ${LLVM_SYSLIBS})
 
 # ==================================================================================================
 
