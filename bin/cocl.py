@@ -32,15 +32,24 @@ if HOSTSIDE_COMPILE_OPT_LEVEL == '':
     HOSTSIDE_COMPILE_OPT_LEVEL = '3'
 
 DEVICE_PARSE_PASSES_LIST = ['-%s' % o for o in DEVICE_PARSE_PASSES.split(',')]
-print('DEVICE_PARSE_PASSES_LIST' % DEVICE_PARSE_PASSES_LIST)
+# print('DEVICE_PARSE_PASSES_LIST', DEVICE_PARSE_PASSES_LIST)
 
 ADDFLAGS = []
 NATIVE_COMPILER = 'g++'
 SO_SUFFIX = '.so'
+print('platform.uname()[0]', platform.uname()[0])
 if platform.uname()[0] == 'Darwin':
     ADDFLAGS += ['-stdlib=libc++']
     NATIVE_COMPILER = 'clang++'
     SO_SUFFIX = '.dylib'
+
+
+def check_output(cmd_list):
+    res = subprocess.check_output(cmd_list)
+    if int(platform.python_version_tuple()[0]) == 2:
+        return res
+    return res.decode('utf-8')
+
 
 def display_help():
     print("""
@@ -160,13 +169,13 @@ if COCL_HOME == '':
     COCL_HOME = path.dirname(SCRIPT_DIR)
 
 if COCL_BIN == '':
-    COCL_BIN = '%s/bin' % COCL_HOME
+    COCL_BIN = join(COCL_HOME, 'bin')
 
 if COCL_LIB == '':
-    COCL_LIB = '%s/lib' % COCL_HOME
+    COCL_LIB = join(COCL_HOME, 'lib')
 
 if COCL_INCLUDE == '':
-    COCL_INCLUDE = '%s/include' % COCL_HOME
+    COCL_INCLUDE = join(COCL_HOME, 'include')
 
 CLANG = 'clang++'
 
@@ -178,15 +187,16 @@ if len(INFILES) == 0:
     sys.exit(1)
 elif len(INFILES) > 1:
     if OUTPATH != '' and COMPILE_ONLY:
-        print('You specified more than one input file, and compile only, and gave an output path')
-        print('Whilst any of these things are ok on their own, or as a pair, all three together seems')
-        print('hard to understand?  Therefore, not supported')
+        print('')
+        print('Error: Cannot simultaneously specify more than one input file, and compile only, and give an output path')
+        print('')
+        print('you gave the following input files:', INFILES)
         sys.exit(-1)
 
-LLVM_COMPILE_FLAGS = subprocess.check_output([
+LLVM_COMPILE_FLAGS = check_output([
     join(CLANG_HOME, 'bin', 'llvm-config'), '--cppflags', '--cxxflags'
 ]).replace('\n', ' ')
-print('LLVM_COMPILE_FLAGS [%s]' % LLVM_COMPILE_FLAGS)
+# print('LLVM_COMPILE_FLAGS [%s]' % LLVM_COMPILE_FLAGS)
 for orig, new in {
         '-fno-rtti': '',
         '-NDEBUG': '',
@@ -197,21 +207,21 @@ for orig, new in {
     }.items():
         LLVM_COMPILE_FLAGS = LLVM_COMPILE_FLAGS.replace(' %s' % orig, new)
 LLVM_COMPILE_FLAGS = re.sub(r' -isysroot [^ ]+', '', LLVM_COMPILE_FLAGS)
-print('LLVM_COMPILE_FLAGS', LLVM_COMPILE_FLAGS)
+# print('LLVM_COMPILE_FLAGS', LLVM_COMPILE_FLAGS)
 LLVM_COMPILE_FLAGS_LIST = [flag for flag in LLVM_COMPILE_FLAGS.split(' ') if flag != '']
-print('LLVM_COMPILE_FLAGS_LIST', LLVM_COMPILE_FLAGS_LIST)
+# print('LLVM_COMPILE_FLAGS_LIST', LLVM_COMPILE_FLAGS_LIST)
 
 # we're going to use LLVM_LL_COMPILE_FLAGS for linking
 # technically, we should be using LLVM_LINK_FLAGS for that, but that seems to
 # not have the libraries we need, though that might be fixable (and thus clearn)
 LLVM_LL_COMPILE_FLAGS = re.sub(r'-I *[^ ]+', ' ', ' %s ' % LLVM_COMPILE_FLAGS)
 LLVM_LL_COMPILE_FLAGS_LIST = [flag for flag in LLVM_LL_COMPILE_FLAGS.split(' ') if flag != '']
-print('LLVM_LL_COMPILE_FLAGS_LIST', LLVM_LL_COMPILE_FLAGS_LIST)
-LLVM_LINK_FLAGS = subprocess.check_output([
+# print('LLVM_LL_COMPILE_FLAGS_LIST', LLVM_LL_COMPILE_FLAGS_LIST)
+LLVM_LINK_FLAGS = check_output([
     join(CLANG_HOME, 'bin', 'llvm-config'), '--ldflags', '--system-libs', '--libs', 'all'
 ]).replace('\n', ' ')
 LLVM_LINK_FLAGS_LIST = LLVM_LINK_FLAGS.split(' ')
-print('LLVM_LINK_FLAGS_LIST', LLVM_LINK_FLAGS_LIST)
+# print('LLVM_LINK_FLAGS_LIST', LLVM_LINK_FLAGS_LIST)
 
 if platform.uname()[0] == 'Windows':
     # windows llvm was built using msvc, so calling llvm-config will give us msvc
@@ -248,7 +258,7 @@ def split_path(filepath):
 def run(cmdline_list):
     print('cmdline_list as list:', cmdline_list)
     print('as string:', ' '.join(cmdline_list))
-    print(subprocess.check_output(cmdline_list))
+    print(check_output(cmdline_list))
 
 
 for infile in INFILES:
@@ -279,30 +289,32 @@ for infile in INFILES:
 
     # device-side: .cu => -deviceside-noopt.ll
     # note to self: hmmmm, should we be defining in addition __CUDA_ARCH__ here?
-    run([
-            join(CLANG_HOME, 'bin', 'clang++'),
+    run(
+        [join(CLANG_HOME, 'bin', 'clang++')] +
+        PASS_THRU + [
             '-DUSE_CLEW',
             '-std=c++11', '-x', 'cuda',
             '-D__CORIANDERCC__',
             '-D__CUDACC__',
             '--cuda-gpu-arch=sm_30', '-nocudalib', '-nocudainc', '--cuda-device-only', '-emit-llvm',
             '-O%s' % DEVICE_PARSE_OPT_LEVEL,
-            '-S',
+            '-S'
+        ] + ADDFLAGS + [
             '-Wno-gnu-anonymous-struct',
-            '-Wno-nested-anon-types',
+            '-Wno-nested-anon-types'
+        ] + LLVM_COMPILE_FLAGS_LIST + [
             '-I%s' % join(COCL_INCLUDE, 'EasyCL'),
+            # '-I%s' % join(COCL_INCLUDE),
             '-I%s' % join(COCL_INCLUDE, 'cocl'),
-            '-I%s' % join(COCL_INCLUDE, 'cocl', 'proxy_includes'),
+            # '-I%s' % join(COCL_INCLUDE, 'cocl', 'proxy_includes'),
             '-include', join(COCL_INCLUDE, 'cocl', 'cocl.h'),
             '-include', join(COCL_INCLUDE, 'cocl', 'fake_funcs.h'),
             '-include', join(COCL_INCLUDE, 'cocl', 'cocl_deviceside.h'),
             '-I%s' % COCL_INCLUDE,
-        ] +
-        PASS_THRU + ADDFLAGS + LLVM_COMPILE_FLAGS_LIST + INCLUDES + [
+        ] + INCLUDES + [
             INPUTBASEPATH + INPUTPOSTFIX,
             '-o', '%s-device-noopt.ll' % OUTPUTBASEPATH
         ])
-
     # opt: -device-noopt.ll => -device.ll
     run(
         [join(CLANG_HOME, 'bin', 'opt')] +
@@ -314,6 +326,7 @@ for infile in INFILES:
     )
 
     # host-side: -.cu => -hostraw.cll
+    print('LLVM_COMPILE_FLAGS_LIST', LLVM_COMPILE_FLAGS_LIST)
     cmdline_list = (
         [join(CLANG_HOME, 'bin', 'clang++')] +
         PASS_THRU +
@@ -331,6 +344,10 @@ for infile in INFILES:
             '-Wno-gnu-anonymous-struct',
             '-Wno-nested-anon-types'
         ] + LLVM_COMPILE_FLAGS_LIST + [
+            '-I%s' % COCL_INCLUDE,
+            '-I%s' % join(COCL_INCLUDE, 'EasyCL'),
+            '-I%s' % join(COCL_INCLUDE, 'cocl')
+        ] + ADDFLAGS + [
             '-include', join(COCL_INCLUDE, 'cocl', 'cocl.h'),
             '-include', join(COCL_INCLUDE, 'cocl', 'fake_funcs.h'),
             '-include', join(COCL_INCLUDE, 'cocl', 'cocl_hostside.h'),

@@ -3,7 +3,7 @@ rem echo SCRIPT_DIR ${SCRIPT_DIR}
 
 echo cocl_py.cmd
 
-python ..\bin\cocl.py
+rem python ..\bin\cocl.py
 
 rem PYOUT=$(${SCRIPT_DIR}/cocl.py)
 rem pyres=$?
@@ -15,3 +15,5 @@ rem     exit 1
 rem } fi
 rem  echo $?
 rem  echo errors [$errors]
+
+%PYTHON27_PATH% %COCL_BIN%\cocl.py %*

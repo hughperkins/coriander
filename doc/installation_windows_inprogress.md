@@ -78,3 +78,10 @@ cmake-gui ..
   - the clang binaries ,from the installer you just ran
   - the llvm headers and libraries, which we build and isntalled earlier
 - we need both
+
+## Running Coriander
+
+- you need to use the `VS2015 x64 Native Tools Command Prompt`, to run Coriander
+  - concretely the 'MSBuild' prompt wont work
+  - if you get errors about `cannot find <stdexcept>`, double-check you are using the `Native Tools` command prompt
+
