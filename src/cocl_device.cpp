@@ -7,9 +7,8 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <mutex>
 using namespace std;
-
-#include "pthread.h"
 
 namespace cocl {
     // int currentDevice = 0;
@@ -23,7 +22,8 @@ using namespace cocl;
 #endif
 
 namespace cocl {
-    static pthread_mutex_t cldevices_mutex = PTHREAD_MUTEX_INITIALIZER;
+    // static pthread_mutex_t cldevices_mutex = PTHREAD_MUTEX_INITIALIZER;
+    static std::mutex cldevices_mutex;
 
     template<typename T>
     static std::string toString(T val) {
@@ -87,7 +87,8 @@ namespace cocl {
         if(devicesInitialized) {
             return;
         }
-        pthread_mutex_lock(&cldevices_mutex);
+        std::lock_guard< std::mutex > guard(cldevices_mutex);
+        // pthread_mutex_lock(&cldevices_mutex);
         if(devicesInitialized) {
             return;
         }
@@ -102,7 +103,7 @@ namespace cocl {
 
         // this should only be set once everything really has been initialized:
         devicesInitialized = true;
-        pthread_mutex_unlock(&cldevices_mutex);        
+        // pthread_mutex_unlock(&cldevices_mutex);
     }
     CoclDevice *getCoclDeviceByGpuOrdinal(int gpuOrdinal) {
         // ThreadVars *v = getThreadVars();

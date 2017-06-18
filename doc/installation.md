@@ -4,6 +4,8 @@ To use Coriander, please build from source:
 
 ## Install pre-requisites
 
+- in each case, you will need python 2.7 available
+
 ### Mac OS X
 
 Download/install llvm-4.0:
@@ -41,7 +43,10 @@ git clone --recursive https://github.com/hughperkins/Coriander
 cd Coriander
 mkdir build
 cd build
-cmake ..
+ccmake ..
+# press 'c'
+# fill in the path to the python2.7 executable
+# press 'c' and 'g'
 # Note: I usually set build/release type to `Debug`, so this is what is tested
 make -j 4
 

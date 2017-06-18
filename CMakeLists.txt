@@ -1,11 +1,17 @@
 cmake_minimum_required(VERSION 2.8)
+project(Coriander)
 
 option(BUILD_TESTS "Build tests" OFF)
 option(COCL_SPAM "Lots of scrolly debug text.  Mostly for maintainer usage" OFF)
 if(APPLE)
-set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE STRING "the downloaded clang-4.0.0 folder, containing lib, bin etc")
+set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE PATH "the downloaded clang-4.0.0 folder, containing lib, bin etc")
+set(PYTHON27_PATH "/usr/local/bin/python2" CACHE FILEPATH "full path of python27")
+elseif(WIN32)
+set(CLANG_HOME "C:\\Program Files\\LLVM" CACHE PATH "the downloaded clang-4.0.0 folder, containing lib, bin etc")
+set(PYTHON27_PATH "C:\\python27\\python" CACHE FILEPATH "full path of python27")
 else()
-set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE STRING "the downloaded clang-4.0.0 folder, containing lib, bin etc")
+set(CLANG_HOME "/usr/local/opt/llvm-4.0" CACHE PATH "the downloaded clang-4.0.0 folder, containing lib, bin etc")
+set(PYTHON27_PATH "/usr/bin/python2" CACHE FILEPATH "full path of python27")
 endif()
 option(EIGEN_TESTS "Build eigen tests?  Needs eigen."  OFF)
 
@@ -83,59 +89,77 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
     src/cocl_funcs.cpp
 )
 
-set(CMAKE_CC_FLAGS "${CMAKE_CC_FLAGS} -fPIC")
-# Note to self: think about why is there a -g here. Can we remove it?
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -g -Wno-sign-compare")
-if(APPLE)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-covered-switch-default")
-endif(APPLE)
+if(WIN32)
+  set(CMAKE_CXX_FLAGS "/EHsc")
+else()
+  SET(PLATFORM_OPTIONS "")
+  if(UNIX)
+      SET(PLATFORM_OPTIONS "-Wno-sign-compare")
+  endif()
+  if(APPLE)
+    set(PLATFORM_OPTIONS "${PLATFORM_OPTIONS} -Wno-covered-switch-default")
+  endif()
+
+  set(CMAKE_CC_FLAGS "-fPIC")
+  set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC -g ${PLATFORM_OPTIONS}")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
+endif()
+
 add_definitions(-DUSE_CLEW)  # turns off direct linking with libOpenCL.so, all goes via clew dynamic loader (no need to link with libOpenCL at build time)
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 
 execute_process(
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/get-llvm-cxxflags.sh ${CLANG_HOME}
     OUTPUT_VARIABLE LLVM_CXXFLAGS
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-# message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 STRING(REGEX REPLACE " " ";" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
-# message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-std=c\\+\\+0x" ";-std=c++11" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-fno-exceptions" ";-fexceptions" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
-# string(REGEX REPLACE ";-fno-rtti" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-DNDEBUG" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
 string(REGEX REPLACE ";-isysroot;[^;]" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
-# message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 
 # split LLVM_CXXFLAGS into defines vs other options
 STRING(REGEX MATCHALL ";-D[^;]+" LLVM_DEFINES "${LLVM_CXXFLAGS}")
 STRING(REGEX REPLACE ";+" ";" LLVM_DEFINES "${LLVM_DEFINES}")
 STRING(REGEX REPLACE ";-D[^;]+" "" LLVM_CXXFLAGS "${LLVM_CXXFLAGS}")
-# message("LLVM_DEFINES ${LLVM_DEFINES}")
-# message("LLVM_CXXFLAGS ${LLVM_CXXFLAGS}")
 
-execute_process(
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/llvm-syslibs.sh ${CLANG_HOME}
-    OUTPUT_VARIABLE LLVM_SYSLIBS
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+if(WIN32)
+    execute_process(
+        COMMAND ${CLANG_HOME}\\bin\\llvm-config --libnames
+        OUTPUT_VARIABLE LLVM_LIBNAMES
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    execute_process(
+        COMMAND ${CLANG_HOME}\\bin\\llvm-config --system-libs
+        OUTPUT_VARIABLE LLVM_SYSLIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+else()
+    # syslibs is non-llvm libs, used by llvm, eg -lz -lm -curses
+    execute_process(
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/llvm-syslibs.sh ${CLANG_HOME}
+        OUTPUT_VARIABLE LLVM_SYSLIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
 
-execute_process(
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/get-llvm-libs.sh ${CLANG_HOME}
-    OUTPUT_VARIABLE LLVM_LIBFILES
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-STRING(REGEX MATCHALL "[^ ]+" LLVM_LIBFILES "${LLVM_LIBFILES}")
-
-foreach(LIB ${LLVM_LIBFILES})
-   if(LLVM_LIBS)
-   set(LLVM_LIBS ${LLVM_LIBS} ${CLANG_HOME}/lib/${LIB})
-   else()
-   set(LLVM_LIBS "${CLANG_HOME}/lib/${LIB}")
-   endif()
+    # llvm-libs is the actual llvm libs, like LLVMCore, etc
+    execute_process(
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/get-llvm-libs.sh ${CLANG_HOME}
+        OUTPUT_VARIABLE LLVM_LIBNAMES
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+endif()
+separate_arguments(LLVM_LIBNAMES)
+separate_arguments(LLVM_SYSLIBS)
+# at this point, LLVM_LIBNAMES should be semi-colon separated, comprising llvm libfile names, without
+# paths. We will add the path now:
+# output of this bit is that LLVM_LIBPATHS should be semi-colon separated, and each item
+# should be a full filepath of one llvm link library
+foreach(LIBNAME ${LLVM_LIBNAMES})
+    set(LLVM_LIBPATHS ${LLVM_LIBPATHS} ${CLANG_HOME}/lib/${LIBNAME})
 endforeach()
 
+<<<<<<< HEAD
 add_executable(walk src/addressspacewalk/spacegraph.cpp src/addressspacewalk/spacegraph_instructionspecific.cpp src/addressspacewalk/walker_main.cpp)
 target_link_libraries(walk cocl clew clblast easycl)
 target_include_directories(walk PRIVATE src)
@@ -160,11 +184,16 @@ target_include_directories(patch_hostside PRIVATE src/EasyCL)
 target_compile_options(patch_hostside PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 target_link_libraries(patch_hostside "${LLVM_LIBS}"  ${LLVM_SYSLIBS})
 
+=======
+>>>>>>> hugh/master
 add_library(clew SHARED src/EasyCL/thirdparty/clew/src/clew.c)
 target_include_directories(clew PRIVATE src/EasyCL/thirdparty/clew/include)
-target_link_libraries(clew dl)
+if(UNIX)
+    target_link_libraries(clew dl)
+endif()
 
 add_library(easycl SHARED ${EASYCL_SRCS})
+target_compile_definitions(easycl PRIVATE -DEasyCL_EXPORTS)
 target_include_directories(easycl PRIVATE src/EasyCL/thirdparty/clew/include)
 target_include_directories(easycl PRIVATE src/EasyCL)
 target_link_libraries(easycl clew)
@@ -184,12 +213,27 @@ endif()
 if(COCL_DEFINITIONS)
     target_compile_definitions(cocl PRIVATE ${COCL_DEFINITIONS})
 endif()
-set(NO_COVERED_SWITCH_DEFAULT)
-if(APPLE)
-  set(NO_COVERED_SWITCH_DEFAULT "-Wno-covered-switch-default")
-endif()
-target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES} -Wno-sign-compare ${NO_COVERED_SWITCH_DEFAULT})
-target_link_libraries(cocl easycl ${LLVM_LIBS} ${LLVM_SYSLIBS})
+separate_arguments(PLATFORM_OPTIONS)
+target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES} ${PLATFORM_OPTIONS})
+target_link_libraries(cocl easycl clblast ${LLVM_LIBPATHS} ${LLVM_SYSLIBS})
+
+add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp)
+target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
+target_include_directories(ir-to-opencl PRIVATE ${CLANG_HOME}/include)
+target_compile_options(ir-to-opencl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
+target_link_libraries(ir-to-opencl cocl ${LLVM_SYSLIBS})
+
+add_executable(patch_hostside
+    src/patch_hostside.cpp src/struct_clone.cpp src/mutations.cpp src/readIR.cpp
+    third_party/argparsecpp/argparsecpp.cpp src/type_dumper.cpp src/GlobalNames.cpp
+    src/EasyCL/util/easycl_stringhelper.cpp src/cocl_logging.cpp
+)
+target_include_directories(patch_hostside PRIVATE ${CLANG_HOME}/include)
+target_include_directories(patch_hostside PRIVATE include)
+target_include_directories(patch_hostside PRIVATE third_party/argparsecpp)
+target_include_directories(patch_hostside PRIVATE src/EasyCL)
+target_compile_options(patch_hostside PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
+target_link_libraries(patch_hostside "${LLVM_LIBPATHS}"  ${LLVM_SYSLIBS})
 
 # ==================================================================================================
 
@@ -201,9 +245,9 @@ target_link_libraries(cocl easycl ${LLVM_LIBS} ${LLVM_SYSLIBS})
 set(CLBLAST_KERNELS copy_fast copy_pad transpose_fast transpose_pad xaxpy xdot xger xgemm xgemv)
 set(CLBLAST_LEVEL1_ROUTINES xswap xscal xcopy xaxpy xdot xdotu xdotc xnrm2 xasum xamax)
 set(CLBLAST_LEVEL2_ROUTINES xgemv xgbmv xhemv xhbmv xhpmv xsymv xsbmv xspmv xtrmv xtbmv xtpmv
-                    xger xgeru xgerc xher xhpr xher2 xhpr2 xsyr xspr xsyr2 xspr2)
-set(CLBLAST_LEVEL3_ROUTINES xgemm xsymm xhemm xsyrk xherk xsyr2k xher2k xtrmm)
-set(CLBLAST_LEVELX_ROUTINES xomatcopy)
+                    xger xgeru xgerc xher xhpr xher2 xhpr2 xsyr xspr xsyr2 xspr2 xtrsv)
+set(CLBLAST_LEVEL3_ROUTINES xgemm xsymm xhemm xsyrk xherk xsyr2k xher2k xtrmm xtrsm)
+set(CLBLAST_LEVELX_ROUTINES xomatcopy xaxpybatched xgemmbatched xinvert)
 set(CLBLAST_ROUTINES ${CLBLAST_LEVEL1_ROUTINES} ${CLBLAST_LEVEL2_ROUTINES} ${CLBLAST_LEVEL3_ROUTINES} ${CLBLAST_LEVELX_ROUTINES})
 set(CLBLAST_PRECISIONS 32 64 3232 6464 16)
 
@@ -215,7 +259,8 @@ set(CLBLAST_SOURCES
   src/CLBlast/src/clblast.cpp
   src/CLBlast/src/clblast_c.cpp
   src/CLBlast/src/routine.cpp
-  src/CLBlast/src/utilities.cpp
+  src/CLBlast/src/utilities/clblast_exceptions.cpp
+  src/CLBlast/src/utilities/utilities.cpp
 )
 foreach(ROUTINE ${CLBLAST_LEVEL1_ROUTINES})
   set(CLBLAST_SOURCES ${CLBLAST_SOURCES} src/CLBlast/src/routines/level1/${ROUTINE}.cpp)
@@ -236,6 +281,9 @@ if(APPLE)
   # remove covered switch build warnings
   target_compile_options(clblast PRIVATE -Wno-switch)
 endif(APPLE)
+if(WIN32)
+    target_compile_options(clblast PRIVATE /DCLBLAST_DLL /DCOMPILING_DLL=1)
+endif()
 target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
 target_include_directories(clblast PRIVATE src/CLBlast/include)
 target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include)
@@ -252,7 +300,7 @@ else()
   set(SO_SUFFIX so)
 endif()
 
-set(THIS_COCL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl)
+set(THIS_COCL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl.py)
 set(COCL_ARTIFACTS patch_hostside cocl)
 # set(THIS_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set(THIS_COCL_BIN ${CMAKE_CURRENT_BINARY_DIR})
@@ -266,6 +314,12 @@ CONFIGURE_FILE(
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl-wrap.in"
   "${CMAKE_CURRENT_BINARY_DIR}/bin/cocl-internal" @ONLY)
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl.sh.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/bin/cocl-builddir.sh" @ONLY)
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl.cmd.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/bin/cocl-builddir.cmd" @ONLY)
 
 include("${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl-internal.cmake")
 
@@ -278,7 +332,7 @@ set(CLEW_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/thirdparty/clew/include/
 FILE(GLOB EASYCL_HEADERS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/*.h)
 # FILE(GLOB CLEW_PROXYHEADERS) ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/thirdparty/clew/include/proxy-opencl/*.h)
 
-set(THIS_COCL_PATH ${CMAKE_INSTALL_PREFIX}/bin/cocl)
+set(THIS_COCL_PATH ${CMAKE_INSTALL_PREFIX}/bin/cocl.py)
 # set(THIS_BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
 set(THIS_LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib)
 set(THIS_COCL_LIB ${CMAKE_INSTALL_PREFIX}/lib)
@@ -291,15 +345,23 @@ CONFIGURE_FILE(
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl-wrap.in"
   "${CMAKE_CURRENT_BINARY_DIR}/bin/cocl" @ONLY)
-# CONFIGURE_FILE(
-#   "${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl"
-#   "${CMAKE_CURRENT_BINARY_DIR}/bin/cocl_wrapped" @ONLY)
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl.sh.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/bin/cocl.sh" @ONLY)
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl.cmd.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/bin/cocl.cmd" @ONLY)
 INSTALL(FILES ${COCL_HEADERS} DESTINATION include/cocl)
-# INSTALL(FILES ${CLEW_PROXYHEADERS} DESTINATION include/clew/proxy-opencl)
 
 # cocl
 INSTALL(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl DESTINATION bin RENAME cocl_wrapped)
 INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/cocl DESTINATION bin)
+INSTALL(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl.py DESTINATION bin)
+if(WIN32)
+INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/cocl.cmd DESTINATION bin RENAME cocl_py.cmd)
+else()
+INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/cocl.sh DESTINATION bin RENAME cocl_py)
+endif()
 
 # INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/share/cocl/cocl.Makefile DESTINATION share/cocl)
 INSTALL(FILES ${CLEW_HEADERS} DESTINATION include)

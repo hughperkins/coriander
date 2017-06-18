@@ -1,8 +1,6 @@
 #pragma once
 
-// #include "EasyCL.h"
 #include "cocl_events.h"
-#include "pthread.h"
 
 namespace easycl {
     class EasyCL;
@@ -29,7 +27,6 @@ extern "C" {
 
 typedef char * cudaStream_t;
 typedef char *CUstream;
-// typedef char *cudaStream_t;
 typedef void (*cudacallbacktype)(char *stream, size_t status, void*userdata);
 
 #define cudaStreamDefault 0
@@ -53,12 +50,5 @@ namespace cocl {
         CoclStream(easycl::EasyCL *cl);
         ~CoclStream();
         easycl::CLQueue *clqueue;
-        // pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     };
-    // class StreamLock {
-    // public:
-    //     StreamLock(CoclStream *stream);
-    //     ~StreamLock();
-    //     CoclStream *stream;
-    // };
 }

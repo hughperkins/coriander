@@ -33,7 +33,9 @@ namespace cocl {
         virtual Indentor &operator<<(const unsigned int value);
         virtual Indentor &operator<<(const unsigned long long value);
         virtual Indentor &operator<<(const long long value);
-        virtual Indentor &operator<<(const size_t value);
+        #ifndef _WIN32
+            virtual Indentor &operator<<(const size_t value);
+        #endif
         virtual Indentor &operator<<(const float value);
         virtual Indentor &operator<<(const endl_fn &fn);
         // template<typename T>
