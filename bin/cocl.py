@@ -240,70 +240,122 @@ for infile in INFILES:
         FINALPOSTFIX = OUTPUTPOSTFIX
         OUTPUTPOSTFIX = '.o'
 
-OUTDIR=$(dirname ${OUTFILE})
-if [[ ! -d ${OUTDIR} ]]; then {
-    echo making output folder ${OUTDIR}
-    (
-        set -x
-        mkdir -p ${OUTDIR}
-    )
-} fi
+    OUTDIR = path.dirname(OUTFILE)
+    if not path.isdir(OUTDIR):
+        print('Creating output folder %s' % OUTDIR)
+        os.makedirs(OUTDIR)
 
 
+def run(cmdline_list):
+    print(' '.join(cmdline_list))
+    print(subprocess.check_output(cmdline_list))
 
 
-if 'CLANG_HOME' not in os.environ:
-    errors = """
-Please set CLANG_HOME, eg on Ubuntu you might do:
- 
-    export CLANG_HOME=/usr/lib/llvm-3.8
- 
-"""
-    errors = errors.replace('\n', '\\n')
-    print('errors=\'%s\'' % errors)
-    sys.exit(1)
+# device-side: .cu => -deviceside-noopt.ll
+# note to self: hmmmm, should we be defining in addition __CUDA_ARCH__ here?
+(
+    set -x
+    ${CLANG_HOME}/bin/clang++ ${PASSTHRU} -DUSE_CLEW \
+        -std=c++11 -x cuda \
+        -D__CORIANDERCC__ \
+        -D__CUDACC__ \
+        --cuda-gpu-arch=sm_30 -nocudalib -nocudainc --cuda-device-only -emit-llvm \
+        -O${DEVICE_PARSE_OPT_LEVEL} \
+        -S \
+        ${ADDFLAGS} \
+        -Wno-gnu-anonymous-struct \
+        -Wno-nested-anon-types \
+        ${LLVM_COMPILE_FLAGS} \
+        -I${COCL_INCLUDE}/EasyCL \
+        -I${COCL_INCLUDE}/cocl \
+        -include ${COCL_INCLUDE}/cocl/cocl.h \
+        -include ${COCL_INCLUDE}/cocl/fake_funcs.h \
+        -include ${COCL_INCLUDE}/cocl/cocl_deviceside.h \
+        -I${COCL_INCLUDE} \
+        ${INCLUDES} \
+        ${INPUTBASEPATH}${INPUTPOSTFIX} -o ${OUTPUTBASEPATH}-device-noopt.ll
+)
 
-CLANG = 'clang++'
-ADDFLAGS = ''
-NATIVE_COMPILER = 'g++'
-SO_SUFFIX = '.so'
+        # -I${COCL_HOME}/src \
+        # -I${COCL_HOME}/src/EasyCL \
+        # -I${COCL_HOME}/src/EasyCL/thirdparty/clew/include \
 
-if platform.uname()[0] == 'Darwin':
-    ADDFLAGS = '-stdlib=libc++'
-    NATIVE_COMPILER = 'clang++'
-    SO_SUFFIX = '.dylib'
+# opt: -device-noopt.ll => -device.ll
+(
+    set -x
+    ${CLANG_HOME}/bin/opt ${DEVICE_PARSE_PASSES_STR} -S \
+        -o ${OUTPUTBASEPATH}-device.ll \
+        ${OUTPUTBASEPATH}-device-noopt.ll
+)
 
-SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-print('SCRIPT_DIR', SCRIPT_DIR)
-COCL_HOME = path.dirname(SCRIPT_DIR)
-print('COCL_HOME', COCL_HOME)
+# host-side: -.cu => -hostraw.cll
+(
+    set -x
+    ${CLANG_HOME}/bin/clang++ ${PASSTHRU} \
+        ${INCLUDES} -DUSE_CLEW \
+        -std=c++11 -x cuda -nocudainc --cuda-host-only -emit-llvm \
+        -O${HOSTSIDE_PARSE_OPT_LEVEL} \
+        -S \
+        ${OPT_G} \
+        -D__CUDACC__ \
+        -D__CORIANDERCC__ \
+        -Wno-gnu-anonymous-struct \
+        -Wno-nested-anon-types \
+        ${LLVM_COMPILE_FLAGS} \
+        -I${COCL_INCLUDE} \
+        -I${COCL_INCLUDE}/EasyCL \
+        -I${COCL_INCLUDE}/cocl \
+        ${ADDFLAGS} \
+        ${LLVM_COMPILE_FLAGS} \
+        -include ${COCL_INCLUDE}/cocl/cocl.h \
+        -include ${COCL_INCLUDE}/cocl/fake_funcs.h \
+        -include ${COCL_INCLUDE}/cocl/cocl_hostside.h \
+        ${INPUTBASEPATH}${INPUTPOSTFIX} \
+        -o ${OUTPUTBASEPATH}-hostraw.ll
+)
 
-# print('os.cwd', os.getcwd())
-PWD = os.getcwd()
-print('PWD', PWD)
-if path.isfile('%s/bin/patch_hostside' % COCL_HOME):
-    COCL_BIN = '%s/bin' % COCL_HOME
-    COCL_LIB = '%s/lib' % COCL_HOME
-else:
-    COCL_BIN = PWD
-    COCL_LIB = PWD
+        # -I${COCL_HOME}/src \
+        # -I${COCL_HOME}/src/EasyCL/thirdparty/clew/include \
+        # -I${COCL_HOME}/src/EasyCL \
 
-i = 1
-PASSTHRU = []
-INCLUDES = []
-while i < len(sys.argv):
-    arg = sys.argv[i]
-    print('i', i, 'arg', arg)
-    if arg in ['-D', '-G']:
-        PASSTHRU.append(arg)
-    elif arg in ['-O', '-U']:
-        pass  # ignore
-    elif arg in ['-x']:
-        # ignore and skip next (which is 'cuda')
-        i += 1
-    elif arg == '-I':
-        INCLUDES.extend(sys.argv[i + 1].replace(':', ';').split(';'))
-    elif arg.startswith('-I'):
-        INCLUDES.extend(arg[2:].replace(':', ';').split(';'))
-    i += 1
-print('INCLUDES', INCLUDES)
+# patch_hostside: -hostraw.ll => -hostpatched.ll
+(
+    set -x
+    ${COCL_BIN}/patch_hostside \
+        --hostrawfile ${OUTPUTBASEPATH}-hostraw.ll \
+        --devicellfile ${OUTPUTBASEPATH}-device.ll \
+        --hostpatchedfile ${OUTPUTBASEPATH}-hostpatched.ll
+)
+
+# -hostpatched.ll => .o
+(
+    set -x
+    ${CLANG_HOME}/bin/clang++ \
+        ${PASSTHRU} \
+        ${LLVM_LL_COMPILE_FLAGS} \
+        -DUSE_CLEW \
+        -O${HOSTSIDE_COMPILE_OPT_LEVEL} \
+        ${OPT_G} \
+        -c ${OUTPUTBASEPATH}-hostpatched.ll \
+        -o ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}
+)
+
+if not COMPILE_ONLY:
+    # .o => executable
+    cmdline_list = [
+        NATIVE_COMPILER,
+        '-o', OUTPUTBASEPATH + FINALPOSTFIX,
+        OUTPUTBASEPATH + OUTPUTPOSTFIX,
+        '-L%s' % COCL_LIB]
+    cmdline_list += LLVM_LINK_FLAGS.split(' ')
+    if OPT_G != '':
+        cmdline_list.append(OPT_G)
+    if platform.uname()[0] == 'Windows':
+        pass
+    else:
+        cmdline_list.append([
+            '-Wl,-rpath,%s' % COCL_LIB,
+            '-Wl,-rpath,$$ORIGIN'
+        ])
+        cmdline_list += ['-lcocl', '-lclblast', '-leasycl', '-lclew', '-lpthread']
+    run(cmdline_list)
