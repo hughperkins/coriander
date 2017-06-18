@@ -279,12 +279,12 @@ for infile in INFILES:
             '-S',
             '-Wno-gnu-anonymous-struct',
             '-Wno-nested-anon-types',
-            '-I%s/EasyCL' % COCL_INCLUDE,
-            '-I%s/cocl' % COCL_INCLUDE,
-            '-I%s/cocl/proxy_includes' % COCL_INCLUDE,
-            '-include', '%s/cocl/cocl.h' % COCL_INCLUDE,
-            '-include', '%s/cocl/fake_funcs.h' % COCL_INCLUDE,
-            '-include', '%s/cocl/cocl_deviceside.h' % COCL_INCLUDE,
+            '-I%s' % join(COCL_INCLUDE, 'EasyCL'),
+            '-I%s' % join(COCL_INCLUDE, 'cocl'),
+            '-I%s' % join(COCL_INCLUDE, 'cocl', 'proxy_includes'),
+            '-include', join(COCL_INCLUDE, 'cocl', 'cocl.h'),
+            '-include', join(COCL_INCLUDE, 'cocl', 'fake_funcs.h'),
+            '-include', join(COCL_INCLUDE, 'cocl', 'cocl_deviceside.h'),
             '-I%s' % COCL_INCLUDE,
         ] +
         PASS_THRU + ADDFLAGS + LLVM_COMPILE_FLAGS_LIST + INCLUDES + [
@@ -302,7 +302,32 @@ for infile in INFILES:
         ]
     )
 
-    # # host-side: -.cu => -hostraw.cll
+    # host-side: -.cu => -hostraw.cll
+    cmdline_list = (
+        [join(CLANG_HOME, 'bin', 'clang++')] +
+        PASS_THRU +
+        INCLUDES +
+        [
+            '-I', join(COCL_INCLUDE, 'cocl'),
+            '-I', join(COCL_INCLUDE, 'cocl', 'proxy_includes'),
+            '-DUSE_CLEW',
+            '-std=c++11', '-x', 'cuda', '-nocudainc', '--cuda-host-only', '-emit-llvm',
+            '-O%s' % HOSTSIDE_PARSE_OPT_LEVEL,
+            '-S'
+        ] + OPT_G + [
+            '-D__CUDACC__',
+            '-D__CORIANDERCC__',
+            '-Wno-gnu-anonymous-struct',
+            '-Wno-nested-anon-types'
+        ] + LLVM_COMPILE_FLAGS_LIST + [
+            '-include', join(COCL_INCLUDE, 'cocl', 'cocl.h'),
+            '-include', join(COCL_INCLUDE, 'cocl', 'fake_funcs.h'),
+            '-include', join(COCL_INCLUDE, 'cocl', 'cocl_hostside.h'),
+            INPUTBASEPATH + INPUTPOSTFIX,
+            '-o', '%s-hostraw.ll' % OUTPUTBASEPATH
+        ])
+    run(cmdline_list)
+
     # ${CLANG_HOME}/bin/clang++ ${PASS_THRU} \
     #     ${INCLUDES} -DUSE_CLEW \
     #     -std=c++11 -x cuda -nocudainc --cuda-host-only -emit-llvm \
