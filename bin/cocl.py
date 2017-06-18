@@ -4,12 +4,11 @@
 # If it happesn to run on python3.5 too, taht's a bonus, but not a design requirements
 
 from __future__ import print_function
-import os
 import platform
-import os
 import sys
 import re
 import subprocess
+import os
 from os import path
 from os.path import join
 
@@ -32,8 +31,8 @@ HOSTSIDE_COMPILE_OPT_LEVEL = os.environ.get('HOSTSIDE_COMPILE_OPT_LEVEL', '')
 if HOSTSIDE_COMPILE_OPT_LEVEL == '':
     HOSTSIDE_COMPILE_OPT_LEVEL = '3'
 
-DEVICE_PARSE_PASSES_STR = ' '.join(['-%s' % o for o in DEVICE_PARSE_PASSES.split(',')])
-print('DEVICE_PARSE_PASSES_STR [%s]' % DEVICE_PARSE_PASSES_STR)
+DEVICE_PARSE_PASSES_LIST = ['-%s' % o for o in DEVICE_PARSE_PASSES.split(',')]
+print('DEVICE_PARSE_PASSES_LIST' % DEVICE_PARSE_PASSES_LIST)
 
 ADDFLAGS = []
 NATIVE_COMPILER = 'g++'
@@ -72,7 +71,6 @@ Usage: cocl [options] <targetfile>
 """)
 
 PASS_THRU = []
-IROOPENCLARGS = ''
 COMPILE_ONLY = False
 OPT_G = []
 OUTPATH = ''
@@ -86,9 +84,10 @@ INFILES = []
 
 args = sys.argv[1:]
 while len(args) > 0:
-    THISARG = args[0].split('=')[0]
+    # THISARG = args[0].split('=')[0]
+    THISARG = args[0]
     DONE = False
-    TWOLETTERS = args[0][:2]
+    TWOLETTERS = args[0].split('=')[0][:2]
 
     if TWOLETTERS == ';':
        # ignore (artifact of cmake file hacking...
@@ -228,10 +227,9 @@ def split_path(filepath):
 
     split_basename = BASENAME.split('.')
     BASEARR0 = split_basename[0]
+    POSTFIX = ''
     if len(split_basename) > 1:
         POSTFIX = '.' + '.'.join(split_basename[1:])
-    else:
-        POSTFIX = ''
     BASEPATH = join(DIRNAME, BASEARR0)
     return BASEPATH, POSTFIX
 
@@ -268,7 +266,6 @@ for infile in INFILES:
         print('Creating output folder %s' % OUTDIR)
         os.makedirs(OUTDIR)
 
-
     # device-side: .cu => -deviceside-noopt.ll
     # note to self: hmmmm, should we be defining in addition __CUDA_ARCH__ here?
     run([
@@ -295,10 +292,15 @@ for infile in INFILES:
             '-o', '%s-device-noopt.ll' % OUTPUTBASEPATH
         ])
 
-    # # opt: -device-noopt.ll => -device.ll
-    # ${CLANG_HOME}/bin/opt ${DEVICE_PARSE_PASSES_STR} -S \
-    #     -o ${OUTPUTBASEPATH}-device.ll \
-    #     ${OUTPUTBASEPATH}-device-noopt.ll
+    # opt: -device-noopt.ll => -device.ll
+    run(
+        [join(CLANG_HOME, 'bin', 'opt')] +
+        DEVICE_PARSE_PASSES_LIST + [
+            '-S',
+            '-o', '%s-device.ll' % OUTPUTBASEPATH,
+            '%s-device-noopt.ll' % OUTPUTBASEPATH
+        ]
+    )
 
     # # host-side: -.cu => -hostraw.cll
     # ${CLANG_HOME}/bin/clang++ ${PASS_THRU} \
