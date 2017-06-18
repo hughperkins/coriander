@@ -213,6 +213,14 @@ LLVM_LINK_FLAGS = subprocess.check_output([
 LLVM_LINK_FLAGS_LIST = LLVM_LINK_FLAGS.split(' ')
 print('LLVM_LINK_FLAGS_LIST', LLVM_LINK_FLAGS_LIST)
 
+if platform.uname()[0] == 'Windows':
+    # windows llvm was built using msvc, so calling llvm-config will give us msvc
+    # compile flags, like /EHsc etc
+    # but, we are not going to use msvc to parse the .cu files into bytecode: we are
+    # going to use clang++. So, we need to use some different flags somehow
+    LLVM_COMPILE_FLAGS_LIST = []
+    LLVM_LL_COMPILE_FLAGS_LIST = []
+
 def split_path(filepath):
     """
     since tf feeds us weird postfixes like '.cu.cc' ,and '.cu.pic.d' (is that a foldername? unclear for now...), so
