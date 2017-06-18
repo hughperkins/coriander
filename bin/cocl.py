@@ -205,10 +205,13 @@ print('LLVM_COMPILE_FLAGS_LIST', LLVM_COMPILE_FLAGS_LIST)
 # technically, we should be using LLVM_LINK_FLAGS for that, but that seems to
 # not have the libraries we need, though that might be fixable (and thus clearn)
 LLVM_LL_COMPILE_FLAGS = re.sub(r'-I *[^ ]+', ' ', ' %s ' % LLVM_COMPILE_FLAGS)
+LLVM_LL_COMPILE_FLAGS_LIST = [flag for flag in LLVM_LL_COMPILE_FLAGS.split(' ') if flag != '']
+print('LLVM_LL_COMPILE_FLAGS_LIST', LLVM_LL_COMPILE_FLAGS_LIST)
 LLVM_LINK_FLAGS = subprocess.check_output([
     join(CLANG_HOME, 'bin', 'llvm-config'), '--ldflags', '--system-libs', '--libs', 'all'
-])
-print('LLVM_LINK_FLAGS [%s]' % LLVM_LINK_FLAGS)
+]).replace('\n', ' ')
+LLVM_LINK_FLAGS_LIST = LLVM_LINK_FLAGS.split(' ')
+print('LLVM_LINK_FLAGS_LIST', LLVM_LINK_FLAGS_LIST)
 
 def split_path(filepath):
     """
@@ -336,26 +339,30 @@ for infile in INFILES:
             '--hostpatchedfile', '%s-hostpatched.ll' % OUTPUTBASEPATH
         ])
 
-    # # -hostpatched.ll => .o
-    # ${CLANG_HOME}/bin/clang++ \
-    #     ${PASS_THRU} \
-    #     ${LLVM_LL_COMPILE_FLAGS} \
-    #     -DUSE_CLEW \
-    #     -O${HOSTSIDE_COMPILE_OPT_LEVEL} \
-    #     ${OPT_G} \
-    #     -c ${OUTPUTBASEPATH}-hostpatched.ll \
-    #     -o ${OUTPUTBASEPATH}${OUTPUTPOSTFIX}
+    # -hostpatched.ll => .o
+    run(
+        [join(CLANG_HOME, 'bin', 'clang++')] +
+        LLVM_LL_COMPILE_FLAGS_LIST + [
+            '-DUSE_CLEW',
+            '-O%s' % HOSTSIDE_COMPILE_OPT_LEVEL
+        ] + OPT_G + [
+            '-c', '%s-hostpatched.ll' % OUTPUTBASEPATH,
+            '-o', OUTPUTBASEPATH + OUTPUTPOSTFIX
+        ]
+    )
 
 if not COMPILE_ONLY:
     # .o => executable
-    cmdline_list = [
-        NATIVE_COMPILER,
-        '-o', OUTPUTBASEPATH + FINALPOSTFIX,
-        OUTPUTBASEPATH + OUTPUTPOSTFIX,
-        '-L%s' % COCL_LIB
-    ] + \
-        OPT_G + \
-        LLVM_LINK_FLAGS.split(' ')
+    cmdline_list = (
+        [
+            NATIVE_COMPILER,
+            '-o', OUTPUTBASEPATH + FINALPOSTFIX,
+            OUTPUTBASEPATH + OUTPUTPOSTFIX,
+            '-L%s' % COCL_LIB
+        ] +
+        OPT_G +
+        LLVM_LINK_FLAGS_LIST
+    )
     if platform.uname()[0] == 'Windows':
         pass
     else:
