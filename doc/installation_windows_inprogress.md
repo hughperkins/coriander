@@ -68,6 +68,6 @@ cmake-gui ..
 # msvc2015 native compiler, make sure to choose the one with 'win64' suffix
 # press 'configure' then 'generate'
 ```
-14. in msvc 2015 ide, open the `ALL_BUILD` solution file, from the Coriander build directory
+15. in msvc 2015 ide, open the `ALL_BUILD` solution file, from the Coriander build directory
 - double-check taht buid configuration is `Debug`, `x64` (in the toolbar, in the middle)
 - right-click target 'cocl', in the right-hand pane, and do 'Build'
