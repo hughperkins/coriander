@@ -65,12 +65,9 @@ mkdir build
 cd build
 cmake-gui ..
 # press 'configure'
-# msvc2017 native compiler, make sure to choose the one with 'win64' suffix
+# msvc2015 native compiler, make sure to choose the one with 'win64' suffix
 # press 'configure' then 'generate'
 ```
-14. From the 'MSBuild Command Prompt for VS2015'
-```
-cd %USERPROFILE%/git/coriander/build
-msbuild ALL_BUILD.vcxproj
-```
-(this fails currently, need to add the llvm libraries into the cmakelists.txt somehow)
+14. in msvc 2015 ide, open the `ALL_BUILD` solution file, from the Coriander build directory
+- double-check taht buid configuration is `Debug`, `x64` (in the toolbar, in the middle)
+- right-click target 'cocl', in the right-hand pane, and do 'Build'
