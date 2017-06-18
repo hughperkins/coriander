@@ -159,33 +159,12 @@ foreach(LIBNAME ${LLVM_LIBNAMES})
     set(LLVM_LIBPATHS ${LLVM_LIBPATHS} ${CLANG_HOME}/lib/${LIBNAME})
 endforeach()
 
-<<<<<<< HEAD
 add_executable(walk src/addressspacewalk/spacegraph.cpp src/addressspacewalk/spacegraph_instructionspecific.cpp src/addressspacewalk/walker_main.cpp)
 target_link_libraries(walk cocl clew clblast easycl)
 target_include_directories(walk PRIVATE src)
 target_include_directories(walk PRIVATE third_party/argparsecpp)
 target_compile_options(walk PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 
-add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp)
-target_include_directories(ir-to-opencl PRIVATE third_party/argparsecpp)
-target_include_directories(ir-to-opencl PRIVATE ${CLANG_HOME}/include)
-target_compile_options(ir-to-opencl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-target_link_libraries(ir-to-opencl cocl ${LLVM_SYSLIBS})
-
-add_executable(patch_hostside
-    src/patch_hostside.cpp src/struct_clone.cpp src/mutations.cpp src/readIR.cpp
-    third_party/argparsecpp/argparsecpp.cpp src/type_dumper.cpp src/GlobalNames.cpp
-    src/EasyCL/util/easycl_stringhelper.cpp src/cocl_logging.cpp
-)
-target_include_directories(patch_hostside PRIVATE ${CLANG_HOME}/include)
-target_include_directories(patch_hostside PRIVATE include)
-target_include_directories(patch_hostside PRIVATE third_party/argparsecpp)
-target_include_directories(patch_hostside PRIVATE src/EasyCL)
-target_compile_options(patch_hostside PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-target_link_libraries(patch_hostside "${LLVM_LIBS}"  ${LLVM_SYSLIBS})
-
-=======
->>>>>>> hugh/master
 add_library(clew SHARED src/EasyCL/thirdparty/clew/src/clew.c)
 target_include_directories(clew PRIVATE src/EasyCL/thirdparty/clew/include)
 if(UNIX)
