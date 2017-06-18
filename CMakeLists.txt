@@ -120,13 +120,11 @@ if(WIN32)
         OUTPUT_VARIABLE LLVM_LIBNAMES
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    message("LLVM_LIBNAMES ${LLVM_LIBNAMES}")
     execute_process(
         COMMAND ${CLANG_HOME}\\bin\\llvm-config --system-libs
         OUTPUT_VARIABLE LLVM_SYSLIBS
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    message("LLVM_SYSLIBS ${LLVM_SYSLIBS}")
 else()
     # syslibs is non-llvm libs, used by llvm, eg -lz -lm -curses
     execute_process(
@@ -151,8 +149,6 @@ separate_arguments(LLVM_SYSLIBS)
 foreach(LIBNAME ${LLVM_LIBNAMES})
     set(LLVM_LIBPATHS ${LLVM_LIBPATHS} ${CLANG_HOME}/lib/${LIBNAME})
 endforeach()
-message("LLVM_LIBPATHS ${LLVM_LIBPATHS}")
-message("LLVM_SYSLIBS ${LLVM_SYSLIBS}")
 
 add_library(clew SHARED src/EasyCL/thirdparty/clew/src/clew.c)
 target_include_directories(clew PRIVATE src/EasyCL/thirdparty/clew/include)
