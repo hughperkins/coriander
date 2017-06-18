@@ -26,9 +26,11 @@
 #include <string>
 #include <set>
 
+#include "cocl_export.h"
+
 namespace cocl {
 
-class KernelDumper {
+cocl_EXPORT class KernelDumper {
 public:
     KernelDumper(llvm::Module *M, std::string kernelName, std::string generatedName, bool offsets_32bit) :
             M(M), kernelName(kernelName), generatedName(generatedName), offsets_32bit(offsets_32bit) {
