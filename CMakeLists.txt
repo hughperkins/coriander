@@ -144,6 +144,7 @@ else()
     # STRING(REGEX MATCHALL "[^ ]+" LLVM_LIBFILES "${LLVM_LIBFILES}")
 endif()
 separate_arguments(LLVM_LIBNAMES)
+separate_arguments(LLVM_SYSLIBS)
 # at this point, LLVM_LIBNAMES should be semi-colon separated, comprising llvm libfile names, without
 # paths. We will add the path now:
 # output of this bit is that LLVM_LIBPATHS should be semi-colon separated, and each item
