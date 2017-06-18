@@ -4,10 +4,10 @@ if [ ! -z "$SETX" ]; then {
    set -x
 } fi
 
-echo ''
-echo 'WARNING: `cocl` is deprecated, and will be removed in a future release'
-echo 'Please use: `cocl_py`, which is easier to maintain, and portable'
-echo ''
+# echo ''
+# echo 'WARNING: `cocl` is deprecated, and will be removed in a future release'
+# echo 'Please use: `cocl_py`, which is easier to maintain, and portable'
+# echo ''
 
 echo cocl args: $@
 
