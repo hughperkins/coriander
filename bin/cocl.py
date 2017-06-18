@@ -14,7 +14,7 @@ from os import path
 from os.path import join
 
 
-print('cocl.py args: ' % json.dumps(sys.argv))
+print(' '.join(sys.argv))
 
 DEVICE_PARSE_OPT_LEVEL = os.environ.get('DEVICE_PARSE_OPT_LEVEL', '')
 if DEVICE_PARSE_OPT_LEVEL == '':
@@ -196,7 +196,6 @@ elif len(INFILES) > 1:
 LLVM_COMPILE_FLAGS = check_output([
     join(CLANG_HOME, 'bin', 'llvm-config'), '--cppflags', '--cxxflags'
 ]).replace('\n', ' ')
-# print('LLVM_COMPILE_FLAGS [%s]' % LLVM_COMPILE_FLAGS)
 for orig, new in {
         '-fno-rtti': '',
         '-NDEBUG': '',
@@ -207,9 +206,7 @@ for orig, new in {
     }.items():
         LLVM_COMPILE_FLAGS = LLVM_COMPILE_FLAGS.replace(' %s' % orig, new)
 LLVM_COMPILE_FLAGS = re.sub(r' -isysroot [^ ]+', '', LLVM_COMPILE_FLAGS)
-# print('LLVM_COMPILE_FLAGS', LLVM_COMPILE_FLAGS)
 LLVM_COMPILE_FLAGS_LIST = [flag for flag in LLVM_COMPILE_FLAGS.split(' ') if flag != '']
-# print('LLVM_COMPILE_FLAGS_LIST', LLVM_COMPILE_FLAGS_LIST)
 
 # we're going to use LLVM_LL_COMPILE_FLAGS for linking
 # technically, we should be using LLVM_LINK_FLAGS for that, but that seems to
@@ -256,13 +253,11 @@ def split_path(filepath):
 
 
 def run(cmdline_list):
-    print('cmdline_list as list:', cmdline_list)
-    print('as string:', ' '.join(cmdline_list))
+    print(' '.join(cmdline_list))
     print(check_output(cmdline_list))
 
 
 for infile in INFILES:
-    print('infile', infile)
     INPUTBASEPATH, INPUTPOSTFIX = split_path(infile)
 
     if OUTPATH != '':
@@ -281,8 +276,8 @@ for infile in INFILES:
     OUTDIR = path.dirname(OUTFILE)
     if OUTDIR == '':
         OUTDIR = '.'
-    print('OUTFILE [%s]' % OUTFILE)
-    print('OUTDIR [%s]' % OUTDIR)
+    # print('OUTFILE [%s]' % OUTFILE)
+    # print('OUTDIR [%s]' % OUTDIR)
     if not path.isdir(OUTDIR):
         print('Creating output folder %s' % OUTDIR)
         os.makedirs(OUTDIR)
@@ -326,7 +321,6 @@ for infile in INFILES:
     )
 
     # host-side: -.cu => -hostraw.cll
-    print('LLVM_COMPILE_FLAGS_LIST', LLVM_COMPILE_FLAGS_LIST)
     cmdline_list = (
         [join(CLANG_HOME, 'bin', 'clang++')] +
         PASS_THRU +
