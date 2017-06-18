@@ -328,33 +328,13 @@ for infile in INFILES:
         ])
     run(cmdline_list)
 
-    # ${CLANG_HOME}/bin/clang++ ${PASS_THRU} \
-    #     ${INCLUDES} -DUSE_CLEW \
-    #     -std=c++11 -x cuda -nocudainc --cuda-host-only -emit-llvm \
-    #     -O${HOSTSIDE_PARSE_OPT_LEVEL} \
-    #     -S \
-    #     ${OPT_G} \
-    #     -D__CUDACC__ \
-    #     -D__CORIANDERCC__ \
-    #     -Wno-gnu-anonymous-struct \
-    #     -Wno-nested-anon-types \
-    #     ${LLVM_COMPILE_FLAGS} \
-    #     -I${COCL_INCLUDE} \
-    #     -I${COCL_INCLUDE}/EasyCL \
-    #     -I${COCL_INCLUDE}/cocl \
-    #     ${ADDFLAGS} \
-    #     ${LLVM_COMPILE_FLAGS} \
-    #     -include ${COCL_INCLUDE}/cocl/cocl.h \
-    #     -include ${COCL_INCLUDE}/cocl/fake_funcs.h \
-    #     -include ${COCL_INCLUDE}/cocl/cocl_hostside.h \
-    #     ${INPUTBASEPATH}${INPUTPOSTFIX} \
-    #     -o ${OUTPUTBASEPATH}-hostraw.ll
-
-    # # patch_hostside: -hostraw.ll => -hostpatched.ll
-    # ${COCL_BIN}/patch_hostside \
-    #     --hostrawfile ${OUTPUTBASEPATH}-hostraw.ll \
-    #     --devicellfile ${OUTPUTBASEPATH}-device.ll \
-    #     --hostpatchedfile ${OUTPUTBASEPATH}-hostpatched.ll
+    # patch_hostside: -hostraw.ll => -hostpatched.ll
+    run([
+            join(COCL_BIN, 'patch_hostside'),
+            '--hostrawfile', '%s-hostraw.ll' % OUTPUTBASEPATH,
+            '--devicellfile', '%s-device.ll' % OUTPUTBASEPATH,
+            '--hostpatchedfile', '%s-hostpatched.ll' % OUTPUTBASEPATH
+        ])
 
     # # -hostpatched.ll => .o
     # ${CLANG_HOME}/bin/clang++ \
