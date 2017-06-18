@@ -25,7 +25,7 @@
 
 #include "gtest/gtest.h"
 
-#include "type_dumper.h"
+#include "cocl/type_dumper.h"
 
 using namespace std;
 using namespace cocl;

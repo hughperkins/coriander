@@ -26,7 +26,7 @@
 
 #include "gtest/gtest.h"
 
-#include "LocalNames.h"
+#include "cocl/LocalNames.h"
 
 using namespace std;
 using namespace cocl;

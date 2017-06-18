@@ -57,8 +57,6 @@ add_executable(gtest-tests ${TESTS_EXCLUDE} test/gtest/gtest_main.cpp test/gtest
     test/gtest/test_type_dumper.cpp test/gtest/test_GlobalNames.cpp test/gtest/test_LocalNames.cpp
     test/gtest/test_struct_cloner.cpp test/gtest/test_function_dumper.cpp
     test/gtest/test_kernel_dumper.cpp test/gtest/test_global_constants.cpp
-    test/gtest/test_dnn_conv.cpp test/gtest/test_dnn_pooling.cpp test/gtest/test_dnn_act.cpp
-    test/gtest/test_dnn_loss.cpp
     test/gtest/test_hostside_opencl_funcs.cpp test/gtest/test_logging.cpp
     test/gtest/test_expressions_helper.cpp test/gtest/test_shims.cpp
     # test/gtest/test_simple.cu

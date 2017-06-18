@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "basicblockdumper.h"
+#include "cocl/basicblockdumper.h"
 
-#include "type_dumper.h"
-#include "GlobalNames.h"
-#include "LocalNames.h"
+#include "cocl/type_dumper.h"
+#include "cocl/GlobalNames.h"
+#include "cocl/LocalNames.h"
 
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/IR/Module.h"

@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "type_dumper.h"
-#include "GlobalNames.h"
-#include "LocalNames.h"
-#include "function_names_map.h"
-#include "new_instruction_dumper.h"
-#include "InstructionDumper.h"
-#include "shims.h"
+#include "cocl/type_dumper.h"
+#include "cocl/GlobalNames.h"
+#include "cocl/LocalNames.h"
+#include "cocl/function_names_map.h"
+#include "cocl/new_instruction_dumper.h"
+#include "cocl/InstructionDumper.h"
+#include "cocl/shims.h"
 
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/IR/Module.h"

@@ -28,9 +28,9 @@
 
 #include "gtest/gtest.h"
 
-#include "type_dumper.h"
-#include "GlobalNames.h"
-#include "struct_clone.h"
+#include "cocl/type_dumper.h"
+#include "cocl/GlobalNames.h"
+#include "cocl/struct_clone.h"
 
 using namespace std;
 using namespace cocl;
