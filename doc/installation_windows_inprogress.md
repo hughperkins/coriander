@@ -73,6 +73,7 @@ cmake-gui ..
 - right-click target 'cocl', in the right-hand pane, and do 'Build'
 - right click target 'patch_hostside', and do 'Build'
 - right click target 'ir-to-opencl', adn do 'Build'
+- right-click target 'INSTALL', and do 'build'
 16. download clang binaries from http://releases.llvm.org/4.0.0/LLVM-4.0.0-win64.exe , and install to default directory, ie `c:\program files\LLVM`
 - so this folder now contains two conceptual things:
   - the clang binaries ,from the installer you just ran

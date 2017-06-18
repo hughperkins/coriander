@@ -9,11 +9,12 @@ import sys
 import re
 import subprocess
 import os
+import json
 from os import path
 from os.path import join
 
 
-print('cocl.py args: [%s]' % ' '.join(sys.argv))
+print('cocl.py args: ' % json.dumps(sys.argv))
 
 DEVICE_PARSE_OPT_LEVEL = os.environ.get('DEVICE_PARSE_OPT_LEVEL', '')
 if DEVICE_PARSE_OPT_LEVEL == '':
@@ -37,7 +38,6 @@ DEVICE_PARSE_PASSES_LIST = ['-%s' % o for o in DEVICE_PARSE_PASSES.split(',')]
 ADDFLAGS = []
 NATIVE_COMPILER = 'g++'
 SO_SUFFIX = '.so'
-print('platform.uname()[0]', platform.uname()[0])
 if platform.uname()[0] == 'Darwin':
     ADDFLAGS += ['-stdlib=libc++']
     NATIVE_COMPILER = 'clang++'
@@ -51,7 +51,7 @@ def check_output(cmd_list):
     return res.decode('utf-8')
 
 
-def display_help():
+def print_help():
     print("""
 Usage: cocl [options] <targetfile>
   -c compile to .o only, dont link
