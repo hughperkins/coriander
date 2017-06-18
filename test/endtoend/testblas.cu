@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
 
     assertEqual(hostCCheck, hostC, M, N);
 
-    // cublasDestroy(blas);
+    cublasDestroy(blas);
 
     cuMemFree(deviceA);
     cuMemFree(deviceB);
