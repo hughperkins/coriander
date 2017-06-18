@@ -198,7 +198,7 @@ LLVM_COMPILE_FLAGS = check_output([
 ]).replace('\n', ' ')
 for orig, new in {
         '-fno-rtti': '',
-        '-NDEBUG': '',
+        '-DNDEBUG': '',
         '-g': '',
         '-fno-exceptions': '-fexceptions',
         '-std=c++0x': '-std=c++11',

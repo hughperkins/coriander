@@ -35,8 +35,8 @@ macro(cocl_build_objects target_name target_type)
             add_custom_command(
                 OUTPUT ${target_name}.d/${filename}.o
                 COMMAND
-                    # ${PYTHON27_PATH} ${COCL_PATH}
-                    ${COCL_PATH}
+                    ${PYTHON27_PATH} ${COCL_PATH}
+                    # ${COCL_PATH}
                     ${G_OPT}
                     --clang-home ${CLANG_HOME}
                     --cocl-bin ${COCL_BIN}
