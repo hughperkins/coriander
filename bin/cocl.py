@@ -9,7 +9,7 @@ import platform
 import os
 import sys
 from os import path
-import sys
+from os.path import join
 
 
 print('cocl.py args: [%s]' % ' '.join(sys.argv))
@@ -149,6 +149,77 @@ while len(args) > 0:
             # add as input file
             INFILES.append(THISARG)
     args = args[1:]
+
+SCRIPT_DIR = path.dirname(path.realpath(__file__))
+
+if CLANG_HOME == '':
+    COCL_HOME = path.dirname(SCRIPT_DIR)
+
+if COCL_BIN == '':
+    COCL_BIN = '%s/bin' % COCL_HOME
+
+if COCL_LIB == '':
+    COCL_LIB = '%s/lib' % COCL_HOME
+
+if COCL_INCLUDE == '':
+    COCL_INCLUDE = '%s/include' % COCL_HOME
+
+CLANG = 'clang++'
+
+if len(INFILES) == 0:
+    print_help()
+    print('')
+    print('Please specify one or more input sourcecode files')
+    print('')
+    sys.exit(1)
+elif len(INFILES) > 1:
+    if OUTPATH != '' and COMPILE_ONLY:
+        print('You specified more than one input file, and compile only, and gave an output path')
+        print('Whilst any of these things are ok on their own, or as a pair, all three together seems')
+        print('hard to understand?  Therefore, not supported')
+        sys.exit(-1)
+
+# since tf feeds us weird postfixes like '.cu.cc' ,and '.cu.pic.d' (is that a foldername? unclear for now...), so
+# we need to do something more robust than just assume the files end in '.cu' or '.o'
+#
+# gets a file basename and postfix, for unknown postfix
+#
+# eg:
+#
+#   in: 'foo/bar/somefile.cu.cc'
+#   return: 'foo/bar/somefile', '.cu.cc'
+#
+def split_path(filepath):
+    DIRNAME = path.dirname(filepath)
+    BASENAME = path.basename(filepath)
+
+    split_basename = basename.split('.')
+    BASEARR0 = split_basename[0]
+    POSTFIX = '.' + '.'.join(ARGREST[1:])
+    BASEPATH = join(DIRNAME, BASEARR0)
+    print('BASEPATH %s' % BASEPATH)
+    print('POSTFIX %s' % POSTFIX)
+    return BASEPATH, POSTFIX
+
+
+for infile in INFILES:
+    print('infile', infile)
+    INPUTBASEPATH, INPUTPOSTFIX = split_path(infile)
+
+    if OUTPATH != '':
+        OUTFILE = OUTPATH
+    else:
+        if COMPILE_ONLY:
+            OUTFILE = '%s.o' % INPUTBASEPATH
+        else:
+            OUTFILE = INPUTBASEPATH
+
+    OUTPUTBASEPATH, OUTPUTPOSTFIX = split_path(OUTFILE)
+    if not COMPILE_ONLY:
+        FINALPOSTFIX = OUTPUTPOSTFIX
+        OUTPUTPOSTFIX = '.o'
+
+
 
 
 if 'CLANG_HOME' not in os.environ:
