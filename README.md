@@ -66,7 +66,7 @@ and appropriate OpenCL drivers installed, for the GPU. Both linux and Mac system
 
 For installation, please see [installation](doc/installation.md)
 
-# Plugins
+## Plugins
 
 You can install the following plugins:
 
@@ -126,7 +126,7 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
       - you can continue to use `cocl` for now, if you wish, but it seems likely to not be maintained, even if it isnt physically deleted
       - this does mean that python 2.7 is now a runtime dependency, but I think python 2.7 is relatively ubiquitous?
     - the Coriander library and executables now build ok on Windows, which isnt to say they will run on Windows, but baby steps...
-  - experimental: plugins:
+  - created plugin architecture
     - see [coriander-dnn](https://github.com/hughperkins/coriander-dnn) for proof of concept for creating plugins :-)
     - ~~it uses the [pluggable](https://github.com/hughperkins/coriander/tree/pluggable) branch of Coriander~~ update: this branch is merged this to `master` now
     - the idea is that you can pick some cool functionality, that doesnt exist it, and create your own project, to implement that
