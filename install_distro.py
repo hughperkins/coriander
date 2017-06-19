@@ -24,7 +24,10 @@ import argparse
 import time
 
 
+REQUIRED_LLVM_VERSION = '4.0.0'
+
 current_dir = '.'
+llvm_dir = None
 
 
 def is_py2():
@@ -46,32 +49,96 @@ def cd_repo_root():
 
 
 def run(cmdlist):
+    print(' '.join(cmdlist))
     f_out = open('out.txt', 'w', buffering=1)
     f_in = open('out.txt', 'r', buffering=1)
     f_in.seek(0)
     p = subprocess.Popen(cmdlist, cwd=current_dir, stdout=f_out, stderr=subprocess.STDOUT, bufsize=1)
+    res = ''
     def print_progress():
         line = f_in.readline()
+        if not is_py2():
+            line = line.decode('utf-8')
+        res_lines = ''
         while line != '':
             print(line[:-1])
+            res_lines += line
             line = f_in.readline()
+            if not is_py2():
+                line = line.decode('utf-8')
+        return res_lines
         # print(lines)
     p.poll()
     while p.returncode is None:
-        print_progress()
+        res += print_progress()
         time.sleep(1)
         p.poll()
-    print_progress()
+    res += print_progress()
     print('p.returncode', p.returncode)
     assert p.returncode == 0
+    return res
 
 
 def makedir(target, sudo=False):
+    if(':' not in target and target[0] != '/'):
+        target = join(current_dir, target)
     if not path.isdir(target):
+        print('creating folder [%s]' % target)
         if sudo:
             run(['sudo', 'mkdir', '-p', target])
         else:
             os.makedirs(target)
+
+
+def is_llvm_dir(p):
+    if not path.isdir(p):
+        return False
+    clangxx_filepath = join(p, 'bin', 'clang++')
+    if not path.isfile(clangxx_filepath):
+        return False
+    llvm_version = run([clangxx_filepath, '--version']).split('\n')[0].split('version ')[1].split(' ')[0]
+    print('llvm_version', llvm_version)
+    if llvm_version != REQUIRED_LLVM_VERSION:
+        return False
+    return True
+
+
+def install_llvm():
+    # install to current directory?
+    cd_repo_root()
+    makedir('soft')
+    cd('soft')
+    target_url = {
+        'Darwin': 'http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-apple-darwin.tar.xz',
+        'Linux': 'http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz',
+        'Windows': 'http://releases.llvm.org/4.0.0/LLVM-4.0.0-win64.exe'
+    }[platform.uname()[0]]
+    filename = target_url.split('/')[-1]
+    run(['wget', target_url, '-O', filename])
+    if filename.endswith('.tar.xz'):
+        run(['tar', '-xf', filename])
+        unzip_name = filename.split('.')[0]
+        run(['mv', unzip_name, 'llvm-4.0'])
+        llvm_dir = join('soft', 'llvm-4.0')
+        if is_llvm_dir(llvm_dir):
+            print('installed llvm ok to [%s]' % join(soft, 'llvm-4.0'))
+        else:
+            print('Failed to install LLVM 4.0.  Please retry, or install by hand')
+            sys.exit(-1)
+    else:
+        print('Please install LLVM 4.0.0 by hand, into default location.  It is already downloaded into "soft" sub-directory. Just need to double-click it :-)')
+        sys.exit(-1)
+
+
+def maybe_install_llvm():
+    global llvm_dir
+    for p in ['/usr/local/opt/llvm-4.0', 'C:\\Program Files\\LLVM', 'llvm']:
+        if is_llvm_dir(p):
+            llvm_dir = p
+            print('found llvm, with required version %s at %s' % (REQUIRED_LLVM_VERSION, llvm_dir))
+            break
+    if llvm_dir is None:
+        install_llvm()
 
 
 def install_coriander():
@@ -104,6 +171,7 @@ def install_plugin(repo_url):
 
 
 def main():
+    maybe_install_llvm()
     install_coriander()
     setup_plugin_perms()
     for plugin in ['https://github.com/hughperkins/coriander-dnn']:
