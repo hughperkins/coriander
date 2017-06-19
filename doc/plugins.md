@@ -37,7 +37,7 @@ cmake .. -DDCORIANDER_DIR=[coriander directory, eg /usr/local] -DCMAKE_INSTALL_P
 make -j 8
 make install
 ```
-- therefore it will run these commands to build and install the repository, https://github.com/hughperkins/coriander/blob/c78b3061e9e8c03069076e06e16f3983addfcdbd/bin/cocl_plugins.py#L15-L35
+- therefore it will run these commands to build and install the repository, [cocl_plugins.py#L15-L35](https://github.com/hughperkins/coriander/blob/c78b3061e9e8c03069076e06e16f3983addfcdbd/bin/cocl_plugins.py#L15-L35)
 
 ### Plugin registration
 
@@ -49,17 +49,15 @@ The plugin can register itself with Coriander in the following ways:
 | Dynamic/static library, for linking using `cocl_py` | Install into `${CORIANDER_DIR}/lib/coriander_plugins/ |
 | ... | We can extend this over time |
 
-You can see the code to add headerfiles to the `cocl_py` compilation process at https://github.com/hughperkins/coriander/blob/c78b3061e9e8c03069076e06e16f3983addfcdbd/bin/cocl.py#L255-L260 , and the code to bring plugin libraries into the `cocl_py` compilation process
-is at https://github.com/hughperkins/coriander/blob/c78b3061e9e8c03069076e06e16f3983addfcdbd/bin/cocl.py#L264-L271
+You can see the code to add headerfiles to the `cocl_py` compilation process at [cocl.py#L255-L260](https://github.com/hughperkins/coriander/blob/c78b3061e9e8c03069076e06e16f3983addfcdbd/bin/cocl.py#L255-L260) , and the code to bring plugin libraries into the `cocl_py` compilation process
+is at [cocl.py#L264-L271](https://github.com/hughperkins/coriander/blob/c78b3061e9e8c03069076e06e16f3983addfcdbd/bin/cocl.py#L264-L271)
 
 ## Future evolution
 
-I envisage that we can extend this registration process over time, to handle other use-cases. For example it might be nice to factorize the
-following components of Coriander into plugins, as a proof of concept of certain types of registration:
+We can extend this registration process over time, to handle other use-cases. For example it might be nice to factorize the
+following components of Coriander into plugins:
 
-- can we move `__shfl` into a plugin?
-- can we move the kernel-side maths functions, such as `sin`, `log`, etc, into a plugin?
+- `__shfl`
+- kernel-side maths functions, such as `sin`, `log`, etc
 
-Of course, you are free to come up with your own registration mechanisms, that will work well with your own plugin.  The only condition is
-that plugin mechanisms should be generic and scalable.  It should be the plugin that registers itself, with some generic plugin mechanism.
-Coriander core should not need to know anything about any specific plugin.
+Of course, you are free to come up with your own registration mechanisms, that will work well with your own plugin.
