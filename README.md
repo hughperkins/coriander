@@ -128,7 +128,7 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
     - the Coriander library and executables now build ok on Windows, which isnt to say they will run on Windows, but baby steps...
   - experimental: plugins:
     - see [coriander-dnn](https://github.com/hughperkins/coriander-dnn) for proof of concept for creating plugins :-)
-    - it uses the [pluggable](https://github.com/hughperkins/coriander/tree/pluggable) branch of Coriander
+    - ~~it uses the [pluggable](https://github.com/hughperkins/coriander/tree/pluggable) branch of Coriander~~ update: this branch is merged this to `master` now
     - the idea is that you can pick some cool functionality, that doesnt exist it, and create your own project, to implement that
     - to install a plugin, simply do eg `cocl_plugins.py install --repo-url https://github.com/hughperkins/coriander-dnn`
     - from then on, `cocl_py` will automatically add its includes and libraries when building :-)
