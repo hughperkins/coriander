@@ -18,7 +18,7 @@ cocl_plugins.py install --repo-url https://github.com/hughperkins/coriander-dnn
 
 ### Plugin build and installation
 
-- `cocl_plugins.py` will clone the given repository
+- [cocl_plugins.py](https://github.com/hughperkins/coriander/blob/c78b3061e9e8c03069076e06e16f3983addfcdbd/bin/cocl_plugins.py) will clone the given repository
 - it will make the following assumptions:
   - the repository contains a `CMakeLists.txt`, at the root of the repository
   - the `CMakeLists.txt` can be built and installed using the following commands:
