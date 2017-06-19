@@ -104,6 +104,7 @@ def is_llvm_dir(p):
 
 
 def install_llvm():
+    global llvm_dir
     # install to current directory?
     cd_repo_root()
     makedir('soft')
@@ -143,6 +144,7 @@ def maybe_install_llvm():
 
 
 def install_coriander():
+    global llvm_dir
     makedir('build')
     cd('build')
     run(['cmake', '..', '-DCLANG_HOME=%s' % llvm_dir])
