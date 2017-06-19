@@ -4,7 +4,10 @@ To use Coriander, please build from source:
 
 ## Install pre-requisites
 
-- in each case, you will need python 2.7 available
+You will need:
+- python 2.7
+- llvm 4.0
+- c++ compiler, and cmake
 
 ### Mac OS X
 
@@ -15,9 +18,10 @@ wget http://llvm.org/releases/4.0.0/clang+llvm-4.0.0-x86_64-apple-darwin.tar.xz
 tar -xf clang+llvm-4.0.0-x86_64-apple-darwin.tar.xz
 mv clang+llvm-4.0.0-x86_64-apple-darwin /usr/local/opt
 ln -s /usr/local/opt/clang+llvm-4.0.0-x86_64-apple-darwin /usr/local/opt/llvm-4.0
+brew install python
 ```
 
-Whenever you use Coriander, please set `CLANG_HOME`, using `export CLANG_HOME=/usr/local/opt/llvm-4.0`
+When you build Coriander, please set `CLANG_HOME` to `/usr/local/opt/llvm-4.0`
 
 ### Ubuntu 16.04
 
@@ -32,10 +36,23 @@ sudo tar -xf ~/Downloads/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz
 sudo mv clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04 llvm-4.0
 ```
 
-Whenever you use Coriander, please set `CLANG_HOME` to `/usr/local/opt/llvm-4.0`
+When you build Coriander, please set `CLANG_HOME` to `/usr/local/opt/llvm-4.0`
 
 ## Build/installation
 
+### To install distro
+
+This is the easiest way, and brings down some core plugins, such as [Coriander-dnn](https://github.com/hughperkins/coriander-dnn)
+
+```
+git clone --recursive https://github.com/hughperkins/coriander
+cd coriander
+python install_distro.py
+```
+
+### To install core only
+
+If you want to install only core, you can do:
 ```
 mkdir -p ~/git
 cd ~/git
@@ -57,18 +74,20 @@ sudo make install
 make install
 ```
 
-You're good.  If you want you can run some tests:
-- `ccmake ..`
-- change `BUILD_TESTS` to `ON`, press `c`, press `g`
-- `make run-tests`
+## Smoke tests
+
+To run some smoke-tests:
+```
+cd build
+make -j 8 tests
+make run-tests
+```
 
 You can select the GPU using the environment variable `CL_GPUOFFSET`. For example, on a Macbook Pro 4th generation, to run on the Radeon:
 ```
 CL_GPUOFFSET=1 make run-tests
 ```
 (This is important, since the HD530 isnt quite working, on SGEMM currently. But the Radeon runs just fine :-) )
-
-Note that you'll need to continue to export `CLANG_HOME` environment variable when using `cocl`.
 
 ## Docker
 

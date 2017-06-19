@@ -86,3 +86,4 @@ cmbuild/
 mac/
 build*/
 /soft/
+out.txt
