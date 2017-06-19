@@ -122,7 +122,7 @@ def install_llvm():
         cd_repo_root()
         llvm_dir = path.abspath(join('soft', 'llvm-4.0'))
         if is_llvm_dir(llvm_dir):
-            print('installed llvm ok to [%s]' % join(soft, 'llvm-4.0'))
+            print('installed llvm ok to [%s]' % join('soft', 'llvm-4.0'))
         else:
             print('Failed to install LLVM 4.0.  Please retry, or install by hand')
             sys.exit(-1)
