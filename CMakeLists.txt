@@ -172,7 +172,6 @@ target_include_directories(cocl PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include BEFO
 target_include_directories(cocl PRIVATE src) # needed for easycl/easycl
 target_include_directories(cocl PRIVATE third_party BEFORE)
 target_include_directories(cocl PRIVATE third_party/yaml-cpp/include BEFORE)
-message("CLANG_HOME ${CLANG_HOME}")
 target_include_directories(cocl PRIVATE ${CLANG_HOME}/include BEFORE)
 target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include BEFORE)
 if(COCL_SPAM)
