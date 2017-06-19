@@ -179,6 +179,7 @@ if COCL_INCLUDE == '':
 
 CLANG = 'clang++'
 
+INFILES = [f for f in INFILES if f != '']
 if len(INFILES) == 0:
     print_help()
     print('')
