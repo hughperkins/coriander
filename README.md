@@ -66,6 +66,15 @@ and appropriate OpenCL drivers installed, for the GPU. Both linux and Mac system
 
 For installation, please see [installation](doc/installation.md)
 
+# Plugins
+
+You can install the following plugins:
+
+- [Coriander-dnn](https://github.com/hughperkins/coriander-dnn): just do `cocl_plugins.py install --repo-url https://github.com/hughperkins/coriander-dnn`
+- Your plugin here?
+
+[How to create a plugin](doc/plugins.md)
+
 ## Add to your own `cmake` project
 
 - use `cocl_add_executable` and `cocl_add_library`
