@@ -8,7 +8,15 @@ You can choose to make your plugin depend only on core Coriander, or use one or 
 
 As an example plugin you can look at: [Coriander-dnn](https://github.com/hughperkins/coriander-dnn).
 
-To install this, simply run:
+To install this, first create the following directories, and ensure they are writable:
+```
+sudo mkdir /usr/local/include/coriander_plugins
+sudo mkdir /usr/local/lib/coriander_plugins
+sudo chmod uog+w /usr/local/include/coriander_plugins
+sudo chmod uog+w /usr/local/lib/coriander_plugins
+```
+
+Then, simply run:
 
 ```
 cocl_plugins.py install --repo-url https://github.com/hughperkins/coriander-dnn
