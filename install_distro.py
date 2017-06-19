@@ -144,7 +144,7 @@ def maybe_install_llvm():
 def install_coriander():
     makedir('build')
     cd('build')
-    run(['cmake', '..'])
+    run(['cmake', '..', '-DCLANG_HOME=%s' % llvm_dir])
     if platform.uname()[0] in ['Darwin', 'Linux']:
         run(['make', '-j', '8'])
     else:
