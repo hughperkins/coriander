@@ -31,11 +31,6 @@ def is_py2():
     return int(platform.python_version_tuple()[0]) == 2
 
 
-def makedir(target):
-    if not path.isdir(target):
-        os.makedirs(target)
-
-
 def cd(subdir):
     global current_dir
     if subdir.startswith('/'):
@@ -43,6 +38,7 @@ def cd(subdir):
     else:
         current_dir = join(current_dir, subdir)
     print('cd to [%s]' % current_dir)
+
 
 def cd_repo_root():
     global current_dir
@@ -70,6 +66,14 @@ def run(cmdlist):
     assert p.returncode == 0
 
 
+def makedir(target, sudo=False):
+    if not path.isdir(target):
+        if sudo:
+            run(['sudo', 'mkdir', '-p', target])
+        else:
+            os.makedirs(target)
+
+
 def install_coriander():
     makedir('build')
     cd('build')
@@ -88,8 +92,8 @@ def install_coriander():
 
 def setup_plugin_perms():
     if platform.uname()[0] in ['Linux']:
-        makedir('/usr/local/include/coriander_plugins')
-        makedir('/usr/local/lib/coriander_plugins')
+        makedir('/usr/local/include/coriander_plugins', sudo=True)
+        makedir('/usr/local/lib/coriander_plugins', sudo=True)
         run(['sudo', 'chmod', 'uog+w', '/usr/local/include/coriander_plugins'])
         run(['sudo', 'chmod', 'uog+w', '/usr/local/lib/coriander_plugins'])
 
