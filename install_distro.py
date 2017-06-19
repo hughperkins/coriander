@@ -117,7 +117,7 @@ def install_llvm():
     run(['wget', target_url, '-O', filename])
     if filename.endswith('.tar.xz'):
         run(['tar', '-xf', filename])
-        unzip_name = filename.split('.')[0]
+        unzip_name = filename.replace('.tar.xz', '')
         run(['mv', unzip_name, 'llvm-4.0'])
         llvm_dir = join('soft', 'llvm-4.0')
         if is_llvm_dir(llvm_dir):
