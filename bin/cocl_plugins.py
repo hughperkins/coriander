@@ -8,10 +8,18 @@ from os import path
 from os.path import join
 
 
-SCRIPT_DIR = path.dirname(path.realpath(__file__))
+from cocl_env import CLANG_HOME, COCL_LIB, COCL_INCLUDE, COCL_INSTALL_PREFIX
+
+# SCRIPT_DIR = path.dirname(path.realpath(__file__))
 # CORIANDER_DIR = path.dirname(SCRIPT_DIR)
-CORIANDER_DIR = '/usr/local'
-print('CORIANDER_DIR', CORIANDER_DIR)
+# CORIANDER_DIR = '/usr/local'
+# print('CORIANDER_DIR', CORIANDER_DIR)
+
+
+print('CLANG_HOME', CLANG_HOME)
+print('COCL_INSTALL_PREFIX', COCL_INSTALL_PREFIX)
+print('COCL_INCLUDE', COCL_INCLUDE)
+print('COCL_LIB', COCL_LIB)
 
 
 def check_output(cmdlist, cwd=None):
@@ -47,11 +55,11 @@ def run_install_checks():
     We need non-sudo write access into `{CORIANDER_DIR}/include/coriander_plugins`, and 
     `{CORIANDER_DIR}/lib/coriander_plugins`
     """
-    INCLUDES_DIR = join(CORIANDER_DIR, 'include', 'coriander_plugins')
+    INCLUDES_DIR = join(COCL_INCLUDE, 'coriander_plugins')
     check_folder_exists(INCLUDES_DIR)
     check_folder_writable(INCLUDES_DIR)
 
-    LIB_DIR = join(CORIANDER_DIR, 'lib', 'coriander_plugins')
+    LIB_DIR = join(COCL_LIB, 'coriander_plugins')
     check_folder_exists(LIB_DIR)
     check_folder_writable(LIB_DIR)
 
@@ -71,7 +79,8 @@ def install(repo_url):
     build_dir = join(repo_dir, 'build')
     os.makedirs(build_dir)
     print(check_output([
-        'cmake', '..', '-DCORIANDER_DIR=%s' % CORIANDER_DIR, '-DCMAKE_INSTALL_PREFIX=%s' % CORIANDER_DIR
+        'cmake', '..', '-DCORIANDER_DIR=%s' % COCL_INSTALL_PREFIX, '-DCMAKE_INSTALL_PREFIX=%s' % COCL_INSTALL_PREFIX,
+        '-DCLANG_HOME=%s' % CLANG_HOME
     ], cwd=build_dir))
     print(check_output([
         'make', '-j', '8'
