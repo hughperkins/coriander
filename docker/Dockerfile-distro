@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake cmake-curses-gui git gcc g++ libc6-dev zlib1g-dev \
     libtinfo-dev \
     curl ca-certificates build-essential wget xz-utils \
-    bash-completion python
+    bash-completion python sudo
 
 RUN git clone --recursive https://github.com/hughperkins/coriander -b ${GIT_BRANCH}
 
