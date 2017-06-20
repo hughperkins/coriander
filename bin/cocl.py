@@ -83,11 +83,11 @@ PASS_THRU = []
 COMPILE_ONLY = False
 OPT_G = []
 OUTPATH = ''
-COCL_HOME = ''
-COCL_LIB = ''
-COCL_INCLUDE = ''
-CLANG_HOME = ''
-COCL_BIN = ''
+COCL_HOME = os.environ.get('COCL_HOME', '')
+COCL_LIB = os.environ.get('COCL_LIB', '')
+COCL_INCLUDE = os.environ.get('COCL_INCLUDE', '')
+CLANG_HOME = os.environ.get('CLANG_HOME', '')
+COCL_BIN = os.environ.get('COCL_BIN', '')
 INCLUDES = []
 INFILES = []
 
