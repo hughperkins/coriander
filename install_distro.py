@@ -170,7 +170,7 @@ def setup_plugin_perms():
 
 def install_plugin(repo_url):
     cd_repo_root()
-    run([sys.executable, join('bin', 'cocl_plugins.py'), 'install', '--repo-url', repo_url])
+    run([sys.executable, join('/usr/local/bin', 'cocl_plugins.py'), 'install', '--repo-url', repo_url])
 
 
 def main():
