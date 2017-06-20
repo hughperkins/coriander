@@ -1,0 +1,2 @@
+export PATH="@THIS_COCL_BIN@:$PATH"
+export COCL_CMAKE="@THIS_COCL_CMAKE@"

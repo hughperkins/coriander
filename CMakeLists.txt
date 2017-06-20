@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 2.8)
 project(Coriander)
 
+IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  SET(CMAKE_INSTALL_PREFIX
+    "$ENV{HOME}/coriander" CACHE PATH "Installation prefix, default '${HOME}/coriander'" FORCE
+   )
+ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+
 option(BUILD_TESTS "Build tests" OFF)
 option(COCL_SPAM "Lots of scrolly debug text.  Mostly for maintainer usage" OFF)
 if(APPLE)
@@ -265,8 +271,13 @@ target_link_libraries(cocl clblast)
 
 if(APPLE)
   set(SO_SUFFIX dylib)
+  set(LIB_SUFFIX dylib)
+elseif(WIN32)
+  set(SO_SUFFIX dll)
+  set(LIB_SUFFIX lib)
 else()
   set(SO_SUFFIX so)
+  set(LIB_SUFFIX so)
 endif()
 
 set(THIS_COCL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl.py)
@@ -275,6 +286,7 @@ set(COCL_ARTIFACTS patch_hostside cocl)
 set(THIS_COCL_BIN ${CMAKE_CURRENT_BINARY_DIR})
 set(THIS_COCL_LIB ${CMAKE_CURRENT_BINARY_DIR})
 set(THIS_COCL_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(THIS_COCL_CMAKE ${CMAKE_CURRENT_BINARY_DIR}/cmake)
 set(THIS_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set(THIS_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 CONFIGURE_FILE(
@@ -292,6 +304,12 @@ CONFIGURE_FILE(
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl_env.py.in"
   "${CMAKE_CURRENT_BINARY_DIR}/bin/cocl_env-builddir.py" @ONLY)
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/bin/activate.cmd.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/bin/activate-builddir.cmd" @ONLY)
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/bin/activate.sh.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/bin/activate-builddir.sh" @ONLY)
 
 include("${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl-internal.cmake")
 
@@ -311,6 +329,7 @@ set(THIS_COCL_PATH ${CMAKE_INSTALL_PREFIX}/bin/cocl.py)
 set(THIS_LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib)
 set(THIS_COCL_LIB ${CMAKE_INSTALL_PREFIX}/lib)
 set(THIS_COCL_BIN ${CMAKE_INSTALL_PREFIX}/bin)
+set(THIS_COCL_CMAKE ${CMAKE_INSTALL_PREFIX}/share/cocl)
 set(THIS_COCL_INCLUDE ${CMAKE_INSTALL_PREFIX}/include)
 set(THIS_COCL_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 set(COCL_ARTIFACTS )
@@ -329,6 +348,12 @@ CONFIGURE_FILE(
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl_env.py.in"
   "${CMAKE_CURRENT_BINARY_DIR}/bin/cocl_env.py" @ONLY)
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/bin/activate.cmd.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/bin/activate.cmd" @ONLY)
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/bin/activate.sh.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/bin/activate.sh" @ONLY)
 INSTALL(FILES ${COCL_HEADERS} DESTINATION include/cocl)
 
 # cocl
@@ -338,8 +363,10 @@ INSTALL(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl.py DESTINATION bin)
 INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/cocl_env.py DESTINATION bin)
 if(WIN32)
 INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/cocl.cmd DESTINATION bin RENAME cocl_py.cmd)
+INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/activate.cmd DESTINATION . RENAME activate.cmd)
 else()
 INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/cocl.sh DESTINATION bin RENAME cocl_py)
+INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/activate.sh DESTINATION . RENAME activate)
 endif()
 INSTALL(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl_plugins.py DESTINATION bin)
 

@@ -254,7 +254,8 @@ def split_path(filepath):
 
 
 # handle plugin include directories
-plugins_include_dir = '/usr/local/include/coriander_plugins'   # obviously this should be generalized somewhat
+# plugins_include_dir = '/usr/local/include/coriander_plugins'   # obviously this should be generalized somewhat
+plugins_include_dir = join(COCL_INCLUDE, 'coriander_plugins')
 if path.isdir(plugins_include_dir):
     for plugin in os.listdir(plugins_include_dir):
         print('adding %s to includes' % plugin)
@@ -263,7 +264,8 @@ print('INCLUDES', INCLUDES)
 
 # handle plugin libraries
 LIBS = []
-plugins_lib_dir = '/usr/local/lib/coriander_plugins'  # should generalize this too...
+# plugins_lib_dir = '/usr/local/lib/coriander_plugins'  # should generalize this too...
+plugins_lib_dir = join(COCL_LIB, 'coriander_plugins')
 if path.isdir(plugins_lib_dir):
     LIBS += ['-L%s' % plugins_lib_dir]
     for lib in os.listdir(plugins_lib_dir):

@@ -46,8 +46,7 @@ def check_folder_writable(target):
 
 def check_folder_exists(target):
     if not path.isdir(target):
-        print('Please create the directory %s, and ensure you can write to it' % target)
-        sys.exit(1)
+        os.makedirs(target)
 
 
 def run_install_checks():
