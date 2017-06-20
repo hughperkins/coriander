@@ -2,9 +2,15 @@ cmake_minimum_required(VERSION 2.8)
 project(Coriander)
 
 IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  SET(CMAKE_INSTALL_PREFIX
-    "$ENV{HOME}/coriander" CACHE PATH "Installation prefix, default '${HOME}/coriander'" FORCE
-   )
+    if(WIN32)
+        SET(CMAKE_INSTALL_PREFIX
+            "$ENV{HOME}/coriander" CACHE PATH "Installation prefix, default '${HOME}/coriander'" FORCE
+        )
+    else()
+        SET(CMAKE_INSTALL_PREFIX
+            "$ENV{HOME}/coriander" CACHE PATH "Installation prefix, default '${HOME}/coriander'" FORCE
+        )
+    endif()
 ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 option(BUILD_TESTS "Build tests" OFF)
@@ -72,6 +78,10 @@ endif()
 if(COCL_SPAM_PROPERTIES)
   add_definitions(-DCOCL_SPAM_PROPERTIES)
 endif()
+
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+SET(CMAKE_MACOSX_RPATH TRUE)
 
 FILE(GLOB YAMLCPP_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/yaml-cpp/src/*.cpp)
 
