@@ -321,9 +321,10 @@ for infile in INFILES:
             '-Wno-gnu-anonymous-struct',
             '-Wno-nested-anon-types'
         ] + LLVM_COMPILE_FLAGS_LIST + [
-            '-I%s' % join(COCL_INCLUDE, 'EasyCL'),
+            # '-I%s' % join(COCL_INCLUDE, 'EasyCL'),
+            # '-I%s' % join(COCL_INCLUDE, 'EasyCL', 'third_party', 'clew', 'include'),
             # '-I%s' % join(COCL_INCLUDE),
-            '-I%s' % join(COCL_INCLUDE, 'cocl'),
+            '-I%s' % join(COCL_INCLUDE, 'cocl'),  # for cuda.h
             # '-I%s' % join(COCL_INCLUDE, 'cocl', 'proxy_includes'),
             '-include', join(COCL_INCLUDE, 'cocl', 'cocl.h'),
             '-include', join(COCL_INCLUDE, 'cocl', 'fake_funcs.h'),
@@ -362,8 +363,9 @@ for infile in INFILES:
             '-Wno-nested-anon-types'
         ] + LLVM_COMPILE_FLAGS_LIST + [
             '-I%s' % COCL_INCLUDE,
-            '-I%s' % join(COCL_INCLUDE, 'EasyCL'),
-            '-I%s' % join(COCL_INCLUDE, 'cocl')
+            # '-I%s' % join(COCL_INCLUDE, 'EasyCL'),
+            # '-I%s' % join(COCL_INCLUDE, 'EasyCL', 'third_party', 'clew', 'include'),
+            '-I%s' % join(COCL_INCLUDE, 'cocl')  # for cuda.h
         ] + ADDFLAGS + [
             '-include', join(COCL_INCLUDE, 'cocl', 'cocl.h'),
             '-include', join(COCL_INCLUDE, 'cocl', 'fake_funcs.h'),
