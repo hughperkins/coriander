@@ -34,5 +34,5 @@ add_custom_target(endtoend-tests
 add_custom_target(run-endtoend-tests
     DEPENDS endtoend-tests ${E2E_TEST_RUN_TARGETS})
 
-set(BUILD_TEST_TARGETS ${BUILD_TEST_TARGETS} endtoend-tests)
-set(RUN_TEST_TARGETS ${RUN_TEST_TARGETS} run-endtoend-tests)
+set(BUILD_TEST_TARGETS ${BUILD_TEST_TARGETS} endtoend-tests PARENT_SCOPE)
+set(RUN_TEST_TARGETS ${RUN_TEST_TARGETS} run-endtoend-tests PARENT_SCOPE)

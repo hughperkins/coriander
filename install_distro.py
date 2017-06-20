@@ -57,15 +57,15 @@ def run(cmdlist):
     res = ''
     def print_progress():
         line = f_in.readline()
-        if not is_py2():
-            line = line.decode('utf-8')
+        # if not is_py2():
+        #     line = line.decode('utf-8')
         res_lines = ''
         while line != '':
             print(line[:-1])
             res_lines += line
             line = f_in.readline()
-            if not is_py2():
-                line = line.decode('utf-8')
+            # if not is_py2():
+            #     line = line.decode('utf-8')
         return res_lines
         # print(lines)
     p.poll()
@@ -103,10 +103,10 @@ def is_llvm_dir(p):
     return True
 
 
-def install_llvm():
+def install_llvm(install_dir):
     global llvm_dir
     # install to current directory?
-    cd_repo_root()
+    cd(install_dir)
     makedir('soft')
     cd('soft')
     target_url = {
@@ -121,7 +121,7 @@ def install_llvm():
         unzip_name = filename.replace('.tar.xz', '')
         run(['mv', unzip_name, 'llvm-4.0'])
         cd_repo_root()
-        llvm_dir = path.abspath(join('soft', 'llvm-4.0'))
+        llvm_dir = path.abspath(join(install_dir, 'soft', 'llvm-4.0'))
         if is_llvm_dir(llvm_dir):
             print('installed llvm ok to [%s]' % join('soft', 'llvm-4.0'))
         else:
@@ -132,22 +132,22 @@ def install_llvm():
         sys.exit(-1)
 
 
-def maybe_install_llvm():
+def maybe_install_llvm(install_dir):
     global llvm_dir
-    for p in ['/usr/local/opt/llvm-4.0', 'C:\\Program Files\\LLVM', 'llvm']:
+    for p in ['/usr/local/opt/llvm-4.0', 'C:\\Program Files\\LLVM', join(install_dir, 'soft', 'llvm')]:
         if is_llvm_dir(p):
             llvm_dir = p
             print('found llvm, with required version %s at %s' % (REQUIRED_LLVM_VERSION, llvm_dir))
             break
     if llvm_dir is None:
-        install_llvm()
+        install_llvm(install_dir)
 
 
-def install_coriander():
+def install_coriander(install_dir):
     global llvm_dir
     makedir('build')
     cd('build')
-    run(['cmake', '..', '-DCLANG_HOME=%s' % llvm_dir])
+    run(['cmake', '..', '-DCLANG_HOME=%s' % llvm_dir, '-DCMAKE_INSTALL_PREFIX=%s' % install_dir])
     if platform.uname()[0] in ['Darwin', 'Linux']:
         run(['make', '-j', '8'])
     else:
@@ -160,26 +160,36 @@ def install_coriander():
         run(['cmake', '--build', '.', '--target', 'install'])
 
 
-def setup_plugin_perms():
-    if platform.uname()[0] in ['Linux']:
-        makedir('/usr/local/include/coriander_plugins', sudo=True)
-        makedir('/usr/local/lib/coriander_plugins', sudo=True)
-        run(['sudo', 'chmod', 'uog+w', '/usr/local/include/coriander_plugins'])
-        run(['sudo', 'chmod', 'uog+w', '/usr/local/lib/coriander_plugins'])
+# def setup_plugin_perms():
+#     if platform.uname()[0] in ['Linux']:
+#         makedir('/usr/local/include/coriander_plugins', sudo=True)
+#         makedir('/usr/local/lib/coriander_plugins', sudo=True)
+#         run(['sudo', 'chmod', 'uog+w', '/usr/local/include/coriander_plugins'])
+#         run(['sudo', 'chmod', 'uog+w', '/usr/local/lib/coriander_plugins'])
 
 
-def install_plugin(repo_url):
+def install_plugin(install_dir, repo_url, git_branch):
     cd_repo_root()
-    run([sys.executable, join('/usr/local/bin', 'cocl_plugins.py'), 'install', '--repo-url', repo_url])
+    run([
+        sys.executable,
+        join(install_dir, 'bin', 'cocl_plugins.py'), 'install',
+        '--repo-url', repo_url,
+        '--git-branch', git_branch
+    ])
 
 
-def main():
-    maybe_install_llvm()
-    install_coriander()
-    setup_plugin_perms()
-    for plugin in ['https://github.com/hughperkins/coriander-dnn']:
-        install_plugin(plugin)
+def main(git_branch, install_dir):
+    maybe_install_llvm(install_dir=install_dir)
+    install_coriander(install_dir=install_dir)
+    # setup_plugin_perms()
+    for repo_url in ['https://github.com/hughperkins/coriander-dnn']:
+        install_plugin(install_dir=install_dir, repo_url=repo_url, git_branch=git_branch)
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--git-branch', type=str, default='master', help='mostly for maintainers')
+    parser.add_argument('--install-dir', type=str, default='~/coriander', help='where to install to')
+    args = parser.parse_args()
+    args.install_dir = args.install_dir.replace('~', os.environ['HOME'])
+    main(**args.__dict__)

@@ -36,5 +36,5 @@ add_custom_target(run-gtest-tests
     DEPENDS patch_hostside
 )
 
-set(BUILD_TEST_TARGETS ${BUILD_TEST_TARGETS} gtest-tests)
-set(RUN_TEST_TARGETS ${RUN_TEST_TARGETS} run-gtest-tests)
+set(BUILD_TEST_TARGETS ${BUILD_TEST_TARGETS} gtest-tests PARENT_SCOPE)
+set(RUN_TEST_TARGETS ${RUN_TEST_TARGETS} run-gtest-tests PARENT_SCOPE)
