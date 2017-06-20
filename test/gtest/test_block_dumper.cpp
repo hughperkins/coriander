@@ -35,7 +35,7 @@ using namespace llvm;
 
 namespace {
 
-string ll_path = "../test/gtest/test_block_dumper.ll";  // this is a bit hacky, but fine-ish for now
+string ll_path = CMAKE_CURRENT_SOURCE_DIR "/test_block_dumper.ll";  // this is a bit hacky, but fine-ish for now
 
 class GlobalWrapper {
 public:

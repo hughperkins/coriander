@@ -41,7 +41,7 @@ namespace test_struct_cloner {
 LLVMContext context;
 unique_ptr<Module>M;
 
-string ll_path = "../test/gtest/test_struct_cloner.ll";  // this is a bit hacky, but fine-ish for now
+string ll_path = CMAKE_CURRENT_SOURCE_DIR "/test_struct_cloner.ll";  // this is a bit hacky, but fine-ish for now
 
 Module *getM() {
     if(M == nullptr) {

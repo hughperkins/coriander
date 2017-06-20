@@ -10,4 +10,13 @@ set(PYTHON27_PATH @PYTHON27_PATH@)
 set(COCL_LIBRARIES @COCL_LIB@/libcocl.@LIB_SUFFIX@ @COCL_LIB@/libclblast.@LIB_SUFFIX@ @COCL_LIB@/libeasycl.@LIB_SUFFIX@ @COCL_LIB@/libclew.@LIB_SUFFIX@)
 set(Coriander_LIBRARIES @COCL_LIB@/libcocl.@LIB_SUFFIX@ @COCL_LIB@/libclblast.@LIB_SUFFIX@ @COCL_LIB@/libeasycl.@LIB_SUFFIX@ @COCL_LIB@/libclew.@LIB_SUFFIX@)
 
+if(EXISTS @THIS_COCL_LIB@/cocl/cocl-targets.cmake)   # for internal test builds, this wont exist, its in build directory, and nothing there
+    include(@THIS_COCL_LIB@/cocl/cocl-targets.cmake)
+endif()
+FILE(GLOB PLUGIN_CMAKES @THIS_COCL_LIB@/coriander_plugins/*-targets.cmake)
+foreach(PLUGIN_CMAKE ${PLUGIN_CMAKES})
+    message("plugin ${PLUGIN_CMAKE}")
+    include(${PLUGIN_CMAKE})
+endforeach()
+
 include(${COCL_CMAKE_DIR}/cocl_impl.cmake)

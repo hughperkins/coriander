@@ -24,9 +24,10 @@ print('COCL_LIB', COCL_LIB)
 
 def check_output(cmdlist, cwd=None):
     res = subprocess.check_output(cmdlist, cwd=cwd)
-    if int(platform.python_version_tuple()[0]) == 2:
-        return res
-    return res.decode('utf-8')
+    if int(platform.python_version_tuple()[0]) != 2:
+        res = res.decode('utf-8')
+    print(res)
+    return res
 
 
 def check_folder_writable(target):
@@ -63,7 +64,7 @@ def run_install_checks():
     check_folder_writable(LIB_DIR)
 
 
-def install(repo_url):
+def install(repo_url, git_branch):
     run_install_checks()
 
     tmpdir = '/tmp/coriander_clone'
@@ -71,7 +72,7 @@ def install(repo_url):
         print(check_output(['rm', '-Rf', tmpdir]))
     os.makedirs(tmpdir)
     print(check_output([
-        'git', 'clone', '--recursive', repo_url
+        'git', 'clone', '--recursive', repo_url, '-b', git_branch
     ], cwd='/tmp/coriander_clone'))
     repo_dir = join(tmpdir, os.listdir(tmpdir)[0])
     print('repo_dir', repo_dir)
@@ -95,6 +96,7 @@ if __name__ == '__main__':
 
     parser_ = subparsers.add_parser('install')
     parser_.add_argument('--repo-url', type=str, required=True, help='eg: https://github.com/hughperkins/coriander-dnn')
+    parser_.add_argument('--git-branch', type=str, default='master', help='for developers/maintainers')
     parser_.set_defaults(func=install)
 
     args = parser.parse_args()

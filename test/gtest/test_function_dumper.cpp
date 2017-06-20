@@ -38,7 +38,7 @@ namespace {
 LLVMContext context;
 unique_ptr<Module>M;
 
-string ll_path = "../test/gtest/test_function_dumper.ll";  // this is a bit hacky, but fine-ish for now
+string ll_path = CMAKE_CURRENT_SOURCE_DIR "/test_function_dumper.ll";
 
 class GlobalWrapper {
 public:

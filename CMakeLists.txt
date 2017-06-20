@@ -323,6 +323,12 @@ CONFIGURE_FILE(
 
 include("${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl-internal.cmake")
 
+# these variables are for the test subdirecftoreis to use:
+set(THIRD_PARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+set(COCL_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/EasyCL/thirdparty/clew/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/cocl/proxy_includes)
 include(test/CMakeLists.txt)
 
 FILE(GLOB_RECURSE COCL_HEADERS

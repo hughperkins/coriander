@@ -36,7 +36,7 @@ using namespace llvm;
 
 namespace {
 
-string ll_path = "../test/gtest/test_kernel_dumper.ll";  // this is a bit hacky, but fine-ish for now
+string ll_path = CMAKE_CURRENT_SOURCE_DIR "/test_kernel_dumper.ll";  // this is a bit hacky, but fine-ish for now
 
 std::string runKernelDumper(KernelDumper *kernelDumper, int numClmemArgs) {
     // assumes all args unique
