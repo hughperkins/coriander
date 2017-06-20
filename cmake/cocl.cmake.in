@@ -15,7 +15,6 @@ if(EXISTS @THIS_COCL_LIB@/cocl/cocl-targets.cmake)   # for internal test builds,
 endif()
 FILE(GLOB PLUGIN_CMAKES @THIS_COCL_LIB@/coriander_plugins/*-targets.cmake)
 foreach(PLUGIN_CMAKE ${PLUGIN_CMAKES})
-    message("plugin ${PLUGIN_CMAKE}")
     include(${PLUGIN_CMAKE})
 endforeach()
 
