@@ -17,6 +17,7 @@ foreach(TEST ${TESTS})
     cocl_add_executable(${TEST} ${TESTS_EXCLUDE} ${TEST}.cu)
     target_link_libraries(${TEST} cocl clew clblast easycl)
     target_include_directories(${TEST} PRIVATE ${COCL_INCLUDES})
+    # target_include_directories(${TEST} PRIVATE ${EIGEN_HOME})
     add_custom_target(run-${TEST}
         COMMAND echo
         COMMAND echo make run-${TEST}

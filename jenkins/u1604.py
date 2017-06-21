@@ -66,8 +66,9 @@ def main(git_branch):
 
     run(['hg', 'clone', 'https://bitbucket.org/hughperkins/eigen', '-b', 'tf-coriander'])
     # mkdir build
+    EIGEN_HOME = join(os.getcwd(), 'eigen')
     cd('build')
-    run(['cmake', '-DEIGEN_TESTS=ON', '-DEIGEN_HOME=${BASEDIR}/eigen', '..'])
+    run(['cmake', '-DEIGEN_TESTS=ON', '-DEIGEN_HOME=%s' % EIGEN_HOME, '..'])
     run(['make', '-j', '16'])
     so_suffix = '.so'
     if platform.uname()[0] == 'Darwin':

@@ -24,9 +24,9 @@ if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/split_test_helper.h)
   endforeach()
 endif()
 
-include_directories(${EIGEN_HOME})
-include_directories(${EIGEN_HOME}/test)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+# include_directories(${EIGEN_HOME})
+# include_directories(${EIGEN_HOME}/test)
+# include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_definitions(-DEIGEN_TEST_NO_FP16)
 if(INDEXES_32BIT)
@@ -38,7 +38,10 @@ endif()
 foreach(EIGEN_TEST ${EIGEN_TESTS})
     cocl_add_executable(${EIGEN_TEST} ${TESTS_EXCLUDE} ${EIGEN_TEST}.cu)
     target_link_libraries(${EIGEN_TEST} cocl clblast clew easycl)
+    target_include_directories(${EIGEN_TEST} PRIVATE ${COCL_INCLUDES})
+    target_include_directories(${EIGEN_TEST} PRIVATE ${EIGEN_HOME})
     target_include_directories(${EIGEN_TEST} PRIVATE ${EIGEN_HOME}/test)
+    target_include_directories(${EIGEN_TEST} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})  # for split_test_helper.h
     add_custom_target(run-${EIGEN_TEST}
         COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${EIGEN_TEST}
         DEPENDS ${EIGEN_TEST} ${CMAKE_CURRENT_SOURCE_DIR}/${EIGEN_TEST}.cu
