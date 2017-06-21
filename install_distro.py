@@ -7,11 +7,6 @@
 # - have a c++ compiler available
 # - cmake installed,  and in the PATH
 # - have internet access
-#
-# platform specific assumptions/requireents:
-# 
-# linux:
-# - need to be able to run `sudo`
 
 from __future__ import print_function
 import subprocess
@@ -152,12 +147,12 @@ def install_coriander(install_dir):
         run(['make', '-j', '8'])
     else:
         run(['cmake', '--build', '.'])
-    if platform.uname()[0] in ['Linux']:
-        # need sudo :-(
-        print('Please enter your sudo password:')
-        run(['sudo', 'cmake', '--build', '.', '--target', 'install'])
-    else:
-        run(['cmake', '--build', '.', '--target', 'install'])
+    # if platform.uname()[0] in ['Linux']:
+    #     # need sudo :-(
+    #     print('Please enter your sudo password:')
+    #     run(['sudo', 'cmake', '--build', '.', '--target', 'install'])
+    # else:
+    run(['cmake', '--build', '.', '--target', 'install'])
 
 
 # def setup_plugin_perms():
