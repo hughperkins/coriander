@@ -119,6 +119,16 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
 
 ## News
 
+- June 21:
+  - created a new release [v6.0.0](https://github.com/hughperkins/coriander/releases/tag/v6.0.0), that marks a bunch of changes:
+    - incorporates of course the earlier changes:
+      - took some big steps towards portability and Windows compilation, ie using python 2.7 scripts, rather than bash scripts, and fixing many Windows-related compilation issues
+      - the plugin architecture
+      - factorizing the partial NVIDIA® CUDA™ cuDNN API implementation into a new plugin [coriander-dnn](https://github.com/hughperkins/coriander-dnn)
+    - moved the default installation directory from `/usr/local` to `~/coriander`
+      - this means that plugins can be installed without `sudo`
+      - it also makes it relatively easy to wipe and reinstall, for more effective jenkins testing
+    - `install_distro.py` is now considerably more tested than a few days ago, and handles downloading `llvm-4.0` automatically
 - June 18:
   - some changes under-the-hood:
     - migrated from pthreads to C++11 threads: C++11 threads are easier to use, more standard, hopefully portable-ish
