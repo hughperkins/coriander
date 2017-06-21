@@ -68,7 +68,7 @@ def maybe_rmtree(tree_dir):
 
 
 def clean_coriander():
-    coriander_dir = join(os['HOME'], 'coriander')
+    coriander_dir = join(os.environ['HOME'], 'coriander')
     maybe_rmtree(coriander_dir)
 
 
