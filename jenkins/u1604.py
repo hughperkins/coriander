@@ -59,8 +59,19 @@ def run(cmdlist):
     return res
 
 
+def clean_coriander():
+    coriander_dir = join(os['HOME'], corianderr)
+    if path.isdir(coriander_dir):
+        if platform.uname()[0] == 'Windows':
+            run(['rmdir', '/s', '/q', coriander_dir])
+        else:
+            run(['rm', '-Rf', coriander_dir])
+
+
 def main(git_branch):
     # BASEDIR = os.getcwd()
+
+    clean_coriander()
 
     run(['python2', 'install_distro.py', '--git-branch', git_branch])
 
