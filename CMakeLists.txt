@@ -246,6 +246,9 @@ CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cocl.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl-internal.cmake" @ONLY)
 CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cocl_vars.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl_vars-internal.cmake" @ONLY)
+CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl-wrap.in"
   "${CMAKE_CURRENT_BINARY_DIR}/bin/cocl-internal" @ONLY)
 CONFIGURE_FILE(
@@ -264,6 +267,7 @@ CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/bin/activate.sh.in"
   "${CMAKE_CURRENT_BINARY_DIR}/bin/activate-builddir.sh" @ONLY)
 
+# this will be used to run our tests
 include("${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl-internal.cmake")
 
 # these variables are for the test subdirecftoreis to use:
@@ -296,6 +300,9 @@ CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cocl.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl.cmake" @ONLY)
 CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cocl_vars.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake/cocl_vars.cmake" @ONLY)
+CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl-wrap.in"
   "${CMAKE_CURRENT_BINARY_DIR}/bin/cocl" @ONLY)
 CONFIGURE_FILE(
@@ -313,19 +320,19 @@ CONFIGURE_FILE(
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/bin/activate.sh.in"
   "${CMAKE_CURRENT_BINARY_DIR}/bin/activate.sh" @ONLY)
+
 INSTALL(FILES ${COCL_HEADERS} DESTINATION include/cocl)
 
-# cocl
 INSTALL(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl DESTINATION bin RENAME cocl_wrapped)
 INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/cocl DESTINATION bin)
 INSTALL(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl.py DESTINATION bin)
 INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/cocl_env.py DESTINATION bin)
 if(WIN32)
-INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/cocl.cmd DESTINATION bin RENAME cocl_py.cmd)
-INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/activate.cmd DESTINATION . RENAME activate.cmd)
+    INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/cocl.cmd DESTINATION bin RENAME cocl_py.cmd)
+    INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/activate.cmd DESTINATION . RENAME activate.cmd)
 else()
-INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/cocl.sh DESTINATION bin RENAME cocl_py)
-INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/activate.sh DESTINATION . RENAME activate)
+    INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/cocl.sh DESTINATION bin RENAME cocl_py)
+    INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/bin/activate.sh DESTINATION . RENAME activate)
 endif()
 INSTALL(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/bin/cocl_plugins.py DESTINATION bin)
 
@@ -338,6 +345,7 @@ INSTALL(FILES ${CLEW_PROXYHEADERS} DESTINATION include/clew/proxy-headers/CL)
 INSTALL(FILES ${CLEW_PROXYHEADERS} DESTINATION include/clew/proxy-headers/OpenCL)
 # INSTALL(FILES ${CMAKE_SOURCE_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
 INSTALL(FILES ${CMAKE_BINARY_DIR}/cmake/cocl.cmake ${CMAKE_SOURCE_DIR}/cmake/cocl_impl.cmake DESTINATION share/cocl)
+INSTALL(FILES ${CMAKE_BINARY_DIR}/cmake/cocl_vars.cmake DESTINATION share/cocl)
 install(TARGETS easycl clew cocl patch_hostside EXPORT cocl-targets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
