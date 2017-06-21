@@ -69,7 +69,7 @@ function error {
 set_status pending Building
 
 # bash jenkins/u1604.sh 2>&1 | tee build.log || error
-python2 jenkins/u1604.py 2>&1 | tee build.log || error
+python2 jenkins/u1604.py --git-branch ${GIT_BRANCH} 2>&1 | tee build.log || error
 
 upload_artifacts 'build.log artifacts.zip'
 update_project_index
