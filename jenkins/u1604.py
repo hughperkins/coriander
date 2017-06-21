@@ -59,13 +59,17 @@ def run(cmdlist):
     return res
 
 
-def clean_coriander():
-    coriander_dir = join(os['HOME'], corianderr)
-    if path.isdir(coriander_dir):
+def maybe_rmtree(tree_dir):
+    if path.isdir(tree_dir):
         if platform.uname()[0] == 'Windows':
-            run(['rmdir', '/s', '/q', coriander_dir])
+            run(['rmdir', '/s', '/q', '"%s"' % tree_dir])
         else:
-            run(['rm', '-Rf', coriander_dir])
+            run(['rm', '-Rf', tree_dir])
+
+
+def clean_coriander():
+    coriander_dir = join(os['HOME'], 'coriander')
+    maybe_rmtree(coriander_dir)
 
 
 def main(git_branch):
