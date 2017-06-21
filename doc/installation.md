@@ -6,43 +6,11 @@ To use Coriander, please build from source:
 
 You will need:
 - python 2.7
-- llvm 4.0
 - c++ compiler, and cmake
 
-### Mac OS X
+## Installation
 
-Download/install llvm-4.0:
-```
-cd ~
-wget http://llvm.org/releases/4.0.0/clang+llvm-4.0.0-x86_64-apple-darwin.tar.xz
-tar -xf clang+llvm-4.0.0-x86_64-apple-darwin.tar.xz
-mv clang+llvm-4.0.0-x86_64-apple-darwin /usr/local/opt
-ln -s /usr/local/opt/clang+llvm-4.0.0-x86_64-apple-darwin /usr/local/opt/llvm-4.0
-brew install python
-```
-
-When you build Coriander, please set `CLANG_HOME` to `/usr/local/opt/llvm-4.0`
-
-### Ubuntu 16.04
-
-```
-sudo apt-get install git cmake cmake-curses-gui libc6-dev-i386 make gcc g++ zlib1g-dev
-sudo apt-get install libtinfo-dev
-cd ~/Downloads
-wget http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz
-sudo mkdir -p /usr/local/opt
-cd /usr/local/opt
-sudo tar -xf ~/Downloads/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz
-sudo mv clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04 llvm-4.0
-```
-
-When you build Coriander, please set `CLANG_HOME` to `/usr/local/opt/llvm-4.0`
-
-## Build/installation
-
-### To install distro
-
-This is the easiest way, and brings down some core plugins, such as [Coriander-dnn](https://github.com/hughperkins/coriander-dnn)
+### On Mac OS X
 
 ```
 git clone --recursive https://github.com/hughperkins/coriander
@@ -50,33 +18,30 @@ cd coriander
 python install_distro.py
 ```
 
-### To install core only
+### On Linux
 
-If you want to install only core, you can do:
 ```
-mkdir -p ~/git
-cd ~/git
-git clone --recursive https://github.com/hughperkins/Coriander
-cd Coriander
-mkdir build
-cd build
-ccmake ..
-# press 'c'
-# fill in the path to the python2.7 executable
-# press 'c' and 'g'
-# Note: I usually set build/release type to `Debug`, so this is what is tested
-make -j 4
-
-# on Ubuntu:
-sudo make install
-
-# or on Mac, if you have homebrew, you dont need sudo:
-make install
+git clone --recursive https://github.com/hughperkins/coriander
+cd coriander
+python install_distro.py
 ```
+
+### On Windows
+
+Windows build is in progress, and doesnt actually run yet. See [installation_windows_inprogress.md](installation_windows_inprogress.md).
+
+## Usage
+
+- Coriander is installed into `~/coriander` directory
+- Before using Coriander, you will need to set some environment variables, which you can do by running
+```
+source ~/coriander/activate
+```
+- (you'll need to do this each time you open a fresh terminal windows, or ssh session)
 
 ## Smoke tests
 
-To run some smoke-tests:
+To run some smoke-tests: from the cloned repository, do:
 ```
 cd build
 make -j 8 tests
@@ -91,7 +56,7 @@ CL_GPUOFFSET=1 make run-tests
 
 ## Docker
 
-Docker images run ok on beignet and NVIDIA :-)  (or used to. not tested very recently...)  Please see [docker](docker) for more details.
+There are [Docker files](docker).
 
 <img src="https://github.com/hughperkins/Coriander/raw/master/doc/img/dockerfile_beignet_cudasample.png?raw=true" width="600" />
 
