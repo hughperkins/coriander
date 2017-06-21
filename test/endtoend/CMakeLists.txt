@@ -2,7 +2,7 @@
 # this CMakeLists.txt, the one you are reading, is included by that one, via the one
 # in this one's parent folder
 
-set(TESTS testblas cuda_sample context byvaluestructwithpointer multigpu multithreading
+set(TESTS cuda_sample context byvaluestructwithpointer multigpu multithreading
     offsetkernelargs properties test_bitcast test_callbacks testcumemcpy testevents2
     testevents testfloat4 test_kernelcachedok testmath testmemcpydevicetodevice test_memhostalloc
     testneg testnullpointer testpartialcopy testshfl teststream test_types
@@ -15,7 +15,7 @@ set(E2E_TEST_BUILD_TARGETS)
 set(E2E_TEST_RUN_TARGETS)
 foreach(TEST ${TESTS})
     cocl_add_executable(${TEST} ${TESTS_EXCLUDE} ${TEST}.cu)
-    target_link_libraries(${TEST} cocl clew clblast easycl)
+    target_link_libraries(${TEST} cocl clew easycl)
     target_include_directories(${TEST} PRIVATE ${COCL_INCLUDES})
     # target_include_directories(${TEST} PRIVATE ${EIGEN_HOME})
     add_custom_target(run-${TEST}

@@ -17,7 +17,7 @@
 #include "cocl/cocl_device.h"
 #include "cocl/cocl_error.h"
 #include "cocl/cocl_properties.h"
-#include "cocl/cocl_blas.h"
+// #include "cocl/cocl_blas.h"
 #include "cocl/cocl_kernellaunch.h"
 #include "cocl/cocl_funcs.h"
 #include "cocl/hostside_opencl_funcs_ext.h"

@@ -92,7 +92,7 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
     src/struct_clone.cpp src/basicblockdumper.cpp src/ExpressionsHelper.cpp src/readIR.cpp
     src/function_names_map.cpp src/function_dumper.cpp src/kernel_dumper.cpp src/mutations.cpp
     third_party/argparsecpp/argparsecpp.cpp
-    src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_blas.cpp src/cocl_device.cpp src/cocl_error.cpp
+    src/hostside_opencl_funcs.cpp src/cocl_events.cpp src/cocl_device.cpp src/cocl_error.cpp
     src/cocl_memory.cpp src/cocl_properties.cpp src/cocl_streams.cpp src/cocl_clsources.cpp src/cocl_context.cpp
     src/ir-to-opencl.cpp src/shims.cpp src/LocalValueInfo.cpp src/ClWriter.cpp src/cocl_vector_types.cpp
     src/cocl_logging.cpp src/DebugDumper.cpp src/fill_buffer.cpp
@@ -183,7 +183,6 @@ target_link_libraries(easycl clew)
 
 add_library(cocl SHARED ${COCL_SRCS} ${YAMLCPP_SRCS})
 target_include_directories(cocl PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl BEFORE)
-target_include_directories(cocl PRIVATE src/CLBlast/include BEFORE)
 target_include_directories(cocl PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include BEFORE)
 target_include_directories(cocl PRIVATE src) # needed for easycl/easycl
 target_include_directories(cocl PRIVATE third_party BEFORE)
@@ -199,7 +198,7 @@ endif()
 separate_arguments(PLATFORM_OPTIONS)
 # message("cocl compile options ${LLVM_CXXFLAGS} ${LLVM_DEFINES} ${PLATFORM_OPTIONS}")
 target_compile_options(cocl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES} ${PLATFORM_OPTIONS})
-target_link_libraries(cocl easycl clblast ${LLVM_LIBPATHS} ${LLVM_SYSLIBS})
+target_link_libraries(cocl easycl ${LLVM_LIBPATHS} ${LLVM_SYSLIBS})
 
 add_executable(ir-to-opencl src/ir-to-opencl_main.cpp third_party/argparsecpp/argparsecpp.cpp)
 target_include_directories(ir-to-opencl PRIVATE include)
@@ -219,62 +218,6 @@ target_include_directories(patch_hostside PRIVATE third_party)
 target_include_directories(patch_hostside PRIVATE src/EasyCL)
 target_compile_options(patch_hostside PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 target_link_libraries(patch_hostside "${LLVM_LIBPATHS}"  ${LLVM_SYSLIBS})
-
-# ==================================================================================================
-
-# next ~20 lines or so are copied from CLBlast CMakeLists.txt (seems easier than figuring out the whole cmake import/export
-# bit...)
-# I prefixed the vars with CLBLAST_ , and removed all the level 1/2 routines, which we dont use
-
-# Sets the supported routines and the used kernels. New routines and kernels should be added here.
-set(CLBLAST_KERNELS copy_fast copy_pad transpose_fast transpose_pad xaxpy xdot xger xgemm xgemv)
-set(CLBLAST_LEVEL1_ROUTINES xswap xscal xcopy xaxpy xdot xdotu xdotc xnrm2 xasum xamax)
-set(CLBLAST_LEVEL2_ROUTINES xgemv xgbmv xhemv xhbmv xhpmv xsymv xsbmv xspmv xtrmv xtbmv xtpmv
-                    xger xgeru xgerc xher xhpr xher2 xhpr2 xsyr xspr xsyr2 xspr2 xtrsv)
-set(CLBLAST_LEVEL3_ROUTINES xgemm xsymm xhemm xsyrk xherk xsyr2k xher2k xtrmm xtrsm)
-set(CLBLAST_LEVELX_ROUTINES xomatcopy xaxpybatched xgemmbatched xinvert)
-set(CLBLAST_ROUTINES ${CLBLAST_LEVEL1_ROUTINES} ${CLBLAST_LEVEL2_ROUTINES} ${CLBLAST_LEVEL3_ROUTINES} ${CLBLAST_LEVELX_ROUTINES})
-set(CLBLAST_PRECISIONS 32 64 3232 6464 16)
-
-# Gathers all source-files
-set(CLBLAST_SOURCES
-  src/CLBlast/src/database/database.cpp
-  src/CLBlast/src/routines/common.cpp
-  src/CLBlast/src/cache.cpp
-  src/CLBlast/src/clblast.cpp
-  src/CLBlast/src/clblast_c.cpp
-  src/CLBlast/src/routine.cpp
-  src/CLBlast/src/utilities/clblast_exceptions.cpp
-  src/CLBlast/src/utilities/utilities.cpp
-)
-foreach(ROUTINE ${CLBLAST_LEVEL1_ROUTINES})
-  set(CLBLAST_SOURCES ${CLBLAST_SOURCES} src/CLBlast/src/routines/level1/${ROUTINE}.cpp)
-endforeach()
-foreach(ROUTINE ${CLBLAST_LEVEL2_ROUTINES})
-  set(CLBLAST_SOURCES ${CLBLAST_SOURCES} src/CLBlast/src/routines/level2/${ROUTINE}.cpp)
-endforeach()
-foreach(ROUTINE ${CLBLAST_LEVEL3_ROUTINES})
-  set(CLBLAST_SOURCES ${CLBLAST_SOURCES} src/CLBlast/src/routines/level3/${ROUTINE}.cpp)
-endforeach()
-foreach(ROUTINE ${CLBLAST_LEVELX_ROUTINES})
-  set(CLBLAST_SOURCES ${CLBLAST_SOURCES} src/CLBlast/src/routines/levelx/${ROUTINE}.cpp)
-endforeach()
-
-include_directories(src/CLBlast/src)
-add_library(clblast SHARED ${CLBLAST_SOURCES})
-if(APPLE)
-  # remove covered switch build warnings
-  target_compile_options(clblast PRIVATE -Wno-switch)
-endif(APPLE)
-if(WIN32)
-    target_compile_options(clblast PRIVATE /DCLBLAST_DLL /DCOMPILING_DLL=1)
-endif()
-target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include/proxy-opencl)
-target_include_directories(clblast PRIVATE src/CLBlast/include)
-target_include_directories(clblast PRIVATE src/EasyCL/thirdparty/clew/include)
-target_link_libraries(clblast clew)
-
-target_link_libraries(cocl clblast)
 
 # ==================================================================================================
 # tests
@@ -395,7 +338,7 @@ INSTALL(FILES ${CLEW_PROXYHEADERS} DESTINATION include/clew/proxy-headers/CL)
 INSTALL(FILES ${CLEW_PROXYHEADERS} DESTINATION include/clew/proxy-headers/OpenCL)
 # INSTALL(FILES ${CMAKE_SOURCE_DIR}/cmake/cocl.cmake DESTINATION share/cocl)
 INSTALL(FILES ${CMAKE_BINARY_DIR}/cmake/cocl.cmake ${CMAKE_SOURCE_DIR}/cmake/cocl_impl.cmake DESTINATION share/cocl)
-install(TARGETS easycl clew clblast cocl patch_hostside EXPORT cocl-targets
+install(TARGETS easycl clew cocl patch_hostside EXPORT cocl-targets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin

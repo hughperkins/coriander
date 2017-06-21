@@ -16,6 +16,6 @@ if(EIGEN_TESTS)
 endif()
 
 add_custom_target(tests
-    DEPENDS clblast clew easycl cocl patch_hostside ir-to-opencl ${BUILD_TEST_TARGETS})
+    DEPENDS clew easycl cocl patch_hostside ir-to-opencl ${BUILD_TEST_TARGETS})
 add_custom_target(run-tests
     DEPENDS tests ${RUN_TEST_TARGETS})
