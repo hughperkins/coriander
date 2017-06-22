@@ -67,14 +67,19 @@ def run_install_checks():
 def install(repo_url, git_branch):
     run_install_checks()
 
-    tmpdir = '/tmp/coriander_clone'
-    if path.isdir(tmpdir):
-        print(check_output(['rm', '-Rf', tmpdir]))
-    os.makedirs(tmpdir)
+    # tmpdir = '/tmp/coriander_clone'
+    git_dir = join(COCL_INSTALL_PREFIX, 'git')
+    plugin_name = repo_url.split('/')[-1].split('.')[0]
+    print('plugin_name [%s]' % plugin_name)
+    plugin_git_dir = join(git_dir, plugin_name)
+    if path.isdir(plugin_git_dir):
+        print(check_output(['rm', '-Rf', plugin_git_dir]))
+    os.makedirs(plugin_git_dir)
     print(check_output([
-        'git', 'clone', '--recursive', repo_url, '-b', git_branch
-    ], cwd='/tmp/coriander_clone'))
-    repo_dir = join(tmpdir, os.listdir(tmpdir)[0])
+        'git', 'clone', '--recursive', repo_url, '-b', git_branch, plugin_name
+    ], cwd=git_dir))
+    repo_dir = plugin_git_dir
+    # repo_dir = join(tmpdir, os.listdir(tmpdir)[0])
     print('repo_dir', repo_dir)
     build_dir = join(repo_dir, 'build')
     os.makedirs(build_dir)
