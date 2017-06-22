@@ -13,7 +13,7 @@ RUN git clone --recursive https://github.com/hughperkins/coriander -b ${GIT_BRAN
 RUN cd coriander && \
     mkdir soft && \
     cd soft && \
-    wget http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz
+    wget --progress=dot:giga http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz
 
 RUN cd coriander/soft && \
     tar -xf clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz && \

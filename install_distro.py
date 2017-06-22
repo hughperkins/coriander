@@ -110,7 +110,7 @@ def install_llvm(install_dir):
         'Windows': 'http://releases.llvm.org/4.0.0/LLVM-4.0.0-win64.exe'
     }[platform.uname()[0]]
     filename = target_url.split('/')[-1]
-    run(['wget', target_url, '-O', filename])
+    run(['wget', '--progress=dot:giga', target_url, '-O', filename])
     if filename.endswith('.tar.xz'):
         run(['tar', '-xf', filename])
         unzip_name = filename.replace('.tar.xz', '')
