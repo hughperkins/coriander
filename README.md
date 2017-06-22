@@ -98,7 +98,6 @@ See [assumptions](doc/assumptions.md)
 Coriander uses the following libraries:
 
 - [clang/llvm](http://llvm.org/): c/c++ parser/compiler; many contributors
-- [CLBlast](https://github.com/cnugteren/CLBlast): Cedric Nugteren's excellent BLAS for OpenCL
 - [thrust](https://github.com/thrust/thrust): parallel GPU library, from NVIDIA®
 - [yaml-cpp](https://github.com/jbeder/yaml-cpp): yaml for c++, by Jesse Beder
 - [EasyCL](https://github.com/hughperkins/EasyCL): wrapper for OpenCL 1.2 boilerplate
