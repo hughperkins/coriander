@@ -106,7 +106,7 @@ def main(git_branch):
     run(['make', 'run-eigen-tests'])
 
     for plugin in ['coriander-clblast', 'coriander-dnn']:
-        cd(join(coriander_dir, 'git', plugin))
+        cd(join(coriander_dir, 'git', plugin, 'test'))
         mkdir('build')
         cd('build')
         run(['cmake', '..'])
