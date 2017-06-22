@@ -105,13 +105,14 @@ def main(git_branch):
     run(['make', 'run-endtoend-tests'])
     run(['make', 'run-eigen-tests'])
 
-    cd(join(coriander_dir, 'git', 'coriander-clblast'))
-    mkdir('build')
-    cd('build')
-    run(['cmake', '..'])
-    run(['cmake', '--build' '.'])
-    run(['cmake', '--build' '.', 'tests'])
-    run(['cmake', '--build' '.', 'run-tests'])
+    for plugin in ['coriander-clblast', 'coriander-dnn']:
+        cd(join(coriander_dir, 'git', plugin))
+        mkdir('build')
+        cd('build')
+        run(['cmake', '..'])
+        run(['cmake', '--build', '.'])
+        run(['cmake', '--build', '.', '--target', 'tests'])
+        run(['cmake', '--build', '.', '--target', 'run-tests'])
 
 
 if __name__ == '__main__':
