@@ -70,6 +70,7 @@ For installation, please see [installation](doc/installation.md)
 
 You can install the following plugins:
 
+- [Coriander-clblast](https://github.com/hughperkins/coriander-clblast): just do `cocl_plugins.py install --repo-url https://github.com/hughperkins/coriander-clblast`
 - [Coriander-dnn](https://github.com/hughperkins/coriander-dnn): just do `cocl_plugins.py install --repo-url https://github.com/hughperkins/coriander-dnn`
 - Your plugin here?
 
@@ -119,6 +120,8 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
 
 ## News
 
+- June 23:
+  - factorized CLBlast implementation of NVIDIA® CUDA™ cuBLAS API, into new plugin [coriander-clblast](https://github.com/hughperkins/coriander-clbast)
 - June 21:
   - created a new release [v6.0.0](https://github.com/hughperkins/coriander/releases/tag/v6.0.0), that marks a bunch of changes:
     - incorporates of course the earlier changes:
