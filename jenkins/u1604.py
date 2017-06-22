@@ -74,6 +74,22 @@ def maybe_rmtree(tree_dir):
             run(['rm', '-Rf', tree_dir])
 
 
+def activate(activate_file):
+    with open(activate_file) as f:
+        contents = f.read()
+    for line in contents.split('\n'):
+        line = line.strip().replace('export ', '')
+        if line == '':
+            continue
+        var = line.split('=')[0].strip()
+        value = line.split('=')[1].strip().replace('$PATH', os.environ['PATH'])
+        if value.startswith('"'):
+            value = value[1:]
+        if value.endswith('"'):
+            value = value[:-1]
+        os.environ[var] = value
+
+
 def main(git_branch):
     # BASEDIR = os.getcwd()
 
@@ -105,6 +121,7 @@ def main(git_branch):
     run(['make', 'run-endtoend-tests'])
     run(['make', 'run-eigen-tests'])
 
+    activate(join(coriander_dir, 'activate'))
     for plugin in ['coriander-clblast', 'coriander-dnn']:
         cd(join(coriander_dir, 'git', plugin, 'test'))
         mkdir('build')
