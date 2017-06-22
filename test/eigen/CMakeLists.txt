@@ -34,6 +34,7 @@ if(INDEXES_32BIT)
 endif()
 
 # include(/usr/local/share/cocl/cocl.cmake)
+include(${CMAKE_INSTALL_PREFIX}/lib/coriander_plugins/corianderclblast-targets.cmake)
 
 foreach(EIGEN_TEST ${EIGEN_TESTS})
     cocl_add_executable(${EIGEN_TEST} ${TESTS_EXCLUDE} ${EIGEN_TEST}.cu)
