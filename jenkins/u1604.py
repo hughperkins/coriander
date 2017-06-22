@@ -115,7 +115,7 @@ def maybe_rmtree(tree_dir):
 
 def wget(target_url):
     # should be generalized for Windows
-    run(['wget', target_url])
+    run(['wget', '--progress=dot:giga', target_url])
 
 
 def gunzip(target):
@@ -159,26 +159,26 @@ def main(git_branch):
         so_suffix = '.dylib'
     elif platform.uname()[0] == 'Windows':
         so_suffix = '.dll'
-    # artifacts_list = []
-    # for libname in ['cocl', 'clew', 'clblast', 'easycl']:
-    #     artifacts_list.append('lib%s%s' % (libname, so_suffix))
-    # run(['zip', '../artifacts.zip'] + artifacts_list)
-    # run(['make', '-j', '16', 'gtest-tests'])
-    # run(['make', '-j', '16', 'endtoend-tests'])
-    # run(['make', '-j', '16', 'eigen-tests'])
-    # run(['make', 'run-gtest-tests'])
-    # run(['make', 'run-endtoend-tests'])
-    # run(['make', 'run-eigen-tests'])
+    artifacts_list = []
+    for libname in ['cocl', 'clew', 'clblast', 'easycl']:
+        artifacts_list.append('lib%s%s' % (libname, so_suffix))
+    run(['zip', '../artifacts.zip'] + artifacts_list)
+    run(['make', '-j', '16', 'gtest-tests'])
+    run(['make', '-j', '16', 'endtoend-tests'])
+    run(['make', '-j', '16', 'eigen-tests'])
+    run(['make', 'run-gtest-tests'])
+    run(['make', 'run-endtoend-tests'])
+    run(['make', 'run-eigen-tests'])
 
     activate(join(coriander_dir, 'activate'))
-    # for plugin in ['coriander-clblast', 'coriander-dnn']:
-    #     cd(join(coriander_dir, 'git', plugin, 'test'))
-    #     mkdir('build')
-    #     cd('build')
-    #     run(['cmake', '..'])
-    #     run(['cmake', '--build', '.'])
-    #     run(['cmake', '--build', '.', '--target', 'tests'])
-    #     run(['cmake', '--build', '.', '--target', 'run-tests'])
+    for plugin in ['coriander-clblast', 'coriander-dnn']:
+        cd(join(coriander_dir, 'git', plugin, 'test'))
+        mkdir('build')
+        cd('build')
+        run(['cmake', '..'])
+        run(['cmake', '--build', '.'])
+        run(['cmake', '--build', '.', '--target', 'tests'])
+        run(['cmake', '--build', '.', '--target', 'run-tests'])
 
     cd_repo_root()
     run(['git', 'clone', '--recursive', 'https://github.com/hughperkins/cudnn-training', '-b', git_branch])
