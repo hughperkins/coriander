@@ -22,6 +22,13 @@ def cd(subdir):
     print('cd to [%s]' % current_dir)
 
 
+def mkdir(subdir):
+    global current_dir
+    full_path = join(current_dir, subdir)
+    if not path.isdir(full_path):
+        os.makedirs(full_path)
+
+
 def cd_repo_root():
     global current_dir
     current_dir = path.abspath(os.getcwd())  # since python never really changes its actual cwd
@@ -67,15 +74,12 @@ def maybe_rmtree(tree_dir):
             run(['rm', '-Rf', tree_dir])
 
 
-def clean_coriander():
-    coriander_dir = join(os.environ['HOME'], 'coriander')
-    maybe_rmtree(coriander_dir)
-
-
 def main(git_branch):
     # BASEDIR = os.getcwd()
 
-    clean_coriander()
+    coriander_dir = join(os.environ['HOME'], 'coriander')
+
+    maybe_rmtree(coriander_dir)
 
     run(['python2', 'install_distro.py', '--git-branch', git_branch])
 
@@ -100,6 +104,14 @@ def main(git_branch):
     run(['make', 'run-gtest-tests'])
     run(['make', 'run-endtoend-tests'])
     run(['make', 'run-eigen-tests'])
+
+    cd(join(coriander_dir, 'git', 'coriander-clblast'))
+    mkdir('build')
+    cd('build')
+    run(['cmake', '..'])
+    run(['cmake', '--build' '.'])
+    run(['cmake', '--build' '.', 'tests'])
+    run(['cmake', '--build' '.', 'run-tests'])
 
 
 if __name__ == '__main__':
