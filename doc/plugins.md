@@ -47,10 +47,53 @@ The plugin can register itself with Coriander in the following ways:
 |---------|---------|
 | C/C++ header files, for compiling using `cocl_py` | Install into `${CORIANDER_DIR}/include/coriander_plugins/{plugin name}/ |
 | Dynamic/static library, for linking using `cocl_py` | Install into `${CORIANDER_DIR}/lib/coriander_plugins/ |
+| CMake exports | Install into ${CORIANDER_DIR}/lib/coriander_plugins/ |
 | ... | We can extend this over time |
 
 You can see the code to add headerfiles to the `cocl_py` compilation process at [cocl.py#L255-L260](https://github.com/hughperkins/coriander/blob/c78b3061e9e8c03069076e06e16f3983addfcdbd/bin/cocl.py#L255-L260) , and the code to bring plugin libraries into the `cocl_py` compilation process
 is at [cocl.py#L264-L271](https://github.com/hughperkins/coriander/blob/c78b3061e9e8c03069076e06e16f3983addfcdbd/bin/cocl.py#L264-L271)
+
+## Key variables and files
+
+### `cocl_py`
+
+`cocl_py` is a wrapper, built from [bin/cocl.sh.in](bin/cocl.sh.in) or [bin/cocl.cmd.in](bin/cocl.cmd.in), depending on whether
+one is running on Windows or Linux.  It has the following variables 'baked in', at build/installation time:
+
+- `CLANG_HOME`: path to llvm 4.0
+- `COCL_PATH`: path to `cocl.py`
+- `COCL_BIN`: path to `${CORIANDER_DIR}/bin`
+- `COCL_LIB`: path to `${CORIANDER_DIR}/lib`
+- `COCL_INCLUDE`: path to `${CORIANDER_DIR}/include`
+- `PYTHON27_PATH`: path to python2 executable
+
+These variables are sufficient for `cocl_py` to locate the various `Coriander` resources, including plugins.
+
+### cmake includes and exports
+
+__`share/cocl/cocl_vars.cmake`__
+
+Bakes in key variables, at Coriander build/install time, similar to `cocl_py` above, but targeted at cmake usage. It defines the following
+variables:
+
+- `CLANG_HOME`
+- `COCL_PATH`
+- `COCL_BIN`
+- `COCL_LIB`
+- `COCL_INCLUDE`
+- `COCL_CMAKE`: path to ${CORIANDER_DIR}/share/cocl
+
+__cmake targets__
+
+- `lib/cocl/cocl-targets.cmake`: provides cmake targets for: `cocl`, `clew`, `easycl`
+- `lib/cocl/coriander_plugins/[plugin name]-targets.cmake`: cmake targets for plugin `[plugin name]`
+
+### `activate`
+
+Bakes in the following variable changes:
+
+- add `${CORIANDER_DIR}/bin` to `PATH`
+- set `COCL_CMAKE` to `${CORIANDER_DIR}/share/cocl`
 
 ## Future evolution
 
@@ -60,4 +103,4 @@ following components of Coriander into plugins:
 - `__shfl`
 - kernel-side maths functions, such as `sin`, `log`, etc
 
-Of course, you are free to come up with your own registration mechanisms, that will work well with your own plugin.
+Of course, you are free to add additional registration mechanisms, that will work well with your own plugin.

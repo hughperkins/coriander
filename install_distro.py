@@ -177,6 +177,7 @@ def main(git_branch, install_dir):
     maybe_install_llvm(install_dir=install_dir)
     install_coriander(install_dir=install_dir)
     # setup_plugin_perms()
+    os.environ['COCL_CMAKE'] = join(install_dir, 'share', 'cocl')
     for repo_url in [
             'https://github.com/hughperkins/coriander-clblast',
             'https://github.com/hughperkins/coriander-dnn']:
