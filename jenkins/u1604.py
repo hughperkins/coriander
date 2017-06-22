@@ -113,6 +113,16 @@ def maybe_rmtree(tree_dir):
             run(['rm', '-Rf', tree_dir])
 
 
+def wget(target_url):
+    # should be generalized for Windows
+    run(['wget', target_url])
+
+
+def gunzip(target):
+    # should be generalized for Windows
+    run(['gunzip', target])
+
+
 def activate(activate_file):
     with open(activate_file) as f:
         contents = f.read()
