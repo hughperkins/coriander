@@ -38,7 +38,7 @@ def cd(subdir):
     print('cd to [%s]' % current_dir)
     if not path.isdir(current_dir):
         print('Folder %s doesnt exist' % current_dir)
-        sys.exit(-1)
+        raise Exception('Folder %s doesnt exist' % current_dir)
 
 
 def cd_repo_root():
@@ -51,7 +51,19 @@ def run(cmdlist):
     f_out = open('out.txt', 'w', buffering=1)
     f_in = open('out.txt', 'r', buffering=1)
     f_in.seek(0)
-    p = subprocess.Popen(cmdlist, cwd=current_dir, stdout=f_out, stderr=subprocess.STDOUT, bufsize=1)
+    try:
+        p = subprocess.Popen(cmdlist, cwd=current_dir, stdout=f_out, stderr=subprocess.STDOUT, bufsize=1)
+    except Exception as e:
+        print('')
+        print('Something went wrong. Sorry about that :-(')
+        print('')
+        print('Here are some diagnostic details. No need to read them. Please copy and paste into')
+        print('an issue at https://github.com/hughperkins/coriander/issues')
+        print('')
+        print('exception:', e)
+        print('current_dir [%s]' % current_dir)
+        print('cmdlist', cmdlist)
+        sys.exit(-1)
     res = ''
     def print_progress():
         line = f_in.readline()
@@ -86,6 +98,10 @@ def makedir(target, sudo=False):
             run(['sudo', 'mkdir', '-p', target])
         else:
             os.makedirs(target)
+
+
+def ensure_dir_exists(target):
+    makedir(target)
 
 
 def is_llvm_dir(p):
@@ -177,6 +193,7 @@ def install_plugin(install_dir, repo_url, git_branch):
 
 
 def main(git_branch, install_dir):
+    ensure_dir_exists(install_dir)
     maybe_install_llvm(install_dir=install_dir)
     install_coriander(install_dir=install_dir)
     # setup_plugin_perms()
