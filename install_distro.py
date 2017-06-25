@@ -156,7 +156,7 @@ def install_llvm(install_dir):
 
 def maybe_install_llvm(install_dir):
     global llvm_dir
-    for p in ['/usr/local/opt/llvm-4.0', 'C:\\Program Files\\LLVM', join(install_dir, 'soft', 'llvm')]:
+    for p in ['/usr/local/opt/llvm-4.0', 'C:\\Program Files\\LLVM', join(install_dir, 'soft', 'llvm-4.0')]:
         if is_llvm_dir(p):
             llvm_dir = p
             print('found llvm, with required version %s at %s' % (REQUIRED_LLVM_VERSION, llvm_dir))
