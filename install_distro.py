@@ -36,6 +36,9 @@ def cd(subdir):
     else:
         current_dir = join(current_dir, subdir)
     print('cd to [%s]' % current_dir)
+    if not path.isdir(current_dir):
+        print('Folder %s doesnt exist' % current_dir)
+        sys.exit(-1)
 
 
 def cd_repo_root():
