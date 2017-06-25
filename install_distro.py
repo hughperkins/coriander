@@ -117,6 +117,14 @@ def is_llvm_dir(p):
     return True
 
 
+def wget(url, filename=None):
+    # run(['wget', '--progress=dot:giga', target_url, '-O', filename])
+    if filename is None:
+        run(['curl', url, '-O'])
+    else:
+        run(['curl', url, '-o', filename])
+
+
 def install_llvm(install_dir):
     global llvm_dir
     # install to current directory?
@@ -129,7 +137,7 @@ def install_llvm(install_dir):
         'Windows': 'http://releases.llvm.org/4.0.0/LLVM-4.0.0-win64.exe'
     }[platform.uname()[0]]
     filename = target_url.split('/')[-1]
-    run(['wget', '--progress=dot:giga', target_url, '-O', filename])
+    wget(target_url, filename)
     if filename.endswith('.tar.xz'):
         run(['tar', '-xf', filename])
         unzip_name = filename.replace('.tar.xz', '')
