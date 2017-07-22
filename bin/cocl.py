@@ -269,9 +269,10 @@ plugins_lib_dir = join(COCL_LIB, 'coriander_plugins')
 if path.isdir(plugins_lib_dir):
     LIBS += ['-L%s' % plugins_lib_dir]
     for lib in os.listdir(plugins_lib_dir):
-        print('adding %s to libs' % lib)
-        # LIBS += ['-l%s' % join(plugins_lib_dir, lib)]
-        LIBS += ['-l%s' % lib.replace('lib', '').split('.')[0]]
+        if not lib.endswith(".cmake"):
+            print('adding %s to libs' % lib)
+            # LIBS += ['-l%s' % join(plugins_lib_dir, lib)]
+            LIBS += ['-l%s' % lib.replace('lib', '').split('.')[0]]
 print('LIBS', LIBS)
 
 
@@ -412,6 +413,7 @@ if not COMPILE_ONLY:
     else:
         cmdline_list += [
             '-Wl,-rpath,%s' % COCL_LIB,
+            '-Wl,-rpath,%s' % plugins_lib_dir,
             '-Wl,-rpath,$$ORIGIN'
         ]
         cmdline_list += ['-lcocl', '-lclblast', '-leasycl', '-lclew', '-lpthread']
