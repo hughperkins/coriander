@@ -120,7 +120,7 @@ Please cite: [CUDA-on-CL: a compiler and runtime for running NVIDIA® CUDA™ C+
 ## News
 
 - June 23:
-  - factorized CLBlast implementation of NVIDIA® CUDA™ cuBLAS API, into new plugin [coriander-clblast](https://github.com/hughperkins/coriander-clbast)
+  - factorized CLBlast implementation of NVIDIA® CUDA™ cuBLAS API, into new plugin [coriander-clblast](https://github.com/hughperkins/coriander-clblast)
 - June 21:
   - created a new release [v6.0.0](https://github.com/hughperkins/coriander/releases/tag/v6.0.0), that marks a bunch of changes:
     - incorporates of course the earlier changes:
