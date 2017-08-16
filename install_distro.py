@@ -110,7 +110,7 @@ def is_llvm_dir(p):
     clangxx_filepath = join(p, 'bin', 'clang++')
     if not path.isfile(clangxx_filepath):
         return False
-    llvm_version = run([clangxx_filepath, '--version']).split('\n')[0].split('version ')[1].split(' ')[0]
+    llvm_version = run([clangxx_filepath, '--version']).split('clang version ')[1].split(' ')[0]
     print('llvm_version', llvm_version)
     if llvm_version != REQUIRED_LLVM_VERSION:
         return False
