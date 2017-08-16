@@ -141,7 +141,7 @@ def install_llvm(install_dir):
     if filename.endswith('.tar.xz'):
         run(['tar', '-xf', filename])
         unzip_name = filename.replace('.tar.xz', '')
-        run(['mv', unzip_name, 'llvm-4.0'])
+        run(['mv', '-T', unzip_name, 'llvm-4.0'])
         cd_repo_root()
         llvm_dir = path.abspath(join(install_dir, 'soft', 'llvm-4.0'))
         if is_llvm_dir(llvm_dir):
