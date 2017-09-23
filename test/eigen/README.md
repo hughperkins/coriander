@@ -1,6 +1,6 @@
 # Eigen tests
 
-Eigen is used by Tensorflow, so being able to build and run Eigen is a pre-requisite for running Eigen.
+Eigen is used by Tensorflow, so being able to build and run Eigen is a pre-requisite for running Tensorflow.
 
 There are tests in Eigen repository itelf, but I find I use these tests instead, which are a subset of the Eigen repo tests,
 and represent operations that are needed to build convolutional networks in Tensorflow.
