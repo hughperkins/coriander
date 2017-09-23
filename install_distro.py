@@ -129,6 +129,7 @@ def install_llvm(install_dir):
     global llvm_dir
     # install to current directory?
     cd(install_dir)
+    run(['rm', '-f', '-r', 'soft'])
     makedir('soft')
     cd('soft')
     target_url = {
