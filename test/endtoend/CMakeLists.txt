@@ -7,7 +7,7 @@ set(TESTS cuda_sample context byvaluestructwithpointer multigpu multithreading
     testevents testfloat4 test_kernelcachedok testmath testmemcpydevicetodevice test_memhostalloc
     testneg testnullpointer testpartialcopy testshfl teststream test_types
     singlebuffer test_devices test_buffers longname test_char test_structs
-    test_floatstarstar
+    test_floatstarstar test_ZeroCudaMalloc
 )
 
 # include_directories(include/cocl/proxy_includes)
