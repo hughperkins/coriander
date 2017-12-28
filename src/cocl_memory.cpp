@@ -378,6 +378,10 @@ size_t  cuMemcpyDtoH(void *host_dst, CUdeviceptr gpu_src, size_t size) {
 }
 
 size_t cudaMalloc(void **_pMemory, size_t N) {
+    if(N==0){
+        (*_pMemory)=0;
+        return 0;
+    }
     Memory *memory = Memory::newDeviceAlloc(N);
     COCL_PRINT("cudaMalloc using cl, size " << N << " memory=" << (void *)memory << " fakePos=" << memory->fakePos);
     *_pMemory = (void *)memory->fakePos;
@@ -393,6 +397,9 @@ size_t cudaMalloc(float **pMemory, size_t N) {
 }
 
 size_t cudaFree(void *_memory) {
+    if(_memory==0){
+        return 0;
+    }
     Memory *memory = findMemory((char *)_memory);
     COCL_PRINT("cudafree using opencl memory=" << memory);
     delete memory;
