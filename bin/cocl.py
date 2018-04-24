@@ -45,7 +45,8 @@ if platform.uname()[0] == 'Darwin':
 
 
 def check_output(cmd_list):
-    res = subprocess.check_output(cmd_list)
+    cleaned_cmd_list = [s for s in cmd_list if (s and not s.isspace())]
+    res = subprocess.check_output(cleaned_cmd_list)
     if int(platform.python_version_tuple()[0]) == 2:
         return res
     return res.decode('utf-8')
