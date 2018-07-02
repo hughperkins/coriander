@@ -125,8 +125,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_int(llvm::Instruction *las
     Function *setKernelArgInt = cast<Function>(M->getOrInsertFunction(
         mangledName,
         Type::getVoidTy(context),
-        IntegerType::get(context, bitLength),
-        NULL));
+        IntegerType::get(context, bitLength)));
     CallInst *call = CallInst::Create(setKernelArgInt, value);
     call->insertAfter(lastInst);
     lastInst = call;
@@ -149,8 +148,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_float(llvm::Instruction *l
     Function *setKernelArgFloat = cast<Function>(M->getOrInsertFunction(
         "setKernelArgFloat",
         Type::getVoidTy(context),
-        Type::getFloatTy(context),
-        NULL));
+        Type::getFloatTy(context)));
     CallInst *call = CallInst::Create(setKernelArgFloat, value);
     call->insertAfter(lastInst);
     return call;
@@ -181,8 +179,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction 
         "setKernelArgGpuBuffer",
         Type::getVoidTy(context),
         PointerType::get(IntegerType::get(context, 8), 0),
-        IntegerType::get(context, 32),
-        NULL));
+        IntegerType::get(context, 32)));
     Value *args[] = {bitcast, createInt32Constant(&context, elementSize)};
     CallInst *call = CallInst::Create(setKernelArgGpuBuffer, ArrayRef<Value *>(args));
     call->insertAfter(lastInst);
@@ -251,8 +248,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluevector(llvm::Instru
         "setKernelArgHostsideBuffer",
         Type::getVoidTy(context),
         PointerType::get(IntegerType::get(context, 8), 0),
-        IntegerType::get(context, 32),
-        NULL));
+        IntegerType::get(context, 32)));
 
     CallInst *call = CallInst::Create(setKernelArgHostsideBuffer, ArrayRef<Value *>(args));
     call->insertAfter(lastInst);
@@ -304,7 +300,8 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
 
     Value *sourceStruct = 0;
     if(structHasPointers) {
-        Instruction *alloca = new AllocaInst(newType, "newalloca");
+        // Assume address space 0
+        Instruction *alloca = new AllocaInst(newType, 0, "newalloca");
         alloca->insertAfter(lastInst);
         lastInst = alloca;
 
@@ -326,8 +323,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
         "setKernelArgHostsideBuffer",
         Type::getVoidTy(context),
         PointerType::get(IntegerType::get(context, 8), 0),
-        IntegerType::get(context, 32),
-        NULL));
+        IntegerType::get(context, 32)));
 
     CallInst *call = CallInst::Create(setKernelArgHostsideBuffer, ArrayRef<Value *>(args));
     call->insertAfter(lastInst);
@@ -422,7 +418,7 @@ void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *inf
     paramInfo->size = size;
     if(!isa<Instruction>(inst->getOperand(0))) {
         outs() << "getlaunchvalue, first operatnd of inst is not an instruction..." << "\n";
-        COCL_LLVM_DUMP(inst);
+        inst->dump();
         outs() << "\n";
         COCL_LLVM_DUMP(inst->getOperand(0));
         outs() << "\n";
@@ -523,9 +519,9 @@ void PatchHostside::patchCudaLaunch(
         "configureKernel",
         Type::getVoidTy(context),
         PointerType::get(IntegerType::get(context, 8), 0),
-        PointerType::get(IntegerType::get(context, 8), 0),
+        PointerType::get(IntegerType::get(context, 8), 0)
         // PointerType::get(IntegerType::get(context, 8), 0),
-        NULL));
+        ));
     Value *args[] = {kernelNameValue, llSourcecodeValue};
     CallInst *callConfigureKernel = CallInst::Create(configureKernel, ArrayRef<Value *>(&args[0], &args[2]));
     callConfigureKernel->insertBefore(inst->getInst());
