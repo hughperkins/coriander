@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "cocl/GlobalNames.h"
+#include "cocl/llvm_dump.h"
 
 #include "EasyCL/util/easycl_stringhelper.h"
 
@@ -35,7 +36,7 @@ std::string GlobalNames::getName(Value *value) {
     auto it = nameByValue.find(value);
     if(it == nameByValue.end()) {
         cout << "this value not found in global name map:" << endl;
-        value->dump();
+        COCL_LLVM_DUMP(value);
         cout << endl;
         throw runtime_error("value not found in global name map");
     }
@@ -99,7 +100,7 @@ std::string GlobalNames::createName(Value *value, std::string name) {
 std::string GlobalNames::getName(Type *type) {
     auto it = nameByType.find(type);
     if(it == nameByType.end()) {
-        type->dump();
+        COCL_LLVM_DUMP(type);
         cout << endl;
         throw runtime_error("type not found in name map");
     }

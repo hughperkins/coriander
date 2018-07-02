@@ -17,6 +17,8 @@
 #include "cocl/mutations.h"
 #include "EasyCL/util/easycl_stringhelper.h"
 
+#include "cocl/llvm_dump.h"
+
 #include "llvm/IR/Instructions.h"
 #include "llvm/Support/raw_ostream.h"
 
@@ -187,7 +189,7 @@ std::string TypeDumper::addStructToGlobalNames(StructType *type) {
             }
         }
     } else {
-        type->dump();
+        COCL_LLVM_DUMP(type);
         throw runtime_error("not implemented: anonymous struct types");
     }
 }
@@ -217,7 +219,7 @@ std::string TypeDumper::dumpVectorType(VectorType *vectorType, bool decayArraysT
     Type *elementType = vectorType->getElementType();
     if(elementType->getPrimitiveSizeInBits() == 0) {
         cout << endl;
-        vectorType->dump();
+        COCL_LLVM_DUMP(vectorType);
         cout << endl;
         throw runtime_error("TypeDumper::dumpVectorType: not implemented for non-primitive types");
     }
@@ -286,7 +288,7 @@ std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {
         default:
             outs() << "type id " << typeID << "\n";
             cout << endl;
-            type->dump();
+            COCL_LLVM_DUMP(type);
             cout << endl;
             throw runtime_error("TypeDumper::dumpType(...): unrecognized type");
     }

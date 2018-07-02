@@ -18,6 +18,8 @@
 #include "EasyCL/util/easycl_stringhelper.h"
 #include "cocl/mutations.h"
 
+#include "cocl/llvm_dump.h"
+
 #include "llvm/Support/raw_os_ostream.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Module.h"
@@ -168,7 +170,7 @@ std::string StructCloner::writeClCopyToDevicesideStruct(llvm::StructType *ptrful
             dstidx++;
         } else {
             outs() << "unhandled type\n";
-            childType->dump();
+            COCL_LLVM_DUMP(childType);
             outs() << "\n";
             throw runtime_error("unhandled type");
             srcidx++;
@@ -251,7 +253,7 @@ llvm::Instruction *StructCloner::writeHostsideIrCopyToMarshallingStruct(
                 }
             } else {
                 outs() << "unhandled type:\n";
-                childType->dump();
+                COCL_LLVM_DUMP(childType);
                 outs() << "\n";
                 throw runtime_error("structcloner unhandled type");
             }
@@ -260,7 +262,7 @@ llvm::Instruction *StructCloner::writeHostsideIrCopyToMarshallingStruct(
         }
     } else {
         outs() << "skipping type:\n";
-        structType->dump();
+        COCL_LLVM_DUMP(structType);
         outs() << "\n";
     }
     return lastInst;
@@ -297,7 +299,7 @@ void StructCloner::walkType(Module *M, StructInfo *structInfo, int level, int of
     } else if(isa<IntegerType>(type)) {
     } else if(type->getPrimitiveSizeInBits() != 0) {
     } else {
-        type->dump();
+        COCL_LLVM_DUMP(type);
         throw runtime_error("walktype type not handled");
     }
 }

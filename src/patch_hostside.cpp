@@ -17,6 +17,7 @@
 #include "cocl/patch_hostside.h"
 
 #include "cocl/cocl_logging.h"
+#include "cocl/llvm_dump.h"
 
 #include "cocl/mutations.h"
 #include "argparsecpp/argparsecpp.h"
@@ -208,7 +209,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointerstruct(llvm::Instru
         cout << "ERROR: Coriander currently forbids pointers inside gpu-side structs, passed into kernels" << endl;
         cout << "If you need this, please create an issue at https://github.com/hughperkins/Coriander/issues" << endl;
         cout << "Note that it's pretty hard to do though" << endl;
-        structPointer->dump();
+        COCL_LLVM_DUMP(structPointer);
         cout << endl;
         throw std::runtime_error("ERROR: Coriander currently forbids pointers inside gpu-side structs, passed into kernels");
     }
@@ -229,7 +230,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluevector(llvm::Instru
     int elementSizeBytes = elementType->getPrimitiveSizeInBits() / 8;
     if(elementType->getPrimitiveSizeInBits() == 0) {
         cout << endl;
-        vectorType->dump();
+        COCL_LLVM_DUMP(vectorType);
         cout << endl;
         throw runtime_error("PatchHostside::addSetKernelArgInst_byvaluevector: not implemented for non-primitive types");
     }
@@ -396,7 +397,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
         // so send it as a hostside buffer?
         lastInst = PatchHostside::addSetKernelArgInst_byvaluevector(lastInst, valueAsPointerInstr);
     } else {
-        value->dump();
+        COCL_LLVM_DUMP(value);
         outs() << "\n";
         throw std::runtime_error("kernel arg type type not implemented " + typeDumper.dumpType(value->getType()));
     }
@@ -421,9 +422,9 @@ void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *inf
     paramInfo->size = size;
     if(!isa<Instruction>(inst->getOperand(0))) {
         outs() << "getlaunchvalue, first operatnd of inst is not an instruction..." << "\n";
-        inst->dump();
+        COCL_LLVM_DUMP(inst);
         outs() << "\n";
-        inst->getOperand(0)->dump();
+        COCL_LLVM_DUMP(inst->getOperand(0));
         outs() << "\n";
         throw runtime_error("getlaunchvalue, first operatnd of inst is not an instruction...");
     }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "cocl/readIR.h"
+#include "cocl/llvm_dump.h"
 
 #include "llvm/Support/raw_os_ostream.h"
 #include "llvm/IR/Constants.h"
@@ -39,7 +40,7 @@ uint32_t ReadIR::readIntConstant_uint32(ConstantInt *constant) {
 
 std::string ReadIR::getName(StructType *type) {
     if(!type->hasName()) {
-        type->dump();
+        COCL_LLVM_DUMP(type);
         throw runtime_error("type doesnt have name");
     }
     return type->getName();
@@ -47,7 +48,8 @@ std::string ReadIR::getName(StructType *type) {
 
 std::string ReadIR::getName(Function *type) {
     if(!type->hasName()) {
-        type->dump();
+        type->print(llvm::dbgs());
+        //COCL_LLVM_DUMP(type);
         throw runtime_error("function doesnt have name");
     }
     return type->getName();
@@ -55,7 +57,7 @@ std::string ReadIR::getName(Function *type) {
 
 std::string ReadIR::getName(Value *value) {
     if(!value->hasName()) {
-        value->dump();
+        COCL_LLVM_DUMP(value);
         throw runtime_error("value doesnt have name");
     }
     return value->getName();
