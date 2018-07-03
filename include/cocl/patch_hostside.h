@@ -58,6 +58,8 @@ Ok, so the doc is mostly below, inside the class declaration, at the bottom of t
 #include <vector>
 #include <memory>
 
+#include "cocl/llvm_dump.h"
+
 #include "llvm/IR/Module.h"
 // #include "llvm/IR/Verifier.h"
 #include "llvm/IR/Type.h"
@@ -148,7 +150,7 @@ public:
     virtual llvm::Value *getOperand(int idx) override { return inst->getArgOperand(idx); }
     virtual llvm::Module *getModule() override { return inst->getModule(); }
     virtual llvm::Instruction *getInst() override { return inst; }
-    virtual void dump() override { inst->dump(); }
+    virtual void dump() override { COCL_LLVM_DUMP(inst); }
 };
 
 class GenericCallInst_Invoke : public GenericCallInst {
@@ -159,7 +161,7 @@ public:
     virtual llvm::Value *getOperand(int idx) override { return inst->getArgOperand(idx); }
     virtual llvm::Module *getModule() override { return inst->getModule(); }
     virtual llvm::Instruction *getInst() override { return inst; }
-    virtual void dump() override { inst->dump(); }
+    virtual void dump() override { COCL_LLVM_DUMP(inst); }
 };
 
 class PatchHostside {

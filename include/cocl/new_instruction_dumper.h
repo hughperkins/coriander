@@ -17,7 +17,7 @@
 #include "cocl/LocalValueInfo.h"
 #include "cocl/InstructionDumper.h"
 #include "cocl/shims.h"
-
+#include "cocl/llvm_dump.h"
 #include <string>
 #include <stdexcept>
 
@@ -29,7 +29,7 @@ public:
     }
     virtual const char* what() const throw()
     {
-        value->dump();
+        COCL_LLVM_DUMP(value);
         return "Need dependent value";
     }
     llvm::Value *value;

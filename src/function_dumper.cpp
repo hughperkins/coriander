@@ -22,6 +22,8 @@
 
 #include "llvm/IR/Function.h"
 
+#include "cocl/llvm_dump.h"
+
 #include <sstream>
 
 using namespace std;
@@ -349,7 +351,7 @@ std::string FunctionDumper::dumpTerminator(Type **pReturnType, Instruction *term
         terminatorCl = dumpBranch(branch);
     } else {
         cout << "unhandled terminator type:";
-        terminator->dump();
+        COCL_LLVM_DUMP(terminator);
         throw runtime_error("unhandled terminator type");
     }
     return terminatorCl;

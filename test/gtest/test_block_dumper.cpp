@@ -18,6 +18,8 @@
 #include "cocl/GlobalNames.h"
 #include "cocl/LocalNames.h"
 
+#include "cocl/llvm_dump.h"
+
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/MemoryBuffer.h"
@@ -97,7 +99,7 @@ public:
         for(auto it=F->arg_begin(); it != F->arg_end(); it++) {
             Argument *arg = &*it;
             // sring name = localNames.getOrCreateName(arg, arg->getName().str());
-            arg->dump();
+            COCL_LLVM_DUMP(arg);
             LocalValueInfo *localValueInfo = LocalValueInfo::getOrCreate(
                 &localNames, &localValueInfos, arg, arg->getName().str());
             localValueInfo->setExpression(localValueInfo->name);
@@ -226,7 +228,7 @@ TEST(test_block_dumper, basic2) {
     }
     ASSERT_EQ(1u, blockDumper->neededFunctions.size());
     Function *neededFunction = *blockDumper->neededFunctions.begin();
-    neededFunction->dump();
+    COCL_LLVM_DUMP(neededFunction);
     cout << endl;
     cout << neededFunction->getName().str() << endl;
     ASSERT_EQ("someFunc_gp", neededFunction->getName().str());

@@ -17,6 +17,7 @@
 #include "cocl/patch_hostside.h"
 
 #include "cocl/cocl_logging.h"
+#include "cocl/llvm_dump.h"
 
 #include "cocl/mutations.h"
 #include "argparsecpp/argparsecpp.h"
@@ -121,11 +122,17 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_int(llvm::Instruction *las
     } else {
         throw std::runtime_error("bitlength " + easycl::toString(bitLength) + " not implemented");
     }
+#if LLVM_VERSION_MAJOR > 4
     Function *setKernelArgInt = cast<Function>(M->getOrInsertFunction(
         mangledName,
         Type::getVoidTy(context),
-        IntegerType::get(context, bitLength),
-        NULL));
+        IntegerType::get(context, bitLength)));
+#else
+    Function *setKernelArgInt = cast<Function>(M->getOrInsertFunction(
+        mangledName,
+        Type::getVoidTy(context),
+        IntegerType::get(context, bitLength), NULL));
+#endif
     CallInst *call = CallInst::Create(setKernelArgInt, value);
     call->insertAfter(lastInst);
     lastInst = call;
@@ -145,11 +152,17 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_float(llvm::Instruction *l
         throw runtime_error("Executing functions with doubles as kernel parameters is not supported");
     }
 
+#if LLVM_VERSION_MAJOR > 4
     Function *setKernelArgFloat = cast<Function>(M->getOrInsertFunction(
         "setKernelArgFloat",
         Type::getVoidTy(context),
-        Type::getFloatTy(context),
-        NULL));
+        Type::getFloatTy(context)));
+#else
+    Function *setKernelArgFloat = cast<Function>(M->getOrInsertFunction(
+        "setKernelArgFloat",
+        Type::getVoidTy(context),
+        Type::getFloatTy(context), NULL));
+#endif
     CallInst *call = CallInst::Create(setKernelArgFloat, value);
     call->insertAfter(lastInst);
     return call;
@@ -176,12 +189,20 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointer(llvm::Instruction 
     int allocSize = dataLayout->getTypeAllocSize(elementType);
     int32_t elementSize = allocSize;
 
+#if LLVM_VERSION_MAJOR > 4
     Function *setKernelArgGpuBuffer = cast<Function>(M->getOrInsertFunction(
         "setKernelArgGpuBuffer",
         Type::getVoidTy(context),
         PointerType::get(IntegerType::get(context, 8), 0),
-        IntegerType::get(context, 32),
-        NULL));
+        IntegerType::get(context, 32)));
+#else
+    Function *setKernelArgGpuBuffer = cast<Function>(M->getOrInsertFunction(
+        "setKernelArgGpuBuffer",
+        Type::getVoidTy(context),
+        PointerType::get(IntegerType::get(context, 8), 0),
+        IntegerType::get(context, 32), NULL));
+#endif
+
     Value *args[] = {bitcast, createInt32Constant(&context, elementSize)};
     CallInst *call = CallInst::Create(setKernelArgGpuBuffer, ArrayRef<Value *>(args));
     call->insertAfter(lastInst);
@@ -208,7 +229,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_pointerstruct(llvm::Instru
         cout << "ERROR: Coriander currently forbids pointers inside gpu-side structs, passed into kernels" << endl;
         cout << "If you need this, please create an issue at https://github.com/hughperkins/Coriander/issues" << endl;
         cout << "Note that it's pretty hard to do though" << endl;
-        structPointer->dump();
+        COCL_LLVM_DUMP(structPointer);
         cout << endl;
         throw std::runtime_error("ERROR: Coriander currently forbids pointers inside gpu-side structs, passed into kernels");
     }
@@ -229,7 +250,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluevector(llvm::Instru
     int elementSizeBytes = elementType->getPrimitiveSizeInBits() / 8;
     if(elementType->getPrimitiveSizeInBits() == 0) {
         cout << endl;
-        vectorType->dump();
+        COCL_LLVM_DUMP(vectorType);
         cout << endl;
         throw runtime_error("PatchHostside::addSetKernelArgInst_byvaluevector: not implemented for non-primitive types");
     }
@@ -246,12 +267,19 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluevector(llvm::Instru
     args[0] = bitcast;
     args[1] = createInt32Constant(&context, allocSize);
 
+#if LLVM_VERSION_MAJOR > 4
     Function *setKernelArgHostsideBuffer = cast<Function>(M->getOrInsertFunction(
         "setKernelArgHostsideBuffer",
         Type::getVoidTy(context),
         PointerType::get(IntegerType::get(context, 8), 0),
-        IntegerType::get(context, 32),
-        NULL));
+        IntegerType::get(context, 32)));
+#else
+    Function *setKernelArgHostsideBuffer = cast<Function>(M->getOrInsertFunction(
+        "setKernelArgHostsideBuffer",
+        Type::getVoidTy(context),
+        PointerType::get(IntegerType::get(context, 8), 0),
+        IntegerType::get(context, 32), NULL));
+#endif
 
     CallInst *call = CallInst::Create(setKernelArgHostsideBuffer, ArrayRef<Value *>(args));
     call->insertAfter(lastInst);
@@ -303,7 +331,12 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
 
     Value *sourceStruct = 0;
     if(structHasPointers) {
+#if LLVM_VERSION_MAJOR > 4
+        // Assume address space 0
+        Instruction *alloca = new AllocaInst(newType, 0, "newalloca");
+#else
         Instruction *alloca = new AllocaInst(newType, "newalloca");
+#endif
         alloca->insertAfter(lastInst);
         lastInst = alloca;
 
@@ -321,12 +354,19 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst_byvaluestruct(llvm::Instru
     args[0] = bitcast;
     args[1] = createInt32Constant(&context, allocSize);
 
+#if LLVM_VERSION_MAJOR > 4
     Function *setKernelArgHostsideBuffer = cast<Function>(M->getOrInsertFunction(
         "setKernelArgHostsideBuffer",
         Type::getVoidTy(context),
         PointerType::get(IntegerType::get(context, 8), 0),
-        IntegerType::get(context, 32),
-        NULL));
+        IntegerType::get(context, 32)));
+#else
+    Function *setKernelArgHostsideBuffer = cast<Function>(M->getOrInsertFunction(
+        "setKernelArgHostsideBuffer",
+        Type::getVoidTy(context),
+        PointerType::get(IntegerType::get(context, 8), 0),
+        IntegerType::get(context, 32), NULL));
+#endif
 
     CallInst *call = CallInst::Create(setKernelArgHostsideBuffer, ArrayRef<Value *>(args));
     call->insertAfter(lastInst);
@@ -396,7 +436,7 @@ llvm::Instruction *PatchHostside::addSetKernelArgInst(llvm::Instruction *lastIns
         // so send it as a hostside buffer?
         lastInst = PatchHostside::addSetKernelArgInst_byvaluevector(lastInst, valueAsPointerInstr);
     } else {
-        value->dump();
+        COCL_LLVM_DUMP(value);
         outs() << "\n";
         throw std::runtime_error("kernel arg type type not implemented " + typeDumper.dumpType(value->getType()));
     }
@@ -423,7 +463,7 @@ void PatchHostside::getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *inf
         outs() << "getlaunchvalue, first operatnd of inst is not an instruction..." << "\n";
         inst->dump();
         outs() << "\n";
-        inst->getOperand(0)->dump();
+        COCL_LLVM_DUMP(inst->getOperand(0));
         outs() << "\n";
         throw runtime_error("getlaunchvalue, first operatnd of inst is not an instruction...");
     }
@@ -518,6 +558,15 @@ void PatchHostside::patchCudaLaunch(
     Instruction *llSourcecodeValue = addStringInstrExistingGlobal(M, devicellcode_stringname);
     llSourcecodeValue->insertBefore(inst->getInst());
 
+#if LLVM_VERSION_MAJOR > 4
+    Function *configureKernel = cast<Function>(F->getParent()->getOrInsertFunction(
+        "configureKernel",
+        Type::getVoidTy(context),
+        PointerType::get(IntegerType::get(context, 8), 0),
+        PointerType::get(IntegerType::get(context, 8), 0)
+        // PointerType::get(IntegerType::get(context, 8), 0),
+        ));
+#else
     Function *configureKernel = cast<Function>(F->getParent()->getOrInsertFunction(
         "configureKernel",
         Type::getVoidTy(context),
@@ -525,6 +574,8 @@ void PatchHostside::patchCudaLaunch(
         PointerType::get(IntegerType::get(context, 8), 0),
         // PointerType::get(IntegerType::get(context, 8), 0),
         NULL));
+#endif
+
     Value *args[] = {kernelNameValue, llSourcecodeValue};
     CallInst *callConfigureKernel = CallInst::Create(configureKernel, ArrayRef<Value *>(&args[0], &args[2]));
     callConfigureKernel->insertBefore(inst->getInst());
