@@ -122,8 +122,15 @@ __device__ float fabsf(float in1);
 __device__ float fabs(float in1);
 __device__ float sqrtf(float in1);
 __device__ float rsqrtf(float in1);
-__device__ float ceilf(float in1);
+
 __device__ float floorf(float in1);
+__device__ double floor(double in1);
+__device__ float floor(float in1);
+
+__device__ float ceilf(float in1);
+__device__ double ceil(double in1);
+__device__ float ceil(float in1);
+
 __device__ void sincosf(float angle, float *sinres, float *cosres);
 
 __device__ float pow(float in1, float in2);

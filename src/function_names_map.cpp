@@ -56,8 +56,17 @@ void FunctionNamesMap::populateKnownValues() {
     knownFunctionsMap["cosf"] = "cos";
     knownFunctionsMap["sinf"] = "sin";
     knownFunctionsMap["tanf"] = "tan";
-    knownFunctionsMap["ceilf"] = "ceil";
+    
+    knownFunctionsMap["floor"] = "floor";
     knownFunctionsMap["floorf"] = "floor";
+    knownFunctionsMap["_Z5floorf"] = "floor";
+    knownFunctionsMap["_Z5floord"] = "floor";
+    
+    knownFunctionsMap["ceil"] = "ceil";
+    knownFunctionsMap["ceilf"] = "ceil";
+    knownFunctionsMap["_Z4ceilf"] = "ceil";
+    knownFunctionsMap["_Z4ceild"] = "ceil";
+    
     knownFunctionsMap["logf"] = "log";
     knownFunctionsMap["sqrtf"] = "sqrt";
 
