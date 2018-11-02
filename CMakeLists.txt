@@ -99,7 +99,7 @@ set(COCL_SRCS src/type_dumper.cpp src/GlobalNames.cpp src/LocalNames.cpp src/new
     src/cocl_funcs.cpp
 )
 
-if(WIN32)
+if(MSVC)
   set(CMAKE_CXX_FLAGS "/EHsc")
 else()
   SET(PLATFORM_OPTIONS "")
