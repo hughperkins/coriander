@@ -210,14 +210,14 @@ target_link_libraries(ir-to-opencl cocl ${LLVM_SYSLIBS})
 add_executable(patch_hostside
     src/patch_hostside.cpp src/struct_clone.cpp src/mutations.cpp src/readIR.cpp
     third_party/argparsecpp/argparsecpp.cpp src/type_dumper.cpp src/GlobalNames.cpp
-    src/EasyCL/util/easycl_stringhelper.cpp src/cocl_logging.cpp
+    src/cocl_logging.cpp
 )
 target_include_directories(patch_hostside PRIVATE ${CLANG_HOME}/include)
 target_include_directories(patch_hostside PRIVATE include)
 target_include_directories(patch_hostside PRIVATE third_party)
 target_include_directories(patch_hostside PRIVATE src/EasyCL)
 target_compile_options(patch_hostside PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
-target_link_libraries(patch_hostside "${LLVM_LIBPATHS}"  ${LLVM_SYSLIBS})
+target_link_libraries(patch_hostside "${LLVM_LIBPATHS}"  ${LLVM_SYSLIBS} easycl)
 
 # ==================================================================================================
 # tests
