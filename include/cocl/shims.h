@@ -19,10 +19,11 @@
 #include <set>
 #include <map>
 #include <string>
+#include "cocl_export.h"
 
 namespace cocl {
 
-class Shims {
+class cocl_EXPORT Shims {
 public:
     Shims();
     virtual ~Shims() {}

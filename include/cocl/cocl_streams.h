@@ -38,7 +38,7 @@ namespace cocl {
         void *userdata;
         char *_queue;
     };
-    void coclCallback(cl_event event, cl_int status, void *userdata);
+    void CL_CALLBACK coclCallback(cl_event event, cl_int status, void *userdata);
 
     // a coclstream:
     // - is associated with one virtual cuda stream, from the point of view of the client
