@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "cocl/ClWriter.h"
+#include "ClWriter.h"
 
-#include "cocl/readIR.h"
-#include "cocl/LocalValueInfo.h"
-#include "cocl/mutations.h"
+#include "readIR.h"
+#include "LocalValueInfo.h"
+#include "mutations.h"
 #include "EasyCL/util/easycl_stringhelper.h"
-#include "cocl/InstructionDumper.h"
-#include "cocl/ExpressionsHelper.h"
+#include "InstructionDumper.h"
+#include "ExpressionsHelper.h"
 
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Constants.h"
-
-#include "cocl/llvm_dump.h"
 
 #include <iostream>
 using namespace std;
@@ -76,7 +74,7 @@ void ClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes a
     }
     if(localValueInfo->toBeDeclared) {
         if(!localValueInfo->expressionValid) {
-            COCL_LLVM_DUMP(localValueInfo->value);
+            localValueInfo->value->dump();
             cout << "expression for " << localValueInfo->name + " not defined" << endl;
             throw runtime_error("expression for " + localValueInfo->name + " not defined");
         }
@@ -158,7 +156,7 @@ void AllocaClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
             throw runtime_error("not implemented: alloca for count != 1");
         }
     } else {
-        COCL_LLVM_DUMP(alloca);
+        alloca->dump();
         throw runtime_error("dumpalloca not implemented for non pointer type");
     }
 }
@@ -229,7 +227,6 @@ void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
         int addressSpace = pointerType->getAddressSpace();
         // cout << "addressSpace " << addressSpace << endl;
         if(addressSpace != 3) {
-            std::cout << "SharedClWriter::writeDeclaration, addressSpace=" << addressSpace << ".  This codepath not handled" << std::endl;
             throw runtime_error("shouldnt be here");
         }
         Type *elementType = pointerType->getElementType();
@@ -245,20 +242,29 @@ void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
             // cout << "numElements " << numElements << endl;
             // primitiveType->dump();
         } else {
-            cout << "ERROR: sharedclwriter::writedlecaraiotn, not implemneted for:" << endl;
-            COCL_LLVM_DUMP(value);
+            cout << "sharedclwriter::writedlecaraiotn, not implemneted for:" << endl;
+            value->dump();
             cout << endl;
-            // TODO: uncomment this line FIXME
-            return;
-            // throw runtime_error("not handled/implemented");
+            throw runtime_error("not handled/implemented");
         }
         // GlobalVariable *globalVariable = cast<GlobalVariable>(value);
         // int count = pointerType->getArrayNumElements();
         // cout << "num elements " << count << endl;
-        os << indent << "local " << typeDumper->dumpType(primitiveType) << " " << localValueInfo->name << "[" << numElements << "];\n";
+        Type::TypeID typeID = primitiveType->getTypeID();
+        if (typeID == Type::ArrayTyID) {
+        	ArrayType *type = cast<ArrayType>(primitiveType);
+    	    int length = type->getNumElements();
+    	    Type *elementType = type->getElementType();
+//    	    if (length > 1)
+//    	    	numElements *=length;
+        	os << indent << "local " << typeDumper->dumpType(elementType, false) << " " << localValueInfo->name << "[" << numElements \
+			<< "][" << length << "];\n";
+        }
+        else
+        	os << indent << "local " << typeDumper->dumpType(primitiveType) << " " << localValueInfo->name << "[" << numElements << "];\n";
     } else {
         cout << "sharedclwriter writedeclaration not implmeneted for htis type:" << endl;
-        COCL_LLVM_DUMP(value);
+        value->dump();
         cout << endl;
         throw runtime_error("not implemented: sharedclwriter for this type");
     }
@@ -313,7 +319,7 @@ void CallClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writ
     }
     if(localValueInfo->toBeDeclared) {
         if(!localValueInfo->expressionValid) {
-            COCL_LLVM_DUMP(localValueInfo->value);
+            localValueInfo->value->dump();
             cout << "expression for " << localValueInfo->name + " not defined" << endl;
             throw runtime_error("expression for " + localValueInfo->name + " not defined");
         }

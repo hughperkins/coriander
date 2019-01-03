@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "cocl/function_names_map.h"
+#include "function_names_map.h"
 
 #include <set>
 #include <map>
@@ -40,7 +40,9 @@ void FunctionNamesMap::populateKnownValues() {
     knownFunctionsMap["_ZSt3expf"] = "exp";
     knownFunctionsMap["_ZSt3powff"] = "pow";
     knownFunctionsMap["_Z3minff"] = "fmin";
+    knownFunctionsMap["_Z3minii"] = "min";
     knownFunctionsMap["_Z3maxff"] = "fmax";
+    knownFunctionsMap["_Z3maxii"] = "max";
     knownFunctionsMap["_Z4fabsf"] = "fabs";
 
     knownFunctionsMap["fminf"] = "fmin";
@@ -56,17 +58,8 @@ void FunctionNamesMap::populateKnownValues() {
     knownFunctionsMap["cosf"] = "cos";
     knownFunctionsMap["sinf"] = "sin";
     knownFunctionsMap["tanf"] = "tan";
-    
-    knownFunctionsMap["floor"] = "floor";
-    knownFunctionsMap["floorf"] = "floor";
-    knownFunctionsMap["_Z5floorf"] = "floor";
-    knownFunctionsMap["_Z5floord"] = "floor";
-    
-    knownFunctionsMap["ceil"] = "ceil";
     knownFunctionsMap["ceilf"] = "ceil";
-    knownFunctionsMap["_Z4ceilf"] = "ceil";
-    knownFunctionsMap["_Z4ceild"] = "ceil";
-    
+    knownFunctionsMap["floorf"] = "floor";
     knownFunctionsMap["logf"] = "log";
     knownFunctionsMap["sqrtf"] = "sqrt";
 
