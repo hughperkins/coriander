@@ -40,7 +40,9 @@ void FunctionNamesMap::populateKnownValues() {
     knownFunctionsMap["_ZSt3expf"] = "exp";
     knownFunctionsMap["_ZSt3powff"] = "pow";
     knownFunctionsMap["_Z3minff"] = "fmin";
+    knownFunctionsMap["_Z3minii"] = "min";
     knownFunctionsMap["_Z3maxff"] = "fmax";
+    knownFunctionsMap["_Z3maxii"] = "max";
     knownFunctionsMap["_Z4fabsf"] = "fabs";
 
     knownFunctionsMap["fminf"] = "fmin";
