@@ -2,17 +2,63 @@
 
 #include <cstddef>
 #include <cstdint>
-
+#include "cocl.h"
 // targeted at running: https://github.com/tbennun/cudnn-training/blob/master/lenet.cu
 
 typedef int32_t CoclDnnGeometryType;
 typedef size_t CoclDnnSizeType;
+//typedef size_t cudnnStatus_t;
 
 enum dnnStatusCodes {
-    CUDNN_STATUS_SUCCESS = 0  // success is typically 0, I think?
+    CUDNN_STATUS_SUCCESS = 0,  // success is typically 0, I think?
+    CUDNN_STATUS_NOT_INITIALIZED,
+    CUDNN_STATUS_ALLOC_FAILED,
+    CUDNN_STATUS_BAD_PARAM,
+    CUDNN_STATUS_INTERNAL_ERROR,
+    CUDNN_STATUS_INVALID_VALUE,
+    CUDNN_STATUS_ARCH_MISMATCH,
+    CUDNN_STATUS_MAPPING_ERROR,
+    CUDNN_STATUS_EXECUTION_FAILED,
+    CUDNN_STATUS_NOT_SUPPORTED,
+    CUDNN_STATUS_LICENSE_ERROR,
+    CUDNN_STATUS_RUNTIME_PREREQUISITE_MISSING = 11,
+    CUDNN_STATUS_RUNTIME_IN_PROGRESS          = 12,
+    CUDNN_STATUS_RUNTIME_FP_OVERFLOW          = 13,
 };
 
+enum{
+    CUDNN_CONVOLUTION_FWD_ALGO_GEMM = 126742,
+    CUDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_GEMM,
+    CUDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_PRECOMP_GEMM,
+    CUDNN_CONVOLUTION_FWD_ALGO_DIRECT,
+    CUDNN_CONVOLUTION_FWD_ALGO_FFT,
+    CUDNN_CONVOLUTION_FWD_ALGO_FFT_TILING,
+    CUDNN_CONVOLUTION_FWD_ALGO_WINOGRAD,
+};
+
+
+enum{
+    CUDNN_CONVOLUTION_BWD_DATA_ALGO_0 = 315315,
+    CUDNN_CONVOLUTION_BWD_DATA_ALGO_1,
+    CUDNN_CONVOLUTION_BWD_DATA_ALGO_FFT,
+    CUDNN_CONVOLUTION_BWD_DATA_ALGO_FFT_TILING,
+    CUDNN_CONVOLUTION_BWD_DATA_ALGO_WINOGRAD,
+    CUDNN_CONVOLUTION_BWD_FILTER_ALGO_0 = 563543,
+    CUDNN_CONVOLUTION_BWD_FILTER_ALGO_1,
+    CUDNN_CONVOLUTION_BWD_FILTER_ALGO_2,
+    CUDNN_CONVOLUTION_BWD_FILTER_ALGO_FFT,
+    CUDNN_CONVOLUTION_BWD_FILTER_ALGO_3,
+};
+
+
 enum CoclDnnLayout {
+    CUDNN_CONVOLUTION_BWD_FILTER_NO_WORKSPACE,
+    CUDNN_CONVOLUTION_BWD_FILTER_SPECIFY_WORKSPACE_LIMIT,
+    CUDNN_CONVOLUTION_FWD_NO_WORKSPACE,
+    CUDNN_CONVOLUTION_FWD_SPECIFY_WORKSPACE_LIMIT,
+    CUDNN_CONVOLUTION_BWD_DATA_SPECIFY_WORKSPACE_LIMIT,
+    CUDNN_CONVOLUTION_BWD_DATA_NO_WORKSPACE,
+    CUDNN_CONVOLUTION_BWD_SPECIFY_WORKSPACE_LIMIT,
     CUDNN_TENSOR_NCHW = 35333,
     CUDNN_DATA_FLOAT,
     CUDNN_POOLING_MAX,
@@ -25,8 +71,14 @@ enum CoclDnnLayout {
     CUDNN_SOFTMAX_ACCURATE,
     CUDNN_SOFTMAX_MODE_CHANNEL,
     CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST,
-    CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST
+    CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST,
+    CUDNN_DATA_DOUBLE = 1,
+    CUDNN_DATA_HALF   = 2,
+    CUDNN_DATA_INT8   = 3,
+    CUDNN_DATA_INT32  = 4,
+    CUDNN_DATA_INT8x4 = 5
 };
+
 
 namespace cocl {
 namespace dnn {
@@ -62,9 +114,16 @@ typedef cocl::dnn::Dnn *cudnnHandle_t;
 typedef cocl::dnn::TensorDescriptor *cudnnTensorDescriptor_t;
 typedef cocl::dnn::FilterDescriptor *cudnnFilterDescriptor_t;
 
+//typedef CoclDnnLayout cudnnTensorFormat_t;
+//typedef CoclDnnLayout cudnnDataType_t;
+//typedef CoclDnnLayout cudnnActivationMode_t;
+//typedef CoclDnnLayout cudnnNanPropagation_t;
+
 extern "C" {
     size_t cudnnCreate(cudnnHandle_t *p_handle);
     size_t cudnnDestroy(cudnnHandle_t handle);
+    size_t cudnnSetStream(cudnnHandle_t handle, cudaStream_t streamId);
+    size_t cudnnGetStream(cudnnHandle_t handle, cudaStream_t *streamId);
 
     const char *cudnnGetErrorString(size_t error);
     size_t cudnnCreateTensorDescriptor(cudnnTensorDescriptor_t *p_tensor);
@@ -87,13 +146,14 @@ extern "C" {
     );
     size_t cudnnAddTensor(
         cudnnHandle_t handle,
-        float *p_alpha,
+        const float *p_alpha,
         cudnnTensorDescriptor_t tensorDesc1,
-        float *tensor,
-        float *p_beta,
+        const float *tensor,
+        const float *p_beta,
         cudnnTensorDescriptor_t tensorDesc2,
         float * tensor2
     );
+
     size_t cudnnSoftmaxForward(
         cudnnHandle_t handle,
         CoclDnnLayout softmaxMode,
