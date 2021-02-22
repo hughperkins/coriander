@@ -96,7 +96,7 @@ INFILES = []
 if platform.uname()[0] == 'Darwin':
     INCLUDES += ['-I', SYSTEM_SDK_PATH+'/../../usr/include/c++/v1']
     INCLUDES += ['-I', SYSTEM_SDK_PATH+'/usr/include']
-
+        
 args = sys.argv[1:]
 while len(args) > 0:
     # THISARG = args[0].split('=')[0]
