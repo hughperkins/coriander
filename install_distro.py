@@ -19,7 +19,7 @@ import argparse
 import time
 
 
-REQUIRED_LLVM_VERSION = '4.0.0'
+REQUIRED_LLVM_VERSION = '8.0.0'
 
 current_dir = '.'
 llvm_dir = None
@@ -133,22 +133,22 @@ def install_llvm(install_dir):
     makedir('soft')
     cd('soft')
     target_url = {
-        'Darwin': 'http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-apple-darwin.tar.xz',
-        'Linux': 'http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz',
-        'Windows': 'http://releases.llvm.org/4.0.0/LLVM-4.0.0-win64.exe'
+        'Darwin': 'https://releases.llvm.org/8.0.0/clang+llvm-8.0.0-x86_64-apple-darwin.tar.xz',
+        'Linux': 'https://releases.llvm.org/8.0.0/clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz',
+        'Windows': 'https://releases.llvm.org/8.0.0/LLVM-8.0.0-win64.exe'
     }[platform.uname()[0]]
     filename = target_url.split('/')[-1]
     wget(target_url, filename)
     if filename.endswith('.tar.xz'):
         run(['tar', '-xf', filename])
         unzip_name = filename.replace('.tar.xz', '')
-        run(['mv', unzip_name, 'llvm-4.0'])
+        run(['mv', unzip_name, 'llvm-'+REQUIRED_LLVM_VERSION])
         cd_repo_root()
-        llvm_dir = path.abspath(join(install_dir, 'soft', 'llvm-4.0'))
+        llvm_dir = path.abspath(join(install_dir, 'soft', 'llvm-'+REQUIRED_LLVM_VERSION))
         if is_llvm_dir(llvm_dir):
-            print('installed llvm ok to [%s]' % join('soft', 'llvm-4.0'))
+            print('installed llvm ok to [%s]' % join('soft', 'llvm-'+REQUIRED_LLVM_VERSION))
         else:
-            print('Failed to install LLVM 4.0.  Please retry, or install by hand')
+            print('Failed to install LLVM ' + REQUIRED_LLVM_VERSION +'.  Please retry, or install by hand')
             sys.exit(-1)
     else:
         print('Please install LLVM 4.0.0 by hand, into default location.  It is already downloaded into "soft" sub-directory. Just need to double-click it :-)')
@@ -157,7 +157,7 @@ def install_llvm(install_dir):
 
 def maybe_install_llvm(install_dir):
     global llvm_dir
-    for p in ['/usr/local/opt/llvm-4.0', 'C:\\Program Files\\LLVM', join(install_dir, 'soft', 'llvm-4.0')]:
+    for p in ['/usr/local/opt/llvm-4.0', 'C:\\Program Files\\LLVM', join(install_dir, 'soft', 'llvm-' + REQUIRED_LLVM_VERSION)]:
         if is_llvm_dir(p):
             llvm_dir = p
             print('found llvm, with required version %s at %s' % (REQUIRED_LLVM_VERSION, llvm_dir))
