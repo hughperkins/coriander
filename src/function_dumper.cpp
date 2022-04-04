@@ -25,12 +25,24 @@
 #include "cocl/llvm_dump.h"
 
 #include <sstream>
+#include <fstream>
 
 using namespace std;
 using namespace llvm;
 
 namespace cocl {
 
+// #ifdef COCL_PRINT
+// #undef COCL_PRINT
+// #endif
+
+#ifdef COCL_SPAM_INSTRUCTIONS
+// #define COCL_PRINT(x) x
+#define WHEN_SPAMMING_INSTRUCTIONS(x) x
+#else
+// #define COCL_PRINT(x)
+#define WHEN_SPAMMING_INSTRUCTIONS(x)
+#endif
 
 // the type used for kernel buffer offsets, ie unsigned 32bit (for beignet), or signed 64bit (default)
 std::string FunctionDumper::getOffsetType() {
@@ -83,6 +95,27 @@ std::string FunctionDumper::dumpPhi(std::string indent, llvm::BranchInst *branch
             }
             gencode += indent + phivarname + " = ";
             gencode += sourceValueCode + ";\n";
+
+            WHEN_SPAMMING_INSTRUCTIONS(ostringstream l);
+            WHEN_SPAMMING_INSTRUCTIONS(l << "Phi" << std::endl);
+            WHEN_SPAMMING_INSTRUCTIONS(l << "===" << std::endl);
+            WHEN_SPAMMING_INSTRUCTIONS(l << std::endl);
+            WHEN_SPAMMING_INSTRUCTIONS(l << phiValueInfo->name << std::endl);
+            WHEN_SPAMMING_INSTRUCTIONS(l << "source: " << sourceValueInfo->name << std::endl);
+
+            #ifdef COCL_SPAM_INSTRUCTIONS
+            std::cout << phiValueInfo->name << ": phi " << sourceValueInfo->name << std::endl;
+            l << "final expr: " << gencode << std::endl;
+
+            ofstream f;
+            f.open("/tmp/" + phiValueInfo->name + "_phi.txt", ios_base::out);
+            f << l.str();
+            f.close();
+            #endif
+
+            // WHEN_SPAMMING_INSTRUCTIONS(l << "names: " << dstInfo->name << " <- " << srcInfo->name << std::endl);
+            // WHEN_SPAMMING_INSTRUCTIONS(l << "types: " << typeDumper->dumpType(dst->getType()) << " <- " << typeDumper->dumpType(src->getType()) << std::endl);
+            // WHEN_SPAMMING_INSTRUCTIONS(l << "instrtype: " << typeDumper->dumpType(instr->getType()) << std::endl);
         }
     }
     return gencode;
