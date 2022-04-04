@@ -44,6 +44,7 @@ protected:
     std::map<llvm::Value *, std::string> nameByValue;
     std::map<std::string, llvm::Value *> valueByName;
 
+    // std::set<unique_ptr<Nameable>> nameables;
     std::map<llvm::Type *, std::string> nameByType;
     std::map<std::string, llvm::Type *> typeByName;
 

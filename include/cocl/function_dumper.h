@@ -44,6 +44,7 @@ public:
                 GlobalNames *globalNames, TypeDumper *typeDumper,
                 FunctionNamesMap *functionNamesMap,
                 bool offsets_32bit) :
+                // std::map<std::string, std::string> *shortFnNameByOrigName) :
             M(M),
             F(F),
             shortName(shortName),
@@ -55,6 +56,9 @@ public:
             structCloner(typeDumper, globalNames),
             functionNamesMap(functionNamesMap),
             offsets_32bit(offsets_32bit) {
+            // shortFnNameByOrigName(shortFnNameByOrigName) {
+        // block_it = F->begin();
+        // std::cout << "functiondumper, numuniqueclmems " << this->kernelNumUniqueClmems << std::endl;
         instructionDumper.reset(new NewInstructionDumper(
             M,
             globalNames,
@@ -67,7 +71,12 @@ public:
 
             &globalExpressionByValue,
             &localValueInfos
+            // shortFnNameByOrigName
         ));
+        // if(F->getParent() == 0) {
+        //     std::cout << "FunctionDumper constr() F->getParent is 0 func " << shortName << std::endl;
+        //     throw std::runtime_error("FunctionDumper constr() F->getParent is 0 " + shortName);
+        // }
     }
     virtual ~FunctionDumper() {
         instructionDumper.release();
@@ -100,6 +109,7 @@ public:
         return this;
     }
 
+    // std::set<std::string> shimFunctionsNeeded; // for __shfldown_3 etc, that we provide as opencl directly
     cocl::Shims shims;
     std::set<llvm::Function *> neededFunctions;
     std::set<llvm::StructType *> structsToDefine;
@@ -117,6 +127,8 @@ public:
     bool usesScratch = false;
 
 protected:
+    // llvm::Function::iterator block_it;
+
     bool _generationDone = false;
     std::ostringstream ouros;
     std::string declaration;
@@ -136,6 +148,7 @@ protected:
     StructCloner structCloner;
     const FunctionNamesMap *functionNamesMap;
     bool offsets_32bit;
+    // std::map<std::string, std::string> *shortFnNameByOrigName;
 
     std::unique_ptr<NewInstructionDumper> instructionDumper;
 };
