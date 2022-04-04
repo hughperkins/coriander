@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "cocl/ClWriter.h"
+#include "ClWriter.h"
 
-#include "cocl/readIR.h"
-#include "cocl/LocalValueInfo.h"
-#include "cocl/mutations.h"
+#include "readIR.h"
+#include "LocalValueInfo.h"
+#include "mutations.h"
 #include "EasyCL/util/easycl_stringhelper.h"
-#include "cocl/InstructionDumper.h"
-#include "cocl/ExpressionsHelper.h"
+#include "InstructionDumper.h"
+#include "ExpressionsHelper.h"
 
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Constants.h"
-
-#include "cocl/llvm_dump.h"
 
 #include <iostream>
 using namespace std;
@@ -56,13 +54,13 @@ void ClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper, std:
     }
     if(localValueInfo->toBeDeclared) {
         // cout << "in localvalueinfo.toBeDeclared:" << endl;
-        cout << "base ClWriter::writeDelcaration: " << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name << ";" << endl;
+        // cout << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name << ";" << endl;
         os << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name << ";\n";
     }
     // if(localValueInfo->toBeDeclared) {
     //     os << indent << typeDumper->dumpType(localValueInfo->value->getType(), true) << " " << localValueInfo->name;\n";
     // }
-    // cout << "done ClWriter::writeDeclaration()" << endl;
+    // cout << "ClWriter::writeDeclaration()" << endl;
 }
 
 void ClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes any cl required, eg if we toggled setAsAssigned, we need to do the assignment
@@ -76,7 +74,7 @@ void ClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writes a
     }
     if(localValueInfo->toBeDeclared) {
         if(!localValueInfo->expressionValid) {
-            COCL_LLVM_DUMP(localValueInfo->value);
+            localValueInfo->value->dump();
             cout << "expression for " << localValueInfo->name + " not defined" << endl;
             throw runtime_error("expression for " + localValueInfo->name + " not defined");
         }
@@ -113,32 +111,30 @@ void AllocaClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
                 // allocaInfo.refValue = alloca;
                 // allocaInfo.definition = allocaDeclaration;
                 // allocaDeclarations->push_back(allocaInfo);
-                std::cout << "allocadeclaration: " << allocaDeclaration << std::endl;
                 os << indent << allocaDeclaration << ";\n";
                 return;
             } else {
                 // cout << "alloca, non-arraytype" << endl;
                 // Value *refInstruction = alloca;
                 // if the elementType is a pointer, assume its global?
-                // if(isa<PointerType>(ptrElementType)) {
-                //     // cout << "alloca, pointertype" << endl;
-                //     // find the store
-                //     for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
-                //         User *user = *it;
-                //         if(StoreInst *store = dyn_cast<StoreInst>(user)) {
-                //             int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
-                //             // refInstruction = store->getOperand(0);
-                //             if(storeop0space == 1) {
-                //                 gencode += "global ";
-                //                 updateAddressSpace(alloca, 1);
-                //             }
-                //             copyAddressSpace(user, alloca);
-                //             typestring = typeDumper->dumpType(ptrElementType);
-                //         }
-                //     }
-                // }
+                if(isa<PointerType>(ptrElementType)) {
+                    // cout << "alloca, pointertype" << endl;
+                    // find the store
+                    for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
+                        User *user = *it;
+                        if(StoreInst *store = dyn_cast<StoreInst>(user)) {
+                            int storeop0space = cast<PointerType>(store->getOperand(0)->getType())->getAddressSpace();
+                            // refInstruction = store->getOperand(0);
+                            if(storeop0space == 1) {
+                                gencode += "global ";
+                                updateAddressSpace(alloca, 1);
+                            }
+                            copyAddressSpace(user, alloca);
+                            typestring = typeDumper->dumpType(ptrElementType);
+                        }
+                    }
+                }
                 string allocaDeclaration = gencode + typestring + " " + localValueInfo->name + "[1]";
-                std::cout << "allocadeclaration: " << allocaDeclaration << std::endl;
                 // find the store
                 // for(auto it=alloca->user_begin(); it != alloca->user_end(); it++) {
                     // User *user = *it;
@@ -160,7 +156,7 @@ void AllocaClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
             throw runtime_error("not implemented: alloca for count != 1");
         }
     } else {
-        COCL_LLVM_DUMP(alloca);
+        alloca->dump();
         throw runtime_error("dumpalloca not implemented for non pointer type");
     }
 }
@@ -207,22 +203,6 @@ void InsertValueClWriter::writeDeclaration(std::string indent, TypeDumper *typeD
         os << indent << *it << ";\n";
     }
     if(fromUndef) {
-        if(ArrayType *arrayType = dyn_cast<ArrayType>(localValueInfo->value->getType())) {
-            cout << "InsertValueClWriter::writedeclaration() is arraytype" << endl;
-            int innercount = arrayType->getNumElements();
-            Type *elementType = arrayType->getElementType();
-            string allocaDeclaration = typeDumper->dumpType(elementType) + " " + 
-                localValueInfo->name + "[" + easycl::toString(innercount) + "]";
-            // allocaInfo.alloca = alloca;
-            // allocaInfo.refValue = alloca;
-            // allocaInfo.definition = allocaDeclaration;
-            // allocaDeclarations->push_back(allocaInfo);
-            std::cout << "insertvaluedelcaration: " << allocaDeclaration << std::endl;
-            os << indent << allocaDeclaration << ";\n";
-            return;
-        }
-
-        std::cout << "InsertValueClWriter:writeDeclaration: " << typeDumper->dumpType(localValueInfo->value->getType()) << " " << localValueInfo->name << std::endl;
         os << indent << typeDumper->dumpType(localValueInfo->value->getType()) << " " << localValueInfo->name << ";\n";
     }
 }
@@ -262,12 +242,13 @@ void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
             primitiveType = arrayType->getElementType();
             // cout << "numElements " << numElements << endl;
             // primitiveType->dump();
+        // } else if(SequentialType *seqType = dyn) {
+            // os << indent << "local " << typeDumper->dumpType(pointerType) << " " << localValueInfo->name << "[1]\n";
         } else {
-            cout << "ERROR: sharedclwriter::writedlecaraiotn, not implemneted for:" << endl;
-            COCL_LLVM_DUMP(value);
-            cout << endl;
-            cout << "elementtype ispointer? " << isa<PointerType>(elementType) << std::endl;
-            cout << "elementtype isseq? " << isa<SequentialType>(elementType) << std::endl;
+            os << indent << "local " << typeDumper->dumpType(elementType) << " " << localValueInfo->name << "[1];\n";
+            // cout << "ERROR: sharedclwriter::writedlecaraiotn, not implemneted for:" << endl;
+            // value->dump();
+            // cout << endl;
             // TODO: uncomment this line FIXME
             return;
             // throw runtime_error("not handled/implemented");
@@ -278,7 +259,7 @@ void SharedClWriter::writeDeclaration(std::string indent, TypeDumper *typeDumper
         os << indent << "local " << typeDumper->dumpType(primitiveType) << " " << localValueInfo->name << "[" << numElements << "];\n";
     } else {
         cout << "sharedclwriter writedeclaration not implmeneted for htis type:" << endl;
-        COCL_LLVM_DUMP(value);
+        value->dump();
         cout << endl;
         throw runtime_error("not implemented: sharedclwriter for this type");
     }
@@ -333,7 +314,7 @@ void CallClWriter::writeInlineCl(std::string indent, std::ostream &os) { // writ
     }
     if(localValueInfo->toBeDeclared) {
         if(!localValueInfo->expressionValid) {
-            COCL_LLVM_DUMP(localValueInfo->value);
+            localValueInfo->value->dump();
             cout << "expression for " << localValueInfo->name + " not defined" << endl;
             throw runtime_error("expression for " + localValueInfo->name + " not defined");
         }

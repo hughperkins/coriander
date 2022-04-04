@@ -379,32 +379,11 @@ void NewInstructionDumper::dumpSelect(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->setExpression(gencode);
 }
 
-void NewInstructionDumper::skipChildrenRecursively(LocalValueInfo *lvi) {
-    Value *value = lvi->value;
-    lvi->skip();
-    std::cout << "skipping children of" << std::endl;
-    value->dump();
-    std::cout << std::endl;
-    for(auto it=value->user_begin(); it != value->user_end(); it++) {
-    // for(auto it=value->use_begin(); it != value->use_end(); it++) {
-        std::cout << "child:" << std::endl;
-        // Use *use = &*it;
-        User *childuser = *it;
-        Value *childvalue = childuser;
-        // Value *value = user->get();
-        childvalue->dump();
-        std::cout << std::endl;
-        LocalValueInfo *childInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, childvalue);
-        skipChildrenRecursively(childInfo);
-    }
-}
-
 void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     GetElementPtrInst *instr = cast<GetElementPtrInst>(localValueInfo->value);
 
-    Value *incomingOp = instr->getOperand(0);
-    LocalValueInfo *op0info = getOperand(incomingOp);
+    LocalValueInfo *op0info = getOperand(instr->getOperand(0));
 
     string gencode = "";
     int numOperands = instr->getNumOperands();
@@ -417,54 +396,18 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         // pointer into shared memory.
         // so, this isnt a local value in llvm, its a global one
         // so, we need to choose to add it as a local variable
-
-        // nuance: for thrust, we're going to simply skip any instrucdtison that use
-        // the type of memory associated with _ZN6thrust6system4cuda6detail5bulk_6detail12_GLOBAL__N_119s_on_chip_allocatorE
-        // seems like if element type is array, it's local memory, otherwise it's not
-        // let's try that...
-        if(!isa<ArrayType>(op0typeptr->getElementType())) {
-            std::cout << "dumpGetElementPtr() => skipping non-array elmenttype shared memory" << std::endl;
-            // localValueInfo->setExpression("/* skipping non-array element type shared memory */");
-            // localValueInfo->clWriter.reset(new NoExpressionClWriter(localValueInfo));
-            // localValueInfo->setAsAssigned();
-            localValueInfo->skip();
-            skipChildrenRecursively(localValueInfo);
-            // instr->getOperand(0)
-            Value *sharedValue = instr->getOperand(0);
-            LocalValueInfo *sharedInfo = LocalValueInfo::getOrCreate(
-                localNames, localValueInfos, sharedValue, sharedValue->getName().str());
-            sharedInfo->skip();
-            skipChildrenRecursively(sharedInfo);
-            return;
-        }
-        // std::cout << "local gep, addr space 3, type=" << typeDumper->dumpType(instr->getType()) << std::endl;
-        // instr->dump();
-        // std::cout << std::endl;
-
-        // cout << "op0typeptr-getElementType() is array? " << isa<ArrayType>(op0typeptr->getElementType()) << std::endl;
-        // if(ArrayType *Type = dyn_cast<)
-
-        //         Type *elementType = pointerType->getElementType();
-        // // cout << "elementType:" << endl;
-        // // elementType->dump();
-        // // cout << endl;
-        // int numElements = 0;
-        // Type *primitiveType = 0;
-        // if(ArrayType *arrayType = dyn_cast<ArrayType>(elementType)) {
-
-
         Value *sharedValue = instr->getOperand(0);
         LocalValueInfo *sharedInfo = LocalValueInfo::getOrCreate(
             localNames, localValueInfos, sharedValue, sharedValue->getName().str());
         sharedInfo->setAddressSpace(3);
     }
     llvm::Type *prevType = nullptr;
-    int d = 0;
-    // for(int d=0; d < numOperands - 1; d++) {
+    std:ostream &l = std::cout;
+    for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
-        // l << "   gep d=" << d << " currnettype=" << typeDumper->dumpType(currentType) << std::endl;
+        l << "gep d=" << d << " currnettype=" << typeDumper->dumpType(currentType) << std::endl;
         if(SequentialType *seqType = dyn_cast<SequentialType>(currentType)) {
-            // l << "    gep seqtype" << std::endl;
+            l << "    gep seqtype" << std::endl;
             if(d == 0) {
                 if(isa<ArrayType>(seqType->getElementType())) {
                     rhs = "(&" + rhs + ")";
@@ -490,6 +433,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                 newType = seqType->getElementType();
             }
         } else if(PointerType *pointerType = dyn_cast<PointerType>(currentType)) {
+            std::cout << "gep pointertype" << std::endl;
             if(d == 0) {
                 if(isa<ArrayType>(pointerType->getElementType())) {
                     rhs = "(&" + rhs + ")";
@@ -501,6 +445,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             rhs += string("[") + idxstring + "]";
             newType = pointerType->getElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
+            std::cout << "gep structtype" << std::endl;
             string structName = ReadIR::getName(structtype);
             if(structName == "struct.float4") {
                 int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
@@ -510,6 +455,8 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                 rhs = "((" + typeDumper->dumpType(castType) + ")&" + rhs + ")";
                 rhs += string("[") + easycl::toString(idx) + "]";
             } else {
+                localValueInfo->inlineCl.push_back(typeDumper->dumpType(currentType) + " " + localValueInfo->name + "_d" + easycl::toString(d) + " = " + rhs);
+
                 // generic struct
                 int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
                 Type *elementType = structtype->getElementType(idx);
@@ -546,48 +493,14 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         // update the addressspace to be global, ie 1.  This is a bit hacky I know
         prevType = currentType;
         currentType = newType;
-    // }
-    // updateAddressSpace(instr, addressspace);
-    // localValueInfo->setAddressSpace(addressspace);
+    }
+    updateAddressSpace(instr, addressspace);
+    localValueInfo->setAddressSpace(addressspace);
     rhs = "(" + ExpressionsHelper::stripOuterParams(rhs) + ")";
     rhs = "(&" + rhs + ")";
 
-    // Value *idxList[2];
-    // args[0] = bitcast;
-    cout << "instr:" << std::endl;
-    instr->dump();
-    cout << "instr->getType()->dump()" << endl;
-    instr->getType()->dump();
-    // idxList[0] = createInt32Constant(&M->getContext(), 0);
-    std::vector<Value *> idxList;
-    idxList.push_back(createInt32Constant(&M->getContext(), 0));
-    // idxList.push_back(createInt32Constant(&M->getContext(), 0));
-    // idxList.push_back(createInt32Constant(&M->getContext(), 0));
-
-    cout << "incomingOp->getType()->dump()" << std::endl;
-    incomingOp->getType()->dump();
-
-    cout << "incomingOp->getType()->getPointerElementType()->dump()" << std::endl;
-    cast<PointerType>(incomingOp->getType())->getElementType()->dump();
-    // instr->dump();
-    cout << "currentType->dump()" << std::endl;
-    currentType->dump();
-    cout << endl;
-    GetElementPtrInst *childInst = GetElementPtrInst::Create(currentType, incomingOp, ArrayRef<Value *>(idxList));
-    // childInst->insertAfter(instr);
-    std::cout << "childinst:" << std::endl;
-    childInst->dump();
-    std::cout << std::endl;
-    cout << "childinst->getType()->dump" << endl;
-    childInst->getType()->dump();
-    cout << endl;
-    LocalValueInfo *thisInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, childInst);
-    
     localValueInfo->setExpression(rhs);
 }
-            // LocalValueInfo *instrInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, inst);
-// static GetElementPtrInst *  Create (Type *PointeeType, Value *Ptr, ArrayRef< Value * > IdxList, const Twine &NameStr="", Instruction *InsertBefore=nullptr)
-// static GetElementPtrInst *  Create (Type *PointeeType, Value *Ptr, ArrayRef< Value * > IdxList, const Twine &NameStr, BasicBlock *InsertAtEnd)
 
 void NewInstructionDumper::dumpLoad(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
@@ -596,8 +509,7 @@ void NewInstructionDumper::dumpLoad(cocl::LocalValueInfo *localValueInfo) {
     string rhs= "";
     bool destIsSinglePointer = false;
     if(PointerType *l1pointer = dyn_cast<PointerType>(instr->getType())) {
-        // if(PointerType *l2pointer = dyn_cast<PointerType>(l1pointer->getElementType())) {
-        if(isa<PointerType>(l1pointer->getElementType())) {
+        if(PointerType *l2pointer = dyn_cast<PointerType>(l1pointer->getElementType())) {
         } else {
             destIsSinglePointer = true;
         }
@@ -1121,25 +1033,6 @@ void NewInstructionDumper::runGeneration(LocalValueInfo *localValueInfo, const s
     Instruction *instruction = cast<Instruction>(localValueInfo->value);
     localValueInfo->needDependencies = false;
     auto opcode = instruction->getOpcode();
-    // for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
-    // std::cout << "checking instr " << std::endl;
-    // instruction->dump();
-    // std::cout << std::endl;
-    // for(auto it=instruction->op_begin(); it != instruction->op_end(); it++) {
-    //     Value *op = &*it->get();
-    //     std::cout << "op " << std::endl;
-    //     op->dump();
-    //     std::cout << std::endl;
-    //     LocalValueInfo *lvi = getOperand(op);
-    //     std::cout << "lvi name=" << lvi->name << " skip=" << lvi->_skip << std::endl;
-    //     if(lvi->_skip) {
-    //         std::cout << "instruction operand marked skip, so skipping self" << std::endl;
-    //         instruction->dump();
-    //         std::cout << std::endl;
-    //         localValueInfo->skip();
-    //         return;
-    //     }
-    // }
     if(_addIRToCl) {
         string originalInstruction = "";
         originalInstruction += typeDumper->dumpType(instruction->getType()) + " " + localValueInfo->name + " =";
