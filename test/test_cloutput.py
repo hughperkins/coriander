@@ -28,23 +28,6 @@ def cuSourcecode():
     with open('test/testcudakernel1.cu', 'r') as f:
         return f.read()
 
-# def compile_code(cl, context, kernelSource):
-#     for file in os.listdir('/tmp'):
-#         if file.startswith('testprog'):
-#             os.unlink('/tmp/%s' % file)
-#     with open('/tmp/testprog.cu', 'w') as f:
-#         f.write(kernelSource)
-#     print(subprocess.check_output([
-#         'bin/cocl',
-#         '-c',
-#         '/tmp/testprog.cu'
-#     ]).decode('utf-8'))
-#     with open('/tmp/testprog-device.cl', 'r') as f:
-#         cl_sourcecode = f.read()
-#     prog = cl.Program(context, cl_sourcecode).build()
-#     return prog
-
-
 # @pytest.fixture(scope='module')
 # def testcudakernel1_cl():
 #     # cl_path = 'test/generated/testcudakernel1-device.cl'
@@ -65,10 +48,6 @@ def cuSourcecode():
 #     return cl_path
 
 
-# def test_cl_generates(testcudakernel1_cl):
-#     pass
-
-
 # @pytest.fixture(scope='module')
 # def testcudakernel1(context, testcudakernel1_cl):
 #     with open(testcudakernel1_cl, 'r') as f:
@@ -76,10 +55,6 @@ def cuSourcecode():
 
 #     prog = cl.Program(context, sourcecode).build()
 #     return prog
-
-
-# def test_program_compiles(testcudakernel1):
-#     pass
 
 
 def test_insertvalue(context, q, float_data, float_data_gpu):

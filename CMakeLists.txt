@@ -174,6 +174,12 @@ foreach(LIBNAME ${LLVM_LIBNAMES})
     set(LLVM_LIBPATHS ${LLVM_LIBPATHS} ${CLANG_HOME}/lib/${LIBNAME})
 endforeach()
 
+add_executable(walk src/addressspacewalk/spacegraph.cpp src/addressspacewalk/spacegraph_instructionspecific.cpp src/addressspacewalk/walker_main.cpp)
+target_link_libraries(walk cocl clew clblast easycl)
+target_include_directories(walk PRIVATE src)
+target_include_directories(walk PRIVATE third_party/argparsecpp)
+target_compile_options(walk PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
+
 add_library(clew SHARED src/EasyCL/thirdparty/clew/src/clew.c)
 target_include_directories(clew PRIVATE src/EasyCL/thirdparty/clew/include)
 if(UNIX)
