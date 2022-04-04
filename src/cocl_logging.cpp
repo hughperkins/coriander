@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "cocl/cocl_logging.h"
+#include "cocl_logging.h"
 
 #include <iostream>
 using namespace std;
@@ -35,45 +35,7 @@ Indentor &Indentor::operator<<(const std::string &message) {
     messageSoFar << message;
     return *this;
 }
-Indentor &Indentor::operator<<(const char *message) {
-    // cout << indent << message << endl;
-    // messageSoFar = message
-    messageSoFar << message;
-    return *this;
-}
 Indentor &Indentor::operator<<(const int value) {
-    // cout << indent << message << endl;
-    // messageSoFar = message
-    messageSoFar << value;
-    return *this;
-}
-Indentor &Indentor::operator<<(const unsigned int value) {
-    // cout << indent << message << endl;
-    // messageSoFar = message
-    messageSoFar << value;
-    return *this;
-}
-Indentor &Indentor::operator<<(const unsigned long long value) {
-    // cout << indent << message << endl;
-    // messageSoFar = message
-    messageSoFar << value;
-    return *this;
-}
-#ifndef _WIN32
-Indentor &Indentor::operator<<(const size_t value) {
-    // cout << indent << message << endl;
-    // messageSoFar = message
-    messageSoFar << value;
-    return *this;
-}
-#endif
-Indentor &Indentor::operator<<(const long long value) {
-    // cout << indent << message << endl;
-    // messageSoFar = message
-    messageSoFar << value;
-    return *this;
-}
-Indentor &Indentor::operator<<(const float value) {
     // cout << indent << message << endl;
     // messageSoFar = message
     messageSoFar << value;
@@ -87,13 +49,5 @@ Indentor &Indentor::operator<<(const endl_fn &fn) {
     messageSoFar.str("");
     return *this;
 }
-// template<typename T>
-// Indentor &Indentor::operator<<(const T &value) {
-//     messageSoFar << value;
-//     return *this;
-// }
-
-// template Indentor &Indentor::operator<< <char *>(const char *&value);
-// template Indentor &Indentor::operator<< <int>(const int &value);
 
 } // namespace cocl

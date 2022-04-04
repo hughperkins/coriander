@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "cocl/cocl_logging.h"
+#include "cocl_logging.h"
 
 #include <iostream>
 
