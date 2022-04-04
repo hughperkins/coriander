@@ -79,7 +79,6 @@ namespace cocl {
         // this->platform_id = _platform_id;
         // this->device_id = _device_id;
     }
-
     int numGpus = 0;
     std::vector<std::unique_ptr<cocl::CoclDevice> > deviceByOrdinal;
     bool devicesInitialized = false;
@@ -187,12 +186,12 @@ size_t cudaSetDevice (int gpuOrdinal) {
 }
 
 size_t cudaDeviceReset() {
-    cout << "ignoring cudaDeviceReset for now" << endl;
+    //cout << "ignoring cudaDeviceReset for now" << endl;
     return 0;
     //throw runtime_error("Not yet implemented, please raise an issue at https://github.com/hughperkins/Coriander/issues");
 }
 
 size_t cudaDeviceSynchronize() {
-    cout << "ignoring cudaDeviceSynchronize for now" << endl;
+    //cout << "ignoring cudaDeviceSynchronize for now" << endl;
     return 0;
 }
