@@ -24,77 +24,21 @@
 
 #include <iostream>
 #include <memory>
-#include <mutex>
 
 using namespace std;
 using namespace cocl;
 using namespace easycl;
 
-#ifdef COCL_PRINT
-#undef COCL_PRINT
-#endif
-
-#ifdef COCL_SPAM_EVENTS
-#define COCL_PRINT(x) std::cout << "[EVT] " << x << std::endl;
-#else
-#define COCL_PRINT(x) 
-#endif
-
-// I guess that events should only be called from a single thread, so there might 
-// be a bug elesewhere, but in the meantime, the events are being called in parallel, from
-// mutliple threads, which crasehs stuff. lets try using a mutex to "fix" this for now
-// static pthread_mutex_t cocl_events_mutex = PTHREAD_MUTEX_INITIALIZER;
-static std::mutex cocl_events_mutex;
-
 namespace cocl {
-    CoclEvent::CoclEvent() {
-        COCL_PRINT("CoclEvent() this=" << this);
-        event = 0;
+    Event::Event() {
+        COCL_PRINT(cout << "Event()" << endl);
     }
-    CoclEvent::~CoclEvent() {
-        COCL_PRINT("~CoclEvent() this=" << this);
+    Event::~Event() {
+        COCL_PRINT(cout << "~Event()" << endl);
         if(event != 0) {
-            COCL_PRINT("~CoclEvent() releasing underlying clevent " << event);
-            cl_int err = clReleaseEvent(event);
-            EasyCL::checkError(err);
+            clReleaseEvent(event);
         }
     }
-}
-
-size_t cuStreamWaitEvent(char *_queue, CoclEvent *event, unsigned int flags) {
-    // pthread_mutex_lock(&cocl_events_mutex);
-    std::lock_guard< std::mutex > guard(cocl_events_mutex);
-    CoclStream *stream = (CoclStream *)_queue;
-    CLQueue *queue = stream->clqueue;
-    if(queue == 0) {
-        cout << "cuStreamWaitEvent stream==0 not implemented" << std::endl;
-        throw runtime_error("cuStreamWaitEvent stream==0 not implemented");
-    }
-
-    // I think what cuStreamWaitEvent does is:
-    // - add something to the queue, some marker/barrier
-    // - anything added to the queue after this will NOT start executing
-    // - until the event given to cuStreamWaitEvent is marked as finished
-    //
-    // I think that with clWaitForEvents, we can give a list of cl events to wait on,
-    // but its the *host* thread that waits, ie the call is blocking
-    // I think that cuStreamWaitEvent is not actually a blocking call, for the host, its more like
-    // some kind of barrier
-
-    // I think waht we plausibly need is clEnqueueBarrierWithWaitList
-    // so lets try that...
-
-    if(event->event == 0) {
-        cerr << "cuStreamWaitEvent redirected: Warning: you havent Recorded on the event you passed in" << endl;
-    } else {
-        // cl_event clevent;
-        clEnqueueBarrierWithWaitList(queue->queue,
-            1,
-            &event->event,
-            0);
-    }
-    // pthread_mutex_unlock(&cocl_events_mutex);
-    return 0;
 }
 
 // opencl:
@@ -105,106 +49,65 @@ size_t cuStreamWaitEvent(char *_queue, CoclEvent *event, unsigned int flags) {
 // clReleaseEvent
 
 // cuda:
-// cuEventCreate(CUCoclEvent *, flags)
+// cuEventCreate(CUEvent *, flags)
 // cuEventRecord(CUEvent, CUstream);  => puts into the stream
 // cuEventQuery(CUevent)
 // cuEventSynchronize(CUevent)
 // cuEventDestroy
 
-size_t cudaStreamWaitEvent(char *_queue, CoclEvent *event, unsigned int flags) {
-    return cuStreamWaitEvent(_queue, event, flags);
-}
-
-size_t cuEventCreate(CoclEvent **pevent, unsigned int flags) {
-    std::lock_guard< std::mutex > guard(cocl_events_mutex);
-    // pthread_mutex_lock(&cocl_events_mutex);
-    CoclEvent *event = new CoclEvent();
+size_t cuEventCreate(Event **pevent, unsigned int flags) {
+    Event *event = new Event();
     *pevent = event;
-    COCL_PRINT("cuEventCreate flags=" << flags << " new CoclEvent=" << event);
-    // throw runtime_error("fake stop");
-    // pthread_mutex_unlock(&cocl_events_mutex);
+    COCL_PRINT(cout << "cuEventCreate redirected flags=" << flags << " new event=" << event << endl);
     return 0;
 }
 
-size_t cudaEventCreateWithFlags(CoclEvent **pevent, unsigned int flags) {
-    return cuEventCreate(pevent, flags);
-}
-
-size_t cudaEventCreate(CoclEvent **pevent) {
+size_t cudaEventCreate(Event **pevent) {
     return cuEventCreate(pevent, 0);
 }
 
-size_t cuEventSynchronize(CoclEvent *event) {
-    std::lock_guard< std::mutex > guard(cocl_events_mutex);
-    // pthread_mutex_lock(&cocl_events_mutex);
-    COCL_PRINT("cuEventSynchronize CoclEvent=" << event);
-    cl_int err = clWaitForEvents(1, &event->event);  // 1 is number of events, 2nd parameter is list of events
+size_t cuEventSynchronize(Event *event) {
+    COCL_PRINT(cout << "cuEventSynchronize redirected event=" << event << endl);
+    cl_int err = clWaitForEvents(1, &event->event);
     EasyCL::checkError(err);
-    // pthread_mutex_unlock(&cocl_events_mutex);
     return 0;
 }
+
 
 size_t cudaProfilerStop() {
     return 0;
 }
 
-size_t cudaEventElapsedTime(float *p_elapsedTime, cocl::CoclEvent *start, cocl::CoclEvent *stop) {
+size_t cudaEventElapsedTime(float *p_elapsedTime, cocl::Event *start, cocl::Event *stop) {
     *p_elapsedTime = 0.0f;
     return 0;
 }
 
-size_t cudaEventSynchronize(cocl::CoclEvent *event) {
+size_t cudaEventSynchronize(cocl::Event *event) {
     return cuEventSynchronize(event);
 }
 
-size_t cuEventRecord(CoclEvent *event, char *_queue) {
-    std::lock_guard< std::mutex > guard(cocl_events_mutex);
-    // pthread_mutex_lock(&cocl_events_mutex);
-    COCL_PRINT("cuEventRecord CoclEvent=" << (long)event << " _queue=" << (long)_queue);
+size_t cuEventRecord(Event *event, char *_queue) {
     CoclStream *coclStream = (CoclStream *)_queue;
-
-    ThreadVars *v = getThreadVars();
-    // EasyCL *cl = v->getContext()->getCl();
-    if(coclStream == 0) {
-        coclStream = v->currentContext->default_stream.get();
-    }
     CLQueue *queue = coclStream->clqueue;
-    COCL_PRINT("  cuEventRecord queue=" << queue);
     // CLQueue *queue = (CLQueue *)_queue;
+    COCL_PRINT(cout << "cuEventRecord redirected event=" << event << " queue=" << queue << endl);
     if(queue == 0) {
-        cout << "cuEventRecord not implemented for stream 0" << endl;
-        throw runtime_error("cuEventRecord not implemented for stream 0");
-    }
-    cl_int err;
-    err = clFlush(queue->queue);
-    EasyCL::checkError(err);
-    if(event->event != 0) {
-        COCL_PRINT("  cuEventRecord releasing existing clevent " << event->event);
-        err = clReleaseEvent(event->event);
-        EasyCL::checkError(err);
-        event->event = 0;
-        // cout << "cuEventRecrd event is already assigned => error" << endl;
-        // throw runtime_error("cuEventRecord: event is already assigned => error");
+        cout << "cuEventRecord redirected not implemented for stream 0" << endl;
+        throw runtime_error("cuEventRecord redirected not implemented for stream 0");
     }
     cl_event clevent;
-    err = clEnqueueMarkerWithWaitList(queue->queue, 0, 0, &clevent);
-    COCL_PRINT("cuEventRecord CoclEvent=" << event << " created clevent=" << clevent);
-    EasyCL::checkError(err);
-    err = clFlush(queue->queue);
-    EasyCL::checkError(err);
+    clEnqueueMarkerWithWaitList(queue->queue, 0, 0, &clevent);
     event->event = clevent;
-    // pthread_mutex_unlock(&cocl_events_mutex);
     return 0;
 }
 
-size_t cudaEventRecord(cocl::CoclEvent *event, char *queue) {
+size_t cudaEventRecord(cocl::Event *event, char *queue) {
     return cuEventRecord(event, queue);
 }
 
-size_t cuEventQuery(CoclEvent *event) {
-    std::lock_guard< std::mutex > guard(cocl_events_mutex);
-    // pthread_mutex_lock(&cocl_events_mutex);
-    COCL_PRINT("cuEventQuery CoclEvent=" << event << " clevent=" << event->event);
+size_t cuEventQuery(Event *event) {
+    COCL_PRINT(cout << "cuEventQuery redirected event=" << event << endl);
     cl_int res;
     cl_int err = clGetEventInfo (
         event->event,
@@ -212,35 +115,19 @@ size_t cuEventQuery(CoclEvent *event) {
         sizeof(cl_int),
         &res,
         0);
-    COCL_PRINT("clGetEventInfo: " << res);
+    COCL_PRINT(cout << "clGetEventInfo: " << res << endl);
     EasyCL::checkError(err);
-    // pthread_mutex_unlock(&cocl_events_mutex);
     if(res == CL_COMPLETE) { // success
-        COCL_PRINT("cuEventQuery, event completed");
         return 0;
     } else if(res > 0) { // not finished yet
-        COCL_PRINT("cuEventQuery, event not finished yet");
         return cudaErrorNotReady;
     } else { // error
-        COCL_PRINT("cuEventQuery, event error");
         return 1;
     }
 }
 
-size_t cuEventDestroy_v2(CoclEvent *event) {
-    std::lock_guard< std::mutex > guard(cocl_events_mutex);
-    // pthread_mutex_lock(&cocl_events_mutex);
-    COCL_PRINT("cuEventDestroy CoclEvent=" << event);
-    // if(event->event != 0) {
-    //     COCL_PRINT("cuEventDestory_v2: releasing event " << event->event);
-    //     cu_int err = clReleaseEvent(event->event);
-    //     EasyCL::checkError(err);
-    // }
+size_t cuEventDestroy_v2(Event *event) {
+    COCL_PRINT(cout << "cuEventDestroy redirected event=" << event << endl);
     delete event;
-    // pthread_mutex_unlock(&cocl_events_mutex);
     return 0;
-}
-
-size_t cudaEventDestroy(CoclEvent *event) {
-    return cuEventDestroy(event);
 }

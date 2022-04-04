@@ -52,13 +52,11 @@ Ok, so the doc is mostly below, inside the class declaration, at the bottom of t
 
 #pragma once
 
-#include "cocl/struct_clone.h"
+#include "struct_clone.h"
 
 #include <string>
 #include <vector>
 #include <memory>
-
-#include "cocl/llvm_dump.h"
 
 #include "llvm/IR/Module.h"
 // #include "llvm/IR/Verifier.h"
@@ -71,31 +69,15 @@ namespace cocl {
 
 class ParamInfo {
 public:
-    // ParamInfo() {}
-    // ParamInfo(const ParamInfo&) = delete;
     // ParamInfo(llvm::Type *type, llvm::Value *value, llvm::Value pointer, bool isByVal) :
     //     type(type), value(value), pointer(pointer), isByVal(isByVal) {
     // }
-    // llvm::Type *typeHostsideFn = 0;     // type of the arg in the hostside bytecode function declaration
-    llvm::Type *typeDevicesideFn = 0;  // how this param is defined in device bytecode function declaration
-
-    // bool hostsideByVal = false;  // in hostside arg, is it byvalue?
-    bool devicesideByVal = false;  // in deviceside arg, is it byvalue?
-
-    // bool devicesideReadNone = false; // in deviceside arg, is it readnone? (ie ignored...)
-    llvm::Value *value = 0;   // from the first arg to the bitcast feeding into cudaSetupArgument
-    llvm::Value *pointer = 0;  // from cudaSetupArgument
-
-    // llvm::Argument *hostsideArg = 0;
-    llvm::Argument *devicesideArg = 0;
-
-    int size = 0;  // from CudaLaunch function call declaration
-
-    int paramIndex = 0; // in the original function, nto in our hacked around kernel function
+    llvm::Type *type = 0;
+    llvm::Value *value = 0;
+    llvm::Value *pointer = 0;
+    bool isByVal = false;
+    int size = 0;
 };
-
-  // noncopyable(const noncopyable&) =delete;  
-  // noncopyable& operator=(const noncopyable&) =delete; 
 
 class LaunchCallInfo {
 public:
@@ -105,15 +87,8 @@ public:
         block_xy_value = 0;
         block_z_value = 0;
     }
-    LaunchCallInfo(const LaunchCallInfo&) = delete;
-    LaunchCallInfo &operator=(const LaunchCallInfo&) = delete;
-
     std::string kernelName = "";
-
-    // this only contains non-readnone args. readnone (devicesdie) are ignored, not stored in this (since hostside wont call them,
-    // eg see the random_op_gpu.cc kernel, from tensorflow, which has NormalDistribution as readnone, on its 4th arg,
-    // but the hostside only passes 3 args, skips the NOrmalDistribution arg)
-    std::vector<std::unique_ptr<ParamInfo> > params;
+    std::vector<ParamInfo> params;
 
     llvm::Value *stream;
     llvm::Value *grid_xy_value;
@@ -135,6 +110,7 @@ public:
     static std::unique_ptr<GenericCallInst> create(llvm::CallInst *inst);
     virtual llvm::Value *getArgOperand(int idx) = 0;
     virtual llvm::Value *getOperand(int idx) = 0;
+    virtual llvm::Type *getType() = 0;
     virtual llvm::Module *getModule() = 0;
     virtual llvm::Instruction *getInst() = 0;
     virtual void dump() = 0;
@@ -148,9 +124,10 @@ public:
     llvm::CallInst *inst;
     virtual llvm::Value *getArgOperand(int idx) override { return inst->getArgOperand(idx); }
     virtual llvm::Value *getOperand(int idx) override { return inst->getArgOperand(idx); }
+    virtual llvm::Type *getType() override { return inst->getType(); }
     virtual llvm::Module *getModule() override { return inst->getModule(); }
     virtual llvm::Instruction *getInst() override { return inst; }
-    virtual void dump() override { COCL_LLVM_DUMP(inst); }
+    virtual void dump() override { inst->dump(); }
 };
 
 class GenericCallInst_Invoke : public GenericCallInst {
@@ -159,15 +136,23 @@ public:
     llvm::InvokeInst *inst;
     virtual llvm::Value *getArgOperand(int idx) override { return inst->getArgOperand(idx); }
     virtual llvm::Value *getOperand(int idx) override { return inst->getArgOperand(idx); }
+    virtual llvm::Type *getType() override { return inst->getType(); }
     virtual llvm::Module *getModule() override { return inst->getModule(); }
     virtual llvm::Instruction *getInst() override { return inst; }
-    virtual void dump() override { COCL_LLVM_DUMP(inst); }
+    virtual void dump() override { inst->dump(); }
 };
 
 class PatchHostside {
 public:
     // returns path without the directory name (I think). this should go into some utiity class really...
     static std::string getBasename(std::string path); 
+
+    static void getLaunchTypes(GenericCallInst *inst, LaunchCallInfo *info);
+
+    // given a bytecode that calls the cudaSetupArgument method, obtains information
+    // about this, such as the type of the argument being set, and an instruction that represents
+    // its value, stores that, in info, along with the arguments there already
+    static void getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info, ParamInfo *paramInfo);
 
     // handle primitive ints and floats (not arrays):
     static llvm::Instruction *addSetKernelArgInst_int(llvm::Instruction *lastInst, llvm::Value *value, llvm::IntegerType *intType);
@@ -206,8 +191,7 @@ public:
     //
     // this patch_hostside addSetKernelArgInst_byvaluestruct function is going to handle walking the struct, and sending
     // the other pointers through using additional method calls, likely to setKernelArgGpuBuffer
-    static llvm::Instruction *addSetKernelArgInst_byvaluestruct(
-        llvm::Instruction *lastInst, cocl::ParamInfo *paramInfo, llvm::Value *valueAsPointerInstr);
+    static llvm::Instruction *addSetKernelArgInst_byvaluestruct(llvm::Instruction *lastInst, llvm::Value *valueAsPointerInstr);
 
     // this needs to do the same as addSetKernelArgInst_byvaluestruct , but it passes the struct pointer into the
     // setKernelArgGpuBuffer function, rather than the setKernelArgHostsideBuffer
@@ -224,18 +208,10 @@ public:
     static llvm::Instruction *addSetKernelArgInst(
         llvm::Instruction *lastInst, ParamInfo *paramInfo);
 
-    static void getLaunchTypes(llvm::Module *M, const llvm::Module *MDevice, GenericCallInst *inst, LaunchCallInfo *info);
-
-    // given a bytecode that calls the cudaSetupArgument method, obtains information
-    // about this, such as the type of the argument being set, and an instruction that represents
-    // its value, stores that, in info, along with the arguments there already
-    static void getLaunchArgValue(GenericCallInst *inst, LaunchCallInfo *info, ParamInfo *paramInfo);
-
-    static void patchCudaLaunch(
-        llvm::Module *M, const llvm::Module *MDevice,
-        llvm::Function *F, GenericCallInst *inst, std::vector<llvm::Instruction *> &to_replace_with_zero);
-    static void patchFunction(llvm::Module *M, const llvm::Module *MDevice, llvm::Function *F);  // patch all kernel launch commands in function F
-    static void patchModule(llvm::Module *M, const llvm::Module *MDevice);  // main entry point. Scan through module M, and rewrite kernel launch commands
+    static void patchCudaLaunch(llvm::Function *F, GenericCallInst *inst, std::vector<llvm::Instruction *> &to_replace_with_zero);
+    static void patchFunction(llvm::Function *F);  // patch all kernel launch commands in function F
+    static void setupGlobalVars(llvm::Module *M);
+    static void patchModule(llvm::Module *M);  // main entry point. Scan through module M, and rewrite kernel launch commands
 };
 
 } // namespace cocl

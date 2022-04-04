@@ -1,4 +1,4 @@
-// Copyright Hugh Perkins 2016, 2017
+// Copyright Hugh Perkins 2016
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 
 #pragma once
 
-#include "cocl/type_dumper.h"
-#include "cocl/GlobalNames.h"
+#include "type_dumper.h"
+#include "GlobalNames.h"
 
 #include <string>
 
@@ -25,6 +25,15 @@
 #include "llvm/IR/DerivedTypes.h"
 
 namespace cocl {
+
+// llvm::Type *cloneStructTypeNoPointers(llvm::StructType *inType);
+// void declareStructNoPointers(std::string name, llvm::StructType *type);
+
+// std::string writeStructCopyCodeNoPointers(llvm::StructType *structType, std::string srcName, std::string destName);
+// llvm::Instruction *copyStructValuesNoPointers(llvm::Instruction *lastInst, llvm::Value *src, llvm::Value *dst);
+
+// std::string dumpTypeNoPointers(llvm::Type *type);
+// std::string dumpStructTypeNoPointers(llvm::StructType *type);
 
 class PointerInfo {
 public:
@@ -51,9 +60,12 @@ public:
     virtual ~StructCloner() {
 
     }
+    // void makePointersGlobal(llvm::StructType *inStructType);
+    llvm::StructType *createGlobalizedPointerStruct(std::map<llvm::StructType *, llvm::StructType *> &newByOld, llvm::StructType *inType);
     llvm::StructType *cloneNoPointers(llvm::StructType *inStructType);
-    std::string writeClCopyToDevicesideStruct(llvm::StructType *ptrfullType, std::string srcName, std::string destName);
-    llvm::Instruction *writeHostsideIrCopyToMarshallingStruct(llvm::Instruction *lastInst, llvm::StructType *ptrfullType,
+    std::string writeClCopyNoPtrToPtrfull(llvm::StructType *ptrfullType, std::string srcName, std::string destName);
+    llvm::Instruction *createHostsideIrCopyPtrfullToNoptr(
+        llvm::Instruction *lastInst, llvm::StructType *ptrfullType,
         llvm::Value *src, llvm::Value *dest);
     static void walkType(
         llvm::Module *M, StructInfo *structInfo, int level, int offset, std::vector<int> indices,

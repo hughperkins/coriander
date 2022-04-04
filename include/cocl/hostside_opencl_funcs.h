@@ -1,4 +1,4 @@
-// Copyright Hugh Perkins 2016, 2017
+// Copyright Hugh Perkins 2016
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,11 +14,18 @@
 
 #pragma once
 
-// things we dont want other projects to need to include, eg tensorflow
-// they'll just need to include coriander includes, not have eg llvm includes
+// #include <iostream>
+#include <memory>
+// #include <vector>
+// #include <map>
+// #include <set>
+#include <cstdint>
 
-#include "cocl/cocl_launch_args.h"
-#include "cocl/hostside_opencl_funcs_ext.h"
+#include "EasyCL/EasyCL.h"
+
+// #include "CL/cl.h"
+
+#include "cocl/cocl_defs.h"
 
 namespace easycl {
     class CLKernel;
@@ -28,6 +35,11 @@ namespace easycl {
 namespace cocl {
     class CoclStream;
 
+    int32_t getNumCachedKernels(); // this should be per-context or something, though right now, it is not yet
+    int32_t getNumKernelCalls();
+    // std::string  convertLlToCl(std::string devicellsourcecode, std::string kernelName);
+    // easycl::CLKernel *getKernelForNameCl(std::string kernelName, std::string clSourcecode);
+
     struct GenerateOpenCLResult {
         std::string clSourcecode;
         std::string originalKernelName;
@@ -35,28 +47,31 @@ namespace cocl {
         std::string uniqueKernelName;
     };
     GenerateOpenCLResult generateOpenCL(int uniqueClmemCount, std::vector<int> &clmemIndexByClmemArgIndex, std::string origKernelName, std::string devicellsourcecode);
-    easycl::CLKernel *compileOpenCLKernel(std::string originalKernelName, std::string uniqueKernelName, std::string shortKernelName, std::string clSourcecode);
-    easycl::CLKernel *compileOpenCLKernel(std::string shortKernelName, std::string clSourcecode);
+    easycl::CLKernel *compileOpenCLKernel(std::string uniqueKernelName, std::string shortKernelName, std::string clSourcecode);
+    // easycl::CLKernel *getKernelForNameLl(std::string kernelName, std::string devicellsourcecode);
 
-
-    class LaunchConfiguration {
-    public:
-        size_t grid[3];
-        size_t block[3];
-        easycl::CLQueue *queue = 0;  // NOT owned by us
-        cocl::CoclStream *coclStream = 0; // NOT owned
-
-        std::vector<std::unique_ptr<Arg> > args;
-
-        std::map<cl_mem, int> clmemIndexByClmem;
-        std::vector<cl_mem> clmems;
-        std::vector<int> clmemIndexByClmemArgIndex;
-
-        std::vector<cl_mem> kernelArgsToBeReleased;
-        std::string kernelName = "";
-        std::string uniqueKernelName = "";
-        std::string shortKernelName = "";
-        std::string devicellsourcecode = "";
-    };
 }
 
+extern "C" {
+    void hostside_opencl_funcs_assure_initialized(void);
+    void configureKernel(
+        const char *kernelName, const char *llsourcecode);
+
+    size_t cuInit(unsigned int flags);
+
+    void configureKernel(const char *kernelName, const char *devicellsourcecode);
+    void addClmemArg(cl_mem clmem);
+    void setKernelArgHostsideBuffer(char *pCpuStruct, int structAllocateSize);
+    void setKernelArgGpuBuffer(char *memory_as_charstar, int32_t elementSize);
+    void setKernelArgInt64(int64_t value);
+    void setKernelArgInt32(int value);
+    void setKernelArgInt8(char value);
+    void setKernelArgFloat(float value);
+    void kernelGo();
+
+    int cudaSetupArgument(char *pValue, int sizeBytes, int a);
+    int cudaLaunch(void *pfn);
+
+    // used by thrust:
+    // void cudaSetupArgument(void *fn, int);
+}

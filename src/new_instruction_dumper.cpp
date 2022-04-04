@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "cocl/new_instruction_dumper.h"
+#include "new_instruction_dumper.h"
 
-#include "cocl/ClWriter.h"
-#include "cocl/LocalNames.h"
-#include "cocl/GlobalNames.h"
-#include "cocl/type_dumper.h"
-#include "cocl/function_names_map.h"
-#include "cocl/LocalValueInfo.h"
-#include "cocl/mutations.h"
-#include "cocl/ExpressionsHelper.h"
-#include "cocl/readIR.h"
+#include "ClWriter.h"
+#include "LocalNames.h"
+#include "GlobalNames.h"
+#include "type_dumper.h"
+#include "function_names_map.h"
+#include "LocalValueInfo.h"
+#include "mutations.h"
+#include "ExpressionsHelper.h"
+#include "readIR.h"
 #include "EasyCL/util/easycl_stringhelper.h"
-
-#include "cocl/llvm_dump.h"
 
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Constants.h"
@@ -127,7 +125,7 @@ LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
         return constantInfo;
     } else {
         cout << "dumpconstant, unhandled valuetype valueTy " << valueTy << endl;
-        COCL_LLVM_DUMP(constant);
+        constant->dump();
         cout << endl;
         throw runtime_error("unknown constnat type");
     }
@@ -404,11 +402,12 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         sharedInfo->setAddressSpace(3);
     }
     llvm::Type *prevType = nullptr;
+    std:ostream &l = std::cout;
     for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
-        // l << "   gep d=" << d << " currnettype=" << typeDumper->dumpType(currentType) << std::endl;
+        l << "gep d=" << d << " currnettype=" << typeDumper->dumpType(currentType) << std::endl;
         if(SequentialType *seqType = dyn_cast<SequentialType>(currentType)) {
-            // l << "    gep seqtype" << std::endl;
+            l << "    gep seqtype" << std::endl;
             if(d == 0) {
                 if(isa<ArrayType>(seqType->getElementType())) {
                     rhs = "(&" + rhs + ")";
@@ -434,6 +433,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                 newType = seqType->getElementType();
             }
         } else if(PointerType *pointerType = dyn_cast<PointerType>(currentType)) {
+            std::cout << "gep pointertype" << std::endl;
             if(d == 0) {
                 if(isa<ArrayType>(pointerType->getElementType())) {
                     rhs = "(&" + rhs + ")";
@@ -445,6 +445,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             rhs += string("[") + idxstring + "]";
             newType = pointerType->getElementType();
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
+            std::cout << "gep structtype" << std::endl;
             string structName = ReadIR::getName(structtype);
             if(structName == "struct.float4") {
                 int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
@@ -454,6 +455,8 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                 rhs = "((" + typeDumper->dumpType(castType) + ")&" + rhs + ")";
                 rhs += string("[") + easycl::toString(idx) + "]";
             } else {
+                localValueInfo->inlineCl.push_back(typeDumper->dumpType(currentType) + " " + localValueInfo->name + "_d" + easycl::toString(d) + " = " + rhs);
+
                 // generic struct
                 int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
                 Type *elementType = structtype->getElementType(idx);
@@ -477,7 +480,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             }
         } else {
             cout << "type unimplemeneted in gep:" << endl;
-            COCL_LLVM_DUMP(currentType);
+            currentType->dump();
             cout << endl;
             cout << "isa pointer " << isa<PointerType>(currentType) << endl;
             cout << "isa struct " << isa<StructType>(currentType) << endl;
@@ -506,8 +509,7 @@ void NewInstructionDumper::dumpLoad(cocl::LocalValueInfo *localValueInfo) {
     string rhs= "";
     bool destIsSinglePointer = false;
     if(PointerType *l1pointer = dyn_cast<PointerType>(instr->getType())) {
-        // if(PointerType *l2pointer = dyn_cast<PointerType>(l1pointer->getElementType())) {
-        if(isa<PointerType>(l1pointer->getElementType())) {
+        if(PointerType *l2pointer = dyn_cast<PointerType>(l1pointer->getElementType())) {
         } else {
             destIsSinglePointer = true;
         }
@@ -622,7 +624,7 @@ void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo
             }
         } else {
             cout << "NewInstructionDumper::dumpExtractValue unimplemented type" << endl;
-            COCL_LLVM_DUMP(currentType);
+            currentType->dump();
             throw runtime_error("type not implemented in extractvalue");
         }
         currentType = newType;
@@ -684,7 +686,7 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
                 newType = elementType;
             }
         } else {
-            COCL_LLVM_DUMP(currentType);
+            currentType->dump();
             throw runtime_error("type not implemented in insertvalue");
         }
         currentType = newType;

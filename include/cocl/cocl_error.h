@@ -5,15 +5,10 @@
 extern "C" {
     const char *cudaGetErrorString (size_t error);
     size_t cudaGetLastError();
-    size_t cudaPeekAtLastError();
+    void checkCudaErrors(size_t errorcode);
 }
 
 // #define cudaErrorNotReady 2222
-
-typedef size_t cudaError_t;
-typedef size_t cudaError; // used in thrust thrust/system/cuda/detail/cub/device/dispatch/device_scan_dispatch.cuh line 523 ish
-typedef size_t CUresult;
-#define cudaSuccess 0
 
 #define CUDA_SUCCESS 0  // this should probably be zero, by convention
 
@@ -83,7 +78,6 @@ enum cudaerrors {
     cudaErrorAddressOfConstant,
     cudaErrorInvalidMemcpyDirection,
     cudaErrorInvalidChannelDescriptor,
-    cudaErrorNotSupported,
     cudaErrorApiFailureBase  // not sure what this is, but it's used in a comparison, in thrust: if(ev < ::cudaErrorApiFailureBase)  <= might need special handling somehow
 };
 

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "clew.h"
+// #include "CL/cl.h"
 
-#include <cstdint>
+// #include "EasyCL.h"
+#include "clew.h"
 
 namespace cocl {
     class Memory {
@@ -19,22 +20,12 @@ namespace cocl {
         // otherwise, problems :-P
     };
 
+    // typedef Memory *PMemory;
     Memory *findMemory(const char *passedInPointer);
-    Memory *findMemoryByClmem(cl_mem clmem);
 }
 
-#define CU_MEMHOSTALLOC_PORTABLE 123
-
-enum MemoryTypeEnum {
-    CU_MEMORYTYPE_DEVICE = 60000,
-    CU_MEMORYTYPE_HOST
-};
-
-enum cudaMemcpyKind {  // name used by thrust, in trivial_copy.inl, line 55 ish
-    cudaMemcpyDeviceToHost=111,
-    cudaMemcpyHostToDevice=222,
-    cudaMemcpyDeviceToDevice=333,
-    cudaMemcpyDefault=444  // from thrust, trivial_copy.inl
+enum Memhostalloctype {
+    CU_MEMHOSTALLOC_PORTABLE=12345
 };
 
 typedef long long CUdeviceptr;
@@ -50,13 +41,15 @@ extern "C" {
     size_t cuMemFreeHost(void *hostPointer);
 
     size_t cudaMemsetAsync(void *devPtr, int value, size_t count, char *queue);
-    size_t cudaMemcpy(void *dst, const void *, size_t, cudaMemcpyKind kind);
+    size_t cudaMemcpy(void *dst, const void *, size_t, size_t cudaMemcpyKind);
     size_t cudaMemcpyAsync (void *dst, const void *src, size_t count, size_t kind, char *queue=0);
 
     size_t cuMemGetInfo(size_t *free, size_t *total);
     size_t cuMemsetD8(CUdeviceptr location, unsigned char value, uint32_t count);
     size_t cuMemsetD32(CUdeviceptr location, unsigned int value, uint32_t count);
 
+    // size_t cuMemcpyHtoD_v2(CUdeviceptr gpu_dst, const void *host_src, size_t size);
+    // size_t cuMemcpyDtoH_v2(void *host_dst, CUdeviceptr gpu_src, size_t size);
     size_t cuMemcpyHtoD(CUdeviceptr gpu_dst, const void *host_src, size_t size);
     size_t cuMemcpyDtoH(void *host_dst, CUdeviceptr gpu_src, size_t size);
     size_t cuMemcpyHtoDAsync(CUdeviceptr gpu_dst, const void *host_src, size_t size, char*queue);
@@ -66,6 +59,11 @@ extern "C" {
 }
 
 size_t cudaMalloc(float **pMemory, size_t N);
+size_t cudaMemset(int *target, int value, size_t count);
+size_t cudaMemset(unsigned int *target, unsigned int value, size_t count);
+size_t cudaMemset(char *target, char value, size_t count);
+size_t cudaFreeHost(void *hostPointer);
+size_t cudaMallocHost(void **pMemory, size_t N);
 
 #define cuMemcpyHtoDAsync_v2 cuMemcpyHtoDAsync
 #define cuMemcpyDtoHAsync_v2 cuMemcpyDtoHAsync
@@ -78,3 +76,12 @@ size_t cudaMalloc(float **pMemory, size_t N);
 
 #define cuDeviceTotalMem_v2 cuDeviceTotalMem
 #define cuMemGetInfo_v2 cuMemGetInfo
+
+#define cudaMemcpyDeviceToHost 111
+#define cudaMemcpyHostToDevice 222
+#define cudaMemcpyDeviceToDevice 333
+
+enum MemoryTypeEnum {
+    CU_MEMORYTYPE_DEVICE = 60000,
+    CU_MEMORYTYPE_HOST
+};

@@ -219,8 +219,8 @@ void test3_unbounded() {
 }
 
 int main(int argc, char *argv[]) {
-    test1();
-    test2_bounded();
-    // test3_unbounded();
+    // test1();
+    // test2_bounded();
+    test3_unbounded();
     return 0;
 }
