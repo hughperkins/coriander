@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "cocl/new_instruction_dumper.h"
+#include "new_instruction_dumper.h"
 
-#include "cocl/ClWriter.h"
-#include "cocl/LocalNames.h"
-#include "cocl/GlobalNames.h"
-#include "cocl/type_dumper.h"
-#include "cocl/function_names_map.h"
-#include "cocl/LocalValueInfo.h"
-#include "cocl/mutations.h"
-#include "cocl/ExpressionsHelper.h"
-#include "cocl/readIR.h"
+#include "ClWriter.h"
+#include "LocalNames.h"
+#include "GlobalNames.h"
+#include "type_dumper.h"
+#include "function_names_map.h"
+#include "LocalValueInfo.h"
+#include "mutations.h"
+#include "ExpressionsHelper.h"
+#include "readIR.h"
 #include "EasyCL/util/easycl_stringhelper.h"
-
-#include "cocl/llvm_dump.h"
 
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Constants.h"
@@ -35,22 +33,9 @@
 #include <string>
 #include <memory>
 #include <iostream>
-#include <fstream>
 
 using namespace std;
 using namespace llvm;
-
-#ifdef COCL_PRINT
-#undef COCL_PRINT
-#endif
-
-#ifdef COCL_SPAM_INSTRUCTIONS
-#define COCL_PRINT(x) x
-#define WHEN_SPAMMING(x) x
-#else
-#define COCL_PRINT(x)
-#define WHEN_SPAMMING(x)
-#endif
 
 namespace cocl {
 
@@ -86,42 +71,23 @@ NewInstructionDumper::NewInstructionDumper(
 LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
     // maybe this should be somewhere more generic?
     LocalValueInfo *constantInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, constant, constant->getName().str());
-    WHEN_SPAMMING(std::cout << constantInfo->name << ": constant" << std::endl);
-
-    WHEN_SPAMMING(ostringstream l);
-    WHEN_SPAMMING(l << "Constant" << std::endl);
-    WHEN_SPAMMING(l << "========" << std::endl);
-    WHEN_SPAMMING(l << std::endl);
-    WHEN_SPAMMING(l << constantInfo->name << endl);
-    // WHEN_SPAMMING(l << "src name: " << srcInfo->name << endl);
-    // WHEN_SPAMMING(l << "src type: " << typeDumper->dumpType(srcValue->getType()) << endl);
-    // WHEN_SPAMMING(l << "dest type: " << typeDumper->dumpType(instr->getDestTy()) << endl);
-
     unsigned int valueTy = constant->getValueID();
     if(ConstantInt *constantInt = dyn_cast<ConstantInt>(constant)) {
         constantInfo->setAddressSpace(0);
-        std::string valueString = easycl::toString(constantInt->getSExtValue());
-        constantInfo->setExpression(valueString);
+        constantInfo->setExpression(easycl::toString(constantInt->getSExtValue()));
         constantInfo->clWriter.reset(new ClWriter(constantInfo));
-        WHEN_SPAMMING(l << "constantInt: " << valueString << std::endl);
-        // return constantInfo;
+        return constantInfo;
     } else if(isa<ConstantStruct>(constant)) {
         throw runtime_error("constantStruct not implemented in basicblockdumper.dumpconstant");
     } else if(isa<ConstantExpr>(constant)) {
         dumpConstantExpr(constantInfo);
-        WHEN_SPAMMING(l << "constantExpr" << std::endl);
-        WHEN_SPAMMING(l << "final expr: " << constantInfo->getExpr() << std::endl);
-        // return constantInfo;
+        return constantInfo;
     } else if(ConstantFP *constantFP = dyn_cast<ConstantFP>(constant)) {
         constantInfo->clWriter.reset(new ClWriter(constantInfo));
         constantInfo->setAddressSpace(0);
-        std::string valueString = ReadIR::dumpFloatConstant(forceSingle, constantFP);
-        constantInfo->setExpression(valueString);
-        WHEN_SPAMMING(l << "constantFloat: " << valueString << std::endl);
-        // return constantInfo;
+        constantInfo->setExpression(ReadIR::dumpFloatConstant(forceSingle, constantFP));
+        return constantInfo;
     } else if(GlobalValue *global = dyn_cast<GlobalValue>(constant)) {
-        bool processed = false;
-        WHEN_SPAMMING(l << "GlobalValue" << std::endl);
         if(PointerType *pointerType = dyn_cast<PointerType>(global->getType())) {
             int addressspace = pointerType->getAddressSpace();
             if(addressspace == 3) {  // if it's local memory, it's not really 'global', juts return the name
@@ -129,35 +95,26 @@ LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
                 constantInfo->setAddressSpace(3);
                 constantInfo->setAsAssigned();
                 constantInfo->setExpression(constantInfo->name);
-                WHEN_SPAMMING(l << "pointertype, addressspace 3" << std::endl);
-                processed = true;
-                // return constantInfo;
+                return constantInfo;
             }
         }
-        if(!processed) {
-            // at about this point we should pehaps swap to come global-specific class to handle this?
-            if(globalNames->hasName(constant)) {
-                // hmmmm, shouldwe be handling global values too???
-                constantInfo->clWriter.reset(new ClWriter(constantInfo));
-                constantInfo->setAddressSpace(4);
-                constantInfo->setExpression(globalNames->getName(constant));
-                // return constantInfo;
-                WHEN_SPAMMING(l << "is global name" << std::endl);
-                processed = true;
-            }
-        }
-        if(!processed) {
-            string name = global->getName().str();
-            string ourinstrstr = "(&" + name + ")";
-            updateAddressSpace(constant, 4);  // 4 means constant
-            constantInfo->setAddressSpace(4);
+        // at about this point we should pehaps swap to come global-specific class to handle this?
+        if(globalNames->hasName(constant)) {
+            // hmmmm, shouldwe be handling global values too???
             constantInfo->clWriter.reset(new ClWriter(constantInfo));
-            globalExpressionByValue->operator[](constant) = ourinstrstr;
-            WHEN_SPAMMING(l << "is global constant, addressspace 4" << std::endl);
-
-            constantInfo->setExpression(ourinstrstr);
+            constantInfo->setAddressSpace(4);
+            constantInfo->setExpression(globalNames->getName(constant));
+            return constantInfo;
         }
-        // return constantInfo;
+        string name = global->getName().str();
+        string ourinstrstr = "(&" + name + ")";
+        updateAddressSpace(constant, 4);  // 4 means constant
+        constantInfo->setAddressSpace(4);
+        constantInfo->clWriter.reset(new ClWriter(constantInfo));
+        globalExpressionByValue->operator[](constant) = ourinstrstr;
+
+        constantInfo->setExpression(ourinstrstr);
+        return constantInfo;
     } else if(isa<UndefValue>(constant)) {
         cout << "undef, not hnalded" << endl;
         throw runtime_error("dumpconstnat, doesnt handle undef, for now");
@@ -165,24 +122,13 @@ LocalValueInfo *NewInstructionDumper::dumpConstant(llvm::Constant *constant) {
         constantInfo->clWriter.reset(new ClWriter(constantInfo));
         constantInfo->setAddressSpace(0);
         constantInfo->setExpression("0");
-        // return constantInfo;
+        return constantInfo;
     } else {
         cout << "dumpconstant, unhandled valuetype valueTy " << valueTy << endl;
-        COCL_LLVM_DUMP(constant);
+        constant->dump();
         cout << endl;
         throw runtime_error("unknown constnat type");
     }
-
-    #ifdef COCL_SPAM_INSTRUCTIONS
-    // l << "final expr: " << gencode << std::endl;
-
-    ofstream f;
-    f.open("/tmp/" + constantInfo->name + "_constant.txt", ios_base::out);
-    f << l.str();
-    f.close();
-    #endif
-
-    return constantInfo;
 }
 
 // lets assumes hit is always local for now
@@ -367,18 +313,8 @@ void NewInstructionDumper::dumpBitCast(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     BitCastInst *instr = cast<BitCastInst>(localValueInfo->value);
 
-    Value *srcValue = instr->getOperand(0);
-    LocalValueInfo *srcInfo = getOperand(srcValue);
-    string srcExpr = srcInfo->getExpr();
-
-    WHEN_SPAMMING(ostringstream l);
-    WHEN_SPAMMING(l << "Bitcast" << std::endl);
-    WHEN_SPAMMING(l << "=======" << std::endl);
-    WHEN_SPAMMING(l << std::endl);
-    WHEN_SPAMMING(l << localValueInfo->name << endl);
-    WHEN_SPAMMING(l << "src name: " << srcInfo->name << endl);
-    WHEN_SPAMMING(l << "src type: " << typeDumper->dumpType(srcValue->getType()) << endl);
-    WHEN_SPAMMING(l << "dest type: " << typeDumper->dumpType(instr->getDestTy()) << endl);
+    LocalValueInfo *op0info = getOperand(instr->getOperand(0));
+    string op0 = op0info->getExpr();
 
     // we will split the code into two parts:
     // assignment, like:  v3 = incoming-expression;
@@ -387,28 +323,20 @@ void NewInstructionDumper::dumpBitCast(cocl::LocalValueInfo *localValueInfo) {
     // lets do that for now
 
     string gencode = "";
-    // string op0str = op0;
+    string op0str = op0;
     localValueInfo->setAddressSpace(0);
     if(PointerType *srcType = dyn_cast<PointerType>(instr->getSrcTy())) {
         if(PointerType *destType = dyn_cast<PointerType>(instr->getDestTy())) {
             Type *castType = PointerType::get(destType->getElementType(), srcType->getAddressSpace());
-            gencode += "((" + typeDumper->dumpType(castType) + ")" + srcExpr + ")";
-            copyAddressSpace(srcValue, instr);
-            localValueInfo->setAddressSpaceFrom(srcValue);
+            gencode += "((" + typeDumper->dumpType(castType) + ")" + op0str + ")";
+            copyAddressSpace(instr->getOperand(0), instr);
+            localValueInfo->setAddressSpaceFrom(instr->getOperand(0));
         }
     } else {
-        gencode += "*(" + typeDumper->dumpType(instr->getDestTy()) + " *)&(" + srcExpr + ")";
+        // just pass through?
+        gencode += "*(" + typeDumper->dumpType(instr->getDestTy()) + " *)&(" + op0str + ")";
     }
     localValueInfo->setExpression(gencode);
-
-    #ifdef COCL_SPAM_INSTRUCTIONS
-    l << "final expr: " << gencode << std::endl;
-
-    ofstream f;
-    f.open("/tmp/" + localValueInfo->name + "_bitcast.txt", ios_base::out);
-    f << l.str();
-    f.close();
-    #endif
 }
 
 void NewInstructionDumper::dumpAddrSpaceCast(cocl::LocalValueInfo *localValueInfo) {
@@ -455,7 +383,8 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
     GetElementPtrInst *instr = cast<GetElementPtrInst>(localValueInfo->value);
 
-    LocalValueInfo *op0info = getOperand(instr->getOperand(0));
+    Value *incomingOp = instr->getOperand(0);
+    LocalValueInfo *op0info = getOperand(incomingOp);
 
     string gencode = "";
     int numOperands = instr->getNumOperands();
@@ -474,23 +403,12 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         sharedInfo->setAddressSpace(3);
     }
     llvm::Type *prevType = nullptr;
-    WHEN_SPAMMING(ostringstream l); // for diag/debug
-    WHEN_SPAMMING(l << "GEP" << std::endl);
-    WHEN_SPAMMING(l << "===" << std::endl);
-    WHEN_SPAMMING(l << std::endl);
-    WHEN_SPAMMING(l << localValueInfo->name << std::endl);
-    for(int d=0; d < numOperands - 1; d++) {
-        WHEN_SPAMMING(l << "d=" << d << std::endl);
-        WHEN_SPAMMING(l << "currentType: " << typeDumper->dumpType(currentType) << std::endl);
+    int d = 0;
+    // for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
-        LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
-        string idxstring = thisInfo->getExpr();
-        idxstring = ExpressionsHelper::stripOuterParams(idxstring);
-        WHEN_SPAMMING(l << "idx: " << idxstring << std::endl);
         // l << "   gep d=" << d << " currnettype=" << typeDumper->dumpType(currentType) << std::endl;
         if(SequentialType *seqType = dyn_cast<SequentialType>(currentType)) {
             // l << "    gep seqtype" << std::endl;
-            WHEN_SPAMMING(l << "seq" << std::endl);
             if(d == 0) {
                 if(isa<ArrayType>(seqType->getElementType())) {
                     rhs = "(&" + rhs + ")";
@@ -517,7 +435,6 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             }
         } else if(PointerType *pointerType = dyn_cast<PointerType>(currentType)) {
             if(d == 0) {
-            WHEN_SPAMMING(l << "ptr" << std::endl);
                 if(isa<ArrayType>(pointerType->getElementType())) {
                     rhs = "(&" + rhs + ")";
                 }
@@ -530,21 +447,17 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
             string structName = ReadIR::getName(structtype);
             if(structName == "struct.float4") {
-                WHEN_SPAMMING(l << "float4" << std::endl);
-               int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
+                int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
                 Type *elementType = structtype->getElementType(idx);
                 Type *castType = PointerType::get(elementType, addressspace);
                 newType = elementType;
                 rhs = "((" + typeDumper->dumpType(castType) + ")&" + rhs + ")";
                 rhs += string("[") + easycl::toString(idx) + "]";
-                WHEN_SPAMMING(l << "applying: " << "((" + typeDumper->dumpType(castType) + ")& ... )" << string("[") + easycl::toString(idx) + "]" << std::endl);
             } else {
-                WHEN_SPAMMING(l << "struct" << std::endl);
                 // generic struct
                 int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
                 Type *elementType = structtype->getElementType(idx);
                 rhs += string(".f") + easycl::toString(idx);
-                WHEN_SPAMMING(l << "applying: " << string(".f") << easycl::toString(idx) << std::endl);
                 newType = elementType;
                 if(PointerType *newTypeAsPointer = dyn_cast<PointerType>(newType)) {
                     // if its a pointer in a struct, hackily assume gloal for now
@@ -553,26 +466,10 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                     // ~~addressspace = 5;~~
 
                     // if its a pointer to pointer, it's address space 5, otherwis 1
-                    int pointerDepth = typeDumper->getPointerDepth(newTypeAsPointer);
-                    std::cout << "pointerDepth=" << pointerDepth << std::endl;
-                    // if(isa<PointerType>(newTypeAsPointer->getElementType())) {
-                    if(pointerDepth == 2) {
-                        std::cout << "pointerdpeth=2 => unwrap virtualmem" << std::endl;
-                        instr->dump();
-                        std::cout << std::endl;
+                    if(isa<PointerType>(newTypeAsPointer->getElementType())) {
                         // l << "gep   struct child is pointer to pointer" << std::endl;
-                        // probably should unwrap this.  something for hte future...
-
-                        localValueInfo->inlineCl.push_back(
-                            "__vmem__ unsigned long " + localValueInfo->name + "_gptrstep = getGlobalPointer(" +
-                                getOperand(instr->getOperand(0))->getExpr() + "[0], pGlobalVars" +
-                            ")"
-                        );
-                        rhs = localValueInfo->name + "_gptrstep";
-                        // since this is a pointer to a pointer, the contents are also virtual pointers :-P
-                        updateAddressSpace(instr, 5);
-                        localValueInfo->addressSpace = 5;
                         addressspace = 5;
+                        // probably should unwrap this.  something for hte future...
                     }
                 } else {
                     // addressspace = 0;
@@ -580,7 +477,7 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             }
         } else {
             cout << "type unimplemeneted in gep:" << endl;
-            COCL_LLVM_DUMP(currentType);
+            currentType->dump();
             cout << endl;
             cout << "isa pointer " << isa<PointerType>(currentType) << endl;
             cout << "isa struct " << isa<StructType>(currentType) << endl;
@@ -593,23 +490,48 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
         // update the addressspace to be global, ie 1.  This is a bit hacky I know
         prevType = currentType;
         currentType = newType;
-        WHEN_SPAMMING(l << std::endl);
-    }
-    WHEN_SPAMMING(l << "deepest type: " << typeDumper->dumpType(currentType) << std::endl);
-    updateAddressSpace(instr, addressspace);
-    localValueInfo->setAddressSpace(addressspace);
+    // }
+    // updateAddressSpace(instr, addressspace);
+    // localValueInfo->setAddressSpace(addressspace);
     rhs = "(" + ExpressionsHelper::stripOuterParams(rhs) + ")";
     rhs = "(&" + rhs + ")";
 
-    WHEN_SPAMMING(l << std::endl);
-    WHEN_SPAMMING(l << "final type: " << typeDumper->dumpType(instr->getType()) << std::endl);
-    WHEN_SPAMMING(l << "final expr: " << rhs << std::endl);
-    WHEN_SPAMMING(std::ofstream f);
-    WHEN_SPAMMING(f.open("/tmp/" + localValueInfo->name + "_gep.txt", ios_base::out));
-    WHEN_SPAMMING(f << l.str());
-    WHEN_SPAMMING(f.close());
+    // Value *idxList[2];
+    // args[0] = bitcast;
+    cout << "instr:" << std::endl;
+    instr->dump();
+    cout << "instr->getType()->dump()" << endl;
+    instr->getType()->dump();
+    // idxList[0] = createInt32Constant(&M->getContext(), 0);
+    std::vector<Value *> idxList;
+    idxList.push_back(createInt32Constant(&M->getContext(), 0));
+    // idxList.push_back(createInt32Constant(&M->getContext(), 0));
+    // idxList.push_back(createInt32Constant(&M->getContext(), 0));
+
+    cout << "incomingOp->getType()->dump()" << std::endl;
+    incomingOp->getType()->dump();
+
+    cout << "incomingOp->getType()->getPointerElementType()->dump()" << std::endl;
+    cast<PointerType>(incomingOp->getType())->getElementType()->dump();
+    // instr->dump();
+    cout << "currentType->dump()" << std::endl;
+    currentType->dump();
+    cout << endl;
+    GetElementPtrInst *childInst = GetElementPtrInst::Create(currentType, incomingOp, ArrayRef<Value *>(idxList));
+    // childInst->insertAfter(instr);
+    std::cout << "childinst:" << std::endl;
+    childInst->dump();
+    std::cout << std::endl;
+    cout << "childinst->getType()->dump" << endl;
+    childInst->getType()->dump();
+    cout << endl;
+    LocalValueInfo *thisInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, childInst);
+    
     localValueInfo->setExpression(rhs);
 }
+            // LocalValueInfo *instrInfo = LocalValueInfo::getOrCreate(localNames, localValueInfos, inst);
+// static GetElementPtrInst *  Create (Type *PointeeType, Value *Ptr, ArrayRef< Value * > IdxList, const Twine &NameStr="", Instruction *InsertBefore=nullptr)
+// static GetElementPtrInst *  Create (Type *PointeeType, Value *Ptr, ArrayRef< Value * > IdxList, const Twine &NameStr, BasicBlock *InsertAtEnd)
 
 void NewInstructionDumper::dumpLoad(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new ClWriter(localValueInfo));
@@ -647,26 +569,15 @@ void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
     localValueInfo->clWriter.reset(new StoreClWriter(localValueInfo));
     StoreInst *instr = cast<StoreInst>(localValueInfo->value);
 
-    Value *src = instr->getOperand(0);
-    Value *dst = instr->getOperand(1);
+    LocalValueInfo *op0info = getOperand(instr->getOperand(0));
+    LocalValueInfo *op1info = getOperand(instr->getOperand(1));
 
-    LocalValueInfo *dstInfo = getOperand(dst);
-    LocalValueInfo *srcInfo = getOperand(src);
-
-    WHEN_SPAMMING(ostringstream l);
-    WHEN_SPAMMING(l << "Store" << std::endl);
-    WHEN_SPAMMING(l << "=====" << std::endl);
-    WHEN_SPAMMING(l << std::endl);
-    WHEN_SPAMMING(l << localValueInfo->name << std::endl);
-    WHEN_SPAMMING(l << "names: " << dstInfo->name << " <- " << srcInfo->name << std::endl);
-    WHEN_SPAMMING(l << "types: " << typeDumper->dumpType(dst->getType()) << " <- " << typeDumper->dumpType(src->getType()) << std::endl);
-    WHEN_SPAMMING(l << "instrtype: " << typeDumper->dumpType(instr->getType()) << std::endl);
-    int destAddressSpace = cast<PointerType>(dst->getType())->getAddressSpace();
+    int destAddressSpace = cast<PointerType>(instr->getOperand(1)->getType())->getAddressSpace();
     std::string lhs = "";
     if(destAddressSpace == 5 && false) {  // vmem
         localValueInfo->inlineCl.push_back(
             "global float * " + localValueInfo->name + "_gptrstep = getGlobalPointer(" +
-                dstInfo->getExpr() + ", pGlobalVars" +
+                op1info->getExpr() + ", pGlobalVars" +
             ")"
         );
         this->usesVmem = true;
@@ -674,24 +585,13 @@ void NewInstructionDumper::dumpStore(cocl::LocalValueInfo *localValueInfo) {
     } else {
         localValueInfo->setAddressSpaceFrom(instr->getOperand(1));
         copyAddressSpace(instr->getOperand(0), instr->getOperand(1));
-        lhs = dstInfo->getExpr();
+        lhs = op1info->getExpr();
     }
 
-    string rhs = srcInfo->getExpr();
-    WHEN_SPAMMING(l << "exprs: " << lhs << " <- " << rhs << std::endl);
+    string rhs = op0info->getExpr();
     rhs = ExpressionsHelper::stripOuterParams(rhs);
-    WHEN_SPAMMING(l << "applying dest transform [0]" << std::endl);
     string inlinecode = lhs + "[0] = " + rhs;
     localValueInfo->inlineCl.push_back(inlinecode);
-
-    WHEN_SPAMMING(l << "final statement, inlinecl: " << inlinecode << std::endl);
-
-    #ifdef COCL_SPAM_INSTRUCTIONS
-    ofstream f;
-    f.open("/tmp/" + localValueInfo->name + "_store.txt");
-    f << l.str();
-    f.close();
-    #endif
 }
 
 void NewInstructionDumper::dumpAlloca(cocl::LocalValueInfo *localValueInfo) {
@@ -756,7 +656,7 @@ void NewInstructionDumper::dumpExtractValue(cocl::LocalValueInfo *localValueInfo
             }
         } else {
             cout << "NewInstructionDumper::dumpExtractValue unimplemented type" << endl;
-            COCL_LLVM_DUMP(currentType);
+            currentType->dump();
             throw runtime_error("type not implemented in extractvalue");
         }
         currentType = newType;
@@ -818,7 +718,7 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
                 newType = elementType;
             }
         } else {
-            COCL_LLVM_DUMP(currentType);
+            currentType->dump();
             throw runtime_error("type not implemented in insertvalue");
         }
         currentType = newType;
