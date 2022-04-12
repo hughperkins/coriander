@@ -222,11 +222,11 @@ llvm::Instruction *StructCloner::writeHostsideIrCopyToMarshallingStruct(
             if(StructType *childStructType = dyn_cast<StructType>(childType)) {
                 lastInst = writeHostsideIrCopyToMarshallingStruct(lastInst, childStructType, childSrcInst, childDstInst);
             } else if(childType->getPrimitiveSizeInBits() > 0 ) {
-                Instruction *load = new LoadInst(childSrcInst, "loadint");
+                Instruction *load = new LoadInst(childStructType, childSrcInst, "loadint", lastInst->getParent()); // insert at end of parent block
                 load->insertAfter(lastInst);
                 lastInst = load;
 
-                Instruction *store = new StoreInst(load, childDstInst);
+                Instruction *store = new StoreInst(load, childDstInst, lastInst->getParent());
                 store->insertAfter(lastInst);
                 lastInst = store;
             } else if(ArrayType *arrayType = dyn_cast<ArrayType>(childType)) {
@@ -243,7 +243,7 @@ llvm::Instruction *StructCloner::writeHostsideIrCopyToMarshallingStruct(
                     arraydst->insertAfter(lastInst);
                     lastInst = arraydst;
 
-                    Instruction *load = new LoadInst(arrsrc, "loadarr");
+                    Instruction *load = new LoadInst( arrsrc, "loadarr", lastInst->getParent());
                     load->insertAfter(arraydst);
                     lastInst = load;
 

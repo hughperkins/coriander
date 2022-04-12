@@ -43,7 +43,7 @@ std::string ReadIR::getName(StructType *type) {
         COCL_LLVM_DUMP(type);
         throw runtime_error("type doesnt have name");
     }
-    return type->getName();
+    return type->getName().str();
 }
 
 std::string ReadIR::getName(Function *type) {
@@ -52,7 +52,7 @@ std::string ReadIR::getName(Function *type) {
         //COCL_LLVM_DUMP(type);
         throw runtime_error("function doesnt have name");
     }
-    return type->getName();
+    return type->getName().str();
 }
 
 std::string ReadIR::getName(Value *value) {
@@ -60,7 +60,7 @@ std::string ReadIR::getName(Value *value) {
         COCL_LLVM_DUMP(value);
         throw runtime_error("value doesnt have name");
     }
-    return value->getName();
+    return value->getName().str();
 }
 
 int ReadIR::readInt32Constant(Value *value) {

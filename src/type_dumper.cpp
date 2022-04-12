@@ -160,7 +160,7 @@ std::string TypeDumper::addStructToGlobalNames(StructType *type) {
         return globalNames->getName(type);
     }
     if(type->hasName()) {
-        string name = type->getName();
+        string name = type->getName().str();
         name = easycl::replaceGlobal(name, ".", "_");
         name = easycl::replaceGlobal(name, ":", "_");
         name = easycl::replaceGlobal(name, "<", "_");
@@ -215,7 +215,7 @@ std::string TypeDumper::dumpArrayType(ArrayType *type, bool decayArraysToPointer
 
 std::string TypeDumper::dumpVectorType(VectorType *vectorType, bool decayArraysToPointer) {
     // std::cout << "TypeDumper::dumpVectorType" << std::endl;
-    int elementCount = vectorType->getNumElements();
+    int elementCount = vectorType->getArrayNumElements();
     Type *elementType = vectorType->getElementType();
     if(elementType->getPrimitiveSizeInBits() == 0) {
         cout << endl;
@@ -264,7 +264,7 @@ std::string TypeDumper::dumpType(Type *type, bool decayArraysToPointer) {
         case Type::StructTyID:
             return dumpStructType(cast<StructType>(type));
 
-        case Type::VectorTyID:
+        case Type::FixedVectorTyID:
             return dumpVectorType(cast<VectorType>(type));
 
         case Type::ArrayTyID:

@@ -407,12 +407,12 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
     for(int d=0; d < numOperands - 1; d++) {
         Type *newType = 0;
         // l << "   gep d=" << d << " currnettype=" << typeDumper->dumpType(currentType) << std::endl;
-        if(SequentialType *seqType = dyn_cast<SequentialType>(currentType)) {
+        if(ArrayType *arrayType = dyn_cast<ArrayType>(currentType)) {
             // l << "    gep seqtype" << std::endl;
             if(d == 0) {
-                if(isa<ArrayType>(seqType->getElementType())) {
+                // if(isa<ArrayType>(seqType->getElementType())) {
                     rhs = "(&" + rhs + ")";
-                }
+                // }
             }
 
             LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
@@ -424,16 +424,50 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             // it is an array of virtual mem offsets
             // we should check the parent type
             // also, this should be an array of *pointers*, not just primitive elements
-            if(prevType != nullptr &&
-                    isa<StructType>(prevType) &&
-                    isa<PointerType>(seqType->getElementType())
-                    ) {
+            if (prevType != nullptr &&
+                isa<StructType>(prevType) &&
+                isa<PointerType>(arrayType->getElementType()))
+            {
                 addressspace = 5;
-                newType = seqType->getElementType();
-            } else {
-                newType = seqType->getElementType();
+                newType = arrayType->getElementType();
             }
-        } else if(PointerType *pointerType = dyn_cast<PointerType>(currentType)) {
+            else
+            {
+                newType = arrayType->getElementType();
+            }
+        }
+        else if (VectorType *vectorType = dyn_cast<VectorType>(currentType))
+        {
+            // l << "    gep seqtype" << std::endl;
+            // if(d == 0) {
+            //     if(isa<ArrayType>(seqType->getElementType())) {
+            //         rhs = "(&" + rhs + ")";
+            //     }
+            // }
+
+            LocalValueInfo *thisInfo = getOperand(instr->getOperand(d + 1));
+            string idxstring = thisInfo->getExpr();
+            idxstring = ExpressionsHelper::stripOuterParams(idxstring);
+            rhs += string("[") + idxstring + "]";
+
+            // if this is an array of pointers, inside a struct, we are going to assume
+            // it is an array of virtual mem offsets
+            // we should check the parent type
+            // also, this should be an array of *pointers*, not just primitive elements
+            if (prevType != nullptr &&
+                isa<StructType>(prevType) &&
+                isa<PointerType>(vectorType->getElementType()))
+            {
+                addressspace = 5;
+                newType = vectorType->getElementType();
+            }
+            else
+            {
+                newType = vectorType->getElementType();
+            }
+        }
+        else if (PointerType *pointerType = dyn_cast<PointerType>(currentType))
+        {
             if(d == 0) {
                 if(isa<ArrayType>(pointerType->getElementType())) {
                     rhs = "(&" + rhs + ")";
@@ -444,7 +478,9 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
             idxstring = ExpressionsHelper::stripOuterParams(idxstring);
             rhs += string("[") + idxstring + "]";
             newType = pointerType->getElementType();
-        } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
+        }
+        else if (StructType *structtype = dyn_cast<StructType>(currentType))
+        {
             string structName = ReadIR::getName(structtype);
             if(structName == "struct.float4") {
                 int idx = ReadIR::readInt32Constant(instr->getOperand(d + 1));
@@ -475,14 +511,16 @@ void NewInstructionDumper::dumpGetElementPtr(cocl::LocalValueInfo *localValueInf
                     // addressspace = 0;
                 }
             }
-        } else {
+        }
+        else
+        {
             cout << "type unimplemeneted in gep:" << endl;
             COCL_LLVM_DUMP(currentType);
             cout << endl;
             cout << "isa pointer " << isa<PointerType>(currentType) << endl;
             cout << "isa struct " << isa<StructType>(currentType) << endl;
-            cout << "isa composite " << isa<CompositeType>(currentType) << endl;
-            cout << "isa sequential " << isa<SequentialType>(currentType) << endl;
+            // cout << "isa composite " << isa<CompositeType>(currentType) << endl;
+            // cout << "isa sequential " << isa<SequentialType>(currentType) << endl;
             cout << "isa type " << isa<Type>(currentType) << endl;
             throw runtime_error("type not implemented in gep");
         }
@@ -662,33 +700,55 @@ void NewInstructionDumper::dumpInsertValue(cocl::LocalValueInfo *localValueInfo)
     for(int d=0; d < numIndices; d++) {
         int idx = indices[d];
         Type *newType = 0;
-        if(SequentialType *seqType = dyn_cast<SequentialType>(currentType)) {
-            if(d == 0) {
-                if(isa<ArrayType>(seqType->getElementType())) {
+        if (ArrayType *arrayType = dyn_cast<ArrayType>(currentType))
+        {
+            if (d == 0)
+            {
+                // if (isa<ArrayType>(seqType->getElementType()))
+                // {
+                    lhs = "(&" + lhs + ")";
+                // }
+            }
+            lhs += string("[") + easycl::toString(idx) + "]";
+            newType = arrayType->getElementType();
+        }
+        else if (VectorType *vectorType = dyn_cast<VectorType>(currentType))
+        {
+            if (d == 0)
+            {
+                if (isa<ArrayType>(vectorType->getElementType()))
+                {
                     lhs = "(&" + lhs + ")";
                 }
             }
             lhs += string("[") + easycl::toString(idx) + "]";
-            newType = seqType->getElementType();
-        } else if(StructType *structtype = dyn_cast<StructType>(currentType)) {
-            string structName = ReadIR::getName(structtype);
-            if(structName == "struct.float4") {
-                Type *elementType = structtype->getElementType(idx);
-                Type *castType = PointerType::get(elementType, 0);
-                newType = elementType;
-                lhs = "((" + typeDumper->dumpType(castType) + ")&" + lhs + ")";
-                lhs += string("[") + easycl::toString(idx) + "]";
-            } else {
-                Type *elementType = structtype->getElementType(idx);
-                lhs += string(".f") + easycl::toString(idx);
-                newType = elementType;
+            newType = vectorType->getElementType();
             }
-        } else {
-            COCL_LLVM_DUMP(currentType);
-            throw runtime_error("type not implemented in insertvalue");
+            else if (StructType *structtype = dyn_cast<StructType>(currentType))
+            {
+                string structName = ReadIR::getName(structtype);
+                if (structName == "struct.float4")
+                {
+                    Type *elementType = structtype->getElementType(idx);
+                    Type *castType = PointerType::get(elementType, 0);
+                    newType = elementType;
+                    lhs = "((" + typeDumper->dumpType(castType) + ")&" + lhs + ")";
+                    lhs += string("[") + easycl::toString(idx) + "]";
+                }
+                else
+                {
+                    Type *elementType = structtype->getElementType(idx);
+                    lhs += string(".f") + easycl::toString(idx);
+                    newType = elementType;
+                }
+            }
+            else
+            {
+                COCL_LLVM_DUMP(currentType);
+                throw runtime_error("type not implemented in insertvalue");
+            }
+            currentType = newType;
         }
-        currentType = newType;
-    }
     string updateline = lhs + " = " + op1info->getExpr();
     localValueInfo->inlineCl.push_back(updateline);
     localValueInfo->setExpression(incomingOperand);
@@ -752,10 +812,10 @@ void NewInstructionDumper::dumpCall(LocalValueInfo *localValueInfo, const std::m
     localValueInfo->clWriter.reset(new CallClWriter(localValueInfo));
     CallInst *instr = cast<CallInst>(localValueInfo->value);
 
-    Value *calledValue = instr->getCalledValue();
+    Value *calledValue = instr->getCalledOperand();
     string calledName = calledValue->getName().str();
 
-    string functionName = instr->getCalledValue()->getName().str();
+    string functionName = instr->getCalledOperand()->getName().str();
     bool internalfunc = false;
     if(functionName == "llvm.ptx.read.tid.x" || functionName == "llvm.nvvm.read.ptx.sreg.tid.x") { // second on is llvm 4.0, first is 3.8
         localValueInfo->setAddressSpace(0);
