@@ -36,11 +36,6 @@ RUN cmake .. -DCMAKE_BUILD_TYPE=Debug -DCLANG_HOME=$PWD/../soft/llvm-4.0 && \
 RUN make -j 4 tests
 RUN make install
 
-#RUN echo "source /root/coriander/activate" >> /root/.bashrc
-#COPY bin/docker/entrypoint.sh /root/entrypoint.sh
-#RUN chmod +x /root/entrypoint.sh
-#ENTRYPOINT ["/root/entrypoint.sh"]
-#CMD ["source ~/coriander/activate"]
 ENTRYPOINT ["/bin/bash"]
 
 # Nvidia Beignet
