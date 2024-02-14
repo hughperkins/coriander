@@ -56,7 +56,7 @@ CL_GPUOFFSET=1 make run-tests
 
 ## Docker
 
-There are [Docker files](docker).
+There are [Docker files](docker.md).
 
 <img src="https://github.com/hughperkins/Coriander/raw/master/doc/img/dockerfile_beignet_cudasample.png?raw=true" width="600" />
 

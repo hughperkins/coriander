@@ -10,9 +10,18 @@ Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 
 ## How to use
 
+### Ensure you have the appropriate OpenCL drivers installed
+For most modern AMD for example:
+```
+apt install pocl-opencl-icd
+```
+
+
 - Write an NVIDIA® CUDA™ sourcecode file, or find an existing one
 - Let's use [cuda_sample.cu](https://github.com/hughperkins/Coriander/blob/76a849d9510276bc67167c9a7676d64ff04c3e4a/test/cuda_sample.cu)
-- Compile, using `cocl`:
+
+# Compile to OpenCL, using `cocl`
+### local:
 ```
 $ cocl_py cuda_sample.cu
    ...
@@ -20,7 +29,6 @@ $ cocl_py cuda_sample.cu
    ...
 
     ./cuda_sample.cu compiled into ./cuda_sample
-
 ```
 Run:
 ```
@@ -33,6 +41,34 @@ hostFloats[2] 444
 ```
 
 <img src="doc/img/mac_run_cuda_sample.png?raw=true" />
+
+### docker:
+Build and enter container.
+```
+docker compose build amd
+docker compose run amd
+docker compose exec amd bash
+```
+Move your source file to a location visable in the container
+`mv cuda_sample.cu build/out`
+
+Then inside the docker container:
+```
+$ source /root/coriander/activate.sh
+$ cd /coriander/build
+$ cocl_py cuda_sample.cu
+   ...
+   ... (bunch of compily stuff) ...
+   ...
+
+    ./cuda_sample.cu compiled into ./cuda_sample
+```
+
+Then back on the host (with drivers, etc installed), can run using:
+```
+$ cd build/out
+$ ./cuda_sample
+```
 
 [Options](doc/options.md)
 
