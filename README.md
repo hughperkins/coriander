@@ -10,6 +10,12 @@ Build applications written in NVIDIA® CUDA™ code for OpenCL™ 1.2 devices.
 
 ## How to use
 
+### Ensure you have the appropriate OpenCL drivers installed
+For most modern AMD for example:
+```
+apt install pocl-opencl-icd
+```
+
 - Write an NVIDIA® CUDA™ sourcecode file, or find an existing one
 - Let's use [cuda_sample.cu](https://github.com/hughperkins/Coriander/blob/76a849d9510276bc67167c9a7676d64ff04c3e4a/test/cuda_sample.cu)
 - Compile, using `cocl`:
