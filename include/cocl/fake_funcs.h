@@ -136,7 +136,7 @@ __device__ void sincosf(float angle, float *sinres, float *cosres);
 __device__ float pow(float in1, float in2);
 __device__ float sqrt(float in1);
 __device__ float log(float in1);
-__device__ float abs(float in1);
+//__device__ float abs(float in1);
 
 __device__ bool isnan(float in1);
 __device__ bool isinf(float in1);

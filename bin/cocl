@@ -459,6 +459,7 @@ if [ ! "$COMPILE" ]; then {
             ${OPT_G} \
             -o ${OUTPUTBASEPATH}${FINALPOSTFIX} ${OUTPUTBASEPATH}${OUTPUTPOSTFIX} \
             -L${COCL_LIB} -lcocl -lclblast -leasycl -lclew -lpthread \
+            ${EXTRA_LINKER_ARGS} \
             ${LLVM_LINK_FLAGS}
     )
 } fi
