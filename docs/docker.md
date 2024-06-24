@@ -1,14 +1,21 @@
 # dockerfile
 
-Dockerfiles for Beignet and NVIDIA systems.
+Dockerfiles for Beignet, generic AMD (mesa), and NVIDIA 1404 systems.
 
-Note that the nvidia dockerfile uses Ubuntu 14.04 for now.
+~~Note that the nvidia dockerfile uses Ubuntu 14.04 for now.~~
 
 ## Testing
 
 ### Pre-requisites
 
 - have installed docker
+
+### Build
+Clone Repo and Build container:
+```
+git clone --recursive https://github.com/hughperkins/Coriander
+docker compose build
+```
 
 ### Beignet platform
 
@@ -18,15 +25,23 @@ Note that the nvidia dockerfile uses Ubuntu 14.04 for now.
 
 #### Procedure:
 ```
-git clone --recursive https://github.com/hughperkins/Coriander
-cd Coriander/docker
-docker build ./ --file Dockerfile-beignet -t coclbeignet
-sudo docker run --device /dev/dri:/dev/dri -it coclbeignet
+docker compose run beignet
 ```
 
 (Based on https://github.com/chihchun/opencl-docker, following heads-up from bhack)
 
 <img src="https://github.com/hughperkins/Coriander/raw/master/doc/img/dockerfile_beignet_cudasample.png?raw=true" width="600" />
+
+### AMD platforms
+
+#### Pre-requisites
+
+- have amd CPU or GPU. Containers using mesa for now.
+
+#### Procedure:
+```
+docker compose run amd
+```
 
 ### NVIDIA platforms
 
@@ -39,15 +54,10 @@ nvidia-docker run -t nvidia/cuda:8.0-cudnn5-devel nvidia-smi
 
 #### Procedure
 
-Build:
-```
-git clone --recursive https://github.com/hughperkins/Coriander
-cd Coriander/docker
-docker build ./ -t coclnvidia --file Dockerfile-1404-nvidia
 ```
 Run:
 ```
-nvidia-docker run -it coclnvidia
+docker compose run nvidia-1404
 ```
 Test a `cocl` compilation:
 ```
