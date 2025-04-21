@@ -133,9 +133,9 @@ def install_llvm(install_dir):
     makedir('soft')
     cd('soft')
     target_url = {
-        'Darwin': 'http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-apple-darwin.tar.xz',
-        'Linux': 'http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz',
-        'Windows': 'http://releases.llvm.org/4.0.0/LLVM-4.0.0-win64.exe'
+        'Darwin': 'https://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-apple-darwin.tar.xz',
+        'Linux': 'https://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz',
+        'Windows': 'https://releases.llvm.org/4.0.0/LLVM-4.0.0-win64.exe'
     }[platform.uname()[0]]
     filename = target_url.split('/')[-1]
     wget(target_url, filename)
