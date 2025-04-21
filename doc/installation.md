@@ -5,8 +5,19 @@ To use Coriander, please build from source:
 ## Install pre-requisites
 
 You will need:
-- python 2.7
-- c++ compiler, and cmake
+- python 3.x
+- c++ compiler
+- cmake
+
+To get these pre-requisites (in progress):
+
+### On Mac OS X (in progress)
+
+```
+# install brew if you don't have it
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install cmake
+```
 
 ## Installation
 
