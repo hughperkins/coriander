@@ -562,7 +562,7 @@ void PatchHostside::patchCudaLaunch(
     Function *kernelGo = cast<Function>(F->getParent()->getOrInsertFunction(
         "kernelGo",
         Type::getVoidTy(context),
-        static_cast<size_t>(NULL)));
+        NULL));
     CallInst *kernelGoInst = CallInst::Create(kernelGo);
     kernelGoInst->insertAfter(lastInst);
     lastInst = kernelGoInst;

@@ -49,7 +49,7 @@ void appendGlobalConstructorCall(Module *M, std::string functionName) {
         M->getOrInsertFunction(
             functionName,
             Type::getVoidTy(M->getContext()),
-            static_cast<size_t>(NULL)),
+            NULL),
         ConstantPointerNull::get(PointerType::get(IntegerType::get(M->getContext(), 8), 0))
     };
     initializers[oldNumConstructors] = ConstantStruct::getAnon(ArrayRef<Constant *>(&structValues[0], &structValues[3]));

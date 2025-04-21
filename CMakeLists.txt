@@ -134,7 +134,7 @@ else()
   endif()
 
   set(CMAKE_CC_FLAGS "-fPIC")
-  set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC -g -fvisibility-inlines-hidden ${PLATFORM_OPTIONS}")
+  set(CMAKE_CXX_FLAGS "-std=c++11 -fPIC -g ${PLATFORM_OPTIONS}")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 endif()
 
