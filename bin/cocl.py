@@ -35,6 +35,14 @@ if HOSTSIDE_COMPILE_OPT_LEVEL == '':
 DEVICE_PARSE_PASSES_LIST = ['-%s' % o for o in DEVICE_PARSE_PASSES.split(',')]
 # print('DEVICE_PARSE_PASSES_LIST', DEVICE_PARSE_PASSES_LIST)
 
+ADDFLAGS = []
+NATIVE_COMPILER = 'g++'
+SO_SUFFIX = '.so'
+if platform.uname()[0] == 'Darwin':
+    ADDFLAGS += ['-stdlib=libc++']
+    NATIVE_COMPILER = 'clang++'
+    SO_SUFFIX = '.dylib'
+
 
 def check_output(cmd_list):
     cleaned_cmd_list = [s for s in cmd_list if (s and not s.isspace())]
@@ -42,6 +50,7 @@ def check_output(cmd_list):
     if int(platform.python_version_tuple()[0]) == 2:
         return res
     return res.decode('utf-8')
+
 
 def print_help():
     print("""
@@ -71,16 +80,6 @@ Usage: cocl [options] <targetfile>
     -gencode
 """)
 
-ADDFLAGS = []
-NATIVE_COMPILER = 'g++'
-SO_SUFFIX = '.so'
-SYSTEM_SDK_PATH = ''
-if platform.uname()[0] == 'Darwin':
-    ADDFLAGS += ['-stdlib=libc++']
-    NATIVE_COMPILER = 'clang++'
-    SO_SUFFIX = '.dylib'
-    SYSTEM_SDK_PATH = check_output(['xcrun', '--show-sdk-path']).strip()
-
 PASS_THRU = []
 COMPILE_ONLY = False
 OPT_G = []
@@ -92,10 +91,6 @@ CLANG_HOME = os.environ.get('CLANG_HOME', '')
 COCL_BIN = os.environ.get('COCL_BIN', '')
 INCLUDES = []
 INFILES = []
-
-if platform.uname()[0] == 'Darwin':
-    INCLUDES += ['-I', SYSTEM_SDK_PATH+'/../../usr/include/c++/v1']
-    INCLUDES += ['-I', SYSTEM_SDK_PATH+'/usr/include']
 
 args = sys.argv[1:]
 while len(args) > 0:
