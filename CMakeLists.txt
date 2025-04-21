@@ -3,6 +3,27 @@ project(Coriander)
 
 set(CMAKE_OSX_ARCHITECTURES "x86_64")
 message(STATUS "Building for x86_64 architecture on macOS")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15")
+# add_compile_definitions(__FLT16_MAX__=1)
+add_definitions(
+    -D__STRICT_ANSI__
+    -DNO_HALF_SUPPORT
+    -mmacosx-version-min=10.15
+)
+add_compile_definitions(
+    MAC_OS_X_VERSION_MIN_REQUIRED=101500
+    MAC_OS_X_VERSION_MAX_ALLOWED=101500
+)
+set(CUDA_COMPILE_FLAGS
+    -D__STRICT_ANSI__
+    -DNO_HALF_SUPPORT
+    -D_LIBCPP_NO_EXPERIMENTAL_FEATURES
+    -D__ENVIRONMEMT_MAC_OS_X_VERSION_MIN_REQUIRED__=101500
+    -mmacosx-version-min=10.15
+    -Wno-deprecated-declarations
+)
+add_definitions(${CUDA_COMPILE_FLAGS})
+
 IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     if(WIN32)
         SET(CMAKE_INSTALL_PREFIX
@@ -208,6 +229,14 @@ target_include_directories(ir-to-opencl PRIVATE third_party)
 target_include_directories(ir-to-opencl PRIVATE ${CLANG_HOME}/include)
 target_compile_options(ir-to-opencl PRIVATE ${LLVM_CXXFLAGS} ${LLVM_DEFINES})
 target_link_libraries(ir-to-opencl cocl ${LLVM_SYSLIBS})
+
+target_compile_options(cocl PRIVATE 
+    ${LLVM_CXXFLAGS} 
+    ${LLVM_DEFINES} 
+    ${PLATFORM_OPTIONS}
+    ${CUDA_COMPILE_FLAGS}
+)
+set_property(TARGET cocl PROPERTY CUDA_FLAGS ${CUDA_COMPILE_FLAGS})
 
 add_executable(patch_hostside
     src/patch_hostside.cpp src/struct_clone.cpp src/mutations.cpp src/readIR.cpp

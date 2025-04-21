@@ -12,18 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \author Aksel Alpay
-
 #ifndef COCL_LLVM_DUMP_H
 #define COCL_LLVM_DUMP_H
 
 #include <llvm/Support/Debug.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Function.h>
 
-#if LLVM_VERSION_MAJOR > 4
-#define COCL_LLVM_DUMP(entity) (entity)->print(llvm::dbgs(), true)
-#else
-#define COCL_LLVM_DUMP(entity) ((entity)->dump())
-#endif
+namespace cocl {
+    inline void llvm_dump(llvm::Type* entity) {
+        entity->print(llvm::dbgs(), false);
+    }
+
+    inline void llvm_dump(llvm::Function* entity) {
+        entity->print(llvm::dbgs(), nullptr);
+    }
+
+    template<typename T>
+    inline void llvm_dump(T* entity) {
+        entity->print(llvm::dbgs(), false);
+    }
+}
+
+#define COCL_LLVM_DUMP(entity) cocl::llvm_dump(entity)
 
 #endif
 
