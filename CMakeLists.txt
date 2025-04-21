@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 4.0.0)
 project(Coriander)
 
+set(CMAKE_OSX_ARCHITECTURES "x86_64")
+message(STATUS "Building for x86_64 architecture on macOS")
 IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     if(WIN32)
         SET(CMAKE_INSTALL_PREFIX
