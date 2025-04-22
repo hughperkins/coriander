@@ -12,6 +12,45 @@ You will need:
 
 ### On Mac OS X
 
+Note: tested on Mac M4 Air, on 2025 april: the branch hp/mac-os-x-2025-b kind of works. That is, you can build coriander. And many of the endtoend tests work ok like:
+```
+make run-singlebuffer
+make run-cuda_sample
+make run-testcumemcpy
+make run-testfloat4
+# ... etc 
+# all the endtoend ones I tried worked ok
+```
+This is using llvm 4.0. (llvm 8.0 didnt work for me, various issues with dump macro and similar.). Had to hack around for a while to get maths things compiling ok, so
+I'm not quite sure quite how much works 😅 But can at least run some stuff :)
+
+```
+(cloud) ~/git/coriander/build (hp/mac-os-x-2025-b|…1) $ make run-testfloat4
+[  0%] Building C object CMakeFiles/clew.dir/src/EasyCL/thirdparty/clew/src/clew.c.o
+[  2%] Linking C shared library libclew.dylib
+[  2%] Built target clew
+[  4%] Linking CXX shared library libeasycl.dylib
+[ 14%] Built target easycl
+[ 16%] Linking CXX shared library libcocl.dylib
+[ 88%] Built target cocl
+[ 90%] Linking CXX executable testfloat4
+ld: warning: object file (/Users/hugh/git/coriander/build/test/endtoend/testfloat4.d/testfloat4.cu.o) was built for newer 'macOS' version (10.20) than being linked (10.15)
+[ 90%] Built target testfloat4
+[ 92%] Linking CXX executable patch_hostside
+[100%] Built target patch_hostside
+
+make run-testfloat4
+loading OpenCL library...
+loaded opencl
+OpenCL platform: Apple
+OpenCL device: Apple M4
+123.456
+19
+9
+12
+[100%] Built target run-testfloat4
+```
+
 ```
 git clone --recursive https://github.com/hughperkins/coriander
 cd coriander
