@@ -309,6 +309,9 @@ for infile in INFILES:
 
     # device-side: .cu => -deviceside-noopt.ll
     # note to self: hmmmm, should we be defining in addition __CUDA_ARCH__ here?
+    print("from repo *******************")
+    print("PASS_THRU", PASS_THRU)
+    print("deviceside =====================")
     run(
         [join(CLANG_HOME, 'bin', 'clang++')] +
         PASS_THRU + [
@@ -332,11 +335,17 @@ for infile in INFILES:
             '-include', join(COCL_INCLUDE, 'cocl', 'fake_funcs.h'),
             '-include', join(COCL_INCLUDE, 'cocl', 'cocl_deviceside.h'),
             '-I%s' % COCL_INCLUDE,
+            '-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include',
+            '-I/Users/hugh/git/coriander/include -I/Users/hugh/git/coriander/src',
+            '-I/Users/hugh/git/coriander/src',
+            '-I/Users/hugh/git/coriander/src/EasyCL/thirdparty/clew/include',
+            '-I/Users/hugh/git/coriander/include/cocl/proxy_includes',
         ] + INCLUDES + [
             INPUTBASEPATH + INPUTPOSTFIX,
             '-o', '%s-device-noopt.ll' % OUTPUTBASEPATH
         ])
     # opt: -device-noopt.ll => -device.ll
+    print("opt ================")
     run(
         [join(CLANG_HOME, 'bin', 'opt')] +
         DEVICE_PARSE_PASSES_LIST + [
@@ -347,6 +356,7 @@ for infile in INFILES:
     )
 
     # host-side: -.cu => -hostraw.cll
+    print("hostside =============")
     cmdline_list = (
         [join(CLANG_HOME, 'bin', 'clang++')] +
         PASS_THRU +
@@ -367,7 +377,12 @@ for infile in INFILES:
             '-I%s' % COCL_INCLUDE,
             # '-I%s' % join(COCL_INCLUDE, 'EasyCL'),
             # '-I%s' % join(COCL_INCLUDE, 'EasyCL', 'third_party', 'clew', 'include'),
-            '-I%s' % join(COCL_INCLUDE, 'cocl')  # for cuda.h
+            '-I%s' % join(COCL_INCLUDE, 'cocl'),  # for cuda.h
+            '-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include',
+            '-I/Users/hugh/git/coriander/include -I/Users/hugh/git/coriander/src',
+            '-I/Users/hugh/git/coriander/src',
+            '-I/Users/hugh/git/coriander/src/EasyCL/thirdparty/clew/include',
+            '-I/Users/hugh/git/coriander/include/cocl/proxy_includes',
         ] + ADDFLAGS + [
             '-include', join(COCL_INCLUDE, 'cocl', 'cocl.h'),
             '-include', join(COCL_INCLUDE, 'cocl', 'fake_funcs.h'),
@@ -378,6 +393,7 @@ for infile in INFILES:
     run(cmdline_list)
 
     # patch_hostside: -hostraw.ll => -hostpatched.ll
+    print("patch_hostside =============")
     run([
             join(COCL_BIN, 'patch_hostside'),
             '--hostrawfile', '%s-hostraw.ll' % OUTPUTBASEPATH,
@@ -386,6 +402,7 @@ for infile in INFILES:
         ])
 
     # -hostpatched.ll => .o
+    print("hostpatched.ll => .o =============")
     run(
         [join(CLANG_HOME, 'bin', 'clang++')] +
         LLVM_LL_COMPILE_FLAGS_LIST + [
@@ -402,6 +419,7 @@ if not COMPILE_ONLY:
     cmdline_list = (
         [
             NATIVE_COMPILER,
+            '-arch', 'x86_64',
             '-o', OUTPUTBASEPATH + FINALPOSTFIX,
             OUTPUTBASEPATH + OUTPUTPOSTFIX,
             '-L%s' % COCL_LIB
@@ -415,8 +433,10 @@ if not COMPILE_ONLY:
         cmdline_list += [
             '-Wl,-rpath,%s' % COCL_LIB,
             '-Wl,-rpath,%s' % plugins_lib_dir,
+            '-Wl,-rpath,%s' % join(CLANG_HOME, 'lib'),
             '-Wl,-rpath,$$ORIGIN'
         ]
-        cmdline_list += ['-lcocl', '-lclblast', '-leasycl', '-lclew', '-lpthread']
+        # cmdline_list += ['-lcocl', '-lclblast', '-leasycl', '-lclew', '-lpthread']
+        cmdline_list += ['-lcocl', '-leasycl', '-lclew', '-lpthread']
     cmdline_list += LIBS
     run(cmdline_list)
