@@ -22,12 +22,17 @@ def get_test_definitions():
             test = (filepath, kernelname, num_clmems)
             if 'struct' in filepath:
                 print('marking xfail')
-                test = pytest.mark.xfail(reason='need global constants')(test)
+                # TODO: fix this
+                # test = pytest.mark.xfail(reason='need global constants')(test)
             tests.append(test)
     return tests
 
 
-@pytest.mark.parametrize("cu_filepath,kernelname,num_clmems", get_test_definitions())
+TEST_DEFINITIONS = get_test_definitions()
+print('TEST_DEFINITIONS', TEST_DEFINITIONS)
+
+
+@pytest.mark.parametrize("cu_filepath,kernelname,num_clmems", TEST_DEFINITIONS)
 def test_compile(context, cu_filepath, kernelname, num_clmems):
     with open(cu_filepath, 'r') as f:
         cu_code = f.read()

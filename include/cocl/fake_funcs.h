@@ -9,6 +9,17 @@
 
 #include <cstdlib>
 
+#include <math.h>
+#ifdef isnan
+# undef isnan
+#endif
+#ifdef isinf
+# undef isinf
+#endif
+#ifdef isfinite
+# undef isfinite
+#endif
+
 #define stubout_gen(SCOPE, OP, SUFFIX, TYPE) \
     TYPE __nvvm_atom_##SCOPE##_##OP##_gen_##SUFFIX(volatile TYPE *p, TYPE val);
 
@@ -97,6 +108,11 @@ extern "C" {
     __device__ double exp10(double in);
     __device__ float exp10f(float in);
 } // extern "C"
+
+
+__device__ bool isnan(float in1);
+__device__ bool isinf(float in1);
+__device__ bool isfinite(float in1);
 
 __device__ double max(double in1, double in2);
 __device__ double min(double in1, double in2);

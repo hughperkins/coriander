@@ -3,12 +3,79 @@
 #ifndef _COCL_H  // since pragma once doesnt work if two files have same name and content, but different location...
 #define _COCL_H
 
+#define _Float16 float
+
 #include "cocl/cocl_attributes.h"
 
 // This file is kind of a catch-all, until we move it somewhere more principled/cleaner
 
-#include <stdexcept>
+#include <math.h>
+#ifdef abs            // these come from math.h on macOS
+# undef abs
+#endif
+#ifdef signbit
+# undef signbit
+#endif
+#ifdef fpclassify
+# undef fpclassify
+#endif
+#ifdef isfinite
+# undef isfinite
+#endif
+#ifdef isinf
+# undef isinf
+#endif
+#ifdef isnan
+# undef isnan
+#endif
+#ifdef isnormal
+# undef isnormal
+#endif
+#ifdef isgreater
+# undef isgreater
+#endif
+#ifdef isgreaterequal
+# undef isgreaterequal
+#endif
+#ifdef isless
+# undef isless
+#endif
+#ifdef islessequal
+# undef islessequal
+#endif
+#ifdef islessgreater
+# undef islessgreater
+#endif
+#ifdef isunordered
+# undef isunordered
+#endif
+#include <type_traits>
+#if defined(__CUDACC__)
+extern "C" {
+    int signbit(double);
+    int fpclassify(double);
+    int isfinite(double);
+    int isinf(double);
+    int isnan(double);
+    int isnormal(double);
+    int isgreater(double, double);
+    int isgreaterequal(double, double);
+    int isless(double, double);
+    int islessequal(double, double);
+    int islessgreater(double, double);
+    int isunordered(double, double);
+}
+
+// ─── supply a global abs(double) for host and device ─────────────────────────
+__devicehost__ inline double abs(double x) {
+    // __builtin_fabs works everywhere
+    return __builtin_fabs(x);
+}
+#endif  // __CUDACC__
+
 #include <cmath>
+
+#include <stdexcept>
 #include <random>
 
 #include "cocl/cocl_memory.h"

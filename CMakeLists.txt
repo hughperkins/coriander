@@ -14,8 +14,21 @@ add_compile_definitions(
     MAC_OS_X_VERSION_MIN_REQUIRED=101500
     MAC_OS_X_VERSION_MAX_ALLOWED=101500
 )
+execute_process(
+    COMMAND xcrun --show-sdk-path
+    OUTPUT_VARIABLE MACOS_SDK_PATH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Add SDK include path for C/C++ compilers
+include_directories(SYSTEM "${MACOS_SDK_PATH}/usr/include")
+
+# Ensure Clang can find system headers
+add_compile_options(
+    "-isysroot" "${MACOS_SDK_PATH}"
+    "-Wno-unused-command-line-argument"
+)
 set(CUDA_COMPILE_FLAGS
-    -D__STRICT_ANSI__
     -DNO_HALF_SUPPORT
     -D_LIBCPP_NO_EXPERIMENTAL_FEATURES
     -D__ENVIRONMEMT_MAC_OS_X_VERSION_MIN_REQUIRED__=101500
